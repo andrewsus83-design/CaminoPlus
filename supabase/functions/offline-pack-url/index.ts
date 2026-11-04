@@ -92,6 +92,11 @@ Deno.serve(async (req) => {
   if (packErr) return json(500, { error: 'lookup_failed' });
   if (!pack) return json(404, { error: 'pack_not_found' });
 
+  // Without R2 secrets we would sign a link to a host that does not exist.
+  if (!Deno.env.get('R2_ACCOUNT_ID') || !Deno.env.get('R2_ACCESS_KEY_ID') || !Deno.env.get('R2_SECRET_ACCESS_KEY')) {
+    return json(503, { error: 'storage_not_configured' });
+  }
+
   try {
     const url = await presign(pack.url, TTL);
     return json(200, {
