@@ -352,6 +352,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
 .cp-subtabs { display: flex; border-bottom: 1px solid var(--cp-border); }
 .cp-subtabs span { flex: 1; text-align: center; padding: 14px 0 12px; font-size: 15px; font-weight: 600; color: var(--cp-text-muted); border-bottom: 3px solid transparent; margin-bottom: -1px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
 .cp-subtabs span.on { color: var(--cp-text); border-color: var(--cp-color-blue); }
+.cp-subtabs span span { flex: none; padding: 0 7px; border: 0; margin: 0; min-width: 20px; }
 .cp-ring { padding: 3px; border-radius: 50%; background: conic-gradient(from 200deg, var(--cp-color-gold), var(--cp-color-red), var(--cp-color-gold-bright), var(--cp-color-gold)); flex: none; display: inline-block; }
 .cp-ring.seen { background: var(--cp-border-strong); }
 .cp-avatar { display: block; border-radius: 50%; border: 3px solid var(--cp-bg); background: linear-gradient(150deg, #E9C987, #A0583F); }
@@ -687,6 +688,64 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
 .cp-legend div { display: flex; align-items: center; gap: 10px; }
 .cp-legend i { width: 26px; height: 0; display: block; flex: none; }
 
+/* ---- v5: inbox, notifications, Instagram-style post flow ---- */
+.cp-bellwrap { position: relative; display: inline-block; flex: none; }
+.cp-bell-badge { position: absolute; top: -3px; right: -3px; min-width: 20px; height: 20px; padding: 0 5px; border-radius: var(--cp-radius-pill); background: var(--cp-color-red); color: #fff; font-size: 11px; font-weight: 700; display: grid; place-items: center; border: 2px solid var(--cp-bg); }
+.cp-inbox-top { display: flex; align-items: center; gap: 10px; }
+.cp-inbox-top h1 { font-family: var(--cp-font-title); font-weight: 600; font-size: 32px; line-height: 38px; letter-spacing: -.5px; margin: 0; flex: 1; }
+.cp-notif-cap { font-family: var(--cp-font-mono); font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--cp-text-muted); margin: 22px 0 6px; }
+.cp-notif { display: flex; gap: 14px; align-items: center; padding: 14px 24px; margin: 0 -24px; position: relative; }
+.cp-notif.unread { background: var(--cp-color-gold-wash); }
+.cp-notif .lead { position: relative; width: 52px; height: 52px; flex: none; }
+.cp-notif .lead > .cp-avatar { width: 52px; height: 52px; border: 0; }
+.cp-notif .lead > .bub { width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; }
+.cp-notif .lead .type { position: absolute; right: -4px; bottom: -4px; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; border: 2px solid var(--cp-bg); }
+.cp-notif.unread .lead .type { border-color: var(--cp-color-gold-wash); }
+.cp-notif .lead .type .cp-icon { width: 12px; height: 12px; stroke-width: 2.6px; }
+.cp-notif .tx { flex: 1; min-width: 0; font-size: 15px; line-height: 21px; }
+.cp-notif .tx b { font-weight: 600; }
+.cp-notif .tx .q { color: var(--cp-text-muted); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cp-notif .tm { font-family: var(--cp-font-mono); font-size: 11px; color: var(--cp-text-muted); display: block; margin-top: 3px; }
+.cp-notif .th { width: 48px; height: 48px; border-radius: 12px; flex: none; }
+.cp-notif .udot { width: 9px; height: 9px; border-radius: 50%; background: var(--cp-color-blue); flex: none; }
+.cp-notif .cp-btn { flex: none; }
+.cp-msg { display: flex; gap: 14px; align-items: center; padding: 12px 24px; margin: 0 -24px; }
+.cp-msg .cp-avatar { width: 56px; height: 56px; border: 0; flex: none; }
+.cp-msg .bd { flex: 1; min-width: 0; }
+.cp-msg .n { font-weight: 600; font-size: 16px; line-height: 22px; display: flex; justify-content: space-between; gap: 8px; }
+.cp-msg .n span { font-family: var(--cp-font-mono); font-weight: 400; font-size: 11px; color: var(--cp-text-muted); padding-top: 3px; }
+.cp-msg .p { font-size: 14px; line-height: 20px; color: var(--cp-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cp-msg.unread .p { color: var(--cp-text); font-weight: 600; }
+.cp-msg .cnt { min-width: 22px; height: 22px; padding: 0 6px; border-radius: var(--cp-radius-pill); background: var(--cp-color-blue); color: var(--cp-color-parchment); font-size: 12px; font-weight: 700; display: grid; place-items: center; flex: none; }
+/* post flow */
+.cp-postbar { position: absolute; left: 0; right: 0; bottom: 0; z-index: 7; padding: 22px 20px 34px; background: linear-gradient(to top, var(--cp-bg) 72%, rgba(246,239,226,0)); display: flex; flex-direction: column; gap: 10px; align-items: stretch; }
+.cp-postbar .cnt { font-family: var(--cp-font-mono); font-size: 12px; color: var(--cp-text-muted); text-align: center; }
+.cp-postbar .row2 { display: flex; align-items: center; gap: 12px; }
+.cp-postbar .row2 .cp-btn { flex: 1; }
+.cp-mediagrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; margin: 0 -24px; }
+.cp-mediagrid .cell { position: relative; aspect-ratio: 1; overflow: hidden; }
+.cp-mediagrid .cell .cp-img { position: absolute; inset: 0; border-radius: 0; }
+.cp-mediagrid .cell.dim::after { content: ""; position: absolute; inset: 0; background: rgba(255,253,248,.5); }
+.cp-mediagrid .cell .num { position: absolute; top: 6px; right: 6px; z-index: 2; width: 24px; height: 24px; border-radius: 50%; background: var(--cp-color-gold); color: var(--cp-color-blue); font-size: 12px; font-weight: 700; display: grid; place-items: center; border: 2px solid #fff; }
+.cp-mediagrid .cell .ring { position: absolute; top: 6px; right: 6px; z-index: 2; width: 24px; height: 24px; border-radius: 50%; border: 2px solid #fff; background: rgba(12,35,64,.18); }
+.cp-mediagrid .cell .vid { position: absolute; left: 6px; bottom: 5px; z-index: 2; font-family: var(--cp-font-mono); font-size: 10px; color: #fff; text-shadow: 0 1px 4px rgba(12,35,64,.6); }
+.cp-pickprev { position: relative; height: 330px; margin: 0 -24px; overflow: hidden; }
+.cp-pickprev .cp-img { position: absolute; inset: 0; border-radius: 0; }
+.cp-pickprev .tools { position: absolute; left: 14px; right: 14px; bottom: 14px; display: flex; justify-content: space-between; z-index: 2; }
+.cp-pickprev .tools .cp-icon-btn { width: 40px; height: 40px; background: rgba(12,35,64,.62); color: #fff; box-shadow: none; }
+.cp-pickprev .tools .sel { background: rgba(12,35,64,.62); color: #fff; }
+.cp-optrow { display: flex; align-items: center; gap: 14px; min-height: 58px; border-bottom: 1px solid var(--cp-border); font-size: 16px; }
+.cp-optrow .lbl { flex: 1; }
+.cp-optrow .v { color: var(--cp-text-muted); font-size: 14px; }
+.cp-optrow > .cp-icon:first-child { color: var(--cp-text); }
+.cp-capture { display: flex; gap: 14px; align-items: flex-start; }
+.cp-capture .tn { width: 88px; height: 88px; border-radius: var(--cp-radius-md); position: relative; overflow: hidden; flex: none; }
+.cp-capture .tn .cp-img { position: absolute; inset: 0; border-radius: 0; }
+.cp-capture .tn .more { position: absolute; right: 6px; bottom: 6px; }
+.cp-capture .ta { flex: 1; min-width: 0; font-size: 17px; line-height: 25px; }
+.cp-capture .ta .ph { color: var(--cp-text-placeholder); }
+.cp-capture .caret { display: inline-block; width: 2px; height: 20px; background: var(--cp-color-gold); vertical-align: -4px; margin-left: 1px; }
+
 @media (max-width: 640px) {
   .wrap, .doc-nav-inner { padding-left: 16px; padding-right: 16px; }
   .doc h2 { font-size: 36px; line-height: 42px; }
@@ -780,6 +839,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     <symbol id="i-bolt2" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
     <symbol id="i-heli" viewBox="0 0 24 24"><path d="M3 4.5h14M10 4.5v3"/><path d="M5 12.5a5 4 0 0 1 5-4h1.5a4.5 4.5 0 0 1 4.5 4.5v1.5H5v-2Z"/><path d="m16 11 5-2v4.5l-5 1M6.5 18.5h9M9 16v2.5M13 16v2.5"/></symbol>
     <symbol id="i-city" viewBox="0 0 24 24"><path d="M4 20.5V10l6-3v13.5M10 20.5V4l10 4v12.5M2.5 20.5h19M13.5 10.5h3M13.5 14.5h3M6.5 12.5h1M6.5 16h1"/></symbol>
+    <symbol id="i-checks" viewBox="0 0 24 24"><path d="m2.5 12.5 4.5 4.5L14.5 8.5M10 16.5l1 1L21 7.5"/></symbol>
   </defs>
 </svg>
 
@@ -1318,7 +1378,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
   </div>
   <p class="spec">.cp-scrim rgba(12,35,64,.66) + 3px blur · .cp-lightbox radius xl, 16px side margins, close button 40 top-right, sticky .ft actions · dismiss: tap scrim, swipe down or ✕</p>
 
-  <h3>Compose & share</h3>
+  <h3>Compose parts & share</h3>
   <div class="grid g2" style="align-items:start">
     <div class="panel" style="display:flex;flex-direction:column;gap:16px">
       <div class="cp-stagecard"><div style="flex:1"><div class="k">Stage 12 · auto</div><div class="v">Burgos → Hontanas</div><div class="s">31.1 km · 7h 20m · 18,240 steps</div></div><span class="cp-switch on"></span></div>
@@ -1371,6 +1431,39 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     </div>
   </div>
 
+  <h3>Inbox & notifications</h3>
+  <div class="grid g2" style="align-items:start">
+    <div class="panel" style="padding:8px 24px 16px;overflow:hidden">
+      <div style="margin:0 -24px"><div class="cp-notif unread"><div class="lead"><span class="bub b-gold"><svg class="cp-icon "><use href="#i-medal"/></svg></span></div><div class="tx"><b>Meseta Walker</b> unlocked. You earned <b>+100 XP</b>.<span class="tm">2 min ago</span></div><span class="udot"></span></div><div class="cp-notif unread"><div class="lead"><span class="cp-avatar" style="background:linear-gradient(150deg,#D7C6E0,#6E5470)"></span><span class="type b-red"><svg class="cp-icon "><use href="#i-heart"/></svg></span></div><div class="tx"><b>Hannah</b> liked your post <span class="q">“Reached the cathedral…”</span><span class="tm">14 min ago</span></div><span class="th cp-img v4"></span><span class="udot"></span></div><div class="cp-notif"><div class="lead"><span class="bub b-sky"><svg class="cp-icon "><use href="#i-face"/></svg></span><span class="type b-gold"><svg class="cp-icon "><use href="#i-image"/></svg></span></div><div class="tx"><b>3 new photos of you</b> from O Cebreiro.<span class="tm">1 h ago</span></div><button class="cp-btn cp-btn-primary sm">View</button></div><div class="cp-notif"><div class="lead"><span class="bub b-blue"><svg class="cp-icon "><use href="#i-stays"/></svg></span><span class="type b-green"><svg class="cp-icon "><use href="#i-bolt2"/></svg></span></div><div class="tx"><b>Albergue El Puntido</b> confirmed your bed.<span class="tm">Yesterday</span></div></div>
+      </div>
+      <p class="spec" style="margin:12px 0 0">.cp-notif (+ .unread gold wash, blue dot) · lead avatar or icon bubble with a small type badge · optional thumbnail or action button</p>
+    </div>
+    <div class="panel" style="display:flex;flex-direction:column;gap:20px">
+      <div class="row" style="gap:28px"><span class="cp-bellwrap"><button class="cp-icon-btn flat"><svg class="cp-icon "><use href="#i-bell"/></svg></button><span class="cp-bell-badge">3</span></span><span class="cp-bellwrap"><button class="cp-icon-btn flat"><svg class="cp-icon "><use href="#i-bell"/></svg></button><span class="cp-bell-badge">12</span></span><span class="cp-bellwrap"><button class="cp-icon-btn flat"><svg class="cp-icon "><use href="#i-bell"/></svg></button></span></div>
+      <div style="overflow:hidden"><div class="cp-msg unread"><span class="cp-avatar" style="background:linear-gradient(150deg,#BFD0C4,#4E6B5A)"></span><div class="bd"><div class="n">María · El Puntido<span>5 min</span></div><div class="p">See you at 18:00. Dinner is at 19:30!</div></div><span class=cnt>2</span></div><div class="cp-msg"><span class="cp-avatar" style="background:linear-gradient(150deg,#D7C6E0,#6E5470)"></span><div class="bd"><div class="n">Hannah<span>Mon</span></div><div class="p">Haha, see you in Hontanas!</div></div></div></div>
+      <p class="spec" style="margin:0">.cp-bellwrap + .cp-bell-badge (red, 99+) · .cp-msg (+ .unread, .cnt)</p>
+      <table class="contrast"><tr><th>Type</th><th>Lead</th><th>Badge</th></tr>
+        <tr><td>Social (likes, comments)</td><td>Avatar</td><td><span class="cp-badge red">heart</span> <span class="cp-badge blue">chat</span></td></tr>
+        <tr><td>Camino alerts</td><td>Icon bubble</td><td><span class="cp-badge gold">hazard</span> <span class="cp-badge blue">crowd</span></td></tr>
+        <tr><td>Bookings</td><td>Icon bubble</td><td><span class="cp-badge green">confirmed</span></td></tr>
+        <tr><td>Rewards and photos</td><td>Icon bubble</td><td><span class="cp-badge gold">XP</span></td></tr></table>
+    </div>
+  </div>
+
+  <h3>Post flow (Instagram-style)</h3>
+  <div class="grid g2" style="align-items:start">
+    <div class="panel" style="display:flex;flex-direction:column;gap:18px">
+      <div class="cp-mediagrid" style="margin:0;border-radius:var(--cp-radius-md);overflow:hidden"><div class="cell dim"><div class="cp-img v4"></div><span class="num">1</span></div><div class="cell"><div class="cp-img v5"></div><span class="ring"></span></div><div class="cell"><div class="cp-img "></div><span class="ring"></span></div><div class="cell dim"><div class="cp-img v2"></div><span class="num">2</span></div><div class="cell"><div class="cp-img v3"></div><span class="ring"></span></div><div class="cell"><div class="cp-img v4"></div><span class="ring"></span></div><div class="cell dim"><div class="cp-img v5"></div><span class="num">3</span></div><div class="cell"><div class="cp-img "></div><span class="ring"></span></div></div>
+      <p class="spec" style="margin:0">.cp-mediagrid (4 columns, 2px gap) · .cp-pickprev · numbered gold selection</p>
+    </div>
+    <div class="panel" style="display:flex;flex-direction:column;gap:18px">
+      <div class="cp-capture"><div class="tn"><div class="cp-img v4"></div><span class="cp-badge glass more" style="height:22px;padding:0 8px;font-size:11px">+2</span></div><div class="ta">Reached the cathedral at sunrise…<span class="caret"></span></div></div>
+      <div><div class="cp-optrow"><svg class="cp-icon "><use href="#i-tagpeople"/></svg><span class="lbl">Tag people</span><svg class="cp-icon sm"><use href="#i-chev"/></svg></div><div class="cp-optrow"><svg class="cp-icon "><use href="#i-shell"/></svg><span class="lbl">Add stamp</span><span class="v">Burgos ✓</span><svg class="cp-icon sm"><use href="#i-chev"/></svg></div><div class="cp-optrow"><svg class="cp-icon "><use href="#i-steps"/></svg><span class="lbl">Stage card</span><span class="cp-switch on"></span></div></div>
+      <div style="display:flex;flex-direction:column;gap:10px;align-items:center"><button class="cp-btn cp-btn-primary block">Post</button><button class="cp-btn cp-btn-ghost" style="height:32px;font-size:14px">Save as draft</button></div>
+      <p class="spec" style="margin:0">.cp-capture (thumbnail + caption) · .cp-optrow · .cp-postbar (primary Post pinned at the bottom, 34px safe area)</p>
+    </div>
+  </div>
+
   <h3>Stay & cafe detail blocks</h3>
   <div class="grid g2" style="align-items:start">
     <div class="panel" style="display:flex;flex-direction:column;gap:22px">
@@ -1414,7 +1507,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
 <section class="doc" id="screens">
   <p class="eyebrow">14 · Screens @ 390 × 844</p>
   <h2>The app, tab by tab</h2>
-  <p class="intro">Reference layouts at iPhone 15 size. Scroll sideways to see all of them. Me has three sub-tabs plus write, share and stamp pop-up screens. Maps has two layers: helicopter view and city view. Stays opens into Airbnb / Agoda-style detail pages for stays and cafes. Explore has a second screen for the photo marketplace.</p>
+  <p class="intro">Reference layouts at iPhone 15 size. Scroll sideways to see all of them. Me has three sub-tabs, an inbox, a two-step write flow, a share screen and a stamp pop-up. Maps has two layers: helicopter view and city view. Stays opens into Airbnb / Agoda-style detail pages for stays and cafes. Explore has a second screen for the photo marketplace.</p>
 
   <div class="phones">
 
@@ -1426,7 +1519,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           <div style="display:flex;align-items:center;gap:10px">
             <span class="un">ana.camina</span>
             <span class="cp-edit-pill" role="button" aria-label="Edit profile"><svg class="cp-icon "><use href="#i-pencil"/></svg>camino.plus/ana</span>
-            <button class="cp-icon-btn flat" style="margin-left:auto;width:44px;height:44px;flex:none" aria-label="Notifications"><svg class="cp-icon "><use href="#i-bell"/></svg></button>
+            <span class="cp-bellwrap" style="margin-left:auto"><button class="cp-icon-btn flat" style="width:44px;height:44px" aria-label="Notifications (3 new)"><svg class="cp-icon "><use href="#i-bell"/></svg></button><span class="cp-bell-badge">3</span></span>
           </div>
           <div class="profile-top" style="margin-top:20px">
             <span class="cp-ring"><span class="cp-avatar" style="width:86px;height:86px"></span></span>
@@ -1462,40 +1555,43 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     </div>
 
     <div class="phone-wrap">
-      <p class="phone-label"><b>Me · Write a journey post</b>Create (FAB Write opens this)</p>
-      <div class="phone ">
+      <p class="phone-label"><b>Me · Write · Pick photos</b>Step 1 · Instagram-style gallery</p>
+      <div class="phone">
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
-        <div class="cp-compose-top"><button class="cp-icon-btn flat" aria-label="Close"><svg class="cp-icon "><use href="#i-x"/></svg></button><span class="t">New journey post</span><button class="cp-btn cp-btn-primary sm" style="height:40px">Post</button></div>
-        <div class="scroll" style="top:104px;padding-bottom:120px">
-          <div style="display:flex;align-items:center;gap:12px">
-            <span class="cp-ring"><span class="cp-avatar" style="width:44px;height:44px"></span></span>
-            <div style="flex:1"><div style="font-weight:600;font-size:16px;line-height:20px">Ana García</div>
-              <div style="display:flex;gap:6px;margin-top:4px"><span class="cp-chip sm" style="height:26px;padding:0 10px;font-size:12px"><svg class="cp-icon sm"><use href="#i-globe"/></svg>Public<svg class="cp-icon sm"><use href="#i-down"/></svg></span><span class="cp-chip sm" style="height:26px;padding:0 10px;font-size:12px"><svg class="cp-icon sm"><use href="#i-pin"/></svg>Burgos</span></div></div>
+        <div class="cp-compose-top" style="padding-top:8px"><button class="cp-icon-btn flat" aria-label="Close"><svg class="cp-icon "><use href="#i-x"/></svg></button><span class="t">New journey post</span><span style="width:48px"></span></div>
+        <div class="scroll" style="top:112px;padding-top:6px;padding-bottom:130px">
+          <div class="cp-pickprev"><div class="cp-img v4"></div>
+            <div class="tools"><span class="cp-badge glass" style="height:36px;padding:0 14px;font-size:13px"><svg class="cp-icon sm"><use href="#i-layers"/></svg>Select multiple</span><button class="cp-icon-btn" aria-label="Camera"><svg class="cp-icon "><use href="#i-camera"/></svg></button></div></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin:14px 0 12px">
+            <span class="cp-chip sm" style="height:38px">Recent<svg class="cp-icon sm"><use href="#i-down"/></svg></span>
+            <span class="cp-badge neutral"><svg class="cp-icon sm"><use href="#i-image"/></svg>Text only</span>
           </div>
-          <div class="cp-compose-area">Reached the cathedral at sunrise. 31 km to Hontanas tomorrow, legs say no, heart says yes.<span class="caret"></span></div>
-          <div class="cp-counter">104 / 600</div>
-          <div class="cp-thumbs" style="margin-top:18px">
-            <div class="th"><div class="cp-img v4"></div><span class="rm"><svg class="cp-icon "><use href="#i-x"/></svg></span></div>
-            <div class="th"><div class="cp-img v5"></div><span class="rm"><svg class="cp-icon "><use href="#i-x"/></svg></span></div>
-            <div class="th"><div class="cp-img v2"></div><span class="rm"><svg class="cp-icon "><use href="#i-x"/></svg></span></div>
-            <div class="add"><svg class="cp-icon "><use href="#i-plus"/></svg></div>
-          </div>
-          <div class="cp-stagecard" style="margin-top:22px">
-            <div style="flex:1"><div class="k">Stage 12 · auto</div><div class="v">Burgos → Hontanas</div><div class="s">31.1 km · 7h 20m · 18,240 steps</div></div>
-            <span class="cp-switch on"></span>
-          </div>
-          <p class="cp-label" style="margin:24px 0 10px">Stamp & mood</p>
-          <div class="row" style="gap:8px">
-            <span class="cp-chip on sm"><svg class="cp-icon sm"><use href="#i-shell"/></svg>Burgos stamp</span><span class="cp-chip sm">Grateful</span><span class="cp-chip on sm" style="background:var(--cp-color-gold);color:var(--cp-color-blue)">Joyful</span><span class="cp-chip sm">Tired</span><span class="cp-chip sm">Peaceful</span>
-          </div>
+          <div class="cp-mediagrid"><div class="cell dim"><div class="cp-img v4"></div><span class="num">1</span></div><div class="cell"><div class="cp-img v5"></div><span class="ring"></span></div><div class="cell"><div class="cp-img "></div><span class="ring"></span></div><div class="cell dim"><div class="cp-img v2"></div><span class="num">2</span></div><div class="cell"><div class="cp-img v3"></div><span class="ring"></span></div><div class="cell"><div class="cp-img v4"></div><span class="ring"></span></div><div class="cell dim"><div class="cp-img v5"></div><span class="num">3</span></div><div class="cell"><div class="cp-img "></div><span class="ring"></span><span class="vid">0:12</span></div><div class="cell"><div class="cp-img v2"></div><span class="ring"></span></div><div class="cell"><div class="cp-img v3"></div><span class="ring"></span></div><div class="cell"><div class="cp-img v4"></div><span class="ring"></span></div><div class="cell"><div class="cp-img v5"></div><span class="ring"></span></div></div>
         </div>
-        <div style="position:absolute;left:16px;right:16px;bottom:30px;z-index:6"><div class="cp-toolbar">
-          <button class="cp-icon-btn on" aria-label="Photos"><svg class="cp-icon "><use href="#i-image"/></svg></button><button class="cp-icon-btn" aria-label="Camera"><svg class="cp-icon "><use href="#i-camera"/></svg></button><button class="cp-icon-btn" aria-label="Location"><svg class="cp-icon "><use href="#i-pin"/></svg></button><button class="cp-icon-btn" aria-label="Stamp"><svg class="cp-icon "><use href="#i-shell"/></svg></button><button class="cp-icon-btn" aria-label="Tag friends"><svg class="cp-icon "><use href="#i-tagpeople"/></svg></button>
-        </div></div>
+        <div class="cp-postbar"><div class="cnt">3 selected · up to 10</div><button class="cp-btn cp-btn-primary block">Next</button></div>
         <span class="home-ind"></span>
       </div>
     </div>
 
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Me · Write · Caption & Post</b>Step 2 · Post button at the bottom</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="cp-compose-top" style="padding-top:8px"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon "><use href="#i-back"/></svg></button><span class="t">New journey post</span><span style="width:48px"></span></div>
+        <div class="scroll" style="top:112px;padding-top:10px;padding-bottom:150px">
+          <div class="cp-capture">
+            <div class="tn"><div class="cp-img v4"></div><span class="cp-badge glass more" style="height:22px;padding:0 8px;font-size:11px">+2</span></div>
+            <div class="ta">Reached the cathedral at sunrise. 31 km to Hontanas tomorrow, legs say no, heart says yes.<span class="caret"></span></div>
+          </div>
+          <div class="cp-counter" style="margin-bottom:8px">104 / 600</div>
+          <div class="hscroll" style="margin-bottom:6px"><span class="cp-chip sm on"><svg class="cp-icon sm"><use href="#i-pin"/></svg>Burgos</span><span class="cp-chip sm">Catedral</span><span class="cp-chip sm">Hontanas</span><span class="cp-chip sm">Camino Francés</span></div>
+          <div style="border-top:1px solid var(--cp-border)"><div class="cp-optrow"><svg class="cp-icon "><use href="#i-tagpeople"/></svg><span class="lbl">Tag people</span><svg class="cp-icon sm"><use href="#i-chev"/></svg></div><div class="cp-optrow"><svg class="cp-icon "><use href="#i-shell"/></svg><span class="lbl">Add stamp</span><span class="v">Burgos ✓</span><svg class="cp-icon sm"><use href="#i-chev"/></svg></div><div class="cp-optrow"><svg class="cp-icon "><use href="#i-globe"/></svg><span class="lbl">Audience</span><span class="v">Public</span><svg class="cp-icon sm"><use href="#i-chev"/></svg></div><div class="cp-optrow"><svg class="cp-icon "><use href="#i-steps"/></svg><span class="lbl">Stage card · 31.1 km · 7h 20m</span><span class="cp-switch on"></span></div><div class="cp-optrow"><svg class="cp-icon "><use href="#i-explore"/></svg><span class="lbl">Also share to Explore</span><span class="cp-switch"></span></div>
+          </div>
+        </div>
+        <div class="cp-postbar"><button class="cp-btn cp-btn-primary block">Post</button><button class="cp-btn cp-btn-ghost" style="height:32px;align-self:center;font-size:14px">Save as draft</button></div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
     <div class="phone-wrap">
       <p class="phone-label"><b>Me · Share journey</b>After posting · share card</p>
       <div class="phone ">
@@ -1634,6 +1730,60 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Explore</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-settings"/></svg></span>Settings</div>
+        </nav></div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Me · Inbox</b>Tap the bell · notifications</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll" style="padding-bottom:130px">
+          <div class="cp-inbox-top">
+            <button class="cp-icon-btn flat" style="width:44px;height:44px" aria-label="Back"><svg class="cp-icon "><use href="#i-back"/></svg></button>
+            <h1>Inbox</h1>
+            <button class="cp-icon-btn flat" style="width:44px;height:44px" aria-label="Mark all as read"><svg class="cp-icon "><use href="#i-checks"/></svg></button>
+          </div>
+          <div class="cp-subtabs" style="margin:16px -24px 0;padding:0 12px"><span class="on">Notifications<span class="cp-badge red" style="height:20px;padding:0 7px;font-size:11px">3</span></span><span>Messages<span class="cp-badge neutral" style="height:20px;padding:0 7px;font-size:11px">2</span></span></div>
+          <div class="hscroll" style="margin-top:14px">
+            <span class="cp-chip on sm">All</span><span class="cp-chip sm">Camino</span><span class="cp-chip sm">Social</span><span class="cp-chip sm">Bookings</span><span class="cp-chip sm">Photos</span>
+          </div>
+          <div class="cp-notif-cap">New</div><div class="cp-notif unread"><div class="lead"><span class="bub b-gold"><svg class="cp-icon "><use href="#i-medal"/></svg></span></div><div class="tx"><b>Meseta Walker</b> unlocked. You earned <b>+100 XP</b>.<span class="tm">2 min ago</span></div><span class="udot"></span></div><div class="cp-notif unread"><div class="lead"><span class="cp-avatar" style="background:linear-gradient(150deg,#D7C6E0,#6E5470)"></span><span class="type b-red"><svg class="cp-icon "><use href="#i-heart"/></svg></span></div><div class="tx"><b>Hannah</b> liked your post <span class="q">“Reached the cathedral at sunrise…”</span><span class="tm">14 min ago</span></div><span class="th cp-img v4"></span><span class="udot"></span></div><div class="cp-notif unread"><div class="lead"><span class="bub b-sky"><svg class="cp-icon "><use href="#i-face"/></svg></span><span class="type b-gold"><svg class="cp-icon "><use href="#i-image"/></svg></span></div><div class="tx"><b>3 new photos of you</b> from O Cebreiro.<span class="q">Tap to preview and buy</span><span class="tm">1 h ago</span></div><button class="cp-btn cp-btn-primary sm">View</button></div>
+          <div class="cp-notif-cap">Earlier</div><div class="cp-notif"><div class="lead"><span class="bub b-blue"><svg class="cp-icon "><use href="#i-stays"/></svg></span><span class="type b-green"><svg class="cp-icon "><use href="#i-bolt2"/></svg></span></div><div class="tx"><b>Albergue El Puntido</b> confirmed your bed for Fri 14 Nov.<span class="tm">Yesterday · 18:02</span></div><span class="th cp-img "></span></div><div class="cp-notif"><div class="lead"><span class="bub b-gold"><svg class="cp-icon "><use href="#i-warn"/></svg></span></div><div class="tx"><b>Muddy path</b> reported 1.4 km ahead by 6 pilgrims.<span class="tm">Yesterday · 09:40</span></div></div><div class="cp-notif"><div class="lead"><span class="cp-avatar" style="background:linear-gradient(150deg,#BFD0C4,#4E6B5A)"></span><span class="type b-blue"><svg class="cp-icon "><use href="#i-chat"/></svg></span></div><div class="tx"><b>Lucas</b> commented: “Save me a bed in Triacastela!”<span class="tm">2 days ago</span></div><span class="th cp-img v5"></span></div>
+        </div>
+        <div class="tabdock"><nav class="cp-tabbar">
+          <div class="cp-tab on"><span class="ico"><svg class="cp-icon "><use href="#i-me"/></svg></span>Me</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-stays"/></svg></span>Stays</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-maps"/></svg></span>Maps</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-explore"/></svg></span>Explore</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-settings"/></svg></span>Settings</div>
+        </nav></div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Me · Inbox · Messages</b>Hosts and pilgrims</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll" style="padding-bottom:130px">
+          <div class="cp-inbox-top">
+            <button class="cp-icon-btn flat" style="width:44px;height:44px" aria-label="Back"><svg class="cp-icon "><use href="#i-back"/></svg></button>
+            <h1>Inbox</h1>
+            <button class="cp-icon-btn flat" style="width:44px;height:44px" aria-label="New message"><svg class="cp-icon "><use href="#i-pencil"/></svg></button>
+          </div>
+          <div class="cp-subtabs" style="margin:16px -24px 0;padding:0 12px"><span>Notifications<span class="cp-badge neutral" style="height:20px;padding:0 7px;font-size:11px">3</span></span><span class="on">Messages<span class="cp-badge red" style="height:20px;padding:0 7px;font-size:11px">2</span></span></div>
+          <div class="cp-search" style="height:48px;margin:16px 0 8px;box-shadow:inset 0 0 0 1px var(--cp-border);padding-left:18px"><svg class="cp-icon "><use href="#i-search"/></svg><div class="txt"><div class="t2" style="font-size:15px;color:var(--cp-text-placeholder)">Search hosts and pilgrims</div></div></div>
+          <div class="cp-notif-cap" style="margin-top:14px">Stays & hosts</div><div class="cp-msg unread"><span class="cp-avatar" style="background:linear-gradient(150deg,#BFD0C4,#4E6B5A)"></span><div class="bd"><div class="n">María · El Puntido<span>5 min</span></div><div class="p">See you at 18:00. Dinner is at 19:30!</div></div><span class=cnt>2</span></div><div class="cp-msg"><span class="cp-avatar" style="background:linear-gradient(150deg,#E9C987,#A0583F)"></span><div class="bd"><div class="n">Café El Peregrino<span>Yesterday</span></div><div class="p">Yes, we open at 08:00 for pilgrims.</div></div></div>
+          <div class="cp-notif-cap">Pilgrims</div><div class="cp-msg"><span class="cp-avatar" style="background:linear-gradient(150deg,#D7C6E0,#6E5470)"></span><div class="bd"><div class="n">Hannah<span>Mon</span></div><div class="p">Haha, see you in Hontanas!</div></div></div><div class="cp-msg"><span class="cp-avatar" style="background:linear-gradient(150deg,#9DB4CC,#14365D)"></span><div class="bd"><div class="n">Lucas<span>Sun</span></div><div class="p">Photo of you at the Cruz de Ferro 😊</div></div></div><div class="cp-msg"><span class="cp-avatar" style="background:linear-gradient(150deg,#F2D8B6,#A0583F)"></span><div class="bd"><div class="n">Camino friends · 5<span>Sat</span></div><div class="p">Anna: Who is up for the sunrise start?</div></div></div>
+        </div>
+        <div class="tabdock"><nav class="cp-tabbar">
+          <div class="cp-tab on"><span class="ico"><svg class="cp-icon "><use href="#i-me"/></svg></span>Me</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-stays"/></svg></span>Stays</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-maps"/></svg></span>Maps</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-explore"/></svg></span>Explore</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-settings"/></svg></span>Settings</div>
         </nav></div>
         <span class="home-ind"></span>
       </div>
