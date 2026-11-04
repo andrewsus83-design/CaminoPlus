@@ -223,16 +223,16 @@ TABS = [
 ROUTES = [
  ("Camino Francés", "Saint-Jean-Pied-de-Port, France", 780, "31–35", "The classic. Across the Pyrenees, the Meseta and into Galicia.", "Most walked"),
  ("Camino Portugués (Central)", "Lisbon or Porto, Portugal", 620, "From Porto 10–13", "Through northern Portugal's villages and vineyards. About 240 km from Porto.", "Popular"),
- ("Camino Portugués (Coastal)", "Porto, Portugal", 280, "12–14", "Atlantic beaches and fishing towns before turning inland at Redondela.", None),
- ("Camino del Norte", "Irún, Spain", 820, "32–36", "Along the Bay of Biscay through San Sebastián, Bilbao and Cantabria.", None),
- ("Camino Primitivo", "Oviedo, Spain", 320, "12–14", "The original route. Mountains, quiet paths and big climbs.", None),
+ ("Camino Portugués (Coastal)", "Porto, Portugal", 260, "11–13", "Atlantic beaches and fishing towns, joining the Central route at Redondela.", None),
+ ("Camino del Norte", "Irún, Spain", 825, "33–38", "Along the Bay of Biscay through San Sebastián, Bilbao and Cantabria.", None),
+ ("Camino Primitivo", "Oviedo, Spain", 310, "12–15", "The original route. Mountains, quiet paths and big climbs.", None),
  ("Vía de la Plata", "Seville, Spain", 1000, "38–42", "The longest in Spain, following an old Roman road north.", None),
  ("Camino Inglés", "Ferrol or A Coruña, Spain", 120, "5–6", "Short and green, the route of pilgrims who arrived by sea.", None),
  ("Camino Finisterre &amp; Muxía", "Santiago de Compostela", 120, "3–5", "Keep walking past Santiago to the coast at the 'end of the world'.", None),
- ("Camino Sanabrés", "Granja de Moreruela, Spain", 370, "14–16", "The Vía de la Plata's branch through Ourense and its hot springs.", None),
+ ("Camino Sanabrés", "Granja de Moreruela, Spain", 370, "15–17", "The Vía de la Plata's branch through Ourense and its hot springs.", None),
  ("Camino de Invierno", "Ponferrada, Spain", 265, "10–12", "The winter route through the Sil valley and Ribeira Sacra.", None),
  ("Camino de Madrid", "Madrid, Spain", 320, "12–14", "From the capital over the Guadarrama to join the Francés at Sahagún.", None),
- ("Camino Aragonés", "Somport, Spain", 165, "6–7", "Down from the Pyrenees to meet the Francés at Puente la Reina.", None),
+ ("Camino Aragonés", "Somport, Spain", 160, "6–7", "Down from the Pyrenees to meet the Francés at Puente la Reina.", None),
  ("Via Podiensis (Le Puy)", "Le Puy-en-Velay, France", 740, "28–32", "France's best-known route, ending at Saint-Jean-Pied-de-Port.", None),
 ]
 
@@ -525,7 +525,7 @@ def pricing():
     ld = {"@context": "https://schema.org", "@type": "Product", "name": "Pilgrim Plus",
           "description": "Yearly subscription with offline route downloads and 5 GB cloud storage.",
           "offers": {"@type": "Offer", "price": "11.99", "priceCurrency": "USD"}}
-    page("pricing", "Pricing", "CaminoPlus is free to start. Pilgrim is $11.99 a year with offline route downloads and 5 GB of cloud storage. Extra storage is $5 per 5 GB a year.", body, "pricing", ld)
+    page("pricing", "Pricing", "CaminoPlus is free to start. Pilgrim Plus is $11.99 a year with offline route downloads and 5 GB of cloud storage. Extra storage is $5 per 5 GB a year.", body, "pricing", ld)
 
 def offline():
     steps = [("Pick your route", "Choose a Camino and the town you start from. CaminoPlus lists your stages."),
