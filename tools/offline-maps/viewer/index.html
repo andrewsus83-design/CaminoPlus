@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Offline pack viewer</title>
+  <link rel="stylesheet" href="./vendor/maplibre-gl/maplibre-gl.css">
+  <style>
+    :root { --gold: #D9A21B; --blue: #14365D; --parchment: #F6EFE2; --ink: #2B2A26; --red: #A63D2F; }
+    html, body { margin: 0; height: 100%; font: 14px/1.4 system-ui, sans-serif; color: var(--ink); background: var(--parchment); }
+    #map { position: absolute; inset: 0; }
+    .panel {
+      position: absolute; top: 12px; left: 12px; z-index: 2; max-width: min(340px, calc(100vw - 48px));
+      background: #fffdf8; border-radius: 18px; padding: 12px 16px; box-shadow: 0 4px 18px rgba(20, 54, 93, .15);
+    }
+    .panel h1 { font-size: 16px; margin: 0 0 6px; color: var(--blue); }
+    .panel dl { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; margin: 8px 0 0; font-size: 12px; }
+    .panel dt { color: #6b665c; }
+    .panel dd { margin: 0; font-variant-numeric: tabular-nums; word-break: break-all; }
+    .pill { display: inline-block; border-radius: 999px; padding: 2px 10px; font-size: 12px; font-weight: 600; }
+    .online { background: #E6F0E0; color: #2F5D1E; }
+    .offline { background: #F8E3DF; color: var(--red); }
+    label.file { display: inline-block; margin-top: 8px; border-radius: 999px; background: var(--blue); color: #fff; padding: 6px 14px; cursor: pointer; font-size: 13px; }
+    label.file input { display: none; }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <div class="panel">
+    <h1>Offline stage pack</h1>
+    <span id="net" class="pill"></span>
+    <div><label class="file">Open a .pmtiles file<input id="file" type="file" accept=".pmtiles"></label></div>
+    <dl id="info"></dl>
+  </div>
+
+  <!-- Everything below is loaded from this folder. No CDN, no tile server. -->
+  <script src="./vendor/pmtiles/pmtiles.js"></script>
+  <script type="module">
+    import * as maplibregl from './vendor/maplibre-gl/maplibre-gl.mjs';
+    import { stageStyle, addOverlays } from './style.js';
+
+    const params = new URLSearchParams(location.search);
+    const info = document.getElementById('info');
+    const net = document.getElementById('net');
+    const showNet = () => {
+      net.textContent = navigator.onLine ? 'Browser says: online' : 'Browser says: offline';
+      net.className = 'pill ' + (navigator.onLine ? 'online' : 'offline');
+    };
+    addEventListener('online', showNet); addEventListener('offline', showNet); showNet();
+
+    const protocol = new pmtiles.Protocol();
+    maplibregl.addProtocol('pmtiles', protocol.tile);
+    let map;
+
+    async function fetchJson(url) {
+      if (!url) return null;
+      try { const r = await fetch(url); return r.ok ? r.json() : null; } catch { return null; }
+    }
+
+    async function open(archive, label) {
+      protocol.add(archive);
+      const header = await archive.getHeader();
+      const meta = await archive.getMetadata().catch(() => ({}));
+      const bounds = [[header.minLon, header.minLat], [header.maxLon, header.maxLat]];
+      const rows = {
+        File: label,
+        Zooms: `${header.minZoom} to ${header.maxZoom}`,
+        Tiles: header.numAddressedTiles?.toLocaleString(),
+        Layers: (meta.vector_layers || []).map((l) => l.id).join(', '),
+        Bounds: bounds.flat().map((n) => n.toFixed(3)).join(', '),
+      };
+      info.innerHTML = Object.entries(rows).map(([k, v]) => `<dt>${k}</dt><dd>${v ?? ''}</dd>`).join('');
+
+      const [route, corridor] = await Promise.all([fetchJson(params.get('route')), fetchJson(params.get('corridor'))]);
+      if (map) map.remove();
+      map = new maplibregl.Map({
+        container: 'map',
+        style: stageStyle('pmtiles://' + archive.source.getKey()),
+        bounds,
+        fitBoundsOptions: { padding: 40 },
+        maxZoom: 18, // overzoom past the pack's z15 is fine for vector tiles
+        attributionControl: { compact: false },
+      });
+      map.addControl(new maplibregl.NavigationControl(), 'top-right');
+      map.addControl(new maplibregl.ScaleControl({ unit: 'metric' }), 'bottom-left');
+      map.on('load', () => addOverlays(map, { route, corridor }));
+      window.__map = map;
+      window.__header = header;
+      window.__source = archive.source.getKey();
+    }
+
+    document.getElementById('file').addEventListener('change', (e) => {
+      const f = e.target.files[0];
+      if (f) open(new pmtiles.PMTiles(new pmtiles.FileSource(f)), `${f.name} (${(f.size / 1048576).toFixed(2)} MB)`);
+    });
+
+    // ?pack=../dist/camino-frances-01-3km-z15.pmtiles&route=...&corridor=...
+    const pack = params.get('pack');
+    if (pack) open(new pmtiles.PMTiles(new URL(pack, location.href).href), pack.split('/').pop());
+  </script>
+</body>
+</html>
