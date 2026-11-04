@@ -668,6 +668,26 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
 .cp-menu .pc { font-family: var(--cp-font-mono); font-size: 14px; }
 .cp-menu small { display: block; font-family: var(--cp-font-body); font-weight: 400; font-size: 13px; color: var(--cp-text-muted); }
 
+/* ---- v4: map layers (helicopter / city) ---- */
+.cp-layer-switch { align-self: flex-start; display: inline-flex; padding: 4px; border-radius: var(--cp-radius-pill); background: rgba(255,253,248,.94); backdrop-filter: blur(10px); box-shadow: var(--cp-shadow-md); }
+.cp-layer-switch span { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 14px; border-radius: var(--cp-radius-pill); font-size: 13px; font-weight: 600; color: var(--cp-text-muted); white-space: nowrap; }
+.cp-layer-switch span .cp-icon { width: 18px; height: 18px; }
+.cp-layer-switch span.on { background: var(--cp-color-blue); color: var(--cp-color-parchment); }
+.cp-pin.sm { width: 34px; height: 34px; border-width: 2.5px; }
+.cp-pin.sm .cp-icon { width: 17px; height: 17px; }
+.cp-pin.iconic.md { width: 50px; height: 50px; }
+.cp-hint { display: inline-flex; align-items: center; gap: 8px; height: 34px; padding: 0 14px; border-radius: var(--cp-radius-pill); background: rgba(12,35,64,.82); color: var(--cp-color-parchment); font-family: var(--cp-font-mono); font-size: 11px; white-space: nowrap; }
+.cp-hint .cp-icon { width: 16px; height: 16px; }
+.cp-elev { display: block; width: 100%; height: 64px; }
+.cp-youhere { position: absolute; z-index: 3; display: flex; align-items: center; gap: 8px; }
+.cp-youhere .ring { width: 50px; height: 50px; border-radius: 50%; background: rgba(217,162,27,.28); display: grid; place-items: center; }
+.cp-youhere .dot { width: 30px; height: 30px; border-radius: 50%; background: var(--cp-color-blue); border: 3px solid var(--cp-color-white); box-shadow: var(--cp-shadow-md); display: grid; place-items: center; }
+.cp-youhere .dot .cp-icon { width: 14px; height: 14px; fill: var(--cp-color-gold); stroke: var(--cp-color-gold); }
+.cp-youhere .tag { background: var(--cp-color-white); border-radius: var(--cp-radius-pill); padding: 4px 10px; font-size: 11px; font-weight: 700; box-shadow: var(--cp-shadow-sm); white-space: nowrap; }
+.cp-legend { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 20px; font-size: 14px; }
+.cp-legend div { display: flex; align-items: center; gap: 10px; }
+.cp-legend i { width: 26px; height: 0; display: block; flex: none; }
+
 @media (max-width: 640px) {
   .wrap, .doc-nav-inner { padding-left: 16px; padding-right: 16px; }
   .doc h2 { font-size: 36px; line-height: 42px; }
@@ -759,6 +779,8 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     <symbol id="i-phone" viewBox="0 0 24 24"><path d="M6.5 3.5h3l1.5 4-2 1.5a11 11 0 0 0 6 6l1.5-2 4 1.5v3a2.5 2.5 0 0 1-2.7 2.5A16.5 16.5 0 0 1 4 6.2 2.5 2.5 0 0 1 6.5 3.5Z"/></symbol>
     <symbol id="i-tagpeople" viewBox="0 0 24 24"><circle cx="9" cy="8.5" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6M18.5 6v6M15.5 9h6"/></symbol>
     <symbol id="i-bolt2" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-heli" viewBox="0 0 24 24"><path d="M3 4.5h14M10 4.5v3"/><path d="M5 12.5a5 4 0 0 1 5-4h1.5a4.5 4.5 0 0 1 4.5 4.5v1.5H5v-2Z"/><path d="m16 11 5-2v4.5l-5 1M6.5 18.5h9M9 16v2.5M13 16v2.5"/></symbol>
+    <symbol id="i-city" viewBox="0 0 24 24"><path d="M4 20.5V10l6-3v13.5M10 20.5V4l10 4v12.5M2.5 20.5h19M13.5 10.5h3M13.5 14.5h3M6.5 12.5h1M6.5 16h1"/></symbol>
   </defs>
 </svg>
 
@@ -1326,6 +1348,30 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     </div>
   </div>
 
+  <h3>Map layers: helicopter and city</h3>
+  <div class="grid g2" style="align-items:start">
+    <div class="panel" style="display:flex;flex-direction:column;gap:22px">
+      <div style="display:flex;gap:16px;flex-wrap:wrap"><div class="cp-layer-switch"><span class="on"><svg class="cp-icon "><use href="#i-heli"/></svg>Helicopter</span><span class=""><svg class="cp-icon "><use href="#i-city"/></svg>City</span></div><div class="cp-layer-switch"><span class=""><svg class="cp-icon "><use href="#i-heli"/></svg>Helicopter</span><span class="on"><svg class="cp-icon "><use href="#i-city"/></svg>City</span></div></div>
+      <div class="cp-legend">
+        <div><i style="border-top:6px solid var(--cp-color-blue);border-radius:3px"></i>Walked route</div>
+        <div><i style="border-top:5px dotted var(--cp-color-blue);opacity:.6"></i>Route ahead</div>
+        <div><i style="height:12px;border-radius:50%;width:12px;background:var(--cp-color-blue);border:3px solid #14365D"></i>Stage town (done)</div>
+        <div><i style="height:12px;border-radius:50%;width:12px;background:#fff;border:3px solid #14365D"></i>Stage town (ahead)</div>
+      </div>
+      <div class="cp-hint" style="align-self:flex-start"><svg class="cp-icon "><use href="#i-locate"/></svg>Pinch in to open Burgos</div>
+      <div><svg class="cp-elev" viewBox="0 0 342 64" preserveAspectRatio="none" aria-hidden="true"><path d="M0 54 L12 30 L30 12 L40 28 L62 45 L95 47 L115 40 L137 31 L160 33 L185 33 L205 31 L222 24 L240 10 L255 20 L270 17 L290 42 L315 48 L342 51 V64 H0Z" fill="#DCE5EF"/><path d="M0 54 L12 30 L30 12 L40 28 L62 45 L95 47 L115 40 L137 31 L160 33 L185 33 L205 31 L222 24 L240 10 L255 20 L270 17 L290 42 L315 48 L342 51" stroke="#14365D" stroke-width="2.5" fill="none" stroke-linejoin="round"/><path d="M0 54 L12 30 L30 12 L40 28 L62 45 L95 47 L115 40 L137 31 V64 H0Z" fill="#14365D" opacity=".18"/><line x1="137" y1="6" x2="137" y2="64" stroke="#D9A21B" stroke-width="2"/><circle cx="137" cy="31" r="5" fill="#D9A21B" stroke="#FFFDF8" stroke-width="2.5"/></svg></div>
+      <p class="spec" style="margin:0">.cp-layer-switch · .cp-pin.sm / .iconic.md · .cp-elev · .cp-youhere · .cp-hint</p>
+    </div>
+    <div class="panel">
+      <table class="contrast">
+        <tr><th>Layer</th><th>What it shows</th></tr>
+        <tr><td><b>Helicopter</b></td><td>Whole route, stage towns, progress and elevation. Small pins for iconic places, churches, hunts, stories and busy areas. Bottom sheet is a trip summary.</td></tr>
+        <tr><td><b>City / area</b></td><td>Streets, buildings and every nearby place. Full-size pins with XP tags, crowd reports, water and weather. Bottom sheet is the selected place.</td></tr>
+      </table>
+      <p class="note" style="margin:16px 0 0">Switch with the pill, or pinch: below zoom 9 the app shows Helicopter, above zoom 12 it shows City. The change flies the camera over 320 ms. Both layers work offline from the downloaded route pack.</p>
+    </div>
+  </div>
+
   <h3>Stay & cafe detail blocks</h3>
   <div class="grid g2" style="align-items:start">
     <div class="panel" style="display:flex;flex-direction:column;gap:22px">
@@ -1369,7 +1415,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
 <section class="doc" id="screens">
   <p class="eyebrow">14 · Screens @ 390 × 844</p>
   <h2>The app, tab by tab</h2>
-  <p class="intro">Reference layouts at iPhone 15 size. Scroll sideways to see all of them. Me has three sub-tabs plus write, share and stamp pop-up screens. Stays opens into Airbnb / Agoda-style detail pages for stays and cafes. Explore has a second screen for the photo marketplace.</p>
+  <p class="intro">Reference layouts at iPhone 15 size. Scroll sideways to see all of them. Me has three sub-tabs plus write, share and stamp pop-up screens. Maps has two layers: helicopter view and city view. Stays opens into Airbnb / Agoda-style detail pages for stays and cafes. Explore has a second screen for the photo marketplace.</p>
 
   <div class="phones">
 
@@ -1785,38 +1831,100 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     </div>
 
     <div class="phone-wrap">
-      <p class="phone-label"><b>Maps</b>Waze map + RPG layer</p>
+      <p class="phone-label"><b>Maps · Helicopter view</b>Whole route, zoomed out</p>
+      <div class="phone" style="background:#E9E0C9">
+        <svg class="map-bg" viewBox="0 0 390 844" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <defs><radialGradient id="heat"><stop offset="0" stop-color="#D9A21B" stop-opacity=".55"/><stop offset="1" stop-color="#D9A21B" stop-opacity="0"/></radialGradient><radialGradient id="heatr"><stop offset="0" stop-color="#A63D2F" stop-opacity=".4"/><stop offset="1" stop-color="#A63D2F" stop-opacity="0"/></radialGradient></defs>
+          <rect width="390" height="844" fill="#E9E0C9"/>
+          <path d="M0 330 C 80 300, 150 250, 260 270 S 390 230, 390 230 V560 H0Z" fill="#E3DCC0"/>
+          <path d="M0 520 C 100 470, 200 520, 300 470 S 390 430, 390 430 V844 H0Z" fill="#D9DDBF"/>
+          <path d="M0 150 C 60 190, 110 170, 170 220 S 130 330, 0 370Z" fill="#CFDDBF"/>
+          <path d="M0 40 L120 40 C 80 100, 36 150, 30 215 C 26 250, 10 270, 0 280Z" fill="#CFE0F0"/>
+          <g fill="#CDBC9C" opacity=".7"><path d="M290 560 l22 -44 l20 34 l16 -26 l26 50Z"/><path d="M80 500 l18 -34 l16 26 l14 -20 l20 40Z"/><path d="M20 410 l16 -30 l14 24 l12 -18 l16 34Z"/></g>
+          <g transform="translate(0,-20)"><circle cx="152" cy="345" r="46" fill="url(#heat)"/><circle cx="118" cy="300" r="34" fill="url(#heatr)"/>
+          <g font-family="JetBrains Mono" font-size="9.5" letter-spacing="2" fill="#556274" opacity=".7"><text x="236" y="512">NAVARRA</text><text x="120" y="440">LA RIOJA</text><text x="196" y="300">CASTILLA Y LEÓN</text><text x="14" y="300" transform="rotate(-90 14 300)">GALICIA</text><text x="8" y="68" fill="#4A6F96">ATLÁNTICO</text></g>
+          <circle cx="300" cy="400" r="34" fill="#A63D2F" fill-opacity=".09" stroke="#A63D2F" stroke-width="2" stroke-dasharray="5 5"/>
+          <path d="M335 495 C 320 480, 305 470, 290 452 S 262 432, 245 420 S 220 398, 205 385 S 170 362, 152 345 S 128 328, 118 315 S 100 290, 88 275 S 70 252, 60 235" stroke="#14365D" stroke-width="5" stroke-dasharray="2 9" stroke-linecap="round" fill="none" opacity=".55"/>
+          <path d="M335 495 C 320 480, 305 470, 290 452 S 262 432, 245 420 S 220 398, 205 385" stroke="#D9A21B" stroke-width="15" fill="none" stroke-linecap="round" opacity=".45"/>
+          <path d="M335 495 C 320 480, 305 470, 290 452 S 262 432, 245 420 S 220 398, 205 385" stroke="#14365D" stroke-width="6" fill="none" stroke-linecap="round"/>
+          <g font-family="Inter" font-size="11" font-weight="700" fill="#14365D" paint-order="stroke" stroke="#E9E0C9" stroke-width="3.5"><circle cx="335" cy="495" r="5.5" fill="#14365D" stroke="#14365D" stroke-width="3"/><text x="324" y="499" text-anchor="end">St-Jean</text><circle cx="290" cy="452" r="5.5" fill="#14365D" stroke="#14365D" stroke-width="3"/><text x="300" y="456" text-anchor="start">Pamplona</text><circle cx="245" cy="420" r="5.5" fill="#14365D" stroke="#14365D" stroke-width="3"/><text x="255" y="424" text-anchor="start">Logroño</text><circle cx="152" cy="345" r="5.5" fill="#FFFDF8" stroke="#14365D" stroke-width="3"/><text x="142" y="349" text-anchor="end">León</text><circle cx="118" cy="315" r="5.5" fill="#FFFDF8" stroke="#14365D" stroke-width="3"/><text x="108" y="319" text-anchor="end">Astorga</text><circle cx="88" cy="275" r="5.5" fill="#FFFDF8" stroke="#14365D" stroke-width="3"/><text x="78" y="279" text-anchor="end">O Cebreiro</text><circle cx="60" cy="235" r="5.5" fill="#FFFDF8" stroke="#14365D" stroke-width="3"/></g>
+        <text x="86" y="232" text-anchor="start" font-size="12">Santiago</text></g>
+        </svg>
+        <div class="cp-pin iconic md" style="position:absolute;left:35px;top:190px;z-index:2"><svg class="cp-icon "><use href="#i-landmark"/></svg></div>
+        <div class="cp-pin church sm" style="position:absolute;left:153px;top:280px;z-index:2"><svg class="cp-icon "><use href="#i-church"/></svg></div>
+        <div class="cp-pin story sm" style="position:absolute;left:212px;top:292px;z-index:2"><svg class="cp-icon "><use href="#i-headphones"/></svg></div>
+        <div class="cp-pin hunt sm" style="position:absolute;left:283px;top:363px;z-index:2"><svg class="cp-icon "><use href="#i-chest"/></svg></div>
+        <div class="cp-pin crowd sm" style="position:absolute;left:101px;top:258px;z-index:2"><svg class="cp-icon "><use href="#i-crowd"/></svg></div>
+        <div class="cp-youhere" style="left:84px;top:338px;flex-direction:row-reverse"><span class="ring"><span class="dot"><svg class="cp-icon "><use href="#i-nav"/></svg></span></span><span class="tag">You · Day 12</span></div>
+        <div style="position:absolute;left:20px;top:440px;z-index:3"><span class="cp-hint"><svg class="cp-icon "><use href="#i-locate"/></svg>Pinch in to open Burgos</span></div>
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div style="position:absolute;top:62px;left:16px;right:16px;display:flex;flex-direction:column;gap:10px;z-index:4">
+          <div style="display:flex;gap:10px;align-items:center">
+            <div class="cp-hud" style="flex:1"><span class="cp-level">7</span><div style="flex:1"><div class="t">Peregrino<span>1,240 / 1,500 XP</span></div><div class="cp-xp"><span style="width:82%"></span></div></div></div>
+            <button class="cp-icon-btn" aria-label="Search"><svg class="cp-icon "><use href="#i-search"/></svg></button>
+          </div>
+          <div class="cp-layer-switch"><span class="on"><svg class="cp-icon "><use href="#i-heli"/></svg>Helicopter</span><span class=""><svg class="cp-icon "><use href="#i-city"/></svg>City</span></div>
+        </div>
+        <div class="cp-fab-stack" style="position:absolute;right:16px;top:188px;z-index:4">
+          <button class="cp-icon-btn" style="align-self:flex-end"><svg class="cp-icon "><use href="#i-layers"/></svg></button>
+          <button class="cp-icon-btn" style="align-self:flex-end"><svg class="cp-icon "><use href="#i-locate"/></svg></button>
+        </div>
+        <div class="cp-sheet" style="position:absolute;left:0;right:0;bottom:0;padding-bottom:124px;z-index:5">
+          <div class="grab"></div>
+          <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px">
+            <div><div class="cp-article" style="display:block"><div class="ey" style="font-family:var(--cp-font-mono);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--cp-text-accent)">Camino Francés · 780 km</div></div>
+              <div style="font-family:var(--cp-font-title);font-weight:600;font-size:28px;line-height:34px;margin-top:4px">312 km <span style="font-size:17px;font-weight:500;color:var(--cp-text-muted)">walked</span></div></div>
+            <span class="cp-badge gold">Day 12 / 33</span>
+          </div>
+          <div class="cp-progress light" style="margin:14px 0 14px;height:8px"><span style="width:40%;background:var(--cp-color-blue)"></span></div>
+          <svg class="cp-elev" viewBox="0 0 342 64" preserveAspectRatio="none" aria-hidden="true"><path d="M0 54 L12 30 L30 12 L40 28 L62 45 L95 47 L115 40 L137 31 L160 33 L185 33 L205 31 L222 24 L240 10 L255 20 L270 17 L290 42 L315 48 L342 51 V64 H0Z" fill="#DCE5EF"/><path d="M0 54 L12 30 L30 12 L40 28 L62 45 L95 47 L115 40 L137 31 L160 33 L185 33 L205 31 L222 24 L240 10 L255 20 L270 17 L290 42 L315 48 L342 51" stroke="#14365D" stroke-width="2.5" fill="none" stroke-linejoin="round"/><path d="M0 54 L12 30 L30 12 L40 28 L62 45 L95 47 L115 40 L137 31 V64 H0Z" fill="#14365D" opacity=".18"/><line x1="137" y1="6" x2="137" y2="64" stroke="#D9A21B" stroke-width="2"/><circle cx="137" cy="31" r="5" fill="#D9A21B" stroke="#FFFDF8" stroke-width="2.5"/></svg>
+        </div>
+        <div class="tabdock clear"><nav class="cp-tabbar">
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-me"/></svg></span>Me</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-stays"/></svg></span>Stays</div>
+          <div class="cp-tab on"><span class="ico"><svg class="cp-icon "><use href="#i-maps"/></svg></span>Maps</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-explore"/></svg></span>Explore</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-settings"/></svg></span>Settings</div>
+        </nav></div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Maps · City view</b>Inside the city / area, street level</p>
       <div class="phone" style="background:#EDE5D3">
         
         
         <svg class="map-bg" viewBox="0 0 390 844" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
           <rect width="390" height="844" fill="#EDE5D3"/>
-          <path d="M0 120 Q120 90 210 160 T390 140 V0 H0Z" fill="#E2E8D5"/>
-          <path d="M0 610 Q90 560 170 640 T390 600 V844 H0Z" fill="#E2E8D5"/>
-          <ellipse cx="330" cy="420" rx="70" ry="44" fill="#CFE0F0"/>
-          <g stroke="#FFFDF8" stroke-width="10" fill="none" stroke-linecap="round"><path d="M-10 300 Q140 280 230 330 T400 300"/><path d="M60 -10 Q80 300 40 860"/></g>
-          <g stroke="#E4D7BF" stroke-width="3" fill="none"><path d="M-10 460 L400 420"/><path d="M260 -10 L300 860"/><path d="M0 760 L390 700"/></g>
-          <path d="M120 900 C 140 760, 90 680, 170 600 S 260 460, 210 380 S 150 230, 240 120 S 300 20, 290 -20" stroke="#D9A21B" stroke-width="16" fill="none" stroke-linecap="round" opacity=".45"/>
-          <path d="M120 900 C 140 760, 90 680, 170 600 S 260 460, 210 380 S 150 230, 240 120 S 300 20, 290 -20" stroke="#14365D" stroke-width="7" fill="none" stroke-linecap="round"/>
-          <!-- hunt zone -->
-          <circle cx="92" cy="400" r="58" fill="#A63D2F" fill-opacity=".08" stroke="#A63D2F" stroke-width="2" stroke-dasharray="6 6"/>
+          <g><rect x="-9" y="-9" width="58" height="54" rx="7" fill="#E2D6BC"/><rect x="-10" y="54" width="60" height="56" rx="7" fill="#E2D6BC"/><rect x="-8" y="132" width="56" height="38" rx="7" fill="#E2D6BC"/><rect x="-6" y="182" width="52" height="34" rx="7" fill="#E2D6BC"/><rect x="-11" y="239" width="62" height="44" rx="7" fill="#E2D6BC"/><rect x="-11" y="288" width="62" height="44" rx="7" fill="#E2D6BC"/><rect x="-5" y="355" width="50" height="32" rx="7" fill="#E2D6BC"/><rect x="-7" y="402" width="54" height="36" rx="7" fill="#E2D6BC"/><rect x="-11" y="459" width="62" height="44" rx="7" fill="#E2D6BC"/><rect x="-9" y="510" width="58" height="40" rx="7" fill="#E2D6BC"/><rect x="-7" y="573" width="54" height="40" rx="7" fill="#E2D6BC"/><rect x="-11" y="622" width="62" height="48" rx="7" fill="#E2D6BC"/><rect x="-7" y="693" width="54" height="76" rx="7" fill="#E2D6BC"/><rect x="-10" y="778" width="60" height="82" rx="7" fill="#E2D6BC"/><rect x="69" y="-11" width="54" height="58" rx="7" fill="#E2D6BC"/><rect x="69" y="52" width="54" height="58" rx="7" fill="#E2D6BC"/><rect x="130" y="-8" width="48" height="52" rx="7" fill="#E2D6BC"/><rect x="130" y="56" width="48" height="52" rx="7" fill="#E2D6BC"/><rect x="69" y="129" width="54" height="44" rx="7" fill="#E2D6BC"/><rect x="70" y="178" width="52" height="42" rx="7" fill="#E2D6BC"/><rect x="128" y="129" width="54" height="44" rx="7" fill="#E2D6BC"/><rect x="132" y="182" width="46" height="36" rx="7" fill="#E2D6BC"/><rect x="72" y="242" width="48" height="38" rx="7" fill="#E2D6BC"/><rect x="69" y="288" width="54" height="44" rx="7" fill="#E2D6BC"/><rect x="134" y="245" width="42" height="32" rx="7" fill="#E2D6BC"/><rect x="132" y="292" width="46" height="36" rx="7" fill="#E2D6BC"/><rect x="69" y="349" width="54" height="44" rx="7" fill="#E2D6BC"/><rect x="70" y="398" width="52" height="42" rx="7" fill="#E2D6BC"/><rect x="132" y="354" width="44" height="34" rx="7" fill="#E2D6BC"/><rect x="132" y="402" width="44" height="34" rx="7" fill="#E2D6BC"/><rect x="73" y="463" width="46" height="36" rx="7" fill="#E2D6BC"/><rect x="69" y="508" width="54" height="44" rx="7" fill="#E2D6BC"/><rect x="132" y="463" width="46" height="36" rx="7" fill="#E2D6BC"/><rect x="132" y="512" width="46" height="36" rx="7" fill="#E2D6BC"/><rect x="72" y="572" width="48" height="42" rx="7" fill="#E2D6BC"/><rect x="69" y="622" width="54" height="48" rx="7" fill="#E2D6BC"/><rect x="128" y="570" width="52" height="46" rx="7" fill="#E2D6BC"/><rect x="128" y="622" width="54" height="48" rx="7" fill="#E2D6BC"/><rect x="73" y="693" width="46" height="76" rx="7" fill="#E2D6BC"/><rect x="75" y="784" width="42" height="72" rx="7" fill="#E2D6BC"/><rect x="128" y="690" width="52" height="82" rx="7" fill="#E2D6BC"/><rect x="130" y="780" width="50" height="80" rx="7" fill="#E2D6BC"/><rect x="202" y="-8" width="38" height="52" rx="7" fill="#E2D6BC"/><rect x="200" y="54" width="42" height="56" rx="7" fill="#E2D6BC"/><rect x="252" y="-7" width="36" height="50" rx="7" fill="#E2D6BC"/><rect x="248" y="52" width="44" height="58" rx="7" fill="#E2D6BC"/><rect x="203" y="133" width="36" height="36" rx="7" fill="#E2D6BC"/><rect x="201" y="180" width="40" height="40" rx="7" fill="#E2D6BC"/><rect x="252" y="133" width="36" height="36" rx="7" fill="#E2D6BC"/><rect x="254" y="184" width="32" height="32" rx="7" fill="#E2D6BC"/><rect x="204" y="244" width="34" height="34" rx="7" fill="#E2D6BC"/><rect x="200" y="288" width="42" height="42" rx="7" fill="#E2D6BC"/><rect x="248" y="239" width="44" height="44" rx="7" fill="#E2D6BC"/><rect x="252" y="292" width="36" height="36" rx="7" fill="#E2D6BC"/><rect x="203" y="353" width="36" height="36" rx="7" fill="#E2D6BC"/><rect x="204" y="402" width="34" height="34" rx="7" fill="#E2D6BC"/><rect x="248" y="350" width="42" height="42" rx="7" fill="#E2D6BC"/><rect x="250" y="400" width="40" height="40" rx="7" fill="#E2D6BC"/><rect x="199" y="459" width="44" height="44" rx="7" fill="#E2D6BC"/><rect x="203" y="512" width="36" height="36" rx="7" fill="#E2D6BC"/><rect x="252" y="464" width="34" height="34" rx="7" fill="#E2D6BC"/><rect x="248" y="508" width="44" height="44" rx="7" fill="#E2D6BC"/><rect x="203" y="573" width="36" height="40" rx="7" fill="#E2D6BC"/><rect x="199" y="622" width="44" height="48" rx="7" fill="#E2D6BC"/><rect x="252" y="573" width="36" height="40" rx="7" fill="#E2D6BC"/><rect x="248" y="624" width="42" height="46" rx="7" fill="#E2D6BC"/><rect x="202" y="692" width="38" height="78" rx="7" fill="#E2D6BC"/><rect x="204" y="782" width="34" height="74" rx="7" fill="#E2D6BC"/><rect x="252" y="693" width="36" height="76" rx="7" fill="#E2D6BC"/><rect x="250" y="780" width="38" height="78" rx="7" fill="#E2D6BC"/><rect x="315" y="-5" width="36" height="46" rx="7" fill="#E2D6BC"/><rect x="311" y="54" width="44" height="54" rx="7" fill="#E2D6BC"/><rect x="366" y="-8" width="42" height="52" rx="7" fill="#E2D6BC"/><rect x="366" y="56" width="40" height="50" rx="7" fill="#E2D6BC"/><rect x="312" y="132" width="42" height="38" rx="7" fill="#E2D6BC"/><rect x="311" y="180" width="44" height="40" rx="7" fill="#E2D6BC"/><rect x="364" y="131" width="44" height="40" rx="7" fill="#E2D6BC"/><rect x="364" y="178" width="46" height="42" rx="7" fill="#E2D6BC"/><rect x="315" y="245" width="36" height="32" rx="7" fill="#E2D6BC"/><rect x="310" y="288" width="46" height="42" rx="7" fill="#E2D6BC"/><rect x="368" y="244" width="38" height="34" rx="7" fill="#E2D6BC"/><rect x="368" y="294" width="36" height="32" rx="7" fill="#E2D6BC"/><rect x="310" y="350" width="46" height="42" rx="7" fill="#E2D6BC"/><rect x="309" y="398" width="48" height="44" rx="7" fill="#E2D6BC"/><rect x="366" y="353" width="40" height="36" rx="7" fill="#E2D6BC"/><rect x="364" y="400" width="44" height="40" rx="7" fill="#E2D6BC"/><rect x="313" y="463" width="40" height="36" rx="7" fill="#E2D6BC"/><rect x="312" y="510" width="42" height="38" rx="7" fill="#E2D6BC"/><rect x="364" y="461" width="44" height="40" rx="7" fill="#E2D6BC"/><rect x="368" y="512" width="38" height="34" rx="7" fill="#E2D6BC"/><rect x="312" y="572" width="42" height="42" rx="7" fill="#E2D6BC"/><rect x="311" y="624" width="44" height="44" rx="7" fill="#E2D6BC"/><rect x="366" y="573" width="40" height="40" rx="7" fill="#E2D6BC"/><rect x="362" y="622" width="48" height="48" rx="7" fill="#E2D6BC"/><rect x="309" y="689" width="48" height="84" rx="7" fill="#E2D6BC"/><rect x="313" y="782" width="40" height="76" rx="7" fill="#E2D6BC"/><rect x="366" y="692" width="42" height="78" rx="7" fill="#E2D6BC"/><rect x="364" y="778" width="46" height="82" rx="7" fill="#E2D6BC"/></g>
+          <rect x="316" y="129" width="100" height="92" rx="14" fill="#CFDDBF"/>
+          <rect x="199" y="239" width="92" height="92" rx="14" fill="#FBF3DC"/>
+          <path d="M-20 700 C 60 640, 140 700, 230 640 S 360 560, 420 600" stroke="#CFE0F0" stroke-width="26" fill="none" stroke-linecap="round"/>
+          <g stroke="#FFFDF8" stroke-width="10" fill="none" stroke-linecap="round">
+            <path d="M-20 120H420M-20 230H420M-20 340H420M-20 450H420M-20 560H420"/><path d="M60 -20V870M190 -20V870M300 -20V870"/>
+          </g>
+          <circle cx="80" cy="300" r="60" fill="#A63D2F" fill-opacity=".09" stroke="#A63D2F" stroke-width="2" stroke-dasharray="6 6"/>
+          <path d="M190 640 V340 H300 V120 V-20" stroke="#D9A21B" stroke-width="16" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity=".45"/>
+          <path d="M190 640 V340 H300 V120 V-20" stroke="#14365D" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <g font-family="Inter" font-size="11" font-weight="600" fill="#8C8272" paint-order="stroke" stroke="#EDE5D3" stroke-width="3"><text x="70" y="114">Calle Mayor</text><text x="198" y="444">Rúa de San Juan</text><text x="308" y="228" transform="rotate(-90 308 228)">Camino Real</text></g>
         </svg>
-        <div class="cp-pin iconic" style="position:absolute;left:214px;top:196px;z-index:2"><svg class="cp-icon"><use href="#i-landmark"/></svg><span class="xp">+80 XP</span><span class="cp-pin-label">Castillo</span></div>
-        <div class="cp-pin church" style="position:absolute;left:186px;top:352px;z-index:2"><svg class="cp-icon"><use href="#i-church"/></svg><span class="cp-pin-label">San Juan</span></div>
-        <div class="cp-pin hunt" style="position:absolute;left:70px;top:378px;z-index:2"><svg class="cp-icon"><use href="#i-chest"/></svg><span class="cp-pin-label">Shell hunt</span></div>
-        <div class="cp-pin story" style="position:absolute;left:262px;top:300px;z-index:2"><svg class="cp-icon"><use href="#i-headphones"/></svg></div>
-        <div class="cp-pin water" style="position:absolute;left:150px;top:470px;z-index:2"><svg class="cp-icon"><use href="#i-drop"/></svg></div>
-        <div class="cp-pin crowd" style="position:absolute;left:96px;top:236px;z-index:2"><svg class="cp-icon"><use href="#i-crowd"/></svg></div>
-        <div style="position:absolute;left:146px;top:560px;width:56px;height:56px;border-radius:50%;background:rgba(20,54,93,.15);display:grid;place-items:center;z-index:2"><div style="width:36px;height:36px;border-radius:50%;background:#14365D;display:grid;place-items:center;border:3px solid #FFFDF8;box-shadow:var(--cp-shadow-md)"><svg class="cp-icon sm" style="fill:#D9A21B;stroke:#D9A21B"><use href="#i-nav"/></svg></div></div>
+        <div class="cp-pin iconic" style="position:absolute;left:222px;top:250px;z-index:2"><svg class="cp-icon "><use href="#i-landmark"/></svg><span class="xp">+80 XP</span><span class="cp-pin-label">Cathedral</span></div>
+        <div class="cp-pin church" style="position:absolute;left:107px;top:350px;z-index:2"><svg class="cp-icon "><use href="#i-church"/></svg><span class="cp-pin-label">San Juan</span></div>
+        <div class="cp-pin hunt" style="position:absolute;left:57px;top:277px;z-index:2"><svg class="cp-icon "><use href="#i-chest"/></svg><span class="cp-pin-label">Shell hunt</span></div>
+        <div class="cp-pin story" style="position:absolute;left:236px;top:168px;z-index:2"><svg class="cp-icon "><use href="#i-headphones"/></svg></div>
+        <div class="cp-pin water" style="position:absolute;left:26px;top:408px;z-index:2"><svg class="cp-icon "><use href="#i-drop"/></svg></div>
+        <div class="cp-pin crowd" style="position:absolute;left:236px;top:380px;z-index:2"><svg class="cp-icon "><use href="#i-crowd"/></svg></div>
+        <div style="position:absolute;left:162px;top:420px;width:56px;height:56px;border-radius:50%;background:rgba(20,54,93,.15);display:grid;place-items:center;z-index:2"><div style="width:36px;height:36px;border-radius:50%;background:#14365D;display:grid;place-items:center;border:3px solid #FFFDF8;box-shadow:var(--cp-shadow-md)"><svg class="cp-icon sm" style="fill:#D9A21B;stroke:#D9A21B"><use href="#i-nav"/></svg></div></div>
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
         <div style="position:absolute;top:62px;left:16px;right:16px;display:flex;flex-direction:column;gap:10px;z-index:4">
           <div style="display:flex;gap:10px;align-items:center">
             <div class="cp-hud" style="flex:1"><span class="cp-level">7</span><div style="flex:1"><div class="t">Peregrino<span>1,240 / 1,500 XP</span></div><div class="cp-xp"><span style="width:82%"></span></div></div></div>
             <button class="cp-icon-btn" aria-label="Search"><svg class="cp-icon"><use href="#i-search"/></svg></button>
           </div>
-          <div class="cp-achieve" style="align-self:flex-start"><span class="md"><svg class="cp-icon"><use href="#i-medal"/></svg></span><div><div class="t">Meseta Walker unlocked</div><div class="m">+100 XP · 300 km walked</div></div></div>
+          <div class="cp-layer-switch"><span class=""><svg class="cp-icon "><use href="#i-heli"/></svg>Helicopter</span><span class="on"><svg class="cp-icon "><use href="#i-city"/></svg>City</span></div>
         </div>
-        <div class="cp-fab-stack" style="position:absolute;right:16px;top:228px;z-index:4">
+        <div class="cp-fab-stack" style="position:absolute;right:16px;top:188px;z-index:4">
           <span class="cp-badge glass" style="height:40px;padding:0 12px;font-size:14px"><svg class="cp-icon sm"><use href="#i-sun"/></svg>24°</span>
           <button class="cp-icon-btn" style="align-self:flex-end"><svg class="cp-icon"><use href="#i-layers"/></svg></button>
           <button class="cp-icon-btn" style="align-self:flex-end"><svg class="cp-icon"><use href="#i-locate"/></svg></button>
@@ -2026,7 +2134,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     <div class="icon-cell"><svg class="cp-icon"><use href="#i-chat"/></svg>whatsapp</div>
     <div class="icon-cell"><svg class="cp-icon"><use href="#i-msg"/></svg>message</div>
     <div class="icon-cell"><svg class="cp-icon"><use href="#i-bolt"/></svg>instant</div>
-    <div class="icon-cell"><svg class="cp-icon"><use href="#i-sos"/></svg>sos</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-pencil"/></svg>write</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-link"/></svg>link</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-wifi"/></svg>wifi</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-utensils"/></svg>food</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-wash"/></svg>laundry</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-bike"/></svg>bike</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-plug"/></svg>charging</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-clock"/></svg>hours</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-image"/></svg>photo</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-copy"/></svg>copy</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-book"/></svg>article</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-shield"/></svg>policy</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-phone"/></svg>call</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-tagpeople"/></svg>tag people</div>
+    <div class="icon-cell"><svg class="cp-icon"><use href="#i-sos"/></svg>sos</div><div class="icon-cell"><svg class="cp-icon"><use href="#i-heli"/></svg>helicopter</div><div class="icon-cell"><svg class="cp-icon"><use href="#i-city"/></svg>city</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-pencil"/></svg>write</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-link"/></svg>link</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-wifi"/></svg>wifi</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-utensils"/></svg>food</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-wash"/></svg>laundry</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-bike"/></svg>bike</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-plug"/></svg>charging</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-clock"/></svg>hours</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-image"/></svg>photo</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-copy"/></svg>copy</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-book"/></svg>article</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-shield"/></svg>policy</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-phone"/></svg>call</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-tagpeople"/></svg>tag people</div>
   </div>
 </section>
 
