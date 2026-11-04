@@ -14,7 +14,7 @@
 # Needs: curl, osmium-tool, python3 with requirements.txt, and docker (or a
 # planetiler.jar with Java 25+ via PLANETILER="java -jar planetiler.jar").
 # Planetiler's own sources (ocean polygons ~750 MB, Natural Earth ~240 MB) are
-# downloaded once into $DATA_DIR/sources and reused.
+# downloaded once into $DATA_DIR/sources (step 5) and reused.
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")/.." && pwd)"
@@ -72,13 +72,26 @@ cp "$WORK/corridor-${BUFFER_KM}km.geojson" "$OUT_DIR/${NAME}.corridor.geojson"
 cp "$ROUTE" "$OUT_DIR/${SLUG}.route.geojson"
 
 # 5. Planetiler --------------------------------------------------------------------
+# Fetch Planetiler's sources ourselves with retries (its own downloader gives up
+# after a 10 s HEAD timeout, which osmdata.openstreetmap.de sometimes needs).
+fetch_source() { # <file> <url>
+  [[ -s "$DATA_DIR/sources/$1" ]] && return 0
+  curl -fSL --retry 5 --retry-all-errors --retry-delay 10 --connect-timeout 60 \
+    -o "$DATA_DIR/sources/$1.part" "$2" && mv "$DATA_DIR/sources/$1.part" "$DATA_DIR/sources/$1"
+}
+fetch_source water-polygons-split-3857.zip https://osmdata.openstreetmap.de/download/water-polygons-split-3857.zip
+fetch_source natural_earth_vector.sqlite.zip https://naciscdn.org/naturalearth/packages/natural_earth_vector.sqlite.zip
+fetch_source lake_centerline.shp.zip https://github.com/acalcutt/osm-lakelines/releases/download/v12/lake_centerline.shp.zip
+
 # Paths are relative to $DATA_DIR, which is mounted at /data in the container.
 cp "$WORK/corridor-${BUFFER_KM}km.poly" "$DATA_DIR/tmp/corridor.poly"
 cp "$STAGE_PBF" "$DATA_DIR/tmp/stage.osm.pbf"
 args=(
   --osm-path=/data/tmp/stage.osm.pbf
-  --download
-  --download-dir=/data/sources
+  --water-polygons-path=/data/sources/water-polygons-split-3857.zip
+  --natural-earth-path=/data/sources/natural_earth_vector.sqlite.zip
+  --lake-centerlines-path=/data/sources/lake_centerline.shp.zip
+  --download-osm-tile-weights=false
   --tmpdir=/data/tmp/planetiler
   --polygon=/data/tmp/corridor.poly
   --bounds="$BOUNDS"
