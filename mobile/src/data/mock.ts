@@ -43,3 +43,18 @@ export const messages = [
   { id: 'm2', name: 'Café El Peregrino', text: 'Yes, we open at 08:00 for pilgrims.', time: 'Yesterday', unread: 0, tint: tints[0] },
   { id: 'm3', name: 'Hannah', text: 'Haha, see you in Hontanas!', time: 'Mon', unread: 0, tint: tints[3] },
 ];
+
+export const rooms = [
+  { id: 'r1', name: 'Dorm bed (8)', price: 14, note: 'Breakfast not included' },
+  { id: 'r2', name: 'Private double', price: 42, note: 'Shared bathroom' },
+];
+export const reviews = [
+  { id: 'v1', who: 'Hannah', when: 'Oct 2026', text: 'Warm welcome, communal dinner was the highlight of my week.' },
+  { id: 'v2', who: 'Lucas', when: 'Sep 2026', text: 'Clean, quiet, great showers. Book ahead in high season.' },
+];
+export const exploreItems = [
+  { id: 'e1', user: 'hannah', caption: 'Sunrise over the meseta', tint: '#E9C987' },
+  { id: 'e2', user: 'lucas', caption: 'Cruz de Ferro', tint: '#9DB4CC' },
+  { id: 'e3', user: 'ana', caption: 'Pilgrim menu, 3 courses', tint: '#BFD0C4' },
+  { id: 'e4', user: 'maria', caption: 'Stamp number 6!', tint: '#D7C6E0' },
+];

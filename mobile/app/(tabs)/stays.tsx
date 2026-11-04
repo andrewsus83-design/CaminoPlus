@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, TextInput, View } from 'react-native';
+import { useRouter } from 'expo-router';
 import { Screen } from '@/components/Screen';
 import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
@@ -10,8 +11,9 @@ import { c, radius, role } from '@/theme';
 const FILTERS = ['All', 'Albergue', 'Hotel', 'Café'] as const;
 
 function StayCard({ s, fav, onFav }: { s: Stay; fav: boolean; onFav: () => void }) {
+  const router = useRouter();
   return (
-    <Card style={{ padding: 12, gap: 12 }}>
+    <Card style={{ padding: 12, gap: 12 }} onPress={() => router.push(`/stay/${s.id}`)}>
       <View>
         <Photo tint={s.tint} height={170} />
         <Pressable accessibilityLabel={fav ? 'Remove favourite' : 'Add favourite'} onPress={onFav} style={{ position: 'absolute', top: 10, right: 10, width: 40, height: 40, borderRadius: radius.pill, backgroundColor: role.surface, alignItems: 'center', justifyContent: 'center' }}>
