@@ -222,7 +222,7 @@ TABS = [
 
 ROUTES = [
  ("Camino Francés", "Saint-Jean-Pied-de-Port, France", 780, "31–35", "The classic. Across the Pyrenees, the Meseta and into Galicia.", "Most walked"),
- ("Camino Portugués (Central)", "Lisbon or Porto, Portugal", 620, "From Porto 10–13", "Through northern Portugal's villages and vineyards. About 240 km from Porto.", "Popular"),
+ ("Camino Portugués (Central)", "Porto (or Lisbon), Portugal", 240, "10–13", "Through northern Portugal's villages and vineyards. About 620 km and 25–29 stages if you start in Lisbon.", "Popular"),
  ("Camino Portugués (Coastal)", "Porto, Portugal", 260, "11–13", "Atlantic beaches and fishing towns, joining the Central route at Redondela.", None),
  ("Camino del Norte", "Irún, Spain", 825, "33–38", "Along the Bay of Biscay through San Sebastián, Bilbao and Cantabria.", None),
  ("Camino Primitivo", "Oviedo, Spain", 310, "12–15", "The original route. Mountains, quiet paths and big climbs.", None),
