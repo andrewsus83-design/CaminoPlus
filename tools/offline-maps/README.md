@@ -23,8 +23,22 @@ OSM extracts ──► osmium (merge + cut) ──► route from OSM ──► c
 ## Measured sizes
 
 <!-- SIZES -->
-Measured by the `offline-maps` GitHub Actions run on the PR (real OSM data).
-See the PR description for the latest table.
+Real build, GitHub Actions run 41858545167 (2026-11-04), OSM data of 2026-11-03,
+route taken from the OSM Camino relations (Napoleon + Valcarlos variants):
+
+| Corridor each side | Max zoom 14 | Max zoom 15 |
+|---|---|---|
+| 2 km | 2.58 MB | 4.54 MB |
+| **3 km (default)** | 2.60 MB | **4.59 MB** |
+| 5 km | 2.64 MB | 4.67 MB |
+
+- The default pack (3 km, z15) has 1,536 tiles and is inside the 2 to 5 MB target.
+- Width barely matters: the mountains outside the villages hold little data. Zoom 15
+  roughly doubles the size, mainly from buildings, paths and POIs in Saint-Jean.
+- If we need it smaller, z14 + overzoom still looks fine for walking (2.6 MB).
+- Render test on the same run: map drew with every outside request blocked (0 tried
+  to leave) and again with the browser offline, e.g. 570 POIs and 322 road/path
+  features at z15 in Saint-Jean, 12 mountain peaks around Orisson at z13.
 <!-- /SIZES -->
 
 ## Why we build our own tiles (and not MapTiler for offline)
