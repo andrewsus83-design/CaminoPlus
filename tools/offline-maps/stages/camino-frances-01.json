@@ -9,7 +9,13 @@
     "https://download.geofabrik.de/europe/france/aquitaine-latest.osm.pbf",
     "https://download.geofabrik.de/europe/spain/navarra-latest.osm.pbf"
   ],
-  "search_bbox": [-1.42, 42.97, -1.15, 43.20],
+  "search_bbox": [
+    -1.42,
+    42.97,
+    -1.15,
+    43.2
+  ],
+  "coastal": false,
   "route_name_regex": "camino|santiago|compostel|saint[- ]jacques|jacquaire|\\bgr ?65\\b|jakobsweg|done jakue",
   "fallback_route": "camino-frances-01.route.geojson",
   "buffer_km": 3,

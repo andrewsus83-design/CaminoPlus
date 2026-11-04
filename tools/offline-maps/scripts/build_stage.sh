@@ -76,10 +76,25 @@ cp "$ROUTE" "$OUT_DIR/${SLUG}.route.geojson"
 # after a 10 s HEAD timeout, which osmdata.openstreetmap.de sometimes needs).
 fetch_source() { # <file> <url>
   [[ -s "$DATA_DIR/sources/$1" ]] && return 0
-  curl -fSL --retry 5 --retry-all-errors --retry-delay 10 --connect-timeout 60 \
+  curl -fSL --retry "${FETCH_RETRIES:-3}" --retry-all-errors --retry-delay 10 --connect-timeout 30 \
     -o "$DATA_DIR/sources/$1.part" "$2" && mv "$DATA_DIR/sources/$1.part" "$DATA_DIR/sources/$1"
 }
-fetch_source water-polygons-split-3857.zip https://osmdata.openstreetmap.de/download/water-polygons-split-3857.zip
+# Ocean polygons only matter for stages that touch the sea. For inland stages, if
+# osmdata.openstreetmap.de is unreachable (it often is from GitHub runners), use
+# Planetiler's tiny test file (Monaco coast only), which adds nothing to the pack.
+OCEAN=osmdata
+if [[ -f "$DATA_DIR/tmp/water-placeholder.zip" ]] || \
+   ! fetch_source water-polygons-split-3857.zip https://osmdata.openstreetmap.de/download/water-polygons-split-3857.zip; then
+  if [[ "$(jqr ".get('coastal', False)")" == "True" ]]; then
+    echo "ocean polygons unavailable and this stage is coastal: stopping" >&2; exit 1
+  fi
+  echo "ocean polygons unavailable; inland stage, using placeholder (no sea in this corridor)"
+  [[ -f "$DATA_DIR/tmp/water-placeholder.zip" ]] || curl -fsSL --retry 3 -o "$DATA_DIR/tmp/water-placeholder.zip" \
+    https://raw.githubusercontent.com/onthegomap/planetiler/main/planetiler-core/src/test/resources/water-polygons-split-3857.zip
+  OCEAN=placeholder
+fi
+WATER=/data/sources/water-polygons-split-3857.zip
+[[ "$OCEAN" == placeholder ]] && WATER=/data/tmp/water-placeholder.zip
 fetch_source natural_earth_vector.sqlite.zip https://naciscdn.org/naturalearth/packages/natural_earth_vector.sqlite.zip
 fetch_source lake_centerline.shp.zip https://github.com/acalcutt/osm-lakelines/releases/download/v12/lake_centerline.shp.zip
 
@@ -88,7 +103,7 @@ cp "$WORK/corridor-${BUFFER_KM}km.poly" "$DATA_DIR/tmp/corridor.poly"
 cp "$STAGE_PBF" "$DATA_DIR/tmp/stage.osm.pbf"
 args=(
   --osm-path=/data/tmp/stage.osm.pbf
-  --water-polygons-path=/data/sources/water-polygons-split-3857.zip
+  --water-polygons-path="$WATER"
   --natural-earth-path=/data/sources/natural_earth_vector.sqlite.zip
   --lake-centerlines-path=/data/sources/lake_centerline.shp.zip
   --download-osm-tile-weights=false
@@ -133,6 +148,7 @@ json.dump({
   "maxzoom": int("$MAXZOOM"),
   "bounds": [float(x) for x in "$BOUNDS".split(",")],
   "route_source": "$ROUTE_SOURCE",
+  "ocean_polygons": "$OCEAN",
   "osm_timestamp": "$OSM_TS",
   "planetiler": "$PLANETILER_VERSION",
   "schema": "openmaptiles",
