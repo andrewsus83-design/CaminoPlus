@@ -348,6 +348,139 @@ textarea.cp-input { height: 120px; border-radius: var(--cp-radius-lg); padding: 
 footer { padding: var(--cp-space-20) 0; text-align: center; color: var(--cp-text-muted); font-size: 15px; }
 footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(--cp-color-red); display: block; margin-bottom: 8px; }
 
+/* ---- v2: profile, sub-tabs, OTA banner, RPG layer, stories, photo market ---- */
+.cp-subtabs { display: flex; border-bottom: 1px solid var(--cp-border); }
+.cp-subtabs span { flex: 1; text-align: center; padding: 14px 0 12px; font-size: 15px; font-weight: 600; color: var(--cp-text-muted); border-bottom: 3px solid transparent; margin-bottom: -1px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.cp-subtabs span.on { color: var(--cp-text); border-color: var(--cp-color-blue); }
+.cp-ring { padding: 3px; border-radius: 50%; background: conic-gradient(from 200deg, var(--cp-color-gold), var(--cp-color-red), var(--cp-color-gold-bright), var(--cp-color-gold)); flex: none; display: inline-block; }
+.cp-ring.seen { background: var(--cp-border-strong); }
+.cp-avatar { display: block; border-radius: 50%; border: 3px solid var(--cp-bg); background: linear-gradient(150deg, #E9C987, #A0583F); }
+.profile-top { display: flex; align-items: center; gap: 20px; }
+.pstats { flex: 1; display: flex; justify-content: space-around; text-align: center; }
+.pstats b { display: block; font-family: var(--cp-font-title); font-weight: 600; font-size: 22px; line-height: 26px; }
+.pstats span { font-size: 13px; color: var(--cp-text-muted); }
+.highlights { display: flex; gap: 16px; overflow-x: auto; margin: 0 -24px; padding: 2px 24px; scrollbar-width: none; }
+.highlights div { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; flex: none; }
+.highlights .cp-avatar { width: 60px; height: 60px; }
+.highlights .add { width: 66px; height: 66px; border-radius: 50%; border: 2px dashed var(--cp-border-strong); display: grid; place-items: center; color: var(--cp-text-muted); }
+.cp-post { background: var(--cp-surface); border-radius: var(--cp-radius-lg); box-shadow: var(--cp-shadow-sm); overflow: hidden; }
+.cp-post .hd { display: flex; align-items: center; gap: 12px; padding: 16px 16px 12px; }
+.cp-post .hd .cp-avatar { width: 40px; height: 40px; border: 0; }
+.cp-post .hd .n { font-weight: 600; font-size: 15px; line-height: 20px; }
+.cp-post .hd .m { font-size: 13px; line-height: 18px; color: var(--cp-text-muted); }
+.cp-post .tx { padding: 0 16px 14px; font-size: 16px; line-height: 24px; }
+.cp-post .cp-img { border-radius: 0; height: 220px; }
+.cp-post .counts { display: flex; justify-content: space-between; padding: 12px 16px; font-size: 13px; color: var(--cp-text-muted); border-bottom: 1px solid var(--cp-border); }
+.cp-post .acts { display: flex; justify-content: space-around; padding: 6px 8px; }
+.cp-post .acts span { display: inline-flex; align-items: center; gap: 6px; padding: 10px 12px; border-radius: var(--cp-radius-pill); font-size: 14px; font-weight: 600; color: var(--cp-text-muted); }
+.cp-banner { position: relative; overflow: hidden; border-radius: var(--cp-radius-xl); background: var(--cp-color-blue); color: var(--cp-color-parchment); padding: 22px 24px; min-height: 176px; }
+.cp-banner .art { position: absolute; right: -36px; bottom: -44px; width: 200px; height: 200px; color: var(--cp-color-gold); opacity: .9; }
+.cp-banner .art .cp-icon { width: 100%; height: 100%; stroke-width: 1.2px; }
+.cp-banner .ey { font-family: var(--cp-font-mono); font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--cp-color-gold-bright); }
+.cp-banner h4 { font-family: var(--cp-font-title); font-weight: 600; font-size: 26px; line-height: 30px; margin: 8px 0 14px; max-width: 210px; }
+.cp-banner .cp-btn { background: var(--cp-color-gold); color: var(--cp-color-blue); position: relative; }
+.cp-dots { display: flex; gap: 6px; justify-content: center; margin-top: 12px; }
+.cp-dots i { width: 6px; height: 6px; border-radius: var(--cp-radius-pill); background: var(--cp-border-strong); }
+.cp-dots i.on { width: 20px; background: var(--cp-color-blue); }
+.cp-stay-row { display: flex; gap: 14px; align-items: stretch; padding: 12px; }
+.cp-stay-row .cp-img { width: 104px; height: 104px; flex: none; border-radius: var(--cp-radius-md); }
+.cp-stay-row .bd { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.cp-stay-row .n { font-weight: 600; font-size: 16px; line-height: 21px; display: flex; justify-content: space-between; gap: 8px; }
+.cp-stay-row .m { font-size: 13px; line-height: 18px; color: var(--cp-text-muted); }
+.cp-stay-row .p { font-size: 15px; margin-top: auto; display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+.cp-stay-row .p b { font-weight: 600; }
+.cp-stay-row .bm { color: var(--cp-text-muted); }
+.cp-stay-row .bm.on { color: var(--cp-color-red); }
+.cp-stay-row .bm.on .cp-icon { fill: currentColor; }
+.cp-chip .cp-icon.sm.after { margin-left: -2px; }
+/* RPG layer */
+.cp-hud { display: flex; align-items: center; gap: 12px; padding: 7px 16px 7px 7px; border-radius: var(--cp-radius-pill); background: var(--cp-surface); box-shadow: var(--cp-shadow-md); }
+.cp-level { width: 42px; height: 42px; border-radius: 50%; background: var(--cp-color-blue); color: var(--cp-color-gold-bright); display: grid; place-items: center; font-family: var(--cp-font-title); font-weight: 700; font-size: 19px; box-shadow: inset 0 0 0 3px var(--cp-color-gold); flex: none; }
+.cp-hud .t { font-size: 13px; font-weight: 600; line-height: 16px; display: flex; justify-content: space-between; gap: 10px; }
+.cp-hud .t span { color: var(--cp-text-muted); font-weight: 500; font-family: var(--cp-font-mono); font-size: 11px; }
+.cp-xp { height: 8px; border-radius: var(--cp-radius-pill); background: var(--cp-surface-sunken); margin-top: 6px; overflow: hidden; }
+.cp-xp span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--cp-color-gold), var(--cp-color-gold-bright)); }
+.cp-pin { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; border: 3px solid var(--cp-color-white); box-shadow: var(--cp-shadow-md); position: relative; }
+.cp-pin .cp-icon { width: 22px; height: 22px; stroke-width: 2px; }
+.cp-pin.church { background: var(--cp-color-blue); color: var(--cp-color-parchment); }
+.cp-pin.iconic { background: var(--cp-color-gold); color: var(--cp-color-blue); width: 56px; height: 56px; }
+.cp-pin.hunt { background: var(--cp-color-red); color: #fff; }
+.cp-pin.story { background: var(--cp-color-white); color: var(--cp-color-blue); box-shadow: 0 0 0 3px var(--cp-color-gold), var(--cp-shadow-md); }
+.cp-pin.water { background: #CFE0F0; color: var(--cp-color-blue); width: 40px; height: 40px; }
+.cp-pin.crowd { background: var(--cp-color-blue-100); color: var(--cp-color-blue); }
+.cp-pin .xp { position: absolute; top: -10px; right: -14px; background: var(--cp-color-gold); color: var(--cp-color-blue); font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: var(--cp-radius-pill); border: 2px solid var(--cp-color-white); white-space: nowrap; }
+.cp-pin-label { position: absolute; top: calc(100% + 6px); left: 50%; transform: translateX(-50%); white-space: nowrap; font-size: 11px; font-weight: 700; background: var(--cp-color-white); padding: 2px 8px; border-radius: var(--cp-radius-pill); box-shadow: var(--cp-shadow-sm); color: var(--cp-text); }
+.cp-audio { display: flex; align-items: center; gap: 14px; padding: 8px 16px 8px 8px; border-radius: var(--cp-radius-pill); background: var(--cp-surface-sunken); }
+.cp-audio .play { width: 48px; height: 48px; border-radius: 50%; background: var(--cp-color-gold); color: var(--cp-color-blue); display: grid; place-items: center; flex: none; }
+.cp-audio .play .cp-icon { fill: currentColor; width: 20px; height: 20px; }
+.cp-audio .t { font-size: 14px; font-weight: 600; line-height: 18px; }
+.cp-audio .m { font-size: 12px; color: var(--cp-text-muted); font-family: var(--cp-font-mono); }
+.cp-wave { display: flex; align-items: center; gap: 3px; height: 22px; margin-top: 4px; }
+.cp-wave i { width: 3px; border-radius: 2px; background: var(--cp-border-strong); }
+.cp-wave i.p { background: var(--cp-color-blue); }
+.cp-quest { display: flex; gap: 14px; align-items: center; padding: 14px 16px; border-radius: var(--cp-radius-lg); background: var(--cp-color-gold-wash); box-shadow: inset 0 0 0 1.5px var(--cp-color-gold-soft); }
+.cp-quest .ic { width: 44px; height: 44px; border-radius: 50%; background: var(--cp-color-red); color: #fff; display: grid; place-items: center; flex: none; }
+.cp-quest .t { font-size: 15px; font-weight: 600; line-height: 20px; }
+.cp-quest .m { font-size: 13px; line-height: 18px; color: var(--cp-text-muted); }
+.cp-quest .shells { display: flex; gap: 4px; margin-top: 6px; color: var(--cp-color-gold-ink); }
+.cp-quest .shells .cp-icon.off { color: var(--cp-border-strong); }
+.cp-achieve { display: flex; align-items: center; gap: 12px; padding: 8px 18px 8px 8px; border-radius: var(--cp-radius-pill); background: var(--cp-color-blue); color: var(--cp-color-parchment); box-shadow: var(--cp-shadow-lg); }
+.cp-achieve .md { width: 44px; height: 44px; border-radius: 50%; background: var(--cp-color-gold); color: var(--cp-color-blue); display: grid; place-items: center; box-shadow: 0 0 0 4px rgba(217,162,27,.3); flex: none; }
+.cp-achieve .t { font-size: 14px; font-weight: 700; line-height: 18px; }
+.cp-achieve .m { font-size: 12px; line-height: 16px; color: var(--cp-color-gold-bright); font-weight: 600; }
+/* Stories: horizontal deck */
+.cp-story-progress { display: flex; gap: 4px; }
+.cp-story-progress i { flex: 1; height: 3px; border-radius: var(--cp-radius-pill); background: rgba(255,253,248,.4); }
+.cp-story-progress i.done { background: #fff; }
+.cp-story-progress i.now { background: linear-gradient(90deg, #fff 55%, rgba(255,253,248,.4) 55%); }
+.deck { position: relative; height: 488px; margin: 0 -24px; overflow: hidden; }
+.deck .card { position: absolute; top: 0; bottom: 0; border-radius: var(--cp-radius-xl); overflow: hidden; color: #fff; }
+.deck .card .cp-img { position: absolute; inset: 0; border-radius: 0; }
+.deck .card.prev { left: -292px; width: 304px; opacity: .7; transform: scale(.94); }
+.deck .card.next { right: -292px; width: 304px; opacity: .7; transform: scale(.94); }
+.deck .card.cur { left: 24px; right: 24px; box-shadow: var(--cp-shadow-lg); }
+.deck .shade { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(12,35,64,.55) 0%, rgba(12,35,64,0) 25%, rgba(12,35,64,0) 50%, rgba(12,35,64,.9) 100%); }
+.deck .top { position: absolute; top: 14px; left: 14px; right: 14px; }
+.deck .who { display: flex; align-items: center; gap: 10px; margin-top: 12px; font-size: 14px; font-weight: 600; }
+.deck .who .cp-avatar { width: 34px; height: 34px; border: 2px solid #fff; }
+.deck .who small { font-weight: 500; opacity: .8; }
+.deck .hand { font-family: var(--cp-font-accent); font-size: 34px; line-height: 36px; color: var(--cp-color-gold-bright); text-shadow: 0 1px 8px rgba(12,35,64,.55); position: absolute; left: 20px; right: 20px; bottom: 132px; transform: rotate(-3deg); }
+.deck .cap { position: absolute; left: 20px; right: 20px; bottom: 76px; font-size: 15px; line-height: 21px; }
+.deck .bar { position: absolute; left: 14px; right: 14px; bottom: 14px; display: flex; gap: 8px; align-items: center; }
+.deck .bar .glass { height: 44px; padding: 0 14px; border-radius: var(--cp-radius-pill); background: rgba(255,253,248,.18); backdrop-filter: blur(10px); display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: #fff; }
+.deck .bar .buy { margin-left: auto; background: var(--cp-color-gold); color: var(--cp-color-blue); }
+.swipe-hint { display: flex; justify-content: center; margin-top: 14px; }
+/* Photo marketplace */
+.cp-photo { position: relative; border-radius: var(--cp-radius-md); overflow: hidden; aspect-ratio: 3 / 4; }
+.cp-photo .cp-img { position: absolute; inset: 0; border-radius: 0; }
+.cp-photo .wm { position: absolute; inset: 0; display: grid; place-items: center; font-family: var(--cp-font-title); font-weight: 600; font-size: 18px; color: rgba(255,255,255,.55); transform: rotate(-24deg); letter-spacing: 1px; pointer-events: none; }
+.cp-photo .face { position: absolute; top: 8px; left: 8px; }
+.cp-photo .price { position: absolute; left: 8px; bottom: 8px; }
+.cp-photo .sel { position: absolute; top: 8px; right: 8px; width: 26px; height: 26px; border-radius: 50%; border: 2px solid #fff; background: rgba(12,35,64,.25); display: grid; place-items: center; color: var(--cp-color-blue); }
+.cp-photo .sel.on { background: var(--cp-color-gold); border-color: var(--cp-color-gold); }
+.photo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+/* Plan tracker */
+.cp-timeline { position: relative; }
+.cp-step { display: flex; gap: 14px; position: relative; padding-bottom: 18px; }
+.cp-step::before { content: ""; position: absolute; left: 13px; top: 30px; bottom: -2px; width: 2px; background: var(--cp-border); }
+.cp-step:last-child::before { display: none; }
+.cp-step .dot { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; flex: none; background: var(--cp-surface); box-shadow: inset 0 0 0 2px var(--cp-border-strong); color: var(--cp-text-muted); font-size: 12px; font-weight: 700; z-index: 1; }
+.cp-step.done .dot { background: var(--cp-color-blue); color: var(--cp-color-parchment); box-shadow: none; }
+.cp-step.done::before { background: var(--cp-color-blue); }
+.cp-step.today .dot { background: var(--cp-color-gold); color: var(--cp-color-blue); box-shadow: 0 0 0 5px var(--cp-color-gold-soft); }
+.cp-step .c { flex: 1; min-width: 0; }
+.cp-step.today .c { background: var(--cp-surface); border-radius: var(--cp-radius-lg); padding: 14px 16px; box-shadow: var(--cp-shadow-sm); margin-top: -6px; }
+.cp-step .t { font-weight: 600; font-size: 16px; line-height: 22px; display: flex; justify-content: space-between; gap: 8px; }
+.cp-step .t span { font-family: var(--cp-font-mono); font-size: 13px; font-weight: 400; color: var(--cp-text-muted); }
+.cp-step .m { font-size: 13px; line-height: 18px; color: var(--cp-text-muted); margin-top: 2px; }
+.cp-step .b { margin-top: 8px; display: flex; gap: 6px; flex-wrap: wrap; }
+.passport-cover { border-radius: var(--cp-radius-xl); background: var(--cp-color-blue); color: var(--cp-color-parchment); padding: 22px 24px; display: flex; align-items: center; gap: 18px; position: relative; overflow: hidden; }
+.passport-cover .seal { width: 64px; height: 64px; border-radius: 50%; border: 2px solid var(--cp-color-gold); color: var(--cp-color-gold); display: grid; place-items: center; flex: none; }
+.passport-cover .seal .cp-icon { width: 34px; height: 34px; }
+.passport-cover .ey { font-family: var(--cp-font-mono); font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--cp-color-gold-bright); }
+.passport-cover h4 { font-family: var(--cp-font-title); font-weight: 600; font-size: 22px; line-height: 26px; margin: 4px 0 2px; }
+.passport-cover p { margin: 0; font-size: 13px; color: rgba(246,239,226,.8); }
+
 @media (max-width: 640px) {
   .wrap, .doc-nav-inner { padding-left: 16px; padding-right: 16px; }
   .doc h2 { font-size: 36px; line-height: 42px; }
@@ -409,6 +542,21 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     <symbol id="i-msg" viewBox="0 0 24 24"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v8a2.5 2.5 0 0 1-2.5 2.5H9l-5 3.5v-14Z"/></symbol>
     <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2.5 4.5 13.5H12l-1 8 8.5-11H12l1-8Z"/></symbol>
     <symbol id="i-logout" viewBox="0 0 24 24"><path d="M14 4h3.5A2.5 2.5 0 0 1 20 6.5v11a2.5 2.5 0 0 1-2.5 2.5H14"/><path d="M9.5 8 5.5 12l4 4M5.5 12H15"/></symbol>
+    <symbol id="i-explore" viewBox="0 0 24 24"><rect x="3" y="5" width="12" height="15" rx="3"/><path d="M18 7.5v10M21 9.5v6"/><path d="m8 10 3.5 2.5L8 15v-5Z"/></symbol>
+    <symbol id="i-church" viewBox="0 0 24 24"><path d="M12 2.5v4M10.3 4.2h3.4"/><path d="m7 11 5-4.5 5 4.5"/><path d="M7 11v9.5h10V11"/><path d="M3.5 20.5V14L7 12M20.5 20.5V14L17 12"/><path d="M10.5 20.5v-3.5a1.5 1.5 0 0 1 3 0v3.5"/></symbol>
+    <symbol id="i-landmark" viewBox="0 0 24 24"><path d="M4 20.5h16M5.5 20.5V9M18.5 20.5V9M4 9h16"/><path d="M4 9V5.5l2 1 2-1 2 1 2-1 2 1 2-1 2 1 2-1V9"/><path d="M10 20.5v-5a2 2 0 0 1 4 0v5"/></symbol>
+    <symbol id="i-flag" viewBox="0 0 24 24"><path d="M5 21V4"/><path d="M5 4.5c4.5-2 7.5 2 14 0v9c-6.5 2-9.5-2-14 0"/></symbol>
+    <symbol id="i-chest" viewBox="0 0 24 24"><path d="M3.5 10a5 5 0 0 1 5-5h7a5 5 0 0 1 5 5v9.5h-17V10Z"/><path d="M3.5 12h17M10.5 10.5h3v3h-3z"/></symbol>
+    <symbol id="i-headphones" viewBox="0 0 24 24"><path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="3.5" y="14" width="4.5" height="6.5" rx="2"/><rect x="16" y="14" width="4.5" height="6.5" rx="2"/></symbol>
+    <symbol id="i-medal" viewBox="0 0 24 24"><path d="M8 3h8l-2 6h-4L8 3Z"/><circle cx="12" cy="15" r="5.5"/><path d="m12 12.3.9 1.8 2 .3-1.4 1.4.3 2-1.8-1-1.8 1 .3-2-1.4-1.4 2-.3.9-1.8Z"/></symbol>
+    <symbol id="i-bookmark" viewBox="0 0 24 24"><path d="M6.5 3.5h11v17l-5.5-4-5.5 4v-17Z"/></symbol>
+    <symbol id="i-face" viewBox="0 0 24 24"><path d="M3.5 8V6A2.5 2.5 0 0 1 6 3.5h2M16 3.5h2A2.5 2.5 0 0 1 20.5 6v2M20.5 16v2a2.5 2.5 0 0 1-2.5 2.5h-2M8 20.5H6A2.5 2.5 0 0 1 3.5 18v-2"/><path d="M9 10v1M15 10v1M9.5 15.5c1.5 1.2 3.5 1.2 5 0"/></symbol>
+    <symbol id="i-tag" viewBox="0 0 24 24"><path d="M3.5 12.2V4.5a1 1 0 0 1 1-1h7.7l8.3 8.3a1.5 1.5 0 0 1 0 2.1l-6.3 6.3a1.5 1.5 0 0 1-2.1 0l-8.6-8Z"/><circle cx="8" cy="8" r="1.5"/></symbol>
+    <symbol id="i-swipe" viewBox="0 0 24 24"><path d="M3 12h18M7 8l-4 4 4 4M17 8l4 4-4 4"/></symbol>
+    <symbol id="i-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-dots" viewBox="0 0 24 24"><circle cx="6" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="18" cy="12" r="1"/></symbol>
   </defs>
 </svg>
 
@@ -417,7 +565,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     <div class="logo-ph"><span class="mark"><svg class="cp-icon"><use href="#i-shell"/></svg></span><span class="word">Camino<span>Plus</span></span><span class="tag">logo TBD</span></div>
     <nav class="doc-nav-links">
       <a href="#color">Color</a><a href="#type">Type</a><a href="#space">Spacing</a><a href="#radius">Radius</a><a href="#shadow">Shadow</a>
-      <a href="#buttons">Buttons</a><a href="#inputs">Inputs</a><a href="#chips">Chips</a><a href="#cards">Cards</a><a href="#waze">Map patterns</a>
+      <a href="#buttons">Buttons</a><a href="#inputs">Inputs</a><a href="#chips">Chips</a><a href="#cards">Cards</a><a href="#waze">Map patterns</a><a href="#rpg">Quests & stories</a>
       <a href="#tabbar">Tab bar</a><a href="#screens">Screens</a><a href="#icons">Icons</a>
     </nav>
   </div>
@@ -438,7 +586,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
   <div class="grid g4 principles">
     <div class="principle panel"><span class="cp-badge gold">01</span><h4>Spacious</h4><p>24px screen margins, 40px between sections. One idea per card. When in doubt, add air.</p></div>
     <div class="principle panel"><span class="cp-badge blue">02</span><h4>Pill-first</h4><p>Buttons, inputs, chips and the tab bar are fully rounded. Cards use 28px. No sharp corners.</p></div>
-    <div class="principle panel"><span class="cp-badge green">03</span><h4>Map-first & friendly</h4><p>Like Waze: floating controls, bottom sheets, one-tap reports with round, colorful icon bubbles.</p></div>
+    <div class="principle panel"><span class="cp-badge green">03</span><h4>Map-first & playful</h4><p>Waze-style floating controls and one-tap reports, plus a light RPG layer: XP, quests, churches and audio stories.</p></div>
     <div class="principle panel"><span class="cp-badge red">04</span><h4>Reverent, not churchy</h4><p>Gold and red are earned accents: Jubilee moments, stamps, alerts. Parchment and blue carry the rest.</p></div>
   </div>
 </section>
@@ -828,235 +976,429 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
   </div>
 </section>
 
+<!-- =================================================================== RPG & SOCIAL -->
+<section class="doc" id="rpg">
+  <p class="eyebrow">11 · Quests, stories & stays patterns</p>
+  <h2>A little game on the Way</h2>
+  <p class="intro">The Maps tab adds a light RPG layer on top of Waze: pilgrims earn XP for walking, visiting churches and iconic places, finishing scavenger hunts and listening to stories. Explore uses horizontal stories, and Stays opens with an OTA-style banner.</p>
+  <div class="grid g2" style="align-items:start">
+    <div style="display:flex;flex-direction:column;gap:24px">
+      <div class="panel">
+        <p class="cp-label" style="margin:0 0 20px">Map pins (POI types)</p>
+        <div class="row" style="gap:30px;padding-bottom:26px;justify-content:space-around">
+          <div class="cp-pin church"><svg class="cp-icon"><use href="#i-church"/></svg><span class="cp-pin-label">Church</span></div>
+          <div class="cp-pin iconic"><svg class="cp-icon"><use href="#i-landmark"/></svg><span class="xp">+80</span><span class="cp-pin-label">Iconic</span></div>
+          <div class="cp-pin hunt"><svg class="cp-icon"><use href="#i-chest"/></svg><span class="cp-pin-label">Hunt</span></div>
+          <div class="cp-pin story"><svg class="cp-icon"><use href="#i-headphones"/></svg><span class="cp-pin-label">Story</span></div>
+          <div class="cp-pin crowd"><svg class="cp-icon"><use href="#i-crowd"/></svg><span class="cp-pin-label">Crowd</span></div>
+          <div class="cp-pin water"><svg class="cp-icon"><use href="#i-drop"/></svg><span class="cp-pin-label">Water</span></div>
+        </div>
+        <p class="spec" style="margin:8px 0 0">.cp-pin .church (blue) · .iconic (gold, 56) · .hunt (red) · .story (white, gold ring) · .crowd · .water · .xp reward tag</p>
+      </div>
+      <div class="panel" style="display:flex;flex-direction:column;gap:16px">
+        <div class="cp-hud"><span class="cp-level">7</span><div style="flex:1"><div class="t">Peregrino · Level 7<span>1,240 / 1,500 XP</span></div><div class="cp-xp"><span style="width:82%"></span></div></div></div>
+        <div class="cp-achieve" style="align-self:flex-start"><span class="md"><svg class="cp-icon"><use href="#i-medal"/></svg></span><div><div class="t">Meseta Walker unlocked</div><div class="m">+100 XP · 300 km walked</div></div></div>
+        <div class="cp-quest"><span class="ic"><svg class="cp-icon"><use href="#i-chest"/></svg></span><div style="flex:1"><div class="t">Shell hunt · Hontanas</div><div class="m">Find 3 hidden shells · +50 XP</div><div class="shells"><svg class="cp-icon sm"><use href="#i-shell"/></svg><svg class="cp-icon sm"><use href="#i-shell"/></svg><svg class="cp-icon sm off"><use href="#i-shell"/></svg></div></div></div>
+        <div class="cp-audio"><span class="play"><svg class="cp-icon"><use href="#i-play"/></svg></span><div style="flex:1;min-width:0"><div class="t">Story · The pilgrim who lost his shell</div><div class="cp-wave"><i class="p" style="height:6px"></i><i class="p" style="height:10px"></i><i class="p" style="height:16px"></i><i class="p" style="height:12px"></i><i class="p" style="height:20px"></i><i class="p" style="height:14px"></i><i class="p" style="height:8px"></i><i class="p" style="height:18px"></i><i class="p" style="height:22px"></i><i class="p" style="height:12px"></i><i class="p" style="height:9px"></i><i class="p" style="height:16px"></i><i class="p" style="height:20px"></i><i class="p" style="height:11px"></i><i class="p" style="height:7px"></i><i class="p" style="height:14px"></i><i class="" style="height:18px"></i><i class="" style="height:10px"></i><i class="" style="height:6px"></i><i class="" style="height:12px"></i><i class="" style="height:16px"></i><i class="" style="height:9px"></i><i class="" style="height:13px"></i><i class="" style="height:7px"></i><i class="" style="height:10px"></i><i class="" style="height:15px"></i><i class="" style="height:8px"></i><i class="" style="height:5px"></i><i class="" style="height:9px"></i><i class="" style="height:14px"></i></div></div><span class="m">1:12 / 3:20</span></div>
+        <p class="spec" style="margin:0">.cp-hud + .cp-level + .cp-xp · .cp-achieve (toast, 3s) · .cp-quest · .cp-audio + .cp-wave</p>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:24px">
+      <div class="panel">
+        <div class="cp-banner"><span class="art"><svg class="cp-icon"><use href="#i-shell"/></svg></span><div class="ey">Jubilee Year 2027</div><h4>Holy Year beds in Santiago go fast</h4><button class="cp-btn sm">Book early</button></div>
+        <div class="cp-dots"><i class="on"></i><i></i><i></i></div>
+        <p class="spec" style="margin:16px 0 0">.cp-banner (OTA promo carousel) · radius xl · .cp-dots</p>
+      </div>
+      <div class="panel" style="padding:12px">
+            <div class="cp-card cp-stay-row">
+              <div class="cp-img "></div>
+              <div class="bd">
+                <div class="n"><span>Albergue El Puntido</span><span class="bm on"><svg class="cp-icon sm"><use href="#i-heart"/></svg></span></div>
+                <div class="m">Albergue · on route</div>
+                <div class="m"><svg class="cp-icon sm" style="width:13px;height:13px;fill:currentColor;vertical-align:-2px"><use href="#i-star"/></svg> <b style="color:var(--cp-text)">4.88</b> (312 reviews)</div>
+                <div class="p"><span><b>€12</b></span><span class="cp-badge blue"><svg class="cp-icon sm"><use href="#i-bolt"/></svg>Instant</span></div>
+              </div>
+            </div>
+        <p class="spec" style="margin:8px 12px 8px">.cp-stay-row · list layout for stays and cafes · heart = favourite</p>
+      </div>
+      <div class="panel">
+        <div class="row" style="gap:16px;align-items:flex-start">
+          <div style="width:150px"><div class="cp-photo"><div class="cp-img v5"></div><span class="wm">CaminoPlus</span><span class="cp-badge glass face"><svg class="cp-icon sm"><use href="#i-face"/></svg>You</span><span class="sel on"><svg class="cp-icon sm" style="width:14px;height:14px;stroke-width:3px"><use href="#i-check"/></svg></span><span class="cp-badge glass price">€2.99</span></div></div>
+          <div style="flex:1;min-width:180px">
+            <div class="cp-story-progress" style="background:var(--cp-color-blue);padding:10px;border-radius:var(--cp-radius-pill)"><i class="done"></i><i class="done"></i><i class="now"></i><i></i><i></i></div>
+            <p class="note" style="margin:14px 0 0">Stories move <b>left / right</b>, not up and down. A peek of the previous and next card shows at the edges. Watermarked photo tiles with a face-match tag feed the "Photos of you" marketplace.</p>
+            <p class="spec" style="margin:10px 0 0">.cp-story-progress · .deck · .cp-photo</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- =================================================================== TAB BAR -->
 <section class="doc" id="tabbar">
-  <p class="eyebrow">11 · Navigation</p>
+  <p class="eyebrow">12 · Navigation</p>
   <h2>Floating tab bar</h2>
-  <p class="intro">Five tabs in a floating pill, 12px from the screen edges. The active tab gets a gold-soft pill behind its icon and a bold label. Labels are always visible.</p>
-  <div class="panel" style="max-width:440px;padding:32px 12px;background:var(--cp-color-sand-200)">
-    <nav class="cp-tabbar" style="margin:0 12px">
-      <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
-      <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
-      <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
-      <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-more"/></svg></span>More</div>
-      <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-settings"/></svg></span>Settings</div>
-    </nav>
+  <p class="intro">Five tabs in a floating pill, 12px from the screen edges: <b>Me</b>, <b>Stays</b>, <b>Maps</b>, <b>Explore</b>, <b>Settings</b>. The active tab gets a gold-soft pill behind its icon and a bold label. Labels are always visible. Inside a tab, sub-sections use underline sub-tabs.</p>
+  <div class="grid g2" style="align-items:start">
+    <div class="panel" style="padding:32px 12px;background:var(--cp-color-sand-200)">
+      <nav class="cp-tabbar" style="margin:0 12px">
+        <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
+        <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
+        <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
+        <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Explore</div>
+        <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-settings"/></svg></span>Settings</div>
+      </nav>
+    </div>
+    <div class="panel" style="padding:12px 24px 0"><div class="cp-subtabs" style="margin:0"><span class="on"><svg class="cp-icon sm"><use href="#i-steps"/></svg>Journey</span><span class=""><svg class="cp-icon sm"><use href="#i-shell"/></svg>Passport</span><span class=""><svg class="cp-icon sm"><use href="#i-flag"/></svg>Plan</span></div><p class="spec" style="margin:16px 0 20px">.cp-subtabs · 15/600 · 3px blue underline</p></div>
   </div>
   <p class="spec" style="margin-top:16px">.cp-tabbar · height 72 · radius pill · shadow-lg · icon 24 in 52×32 pill · label 12/500 (active 700)</p>
 </section>
 
 <!-- =================================================================== SCREENS -->
 <section class="doc" id="screens">
-  <p class="eyebrow">12 · Screens @ 390 × 844</p>
-  <h2>One screen per tab</h2>
-  <p class="intro">Reference layouts at iPhone 15 size. Scroll sideways to see all five. Every screen uses 24px margins, 40px section gaps and the floating tab bar.</p>
+  <p class="eyebrow">13 · Screens @ 390 × 844</p>
+  <h2>The app, tab by tab</h2>
+  <p class="intro">Reference layouts at iPhone 15 size. Scroll sideways to see all of them. Me has three sub-tabs (Journey, Passport, Plan) and Explore has a second screen for the photo marketplace.</p>
 
   <div class="phones">
 
-    <!-- ---------------- ME ---------------- -->
     <div class="phone-wrap">
-      <p class="phone-label"><b>Me</b>Journey · Passport · Plan · Health</p>
+      <p class="phone-label"><b>Me · Journey</b>Instagram profile + Facebook timeline</p>
       <div class="phone">
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
         <div class="scroll">
           <div style="display:flex;justify-content:space-between;align-items:center">
-            <div class="logo-ph"><span class="mark" style="width:40px;height:40px"><svg class="cp-icon sm"><use href="#i-shell"/></svg></span></div>
-            <button class="cp-icon-btn flat" aria-label="Notifications"><svg class="cp-icon"><use href="#i-bell"/></svg></button>
+            <span style="font-family:var(--cp-font-title);font-weight:600;font-size:24px">ana.camina</span>
+            <div class="row" style="gap:8px"><button class="cp-icon-btn flat" aria-label="New post"><svg class="cp-icon"><use href="#i-plus"/></svg></button><button class="cp-icon-btn flat" aria-label="Notifications"><svg class="cp-icon"><use href="#i-bell"/></svg></button></div>
           </div>
-          <p style="font-family:var(--cp-font-accent);font-size:28px;color:var(--cp-color-red);margin:24px 0 0;transform:rotate(-2deg);display:inline-block">Buen Camino,</p>
-          <h1 class="scr-title" style="margin-top:0">Ana</h1>
-          <p class="scr-sub">Day 12 of your Camino Francés</p>
-          <article class="cp-journey" style="padding:24px">
-            <div class="route">Today's stage</div>
-            <h4 style="font-size:28px;line-height:32px">Burgos → Hontanas</h4>
-            <div class="sub">31.1 km · 7h 20m</div>
-            <div class="cp-progress"><span style="width:40%"></span></div>
-            <div class="stats"><span><b>312</b> km walked</span><span><b>468</b> to go</span></div>
-            <div class="next"><span>Next: Hornillos</span><button class="cp-btn sm">Start</button></div>
+          <div class="profile-top" style="margin-top:20px">
+            <span class="cp-ring"><span class="cp-avatar" style="width:86px;height:86px"></span></span>
+            <div class="pstats"><div><b>312</b><span>km</span></div><div><b>12</b><span>stamps</span></div><div><b>148</b><span>friends</span></div></div>
+          </div>
+          <div style="margin-top:14px"><div style="font-weight:600;font-size:17px">Ana García</div>
+          <div style="font-size:15px;line-height:22px">Camino Francés, day 12. Walking for my grandmother. <span style="font-family:var(--cp-font-accent);font-size:22px;color:var(--cp-color-red)">Ultreia!</span></div></div>
+          <div style="display:flex;gap:10px;margin-top:16px"><button class="cp-btn cp-btn-secondary sm" style="flex:1;height:40px">Edit profile</button><button class="cp-btn cp-btn-secondary sm" style="flex:1;height:40px">Share journey</button></div>
+          <div class="highlights" style="margin-top:20px">
+            <div><span class="cp-ring seen"><span class="cp-avatar" style="background:linear-gradient(150deg,#BFD0C4,#4E6B5A)"></span></span>Pyrenees</div>
+            <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#F2D8B6,#A0583F)"></span></span>Pamplona</div>
+            <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#9DB4CC,#14365D)"></span></span>Meseta</div>
+            <div><span class="cp-ring seen"><span class="cp-avatar" style="background:linear-gradient(150deg,#D7C6E0,#6E5470)"></span></span>Burgos</div>
+            <div><span class="add"><svg class="cp-icon"><use href="#i-plus"/></svg></span>New</div>
+          </div><div class="cp-subtabs" style="margin:22px -24px 20px;padding:0 12px"><span class="on"><svg class="cp-icon sm"><use href="#i-steps"/></svg>Journey</span><span class=""><svg class="cp-icon sm"><use href="#i-shell"/></svg>Passport</span><span class=""><svg class="cp-icon sm"><use href="#i-flag"/></svg>Plan</span></div>
+          <article class="cp-post">
+            <div class="hd"><span class="cp-avatar"></span><div style="flex:1"><div class="n">Ana García</div><div class="m">Day 12 · Burgos · 2h ago</div></div><svg class="cp-icon" style="color:var(--cp-text-muted)"><use href="#i-dots"/></svg></div>
+            <div class="tx">Reached the cathedral at sunrise. 31 km to Hontanas tomorrow, legs say no, heart says yes.</div>
+            <div class="cp-img v4"></div>
+            <div class="counts"><span>❤ 48 Buen Caminos</span><span>12 comments</span></div>
+            <div class="acts"><span><svg class="cp-icon sm"><use href="#i-heart"/></svg>Buen Camino</span><span><svg class="cp-icon sm"><use href="#i-chat"/></svg>Comment</span><span><svg class="cp-icon sm"><use href="#i-share"/></svg>Share</span></div>
           </article>
-          <div class="scr-h"><h5>Health today</h5><span class="cp-badge neutral"><svg class="cp-icon sm"><use href="#i-watch"/></svg>Apple Watch</span></div>
-          <div class="tiles">
-            <div class="tile"><div class="k"><svg class="cp-icon sm"><use href="#i-steps"/></svg>Steps</div><div class="v">18,240</div></div>
-            <div class="tile"><div class="k"><svg class="cp-icon sm"><use href="#i-pulse"/></svg>Heart rate</div><div class="v">92 <small>bpm</small></div></div>
+        </div>
+        <div class="tabdock"><nav class="cp-tabbar">
+          <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Explore</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-settings"/></svg></span>Settings</div>
+        </nav></div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Me · Passport</b>Credencial & stamps</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll">
+          <div style="display:flex;align-items:center;gap:14px">
+            <span class="cp-ring"><span class="cp-avatar" style="width:52px;height:52px"></span></span>
+            <div style="flex:1"><div style="font-weight:600;font-size:17px">Ana García</div><div class="note" style="font-size:13px">@ana.camina · Day 12</div></div>
+            <button class="cp-icon-btn flat" aria-label="Share"><svg class="cp-icon"><use href="#i-share"/></svg></button>
+          </div><div class="cp-subtabs" style="margin:22px -24px 20px;padding:0 12px"><span class=""><svg class="cp-icon sm"><use href="#i-steps"/></svg>Journey</span><span class="on"><svg class="cp-icon sm"><use href="#i-shell"/></svg>Passport</span><span class=""><svg class="cp-icon sm"><use href="#i-flag"/></svg>Plan</span></div>
+          <div class="passport-cover">
+            <span class="seal"><svg class="cp-icon"><use href="#i-shell"/></svg></span>
+            <div><div class="ey">Credencial del Peregrino</div><h4>12 of 33 stamps</h4><p>Camino Francés · since 24 Oct 2026</p></div>
           </div>
-          <div class="scr-h"><h5>Passport</h5><a>See all 12</a></div>
+          <div class="scr-h" style="margin-top:28px"><h5>Stamps</h5><a>Scan a sello</a></div>
           <div class="stamps">
-            <div class="stamp red" style="--r:-10deg">Roncesvalles</div>
+            <div class="stamp red" style="--r:-10deg">Ronces-<br>valles</div>
             <div class="stamp blue" style="--r:6deg">Pamplona</div>
             <div class="stamp gold" style="--r:-4deg">Logroño</div>
             <div class="stamp red" style="--r:9deg">Burgos</div>
             <div class="stamp blue" style="--r:-7deg">Nájera</div>
             <div class="stamp gold" style="--r:5deg">Estella</div>
             <div class="stamp red" style="--r:-3deg">Viana</div>
-            <div class="stamp empty">+</div>
+            <div class="stamp blue" style="--r:8deg">Belorado</div>
+            <div class="stamp empty">+</div><div class="stamp empty">+</div><div class="stamp empty">+</div><div class="stamp empty">+</div>
+          </div>
+          <div class="cp-quest" style="margin-top:28px">
+            <span class="ic" style="background:var(--cp-color-blue)"><svg class="cp-icon"><use href="#i-medal"/></svg></span>
+            <div style="flex:1"><div class="t">Compostela progress</div><div class="m">Walk the last 100 km with 2 stamps a day</div><div class="cp-progress light" style="margin:10px 0 0;height:8px"><span style="width:0%"></span></div></div>
+            <span class="cp-badge neutral">From Sarria</span>
           </div>
         </div>
         <div class="tabdock"><nav class="cp-tabbar">
           <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
-          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-more"/></svg></span>More</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Explore</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-settings"/></svg></span>Settings</div>
         </nav></div>
         <span class="home-ind"></span>
       </div>
     </div>
 
-    <!-- ---------------- STAYS ---------------- -->
     <div class="phone-wrap">
-      <p class="phone-label"><b>Stays</b>Albergues · Hotels · Cafes · Booking</p>
+      <p class="phone-label"><b>Me · Plan</b>Stage tracker</p>
       <div class="phone">
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
         <div class="scroll">
-          <div class="cp-search" style="height:60px">
+          <div style="display:flex;align-items:center;gap:14px">
+            <span class="cp-ring"><span class="cp-avatar" style="width:52px;height:52px"></span></span>
+            <div style="flex:1"><div style="font-weight:600;font-size:17px">Ana García</div><div class="note" style="font-size:13px">@ana.camina · Day 12</div></div>
+            <button class="cp-icon-btn flat" aria-label="Share"><svg class="cp-icon"><use href="#i-share"/></svg></button>
+          </div><div class="cp-subtabs" style="margin:22px -24px 20px;padding:0 12px"><span class=""><svg class="cp-icon sm"><use href="#i-steps"/></svg>Journey</span><span class=""><svg class="cp-icon sm"><use href="#i-shell"/></svg>Passport</span><span class="on"><svg class="cp-icon sm"><use href="#i-flag"/></svg>Plan</span></div>
+          <div class="tiles" style="margin-bottom:24px">
+            <div class="tile"><div class="k">Days left</div><div class="v">21</div></div>
+            <div class="tile"><div class="k">Arrive Santiago</div><div class="v" style="font-size:24px">25 Nov</div></div>
+          </div>
+          <div class="cp-timeline">
+            <div class="cp-step done"><span class="dot"><svg class="cp-icon sm"><use href="#i-check"/></svg></span><div class="c"><div class="t">Belorado → Agés<span>27.6 km</span></div><div class="m">Day 10 · walked in 6h 52m</div></div></div>
+            <div class="cp-step done"><span class="dot"><svg class="cp-icon sm"><use href="#i-check"/></svg></span><div class="c"><div class="t">Agés → Burgos<span>22.4 km</span></div><div class="m">Day 11 · walked in 5h 30m</div></div></div>
+            <div class="cp-step today"><span class="dot">12</span><div class="c"><div class="t">Burgos → Hontanas<span>31.1 km</span></div><div class="m">Today · leave by 07:00 for shade</div><div class="b"><span class="cp-badge blue"><svg class="cp-icon sm"><use href="#i-bolt"/></svg>El Puntido booked</span><span class="cp-badge neutral"><svg class="cp-icon sm"><use href="#i-drop"/></svg>2 fountains</span></div></div></div>
+            <div class="cp-step"><span class="dot">13</span><div class="c"><div class="t">Hontanas → Boadilla<span>28.5 km</span></div><div class="m">No stay yet</div><div class="b"><span class="cp-chip sm">Find a stay</span></div></div></div>
+            <div class="cp-step"><span class="dot">14</span><div class="c"><div class="t">Boadilla → Carrión<span>24.6 km</span></div><div class="m">Rest day option</div></div></div>
+          </div>
+        </div>
+        <div class="tabdock"><nav class="cp-tabbar">
+          <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Explore</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-settings"/></svg></span>Settings</div>
+        </nav></div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Stays</b>OTA banner · stays + cafes · filters</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <h1 class="scr-title" style="margin:0">Stays</h1>
+            <button class="cp-icon-btn flat" aria-label="Saved"><svg class="cp-icon"><use href="#i-heart"/></svg></button>
+          </div>
+          <div class="cp-search" style="height:58px;margin-top:16px">
             <svg class="cp-icon"><use href="#i-search"/></svg>
-            <div class="txt"><div class="t1">Near Hontanas</div><div class="t2">Tonight · 1 pilgrim · On route</div></div>
-            <button class="cp-icon-btn flat" style="width:42px;height:42px" aria-label="Filters"><svg class="cp-icon sm"><use href="#i-filter"/></svg></button>
+            <div class="txt"><div class="t1">Near Hontanas</div><div class="t2">Tonight · 1 pilgrim</div></div>
           </div>
-          <div class="hscroll" style="margin-top:20px">
-            <span class="cp-chip on"><svg class="cp-icon sm"><use href="#i-stays"/></svg>Albergues</span>
-            <span class="cp-chip">Hotels</span>
-            <span class="cp-chip"><svg class="cp-icon sm"><use href="#i-cup"/></svg>Cafes</span>
-            <span class="cp-chip">Open now</span>
+          <div class="cp-banner" style="margin-top:20px">
+            <span class="art"><svg class="cp-icon"><use href="#i-shell"/></svg></span>
+            <div class="ey">Jubilee Year 2027</div>
+            <h4>Holy Year beds in Santiago go fast</h4>
+            <button class="cp-btn sm">Book early</button>
           </div>
-          <h1 class="scr-title" style="font-size:30px;line-height:36px;margin-top:28px">8 stays on your stage</h1>
-          <p class="scr-sub" style="margin-bottom:24px">Sorted by distance along the Way</p>
-          <article class="cp-stay">
-            <div class="cp-img"><div class="top"><span class="cp-badge glass">Pilgrim favourite</span><span class="fav"><svg class="cp-icon sm"><use href="#i-heart"/></svg></span></div></div>
-            <div>
-              <div class="line1"><span class="name">Albergue El Puntido</span><span class="rating"><svg class="cp-icon sm" style="fill:currentColor"><use href="#i-star"/></svg>4.88</span></div>
-              <div class="meta">Hontanas · on route · 34 beds</div>
-              <div class="price"><b>€12</b> bed · <b>€11</b> dinner</div>
-              <div class="book"><span class="cp-badge blue"><svg class="cp-icon sm"><use href="#i-bolt"/></svg>Instant booking</span><span class="cp-badge green"><span class="cp-dot"></span>9 beds free</span></div>
+          <div class="cp-dots"><i class="on"></i><i></i><i></i></div>
+          <div class="hscroll" style="margin-top:18px">
+            <span class="cp-chip on">All</span><span class="cp-chip"><svg class="cp-icon sm"><use href="#i-stays"/></svg>Albergues</span><span class="cp-chip">Hotels</span><span class="cp-chip"><svg class="cp-icon sm"><use href="#i-cup"/></svg>Cafes</span>
+          </div>
+          <div class="hscroll" style="margin-top:10px">
+            <span class="cp-chip sm"><svg class="cp-icon sm"><use href="#i-filter"/></svg>Filters · 2</span>
+            <span class="cp-chip sm" style="background:var(--cp-color-blue-100);box-shadow:none">Nearest<svg class="cp-icon sm"><use href="#i-down"/></svg></span>
+            <span class="cp-chip sm">★ 4.5+</span><span class="cp-chip sm">Under €20</span><span class="cp-chip sm"><svg class="cp-icon sm"><use href="#i-heart"/></svg>Saved</span><span class="cp-chip sm">Label<svg class="cp-icon sm"><use href="#i-down"/></svg></span>
+          </div>
+          <p class="note" style="margin:22px 0 12px">24 places within 5 km</p>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div class="cp-card cp-stay-row">
+              <div class="cp-img "></div>
+              <div class="bd">
+                <div class="n"><span>Albergue El Puntido</span><span class="bm on"><svg class="cp-icon sm"><use href="#i-heart"/></svg></span></div>
+                <div class="m">Albergue · on route</div>
+                <div class="m"><svg class="cp-icon sm" style="width:13px;height:13px;fill:currentColor;vertical-align:-2px"><use href="#i-star"/></svg> <b style="color:var(--cp-text)">4.88</b> (312 reviews)</div>
+                <div class="p"><span><b>€12</b></span><span class="cp-badge blue"><svg class="cp-icon sm"><use href="#i-bolt"/></svg>Instant</span></div>
+              </div>
             </div>
-          </article>
-          <article class="cp-stay" style="margin-top:36px">
-            <div class="cp-img v2"><div class="top"><span class="cp-badge gold"><svg class="cp-icon sm"><use href="#i-shell"/></svg>Jubilee host</span><span class="fav"><svg class="cp-icon sm"><use href="#i-heart"/></svg></span></div></div>
-            <div>
-              <div class="line1"><span class="name">Casa Rural Hontanas</span><span class="rating"><svg class="cp-icon sm" style="fill:currentColor"><use href="#i-star"/></svg>4.71</span></div>
-              <div class="meta">Private rooms · 200 m off route</div>
-              <div class="price"><b>€48</b> night</div>
-              <div class="book"><span class="cp-badge green"><svg class="cp-icon sm"><use href="#i-chat"/></svg>WhatsApp</span></div>
+            <div class="cp-card cp-stay-row">
+              <div class="cp-img v4"></div>
+              <div class="bd">
+                <div class="n"><span>Café El Peregrino</span><span class="bm"><svg class="cp-icon sm"><use href="#i-heart"/></svg></span></div>
+                <div class="m">Cafe · open till 21:00 · 400 m</div>
+                <div class="m"><svg class="cp-icon sm" style="width:13px;height:13px;fill:currentColor;vertical-align:-2px"><use href="#i-star"/></svg> <b style="color:var(--cp-text)">4.7</b> (96 reviews)</div>
+                <div class="p"><span><b>€12 menu</b></span><span class="cp-badge neutral">Walk-in</span></div>
+              </div>
             </div>
-          </article>
+            <div class="cp-card cp-stay-row">
+              <div class="cp-img v2"></div>
+              <div class="bd">
+                <div class="n"><span>Casa Rural Hontanas</span><span class="bm"><svg class="cp-icon sm"><use href="#i-heart"/></svg></span></div>
+                <div class="m">Hotel · 200 m off</div>
+                <div class="m"><svg class="cp-icon sm" style="width:13px;height:13px;fill:currentColor;vertical-align:-2px"><use href="#i-star"/></svg> <b style="color:var(--cp-text)">4.71</b> (58 reviews)</div>
+                <div class="p"><span><b>€48</b></span><span class="cp-badge green"><svg class="cp-icon sm"><use href="#i-chat"/></svg>WhatsApp</span></div>
+              </div>
+            </div>
+            <div class="cp-card cp-stay-row">
+              <div class="cp-img v3"></div>
+              <div class="bd">
+                <div class="n"><span>Albergue Municipal</span><span class="bm"><svg class="cp-icon sm"><use href="#i-heart"/></svg></span></div>
+                <div class="m">Albergue · on route</div>
+                <div class="m"><svg class="cp-icon sm" style="width:13px;height:13px;fill:currentColor;vertical-align:-2px"><use href="#i-star"/></svg> <b style="color:var(--cp-text)">4.2</b> (140 reviews)</div>
+                <div class="p"><span><b>Donativo</b></span><span class="cp-badge red"><span class="cp-dot"></span>Full</span></div>
+              </div>
+            </div>
+          </div>
         </div>
         <div class="tabdock"><nav class="cp-tabbar">
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
           <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
-          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-more"/></svg></span>More</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Explore</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-settings"/></svg></span>Settings</div>
         </nav></div>
         <span class="home-ind"></span>
       </div>
     </div>
 
-    <!-- ---------------- MAPS ---------------- -->
     <div class="phone-wrap">
-      <p class="phone-label"><b>Maps</b>Route · Crowd reports · Weather</p>
+      <p class="phone-label"><b>Maps</b>Waze map + RPG layer</p>
       <div class="phone" style="background:#EDE5D3">
+        
+        
         <svg class="map-bg" viewBox="0 0 390 844" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
           <rect width="390" height="844" fill="#EDE5D3"/>
           <path d="M0 120 Q120 90 210 160 T390 140 V0 H0Z" fill="#E2E8D5"/>
           <path d="M0 610 Q90 560 170 640 T390 600 V844 H0Z" fill="#E2E8D5"/>
-          <ellipse cx="320" cy="360" rx="70" ry="44" fill="#CFE0F0"/>
+          <ellipse cx="330" cy="420" rx="70" ry="44" fill="#CFE0F0"/>
           <g stroke="#FFFDF8" stroke-width="10" fill="none" stroke-linecap="round"><path d="M-10 300 Q140 280 230 330 T400 300"/><path d="M60 -10 Q80 300 40 860"/></g>
           <g stroke="#E4D7BF" stroke-width="3" fill="none"><path d="M-10 460 L400 420"/><path d="M260 -10 L300 860"/><path d="M0 760 L390 700"/></g>
-          <!-- Camino route -->
           <path d="M120 900 C 140 760, 90 680, 170 600 S 260 460, 210 380 S 150 230, 240 120 S 300 20, 290 -20" stroke="#D9A21B" stroke-width="16" fill="none" stroke-linecap="round" opacity=".45"/>
           <path d="M120 900 C 140 760, 90 680, 170 600 S 260 460, 210 380 S 150 230, 240 120 S 300 20, 290 -20" stroke="#14365D" stroke-width="7" fill="none" stroke-linecap="round"/>
-          <!-- town labels -->
-          <text x="250" y="112" font-family="Inter" font-size="13" font-weight="600" fill="#556274">Hontanas</text>
-          <text x="22" y="590" font-family="Inter" font-size="13" font-weight="600" fill="#556274">Hornillos</text>
+          <!-- hunt zone -->
+          <circle cx="92" cy="400" r="58" fill="#A63D2F" fill-opacity=".08" stroke="#A63D2F" stroke-width="2" stroke-dasharray="6 6"/>
         </svg>
-        <!-- pins -->
-        <div style="position:absolute;left:222px;top:360px;width:44px;height:44px;border-radius:50%;background:#A63D2F;color:#fff;display:grid;place-items:center;box-shadow:var(--cp-shadow-md);border:3px solid #FFFDF8"><svg class="cp-icon sm"><use href="#i-bed-full"/></svg></div>
-        <div style="position:absolute;left:150px;top:250px;width:44px;height:44px;border-radius:50%;background:#14365D;color:#F6EFE2;display:grid;place-items:center;box-shadow:var(--cp-shadow-md);border:3px solid #FFFDF8"><svg class="cp-icon sm"><use href="#i-crowd"/></svg></div>
-        <div style="position:absolute;left:110px;top:470px;width:40px;height:40px;border-radius:50%;background:#CFE0F0;color:#14365D;display:grid;place-items:center;box-shadow:var(--cp-shadow-md);border:3px solid #FFFDF8"><svg class="cp-icon sm"><use href="#i-drop"/></svg></div>
-        <!-- me -->
-        <div style="position:absolute;left:146px;top:572px;width:56px;height:56px;border-radius:50%;background:rgba(20,54,93,.15);display:grid;place-items:center"><div style="width:36px;height:36px;border-radius:50%;background:#14365D;color:#D9A21B;display:grid;place-items:center;border:3px solid #FFFDF8;box-shadow:var(--cp-shadow-md)"><svg class="cp-icon sm" style="fill:#D9A21B;stroke:#D9A21B"><use href="#i-nav"/></svg></div></div>
-
-        <div class="status" style="background:none"><span>9:41</span><span class="island"></span><span>●●●</span></div>
-        <!-- top floating -->
-        <div style="position:absolute;top:66px;left:16px;right:16px;display:flex;flex-direction:column;gap:10px;z-index:4">
-          <div class="cp-search" style="height:56px;padding-left:20px"><svg class="cp-icon"><use href="#i-search"/></svg><div class="txt"><div class="t1" style="font-size:15px">Search the Way</div></div><span class="cp-badge glass" style="box-shadow:none;background:var(--cp-surface-sunken)"><svg class="cp-icon sm"><use href="#i-sun"/></svg>24°</span></div>
-          <div class="cp-alert" style="padding:8px 16px 8px 8px"><span class="bubble b-gold" style="width:40px;height:40px"><svg class="cp-icon sm"><use href="#i-warn"/></svg></span><div><div class="t" style="font-size:14px">Muddy path · 1.4 km</div><div class="m" style="font-size:12px">6 pilgrims · 20 min ago</div></div></div>
+        <div class="cp-pin iconic" style="position:absolute;left:214px;top:196px;z-index:2"><svg class="cp-icon"><use href="#i-landmark"/></svg><span class="xp">+80 XP</span><span class="cp-pin-label">Castillo</span></div>
+        <div class="cp-pin church" style="position:absolute;left:186px;top:352px;z-index:2"><svg class="cp-icon"><use href="#i-church"/></svg><span class="cp-pin-label">San Juan</span></div>
+        <div class="cp-pin hunt" style="position:absolute;left:70px;top:378px;z-index:2"><svg class="cp-icon"><use href="#i-chest"/></svg><span class="cp-pin-label">Shell hunt</span></div>
+        <div class="cp-pin story" style="position:absolute;left:262px;top:300px;z-index:2"><svg class="cp-icon"><use href="#i-headphones"/></svg></div>
+        <div class="cp-pin water" style="position:absolute;left:150px;top:470px;z-index:2"><svg class="cp-icon"><use href="#i-drop"/></svg></div>
+        <div class="cp-pin crowd" style="position:absolute;left:96px;top:236px;z-index:2"><svg class="cp-icon"><use href="#i-crowd"/></svg></div>
+        <div style="position:absolute;left:146px;top:560px;width:56px;height:56px;border-radius:50%;background:rgba(20,54,93,.15);display:grid;place-items:center;z-index:2"><div style="width:36px;height:36px;border-radius:50%;background:#14365D;display:grid;place-items:center;border:3px solid #FFFDF8;box-shadow:var(--cp-shadow-md)"><svg class="cp-icon sm" style="fill:#D9A21B;stroke:#D9A21B"><use href="#i-nav"/></svg></div></div>
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div style="position:absolute;top:62px;left:16px;right:16px;display:flex;flex-direction:column;gap:10px;z-index:4">
+          <div style="display:flex;gap:10px;align-items:center">
+            <div class="cp-hud" style="flex:1"><span class="cp-level">7</span><div style="flex:1"><div class="t">Peregrino<span>1,240 / 1,500 XP</span></div><div class="cp-xp"><span style="width:82%"></span></div></div></div>
+            <button class="cp-icon-btn" aria-label="Search"><svg class="cp-icon"><use href="#i-search"/></svg></button>
+          </div>
+          <div class="cp-achieve" style="align-self:flex-start"><span class="md"><svg class="cp-icon"><use href="#i-medal"/></svg></span><div><div class="t">Meseta Walker unlocked</div><div class="m">+100 XP · 300 km walked</div></div></div>
         </div>
-        <!-- right controls -->
-        <div class="cp-fab-stack" style="position:absolute;right:16px;top:262px;z-index:4">
-          <button class="cp-icon-btn"><svg class="cp-icon"><use href="#i-layers"/></svg></button>
-          <button class="cp-icon-btn"><svg class="cp-icon"><use href="#i-offline"/></svg></button>
-          <button class="cp-icon-btn"><svg class="cp-icon"><use href="#i-locate"/></svg></button>
+        <div class="cp-fab-stack" style="position:absolute;right:16px;top:228px;z-index:4">
+          <span class="cp-badge glass" style="height:40px;padding:0 12px;font-size:14px"><svg class="cp-icon sm"><use href="#i-sun"/></svg>24°</span>
+          <button class="cp-icon-btn" style="align-self:flex-end"><svg class="cp-icon"><use href="#i-layers"/></svg></button>
+          <button class="cp-icon-btn" style="align-self:flex-end"><svg class="cp-icon"><use href="#i-locate"/></svg></button>
         </div>
-        <!-- bottom sheet -->
-        <div class="cp-sheet" style="position:absolute;left:0;right:0;bottom:0;padding-bottom:130px;z-index:5">
+        <div class="cp-sheet" style="position:absolute;left:0;right:0;bottom:0;padding-bottom:124px;z-index:5">
           <div class="grab"></div>
           <button class="cp-report-fab" style="position:absolute;right:20px;top:-80px" aria-label="Report"><svg class="cp-icon"><use href="#i-plus"/></svg></button>
-          <div class="cp-eta">
-            <div style="flex:1"><div class="big">19.4 km</div><div class="note">to Hontanas · 4h 35m · arrive 14:15</div></div>
-            <button class="cp-btn cp-btn-primary md"><svg class="cp-icon sm"><use href="#i-nav"/></svg>Go</button>
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+            <div><div style="font-family:var(--cp-font-title);font-weight:600;font-size:24px;line-height:28px">Iglesia de San Juan</div><div class="note" style="font-size:14px">Church · 12th century · 300 m</div></div>
+            <span class="cp-badge gold">+40 XP</span>
           </div>
-          <div class="hscroll" style="margin:16px -24px 0;padding:0 24px">
-            <span class="cp-badge blue" style="height:34px;padding:0 14px"><svg class="cp-icon sm"><use href="#i-crowd"/></svg>Busy after 14:00</span>
-            <span class="cp-badge green" style="height:34px;padding:0 14px"><svg class="cp-icon sm"><use href="#i-drop"/></svg>Water in 3 km</span>
+          <div class="cp-audio" style="margin-top:14px">
+            <span class="play"><svg class="cp-icon"><use href="#i-play"/></svg></span>
+            <div style="flex:1;min-width:0"><div class="t">The pilgrim who lost his shell</div><div class="cp-wave"><i class="p" style="height:6px"></i><i class="p" style="height:10px"></i><i class="p" style="height:16px"></i><i class="p" style="height:12px"></i><i class="p" style="height:20px"></i><i class="p" style="height:14px"></i><i class="p" style="height:8px"></i><i class="p" style="height:18px"></i><i class="p" style="height:22px"></i><i class="p" style="height:12px"></i><i class="p" style="height:9px"></i><i class="p" style="height:16px"></i><i class="p" style="height:20px"></i><i class="p" style="height:11px"></i><i class="" style="height:7px"></i><i class="" style="height:14px"></i><i class="" style="height:18px"></i><i class="" style="height:10px"></i><i class="" style="height:6px"></i><i class="" style="height:12px"></i><i class="" style="height:16px"></i><i class="" style="height:9px"></i><i class="" style="height:13px"></i><i class="" style="height:7px"></i><i class="" style="height:10px"></i><i class="" style="height:15px"></i><i class="" style="height:8px"></i><i class="" style="height:5px"></i></div></div>
+            <span class="m">1:12 / 3:20</span>
+          </div>
+          <div class="cp-quest" style="margin-top:12px;padding:10px 14px">
+            <span class="ic" style="width:38px;height:38px"><svg class="cp-icon sm"><use href="#i-chest"/></svg></span>
+            <div style="flex:1"><div class="t" style="font-size:14px">Shell hunt · Hontanas</div><div class="m">2 of 3 hidden shells found</div></div>
+            <div class="shells"><svg class="cp-icon sm"><use href="#i-shell"/></svg><svg class="cp-icon sm"><use href="#i-shell"/></svg><svg class="cp-icon sm off"><use href="#i-shell"/></svg></div>
           </div>
         </div>
         <div class="tabdock clear"><nav class="cp-tabbar">
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
           <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
-          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-more"/></svg></span>More</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Explore</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-settings"/></svg></span>Settings</div>
         </nav></div>
         <span class="home-ind"></span>
       </div>
     </div>
 
-    <!-- ---------------- MORE ---------------- -->
     <div class="phone-wrap">
-      <p class="phone-label"><b>More</b>Feed · Photos · Share</p>
+      <p class="phone-label"><b>Explore</b>Stories, swipe left / right</p>
       <div class="phone">
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
         <div class="scroll">
           <div style="display:flex;justify-content:space-between;align-items:center">
-            <h1 class="scr-title" style="margin:0">Pilgrim feed</h1>
-            <button class="cp-icon-btn blue" aria-label="New post"><svg class="cp-icon"><use href="#i-camera"/></svg></button>
+            <h1 class="scr-title" style="margin:0">Explore</h1>
+            <button class="cp-icon-btn blue" aria-label="New story"><svg class="cp-icon"><use href="#i-camera"/></svg></button>
           </div>
-          <div class="cp-segment" style="margin:20px 0 20px"><span class="on">For you</span><span>Nearby</span><span>My photos</span></div>
-          <div class="reel">
-            <div class="cp-img v5"></div>
-            <div class="shade"></div>
-            <span class="hand">Sunrise at O Cebreiro</span>
-            <div style="position:absolute;inset:0;display:grid;place-items:center"><span style="width:72px;height:72px;border-radius:50%;background:rgba(255,253,248,.25);display:grid;place-items:center;backdrop-filter:blur(6px)"><svg class="cp-icon lg" style="fill:#fff;stroke:#fff"><use href="#i-play"/></svg></span></div>
-            <div class="side">
-              <div><svg class="cp-icon"><use href="#i-heart"/></svg>2.4k</div>
-              <div><svg class="cp-icon"><use href="#i-chat"/></svg>86</div>
-              <div><svg class="cp-icon"><use href="#i-share"/></svg>Share</div>
-            </div>
-            <div class="cap">
-              <div class="who"><span class="av"></span>@peregrina_ana · Day 27</div>
-              <p>Fog below, sun above. 150 km to go. Ultreia!</p>
+          <div class="cp-segment" style="margin:16px 0 18px"><span class="on">For you</span><span>Nearby</span><span>Photos of me</span></div>
+          <div class="deck">
+            <div class="card prev"><div class="cp-img v2"></div></div><div class="card next"><div class="cp-img v4"></div></div>
+            <div class="card cur">
+              <div class="cp-img v5"></div>
+              <div class="shade"></div>
+              <div class="top">
+                <div class="cp-story-progress"><i class="done"></i><i class="done"></i><i class="now"></i><i></i><i></i></div>
+                <div class="who"><span class="cp-avatar"></span><span>@lucas.walks <small>· O Cebreiro · 3h</small></span></div>
+              </div>
+              <span class="hand">Fog below, sun above</span>
+              <div class="cap">150 km to go. Who else is sleeping in Triacastela tonight?</div>
+              <div class="bar">
+                <span class="glass"><svg class="cp-icon sm"><use href="#i-heart"/></svg>2.4k</span>
+                <span class="glass"><svg class="cp-icon sm"><use href="#i-chat"/></svg>86</span>
+                <span class="glass buy"><svg class="cp-icon sm"><use href="#i-face"/></svg>You're in this</span>
+              </div>
             </div>
           </div>
-          <div class="scr-h"><h5>More</h5></div>
-          <div class="s-group">
-            <div class="s-row"><svg class="cp-icon"><use href="#i-trophy"/></svg><span class="lbl">Achievements</span><span class="cp-badge gold">7</span></div>
-            <div class="s-row"><svg class="cp-icon"><use href="#i-compass"/></svg><span class="lbl">Scavenger hunts</span><svg class="cp-icon sm"><use href="#i-chev"/></svg></div>
-            <div class="s-row"><svg class="cp-icon"><use href="#i-share"/></svg><span class="lbl">Share & shop</span><svg class="cp-icon sm"><use href="#i-chev"/></svg></div>
+          <div class="swipe-hint"><span class="cp-badge neutral" style="height:32px"><svg class="cp-icon sm"><use href="#i-swipe"/></svg>Swipe left or right</span></div>
+        </div>
+        <div class="tabdock"><nav class="cp-tabbar">
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
+          <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Explore</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-settings"/></svg></span>Settings</div>
+        </nav></div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Explore · Photos of you</b>Buy photos others took of you</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll">
+          <div style="display:flex;align-items:center;gap:12px">
+            <button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon"><use href="#i-back"/></svg></button>
+            <span class="cp-badge gold" style="margin-left:auto">Coming later</span>
+          </div>
+          <h1 class="scr-title" style="margin-top:18px">Photos of you</h1>
+          <p class="scr-sub" style="margin-bottom:18px">Other pilgrims caught you on the Way. Face match is private and opt-in.</p>
+          <div class="cp-quest" style="background:var(--cp-color-blue-50);box-shadow:inset 0 0 0 1.5px var(--cp-color-blue-100)">
+            <span class="ic" style="background:var(--cp-color-blue)"><svg class="cp-icon"><use href="#i-face"/></svg></span>
+            <div style="flex:1"><div class="t">6 photos found this week</div><div class="m">From 4 photographers · O Cebreiro, Sarria</div></div>
+          </div>
+          <div class="photo-grid" style="margin-top:18px"><div class="cp-photo"><div class="cp-img v5"></div><span class="wm">CaminoPlus</span><span class="cp-badge glass face"><svg class="cp-icon sm"><use href="#i-face"/></svg>You</span><span class="sel on"><svg class="cp-icon sm" style="width:14px;height:14px;stroke-width:3px"><use href="#i-check"/></svg></span><span class="cp-badge glass price">€2.99</span></div><div class="cp-photo"><div class="cp-img "></div><span class="wm">CaminoPlus</span><span class="cp-badge glass face"><svg class="cp-icon sm"><use href="#i-face"/></svg>You</span><span class="sel on"><svg class="cp-icon sm" style="width:14px;height:14px;stroke-width:3px"><use href="#i-check"/></svg></span><span class="cp-badge glass price">€2.99</span></div><div class="cp-photo"><div class="cp-img v2"></div><span class="wm">CaminoPlus</span><span class="cp-badge glass face"><svg class="cp-icon sm"><use href="#i-face"/></svg>You</span><span class="sel"></span><span class="cp-badge glass price">€1.99</span></div><div class="cp-photo"><div class="cp-img v4"></div><span class="wm">CaminoPlus</span><span class="cp-badge glass face"><svg class="cp-icon sm"><use href="#i-face"/></svg>You</span><span class="sel on"><svg class="cp-icon sm" style="width:14px;height:14px;stroke-width:3px"><use href="#i-check"/></svg></span><span class="cp-badge glass price">€3.49</span></div>
+          </div>
+          <div style="position:sticky;bottom:0;margin-top:18px">
+            <button class="cp-btn cp-btn-gold block"><svg class="cp-icon sm"><use href="#i-tag"/></svg>Buy 3 photos · €8.47</button>
           </div>
         </div>
         <div class="tabdock"><nav class="cp-tabbar">
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
-          <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-more"/></svg></span>More</div>
+          <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Explore</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-settings"/></svg></span>Settings</div>
         </nav></div>
         <span class="home-ind"></span>
       </div>
     </div>
 
-    <!-- ---------------- SETTINGS ---------------- -->
     <div class="phone-wrap">
       <p class="phone-label"><b>Settings</b>Billing · Password · Smartwatch</p>
       <div class="phone">
@@ -1094,7 +1436,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
-          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-more"/></svg></span>More</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Explore</div>
           <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-settings"/></svg></span>Settings</div>
         </nav></div>
         <span class="home-ind"></span>
@@ -1106,7 +1448,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
 
 <!-- =================================================================== ICONS -->
 <section class="doc" id="icons">
-  <p class="eyebrow">13 · Icons</p>
+  <p class="eyebrow">14 · Icons</p>
   <h2>Friendly line icons</h2>
   <p class="intro">24px grid, 1.75px rounded stroke (2.2px when active). Placeholder set drawn for this doc; swap for a licensed set (e.g. Phosphor or Lucide) when building the app, keeping the same weight.</p>
   <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:12px">
@@ -1114,7 +1456,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     <div class="icon-cell"><svg class="cp-icon"><use href="#i-me"/></svg>me</div>
     <div class="icon-cell"><svg class="cp-icon"><use href="#i-stays"/></svg>stays</div>
     <div class="icon-cell"><svg class="cp-icon"><use href="#i-maps"/></svg>maps</div>
-    <div class="icon-cell"><svg class="cp-icon"><use href="#i-more"/></svg>more</div>
+    <div class="icon-cell"><svg class="cp-icon"><use href="#i-explore"/></svg>explore</div>
     <div class="icon-cell"><svg class="cp-icon"><use href="#i-settings"/></svg>settings</div>
     <div class="icon-cell"><svg class="cp-icon"><use href="#i-crowd"/></svg>crowd</div>
     <div class="icon-cell"><svg class="cp-icon"><use href="#i-bed-full"/></svg>bed-full</div>
@@ -1132,7 +1474,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     <div class="icon-cell"><svg class="cp-icon"><use href="#i-pulse"/></svg>pulse</div>
     <div class="icon-cell"><svg class="cp-icon"><use href="#i-watch"/></svg>watch</div>
     <div class="icon-cell"><svg class="cp-icon"><use href="#i-trophy"/></svg>trophy</div>
-    <div class="icon-cell"><svg class="cp-icon"><use href="#i-compass"/></svg>hunt</div>
+    <div class="icon-cell"><svg class="cp-icon"><use href="#i-church"/></svg>church</div><div class="icon-cell"><svg class="cp-icon"><use href="#i-landmark"/></svg>iconic</div><div class="icon-cell"><svg class="cp-icon"><use href="#i-chest"/></svg>hunt</div><div class="icon-cell"><svg class="cp-icon"><use href="#i-flag"/></svg>plan</div><div class="icon-cell"><svg class="cp-icon"><use href="#i-headphones"/></svg>audio</div><div class="icon-cell"><svg class="cp-icon"><use href="#i-medal"/></svg>achievement</div><div class="icon-cell"><svg class="cp-icon"><use href="#i-face"/></svg>face match</div><div class="icon-cell"><svg class="cp-icon"><use href="#i-tag"/></svg>price</div><div class="icon-cell"><svg class="cp-icon"><use href="#i-swipe"/></svg>swipe</div>
     <div class="icon-cell"><svg class="cp-icon"><use href="#i-camera"/></svg>camera</div>
     <div class="icon-cell"><svg class="cp-icon"><use href="#i-heart"/></svg>heart</div>
     <div class="icon-cell"><svg class="cp-icon"><use href="#i-star"/></svg>star</div>
