@@ -352,6 +352,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
 .cp-subtabs { display: flex; border-bottom: 1px solid var(--cp-border); }
 .cp-subtabs span { flex: 1; text-align: center; padding: 14px 0 12px; font-size: 15px; font-weight: 600; color: var(--cp-text-muted); border-bottom: 3px solid transparent; margin-bottom: -1px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
 .cp-subtabs span.on { color: var(--cp-text); border-color: var(--cp-color-blue); }
+.cp-subtabs span span { flex: none; padding: 0 7px; border: 0; margin: 0; min-width: 20px; }
 .cp-ring { padding: 3px; border-radius: 50%; background: conic-gradient(from 200deg, var(--cp-color-gold), var(--cp-color-red), var(--cp-color-gold-bright), var(--cp-color-gold)); flex: none; display: inline-block; }
 .cp-ring.seen { background: var(--cp-border-strong); }
 .cp-avatar { display: block; border-radius: 50%; border: 3px solid var(--cp-bg); background: linear-gradient(150deg, #E9C987, #A0583F); }
@@ -500,6 +501,251 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
 .passport-cover h4 { font-family: var(--cp-font-title); font-weight: 600; font-size: 22px; line-height: 26px; margin: 4px 0 2px; }
 .passport-cover p { margin: 0; font-size: 13px; color: rgba(246,239,226,.8); }
 
+/* ---- v3: edit pill, write FAB, lightbox, articles, compose, share, detail pages ---- */
+.un { font-family: var(--cp-font-title); font-weight: 600; font-size: 24px; letter-spacing: -.3px; }
+.cp-edit-pill { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 11px; border-radius: var(--cp-radius-pill); background: var(--cp-surface); box-shadow: inset 0 0 0 1px var(--cp-border-strong); font-family: var(--cp-font-mono); font-size: 11px; line-height: 1; color: var(--cp-text-muted); white-space: nowrap; cursor: pointer; }
+.cp-edit-pill .cp-icon { width: 13px; height: 13px; stroke-width: 2.2px; color: var(--cp-text); }
+.cp-fab-write { display: inline-flex; align-items: center; justify-content: center; width: 60px; height: 60px; padding: 0; border-radius: var(--cp-radius-pill); background: var(--cp-color-gold); color: var(--cp-color-blue); border: 0; font: 700 16px/1 var(--cp-font-body); box-shadow: var(--cp-shadow-gold); cursor: pointer; }
+.cp-fab-write .cp-icon { width: 26px; height: 26px; stroke-width: 2.2px; }
+.phone .fab-slot { position: absolute; right: 20px; bottom: 116px; z-index: 6; }
+/* lightbox */
+.cp-scrim { position: absolute; inset: 0; background: rgba(12,35,64,.66); backdrop-filter: blur(3px); z-index: 8; }
+.cp-lightbox { position: absolute; left: 16px; right: 16px; z-index: 9; background: var(--cp-surface); border-radius: var(--cp-radius-xl); overflow: hidden; box-shadow: var(--cp-shadow-xl); display: flex; flex-direction: column; }
+.cp-lightbox .close { position: absolute; top: 12px; right: 12px; width: 40px; height: 40px; border-radius: 50%; background: rgba(255,253,248,.94); color: var(--cp-text); display: grid; place-items: center; z-index: 2; box-shadow: var(--cp-shadow-sm); border: 0; }
+.cp-lightbox .bd { padding: 22px 24px 24px; overflow: hidden; }
+.cp-lightbox .ft { padding: 14px 24px 22px; display: flex; gap: 10px; border-top: 1px solid var(--cp-border); background: var(--cp-surface); }
+.cp-lightbox .ft .cp-btn { flex: 1; padding: 0 12px; }
+.lb-stage { position: relative; width: 390px; max-width: 100%; height: 720px; border-radius: var(--cp-radius-xl); overflow: hidden; background: var(--cp-bg); }
+.lb-stage .fake { padding: 24px; filter: saturate(.8); }
+/* article */
+.cp-article .hero { position: relative; height: 150px; flex: none; }
+.cp-article .hero .cp-img { position: absolute; inset: 0; border-radius: 0; }
+.cp-article .hero .tags { position: absolute; left: 20px; bottom: 14px; display: flex; gap: 8px; }
+.cp-article .ey { font-family: var(--cp-font-mono); font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--cp-text-accent); }
+.cp-article h3 { font-family: var(--cp-font-title); font-weight: 600; font-size: 30px; line-height: 34px; letter-spacing: -.4px; margin: 8px 0 6px; }
+.cp-article .by { font-size: 13px; color: var(--cp-text-muted); display: flex; align-items: center; gap: 8px; }
+.cp-article .by .cp-avatar { width: 26px; height: 26px; border: 0; }
+.cp-article p { font-size: 16px; line-height: 25px; margin: 14px 0 0; }
+.cp-article p.lead::first-letter { font-family: var(--cp-font-title); font-weight: 700; font-size: 52px; line-height: 44px; float: left; padding: 4px 8px 0 0; color: var(--cp-color-gold-ink); }
+.cp-article blockquote { margin: 16px 0 0; padding: 4px 0 4px 16px; border-left: 3px solid var(--cp-color-gold); font-family: var(--cp-font-accent); font-size: 26px; line-height: 28px; color: var(--cp-color-red); }
+.cp-facts { display: flex; gap: 8px; margin-top: 16px; }
+.cp-facts div { flex: 1; background: var(--cp-surface-sunken); border-radius: var(--cp-radius-md); padding: 10px 12px; }
+.cp-facts b { display: block; font-family: var(--cp-font-title); font-size: 17px; line-height: 22px; font-weight: 600; }
+.cp-facts span { font-family: var(--cp-font-mono); font-size: 10px; letter-spacing: .8px; text-transform: uppercase; color: var(--cp-text-muted); }
+.cp-article-card { background: var(--cp-surface); border-radius: var(--cp-radius-lg); box-shadow: var(--cp-shadow-sm); overflow: hidden; }
+.cp-article-card .cp-img { height: 170px; border-radius: 0; }
+.cp-article-card .bd { padding: 16px 20px 20px; }
+.cp-article-card h4 { font-family: var(--cp-font-title); font-weight: 600; font-size: 22px; line-height: 28px; margin: 10px 0 6px; }
+.cp-article-card p { margin: 0; font-size: 15px; line-height: 22px; color: var(--cp-text-muted); }
+.cp-article-card .meta { margin-top: 12px; font-family: var(--cp-font-mono); font-size: 12px; color: var(--cp-text-muted); }
+.cp-article-row { display: flex; gap: 14px; padding: 12px; align-items: center; }
+.cp-article-row .cp-img { width: 88px; height: 88px; flex: none; border-radius: var(--cp-radius-md); }
+.cp-article-row h5 { font-family: var(--cp-font-title); font-weight: 600; font-size: 18px; line-height: 23px; margin: 6px 0 4px; }
+.cp-article-row .meta { font-family: var(--cp-font-mono); font-size: 11px; color: var(--cp-text-muted); }
+/* stamp lightbox */
+.stamp-hero { background: radial-gradient(circle at 50% 40%, #FBF3DC 0%, var(--cp-color-sand-200) 100%); padding: 36px 0 28px; display: grid; place-items: center; position: relative; }
+.big-stamp { width: 168px; height: 168px; border-radius: 50%; border: 3px solid var(--cp-color-red); color: var(--cp-color-red); display: grid; place-items: center; text-align: center; transform: rotate(-9deg); position: relative; opacity: .92; }
+.big-stamp::before { content: ""; position: absolute; inset: 7px; border-radius: 50%; border: 1.5px solid var(--cp-color-red); }
+.big-stamp .a { font-family: var(--cp-font-mono); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; }
+.big-stamp .b { font-family: var(--cp-font-accent); font-weight: 700; font-size: 40px; line-height: 38px; }
+.big-stamp .c { font-family: var(--cp-font-mono); font-size: 10px; letter-spacing: 1.5px; }
+.big-stamp .cp-icon { width: 22px; height: 22px; margin: 2px auto; }
+/* compose */
+.cp-compose-top { display: flex; align-items: center; justify-content: space-between; padding: 6px 16px 10px; }
+.cp-compose-top .t { font-family: var(--cp-font-title); font-weight: 600; font-size: 20px; }
+.cp-compose-area { font-size: 20px; line-height: 30px; margin: 18px 0 0; }
+.cp-compose-area .caret { display: inline-block; width: 2px; height: 24px; background: var(--cp-color-gold); vertical-align: -5px; margin-left: 2px; }
+.cp-counter { font-family: var(--cp-font-mono); font-size: 12px; color: var(--cp-text-muted); text-align: right; margin-top: 6px; }
+.cp-thumbs { display: flex; gap: 10px; }
+.cp-thumbs .th { width: 84px; height: 104px; border-radius: var(--cp-radius-md); position: relative; overflow: hidden; flex: none; }
+.cp-thumbs .th .cp-img { position: absolute; inset: 0; border-radius: 0; }
+.cp-thumbs .th .rm { position: absolute; top: 6px; right: 6px; width: 22px; height: 22px; border-radius: 50%; background: rgba(12,35,64,.7); color: #fff; display: grid; place-items: center; }
+.cp-thumbs .th .rm .cp-icon { width: 12px; height: 12px; stroke-width: 3px; }
+.cp-thumbs .add { width: 84px; height: 104px; border-radius: var(--cp-radius-md); border: 2px dashed var(--cp-border-strong); display: grid; place-items: center; color: var(--cp-text-muted); flex: none; }
+.cp-toolbar { display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; background: var(--cp-surface); border-radius: var(--cp-radius-pill); box-shadow: var(--cp-shadow-lg); }
+.cp-toolbar .cp-icon-btn { box-shadow: none; background: transparent; }
+.cp-toolbar .cp-icon-btn.on { background: var(--cp-color-gold-soft); }
+.cp-stagecard { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: var(--cp-radius-lg); background: var(--cp-color-blue); color: var(--cp-color-parchment); }
+.cp-stagecard .k { font-family: var(--cp-font-mono); font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--cp-color-gold-bright); }
+.cp-stagecard .v { font-family: var(--cp-font-title); font-weight: 600; font-size: 19px; line-height: 24px; }
+.cp-stagecard .s { font-size: 13px; color: rgba(246,239,226,.78); }
+.cp-stagecard .cp-switch { background: rgba(246,239,226,.3); }
+.cp-stagecard .cp-switch.on { background: var(--cp-color-gold); }
+/* share */
+.cp-sharecard { position: relative; width: 268px; aspect-ratio: 4 / 5; border-radius: var(--cp-radius-xl); overflow: hidden; background: linear-gradient(165deg, #1E4A7A 0%, #14365D 55%, #0C2340 100%); color: var(--cp-color-parchment); box-shadow: var(--cp-shadow-xl); padding: 22px; display: flex; flex-direction: column; }
+.cp-sharecard svg.route { position: absolute; left: 0; right: 0; top: 40px; width: 100%; height: 96px; }
+.cp-sharecard .hand { font-family: var(--cp-font-accent); font-size: 30px; line-height: 30px; color: var(--cp-color-gold-bright); transform: rotate(-4deg); display: inline-block; }
+.cp-sharecard .km { font-family: var(--cp-font-title); font-weight: 600; font-size: 56px; line-height: 56px; letter-spacing: -2px; margin-top: auto; white-space: nowrap; }
+.cp-sharecard .km small { font-size: 22px; letter-spacing: 0; }
+.cp-sharecard .rt { font-size: 15px; color: rgba(246,239,226,.85); margin-top: 4px; }
+.cp-sharecard .row3 { white-space: nowrap; display: flex; justify-content: space-between; margin-top: 16px; padding-top: 14px; border-top: 1px solid rgba(246,239,226,.2); font-family: var(--cp-font-mono); font-size: 11px; color: rgba(246,239,226,.85); }
+.cp-sharecard .brand { position: absolute; top: 22px; right: 22px; font-family: var(--cp-font-title); font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 6px; opacity: .9; }
+.cp-sharecard .mini-stamp { position: absolute; top: 92px; right: 18px; width: 58px; height: 58px; border-radius: 50%; border: 2px solid var(--cp-color-gold-bright); color: var(--cp-color-gold-bright); display: grid; place-items: center; font-family: var(--cp-font-accent); font-size: 15px; line-height: 14px; text-align: center; transform: rotate(10deg); }
+.cp-share-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px 6px; }
+.cp-share-grid div { display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; text-align: center; }
+.cp-share-grid .bubble { width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; }
+.cp-linkbar { display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 6px 0 20px; border-radius: var(--cp-radius-pill); background: var(--cp-surface-sunken); font-family: var(--cp-font-mono); font-size: 13px; }
+.cp-linkbar span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* detail pages (Airbnb / Agoda) */
+.phone.detail .scroll { top: 0; padding: 0 0 120px; }
+.cp-gallery { position: relative; height: 316px; }
+.cp-gallery .cp-img { position: absolute; inset: 0; border-radius: 0; }
+.cp-gallery .nav { position: absolute; top: 56px; left: 16px; right: 16px; display: flex; justify-content: space-between; z-index: 3; }
+.cp-gallery .nav .r { display: flex; gap: 10px; }
+.cp-gallery .nav .cp-icon-btn { width: 44px; height: 44px; }
+.cp-gallery .count { position: absolute; right: 16px; bottom: 44px; z-index: 3; }
+.cp-gallery .dots { position: absolute; left: 0; right: 0; bottom: 44px; display: flex; justify-content: center; gap: 6px; z-index: 3; }
+.cp-gallery .dots i { width: 6px; height: 6px; border-radius: var(--cp-radius-pill); background: rgba(255,255,255,.6); }
+.cp-gallery .dots i.on { width: 18px; background: #fff; }
+.detail-sheet { position: relative; margin-top: -28px; background: var(--cp-bg); border-radius: var(--cp-radius-xl) var(--cp-radius-xl) 0 0; padding: 28px 24px 0; z-index: 2; }
+.detail-sheet h1 { font-family: var(--cp-font-title); font-weight: 600; font-size: 30px; line-height: 36px; letter-spacing: -.5px; margin: 0 0 6px; }
+.d-sub { color: var(--cp-text-muted); font-size: 15px; line-height: 22px; }
+.d-rate { display: flex; align-items: center; gap: 8px; margin-top: 12px; font-size: 15px; }
+.d-rate u { text-underline-offset: 3px; font-weight: 600; }
+.d-div { height: 1px; background: var(--cp-border); margin: 24px 0; }
+.d-h { font-family: var(--cp-font-title); font-weight: 600; font-size: 22px; line-height: 28px; margin: 0 0 14px; }
+.d-hl { display: flex; gap: 16px; align-items: flex-start; margin-bottom: 18px; }
+.d-hl .ico { width: 44px; height: 44px; border-radius: 50%; background: var(--cp-surface); box-shadow: var(--cp-shadow-sm); display: grid; place-items: center; flex: none; }
+.d-hl b { display: block; font-size: 16px; line-height: 22px; font-weight: 600; }
+.d-hl span { font-size: 14px; line-height: 20px; color: var(--cp-text-muted); }
+.d-host { display: flex; align-items: center; gap: 14px; }
+.d-host .cp-avatar { width: 52px; height: 52px; border: 0; }
+.cp-amenities { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 16px; }
+.cp-amenities div { display: flex; align-items: center; gap: 12px; font-size: 15px; }
+.cp-amenities .off { color: var(--cp-text-placeholder); text-decoration: line-through; }
+.cp-room { background: var(--cp-surface); border-radius: var(--cp-radius-lg); box-shadow: var(--cp-shadow-sm); padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+.cp-room .top { display: flex; gap: 14px; }
+.cp-room .cp-img { width: 88px; height: 88px; border-radius: var(--cp-radius-md); flex: none; }
+.cp-room .n { font-weight: 600; font-size: 16px; line-height: 21px; }
+.cp-room .m { font-size: 13px; line-height: 18px; color: var(--cp-text-muted); }
+.cp-room .feat { display: flex; gap: 6px; flex-wrap: wrap; }
+.cp-room .bot { display: flex; align-items: flex-end; justify-content: space-between; gap: 10px; }
+.cp-room .price { text-align: left; }
+.cp-room .price s { color: var(--cp-text-placeholder); font-size: 13px; margin-right: 6px; }
+.cp-room .price b { font-family: var(--cp-font-title); font-size: 24px; line-height: 28px; font-weight: 600; }
+.cp-room .price small { display: block; font-size: 12px; color: var(--cp-text-muted); }
+.cp-room.sel { box-shadow: inset 0 0 0 2px var(--cp-color-blue), var(--cp-shadow-md); }
+.cp-urgent { color: var(--cp-color-red); font-size: 12px; font-weight: 700; }
+.cp-ratebars { display: grid; gap: 12px; }
+.cp-ratebar { display: grid; grid-template-columns: 112px 1fr 34px; align-items: center; gap: 12px; font-size: 14px; }
+.cp-ratebar i { height: 6px; border-radius: var(--cp-radius-pill); background: var(--cp-surface-sunken); position: relative; overflow: hidden; display: block; }
+.cp-ratebar i::after { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: var(--w); background: var(--cp-color-blue); border-radius: inherit; }
+.cp-ratebar b { font-family: var(--cp-font-mono); font-size: 12px; font-weight: 600; text-align: right; }
+.cp-review { background: var(--cp-surface); border-radius: var(--cp-radius-lg); box-shadow: var(--cp-shadow-sm); padding: 18px; }
+.cp-review .hd { display: flex; gap: 12px; align-items: center; }
+.cp-review .hd .cp-avatar { width: 40px; height: 40px; border: 0; }
+.cp-review .n { font-weight: 600; font-size: 15px; line-height: 20px; }
+.cp-review .m { font-family: var(--cp-font-mono); font-size: 11px; color: var(--cp-text-muted); }
+.cp-review p { margin: 12px 0 0; font-size: 15px; line-height: 23px; }
+.cp-review .st { display: flex; gap: 2px; color: var(--cp-color-gold-ink); margin-top: 10px; }
+.cp-review .st .cp-icon { width: 14px; height: 14px; fill: currentColor; stroke-width: 1.5px; }
+.cp-minimap { position: relative; height: 170px; border-radius: var(--cp-radius-lg); overflow: hidden; box-shadow: var(--cp-shadow-sm); }
+.cp-minimap svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.cp-rules { background: var(--cp-surface); border-radius: var(--cp-radius-lg); box-shadow: var(--cp-shadow-sm); }
+.cp-rules div { display: flex; justify-content: space-between; gap: 12px; padding: 14px 18px; border-bottom: 1px solid var(--cp-border); font-size: 15px; }
+.cp-rules div:last-child { border: 0; }
+.cp-rules span { font-family: var(--cp-font-mono); font-size: 13px; color: var(--cp-text-muted); }
+.cp-bookbar { position: absolute; left: 0; right: 0; bottom: 0; z-index: 7; background: var(--cp-surface); box-shadow: 0 -8px 24px rgba(20,54,93,.10); padding: 14px 20px 30px; display: flex; align-items: center; gap: 14px; }
+.cp-bookbar .pr b { font-family: var(--cp-font-title); font-weight: 600; font-size: 26px; line-height: 30px; }
+.cp-bookbar .pr small { font-size: 14px; color: var(--cp-text-muted); }
+.cp-bookbar .pr .d { display: block; font-size: 12px; color: var(--cp-success); font-weight: 600; margin-top: 1px; }
+.cp-bookbar .cp-btn { margin-left: auto; flex: none; }
+.cp-stickytabs { position: sticky; top: 0; z-index: 4; background: rgba(246,239,226,.94); backdrop-filter: blur(10px); }
+.cp-stickytabs .cp-subtabs span { font-size: 14px; }
+.cp-quick { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.cp-quick div { display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; }
+.cp-quick .cp-icon-btn { width: 56px; height: 56px; box-shadow: var(--cp-shadow-sm); }
+.cp-hours div { display: flex; justify-content: space-between; padding: 8px 0; font-size: 15px; }
+.cp-hours div span:last-child { font-family: var(--cp-font-mono); font-size: 13px; color: var(--cp-text-muted); }
+.cp-hours .today { font-weight: 700; } .cp-hours .today span:last-child { color: var(--cp-success); font-weight: 600; }
+.cp-popular { display: flex; align-items: flex-end; gap: 6px; height: 84px; }
+.cp-popular i { flex: 1; border-radius: 6px 6px 3px 3px; background: var(--cp-color-blue-100); display: block; }
+.cp-popular i.now { background: var(--cp-color-gold); }
+.cp-popular-x { display: flex; justify-content: space-between; font-family: var(--cp-font-mono); font-size: 10px; color: var(--cp-text-muted); margin-top: 6px; }
+.cp-menu div { display: flex; align-items: baseline; gap: 8px; padding: 9px 0; }
+.cp-menu .nm { font-family: var(--cp-font-title); font-weight: 600; font-size: 17px; }
+.cp-menu .ln { flex: 1; border-bottom: 2px dotted var(--cp-border-strong); transform: translateY(-4px); }
+.cp-menu .pc { font-family: var(--cp-font-mono); font-size: 14px; }
+.cp-menu small { display: block; font-family: var(--cp-font-body); font-weight: 400; font-size: 13px; color: var(--cp-text-muted); }
+
+/* ---- v4: map layers (helicopter / city) ---- */
+.cp-layer-switch { align-self: flex-start; display: inline-flex; padding: 4px; border-radius: var(--cp-radius-pill); background: rgba(255,253,248,.94); backdrop-filter: blur(10px); box-shadow: var(--cp-shadow-md); }
+.cp-layer-switch span { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 14px; border-radius: var(--cp-radius-pill); font-size: 13px; font-weight: 600; color: var(--cp-text-muted); white-space: nowrap; }
+.cp-layer-switch span .cp-icon { width: 18px; height: 18px; }
+.cp-layer-switch span.on { background: var(--cp-color-blue); color: var(--cp-color-parchment); }
+.cp-pin.sm { width: 34px; height: 34px; border-width: 2.5px; }
+.cp-pin.sm .cp-icon { width: 17px; height: 17px; }
+.cp-pin.iconic.md { width: 50px; height: 50px; }
+.cp-hint { display: inline-flex; align-items: center; gap: 8px; height: 34px; padding: 0 14px; border-radius: var(--cp-radius-pill); background: rgba(12,35,64,.82); color: var(--cp-color-parchment); font-family: var(--cp-font-mono); font-size: 11px; white-space: nowrap; }
+.cp-hint .cp-icon { width: 16px; height: 16px; }
+.cp-elev { display: block; width: 100%; height: 64px; }
+.cp-youhere { position: absolute; z-index: 3; display: flex; align-items: center; gap: 8px; }
+.cp-youhere .ring { width: 50px; height: 50px; border-radius: 50%; background: rgba(217,162,27,.28); display: grid; place-items: center; }
+.cp-youhere .dot { width: 30px; height: 30px; border-radius: 50%; background: var(--cp-color-blue); border: 3px solid var(--cp-color-white); box-shadow: var(--cp-shadow-md); display: grid; place-items: center; }
+.cp-youhere .dot .cp-icon { width: 14px; height: 14px; fill: var(--cp-color-gold); stroke: var(--cp-color-gold); }
+.cp-youhere .tag { background: var(--cp-color-white); border-radius: var(--cp-radius-pill); padding: 4px 10px; font-size: 11px; font-weight: 700; box-shadow: var(--cp-shadow-sm); white-space: nowrap; }
+.cp-legend { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 20px; font-size: 14px; }
+.cp-legend div { display: flex; align-items: center; gap: 10px; }
+.cp-legend i { width: 26px; height: 0; display: block; flex: none; }
+
+/* ---- v5: inbox, notifications, Instagram-style post flow ---- */
+.cp-bellwrap { position: relative; display: inline-block; flex: none; }
+.cp-bell-badge { position: absolute; top: -3px; right: -3px; min-width: 20px; height: 20px; padding: 0 5px; border-radius: var(--cp-radius-pill); background: var(--cp-color-red); color: #fff; font-size: 11px; font-weight: 700; display: grid; place-items: center; border: 2px solid var(--cp-bg); }
+.cp-inbox-top { display: flex; align-items: center; gap: 10px; }
+.cp-inbox-top h1 { font-family: var(--cp-font-title); font-weight: 600; font-size: 32px; line-height: 38px; letter-spacing: -.5px; margin: 0; flex: 1; }
+.cp-notif-cap { font-family: var(--cp-font-mono); font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--cp-text-muted); margin: 22px 0 6px; }
+.cp-notif { display: flex; gap: 14px; align-items: center; padding: 14px 24px; margin: 0 -24px; position: relative; }
+.cp-notif.unread { background: var(--cp-color-gold-wash); }
+.cp-notif .lead { position: relative; width: 52px; height: 52px; flex: none; }
+.cp-notif .lead > .cp-avatar { width: 52px; height: 52px; border: 0; }
+.cp-notif .lead > .bub { width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; }
+.cp-notif .lead .type { position: absolute; right: -4px; bottom: -4px; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; border: 2px solid var(--cp-bg); }
+.cp-notif.unread .lead .type { border-color: var(--cp-color-gold-wash); }
+.cp-notif .lead .type .cp-icon { width: 12px; height: 12px; stroke-width: 2.6px; }
+.cp-notif .tx { flex: 1; min-width: 0; font-size: 15px; line-height: 21px; }
+.cp-notif .tx b { font-weight: 600; }
+.cp-notif .tx .q { color: var(--cp-text-muted); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cp-notif .tm { font-family: var(--cp-font-mono); font-size: 11px; color: var(--cp-text-muted); display: block; margin-top: 3px; }
+.cp-notif .th { width: 48px; height: 48px; border-radius: 12px; flex: none; }
+.cp-notif .udot { width: 9px; height: 9px; border-radius: 50%; background: var(--cp-color-blue); flex: none; }
+.cp-notif .cp-btn { flex: none; }
+.cp-msg { display: flex; gap: 14px; align-items: center; padding: 12px 24px; margin: 0 -24px; }
+.cp-msg .cp-avatar { width: 56px; height: 56px; border: 0; flex: none; }
+.cp-msg .bd { flex: 1; min-width: 0; }
+.cp-msg .n { font-weight: 600; font-size: 16px; line-height: 22px; display: flex; justify-content: space-between; gap: 8px; }
+.cp-msg .n span { font-family: var(--cp-font-mono); font-weight: 400; font-size: 11px; color: var(--cp-text-muted); padding-top: 3px; }
+.cp-msg .p { font-size: 14px; line-height: 20px; color: var(--cp-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cp-msg.unread .p { color: var(--cp-text); font-weight: 600; }
+.cp-msg .cnt { min-width: 22px; height: 22px; padding: 0 6px; border-radius: var(--cp-radius-pill); background: var(--cp-color-blue); color: var(--cp-color-parchment); font-size: 12px; font-weight: 700; display: grid; place-items: center; flex: none; }
+/* post flow */
+.cp-postbar { position: absolute; left: 0; right: 0; bottom: 0; z-index: 7; padding: 22px 20px 34px; background: linear-gradient(to top, var(--cp-bg) 72%, rgba(246,239,226,0)); display: flex; flex-direction: column; gap: 10px; align-items: stretch; }
+.cp-postbar .cnt { font-family: var(--cp-font-mono); font-size: 12px; color: var(--cp-text-muted); text-align: center; }
+.cp-postbar .row2 { display: flex; align-items: center; gap: 12px; }
+.cp-postbar .row2 .cp-btn { flex: 1; }
+.cp-mediagrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; margin: 0 -24px; }
+.cp-mediagrid .cell { position: relative; aspect-ratio: 1; overflow: hidden; }
+.cp-mediagrid .cell .cp-img { position: absolute; inset: 0; border-radius: 0; }
+.cp-mediagrid .cell.dim::after { content: ""; position: absolute; inset: 0; background: rgba(255,253,248,.5); }
+.cp-mediagrid .cell .num { position: absolute; top: 6px; right: 6px; z-index: 2; width: 24px; height: 24px; border-radius: 50%; background: var(--cp-color-gold); color: var(--cp-color-blue); font-size: 12px; font-weight: 700; display: grid; place-items: center; border: 2px solid #fff; }
+.cp-mediagrid .cell .ring { position: absolute; top: 6px; right: 6px; z-index: 2; width: 24px; height: 24px; border-radius: 50%; border: 2px solid #fff; background: rgba(12,35,64,.18); }
+.cp-mediagrid .cell .vid { position: absolute; left: 6px; bottom: 5px; z-index: 2; font-family: var(--cp-font-mono); font-size: 10px; color: #fff; text-shadow: 0 1px 4px rgba(12,35,64,.6); }
+.cp-pickprev { position: relative; height: 330px; margin: 0 -24px; overflow: hidden; }
+.cp-pickprev .cp-img { position: absolute; inset: 0; border-radius: 0; }
+.cp-pickprev .tools { position: absolute; left: 14px; right: 14px; bottom: 14px; display: flex; justify-content: space-between; z-index: 2; }
+.cp-pickprev .tools .cp-icon-btn { width: 40px; height: 40px; background: rgba(12,35,64,.62); color: #fff; box-shadow: none; }
+.cp-pickprev .tools .sel { background: rgba(12,35,64,.62); color: #fff; }
+.cp-optrow { display: flex; align-items: center; gap: 14px; min-height: 58px; border-bottom: 1px solid var(--cp-border); font-size: 16px; }
+.cp-optrow .lbl { flex: 1; }
+.cp-optrow .v { color: var(--cp-text-muted); font-size: 14px; }
+.cp-optrow > .cp-icon:first-child { color: var(--cp-text); }
+.cp-capture { display: flex; gap: 14px; align-items: flex-start; }
+.cp-capture .tn { width: 88px; height: 88px; border-radius: var(--cp-radius-md); position: relative; overflow: hidden; flex: none; }
+.cp-capture .tn .cp-img { position: absolute; inset: 0; border-radius: 0; }
+.cp-capture .tn .more { position: absolute; right: 6px; bottom: 6px; }
+.cp-capture .ta { flex: 1; min-width: 0; font-size: 17px; line-height: 25px; }
+.cp-capture .ta .ph { color: var(--cp-text-placeholder); }
+.cp-capture .caret { display: inline-block; width: 2px; height: 20px; background: var(--cp-color-gold); vertical-align: -4px; margin-left: 1px; }
+
 @media (max-width: 640px) {
   .wrap, .doc-nav-inner { padding-left: 16px; padding-right: 16px; }
   .doc h2 { font-size: 36px; line-height: 42px; }
@@ -576,6 +822,24 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
     <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
     <symbol id="i-dots" viewBox="0 0 24 24"><circle cx="6" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="18" cy="12" r="1"/></symbol>
+    <symbol id="i-pencil" viewBox="0 0 24 24"><path d="M4 20h4L19.5 8.5a2.8 2.8 0 0 0-4-4L4 16v4Z"/><path d="m13.5 6.5 4 4"/></symbol>
+    <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"/></symbol>
+    <symbol id="i-wifi" viewBox="0 0 24 24"><path d="M2.5 9a15 15 0 0 1 19 0M5.5 12.5a10.5 10.5 0 0 1 13 0M8.7 16a6 6 0 0 1 6.6 0"/><path d="M12 19.5h.01"/></symbol>
+    <symbol id="i-utensils" viewBox="0 0 24 24"><path d="M6 3v7a2.5 2.5 0 0 0 5 0V3M8.5 3v18M17 21V3c-2.5 1.5-3.5 4.5-3.5 8H17"/></symbol>
+    <symbol id="i-wash" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="3"/><circle cx="12" cy="13" r="4"/><path d="M7.5 6.5h.01M10.5 6.5h.01"/></symbol>
+    <symbol id="i-bike" viewBox="0 0 24 24"><circle cx="5.5" cy="16.5" r="3.5"/><circle cx="18.5" cy="16.5" r="3.5"/><path d="m5.5 16.5 4-8h6l3 8M9.5 8.5 12 16.5M8 6h3"/></symbol>
+    <symbol id="i-plug" viewBox="0 0 24 24"><path d="M9 3v5M15 3v5M6.5 8h11v3.5a5.5 5.5 0 0 1-11 0V8ZM12 17v4"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-image" viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="3.5"/><circle cx="9" cy="10" r="1.8"/><path d="m4 17 5-4.5 3.5 3L16 12l4.5 4.5"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="12" height="12" rx="3"/><path d="M15.5 8.5V6.5a3 3 0 0 0-3-3h-6a3 3 0 0 0-3 3v6a3 3 0 0 0 3 3h2"/></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5v-15Z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 4.5 6v5.5c0 4.6 3.2 8.2 7.5 9.5 4.3-1.3 7.5-4.9 7.5-9.5V6L12 3Z"/><path d="m8.8 12 2.4 2.4 4.2-4.6"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24"><path d="M6.5 3.5h3l1.5 4-2 1.5a11 11 0 0 0 6 6l1.5-2 4 1.5v3a2.5 2.5 0 0 1-2.7 2.5A16.5 16.5 0 0 1 4 6.2 2.5 2.5 0 0 1 6.5 3.5Z"/></symbol>
+    <symbol id="i-tagpeople" viewBox="0 0 24 24"><circle cx="9" cy="8.5" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6M18.5 6v6M15.5 9h6"/></symbol>
+    <symbol id="i-bolt2" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-heli" viewBox="0 0 24 24"><path d="M3 4.5h14M10 4.5v3"/><path d="M5 12.5a5 4 0 0 1 5-4h1.5a4.5 4.5 0 0 1 4.5 4.5v1.5H5v-2Z"/><path d="m16 11 5-2v4.5l-5 1M6.5 18.5h9M9 16v2.5M13 16v2.5"/></symbol>
+    <symbol id="i-city" viewBox="0 0 24 24"><path d="M4 20.5V10l6-3v13.5M10 20.5V4l10 4v12.5M2.5 20.5h19M13.5 10.5h3M13.5 14.5h3M6.5 12.5h1M6.5 16h1"/></symbol>
+    <symbol id="i-checks" viewBox="0 0 24 24"><path d="m2.5 12.5 4.5 4.5L14.5 8.5M10 16.5l1 1L21 7.5"/></symbol>
   </defs>
 </svg>
 
@@ -584,7 +848,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     <div class="logo-ph"><span class="mark"><svg class="cp-icon"><use href="#i-shell"/></svg></span><span class="word">Camino<span>Plus</span></span><span class="tag">logo TBD</span></div>
     <nav class="doc-nav-links">
       <a href="#color">Color</a><a href="#type">Type</a><a href="#space">Spacing</a><a href="#radius">Radius</a><a href="#shadow">Shadow</a>
-      <a href="#buttons">Buttons</a><a href="#inputs">Inputs</a><a href="#chips">Chips</a><a href="#cards">Cards</a><a href="#waze">Map patterns</a><a href="#rpg">Quests & stories</a>
+      <a href="#buttons">Buttons</a><a href="#inputs">Inputs</a><a href="#chips">Chips</a><a href="#cards">Cards</a><a href="#waze">Map patterns</a><a href="#rpg">Quests & stories</a><a href="#patterns">Lightbox & detail</a>
       <a href="#tabbar">Tab bar</a><a href="#screens">Screens</a><a href="#icons">Icons</a>
     </nav>
   </div>
@@ -1054,9 +1318,174 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
   </div>
 </section>
 
+<!-- =================================================================== PATTERNS -->
+<section class="doc" id="patterns">
+  <p class="eyebrow">12 · Lightbox, journal & detail patterns</p>
+  <h2>Reusable building blocks</h2>
+  <p class="intro">Pop-ups open over a dimmed, blurred screen. Articles and stamps use the same lightbox shell. Detail pages follow Airbnb and Agoda: a big gallery, a rounded sheet, clear facts and a sticky booking bar.</p>
+
+  <h3 style="margin-top:0">Profile actions</h3>
+  <div class="grid g2" style="align-items:start">
+    <div class="panel">
+      <p class="spec" style="margin:0 0 16px">.cp-edit-pill · mono 11 · 28h · sits beside the username</p>
+      <div style="display:flex;align-items:center;gap:10px"><span class="un">ana.camina</span><span class="cp-edit-pill"><svg class="cp-icon "><use href="#i-pencil"/></svg>camino.plus/ana</span></div>
+    </div>
+    <div class="panel">
+      <p class="spec" style="margin:0 0 16px">.cp-fab-write · gold, 60 round, pen icon only, bottom-right above the tab bar</p>
+      <div class="row"><button class="cp-fab-write" aria-label="Write a journey post"><svg class="cp-icon "><use href="#i-pencil"/></svg></button></div>
+    </div>
+  </div>
+
+  <h3>Blog & article cards</h3>
+  <div class="grid g2" style="align-items:start">
+    <article class="cp-article-card"><div class="cp-img v3"></div><div class="bd"><span class="cp-badge blue"><svg class="cp-icon sm"><use href="#i-church"/></svg>Church · History</span><h4>The pilgrim who lost his shell</h4><p>How a 12th-century hospital became the best-loved stop between Burgos and Hontanas.</p><div class="meta">4 min read · Fr. Miguel</div></div></article>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="cp-card cp-article-row"><div class="cp-img v2"></div><div style="flex:1;min-width:0"><span class="cp-badge neutral">Iconic place</span><h5>Why the Meseta changes you</h5><div class="meta">3 min · +20 XP</div></div></div>
+      <div class="cp-card cp-article-row"><div class="cp-img v4"></div><div style="flex:1;min-width:0"><span class="cp-badge neutral">Local food</span><h5>Sopa de ajo, a pilgrim's breakfast</h5><div class="meta">2 min · Café El Peregrino</div></div></div>
+      <p class="spec" style="margin:4px 0 0">.cp-article-card (featured) · .cp-article-row (list). Tapping opens the article lightbox.</p>
+    </div>
+  </div>
+
+  <h3>Lightbox (article and stamp)</h3>
+  <div class="phones" style="padding-bottom:12px">
+    <div class="lb-stage"><div class="fake"><div class="scr-title">Maps</div></div><div class="cp-scrim"></div><div class="cp-lightbox cp-article" style="top:40px;bottom:96px;bottom:30px">
+          <button class="close" aria-label="Close"><svg class="cp-icon "><use href="#i-x"/></svg></button>
+          <div class="hero"><div class="cp-img v3"></div>
+            <div class="tags"><span class="cp-badge glass"><svg class="cp-icon sm"><use href="#i-church"/></svg>Church</span><span class="cp-badge gold">12th century</span></div></div>
+          <div class="bd">
+            <div class="ey">History · 4 min read</div>
+            <h3>Iglesia de San Juan</h3>
+            <div class="by"><span class="cp-avatar" style="background:linear-gradient(150deg,#E9C987,#A0583F)"></span>Fr. Miguel · updated Oct 2026</div>
+            <p class="lead">Pilgrims have rested under this Romanesque porch since 1190, when the hospital of San Juan opened its doors to travellers who had lost their way on the Meseta.</p>
+            <blockquote>Knock twice. Someone always answers.</blockquote>
+            <div class="cp-facts"><div><b>1190</b><span>Built</span></div><div><b>Romanesque</b><span>Style</span></div><div><b>19:00</b><span>Pilgrim mass</span></div></div>
+          </div>
+          <div class="ft"><button class="cp-btn cp-btn-secondary md"><svg class="cp-icon sm"><use href="#i-headphones"/></svg>Listen</button><button class="cp-btn cp-btn-primary md"><svg class="cp-icon sm"><use href="#i-nav"/></svg>Navigate</button></div>
+        </div></div>
+    <div class="lb-stage"><div class="fake"><div class="scr-title">Passport</div></div><div class="cp-scrim"></div><div class="cp-lightbox" style="top:40px;">
+          <button class="close" aria-label="Close"><svg class="cp-icon "><use href="#i-x"/></svg></button>
+          <div class="stamp-hero"><div class="big-stamp"><div><div class="a">Catedral</div><svg class="cp-icon "><use href="#i-shell"/></svg><div class="b">Burgos</div><div class="c">04 · XI · 2026</div></div></div></div>
+          <div class="bd cp-article">
+            <div class="ey">Stamp 07 of 33 · Camino Francés</div>
+            <h3 style="font-size:28px;line-height:32px">Burgos Cathedral</h3>
+            <p style="margin-top:6px;font-size:15px;line-height:22px;color:var(--cp-text-muted)">Official sello from the pilgrim office, collected at the cathedral door.</p>
+            <div class="cp-facts"><div><b>14:32</b><span>Collected</span></div><div><b>243 km</b><span>From start</span></div><div><b>18°</b><span>Weather</span></div></div>
+            <blockquote style="font-size:24px">Cold hands, warm soup.</blockquote>
+            <div class="note" style="margin-top:10px;font-family:var(--cp-font-mono);font-size:11px">42.3408° N · 3.7047° W</div>
+          </div>
+          <div class="ft"><button class="cp-btn cp-btn-secondary md"><svg class="cp-icon sm"><use href="#i-share"/></svg>Share</button><button class="cp-btn cp-btn-primary md"><svg class="cp-icon sm"><use href="#i-pin"/></svg>On map</button></div>
+        </div></div>
+  </div>
+  <p class="spec">.cp-scrim rgba(12,35,64,.66) + 3px blur · .cp-lightbox radius xl, 16px side margins, close button 40 top-right, sticky .ft actions · dismiss: tap scrim, swipe down or ✕</p>
+
+  <h3>Compose parts & share</h3>
+  <div class="grid g2" style="align-items:start">
+    <div class="panel" style="display:flex;flex-direction:column;gap:16px">
+      <div class="cp-stagecard"><div style="flex:1"><div class="k">Stage 12 · auto</div><div class="v">Burgos → Hontanas</div><div class="s">31.1 km · 7h 20m · 18,240 steps</div></div><span class="cp-switch on"></span></div>
+      <div class="cp-thumbs"><div class="th"><div class="cp-img v4"></div><span class="rm"><svg class="cp-icon "><use href="#i-x"/></svg></span></div><div class="th"><div class="cp-img v5"></div><span class="rm"><svg class="cp-icon "><use href="#i-x"/></svg></span></div><div class="add"><svg class="cp-icon "><use href="#i-plus"/></svg></div></div>
+      <div class="cp-toolbar"><button class="cp-icon-btn on"><svg class="cp-icon "><use href="#i-image"/></svg></button><button class="cp-icon-btn"><svg class="cp-icon "><use href="#i-camera"/></svg></button><button class="cp-icon-btn"><svg class="cp-icon "><use href="#i-pin"/></svg></button><button class="cp-icon-btn"><svg class="cp-icon "><use href="#i-shell"/></svg></button><button class="cp-icon-btn"><svg class="cp-icon "><use href="#i-tagpeople"/></svg></button></div>
+      <p class="spec" style="margin:0">.cp-stagecard (auto stats) · .cp-thumbs · .cp-toolbar (media, location, stamp, tag)</p>
+    </div>
+    <div class="panel" style="display:flex;flex-direction:column;gap:20px;align-items:center">
+      <div style="transform:rotate(-2deg)"><div class="cp-sharecard">
+            <span class="brand"><span class="cp-badge gold" style="height:22px;padding:0 8px;font-size:11px">logo TBD</span></span>
+            <span class="hand">Day 12</span>
+            <svg class="route" viewBox="0 0 268 150" preserveAspectRatio="none"><path d="M-10 130 C 40 120, 60 40, 120 70 S 200 110, 280 20" stroke="#D9A21B" stroke-width="10" fill="none" opacity=".35" stroke-linecap="round"/><path d="M-10 130 C 40 120, 60 40, 120 70 S 200 110, 280 20" stroke="#F6EFE2" stroke-width="3.5" fill="none" stroke-linecap="round"/><circle cx="120" cy="70" r="7" fill="#D9A21B" stroke="#F6EFE2" stroke-width="3"/></svg>
+            <span class="mini-stamp">Burgos<br>04·XI</span>
+            <div class="km">31.1<small> km</small></div>
+            <div class="rt">Burgos → Hontanas</div>
+            <div class="row3"><span>7h 20m</span><span>468 km to go</span></div>
+          </div></div>
+      <div style="width:100%"><div class="cp-share-grid">
+            <div><span class="bubble b-gold"><svg class="cp-icon "><use href="#i-play"/></svg></span>Stories</div>
+            <div><span class="bubble b-green"><svg class="cp-icon "><use href="#i-chat"/></svg></span>WhatsApp</div>
+            <div><span class="bubble b-blue"><svg class="cp-icon "><use href="#i-msg"/></svg></span>Messages</div>
+            <div><span class="bubble b-sand"><svg class="cp-icon "><use href="#i-offline"/></svg></span>Save image</div>
+          </div></div>
+      <div class="cp-linkbar" style="width:100%"><span>camino.plus/j/ana-12</span><button class="cp-btn cp-btn-primary sm"><svg class="cp-icon sm"><use href="#i-copy"/></svg>Copy</button></div>
+      <p class="spec" style="margin:0">.cp-sharecard (4:5, 9:16, 1:1) · .cp-share-grid · .cp-linkbar (mono URL)</p>
+    </div>
+  </div>
+
+  <h3>Map layers: helicopter and city</h3>
+  <div class="grid g2" style="align-items:start">
+    <div class="panel" style="display:flex;flex-direction:column;gap:22px">
+      <div style="display:flex;gap:16px;flex-wrap:wrap"><div class="cp-layer-switch"><span class="on"><svg class="cp-icon "><use href="#i-heli"/></svg>Helicopter</span><span class=""><svg class="cp-icon "><use href="#i-city"/></svg>City</span></div><div class="cp-layer-switch"><span class=""><svg class="cp-icon "><use href="#i-heli"/></svg>Helicopter</span><span class="on"><svg class="cp-icon "><use href="#i-city"/></svg>City</span></div></div>
+      <div class="cp-legend">
+        <div><i style="border-top:6px solid var(--cp-color-blue);border-radius:3px"></i>Walked route</div>
+        <div><i style="border-top:5px dotted var(--cp-color-blue);opacity:.6"></i>Route ahead</div>
+        <div><i style="height:12px;border-radius:50%;width:12px;background:var(--cp-color-blue);border:3px solid #14365D"></i>Stage town (done)</div>
+        <div><i style="height:12px;border-radius:50%;width:12px;background:#fff;border:3px solid #14365D"></i>Stage town (ahead)</div>
+      </div>
+      <div class="cp-hint" style="align-self:flex-start"><svg class="cp-icon "><use href="#i-locate"/></svg>Pinch in to open Burgos</div>
+      <div><svg class="cp-elev" viewBox="0 0 342 64" preserveAspectRatio="none" aria-hidden="true"><path d="M0 54 L12 30 L30 12 L40 28 L62 45 L95 47 L115 40 L137 31 L160 33 L185 33 L205 31 L222 24 L240 10 L255 20 L270 17 L290 42 L315 48 L342 51 V64 H0Z" fill="#DCE5EF"/><path d="M0 54 L12 30 L30 12 L40 28 L62 45 L95 47 L115 40 L137 31 L160 33 L185 33 L205 31 L222 24 L240 10 L255 20 L270 17 L290 42 L315 48 L342 51" stroke="#14365D" stroke-width="2.5" fill="none" stroke-linejoin="round"/><path d="M0 54 L12 30 L30 12 L40 28 L62 45 L95 47 L115 40 L137 31 V64 H0Z" fill="#14365D" opacity=".18"/><line x1="137" y1="6" x2="137" y2="64" stroke="#D9A21B" stroke-width="2"/><circle cx="137" cy="31" r="5" fill="#D9A21B" stroke="#FFFDF8" stroke-width="2.5"/></svg></div>
+      <p class="spec" style="margin:0">.cp-layer-switch · .cp-pin.sm / .iconic.md · .cp-elev · .cp-youhere · .cp-hint</p>
+    </div>
+    <div class="panel">
+      <table class="contrast">
+        <tr><th>Layer</th><th>What it shows</th></tr>
+        <tr><td><b>Helicopter</b></td><td>Whole route, stage towns, progress and elevation. Small pins for iconic places, churches, hunts, stories and busy areas. Bottom sheet is a trip summary.</td></tr>
+        <tr><td><b>City / area</b></td><td>Streets, buildings and every nearby place. Full-size pins with XP tags, crowd reports, water and weather. Bottom sheet is the selected place.</td></tr>
+      </table>
+      <p class="note" style="margin:16px 0 0">Switch with the pill, or pinch: below zoom 9 the app shows Helicopter, above zoom 12 it shows City. The change flies the camera over 320 ms. Both layers work offline from the downloaded route pack.</p>
+    </div>
+  </div>
+
+  <h3>Inbox & notifications</h3>
+  <div class="grid g2" style="align-items:start">
+    <div class="panel" style="padding:8px 24px 16px;overflow:hidden">
+      <div style="margin:0 -24px"><div class="cp-notif unread"><div class="lead"><span class="bub b-gold"><svg class="cp-icon "><use href="#i-medal"/></svg></span></div><div class="tx"><b>Meseta Walker</b> unlocked. You earned <b>+100 XP</b>.<span class="tm">2 min ago</span></div><span class="udot"></span></div><div class="cp-notif unread"><div class="lead"><span class="cp-avatar" style="background:linear-gradient(150deg,#D7C6E0,#6E5470)"></span><span class="type b-red"><svg class="cp-icon "><use href="#i-heart"/></svg></span></div><div class="tx"><b>Hannah</b> liked your post <span class="q">“Reached the cathedral…”</span><span class="tm">14 min ago</span></div><span class="th cp-img v4"></span><span class="udot"></span></div><div class="cp-notif"><div class="lead"><span class="bub b-sky"><svg class="cp-icon "><use href="#i-face"/></svg></span><span class="type b-gold"><svg class="cp-icon "><use href="#i-image"/></svg></span></div><div class="tx"><b>3 new photos of you</b> from O Cebreiro.<span class="tm">1 h ago</span></div><button class="cp-btn cp-btn-primary sm">View</button></div><div class="cp-notif"><div class="lead"><span class="bub b-blue"><svg class="cp-icon "><use href="#i-stays"/></svg></span><span class="type b-green"><svg class="cp-icon "><use href="#i-bolt2"/></svg></span></div><div class="tx"><b>Albergue El Puntido</b> confirmed your bed.<span class="tm">Yesterday</span></div></div>
+      </div>
+      <p class="spec" style="margin:12px 0 0">.cp-notif (+ .unread gold wash, blue dot) · lead avatar or icon bubble with a small type badge · optional thumbnail or action button</p>
+    </div>
+    <div class="panel" style="display:flex;flex-direction:column;gap:20px">
+      <div class="row" style="gap:28px"><span class="cp-bellwrap"><button class="cp-icon-btn flat"><svg class="cp-icon "><use href="#i-bell"/></svg></button><span class="cp-bell-badge">3</span></span><span class="cp-bellwrap"><button class="cp-icon-btn flat"><svg class="cp-icon "><use href="#i-bell"/></svg></button><span class="cp-bell-badge">12</span></span><span class="cp-bellwrap"><button class="cp-icon-btn flat"><svg class="cp-icon "><use href="#i-bell"/></svg></button></span></div>
+      <div style="overflow:hidden"><div class="cp-msg unread"><span class="cp-avatar" style="background:linear-gradient(150deg,#BFD0C4,#4E6B5A)"></span><div class="bd"><div class="n">María · El Puntido<span>5 min</span></div><div class="p">See you at 18:00. Dinner is at 19:30!</div></div><span class=cnt>2</span></div><div class="cp-msg"><span class="cp-avatar" style="background:linear-gradient(150deg,#D7C6E0,#6E5470)"></span><div class="bd"><div class="n">Hannah<span>Mon</span></div><div class="p">Haha, see you in Hontanas!</div></div></div></div>
+      <p class="spec" style="margin:0">.cp-bellwrap + .cp-bell-badge (red, 99+) · .cp-msg (+ .unread, .cnt)</p>
+      <table class="contrast"><tr><th>Type</th><th>Lead</th><th>Badge</th></tr>
+        <tr><td>Social (likes, comments)</td><td>Avatar</td><td><span class="cp-badge red">heart</span> <span class="cp-badge blue">chat</span></td></tr>
+        <tr><td>Camino alerts</td><td>Icon bubble</td><td><span class="cp-badge gold">hazard</span> <span class="cp-badge blue">crowd</span></td></tr>
+        <tr><td>Bookings</td><td>Icon bubble</td><td><span class="cp-badge green">confirmed</span></td></tr>
+        <tr><td>Rewards and photos</td><td>Icon bubble</td><td><span class="cp-badge gold">XP</span></td></tr></table>
+    </div>
+  </div>
+
+  <h3>Post flow (Instagram-style)</h3>
+  <div class="grid g2" style="align-items:start">
+    <div class="panel" style="display:flex;flex-direction:column;gap:18px">
+      <div class="cp-mediagrid" style="margin:0;border-radius:var(--cp-radius-md);overflow:hidden"><div class="cell dim"><div class="cp-img v4"></div><span class="num">1</span></div><div class="cell"><div class="cp-img v5"></div><span class="ring"></span></div><div class="cell"><div class="cp-img "></div><span class="ring"></span></div><div class="cell dim"><div class="cp-img v2"></div><span class="num">2</span></div><div class="cell"><div class="cp-img v3"></div><span class="ring"></span></div><div class="cell"><div class="cp-img v4"></div><span class="ring"></span></div><div class="cell dim"><div class="cp-img v5"></div><span class="num">3</span></div><div class="cell"><div class="cp-img "></div><span class="ring"></span></div></div>
+      <p class="spec" style="margin:0">.cp-mediagrid (4 columns, 2px gap) · .cp-pickprev · numbered gold selection</p>
+    </div>
+    <div class="panel" style="display:flex;flex-direction:column;gap:18px">
+      <div class="cp-capture"><div class="tn"><div class="cp-img v4"></div><span class="cp-badge glass more" style="height:22px;padding:0 8px;font-size:11px">+2</span></div><div class="ta">Reached the cathedral at sunrise…<span class="caret"></span></div></div>
+      <div><div class="cp-optrow"><svg class="cp-icon "><use href="#i-tagpeople"/></svg><span class="lbl">Tag people</span><svg class="cp-icon sm"><use href="#i-chev"/></svg></div><div class="cp-optrow"><svg class="cp-icon "><use href="#i-shell"/></svg><span class="lbl">Add stamp</span><span class="v">Burgos ✓</span><svg class="cp-icon sm"><use href="#i-chev"/></svg></div><div class="cp-optrow"><svg class="cp-icon "><use href="#i-steps"/></svg><span class="lbl">Stage card</span><span class="cp-switch on"></span></div></div>
+      <div style="display:flex;flex-direction:column;gap:10px;align-items:center"><button class="cp-btn cp-btn-primary block">Post</button><button class="cp-btn cp-btn-ghost" style="height:32px;font-size:14px">Save as draft</button></div>
+      <p class="spec" style="margin:0">.cp-capture (thumbnail + caption) · .cp-optrow · .cp-postbar (primary Post pinned at the bottom, 34px safe area)</p>
+    </div>
+  </div>
+
+  <h3>Stay & cafe detail blocks</h3>
+  <div class="grid g2" style="align-items:start">
+    <div class="panel" style="display:flex;flex-direction:column;gap:22px">
+      <div class="cp-amenities"><div><svg class="cp-icon "><use href="#i-wifi"/></svg>Wi-Fi</div><div><svg class="cp-icon "><use href="#i-utensils"/></svg>Kitchen</div><div><svg class="cp-icon "><use href="#i-wash"/></svg>Laundry</div><div><svg class="cp-icon "><use href="#i-bike"/></svg>Bike storage</div><div><svg class="cp-icon "><use href="#i-plug"/></svg>Charging</div><div class="off"><svg class="cp-icon "><use href="#i-cup"/></svg>Breakfast</div></div>
+      <div class="cp-ratebars"><div class="cp-ratebar">Cleanliness<i style="--w:98%"></i><b>4.9</b></div><div class="cp-ratebar">Value<i style="--w:92%"></i><b>4.6</b></div></div>
+      <div class="cp-review"><div class="hd"><span class="cp-avatar" style="background:linear-gradient(150deg,#D7C6E0,#6E5470)"></span><div><div class="n">Hannah</div><div class="m">Germany · Oct 2026</div></div></div><div class="st"><svg class="cp-icon "><use href="#i-star"/></svg><svg class="cp-icon "><use href="#i-star"/></svg><svg class="cp-icon "><use href="#i-star"/></svg><svg class="cp-icon "><use href="#i-star"/></svg><svg class="cp-icon "><use href="#i-star"/></svg></div><p>Paco played guitar after dinner and nobody wanted to leave the table.</p></div>
+      <p class="spec" style="margin:0">.cp-amenities · .cp-ratebar · .cp-review</p>
+    </div>
+    <div class="panel" style="display:flex;flex-direction:column;gap:18px">
+      <div class="cp-room sel"><div class="top"><div class="cp-img "></div><div><div class="n">Dormitory bed</div><div class="m">8 beds · shared bathroom</div><div class="cp-urgent" style="margin-top:6px">3 beds left at this price</div></div></div>
+              <div class="feat"><span class="cp-badge green">Free cancellation</span></div>
+              <div class="bot"><div class="price"><s>€14</s><b>€12</b><small>per bed · taxes included</small></div><button class="cp-btn cp-btn-primary md">Selected</button></div></div>
+      <div class="cp-hours"><div class="today"><span>Today</span><span>08:00 – 21:00</span></div><div><span>Tomorrow</span><span>08:00 – 21:00</span></div></div>
+      <div class="cp-bookbar" style="position:static;box-shadow:var(--cp-shadow-lg);border-radius:var(--cp-radius-xl);padding:14px 16px 14px 20px"><div class="pr"><b>€12</b> <small>/ bed</small><span class="d">Free cancellation</span></div><button class="cp-btn cp-btn-primary">Reserve</button></div>
+      <p class="spec" style="margin:0">.cp-room (Agoda-style option) · .cp-hours · .cp-bookbar (replaces the tab bar on detail pages)</p>
+    </div>
+  </div>
+</section>
+
 <!-- =================================================================== TAB BAR -->
 <section class="doc" id="tabbar">
-  <p class="eyebrow">12 · Navigation</p>
+  <p class="eyebrow">13 · Navigation</p>
   <h2>Floating tab bar</h2>
   <p class="intro">Five tabs in a floating pill, 12px from the screen edges: <b>Me</b>, <b>Stays</b>, <b>Maps</b>, <b>Explore</b>, <b>Settings</b>. The active tab gets a gold-soft pill behind its icon and a bold label. Labels are always visible. Inside a tab, sub-sections use underline sub-tabs.</p>
   <div class="grid g2" style="align-items:start">
@@ -1076,9 +1505,9 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
 
 <!-- =================================================================== SCREENS -->
 <section class="doc" id="screens">
-  <p class="eyebrow">13 · Screens @ 390 × 844</p>
+  <p class="eyebrow">14 · Screens @ 390 × 844</p>
   <h2>The app, tab by tab</h2>
-  <p class="intro">Reference layouts at iPhone 15 size. Scroll sideways to see all of them. Me has three sub-tabs (Journey, Passport, Plan) and Explore has a second screen for the photo marketplace.</p>
+  <p class="intro">Reference layouts at iPhone 15 size. Scroll sideways to see all of them. Me has three sub-tabs, an inbox, a two-step write flow, a share screen and a stamp pop-up. Maps has two layers: helicopter view and city view. Stays opens into Airbnb / Agoda-style detail pages for stays and cafes. Explore has a second screen for the photo marketplace.</p>
 
   <div class="phones">
 
@@ -1087,9 +1516,10 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
       <div class="phone">
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
         <div class="scroll">
-          <div style="display:flex;justify-content:space-between;align-items:center">
-            <span style="font-family:var(--cp-font-title);font-weight:600;font-size:24px">ana.camina</span>
-            <div class="row" style="gap:8px"><button class="cp-icon-btn flat" aria-label="New post"><svg class="cp-icon"><use href="#i-plus"/></svg></button><button class="cp-icon-btn flat" aria-label="Notifications"><svg class="cp-icon"><use href="#i-bell"/></svg></button></div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span class="un">ana.camina</span>
+            <span class="cp-edit-pill" role="button" aria-label="Edit profile"><svg class="cp-icon "><use href="#i-pencil"/></svg>camino.plus/ana</span>
+            <span class="cp-bellwrap" style="margin-left:auto"><button class="cp-icon-btn flat" style="width:44px;height:44px" aria-label="Notifications (3 new)"><svg class="cp-icon "><use href="#i-bell"/></svg></button><span class="cp-bell-badge">3</span></span>
           </div>
           <div class="profile-top" style="margin-top:20px">
             <span class="cp-ring"><span class="cp-avatar" style="width:86px;height:86px"></span></span>
@@ -1097,8 +1527,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           </div>
           <div style="margin-top:14px"><div style="font-weight:600;font-size:17px">Ana García</div>
           <div style="font-size:15px;line-height:22px">Camino Francés, day 12. Walking for my grandmother. <span style="font-family:var(--cp-font-accent);font-size:22px;color:var(--cp-color-red)">Ultreia!</span></div></div>
-          <div style="display:flex;gap:10px;margin-top:16px"><button class="cp-btn cp-btn-secondary sm" style="flex:1;height:40px">Edit profile</button><button class="cp-btn cp-btn-secondary sm" style="flex:1;height:40px">Share journey</button></div>
-          <div class="highlights" style="margin-top:20px">
+          <div class="highlights" style="margin-top:18px">
             <div><span class="cp-ring seen"><span class="cp-avatar" style="background:linear-gradient(150deg,#BFD0C4,#4E6B5A)"></span></span>Pyrenees</div>
             <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#F2D8B6,#A0583F)"></span></span>Pamplona</div>
             <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#9DB4CC,#14365D)"></span></span>Meseta</div>
@@ -1113,6 +1542,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
             <div class="acts"><span><svg class="cp-icon sm"><use href="#i-heart"/></svg>Buen Camino</span><span><svg class="cp-icon sm"><use href="#i-chat"/></svg>Comment</span><span><svg class="cp-icon sm"><use href="#i-share"/></svg>Share</span></div>
           </article>
         </div>
+        <div class="fab-slot"><button class="cp-fab-write" aria-label="Write a journey post"><svg class="cp-icon "><use href="#i-pencil"/></svg></button></div>
         <div class="tabdock"><nav class="cp-tabbar">
           <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
@@ -1120,6 +1550,79 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Explore</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-settings"/></svg></span>Settings</div>
         </nav></div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Me · Write · Pick photos</b>Step 1 · Instagram-style gallery</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="cp-compose-top" style="padding-top:8px"><button class="cp-icon-btn flat" aria-label="Close"><svg class="cp-icon "><use href="#i-x"/></svg></button><span class="t">New journey post</span><span style="width:48px"></span></div>
+        <div class="scroll" style="top:112px;padding-top:6px;padding-bottom:130px">
+          <div class="cp-pickprev"><div class="cp-img v4"></div>
+            <div class="tools"><span class="cp-badge glass" style="height:36px;padding:0 14px;font-size:13px"><svg class="cp-icon sm"><use href="#i-layers"/></svg>Select multiple</span><button class="cp-icon-btn" aria-label="Camera"><svg class="cp-icon "><use href="#i-camera"/></svg></button></div></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin:14px 0 12px">
+            <span class="cp-chip sm" style="height:38px">Recent<svg class="cp-icon sm"><use href="#i-down"/></svg></span>
+            <span class="cp-badge neutral"><svg class="cp-icon sm"><use href="#i-image"/></svg>Text only</span>
+          </div>
+          <div class="cp-mediagrid"><div class="cell dim"><div class="cp-img v4"></div><span class="num">1</span></div><div class="cell"><div class="cp-img v5"></div><span class="ring"></span></div><div class="cell"><div class="cp-img "></div><span class="ring"></span></div><div class="cell dim"><div class="cp-img v2"></div><span class="num">2</span></div><div class="cell"><div class="cp-img v3"></div><span class="ring"></span></div><div class="cell"><div class="cp-img v4"></div><span class="ring"></span></div><div class="cell dim"><div class="cp-img v5"></div><span class="num">3</span></div><div class="cell"><div class="cp-img "></div><span class="ring"></span><span class="vid">0:12</span></div><div class="cell"><div class="cp-img v2"></div><span class="ring"></span></div><div class="cell"><div class="cp-img v3"></div><span class="ring"></span></div><div class="cell"><div class="cp-img v4"></div><span class="ring"></span></div><div class="cell"><div class="cp-img v5"></div><span class="ring"></span></div></div>
+        </div>
+        <div class="cp-postbar"><div class="cnt">3 selected · up to 10</div><button class="cp-btn cp-btn-primary block">Next</button></div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Me · Write · Caption & Post</b>Step 2 · Post button at the bottom</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="cp-compose-top" style="padding-top:8px"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon "><use href="#i-back"/></svg></button><span class="t">New journey post</span><span style="width:48px"></span></div>
+        <div class="scroll" style="top:112px;padding-top:10px;padding-bottom:150px">
+          <div class="cp-capture">
+            <div class="tn"><div class="cp-img v4"></div><span class="cp-badge glass more" style="height:22px;padding:0 8px;font-size:11px">+2</span></div>
+            <div class="ta">Reached the cathedral at sunrise. 31 km to Hontanas tomorrow, legs say no, heart says yes.<span class="caret"></span></div>
+          </div>
+          <div class="cp-counter" style="margin-bottom:8px">104 / 600</div>
+          <div class="hscroll" style="margin-bottom:6px"><span class="cp-chip sm on"><svg class="cp-icon sm"><use href="#i-pin"/></svg>Burgos</span><span class="cp-chip sm">Catedral</span><span class="cp-chip sm">Hontanas</span><span class="cp-chip sm">Camino Francés</span></div>
+          <div style="border-top:1px solid var(--cp-border)"><div class="cp-optrow"><svg class="cp-icon "><use href="#i-tagpeople"/></svg><span class="lbl">Tag people</span><svg class="cp-icon sm"><use href="#i-chev"/></svg></div><div class="cp-optrow"><svg class="cp-icon "><use href="#i-shell"/></svg><span class="lbl">Add stamp</span><span class="v">Burgos ✓</span><svg class="cp-icon sm"><use href="#i-chev"/></svg></div><div class="cp-optrow"><svg class="cp-icon "><use href="#i-globe"/></svg><span class="lbl">Audience</span><span class="v">Public</span><svg class="cp-icon sm"><use href="#i-chev"/></svg></div><div class="cp-optrow"><svg class="cp-icon "><use href="#i-steps"/></svg><span class="lbl">Stage card · 31.1 km · 7h 20m</span><span class="cp-switch on"></span></div><div class="cp-optrow"><svg class="cp-icon "><use href="#i-explore"/></svg><span class="lbl">Also share to Explore</span><span class="cp-switch"></span></div>
+          </div>
+        </div>
+        <div class="cp-postbar"><button class="cp-btn cp-btn-primary block">Post</button><button class="cp-btn cp-btn-ghost" style="height:32px;align-self:center;font-size:14px">Save as draft</button></div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Me · Share journey</b>After posting · share card</p>
+      <div class="phone ">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll" style="padding-bottom:0">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <button class="cp-icon-btn flat" aria-label="Close"><svg class="cp-icon "><use href="#i-x"/></svg></button><span class="cp-badge green"><svg class="cp-icon sm"><use href="#i-bolt2"/></svg>Posted</span>
+          </div>
+          <h1 class="scr-title" style="margin-top:12px;font-size:32px;line-height:38px">Share your journey</h1>
+          <div class="cp-segment" style="margin:14px 0 18px"><span class="on">Card 4:5</span><span>Story 9:16</span><span>Square</span></div>
+          <div style="display:grid;place-items:center;transform:rotate(-2deg)"><div class="cp-sharecard" style="width:226px">
+            <span class="brand"><span class="cp-badge gold" style="height:22px;padding:0 8px;font-size:11px">logo TBD</span></span>
+            <span class="hand">Day 12</span>
+            <svg class="route" viewBox="0 0 268 150" preserveAspectRatio="none"><path d="M-10 130 C 40 120, 60 40, 120 70 S 200 110, 280 20" stroke="#D9A21B" stroke-width="10" fill="none" opacity=".35" stroke-linecap="round"/><path d="M-10 130 C 40 120, 60 40, 120 70 S 200 110, 280 20" stroke="#F6EFE2" stroke-width="3.5" fill="none" stroke-linecap="round"/><circle cx="120" cy="70" r="7" fill="#D9A21B" stroke="#F6EFE2" stroke-width="3"/></svg>
+            <span class="mini-stamp">Burgos<br>04·XI</span>
+            <div class="km">31.1<small> km</small></div>
+            <div class="rt">Burgos → Hontanas</div>
+            <div class="row3"><span>7h 20m</span><span>468 km to go</span></div>
+          </div></div>
+        </div>
+        <div class="cp-sheet" style="position:absolute;left:0;right:0;bottom:0;padding-bottom:34px;z-index:6">
+          <div class="grab"></div>
+          <p class="cp-label" style="margin:0 0 14px">Share to</p>
+          <div class="cp-share-grid">
+            <div><span class="bubble b-gold"><svg class="cp-icon "><use href="#i-play"/></svg></span>Stories</div>
+            <div><span class="bubble b-green"><svg class="cp-icon "><use href="#i-chat"/></svg></span>WhatsApp</div>
+            <div><span class="bubble b-blue"><svg class="cp-icon "><use href="#i-msg"/></svg></span>Messages</div>
+            <div><span class="bubble b-sand"><svg class="cp-icon "><use href="#i-offline"/></svg></span>Save image</div>
+          </div>
+          <div class="cp-linkbar" style="margin-top:18px"><span>camino.plus/j/ana-12</span><button class="cp-btn cp-btn-primary sm"><svg class="cp-icon sm"><use href="#i-copy"/></svg>Copy</button></div>
+        </div>
         <span class="home-ind"></span>
       </div>
     </div>
@@ -1139,6 +1642,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
             <div><div class="ey">Credencial del Peregrino</div><h4>12 of 33 stamps</h4><p>Camino Francés · since 24 Oct 2026</p></div>
           </div>
           <div class="scr-h" style="margin-top:28px"><h5>Stamps</h5><a>Scan a sello</a></div>
+          <p class="note" style="margin:-8px 0 16px">Tap a stamp to open its story.</p>
           <div class="stamps">
             <div class="stamp red" style="--r:-10deg">Ronces-<br>valles</div>
             <div class="stamp blue" style="--r:6deg">Pamplona</div>
@@ -1162,6 +1666,37 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Explore</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-settings"/></svg></span>Settings</div>
+        </nav></div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Me · Stamp popup</b>Tap a stamp to see its story</p>
+      <div class="phone ">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div><div class="scroll"><div class="passport-cover"><span class="seal"><svg class="cp-icon "><use href="#i-shell"/></svg></span><div><div class="ey">Credencial del Peregrino</div><h4>12 of 33 stamps</h4><p>Camino Francés · since 24 Oct 2026</p></div></div>
+          <div class="scr-h" style="margin-top:28px"><h5>Stamps</h5><a>Scan a sello</a></div>
+          <div class="stamps">
+            <div class="stamp red" style="--r:-10deg">Ronces-<br>valles</div><div class="stamp blue" style="--r:6deg">Pamplona</div><div class="stamp gold" style="--r:-4deg">Logroño</div><div class="stamp red" style="--r:9deg">Burgos</div>
+            <div class="stamp blue" style="--r:-7deg">Nájera</div><div class="stamp gold" style="--r:5deg">Estella</div><div class="stamp red" style="--r:-3deg">Viana</div><div class="stamp blue" style="--r:8deg">Belorado</div>
+          </div></div><div class="cp-scrim"></div><div class="cp-lightbox" style="top:118px;">
+          <button class="close" aria-label="Close"><svg class="cp-icon "><use href="#i-x"/></svg></button>
+          <div class="stamp-hero"><div class="big-stamp"><div><div class="a">Catedral</div><svg class="cp-icon "><use href="#i-shell"/></svg><div class="b">Burgos</div><div class="c">04 · XI · 2026</div></div></div></div>
+          <div class="bd cp-article">
+            <div class="ey">Stamp 07 of 33 · Camino Francés</div>
+            <h3 style="font-size:28px;line-height:32px">Burgos Cathedral</h3>
+            <p style="margin-top:6px;font-size:15px;line-height:22px;color:var(--cp-text-muted)">Official sello from the pilgrim office, collected at the cathedral door.</p>
+            <div class="cp-facts"><div><b>14:32</b><span>Collected</span></div><div><b>243 km</b><span>From start</span></div><div><b>18°</b><span>Weather</span></div></div>
+            <blockquote style="font-size:24px">Cold hands, warm soup.</blockquote>
+            <div class="note" style="margin-top:10px;font-family:var(--cp-font-mono);font-size:11px">42.3408° N · 3.7047° W</div>
+          </div>
+          <div class="ft"><button class="cp-btn cp-btn-secondary md"><svg class="cp-icon sm"><use href="#i-share"/></svg>Share</button><button class="cp-btn cp-btn-primary md"><svg class="cp-icon sm"><use href="#i-pin"/></svg>On map</button></div>
+        </div><div class="tabdock"><nav class="cp-tabbar">
+          <div class="cp-tab on"><span class="ico"><svg class="cp-icon "><use href="#i-me"/></svg></span>Me</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-stays"/></svg></span>Stays</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-maps"/></svg></span>Maps</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-explore"/></svg></span>Explore</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-settings"/></svg></span>Settings</div>
         </nav></div>
         <span class="home-ind"></span>
       </div>
@@ -1195,6 +1730,60 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Explore</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-settings"/></svg></span>Settings</div>
+        </nav></div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Me · Inbox</b>Tap the bell · notifications</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll" style="padding-bottom:130px">
+          <div class="cp-inbox-top">
+            <button class="cp-icon-btn flat" style="width:44px;height:44px" aria-label="Back"><svg class="cp-icon "><use href="#i-back"/></svg></button>
+            <h1>Inbox</h1>
+            <button class="cp-icon-btn flat" style="width:44px;height:44px" aria-label="Mark all as read"><svg class="cp-icon "><use href="#i-checks"/></svg></button>
+          </div>
+          <div class="cp-subtabs" style="margin:16px -24px 0;padding:0 12px"><span class="on">Notifications<span class="cp-badge red" style="height:20px;padding:0 7px;font-size:11px">3</span></span><span>Messages<span class="cp-badge neutral" style="height:20px;padding:0 7px;font-size:11px">2</span></span></div>
+          <div class="hscroll" style="margin-top:14px">
+            <span class="cp-chip on sm">All</span><span class="cp-chip sm">Camino</span><span class="cp-chip sm">Social</span><span class="cp-chip sm">Bookings</span><span class="cp-chip sm">Photos</span>
+          </div>
+          <div class="cp-notif-cap">New</div><div class="cp-notif unread"><div class="lead"><span class="bub b-gold"><svg class="cp-icon "><use href="#i-medal"/></svg></span></div><div class="tx"><b>Meseta Walker</b> unlocked. You earned <b>+100 XP</b>.<span class="tm">2 min ago</span></div><span class="udot"></span></div><div class="cp-notif unread"><div class="lead"><span class="cp-avatar" style="background:linear-gradient(150deg,#D7C6E0,#6E5470)"></span><span class="type b-red"><svg class="cp-icon "><use href="#i-heart"/></svg></span></div><div class="tx"><b>Hannah</b> liked your post <span class="q">“Reached the cathedral at sunrise…”</span><span class="tm">14 min ago</span></div><span class="th cp-img v4"></span><span class="udot"></span></div><div class="cp-notif unread"><div class="lead"><span class="bub b-sky"><svg class="cp-icon "><use href="#i-face"/></svg></span><span class="type b-gold"><svg class="cp-icon "><use href="#i-image"/></svg></span></div><div class="tx"><b>3 new photos of you</b> from O Cebreiro.<span class="q">Tap to preview and buy</span><span class="tm">1 h ago</span></div><button class="cp-btn cp-btn-primary sm">View</button></div>
+          <div class="cp-notif-cap">Earlier</div><div class="cp-notif"><div class="lead"><span class="bub b-blue"><svg class="cp-icon "><use href="#i-stays"/></svg></span><span class="type b-green"><svg class="cp-icon "><use href="#i-bolt2"/></svg></span></div><div class="tx"><b>Albergue El Puntido</b> confirmed your bed for Fri 14 Nov.<span class="tm">Yesterday · 18:02</span></div><span class="th cp-img "></span></div><div class="cp-notif"><div class="lead"><span class="bub b-gold"><svg class="cp-icon "><use href="#i-warn"/></svg></span></div><div class="tx"><b>Muddy path</b> reported 1.4 km ahead by 6 pilgrims.<span class="tm">Yesterday · 09:40</span></div></div><div class="cp-notif"><div class="lead"><span class="cp-avatar" style="background:linear-gradient(150deg,#BFD0C4,#4E6B5A)"></span><span class="type b-blue"><svg class="cp-icon "><use href="#i-chat"/></svg></span></div><div class="tx"><b>Lucas</b> commented: “Save me a bed in Triacastela!”<span class="tm">2 days ago</span></div><span class="th cp-img v5"></span></div>
+        </div>
+        <div class="tabdock"><nav class="cp-tabbar">
+          <div class="cp-tab on"><span class="ico"><svg class="cp-icon "><use href="#i-me"/></svg></span>Me</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-stays"/></svg></span>Stays</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-maps"/></svg></span>Maps</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-explore"/></svg></span>Explore</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-settings"/></svg></span>Settings</div>
+        </nav></div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Me · Inbox · Messages</b>Hosts and pilgrims</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll" style="padding-bottom:130px">
+          <div class="cp-inbox-top">
+            <button class="cp-icon-btn flat" style="width:44px;height:44px" aria-label="Back"><svg class="cp-icon "><use href="#i-back"/></svg></button>
+            <h1>Inbox</h1>
+            <button class="cp-icon-btn flat" style="width:44px;height:44px" aria-label="New message"><svg class="cp-icon "><use href="#i-pencil"/></svg></button>
+          </div>
+          <div class="cp-subtabs" style="margin:16px -24px 0;padding:0 12px"><span>Notifications<span class="cp-badge neutral" style="height:20px;padding:0 7px;font-size:11px">3</span></span><span class="on">Messages<span class="cp-badge red" style="height:20px;padding:0 7px;font-size:11px">2</span></span></div>
+          <div class="cp-search" style="height:48px;margin:16px 0 8px;box-shadow:inset 0 0 0 1px var(--cp-border);padding-left:18px"><svg class="cp-icon "><use href="#i-search"/></svg><div class="txt"><div class="t2" style="font-size:15px;color:var(--cp-text-placeholder)">Search hosts and pilgrims</div></div></div>
+          <div class="cp-notif-cap" style="margin-top:14px">Stays & hosts</div><div class="cp-msg unread"><span class="cp-avatar" style="background:linear-gradient(150deg,#BFD0C4,#4E6B5A)"></span><div class="bd"><div class="n">María · El Puntido<span>5 min</span></div><div class="p">See you at 18:00. Dinner is at 19:30!</div></div><span class=cnt>2</span></div><div class="cp-msg"><span class="cp-avatar" style="background:linear-gradient(150deg,#E9C987,#A0583F)"></span><div class="bd"><div class="n">Café El Peregrino<span>Yesterday</span></div><div class="p">Yes, we open at 08:00 for pilgrims.</div></div></div>
+          <div class="cp-notif-cap">Pilgrims</div><div class="cp-msg"><span class="cp-avatar" style="background:linear-gradient(150deg,#D7C6E0,#6E5470)"></span><div class="bd"><div class="n">Hannah<span>Mon</span></div><div class="p">Haha, see you in Hontanas!</div></div></div><div class="cp-msg"><span class="cp-avatar" style="background:linear-gradient(150deg,#9DB4CC,#14365D)"></span><div class="bd"><div class="n">Lucas<span>Sun</span></div><div class="p">Photo of you at the Cruz de Ferro 😊</div></div></div><div class="cp-msg"><span class="cp-avatar" style="background:linear-gradient(150deg,#F2D8B6,#A0583F)"></span><div class="bd"><div class="n">Camino friends · 5<span>Sat</span></div><div class="p">Anna: Who is up for the sunrise start?</div></div></div>
+        </div>
+        <div class="tabdock"><nav class="cp-tabbar">
+          <div class="cp-tab on"><span class="ico"><svg class="cp-icon "><use href="#i-me"/></svg></span>Me</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-stays"/></svg></span>Stays</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-maps"/></svg></span>Maps</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-explore"/></svg></span>Explore</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-settings"/></svg></span>Settings</div>
         </nav></div>
         <span class="home-ind"></span>
       </div>
@@ -1279,38 +1868,212 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     </div>
 
     <div class="phone-wrap">
-      <p class="phone-label"><b>Maps</b>Waze map + RPG layer</p>
+      <p class="phone-label"><b>Stay detail · overview</b>Airbnb / Agoda style · tap a stay</p>
+      <div class="phone detail"><div class="status" style="color:#fff;position:absolute;left:0;right:0;top:0"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        
+        <div class="scroll">
+          <div class="cp-gallery"><div class="cp-img"></div>
+            <div class="nav"><button class="cp-icon-btn" aria-label="Back"><svg class="cp-icon "><use href="#i-back"/></svg></button><div class="r"><button class="cp-icon-btn" aria-label="Share"><svg class="cp-icon "><use href="#i-share"/></svg></button><button class="cp-icon-btn" aria-label="Save"><svg class="cp-icon "><use href="#i-heart"/></svg></button></div></div>
+            <span class="cp-badge glass count">1 / 24</span>
+          </div>
+          <div class="detail-sheet">
+            <h1>Albergue El Puntido</h1>
+            <div class="d-sub">Albergue in Hontanas · 34 beds · on the Way</div>
+            <div class="d-rate"><span style="display:inline-flex;gap:4px;align-items:center;font-weight:700"><svg class="cp-icon sm" style="width:14px;height:14px;fill:currentColor"><use href="#i-star"/></svg>4.88</span><span>·</span><u>312 reviews</u><span>·</span><span class="cp-badge gold" style="height:24px">Pilgrim favourite</span></div>
+            <div class="row" style="gap:8px;margin-top:14px"><span class="cp-badge blue"><svg class="cp-icon sm"><use href="#i-bolt"/></svg>Instant booking</span><span class="cp-badge green"><span class="cp-dot"></span>9 beds free</span></div>
+            <div class="d-div"></div>
+            <div class="d-host"><span class="cp-avatar" style="background:linear-gradient(150deg,#BFD0C4,#4E6B5A)"></span><div><div style="font-weight:600;font-size:17px">Hosted by María & Paco</div><div class="d-sub" style="font-size:14px">Hospitaleros since 1994</div></div></div>
+            <div class="d-div"></div>
+            <div class="d-hl"><span class="ico"><svg class="cp-icon "><use href="#i-pin"/></svg></span><div><b>Right on the route</b><span>0 m off the Way · 100 m to the church</span></div></div>
+            <div class="d-hl"><span class="ico"><svg class="cp-icon "><use href="#i-utensils"/></svg></span><div><b>Pilgrim dinner included</b><span>Communal table at 19:30 · vegetarian on request</span></div></div>
+            <div class="d-hl"><span class="ico"><svg class="cp-icon "><use href="#i-shield"/></svg></span><div><b style="color:var(--cp-success)">Free cancellation</b><span>Until 14:00 on the day of arrival</span></div></div>
+          </div>
+        </div>
+        <div class="cp-bookbar"><div class="pr"><b>€12</b> <small>/ bed</small><span class="d">Free cancellation · 9 left</span></div><button class="cp-btn cp-btn-primary">Reserve</button></div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Stay detail · beds, reviews</b>Agoda-style room list + Airbnb reviews</p>
+      <div class="phone detail"><div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        
+        <div class="scroll" style="padding-top:54px">
+          <div class="cp-stickytabs" style="margin:0 0 18px">
+            <div style="display:flex;align-items:center;gap:10px;padding:6px 16px 8px"><button class="cp-icon-btn flat" style="width:40px;height:40px" aria-label="Back"><svg class="cp-icon "><use href="#i-back"/></svg></button><span style="font-family:var(--cp-font-title);font-weight:600;font-size:18px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Albergue El Puntido</span><button class="cp-icon-btn flat" style="width:40px;height:40px" aria-label="Save"><svg class="cp-icon "><use href="#i-heart"/></svg></button></div>
+            <div class="cp-subtabs" style="padding:0 8px"><span>Photos</span><span class="on">Beds</span><span>Reviews</span><span>Location</span></div>
+          </div>
+          <div style="padding:0 24px">
+          <div class="d-h">Choose your bed</div>
+          <div style="display:grid;gap:12px"><div class="cp-room sel"><div class="top"><div class="cp-img "></div><div><div class="n">Dormitory bed</div><div class="m">8 beds · shared bathroom · lockers</div><div class="cp-urgent" style="margin-top:6px">3 beds left at this price</div></div></div>
+              <div class="feat"><span class="cp-badge green">Free cancellation</span><span class="cp-badge neutral">Dinner +€11</span></div>
+              <div class="bot"><div class="price"><s>€14</s><b>€12</b><small>per bed · taxes included</small></div><button class="cp-btn cp-btn-primary md">Selected</button></div></div><div class="cp-room"><div class="top"><div class="cp-img v2"></div><div><div class="n">Private room</div><div class="m">2 pilgrims · en-suite · towels</div></div></div>
+              <div class="feat"><span class="cp-badge green">Free cancellation</span><span class="cp-badge neutral">Breakfast incl.</span></div>
+              <div class="bot"><div class="price"><b>€38</b><small>per bed · taxes included</small></div><button class="cp-btn cp-btn-secondary md">Select</button></div></div>
+          </div>
+          <div class="d-div"></div>
+          <div style="display:flex;align-items:center;gap:18px">
+            <div style="font-family:var(--cp-font-title);font-weight:600;font-size:56px;line-height:56px;letter-spacing:-1.5px">4.88</div>
+            <div><div class="st" style="display:flex;gap:2px;color:var(--cp-color-gold-ink)"><svg class="cp-icon sm" style="fill:currentColor"><use href="#i-star"/></svg><svg class="cp-icon sm" style="fill:currentColor"><use href="#i-star"/></svg><svg class="cp-icon sm" style="fill:currentColor"><use href="#i-star"/></svg><svg class="cp-icon sm" style="fill:currentColor"><use href="#i-star"/></svg><svg class="cp-icon sm" style="fill:currentColor"><use href="#i-star"/></svg></div><div class="d-sub" style="margin-top:4px">312 reviews · Pilgrim favourite</div></div>
+          </div>
+          <div class="cp-ratebars" style="margin-top:20px">
+            <div class="cp-ratebar">Cleanliness<i style="--w:98%"></i><b>4.9</b></div>
+            <div class="cp-ratebar">Hospitality<i style="--w:100%"></i><b>5.0</b></div>
+            <div class="cp-ratebar">Location<i style="--w:96%"></i><b>4.8</b></div>
+            <div class="cp-ratebar">Value<i style="--w:92%"></i><b>4.6</b></div>
+          </div>
+          <div style="display:grid;gap:12px;margin-top:22px"><div class="cp-review"><div class="hd"><span class="cp-avatar" style="background:linear-gradient(150deg,#D7C6E0,#6E5470)"></span><div><div class="n">Hannah</div><div class="m">Germany · Oct 2026 · walked from SJPP</div></div></div><div class="st"><svg class="cp-icon "><use href="#i-star"/></svg><svg class="cp-icon "><use href="#i-star"/></svg><svg class="cp-icon "><use href="#i-star"/></svg><svg class="cp-icon "><use href="#i-star"/></svg><svg class="cp-icon "><use href="#i-star"/></svg></div><p>Paco played guitar after dinner and nobody wanted to leave the table. Cleanest albergue so far.</p></div>
+          </div>
+          <button class="cp-btn cp-btn-secondary md block" style="margin-top:14px">Show all 312 reviews</button>
+          <div class="d-div"></div>
+          <div class="d-h">Where you'll be</div>
+          <div class="cp-minimap"><svg viewBox="0 0 342 170" preserveAspectRatio="xMidYMid slice"><rect width="342" height="170" fill="#EDE5D3"/><path d="M0 120 Q90 100 170 130 T342 110 V170 H0Z" fill="#E2E8D5"/><path d="M-10 60 Q100 90 190 70 T360 80" stroke="#FFFDF8" stroke-width="9" fill="none"/><path d="M-10 90 C 80 50, 150 110, 230 70 S 320 40, 360 60" stroke="#D9A21B" stroke-width="12" fill="none" opacity=".4" stroke-linecap="round"/><path d="M-10 90 C 80 50, 150 110, 230 70 S 320 40, 360 60" stroke="#14365D" stroke-width="5" fill="none" stroke-linecap="round"/></svg>
+            <div class="cp-pin" style="position:absolute;left:150px;top:62px;background:var(--cp-color-blue);color:var(--cp-color-parchment)"><svg class="cp-icon "><use href="#i-stays"/></svg></div></div>
+          <div class="row" style="gap:8px;margin-top:14px"><span class="cp-chip sm"><svg class="cp-icon sm"><use href="#i-drop"/></svg>Water 100 m</span><span class="cp-chip sm"><svg class="cp-icon sm"><use href="#i-church"/></svg>Church 200 m</span><span class="cp-chip sm"><svg class="cp-icon sm"><use href="#i-cup"/></svg>Cafe 300 m</span></div>
+          <div class="d-div"></div>
+          <div class="d-h">House rules</div>
+          <div class="cp-rules"><div>Check-in<span>13:00 – 22:00</span></div><div>Lights out<span>22:00</span></div><div>Check-out<span>by 08:00</span></div><div>Cancellation<span>free until 14:00</span></div></div>
+          </div>
+        </div>
+        <div class="cp-bookbar"><div class="pr"><b>€12</b> <small>/ bed</small><span class="d">Dormitory · Fri 14 Nov</span></div><button class="cp-btn cp-btn-primary">Reserve</button></div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Cafe detail</b>Hours, menu, popular times</p>
+      <div class="phone detail"><div class="status" style="color:#fff;position:absolute;left:0;right:0;top:0"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        
+        <div class="scroll">
+          <div class="cp-gallery" style="height:270px"><div class="cp-img v4"></div>
+            <div class="nav"><button class="cp-icon-btn" aria-label="Back"><svg class="cp-icon "><use href="#i-back"/></svg></button><div class="r"><button class="cp-icon-btn" aria-label="Share"><svg class="cp-icon "><use href="#i-share"/></svg></button><button class="cp-icon-btn" aria-label="Save"><svg class="cp-icon "><use href="#i-heart"/></svg></button></div></div>
+            <div class="dots"><i class="on"></i><i></i><i></i><i></i></div>
+          </div>
+          <div class="detail-sheet">
+            <h1>Café El Peregrino</h1>
+            <div class="d-sub">Cafe & bar · Hontanas · 400 m from the Way</div>
+            <div class="d-rate"><span style="display:inline-flex;gap:4px;align-items:center;font-weight:700"><svg class="cp-icon sm" style="width:14px;height:14px;fill:currentColor"><use href="#i-star"/></svg>4.7</span><span>·</span><u>96 reviews</u><span>·</span><span class="cp-badge green"><span class="cp-dot"></span>Open · closes 21:00</span></div>
+            <div class="row" style="gap:8px;margin-top:14px"><span class="cp-badge neutral">Walk-in</span><span class="cp-badge gold">Menú del peregrino €12</span></div>
+            <div class="cp-quick" style="margin-top:22px">
+              <div><button class="cp-icon-btn"><svg class="cp-icon "><use href="#i-nav"/></svg></button>Directions</div><div><button class="cp-icon-btn"><svg class="cp-icon "><use href="#i-phone"/></svg></button>Call</div><div><button class="cp-icon-btn"><svg class="cp-icon "><use href="#i-heart"/></svg></button>Save</div><div><button class="cp-icon-btn"><svg class="cp-icon "><use href="#i-share"/></svg></button>Share</div>
+            </div>
+            <div class="d-div"></div>
+            <div class="d-h">Menú del peregrino · €12</div>
+            <div class="cp-menu">
+              <div><span class="nm">Sopa de ajo<small>Castilian garlic soup</small></span><span class="ln"></span><span class="pc">starter</span></div>
+              <div><span class="nm">Pollo asado<small>With roast potatoes</small></span><span class="ln"></span><span class="pc">main</span></div>
+              <div><span class="nm">Flan casero<small>Or fresh fruit</small></span><span class="ln"></span><span class="pc">dessert</span></div>
+            </div>
+            <div class="d-div"></div>
+            <div class="d-h">Hours</div>
+            <div class="cp-hours"><div class="today"><span>Today</span><span>08:00 – 21:00</span></div><div><span>Tomorrow</span><span>08:00 – 21:00</span></div><div><span>Sunday</span><span>09:00 – 15:00</span></div></div>
+            <div class="d-div"></div>
+            <div class="d-h">Busy times</div>
+            <div class="cp-popular"><i class="" style="height:20%"></i><i class="" style="height:35%"></i><i class="" style="height:60%"></i><i class="" style="height:85%"></i><i class="" style="height:70%"></i><i class="now" style="height:45%"></i><i class="" style="height:30%"></i><i class="" style="height:50%"></i><i class="" style="height:75%"></i><i class="" style="height:40%"></i></div>
+            <div class="cp-popular-x"><span>08</span><span>12</span><span>16</span><span>20</span></div>
+            <div class="d-sub" style="margin-top:10px">Quiet now. Usually busiest at 11:00 and 18:00.</div>
+          </div>
+        </div>
+        <div class="cp-bookbar"><div class="pr"><small>Open until</small><br><b style="font-size:22px">21:00</b></div><button class="cp-btn cp-btn-secondary md" style="margin-left:auto"><svg class="cp-icon sm"><use href="#i-phone"/></svg>Call</button><button class="cp-btn cp-btn-primary md" style="margin-left:0"><svg class="cp-icon sm"><use href="#i-nav"/></svg>Navigate</button></div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Maps · Helicopter view</b>Whole route, zoomed out</p>
+      <div class="phone" style="background:#E9E0C9">
+        <svg class="map-bg" viewBox="0 0 390 844" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <defs><radialGradient id="heat"><stop offset="0" stop-color="#D9A21B" stop-opacity=".55"/><stop offset="1" stop-color="#D9A21B" stop-opacity="0"/></radialGradient><radialGradient id="heatr"><stop offset="0" stop-color="#A63D2F" stop-opacity=".4"/><stop offset="1" stop-color="#A63D2F" stop-opacity="0"/></radialGradient></defs>
+          <rect width="390" height="844" fill="#E9E0C9"/>
+          <path d="M0 330 C 80 300, 150 250, 260 270 S 390 230, 390 230 V560 H0Z" fill="#E3DCC0"/>
+          <path d="M0 520 C 100 470, 200 520, 300 470 S 390 430, 390 430 V844 H0Z" fill="#D9DDBF"/>
+          <path d="M0 150 C 60 190, 110 170, 170 220 S 130 330, 0 370Z" fill="#CFDDBF"/>
+          <path d="M0 40 L120 40 C 80 100, 36 150, 30 215 C 26 250, 10 270, 0 280Z" fill="#CFE0F0"/>
+          <g fill="#CDBC9C" opacity=".7"><path d="M290 560 l22 -44 l20 34 l16 -26 l26 50Z"/><path d="M80 500 l18 -34 l16 26 l14 -20 l20 40Z"/><path d="M20 410 l16 -30 l14 24 l12 -18 l16 34Z"/></g>
+          <g transform="translate(0,-20)"><circle cx="152" cy="345" r="46" fill="url(#heat)"/><circle cx="118" cy="300" r="34" fill="url(#heatr)"/>
+          <g font-family="JetBrains Mono" font-size="9.5" letter-spacing="2" fill="#556274" opacity=".7"><text x="236" y="512">NAVARRA</text><text x="120" y="440">LA RIOJA</text><text x="196" y="300">CASTILLA Y LEÓN</text><text x="14" y="300" transform="rotate(-90 14 300)">GALICIA</text><text x="8" y="68" fill="#4A6F96">ATLÁNTICO</text></g>
+          <circle cx="300" cy="400" r="34" fill="#A63D2F" fill-opacity=".09" stroke="#A63D2F" stroke-width="2" stroke-dasharray="5 5"/>
+          <path d="M335 495 C 320 480, 305 470, 290 452 S 262 432, 245 420 S 220 398, 205 385 S 170 362, 152 345 S 128 328, 118 315 S 100 290, 88 275 S 70 252, 60 235" stroke="#14365D" stroke-width="5" stroke-dasharray="2 9" stroke-linecap="round" fill="none" opacity=".55"/>
+          <path d="M335 495 C 320 480, 305 470, 290 452 S 262 432, 245 420 S 220 398, 205 385" stroke="#D9A21B" stroke-width="15" fill="none" stroke-linecap="round" opacity=".45"/>
+          <path d="M335 495 C 320 480, 305 470, 290 452 S 262 432, 245 420 S 220 398, 205 385" stroke="#14365D" stroke-width="6" fill="none" stroke-linecap="round"/>
+          <g font-family="Inter" font-size="11" font-weight="700" fill="#14365D" paint-order="stroke" stroke="#E9E0C9" stroke-width="3.5"><circle cx="335" cy="495" r="5.5" fill="#14365D" stroke="#14365D" stroke-width="3"/><text x="324" y="499" text-anchor="end">St-Jean</text><circle cx="290" cy="452" r="5.5" fill="#14365D" stroke="#14365D" stroke-width="3"/><text x="300" y="456" text-anchor="start">Pamplona</text><circle cx="245" cy="420" r="5.5" fill="#14365D" stroke="#14365D" stroke-width="3"/><text x="255" y="424" text-anchor="start">Logroño</text><circle cx="152" cy="345" r="5.5" fill="#FFFDF8" stroke="#14365D" stroke-width="3"/><text x="142" y="349" text-anchor="end">León</text><circle cx="118" cy="315" r="5.5" fill="#FFFDF8" stroke="#14365D" stroke-width="3"/><text x="108" y="319" text-anchor="end">Astorga</text><circle cx="88" cy="275" r="5.5" fill="#FFFDF8" stroke="#14365D" stroke-width="3"/><text x="78" y="279" text-anchor="end">O Cebreiro</text><circle cx="60" cy="235" r="5.5" fill="#FFFDF8" stroke="#14365D" stroke-width="3"/></g>
+        <text x="86" y="232" text-anchor="start" font-size="12">Santiago</text></g>
+        </svg>
+        <div class="cp-pin iconic md" style="position:absolute;left:35px;top:190px;z-index:2"><svg class="cp-icon "><use href="#i-landmark"/></svg></div>
+        <div class="cp-pin church sm" style="position:absolute;left:153px;top:280px;z-index:2"><svg class="cp-icon "><use href="#i-church"/></svg></div>
+        <div class="cp-pin story sm" style="position:absolute;left:212px;top:292px;z-index:2"><svg class="cp-icon "><use href="#i-headphones"/></svg></div>
+        <div class="cp-pin hunt sm" style="position:absolute;left:283px;top:363px;z-index:2"><svg class="cp-icon "><use href="#i-chest"/></svg></div>
+        <div class="cp-pin crowd sm" style="position:absolute;left:101px;top:258px;z-index:2"><svg class="cp-icon "><use href="#i-crowd"/></svg></div>
+        <div class="cp-youhere" style="left:84px;top:338px;flex-direction:row-reverse"><span class="ring"><span class="dot"><svg class="cp-icon "><use href="#i-nav"/></svg></span></span><span class="tag">You · Day 12</span></div>
+        <div style="position:absolute;left:20px;top:440px;z-index:3"><span class="cp-hint"><svg class="cp-icon "><use href="#i-locate"/></svg>Pinch in to open Burgos</span></div>
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div style="position:absolute;top:62px;left:16px;right:16px;display:flex;flex-direction:column;gap:10px;z-index:4">
+          <div style="display:flex;gap:10px;align-items:center">
+            <div class="cp-hud" style="flex:1"><span class="cp-level">7</span><div style="flex:1"><div class="t">Peregrino<span>1,240 / 1,500 XP</span></div><div class="cp-xp"><span style="width:82%"></span></div></div></div>
+            <button class="cp-icon-btn" aria-label="Search"><svg class="cp-icon "><use href="#i-search"/></svg></button>
+          </div>
+          <div class="cp-layer-switch"><span class="on"><svg class="cp-icon "><use href="#i-heli"/></svg>Helicopter</span><span class=""><svg class="cp-icon "><use href="#i-city"/></svg>City</span></div>
+        </div>
+        <div class="cp-fab-stack" style="position:absolute;right:16px;top:188px;z-index:4">
+          <button class="cp-icon-btn" style="align-self:flex-end"><svg class="cp-icon "><use href="#i-layers"/></svg></button>
+          <button class="cp-icon-btn" style="align-self:flex-end"><svg class="cp-icon "><use href="#i-locate"/></svg></button>
+        </div>
+        <div class="cp-sheet" style="position:absolute;left:0;right:0;bottom:0;padding-bottom:124px;z-index:5">
+          <div class="grab"></div>
+          <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px">
+            <div><div class="cp-article" style="display:block"><div class="ey" style="font-family:var(--cp-font-mono);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--cp-text-accent)">Camino Francés · 780 km</div></div>
+              <div style="font-family:var(--cp-font-title);font-weight:600;font-size:28px;line-height:34px;margin-top:4px">312 km <span style="font-size:17px;font-weight:500;color:var(--cp-text-muted)">walked</span></div></div>
+            <span class="cp-badge gold">Day 12 / 33</span>
+          </div>
+          <div class="cp-progress light" style="margin:14px 0 14px;height:8px"><span style="width:40%;background:var(--cp-color-blue)"></span></div>
+          <svg class="cp-elev" viewBox="0 0 342 64" preserveAspectRatio="none" aria-hidden="true"><path d="M0 54 L12 30 L30 12 L40 28 L62 45 L95 47 L115 40 L137 31 L160 33 L185 33 L205 31 L222 24 L240 10 L255 20 L270 17 L290 42 L315 48 L342 51 V64 H0Z" fill="#DCE5EF"/><path d="M0 54 L12 30 L30 12 L40 28 L62 45 L95 47 L115 40 L137 31 L160 33 L185 33 L205 31 L222 24 L240 10 L255 20 L270 17 L290 42 L315 48 L342 51" stroke="#14365D" stroke-width="2.5" fill="none" stroke-linejoin="round"/><path d="M0 54 L12 30 L30 12 L40 28 L62 45 L95 47 L115 40 L137 31 V64 H0Z" fill="#14365D" opacity=".18"/><line x1="137" y1="6" x2="137" y2="64" stroke="#D9A21B" stroke-width="2"/><circle cx="137" cy="31" r="5" fill="#D9A21B" stroke="#FFFDF8" stroke-width="2.5"/></svg>
+        </div>
+        <div class="tabdock clear"><nav class="cp-tabbar">
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-me"/></svg></span>Me</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-stays"/></svg></span>Stays</div>
+          <div class="cp-tab on"><span class="ico"><svg class="cp-icon "><use href="#i-maps"/></svg></span>Maps</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-explore"/></svg></span>Explore</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-settings"/></svg></span>Settings</div>
+        </nav></div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Maps · City view</b>Inside the city / area, street level</p>
       <div class="phone" style="background:#EDE5D3">
         
         
         <svg class="map-bg" viewBox="0 0 390 844" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
           <rect width="390" height="844" fill="#EDE5D3"/>
-          <path d="M0 120 Q120 90 210 160 T390 140 V0 H0Z" fill="#E2E8D5"/>
-          <path d="M0 610 Q90 560 170 640 T390 600 V844 H0Z" fill="#E2E8D5"/>
-          <ellipse cx="330" cy="420" rx="70" ry="44" fill="#CFE0F0"/>
-          <g stroke="#FFFDF8" stroke-width="10" fill="none" stroke-linecap="round"><path d="M-10 300 Q140 280 230 330 T400 300"/><path d="M60 -10 Q80 300 40 860"/></g>
-          <g stroke="#E4D7BF" stroke-width="3" fill="none"><path d="M-10 460 L400 420"/><path d="M260 -10 L300 860"/><path d="M0 760 L390 700"/></g>
-          <path d="M120 900 C 140 760, 90 680, 170 600 S 260 460, 210 380 S 150 230, 240 120 S 300 20, 290 -20" stroke="#D9A21B" stroke-width="16" fill="none" stroke-linecap="round" opacity=".45"/>
-          <path d="M120 900 C 140 760, 90 680, 170 600 S 260 460, 210 380 S 150 230, 240 120 S 300 20, 290 -20" stroke="#14365D" stroke-width="7" fill="none" stroke-linecap="round"/>
-          <!-- hunt zone -->
-          <circle cx="92" cy="400" r="58" fill="#A63D2F" fill-opacity=".08" stroke="#A63D2F" stroke-width="2" stroke-dasharray="6 6"/>
+          <g><rect x="-9" y="-9" width="58" height="54" rx="7" fill="#E2D6BC"/><rect x="-10" y="54" width="60" height="56" rx="7" fill="#E2D6BC"/><rect x="-8" y="132" width="56" height="38" rx="7" fill="#E2D6BC"/><rect x="-6" y="182" width="52" height="34" rx="7" fill="#E2D6BC"/><rect x="-11" y="239" width="62" height="44" rx="7" fill="#E2D6BC"/><rect x="-11" y="288" width="62" height="44" rx="7" fill="#E2D6BC"/><rect x="-5" y="355" width="50" height="32" rx="7" fill="#E2D6BC"/><rect x="-7" y="402" width="54" height="36" rx="7" fill="#E2D6BC"/><rect x="-11" y="459" width="62" height="44" rx="7" fill="#E2D6BC"/><rect x="-9" y="510" width="58" height="40" rx="7" fill="#E2D6BC"/><rect x="-7" y="573" width="54" height="40" rx="7" fill="#E2D6BC"/><rect x="-11" y="622" width="62" height="48" rx="7" fill="#E2D6BC"/><rect x="-7" y="693" width="54" height="76" rx="7" fill="#E2D6BC"/><rect x="-10" y="778" width="60" height="82" rx="7" fill="#E2D6BC"/><rect x="69" y="-11" width="54" height="58" rx="7" fill="#E2D6BC"/><rect x="69" y="52" width="54" height="58" rx="7" fill="#E2D6BC"/><rect x="130" y="-8" width="48" height="52" rx="7" fill="#E2D6BC"/><rect x="130" y="56" width="48" height="52" rx="7" fill="#E2D6BC"/><rect x="69" y="129" width="54" height="44" rx="7" fill="#E2D6BC"/><rect x="70" y="178" width="52" height="42" rx="7" fill="#E2D6BC"/><rect x="128" y="129" width="54" height="44" rx="7" fill="#E2D6BC"/><rect x="132" y="182" width="46" height="36" rx="7" fill="#E2D6BC"/><rect x="72" y="242" width="48" height="38" rx="7" fill="#E2D6BC"/><rect x="69" y="288" width="54" height="44" rx="7" fill="#E2D6BC"/><rect x="134" y="245" width="42" height="32" rx="7" fill="#E2D6BC"/><rect x="132" y="292" width="46" height="36" rx="7" fill="#E2D6BC"/><rect x="69" y="349" width="54" height="44" rx="7" fill="#E2D6BC"/><rect x="70" y="398" width="52" height="42" rx="7" fill="#E2D6BC"/><rect x="132" y="354" width="44" height="34" rx="7" fill="#E2D6BC"/><rect x="132" y="402" width="44" height="34" rx="7" fill="#E2D6BC"/><rect x="73" y="463" width="46" height="36" rx="7" fill="#E2D6BC"/><rect x="69" y="508" width="54" height="44" rx="7" fill="#E2D6BC"/><rect x="132" y="463" width="46" height="36" rx="7" fill="#E2D6BC"/><rect x="132" y="512" width="46" height="36" rx="7" fill="#E2D6BC"/><rect x="72" y="572" width="48" height="42" rx="7" fill="#E2D6BC"/><rect x="69" y="622" width="54" height="48" rx="7" fill="#E2D6BC"/><rect x="128" y="570" width="52" height="46" rx="7" fill="#E2D6BC"/><rect x="128" y="622" width="54" height="48" rx="7" fill="#E2D6BC"/><rect x="73" y="693" width="46" height="76" rx="7" fill="#E2D6BC"/><rect x="75" y="784" width="42" height="72" rx="7" fill="#E2D6BC"/><rect x="128" y="690" width="52" height="82" rx="7" fill="#E2D6BC"/><rect x="130" y="780" width="50" height="80" rx="7" fill="#E2D6BC"/><rect x="202" y="-8" width="38" height="52" rx="7" fill="#E2D6BC"/><rect x="200" y="54" width="42" height="56" rx="7" fill="#E2D6BC"/><rect x="252" y="-7" width="36" height="50" rx="7" fill="#E2D6BC"/><rect x="248" y="52" width="44" height="58" rx="7" fill="#E2D6BC"/><rect x="203" y="133" width="36" height="36" rx="7" fill="#E2D6BC"/><rect x="201" y="180" width="40" height="40" rx="7" fill="#E2D6BC"/><rect x="252" y="133" width="36" height="36" rx="7" fill="#E2D6BC"/><rect x="254" y="184" width="32" height="32" rx="7" fill="#E2D6BC"/><rect x="204" y="244" width="34" height="34" rx="7" fill="#E2D6BC"/><rect x="200" y="288" width="42" height="42" rx="7" fill="#E2D6BC"/><rect x="248" y="239" width="44" height="44" rx="7" fill="#E2D6BC"/><rect x="252" y="292" width="36" height="36" rx="7" fill="#E2D6BC"/><rect x="203" y="353" width="36" height="36" rx="7" fill="#E2D6BC"/><rect x="204" y="402" width="34" height="34" rx="7" fill="#E2D6BC"/><rect x="248" y="350" width="42" height="42" rx="7" fill="#E2D6BC"/><rect x="250" y="400" width="40" height="40" rx="7" fill="#E2D6BC"/><rect x="199" y="459" width="44" height="44" rx="7" fill="#E2D6BC"/><rect x="203" y="512" width="36" height="36" rx="7" fill="#E2D6BC"/><rect x="252" y="464" width="34" height="34" rx="7" fill="#E2D6BC"/><rect x="248" y="508" width="44" height="44" rx="7" fill="#E2D6BC"/><rect x="203" y="573" width="36" height="40" rx="7" fill="#E2D6BC"/><rect x="199" y="622" width="44" height="48" rx="7" fill="#E2D6BC"/><rect x="252" y="573" width="36" height="40" rx="7" fill="#E2D6BC"/><rect x="248" y="624" width="42" height="46" rx="7" fill="#E2D6BC"/><rect x="202" y="692" width="38" height="78" rx="7" fill="#E2D6BC"/><rect x="204" y="782" width="34" height="74" rx="7" fill="#E2D6BC"/><rect x="252" y="693" width="36" height="76" rx="7" fill="#E2D6BC"/><rect x="250" y="780" width="38" height="78" rx="7" fill="#E2D6BC"/><rect x="315" y="-5" width="36" height="46" rx="7" fill="#E2D6BC"/><rect x="311" y="54" width="44" height="54" rx="7" fill="#E2D6BC"/><rect x="366" y="-8" width="42" height="52" rx="7" fill="#E2D6BC"/><rect x="366" y="56" width="40" height="50" rx="7" fill="#E2D6BC"/><rect x="312" y="132" width="42" height="38" rx="7" fill="#E2D6BC"/><rect x="311" y="180" width="44" height="40" rx="7" fill="#E2D6BC"/><rect x="364" y="131" width="44" height="40" rx="7" fill="#E2D6BC"/><rect x="364" y="178" width="46" height="42" rx="7" fill="#E2D6BC"/><rect x="315" y="245" width="36" height="32" rx="7" fill="#E2D6BC"/><rect x="310" y="288" width="46" height="42" rx="7" fill="#E2D6BC"/><rect x="368" y="244" width="38" height="34" rx="7" fill="#E2D6BC"/><rect x="368" y="294" width="36" height="32" rx="7" fill="#E2D6BC"/><rect x="310" y="350" width="46" height="42" rx="7" fill="#E2D6BC"/><rect x="309" y="398" width="48" height="44" rx="7" fill="#E2D6BC"/><rect x="366" y="353" width="40" height="36" rx="7" fill="#E2D6BC"/><rect x="364" y="400" width="44" height="40" rx="7" fill="#E2D6BC"/><rect x="313" y="463" width="40" height="36" rx="7" fill="#E2D6BC"/><rect x="312" y="510" width="42" height="38" rx="7" fill="#E2D6BC"/><rect x="364" y="461" width="44" height="40" rx="7" fill="#E2D6BC"/><rect x="368" y="512" width="38" height="34" rx="7" fill="#E2D6BC"/><rect x="312" y="572" width="42" height="42" rx="7" fill="#E2D6BC"/><rect x="311" y="624" width="44" height="44" rx="7" fill="#E2D6BC"/><rect x="366" y="573" width="40" height="40" rx="7" fill="#E2D6BC"/><rect x="362" y="622" width="48" height="48" rx="7" fill="#E2D6BC"/><rect x="309" y="689" width="48" height="84" rx="7" fill="#E2D6BC"/><rect x="313" y="782" width="40" height="76" rx="7" fill="#E2D6BC"/><rect x="366" y="692" width="42" height="78" rx="7" fill="#E2D6BC"/><rect x="364" y="778" width="46" height="82" rx="7" fill="#E2D6BC"/></g>
+          <rect x="316" y="129" width="100" height="92" rx="14" fill="#CFDDBF"/>
+          <rect x="199" y="239" width="92" height="92" rx="14" fill="#FBF3DC"/>
+          <path d="M-20 700 C 60 640, 140 700, 230 640 S 360 560, 420 600" stroke="#CFE0F0" stroke-width="26" fill="none" stroke-linecap="round"/>
+          <g stroke="#FFFDF8" stroke-width="10" fill="none" stroke-linecap="round">
+            <path d="M-20 120H420M-20 230H420M-20 340H420M-20 450H420M-20 560H420"/><path d="M60 -20V870M190 -20V870M300 -20V870"/>
+          </g>
+          <circle cx="80" cy="300" r="60" fill="#A63D2F" fill-opacity=".09" stroke="#A63D2F" stroke-width="2" stroke-dasharray="6 6"/>
+          <path d="M190 640 V340 H300 V120 V-20" stroke="#D9A21B" stroke-width="16" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity=".45"/>
+          <path d="M190 640 V340 H300 V120 V-20" stroke="#14365D" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <g font-family="Inter" font-size="11" font-weight="600" fill="#8C8272" paint-order="stroke" stroke="#EDE5D3" stroke-width="3"><text x="70" y="114">Calle Mayor</text><text x="198" y="444">Rúa de San Juan</text><text x="308" y="228" transform="rotate(-90 308 228)">Camino Real</text></g>
         </svg>
-        <div class="cp-pin iconic" style="position:absolute;left:214px;top:196px;z-index:2"><svg class="cp-icon"><use href="#i-landmark"/></svg><span class="xp">+80 XP</span><span class="cp-pin-label">Castillo</span></div>
-        <div class="cp-pin church" style="position:absolute;left:186px;top:352px;z-index:2"><svg class="cp-icon"><use href="#i-church"/></svg><span class="cp-pin-label">San Juan</span></div>
-        <div class="cp-pin hunt" style="position:absolute;left:70px;top:378px;z-index:2"><svg class="cp-icon"><use href="#i-chest"/></svg><span class="cp-pin-label">Shell hunt</span></div>
-        <div class="cp-pin story" style="position:absolute;left:262px;top:300px;z-index:2"><svg class="cp-icon"><use href="#i-headphones"/></svg></div>
-        <div class="cp-pin water" style="position:absolute;left:150px;top:470px;z-index:2"><svg class="cp-icon"><use href="#i-drop"/></svg></div>
-        <div class="cp-pin crowd" style="position:absolute;left:96px;top:236px;z-index:2"><svg class="cp-icon"><use href="#i-crowd"/></svg></div>
-        <div style="position:absolute;left:146px;top:560px;width:56px;height:56px;border-radius:50%;background:rgba(20,54,93,.15);display:grid;place-items:center;z-index:2"><div style="width:36px;height:36px;border-radius:50%;background:#14365D;display:grid;place-items:center;border:3px solid #FFFDF8;box-shadow:var(--cp-shadow-md)"><svg class="cp-icon sm" style="fill:#D9A21B;stroke:#D9A21B"><use href="#i-nav"/></svg></div></div>
+        <div class="cp-pin iconic" style="position:absolute;left:222px;top:250px;z-index:2"><svg class="cp-icon "><use href="#i-landmark"/></svg><span class="xp">+80 XP</span><span class="cp-pin-label">Cathedral</span></div>
+        <div class="cp-pin church" style="position:absolute;left:107px;top:350px;z-index:2"><svg class="cp-icon "><use href="#i-church"/></svg><span class="cp-pin-label">San Juan</span></div>
+        <div class="cp-pin hunt" style="position:absolute;left:57px;top:277px;z-index:2"><svg class="cp-icon "><use href="#i-chest"/></svg><span class="cp-pin-label">Shell hunt</span></div>
+        <div class="cp-pin story" style="position:absolute;left:236px;top:168px;z-index:2"><svg class="cp-icon "><use href="#i-headphones"/></svg></div>
+        <div class="cp-pin water" style="position:absolute;left:26px;top:408px;z-index:2"><svg class="cp-icon "><use href="#i-drop"/></svg></div>
+        <div class="cp-pin crowd" style="position:absolute;left:236px;top:380px;z-index:2"><svg class="cp-icon "><use href="#i-crowd"/></svg></div>
+        <div style="position:absolute;left:162px;top:420px;width:56px;height:56px;border-radius:50%;background:rgba(20,54,93,.15);display:grid;place-items:center;z-index:2"><div style="width:36px;height:36px;border-radius:50%;background:#14365D;display:grid;place-items:center;border:3px solid #FFFDF8;box-shadow:var(--cp-shadow-md)"><svg class="cp-icon sm" style="fill:#D9A21B;stroke:#D9A21B"><use href="#i-nav"/></svg></div></div>
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
         <div style="position:absolute;top:62px;left:16px;right:16px;display:flex;flex-direction:column;gap:10px;z-index:4">
           <div style="display:flex;gap:10px;align-items:center">
             <div class="cp-hud" style="flex:1"><span class="cp-level">7</span><div style="flex:1"><div class="t">Peregrino<span>1,240 / 1,500 XP</span></div><div class="cp-xp"><span style="width:82%"></span></div></div></div>
             <button class="cp-icon-btn" aria-label="Search"><svg class="cp-icon"><use href="#i-search"/></svg></button>
           </div>
-          <div class="cp-achieve" style="align-self:flex-start"><span class="md"><svg class="cp-icon"><use href="#i-medal"/></svg></span><div><div class="t">Meseta Walker unlocked</div><div class="m">+100 XP · 300 km walked</div></div></div>
+          <div class="cp-layer-switch"><span class=""><svg class="cp-icon "><use href="#i-heli"/></svg>Helicopter</span><span class="on"><svg class="cp-icon "><use href="#i-city"/></svg>City</span></div>
         </div>
-        <div class="cp-fab-stack" style="position:absolute;right:16px;top:228px;z-index:4">
+        <div class="cp-fab-stack" style="position:absolute;right:16px;top:188px;z-index:4">
           <span class="cp-badge glass" style="height:40px;padding:0 12px;font-size:14px"><svg class="cp-icon sm"><use href="#i-sun"/></svg>24°</span>
           <button class="cp-icon-btn" style="align-self:flex-end"><svg class="cp-icon"><use href="#i-layers"/></svg></button>
           <button class="cp-icon-btn" style="align-self:flex-end"><svg class="cp-icon"><use href="#i-locate"/></svg></button>
@@ -1339,6 +2102,33 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Explore</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-settings"/></svg></span>Settings</div>
+        </nav></div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Maps · Article popup</b>Church / history lightbox</p>
+      <div class="phone " style="background:#EDE5D3">
+        <svg class="map-bg" viewBox="0 0 390 844" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="390" height="844" fill="#EDE5D3"/><path d="M0 120 Q120 90 210 160 T390 140 V0 H0Z" fill="#E2E8D5"/><path d="M0 610 Q90 560 170 640 T390 600 V844 H0Z" fill="#E2E8D5"/><g stroke="#FFFDF8" stroke-width="10" fill="none" stroke-linecap="round"><path d="M-10 300 Q140 280 230 330 T400 300"/><path d="M60 -10 Q80 300 40 860"/></g><path d="M120 900 C 140 760, 90 680, 170 600 S 260 460, 210 380 S 150 230, 240 120 S 300 20, 290 -20" stroke="#14365D" stroke-width="7" fill="none" stroke-linecap="round"/></svg><div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div><div class="cp-scrim"></div><div class="cp-lightbox cp-article" style="top:70px;bottom:96px;">
+          <button class="close" aria-label="Close"><svg class="cp-icon "><use href="#i-x"/></svg></button>
+          <div class="hero"><div class="cp-img v3"></div>
+            <div class="tags"><span class="cp-badge glass"><svg class="cp-icon sm"><use href="#i-church"/></svg>Church</span><span class="cp-badge gold">12th century</span></div></div>
+          <div class="bd">
+            <div class="ey">History · 4 min read</div>
+            <h3>Iglesia de San Juan</h3>
+            <div class="by"><span class="cp-avatar" style="background:linear-gradient(150deg,#E9C987,#A0583F)"></span>Fr. Miguel · updated Oct 2026</div>
+            <p class="lead">Pilgrims have rested under this Romanesque porch since 1190, when the hospital of San Juan opened its doors to travellers who had lost their way on the Meseta.</p>
+            <blockquote>Knock twice. Someone always answers.</blockquote>
+            <div class="cp-facts"><div><b>1190</b><span>Built</span></div><div><b>Romanesque</b><span>Style</span></div><div><b>19:00</b><span>Pilgrim mass</span></div></div>
+          </div>
+          <div class="ft"><button class="cp-btn cp-btn-secondary md"><svg class="cp-icon sm"><use href="#i-headphones"/></svg>Listen</button><button class="cp-btn cp-btn-primary md"><svg class="cp-icon sm"><use href="#i-nav"/></svg>Navigate</button></div>
+        </div><div class="tabdock"><nav class="cp-tabbar">
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-me"/></svg></span>Me</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-stays"/></svg></span>Stays</div>
+          <div class="cp-tab on"><span class="ico"><svg class="cp-icon "><use href="#i-maps"/></svg></span>Maps</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-explore"/></svg></span>Explore</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-settings"/></svg></span>Settings</div>
         </nav></div>
         <span class="home-ind"></span>
       </div>
@@ -1460,7 +2250,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
 
 <!-- =================================================================== ICONS -->
 <section class="doc" id="icons">
-  <p class="eyebrow">14 · Icons</p>
+  <p class="eyebrow">15 · Icons</p>
   <h2>Friendly line icons</h2>
   <p class="intro">24px grid, 1.75px rounded stroke (2.2px when active). Placeholder set drawn for this doc; swap for a licensed set (e.g. Phosphor or Lucide) when building the app, keeping the same weight.</p>
   <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:12px">
@@ -1493,7 +2283,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     <div class="icon-cell"><svg class="cp-icon"><use href="#i-chat"/></svg>whatsapp</div>
     <div class="icon-cell"><svg class="cp-icon"><use href="#i-msg"/></svg>message</div>
     <div class="icon-cell"><svg class="cp-icon"><use href="#i-bolt"/></svg>instant</div>
-    <div class="icon-cell"><svg class="cp-icon"><use href="#i-sos"/></svg>sos</div>
+    <div class="icon-cell"><svg class="cp-icon"><use href="#i-sos"/></svg>sos</div><div class="icon-cell"><svg class="cp-icon"><use href="#i-heli"/></svg>helicopter</div><div class="icon-cell"><svg class="cp-icon"><use href="#i-city"/></svg>city</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-pencil"/></svg>write</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-link"/></svg>link</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-wifi"/></svg>wifi</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-utensils"/></svg>food</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-wash"/></svg>laundry</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-bike"/></svg>bike</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-plug"/></svg>charging</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-clock"/></svg>hours</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-image"/></svg>photo</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-copy"/></svg>copy</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-book"/></svg>article</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-shield"/></svg>policy</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-phone"/></svg>call</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-tagpeople"/></svg>tag people</div>
   </div>
 </section>
 
