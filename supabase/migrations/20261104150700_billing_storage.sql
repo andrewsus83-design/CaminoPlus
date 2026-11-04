@@ -253,3 +253,18 @@ create policy "delete own media" on storage.objects for delete to authenticated
 
 create index if not exists user_stamps_photo_idx on public.user_stamps (photo_path) where photo_path is not null;
 create index if not exists crowd_reports_photo_idx on public.crowd_reports (photo_path) where photo_path is not null;
+
+-- -----------------------------------------------------------------------------
+-- Free vs CaminoPlus
+--   Free (basic app): 0 GB cloud storage, no offline route downloads.
+--   CaminoPlus: 5 GB storage (+ add-ons) and offline route downloads.
+-- The offline pack manifest (with download URLs) is readable only with an
+-- active plan. Free users get the catalog without URLs through
+-- rpc('offline_pack_catalog') so the app can show sizes and an upgrade prompt.
+-- The pack files on Cloudflare R2 must be served through signed URLs issued
+-- by an edge function that checks has_plus, not through public links.
+-- -----------------------------------------------------------------------------
+drop policy "offline packs are public" on public.offline_packs;
+create policy "offline packs need CaminoPlus" on public.offline_packs for select to authenticated
+  using (private.has_plus((select auth.uid())));
+revoke all on public.offline_packs from anon;

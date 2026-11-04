@@ -6,7 +6,7 @@
 
 -- App config ------------------------------------------------------------------
 insert into public.app_config (key, value, description) values
-  ('free_storage_bytes', '0', 'Cloud storage for users without CaminoPlus (bytes). Open decision.'),
+  ('free_storage_bytes', '0', 'Cloud storage for free users (bytes). Free = basic app, 0 GB.'),
   ('crowd_ttl_minutes.crowd_level', '120', 'How long a crowd level report stays on the map')
 on conflict (key) do nothing;
 
@@ -122,3 +122,9 @@ on conflict (id) do nothing;
 insert into private.hunt_step_answers (step_id, answer) values
   ('71000000-0000-0000-0000-000000000002', '790')
 on conflict (step_id) do nothing;
+
+-- Sample offline pack (manifest only)
+insert into public.offline_packs (route_id, stage_id, kind, format, version, url, size_bytes) values
+  ('20000000-0000-0000-0000-000000000001', '40000000-0000-0000-0000-000000000001', 'tiles', 'pmtiles', 1,
+   'r2://caminoplus-packs/camino-frances/stage-01/tiles-v1.pmtiles', 3145728)
+on conflict do nothing;

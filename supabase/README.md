@@ -143,6 +143,7 @@ erDiagram
 - **Audio stories** per stage or POI with a trigger radius for auto-play. Files are on Cloudflare R2.
 - **Offline packs**: manifest of downloadable files per route or stage (`pmtiles`, `sqlite`, audio zip),
   with version, size and sha256 so the app can download in stages and update only what changed.
+  CaminoPlus only (see Settings and billing).
 - **Scavenger hunts**: steps verified by GPS, photo, answer or QR. Answers are in `private.hunt_step_answers`
   and checked by `rpc('complete_hunt_step')`, which is safe to replay from the offline outbox.
 - **XP**: `xp_events` is an append-only ledger with one row per (reason, source), so XP can never be
@@ -190,6 +191,12 @@ erDiagram
 - `billing_products`: `plus_yearly` ($11.99/year, 5 GB) and `storage_5gb_yearly` ($5/year, +5 GB).
 - `subscriptions` mirrors RevenueCat. Only the RevenueCat webhook edge function (service role) writes it,
   logging every event in `revenuecat_events` (event id is the primary key, so retries are harmless).
+- **Free = basic app**: 0 GB cloud storage and no offline route downloads. Everything else
+  (browsing routes, stays, map online, social) works. `rpc('get_my_entitlements')` tells the app
+  which plan the user is on.
+- Offline pack URLs (`offline_packs`) are readable only with CaminoPlus; free users see sizes via
+  `rpc('offline_pack_catalog')` for the upgrade prompt. Pack files on R2 must be served through
+  signed URLs from an edge function that checks the plan.
 - Quota = 5 GB with an active plan (including grace period and "cancelled but not yet expired")
   + all active add-ons. Without a plan the quota is `app_config.free_storage_bytes` (0 for now).
 - Uploads to the `user-media` bucket are refused once usage reaches the quota. Nothing is deleted
@@ -228,7 +235,7 @@ Built for 6 to 8 hours without signal:
 ## Security
 
 - RLS is on for every table in `public`; the last migration fails if any table is missing it.
-- Catalog data is readable without login (for the camino.plus website); everything personal needs a session.
+- Catalog data (except offline pack URLs) is readable without login (for the camino.plus website); everything personal needs a session.
 - Helper functions used by policies live in the `private` schema, which is not exposed by the API.
 - Health data, settings, devices, storage usage and subscriptions are owner-only.
 
@@ -256,7 +263,6 @@ supabase/dev/validate.sh    # migrations + seed + RLS smoke test (about 50 asser
 
 ## Open decisions
 
-- Free tier storage: `free_storage_bytes` is 0, so photo uploads need CaminoPlus. Change in `app_config`.
 - Moderation workflow for posts and comments (tables and flags are ready).
 - Whether `is_premium` audio stories are gated (currently the URL is public).
 - Phase 2 marketplace: legal review of face matching before any of it is switched on.

@@ -141,6 +141,13 @@ do $$ begin
   end;
 end $$;
 
+-- free plan: no route downloads, but the catalog (without URLs) is visible
+do $$ begin
+  assert (select count(*) from public.offline_packs) = 0, 'free user cannot read pack URLs';
+  assert (select count(*) from public.offline_pack_catalog('20000000-0000-0000-0000-000000000001')) = 1, 'catalog visible';
+  assert (public.get_my_entitlements() ->> 'can_download_routes')::boolean = false, 'free cannot download';
+end $$;
+
 -- cannot grant yourself a subscription
 do $$ begin
   begin
@@ -170,6 +177,8 @@ begin
   assert (s ->> 'has_plus')::boolean, 'plus active';
   assert (s ->> 'quota_bytes')::bigint = 10737418240, '5 GB plan + 5 GB add-on';
   assert (s ->> 'used_bytes')::bigint = 1000, 'usage counted';
+  assert (select count(*) from public.offline_packs) = 1, 'plus user reads pack URLs';
+  assert (public.get_my_entitlements() ->> 'plan') = 'plus', 'plus entitlement';
 end $$;
 -- A goes private
 update public.profiles set is_private = true where id = auth.uid();

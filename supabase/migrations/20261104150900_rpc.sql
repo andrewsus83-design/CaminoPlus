@@ -213,6 +213,39 @@ $$;
 revoke execute on function public.get_my_storage(), public.refresh_my_storage_usage() from public, anon;
 grant execute on function public.get_my_storage(), public.refresh_my_storage_usage() to authenticated;
 
+-- What the current user is entitled to (free basic app vs CaminoPlus).
+create or replace function public.get_my_entitlements()
+returns jsonb
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select jsonb_build_object(
+    'plan',                case when private.has_plus(auth.uid()) then 'plus' else 'free' end,
+    'has_plus',            private.has_plus(auth.uid()),
+    'can_download_routes', private.has_plus(auth.uid()),
+    'storage_quota_bytes', private.storage_quota_bytes(auth.uid())
+  );
+$$;
+
+-- Offline pack catalog without download URLs (for the upgrade screen).
+create or replace function public.offline_pack_catalog(p_route_id uuid)
+returns table (id uuid, route_id uuid, stage_id uuid, kind text, format text,
+               version integer, size_bytes bigint, published_at timestamptz)
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select p.id, p.route_id, p.stage_id, p.kind, p.format, p.version, p.size_bytes, p.published_at
+  from public.offline_packs p
+  where p.route_id = p_route_id and p.is_current and p.deleted_at is null
+  order by p.stage_id nulls first, p.kind;
+$$;
+revoke execute on function public.get_my_entitlements(), public.offline_pack_catalog(uuid) from public, anon;
+grant execute on function public.get_my_entitlements(), public.offline_pack_catalog(uuid) to authenticated;
+
 -- Housekeeping for a scheduled job (pg_cron), e.g. every 15 minutes:
 --   select cron.schedule('caminoplus-housekeeping', '*/15 * * * *', 'select private.housekeeping()');
 create or replace function private.housekeeping()
