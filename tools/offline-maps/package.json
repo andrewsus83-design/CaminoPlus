@@ -1,0 +1,20 @@
+{
+  "name": "caminoplus-offline-maps",
+  "private": true,
+  "type": "module",
+  "description": "Build, publish and test offline map packs (one PMTiles file per Camino stage).",
+  "scripts": {
+    "setup": "node scripts/setup_viewer.mjs",
+    "viewer": "node scripts/serve.mjs",
+    "test:render": "node test/render_offline.mjs",
+    "publish-pack": "node scripts/publish_pack.mjs"
+  },
+  "dependencies": {
+    "aws4fetch": "1.0.20",
+    "maplibre-gl": "6.15.0",
+    "pmtiles": "4.5.0"
+  },
+  "devDependencies": {
+    "playwright": "1.63.0"
+  }
+}
