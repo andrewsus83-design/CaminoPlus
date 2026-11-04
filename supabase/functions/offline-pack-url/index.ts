@@ -1,5 +1,11 @@
 // offline-pack-url: hand a CaminoPlus subscriber a short-lived download link
-// for one offline pack (map tiles, data or audio) stored on Cloudflare R2.
+// for one offline pack (map tiles, data or audio).
+//
+// Where the file lives is read from offline_packs.url:
+//   supabase://offline-packs/<key>  private Supabase Storage bucket (now)
+//   r2://<bucket>/<key>             private Cloudflare R2 bucket (later)
+// Moving to R2 = upload the files there and update the url column; the app and
+// this function's contract do not change.
 //
 // POST /functions/v1/offline-pack-url   Authorization: Bearer <user JWT>
 //   body: { "pack_id": "<offline_packs.id>" }
@@ -9,19 +15,20 @@
 // Two gates, both server side:
 //   1. rpc get_my_entitlements().can_download_routes   (private.has_plus)
 //   2. RLS on offline_packs ("offline packs need CaminoPlus") when reading the row
-// The R2 bucket itself stays private; the link is an S3 SigV4 presigned GET
-// that expires after PACK_URL_TTL_SECONDS (default 15 min). A download that has
+// Buckets stay private; the link is a signed GET (Storage signed URL or R2
+// SigV4 presign) that expires after PACK_URL_TTL_SECONDS (default 15 min). A download that has
 // started finishes even if the link expires mid-way; a resumed (Range) request
 // after expiry needs a fresh link, so the app simply calls this function again.
 //
-// Secrets (supabase secrets set ...): R2_ACCOUNT_ID, R2_ACCESS_KEY_ID,
-// R2_SECRET_ACCESS_KEY, R2_BUCKET. Use an R2 API token scoped to Object Read
-// on that one bucket. SUPABASE_URL and SUPABASE_ANON_KEY are provided by Supabase.
+// Env: SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY are provided by
+// Supabase. Only for r2:// packs: R2_ACCOUNT_ID, R2_ACCESS_KEY_ID,
+// R2_SECRET_ACCESS_KEY, R2_BUCKET (an R2 token with Object Read on that bucket).
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { AwsClient } from 'npm:aws4fetch@1.0.20';
 
 const TTL = Math.min(Math.max(Number(Deno.env.get('PACK_URL_TTL_SECONDS') ?? 900), 60), 3600);
 const BUCKET = Deno.env.get('R2_BUCKET') ?? 'caminoplus-packs';
+const STORAGE_BUCKET = 'offline-packs';
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 const cors = {
@@ -35,6 +42,8 @@ const json = (status: number, body: unknown) =>
     headers: { ...cors, 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
   });
 
+class StorageNotConfigured extends Error {}
+
 const r2 = new AwsClient({
   accessKeyId: Deno.env.get('R2_ACCESS_KEY_ID') ?? '',
   secretAccessKey: Deno.env.get('R2_SECRET_ACCESS_KEY') ?? '',
@@ -43,7 +52,10 @@ const r2 = new AwsClient({
 });
 
 // "r2://bucket/key/with/slashes.pmtiles" -> presigned https URL
-export async function presign(r2Url: string, ttlSeconds: number): Promise<string> {
+export async function presignR2(r2Url: string, ttlSeconds: number): Promise<string> {
+  if (!Deno.env.get('R2_ACCOUNT_ID') || !Deno.env.get('R2_ACCESS_KEY_ID') || !Deno.env.get('R2_SECRET_ACCESS_KEY')) {
+    throw new StorageNotConfigured('R2 secrets are not set');
+  }
   const m = /^r2:\/\/([^/]+)\/(.+)$/.exec(r2Url);
   if (!m || m[1] !== BUCKET) throw new Error(`pack url not in bucket ${BUCKET}`);
   const key = m[2].split('/').map(encodeURIComponent).join('/');
@@ -51,6 +63,25 @@ export async function presign(r2Url: string, ttlSeconds: number): Promise<string
   url.searchParams.set('X-Amz-Expires', String(ttlSeconds));
   const signed = await r2.sign(new Request(url, { method: 'GET' }), { aws: { signQuery: true } });
   return signed.url;
+}
+
+// "supabase://offline-packs/camino-frances/stage-01/tiles-v20261103.pmtiles"
+// -> Storage signed URL (service role; the plan was checked before this).
+async function signSupabase(url: string, ttlSeconds: number): Promise<string> {
+  const m = /^supabase:\/\/([^/]+)\/(.+)$/.exec(url);
+  if (!m || m[1] !== STORAGE_BUCKET) throw new Error(`pack url not in bucket ${STORAGE_BUCKET}`);
+  const admin = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!, {
+    auth: { persistSession: false },
+  });
+  const { data, error } = await admin.storage.from(STORAGE_BUCKET).createSignedUrl(m[2], ttlSeconds);
+  if (error || !data?.signedUrl) throw new Error(`storage sign failed: ${error?.message ?? 'no url'}`);
+  return data.signedUrl;
+}
+
+export function signedDownloadUrl(packUrl: string, ttlSeconds: number): Promise<string> {
+  if (packUrl.startsWith('supabase://')) return signSupabase(packUrl, ttlSeconds);
+  if (packUrl.startsWith('r2://')) return presignR2(packUrl, ttlSeconds);
+  return Promise.reject(new Error('unknown pack storage'));
 }
 
 Deno.serve(async (req) => {
@@ -92,13 +123,8 @@ Deno.serve(async (req) => {
   if (packErr) return json(500, { error: 'lookup_failed' });
   if (!pack) return json(404, { error: 'pack_not_found' });
 
-  // Without R2 secrets we would sign a link to a host that does not exist.
-  if (!Deno.env.get('R2_ACCOUNT_ID') || !Deno.env.get('R2_ACCESS_KEY_ID') || !Deno.env.get('R2_SECRET_ACCESS_KEY')) {
-    return json(503, { error: 'storage_not_configured' });
-  }
-
   try {
-    const url = await presign(pack.url, TTL);
+    const url = await signedDownloadUrl(pack.url, TTL);
     return json(200, {
       url,
       expires_at: new Date(Date.now() + TTL * 1000).toISOString(),
@@ -110,7 +136,8 @@ Deno.serve(async (req) => {
       is_current: pack.is_current,
     });
   } catch (e) {
-    console.error('presign failed', e);
-    return json(500, { error: 'presign_failed' });
+    if (e instanceof StorageNotConfigured) return json(503, { error: 'storage_not_configured' });
+    console.error('signing failed', e);
+    return json(500, { error: 'sign_failed' });
   }
 });

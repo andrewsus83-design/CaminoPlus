@@ -15,7 +15,7 @@ OSM extracts ──► osmium (merge + cut) ──► route from OSM ──► c
           Planetiler, OpenMapTiles schema, --polygon corridor, z0 to z15
                                                           │
                                                           ▼
-               stage.pmtiles + manifest ──► R2 (private) + offline_packs row
+               stage.pmtiles + manifest ──► Storage (private) + offline_packs row
                                                           │
  app ── POST offline-pack-url {pack_id} ──► entitlement check ──► presigned URL (15 min)
 ```
@@ -72,10 +72,11 @@ offline style (same palette, same layers) so switching is not jarring.
 | `scripts/build_stage.sh` | Whole build: download, cut, route, corridor, Planetiler, manifest |
 | `scripts/route_from_osm.py` | Takes the real route from OSM hiking relations (Camino de Santiago / GR 65) |
 | `scripts/corridor.py` | Buffers the route (default 3 km each side) into the `.poly` Planetiler uses |
-| `scripts/publish_pack.mjs` | Uploads to R2 and registers the `offline_packs` row (or writes the SQL) |
+| `scripts/publish_pack.mjs` | Uploads to Supabase Storage (or R2 with `--target r2`) and registers the `offline_packs` row (or writes the SQL) |
 | `viewer/` | MapLibre GL JS page that opens a `.pmtiles` with no network; CaminoPlus palette |
 | `test/render_offline.mjs` | Playwright test: renders with all outside requests blocked, then with the browser offline |
-| `../../supabase/functions/offline-pack-url/` | Edge function: presigned R2 link only for CaminoPlus subscribers |
+| `../../supabase/functions/offline-pack-url/` | Edge function: signed download link only for CaminoPlus subscribers |
+| `../../supabase/migrations/20261104170000_offline_packs_bucket.sql` | Private Storage bucket `offline-packs` |
 | `../../.github/workflows/offline-maps.yml` | Builds + measures on PRs, rebuilds monthly, publishes when secrets exist |
 
 ## Run it locally
@@ -110,20 +111,32 @@ Flags: `scripts/build_stage.sh <stage.json> [buffer_km] [maxzoom]`.
   separate tiny low-zoom pack (z0 to z10 for the whole Camino, likely 2 to 4 MB). That is the
   next step after this prototype.
 
-## Publishing (R2 + Supabase)
+## Publishing (Supabase Storage now, Cloudflare R2 later)
 
-`publish_pack.mjs` (and the scheduled workflow) do:
+Decision 2026-11-04: packs live in **Supabase Storage** for now and move to Cloudflare R2
+later. `offline_packs.url` says where each file is, so the move needs no app change:
+
+| url | Storage |
+|---|---|
+| `supabase://offline-packs/<key>` | private Supabase Storage bucket `offline-packs` (now) |
+| `r2://<bucket>/<key>` | private Cloudflare R2 bucket (later) |
+
+`publish_pack.mjs [--target supabase|r2]` (and the scheduled workflow) do:
 
 1. Check the file against its manifest (size + sha256).
-2. `PUT` to R2 at `<route_slug>/stage-<NN>/tiles-v<YYYYMMDD>.pmtiles`.
+2. Upload to `<route_slug>/stage-<NN>/tiles-v<YYYYMMDD>.pmtiles`.
    Version = date of the OSM data, so each monthly build gets a new immutable key
-   (`Cache-Control: immutable`). Old versions can be deleted by an R2 lifecycle rule
-   after 60 days, once no app still points at them.
-3. Upsert the `offline_packs` row from PR #3: `kind 'tiles'`, `format 'pmtiles'`,
-   `version`, `url 'r2://<bucket>/<key>'`, `size_bytes`, `sha256`, `is_current true`,
-   and set `is_current = false` on older versions of that stage.
+   (`Cache-Control: immutable`). Old versions can be deleted after 60 days, once no app
+   still points at them.
+3. Upsert the `offline_packs` row: `kind 'tiles'`, `format 'pmtiles'`, `version`, `url`,
+   `size_bytes`, `sha256`, `is_current true`, and set `is_current = false` on older
+   versions of that stage.
 4. Always writes `<pack>.offline_packs.sql` with the same statements so the row can be
    applied by hand.
+
+**Moving to R2 later:** create the bucket and tokens, set the R2 secrets (GitHub + Supabase),
+set the repo variable `PACK_TARGET=r2`, run the workflow once. New rows point at `r2://`;
+the edge function signs both kinds, so old rows keep working until they are retired.
 
 ## Download links only for subscribers
 
@@ -134,9 +147,10 @@ Flags: `scripts/build_stage.sh <stage.json> [buffer_km] [maxzoom]`.
   Free users get `403 {"error":"subscription_required"}`, so the app can show the upgrade screen.
 - Gate 2: reads the pack row through RLS (`offline packs need CaminoPlus`), so even a bug
   in gate 1 cannot leak a URL.
-- Returns a SigV4 presigned `GET` for the private R2 bucket, valid 15 minutes
+- Returns a signed `GET` (Supabase Storage signed URL, or SigV4 presign for `r2://`), valid 15 minutes
   (`PACK_URL_TTL_SECONDS`, 60 to 3600), plus `size_bytes` and `sha256`. A download that
   starts in time finishes; a resume after expiry asks for a new link.
+- `503 storage_not_configured` if a pack is on R2 but the R2 secrets are not set.
 - Tested against a mock Supabase: `deno test --allow-net --allow-env --allow-run --allow-read supabase/functions/offline-pack-url/index.test.ts`.
 
 The bucket is never public and never has a custom domain for packs, so a link cannot be
@@ -189,9 +203,6 @@ The app checks `offline_packs` (version / `is_current`) when online and offers
 
 | Item | Where | Notes |
 |---|---|---|
-| Cloudflare R2 bucket `caminoplus-packs` (private) | Cloudflare dashboard → R2 | No public access, no custom domain |
-| R2 API token: Object Read & Write on that bucket | GitHub repo secrets `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` | Used by the monthly build |
-| R2 API token: Object Read only on that bucket | Supabase secrets for the edge function (same three names + `R2_BUCKET`) | Separate read-only token |
-| Supabase URL + service role key | GitHub secrets `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` | Only to register rows automatically; otherwise apply the generated SQL |
-| PR #3 merged | | The edge function and `offline_packs` row depend on it |
-| Deploy the function | `supabase functions deploy offline-pack-url` | After the secrets are set |
+| Supabase URL + service role key | GitHub secrets `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` | Lets the monthly build upload packs and register rows |
+| Later, for Cloudflare: R2 bucket `caminoplus-packs` (private) + tokens | GitHub secrets `R2_*`, Supabase function secrets `R2_*`, repo variable `PACK_TARGET=r2` | Read-only token for the function, read/write for the build |
+| Deploy the function | `supabase functions deploy offline-pack-url` | Needs no extra secrets for Supabase Storage |

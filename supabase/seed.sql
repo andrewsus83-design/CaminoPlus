@@ -126,5 +126,5 @@ on conflict (step_id) do nothing;
 -- Sample offline pack (manifest only)
 insert into public.offline_packs (route_id, stage_id, kind, format, version, url, size_bytes) values
   ('20000000-0000-0000-0000-000000000001', '40000000-0000-0000-0000-000000000001', 'tiles', 'pmtiles', 1,
-   'r2://caminoplus-packs/camino-frances/stage-01/tiles-v1.pmtiles', 3145728)
+   'supabase://offline-packs/camino-frances/stage-01/tiles-v1.pmtiles', 3145728)
 on conflict do nothing;
