@@ -504,9 +504,8 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
 .un { font-family: var(--cp-font-title); font-weight: 600; font-size: 24px; letter-spacing: -.3px; }
 .cp-edit-pill { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 11px; border-radius: var(--cp-radius-pill); background: var(--cp-surface); box-shadow: inset 0 0 0 1px var(--cp-border-strong); font-family: var(--cp-font-mono); font-size: 11px; line-height: 1; color: var(--cp-text-muted); white-space: nowrap; cursor: pointer; }
 .cp-edit-pill .cp-icon { width: 13px; height: 13px; stroke-width: 2.2px; color: var(--cp-text); }
-.cp-fab-write { display: inline-flex; align-items: center; gap: 10px; height: 56px; padding: 0 24px 0 20px; border-radius: var(--cp-radius-pill); background: var(--cp-color-gold); color: var(--cp-color-blue); border: 0; font: 700 16px/1 var(--cp-font-body); box-shadow: var(--cp-shadow-gold); cursor: pointer; }
-.cp-fab-write .cp-icon { width: 22px; height: 22px; stroke-width: 2.2px; }
-.cp-fab-write.mini { width: 56px; padding: 0; justify-content: center; }
+.cp-fab-write { display: inline-flex; align-items: center; justify-content: center; width: 60px; height: 60px; padding: 0; border-radius: var(--cp-radius-pill); background: var(--cp-color-gold); color: var(--cp-color-blue); border: 0; font: 700 16px/1 var(--cp-font-body); box-shadow: var(--cp-shadow-gold); cursor: pointer; }
+.cp-fab-write .cp-icon { width: 26px; height: 26px; stroke-width: 2.2px; }
 .phone .fab-slot { position: absolute; right: 20px; bottom: 116px; z-index: 6; }
 /* lightbox */
 .cp-scrim { position: absolute; inset: 0; background: rgba(12,35,64,.66); backdrop-filter: blur(3px); z-index: 8; }
@@ -1272,8 +1271,8 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
       <div style="display:flex;align-items:center;gap:10px"><span class="un">ana.camina</span><span class="cp-edit-pill"><svg class="cp-icon "><use href="#i-pencil"/></svg>camino.plus/ana</span></div>
     </div>
     <div class="panel">
-      <p class="spec" style="margin:0 0 16px">.cp-fab-write · gold, bottom-right above the tab bar (shrinks to .mini while scrolling)</p>
-      <div class="row"><button class="cp-fab-write"><svg class="cp-icon "><use href="#i-pencil"/></svg>Write</button><button class="cp-fab-write mini" aria-label="Write"><svg class="cp-icon "><use href="#i-pencil"/></svg></button></div>
+      <p class="spec" style="margin:0 0 16px">.cp-fab-write · gold, 60 round, pen icon only, bottom-right above the tab bar</p>
+      <div class="row"><button class="cp-fab-write" aria-label="Write a journey post"><svg class="cp-icon "><use href="#i-pencil"/></svg></button></div>
     </div>
   </div>
 
@@ -1450,7 +1449,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
             <div class="acts"><span><svg class="cp-icon sm"><use href="#i-heart"/></svg>Buen Camino</span><span><svg class="cp-icon sm"><use href="#i-chat"/></svg>Comment</span><span><svg class="cp-icon sm"><use href="#i-share"/></svg>Share</span></div>
           </article>
         </div>
-        <div class="fab-slot"><button class="cp-fab-write" aria-label="Write a journey post"><svg class="cp-icon "><use href="#i-pencil"/></svg>Write</button></div>
+        <div class="fab-slot"><button class="cp-fab-write" aria-label="Write a journey post"><svg class="cp-icon "><use href="#i-pencil"/></svg></button></div>
         <div class="tabdock"><nav class="cp-tabbar">
           <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
