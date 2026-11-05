@@ -164,7 +164,7 @@ def page(slug, title, desc, body, active=None, jsonld=None):
 
 def cta(title="Your Camino starts with one download.", sub="CaminoPlus launches on iPhone and Android. Leave your email with us and we will tell you the day it is live."):
     return f'''<section class="section" id="download">
-  <div class="wrap"><div class="band cta">
+  <div class="wrap"><div class="band band-cathedral cta">
     <p class="script" style="color:var(--cp-color-gold-bright)">Buen Camino</p>
     <h2 style="margin-top:12px">{title}</h2>
     <p class="lead" style="margin:16px auto 0">{sub}</p>
@@ -294,7 +294,7 @@ def home():
     routes = "".join(f'<li><a class="btn btn-ghost" href="/routes">{n}</a></li>' for n, *_ in ROUTES[:8])
     faq_short = [FAQ[1][2][0], FAQ[2][2][0], FAQ[1][2][1], FAQ[6][2][1]]
     qa = "".join(f'<details class="qa"><summary>{q}</summary><div class="ans">{a}</div></details>' for q, a in faq_short)
-    body = f'''<section class="hero"><div class="wrap hero-grid">
+    body = f'''<section class="hero hero-photo"><div class="wrap hero-grid">
   <div class="hero-copy">
     <p class="script">Buen Camino</p>
     <h1 class="display">Every step of the Way, <em>even offline.</em></h1>
@@ -349,7 +349,7 @@ def home():
   </article>
 </div></section>
 
-<section class="section tight"><div class="wrap"><div class="band"><div class="band-grid">
+<section class="section tight"><div class="wrap"><div class="band band-hills"><div class="band-grid">
   <div class="stack-lg">
     <p class="eyebrow">Offline-first</p>
     <h2>Built for the hills where your signal disappears.</h2>

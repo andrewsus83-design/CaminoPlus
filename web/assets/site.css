@@ -117,6 +117,15 @@ p { margin: 0; }
 @media (min-width: 900px) { .hero { padding: 72px 0 112px; } }
 .hero-grid { display: grid; gap: 48px; align-items: center; }
 @media (min-width: 960px) { .hero-grid { grid-template-columns: 1.05fr 1fr; gap: 32px; } }
+/* photo backgrounds (AI-generated, see README) */
+.hero-photo { position: relative; isolation: isolate; }
+.hero-photo::before { content: ""; position: absolute; inset: 0; z-index: -2; background: url(/assets/photos/meseta-wheat.webp) center 62% / cover no-repeat; }
+.hero-photo::after { content: ""; position: absolute; inset: 0; z-index: -1;
+  background: linear-gradient(180deg, rgba(246,239,226,.93) 0%, rgba(246,239,226,.80) 55%, var(--cp-color-parchment) 100%); }
+@media (min-width: 960px) {
+  .hero-photo::after { background: linear-gradient(90deg, rgba(246,239,226,.97) 0%, rgba(246,239,226,.90) 42%, rgba(246,239,226,.35) 78%, rgba(246,239,226,.20) 100%),
+    linear-gradient(180deg, rgba(246,239,226,0) 72%, var(--cp-color-parchment) 100%); }
+}
 .hero .display em { font-style: italic; color: var(--cp-color-gold-ink); }
 .hero-copy > * + * { margin-top: 24px; }
 .hero-copy .stores { margin-top: 36px; }
@@ -179,6 +188,9 @@ p { margin: 0; }
 .band h2, .band h3, .band h4 { color: var(--cp-color-parchment); }
 .band .lead, .band .muted { color: #C9D3E0; }
 .band .eyebrow { color: var(--cp-color-gold-bright); }
+.band-hills { background: linear-gradient(90deg, rgba(20,54,93,.93) 0%, rgba(20,54,93,.80) 50%, rgba(20,54,93,.70) 100%), url(/assets/photos/pyrenees-ridge.webp) center 35% / cover no-repeat, var(--cp-color-blue); }
+.band-cathedral { background: linear-gradient(180deg, rgba(20,54,93,.82) 0%, rgba(20,54,93,.88) 100%), url(/assets/photos/santiago-cathedral.webp) center 30% / cover no-repeat, var(--cp-color-blue); }
+.band-hills .stat { background: rgba(20,54,93,.55); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
 .band-grid { display: grid; gap: 40px; align-items: center; }
 @media (min-width: 900px) { .band-grid { grid-template-columns: 1.1fr 1fr; gap: 64px; } }
 .stat-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
