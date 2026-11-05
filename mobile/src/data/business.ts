@@ -41,7 +41,7 @@ export type Draft = {
 };
 
 export const emptyDraft: Draft = {
-  type: 'albergue_private', name: '', address: '', photos: [], amenities: ['Wi-Fi'], hours: '12:00 – 22:00',
+  type: '', name: '', address: '', photos: [], amenities: ['Wi-Fi'], hours: '12:00 – 22:00',
   priceBed: '', priceRoom: '', booking: ['whatsapp'], taxId: '', proof: null,
 };
 

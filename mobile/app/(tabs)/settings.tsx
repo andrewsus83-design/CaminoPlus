@@ -1,10 +1,11 @@
-import { Pressable, View } from 'react-native';
+import { useState } from 'react';
+import { View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Screen } from '@/components/Screen';
 import { AppText } from '@/components/AppText';
 import { Card, SectionLabel } from '@/components/ui';
-import { Icon } from '@/components/Icon';
-import { Badge } from '@/features/business/ui';
+import { BusinessCard, IntroSheet } from '@/features/business/BusinessCard';
+import { useOwner } from '@/features/business/store';
 import { c, radius } from '@/theme';
 
 const rows = {
@@ -15,6 +16,14 @@ const rows = {
 
 export default function Settings() {
   const router = useRouter();
+  const owner = useOwner();
+  const [sheet, setSheet] = useState(false);
+  const openCard = () => {
+    if (owner.state === 'none') setSheet(true);
+    else if (owner.state === 'draft' || owner.state === 'changes_requested') router.push('/business/register');
+    else if (owner.state === 'in_review') router.push('/business/status');
+    else router.push('/business/dashboard');
+  };
   return (
     <Screen>
       <AppText variant="h2">Settings</AppText>
@@ -42,22 +51,11 @@ export default function Settings() {
       ))}
       <View style={{ gap: 8 }}>
         <SectionLabel>For business</SectionLabel>
-        <Card style={{ padding: 4 }}>
-          <Pressable accessibilityRole="button" onPress={() => router.push('/business')} style={{ flexDirection: 'row', alignItems: 'center', gap: 14, padding: 16 }}>
-            <Icon name="briefcase" color={c.blue} />
-            <View style={{ flex: 1 }}>
-              <AppText variant="label">List your business</AppText>
-              <AppText variant="caption" muted>Albergue, hotel, café, shop or service</AppText>
-            </View>
-            <Badge label="Free" tone="gold" />
-          </Pressable>
-          <Pressable accessibilityRole="button" onPress={() => router.push('/business/dashboard')} style={{ flexDirection: 'row', alignItems: 'center', gap: 14, padding: 16, borderTopWidth: 1, borderTopColor: c.sand300 }}>
-            <Icon name="shield" color={c.blue} />
-            <AppText variant="label" style={{ flex: 1 }}>My business dashboard</AppText>
-            <Icon name="chevron" color={c.stone600} size={20} />
-          </Pressable>
-        </Card>
+        <BusinessCard state={owner.state} name={owner.draft.name} stepsDone={owner.stepsDone} onPress={openCard} />
       </View>
+      <IntroSheet visible={sheet} onClose={() => setSheet(false)}
+        onStart={() => { setSheet(false); router.push('/business/register'); }}
+        onClaim={() => { setSheet(false); router.push('/business/register?claim=1'); }} />
     </Screen>
   );
 }

@@ -7,6 +7,8 @@ import { Icon } from '@/components/Icon';
 import { Card, Chip, IconButton, Photo } from '@/components/ui';
 import { Stay, stays } from '@/data/mock';
 import { Badge } from '@/features/business/ui';
+import { BusinessFeedCard } from '@/features/business/BusinessCard';
+import { ownerStore, useOwner } from '@/features/business/store';
 import { c, radius, role } from '@/theme';
 
 const FILTERS = ['All', 'Albergue', 'Hotel', 'Café'] as const;
@@ -43,6 +45,8 @@ function StayCard({ s, fav, onFav }: { s: Stay; fav: boolean; onFav: () => void 
 }
 
 export default function Stays() {
+  const router = useRouter();
+  const owner = useOwner();
   const [q, setQ] = useState('');
   const [filter, setFilter] = useState<(typeof FILTERS)[number]>('All');
   const [favs, setFavs] = useState<Set<string>>(new Set());
@@ -63,7 +67,14 @@ export default function Stays() {
         {FILTERS.map((f) => (<Chip key={f} label={f} selected={filter === f} onPress={() => setFilter(f)} />))}
         <View style={{ width: 16 }} />
       </ScrollView>
-      {list.map((s) => (<StayCard key={s.id} s={s} fav={favs.has(s.id)} onFav={() => toggle(s.id)} />))}
+      {list.map((s, i) => (
+        <View key={s.id} style={{ gap: 16 }}>
+          <StayCard s={s} fav={favs.has(s.id)} onFav={() => toggle(s.id)} />
+          {i === 1 && owner.state === 'none' && !owner.feedCardHidden && (
+            <BusinessFeedCard onPress={() => router.push('/business')} onDismiss={ownerStore.hideFeedCard} />
+          )}
+        </View>
+      ))}
       {list.length === 0 && <AppText muted>Nothing matches. Try another search.</AppText>}
     </Screen>
   );
