@@ -1,10 +1,10 @@
 # Offline map packs: build, measure, test offline rendering, and (on schedule or
-# by hand) publish to Cloudflare R2 + register in Supabase offline_packs.
+# by hand) publish to Supabase Storage (R2 later) + register in offline_packs.
 #
 # - pull_request touching tools/offline-maps: build stage 1 in several corridor
 #   widths / zooms, report the real sizes, prove the pack renders offline. No upload.
 # - schedule (monthly) / workflow_dispatch: same build, then publish the default
-#   variant if the R2 secrets exist (fresh OSM data each month).
+#   variant if the Supabase secrets exist (fresh OSM data each month).
 name: offline-maps
 
 on:
@@ -17,7 +17,7 @@ on:
   workflow_dispatch:
     inputs:
       publish:
-        description: 'Upload to R2 and register in Supabase'
+        description: 'Upload the pack and register it in Supabase'
         type: boolean
         default: false
 
@@ -107,19 +107,21 @@ jobs:
             tools/offline-maps/dist/
           retention-days: 14
 
-      - name: Publish to R2 and register in Supabase
+      - name: Publish (Supabase Storage now, R2 later) and register in Supabase
         if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.publish)
         env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          # Set the repo variable PACK_TARGET=r2 (plus the R2 secrets) after the move to Cloudflare.
+          PACK_TARGET: ${{ vars.PACK_TARGET || 'supabase' }}
           R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
           R2_BUCKET: ${{ vars.R2_BUCKET || 'caminoplus-packs' }}
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
-          if [ -z "$R2_ACCOUNT_ID" ]; then
-            echo "R2 secrets not set; skipping upload" | tee -a "$GITHUB_STEP_SUMMARY"
-            node scripts/publish_pack.mjs dist/camino-frances-01-3km-z15.json --dry-run
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_SERVICE_ROLE_KEY" ]; then
+            echo "SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY secrets not set; skipping upload" | tee -a "$GITHUB_STEP_SUMMARY"
+            node scripts/publish_pack.mjs dist/camino-frances-01-3km-z15.json --target "$PACK_TARGET" --dry-run
             exit 0
           fi
-          node scripts/publish_pack.mjs dist/camino-frances-01-3km-z15.json
+          node scripts/publish_pack.mjs dist/camino-frances-01-3km-z15.json --target "$PACK_TARGET"

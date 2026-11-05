@@ -1,11 +1,13 @@
 // deno test --allow-net --allow-env --allow-run --allow-read supabase/functions/offline-pack-url/index.test.ts
 //
 // Runs the function against a fake Supabase (auth + PostgREST) on localhost and
-// checks: free user -> 403, subscriber -> presigned R2 URL, unknown pack -> 404,
+// checks: free user -> 403, subscriber -> signed Storage or presigned R2 URL, unknown pack -> 404,
 // no token -> 401. No real Supabase or R2 needed.
 import { assert, assertEquals, assertMatch } from 'jsr:@std/assert@1';
 
-const PACK = '11111111-1111-4111-8111-111111111111';
+const PACK = '11111111-1111-4111-8111-111111111111'; // on R2
+const SB_PACK = '33333333-3333-4333-8333-333333333333'; // on Supabase Storage
+const KEY = 'camino-frances/stage-01/tiles-v20261103.pmtiles';
 const users: Record<string, { plus: boolean }> = { 'tok-free': { plus: false }, 'tok-plus': { plus: true } };
 
 const fake = Deno.serve({ port: 54399, onListen() {} }, (req) => {
@@ -20,10 +22,18 @@ const fake = Deno.serve({ port: 54399, onListen() {} }, (req) => {
   }
   if (u.pathname === '/rest/v1/offline_packs') {
     // RLS: only CaminoPlus users see rows.
-    const rows = who?.plus && u.searchParams.get('id') === `eq.${PACK}`
-      ? [{ id: PACK, kind: 'tiles', format: 'pmtiles', version: 20261103, url: 'r2://caminoplus-packs/camino-frances/stage-01/tiles-v20261103.pmtiles', size_bytes: 3145728, sha256: 'ab'.repeat(32), is_current: true }]
+    const id = u.searchParams.get('id');
+    const base = { kind: 'tiles', format: 'pmtiles', version: 20261103, size_bytes: 3145728, sha256: 'ab'.repeat(32), is_current: true };
+    const rows = !who?.plus ? []
+      : id === `eq.${PACK}` ? [{ ...base, id: PACK, url: `r2://caminoplus-packs/${KEY}` }]
+      : id === `eq.${SB_PACK}` ? [{ ...base, id: SB_PACK, url: `supabase://offline-packs/${KEY}` }]
       : [];
     return Response.json(rows);
+  }
+  if (u.pathname === `/storage/v1/object/sign/offline-packs/${KEY}`) {
+    // Only the service role may sign.
+    if (tok !== 'service') return new Response('{"message":"unauthorized"}', { status: 403 });
+    return Response.json({ signedURL: `/object/sign/offline-packs/${KEY}?token=signed-token` });
   }
   return new Response('not mocked: ' + u.pathname, { status: 500 });
 });
@@ -31,7 +41,7 @@ const fake = Deno.serve({ port: 54399, onListen() {} }, (req) => {
 const fn = new Deno.Command(Deno.execPath(), {
   args: ['run', '--allow-net', '--allow-env', new URL('./index.ts', import.meta.url).pathname],
   env: {
-    SUPABASE_URL: 'http://127.0.0.1:54399', SUPABASE_ANON_KEY: 'anon',
+    SUPABASE_URL: 'http://127.0.0.1:54399', SUPABASE_ANON_KEY: 'anon', SUPABASE_SERVICE_ROLE_KEY: 'service',
     R2_ACCOUNT_ID: 'acct123', R2_ACCESS_KEY_ID: 'AKIDEXAMPLE', R2_SECRET_ACCESS_KEY: 'secret', R2_BUCKET: 'caminoplus-packs',
   },
   stdout: 'null', stderr: 'inherit',
@@ -68,6 +78,13 @@ Deno.test({ name: 'offline-pack-url', sanitizeOps: false, sanitizeResources: fal
     });
     await t.step('unknown pack -> 404', async () => {
       assertEquals((await call('tok-plus', { pack_id: '22222222-2222-4222-8222-222222222222' })).status, 404);
+    });
+    await t.step('subscriber, Supabase Storage pack -> signed Storage URL', async () => {
+      const r = await call('tok-plus', { pack_id: SB_PACK });
+      assertEquals(r.status, 200);
+      const u = new URL(r.body.url);
+      assertEquals(u.pathname, `/storage/v1/object/sign/offline-packs/${KEY}`);
+      assertEquals(u.searchParams.get('token'), 'signed-token');
     });
     await t.step('subscriber -> presigned R2 URL', async () => {
       const r = await call('tok-plus', { pack_id: PACK });
