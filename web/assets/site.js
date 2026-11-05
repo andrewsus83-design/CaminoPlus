@@ -6,12 +6,14 @@
   if (btn && menu) {
     btn.addEventListener('click', function () {
       var open = menu.classList.toggle('open');
+      if (header) header.classList.toggle('menu-open', open);
       btn.setAttribute('aria-expanded', open ? 'true' : 'false');
       btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
     });
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape' && menu.classList.contains('open')) {
         menu.classList.remove('open');
+        if (header) header.classList.remove('menu-open');
         btn.setAttribute('aria-expanded', 'false');
         btn.focus();
       }

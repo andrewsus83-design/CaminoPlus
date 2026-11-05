@@ -85,15 +85,18 @@ p { margin: 0; }
 /* ---------- header ---------- */
 .site-header {
   position: sticky; top: 0; z-index: 50;
-  background: rgba(246, 239, 226, 0.88); backdrop-filter: saturate(1.4) blur(14px); -webkit-backdrop-filter: saturate(1.4) blur(14px);
-  border-bottom: 1px solid transparent; transition: border-color var(--cp-duration-base);
+  background: transparent; border-bottom: 1px solid transparent;
+  transition: background-color var(--cp-duration-base), border-color var(--cp-duration-base), backdrop-filter var(--cp-duration-base);
+}
+.site-header.scrolled, .site-header.menu-open {
+  background: rgba(246, 239, 226, 0.92); backdrop-filter: saturate(1.4) blur(14px); -webkit-backdrop-filter: saturate(1.4) blur(14px);
 }
 .site-header.scrolled { border-bottom-color: var(--cp-color-sand-300); }
 .nav { display: flex; align-items: center; justify-content: space-between; height: 72px; gap: 16px; }
-.brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; font-family: var(--cp-font-title); font-weight: 700; font-size: 25px; letter-spacing: -0.02em; color: var(--cp-color-ink-strong); }
-.brand-mark { width: 34px; height: 34px; flex: none; }
+.brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; font-family: var(--cp-font-title); font-weight: 700; font-size: 30px; letter-spacing: -0.02em; color: var(--cp-color-ink-strong); }
+.brand-mark { width: 42px; height: 42px; flex: none; }
 .brand .plus { color: var(--cp-color-gold); font-family: var(--cp-font-body); font-weight: 700; font-size: 1.12em; line-height: 1; margin-left: 1px; -webkit-text-stroke: 0.9px currentColor; position: relative; top: -0.12em; }
-.nav-links { display: none; list-style: none; margin: 0; padding: 0; gap: 4px; }
+.nav-links { display: none; list-style: none; margin: 0 0 0 auto; padding: 0; gap: 4px; }
 .nav-links a { display: block; padding: 10px 14px; border-radius: 999px; text-decoration: none; font-weight: 500; font-size: 15px; color: var(--cp-color-ink); }
 .nav-links a:hover { background: var(--cp-color-sand-200); }
 .nav-links a[aria-current="page"] { background: var(--cp-color-gold-soft); color: var(--cp-color-ink-strong); font-weight: 600; }
@@ -105,7 +108,7 @@ p { margin: 0; }
 .mobile-nav ul { list-style: none; margin: 0; padding: 0; }
 .mobile-nav a { display: block; padding: 14px 4px; font-family: var(--cp-font-title); font-size: 24px; font-weight: 600; text-decoration: none; border-bottom: 1px solid var(--cp-color-sand-200); }
 .mobile-nav a[aria-current="page"] { color: var(--cp-color-gold-ink); }
-.mobile-nav .btn { margin-top: 20px; width: 100%; }
+.mobile-nav .btn { display: flex; align-items: center; justify-content: center; min-height: 52px; margin-top: 20px; width: 100%; font-family: var(--cp-font-body); font-size: 17px; font-weight: 600; border-bottom: 0; padding: 0 24px; }
 @media (min-width: 1080px) {
   .nav-links { display: flex; }
   .nav-cta { display: inline-flex; min-height: 46px; }
@@ -118,7 +121,8 @@ p { margin: 0; }
 .hero-grid { display: grid; gap: 48px; align-items: center; }
 @media (min-width: 960px) { .hero-grid { grid-template-columns: 1.05fr 1fr; gap: 32px; } }
 /* photo backgrounds (AI-generated, see README) */
-.hero-photo { position: relative; isolation: isolate; }
+.hero-photo { position: relative; isolation: isolate; margin-top: -72px; padding-top: 112px; }
+@media (min-width: 900px) { .hero-photo { padding-top: 144px; } }
 .hero-photo::before { content: ""; position: absolute; inset: 0; z-index: -2; background: url(/assets/photos/meseta-wheat.webp) center 62% / cover no-repeat; }
 .hero-photo::after { content: ""; position: absolute; inset: 0; z-index: -1;
   background: linear-gradient(180deg, rgba(246,239,226,.93) 0%, rgba(246,239,226,.80) 55%, var(--cp-color-parchment) 100%); }
