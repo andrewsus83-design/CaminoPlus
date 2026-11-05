@@ -6,7 +6,7 @@ import { c, radius } from '@/theme';
 
 const rows = {
   Account: [['Email', 'ana@example.com'], ['Password', 'Change']],
-  'Plan and storage': [['CaminoPlus', '$11.99 / year'], ['Extra storage', '$5 per 5 GB / year']],
+  'Plan and storage': [['CaminoPlus', '$12 / year'], ['Extra storage', '$5 per 5 GB / year']],
   Devices: [['Apple Watch', 'Connect'], ['Garmin', 'Connect']],
 } as const;
 
