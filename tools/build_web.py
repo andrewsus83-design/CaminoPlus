@@ -112,7 +112,7 @@ FOOTER = f'''<footer class="site-footer">
     </div>
   </div>
 </footer>
-<script src="/assets/site.js" defer></script>'''
+<script src="/assets/site.js?v=20261105" defer></script>'''
 
 def page(slug, title, desc, body, active=None, jsonld=None):
     path = "/" if slug == "index" else f"/{slug}"
@@ -148,7 +148,7 @@ def page(slug, title, desc, body, active=None, jsonld=None):
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="/assets/tokens.css">
-<link rel="stylesheet" href="/assets/site.css">{ld}
+<link rel="stylesheet" href="/assets/site.css?v=20261105">{ld}
 </head>
 <body>
 {header(active)}
