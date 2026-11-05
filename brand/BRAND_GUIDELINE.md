@@ -64,7 +64,7 @@ The source of truth for colours, type and spacing in code is [`design/tokens.jso
 | walk, pilgrimage, the Way, stage, albergue, stay | trip package, tour, hack, crush it |
 | offline, no signal needed, works on the trail | revolutionary, game-changing, AI-powered (unless it really is) |
 | ~ (approximate) for distances | exact claims we haven't verified |
-| "from $11.99 a year" | "cheap", "free" (only the free tier is free) |
+| "from $12 a year" | "cheap", "free" (only the free tier is free) |
 
 **Taglines and lines we can reuse**
 
@@ -231,7 +231,7 @@ The look is **natural documentary travel photography**: true-to-life colour, sof
 ## 10. Legal and honesty basics
 
 - Distances and stage counts are approximate; write "~" as on the website.
-- Pricing: "$11.99 a year" for Pilgrim Plus; free tier exists. Don't invent discounts.
+- Pricing: "$12 a year" for Pilgrim Plus; free tier exists. Don't invent discounts.
 - Partner or paid posts must be marked (#ad / "Paid partnership" label).
 - Respect location rules: no drone footage in restricted areas, no filming inside churches during services.
 - Credit photographers and UGC; keep the permission screenshot in the content folder.

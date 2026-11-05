@@ -71,7 +71,7 @@ Have you walked here? Tell us below.
 [Problem in pilgrim words]
 [How CaminoPlus solves it, one sentence]
 [How it works: 2–3 short steps]
-[Status: "Coming soon" | "Free to start, Pilgrim Plus $11.99/yr"]
+[Status: "Coming soon" | "Free to start, Pilgrim Plus $12/yr"]
 [CTA: Tap the link in bio to get notified at launch]
 
 [hashtags]

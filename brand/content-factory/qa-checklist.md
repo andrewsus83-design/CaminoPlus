@@ -9,7 +9,7 @@
 **Facts and honesty**
 - [ ] Distances, stages, dates checked against a reliable source; approximate figures use "~"
 - [ ] No feature shown that doesn't exist; "coming soon" stated where true
-- [ ] Price is "$11.99 a year" (Pilgrim Plus) or free tier; no invented offers
+- [ ] Price is "$12 a year" (Pilgrim Plus) or free tier; no invented offers
 - [ ] No fake reviews, quotes or statistics
 - [ ] AI image of a real place is checked and labelled "AI illustration"
 - [ ] UGC: written permission saved, @credit in the first line
