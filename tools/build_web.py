@@ -539,7 +539,7 @@ def offline():
               ("pin", "Points of interest", "Churches, fountains, pharmacies and more, with their stories.")]
     ins = "".join(f'<article class="card"><span class="ic">{icon(a)}</span><h4>{b}</h4><p>{c}</p></article>' for a, b, c in inside)
     body = head("Offline maps", "Signal drops. Your map doesn't.",
-        "Large parts of the Camino have weak or no mobile signal. CaminoPlus is built offline-first, so a full walking day works with your phone in airplane mode.")
+        "Large parts of the Camino have weak or no mobile signal. CaminoPlus is built offline-first, so a full walking day works with your phone in airplane mode.", photo="offline-waymarker-hiker", pos="center 78%", posm="72% center")
     body += f'''<section class="section" style="padding-top:32px"><div class="wrap">
   <div class="head"><p class="eyebrow">How it works</p><h2>Four steps, then just walk.</h2></div>
   <div class="steps">{st}</div>
@@ -586,7 +586,7 @@ def faq():
         {"@type": "Question", "name": a, "acceptedAnswer": {"@type": "Answer", "text": re.sub("<[^>]+>", "", b).replace("&amp;", "&")}}
         for _, _, qs in FAQ for a, b in qs]}
     body = head("FAQ", "Questions, answered.",
-        "Offline use, pricing, storage, privacy, smartwatches, routes and more. Can't find yours? <a href=\"/contact\">Ask us</a>.")
+        "Offline use, pricing, storage, privacy, smartwatches, routes and more. Can't find yours? <a href=\"/contact\">Ask us</a>.", photo="faq-boots-arrow", pos="center 60%", posm="40% center")
     body += f'''<section class="section" style="padding-top:24px"><div class="wrap faq-layout">
   <nav class="faq-toc" aria-label="FAQ topics"><ul>{toc}</ul></nav>
   <div>{groups}</div>
@@ -625,7 +625,7 @@ def about():
 
 def contact():
     body = head("Contact", "Say hola.",
-        "Questions, feedback, a listing to fix or a partnership idea. We read everything.")
+        "Questions, feedback, a listing to fix or a partnership idea. We read everything.", photo="contact-backpack-church", pos="center 40%", posm="70% center")
     body += f'''<section class="section" style="padding-top:24px"><div class="wrap">
   <div class="grid c2" style="gap:32px;align-items:start">
     <form class="card pad-lg stack-lg" id="contact-form">
