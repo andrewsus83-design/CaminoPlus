@@ -317,7 +317,7 @@ def home():
 </ul></div></section>
 
 <section class="section"><div class="wrap">
-  <div class="head"><p class="eyebrow">Five tabs, one app</p><h2>Everything a pilgrim needs, in the bottom bar.</h2>
+  <div class="head center"><p class="eyebrow">Five tabs, one app</p><h2>Everything a pilgrim needs, in the bottom bar.</h2>
   <p class="lead" style="margin-top:16px">No more switching between a map app, a booking site, a notes app and a photo album. CaminoPlus keeps the whole Camino in five tabs.</p></div>
   <div class="grid c3">{tabs}
     <article class="card pad-lg stack" style="background:var(--cp-color-gold-wash);border-color:var(--cp-color-gold-soft)">
