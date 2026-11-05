@@ -93,7 +93,7 @@ p { margin: 0; }
 .brand { display: inline-flex; align-items: baseline; text-decoration: none; color: var(--cp-color-ink-strong); line-height: 1; }
 .brand-word { display: inline-flex; align-items: baseline; font-family: var(--cp-font-title); font-weight: 700; font-size: 28px; letter-spacing: -0.02em; }
 /* the shell icon stands in for the "o" */
-.brand-o { width: 0.66em; height: 0.66em; margin-left: 0.04em; flex: none; align-self: baseline; transform: translateY(0.06em); }
+.brand-o { width: 0.64em; height: 0.64em; margin-left: 0.02em; flex: none; align-self: baseline; overflow: visible; transform: translateY(0.07em); }
 .brand-o .o-bg { fill: var(--cp-color-blue); }
 .brand-o .o-shell { fill: var(--cp-color-gold); }
 .brand-o .o-ray { stroke: var(--cp-color-blue); }

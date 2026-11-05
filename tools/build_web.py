@@ -46,7 +46,7 @@ def icon(name, cls=""):
     c = f' class="{cls}"' if cls else ""
     return f'<svg{c} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{I[name]}</svg>'
 
-MARK = ('<svg class="brand-o" viewBox="0 0 40 40" aria-hidden="true">'
+MARK = ('<svg class="brand-o" viewBox="-2 -2 44 44" aria-hidden="true">'
         '<circle class="o-bg" cx="20" cy="20" r="20"/>'
         '<path class="o-shell" d="M20 31 9.5 14.5a12.5 12.5 0 0 1 21 0z"/>'
         '<path class="o-ray" d="M20 31 13 13.2M20 31l-2.6-19.4M20 31l2.6-19.4M20 31l7-17.8" stroke-width="1.6" stroke-linecap="round" fill="none"/>'
