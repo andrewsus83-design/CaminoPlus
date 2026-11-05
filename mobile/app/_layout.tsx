@@ -8,18 +8,53 @@ import { Fraunces_600SemiBold } from '@expo-google-fonts/fraunces';
 import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold } from '@expo-google-fonts/inter';
 import { JetBrainsMono_400Regular } from '@expo-google-fonts/jetbrains-mono';
 import { Caveat_700Bold } from '@expo-google-fonts/caveat';
+import { AuthProvider, useAuth } from '@/lib/auth';
 import { role } from '@/theme';
 
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({ Fraunces_600SemiBold, Inter_400Regular, Inter_500Medium, Inter_600SemiBold, JetBrainsMono_400Regular, Caveat_700Bold });
-  useEffect(() => { if (loaded || error) SplashScreen.hideAsync(); }, [loaded, error]);
   if (!loaded && !error) return null;
   return (
     <SafeAreaProvider>
-      <StatusBar style="dark" />
-      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: role.bg } }} />
+      <AuthProvider>
+        <StatusBar style="dark" />
+        <RootStack />
+      </AuthProvider>
     </SafeAreaProvider>
+  );
+}
+
+// Route guard: signed out -> (auth); signed in without a journey -> onboarding;
+// otherwise the app. auth-callback and reset-password are always reachable.
+function RootStack() {
+  const { ready, session, journey } = useAuth();
+  useEffect(() => { if (ready) SplashScreen.hideAsync(); }, [ready]);
+  if (!ready) return null;
+  const signedIn = !!session;
+  const onboarded = signedIn && !!journey;
+  return (
+    <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: role.bg } }}>
+      <Stack.Screen name="index" />
+      <Stack.Screen name="auth-callback" />
+      <Stack.Screen name="reset-password" />
+      <Stack.Protected guard={!signedIn}>
+        <Stack.Screen name="(auth)" />
+      </Stack.Protected>
+      <Stack.Protected guard={signedIn && !onboarded}>
+        <Stack.Screen name="onboarding" />
+      </Stack.Protected>
+      <Stack.Protected guard={onboarded}>
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="stay/[id]" />
+        <Stack.Screen name="write" />
+        <Stack.Screen name="inbox" />
+        <Stack.Screen name="business/index" />
+        <Stack.Screen name="business/register" />
+        <Stack.Screen name="business/status" />
+        <Stack.Screen name="business/dashboard" />
+      </Stack.Protected>
+    </Stack>
   );
 }
