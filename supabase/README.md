@@ -1,7 +1,7 @@
 # CaminoPlus database (Supabase)
 
 Postgres schema, row level security, storage buckets and RPCs for the CaminoPlus app.
-53 tables in `public` (plus 2 server-only tables in `private`), split by app area.
+62 tables in `public` (plus 2 server-only tables in `private`), split by app area.
 
 ```
 supabase/
@@ -17,8 +17,12 @@ supabase/
     ..._billing_storage.sql     RevenueCat subscription state, storage add-ons, quota, buckets
     ..._marketplace_phase2.sql  face-match photo marketplace (tables only, feature off)
     ..._rpc.sql                 search_stays, nearby_pois, complete_hunt_step, get_my_storage, ...
+    ..._offline_packs_bucket.sql private bucket for offline map packs
+    ..._business_owners.sql     business owners (Settings > List your business): businesses, members,
+                                listings + review workflow, proof of ownership, availability, replies, stats
   seed.sql                 reference data + a small Camino Frances sample
   dev/validate.sh          applies everything to a throwaway local Postgres and runs dev/rls_smoke.sql
+                           and dev/business_smoke.sql
 ```
 
 ## Auth: email and Google
@@ -190,7 +194,7 @@ erDiagram
   revenuecat_events }o..o| profiles : "webhook log"
 ```
 
-- `billing_products`: `plus_yearly` ($11.99/year, 5 GB) and `storage_5gb_yearly` ($5/year, +5 GB).
+- `billing_products`: `plus_yearly` ($12/year, 5 GB) and `storage_5gb_yearly` ($5/year, +5 GB).
 - `subscriptions` mirrors RevenueCat. Only the RevenueCat webhook edge function (service role) writes it,
   logging every event in `revenuecat_events` (event id is the primary key, so retries are harmless).
 - **Free = basic app**: 0 GB cloud storage and no offline route downloads. Everything else
@@ -268,3 +272,24 @@ supabase/dev/validate.sh    # migrations + seed + RLS smoke test (about 50 asser
 - Moderation workflow for posts and comments (tables and flags are ready).
 - Whether `is_premium` audio stories are gated (currently the URL is public).
 - Phase 2 marketplace: legal review of face matching before any of it is switched on.
+
+## Business owners (migration 12)
+
+Owners register their place from Settings > For business, Agoda-extranet style.
+
+1. `businesses` insert (creator becomes `owner` in `business_members`).
+2. Draft in `business_listings`: a new place, or `claim_stay(business, stay)` to claim one already in the app.
+3. Photos in `business_listing_photos` (files in public bucket `business-media/<business_id>/...`, at least 3)
+   and proof in `business_verifications` (files in private bucket `business-docs/<business_id>/...`).
+4. `submit_business_listing(listing)` checks location, address, contact, photos and proof, then sets `submitted`.
+5. The team calls `review_business_listing(listing, 'approve' | 'changes_requested' | 'reject' | 'suspend' | 'in_review', note)`
+   with the service role (not callable from the app). Approval copies the listing into `stays` with `business_id`,
+   `owner_verified_at` and the `verified_owner` label.
+6. After approval, description, contact, hours, prices, amenities and photos go live at once; changing name,
+   category, address or location sends the listing back to review while the old version stays live.
+
+Owners also set `stay_availability` (beds free / few left / full per day), reply to reviews in `stay_review_replies`,
+and read `business_stay_summary(stay)` (views, saves, contact taps from `track_stay_event`).
+Revenue hooks, not used yet: `businesses.plan`, `businesses.commission_rate`, `businesses.billing_customer_id`,
+`stays.listing_tier`, `stays.featured_until`. `stays.kind` now also has `service` (shops, pharmacies, bike and
+luggage services, tour operators).

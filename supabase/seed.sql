@@ -12,7 +12,7 @@ on conflict (key) do nothing;
 
 -- Billing products (prices are display/reference; stores are the source of truth)
 insert into public.billing_products (id, kind, name, price_cents, currency, billing_period, storage_bytes, revenuecat_entitlement, store_product_ids) values
-  ('plus_yearly', 'subscription', 'CaminoPlus yearly', 1199, 'USD', 'year', 5368709120, 'plus',
+  ('plus_yearly', 'subscription', 'CaminoPlus yearly', 1200, 'USD', 'year', 5368709120, 'plus',
      '{"app_store": "caminoplus_plus_yearly", "play_store": "caminoplus_plus_yearly"}'),
   ('storage_5gb_yearly', 'storage_addon', 'Extra 5 GB storage', 500, 'USD', 'year', 5368709120, null,
      '{"app_store": "caminoplus_storage_5gb_yearly", "play_store": "caminoplus_storage_5gb_yearly"}')

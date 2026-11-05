@@ -50,6 +50,10 @@ function RootStack() {
         <Stack.Screen name="stay/[id]" />
         <Stack.Screen name="write" />
         <Stack.Screen name="inbox" />
+        <Stack.Screen name="business/index" />
+        <Stack.Screen name="business/register" />
+        <Stack.Screen name="business/status" />
+        <Stack.Screen name="business/dashboard" />
       </Stack.Protected>
     </Stack>
   );

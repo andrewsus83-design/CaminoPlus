@@ -23,9 +23,9 @@ export const plan = [
   { id: 'p4', stage: 'Frómista → Carrión', km: 19.3, done: false },
 ];
 
-export type Stay = { id: string; name: string; kind: 'Albergue' | 'Hotel' | 'Café'; town: string; price: number | null; rating: number; reviews: number; distanceKm: number; label: string; tint: string };
+export type Stay = { id: string; name: string; kind: 'Albergue' | 'Hotel' | 'Café'; town: string; price: number | null; rating: number; reviews: number; distanceKm: number; label: string; tint: string; verifiedOwner?: boolean };
 export const stays: Stay[] = [
-  { id: 'st1', name: 'Albergue El Puntido', kind: 'Albergue', town: 'Hontanas', price: 14, rating: 4.8, reviews: 312, distanceKm: 0.3, label: 'Book by email', tint: tints[0] },
+  { id: 'st1', name: 'Albergue El Puntido', kind: 'Albergue', town: 'Hontanas', price: 14, rating: 4.8, reviews: 312, distanceKm: 0.3, label: 'Book by email', tint: tints[0], verifiedOwner: true },
   { id: 'st2', name: 'Hotel Camino Real', kind: 'Hotel', town: 'Burgos', price: 68, rating: 4.5, reviews: 128, distanceKm: 1.2, label: 'Instant booking', tint: tints[1] },
   { id: 'st3', name: 'Café El Peregrino', kind: 'Café', town: 'Castrojeriz', price: null, rating: 4.7, reviews: 96, distanceKm: 0.6, label: 'Opens 08:00', tint: tints[4] },
   { id: 'st4', name: 'Albergue San Antón', kind: 'Albergue', town: 'Castrojeriz', price: 12, rating: 4.6, reviews: 204, distanceKm: 0.9, label: 'WhatsApp', tint: tints[2] },
