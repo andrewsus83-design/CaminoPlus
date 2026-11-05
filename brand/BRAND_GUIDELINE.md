@@ -1,6 +1,6 @@
 # CaminoPlus Brand Guideline
 
-Version 1.0 · November 2026 · Scope: social media (Instagram, TikTok, Facebook), also valid for ads, app store screenshots and press.
+Version 1.0 · November 2026 · Scope: social media (Instagram, TikTok, Facebook, Pinterest, YouTube Shorts, Threads, X, WhatsApp Channel), also valid for ads, app store screenshots and press.
 
 The source of truth for colours, type and spacing in code is [`design/tokens.json`](../design/tokens.json). This document explains how to use them in content.
 
@@ -179,7 +179,10 @@ The look is **natural documentary travel photography**: true-to-life colour, sof
 | Feed portrait (IG, FB) | 1080 × 1350 | 60 px margin all sides |
 | Carousel slide | 1080 × 1350 | 60 px margin; keep slide number top right |
 | Reels / TikTok / Stories | 1080 × 1920 | Top 250 px and bottom 400 px empty; right 140 px empty (buttons) |
-| Square (FB, ads) | 1080 × 1080 | 60 px margin |
+| Square (FB, ads, WhatsApp) | 1080 × 1080 | 60 px margin |
+| Pinterest pin | 1000 × 1500 | 60 px margin; headline in top half; logo bottom centre |
+| YouTube Shorts | 1080 × 1920 | Same as Reels; bottom 450 px empty (title + buttons) |
+| X / Threads image | 1200 × 675 or 1080 × 1350 | 60 px margin |
 | Cover / grid crop | Centre 1080 × 1080 of a 1350 post | Hook must read in the square crop |
 
 **Layout rules**
@@ -237,7 +240,7 @@ The look is **natural documentary travel photography**: true-to-life colour, sof
 
 ## 11. Handles and bios (to set up)
 
-Handle: **@caminoplus** on all platforms if available (fallbacks: @camino.plus, @caminoplusapp).
+Handle: **@caminoplus** on all platforms if available (Instagram, TikTok, Facebook, Pinterest, YouTube, Threads, X, WhatsApp Channel, LinkedIn) (fallbacks: @camino.plus, @caminoplusapp).
 
 Bio (Instagram / TikTok, ≤150 chars):
 > The offline Camino de Santiago app 🐚 Maps, stays, passport and journal for every route. Buen Camino. ↓ Notify me at launch

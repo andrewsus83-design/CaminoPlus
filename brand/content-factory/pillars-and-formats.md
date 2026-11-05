@@ -41,6 +41,16 @@ Baseline for a small team (≈ 9 feed pieces + daily Stories per week). Each vid
 | Sat | F04 Trail Moment Reel (Inspire) | F09 Ask the Camino (reply video) | Reel | "Where are you walking from?" |
 | Sun | — (rest, or community reposts) | — | Weekly question post | Weekly recap |
 
+**Extra platforms each week** (mostly reused, see [`platforms.md`](platforms.md)):
+
+| Platform | Weekly |
+|---|---|
+| YouTube Shorts | Every Reel (3 to 4) |
+| Pinterest | 5 to 10 pins from Stage Cards, carousels, quotes |
+| Threads | 3 to 5 short tips / questions |
+| X | 2 to 3 (optional) |
+| WhatsApp Channel | 1 tip of the week, Monday (optional) |
+
 **Lite version** (if time is short): Mon F02, Wed F01, Thu F06, Sat F04 + 3 Stories a week.
 
 ## Seasonality

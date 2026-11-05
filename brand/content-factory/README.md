@@ -7,7 +7,7 @@ A repeatable system to plan, make and publish CaminoPlus social content every mo
  (pillars × cadence)   (1 per post)   (templates)    (checklist)  (Meta / TikTok)   (metrics → next month)
 ```
 
-Platforms: **Instagram** (main), **TikTok**, **Facebook**. Language: **English**.
+Platforms: **Instagram** (main), **TikTok**, **Facebook** (core), **Pinterest**, **YouTube Shorts**, **Threads** (growth, mostly reused content), **X**, **WhatsApp Channel** (optional). Playbook per platform: [`platforms.md`](platforms.md). Language: **English**.
 
 ---
 
@@ -40,7 +40,9 @@ Fill the **Post brief** in [`templates.md`](templates.md#1-post-brief) in the sh
 |---|---|
 | 1 Tip carousel (IG) | 1 TikTok "list" video · 1 FB post with the same list · 3 Stories (one tip each, with a poll) |
 | 1 Reel | Same video on TikTok (re-upload without watermark) and FB Reels · cover frame as a Story |
-| 1 Stage Card | Pin to a "Stages" Highlight · reuse inside a "Route guide" carousel later |
+| 1 Stage Card | Pin to a "Stages" Highlight · 2:3 Pinterest pin · reuse inside a "Route guide" carousel later |
+
+Full map across all platforms: [`platforms.md`](platforms.md#repurpose-map-1-piece--many-platforms).
 
 ## Step 4 · QA
 
@@ -48,7 +50,7 @@ Every post passes [`qa-checklist.md`](qa-checklist.md). Set the sheet status to 
 
 ## Step 5 · Schedule
 
-- Instagram + Facebook: Meta Business Suite (free). TikTok: TikTok Studio scheduler (free).
+- Instagram + Facebook: Meta Business Suite (free). TikTok: TikTok Studio scheduler (free). Pinterest and YouTube: their own schedulers (free). Threads/X: native scheduling. Or one paid tool for all (Buffer, Later, Metricool).
 - Best first-guess times (test and adjust): 07:00 to 09:00 and 18:00 to 21:00 in the audience time zone. Main audiences: US/Canada, UK/Ireland, Germany, Spain, Australia, Korea. Start with Europe evening (19:00 CET) + US morning (09:00 ET), then use your own insights after 4 weeks.
 - Status in sheet: `idea → brief → in production → ready → scheduled → published`.
 
