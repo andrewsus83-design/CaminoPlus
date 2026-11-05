@@ -8,7 +8,10 @@
     "userInterfaceStyle": "light",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "plus.camino.app"
+      "bundleIdentifier": "plus.camino.app",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -26,7 +29,22 @@
     "scheme": "caminoplus",
     "backgroundColor": "#F6EFE2",
     "plugins": [
-      "expo-router"
+      "expo-router",
+      "expo-asset",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "CaminoPlus uses your location to show where you are on the Camino, how far you have walked and what is near you, also offline.",
+          "isIosBackgroundLocationEnabled": false,
+          "isAndroidBackgroundLocationEnabled": false,
+          "isAndroidForegroundServiceEnabled": false
+        }
+      ],
+      [
+        "@maplibre/maplibre-react-native",
+        {}
+      ],
+      "expo-dev-client"
     ],
     "experiments": {
       "typedRoutes": false

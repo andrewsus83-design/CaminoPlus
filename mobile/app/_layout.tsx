@@ -9,9 +9,14 @@ import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold } from '@expo-goog
 import { JetBrainsMono_400Regular } from '@expo-google-fonts/jetbrains-mono';
 import { Caveat_700Bold } from '@expo-google-fonts/caveat';
 import { AuthProvider, useAuth } from '@/lib/auth';
+import { setMapSession } from '@/features/map';
+import { supabase } from '@/lib/supabase';
 import { role } from '@/theme';
 
 SplashScreen.preventAutoHideAsync();
+
+// The map module gets the login token through this one function (offline pack downloads).
+setMapSession({ getAccessToken: async () => (await supabase.auth.getSession()).data.session?.access_token ?? null });
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({ Fraunces_600SemiBold, Inter_400Regular, Inter_500Medium, Inter_600SemiBold, JetBrainsMono_400Regular, Caveat_700Bold });
@@ -50,6 +55,7 @@ function RootStack() {
         <Stack.Screen name="stay/[id]" />
         <Stack.Screen name="write" />
         <Stack.Screen name="inbox" />
+        <Stack.Screen name="offline-maps" />
         <Stack.Screen name="business/index" />
         <Stack.Screen name="business/register" />
         <Stack.Screen name="business/status" />
