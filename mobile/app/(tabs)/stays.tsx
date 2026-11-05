@@ -6,6 +6,7 @@ import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
 import { Card, Chip, IconButton, Photo } from '@/components/ui';
 import { Stay, stays } from '@/data/mock';
+import { Badge } from '@/features/business/ui';
 import { c, radius, role } from '@/theme';
 
 const FILTERS = ['All', 'Albergue', 'Hotel', 'Café'] as const;
@@ -28,6 +29,7 @@ function StayCard({ s, fav, onFav }: { s: Stay; fav: boolean; onFav: () => void 
             <AppText variant="label">{s.rating}</AppText>
           </View>
         </View>
+        {s.verifiedOwner && <Badge label="Verified owner" tone="blue" icon="shield" />}
         <AppText variant="small" muted>{s.kind} · {s.town} · {s.distanceKm} km away · {s.reviews} reviews</AppText>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 6 }}>
           <AppText variant="label">{s.price ? `€${s.price} / night` : 'Café'}</AppText>

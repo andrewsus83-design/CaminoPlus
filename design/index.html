@@ -756,6 +756,45 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
   .dodont { grid-template-columns: 1fr; }
   .phone { transform-origin: top left; }
 }
+/* ---- Business owner (extranet) ---- */
+.biz-top { display: flex; align-items: center; gap: 12px; }
+.biz-top .stepno { margin-left: auto; font-family: var(--cp-font-mono); font-size: 13px; color: var(--cp-text-muted); }
+.biz-bar { display: flex; gap: 6px; margin: 14px 0 22px; }
+.biz-bar i { flex: 1; height: 6px; border-radius: var(--cp-radius-pill); background: var(--cp-surface-sunken); }
+.biz-bar i.on { background: var(--cp-color-gold); }
+.biz-types { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.biz-type { background: var(--cp-surface); border-radius: var(--cp-radius-lg); padding: 18px 16px; box-shadow: inset 0 0 0 1.5px var(--cp-border); display: flex; flex-direction: column; gap: 10px; font-weight: 600; font-size: 16px; line-height: 20px; }
+.biz-type small { display: block; font-weight: 400; font-size: 13px; line-height: 18px; color: var(--cp-text-muted); }
+.biz-type.on { box-shadow: inset 0 0 0 2.5px var(--cp-color-blue); background: var(--cp-color-blue-50); }
+.biz-type .ic { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: var(--cp-color-gold-wash); color: var(--cp-color-gold-ink); }
+.biz-type.on .ic { background: var(--cp-color-blue); color: var(--cp-color-parchment); }
+.biz-map { height: 150px; border-radius: var(--cp-radius-lg); position: relative; overflow: hidden; background:
+  linear-gradient(115deg, transparent 46%, rgba(217,162,27,.85) 46.5%, rgba(217,162,27,.85) 48.5%, transparent 49%),
+  repeating-linear-gradient(0deg, transparent 0 28px, rgba(20,54,93,.07) 28px 29px),
+  repeating-linear-gradient(90deg, transparent 0 28px, rgba(20,54,93,.07) 28px 29px), #EDE5D3; }
+.biz-map .pin { position: absolute; left: 50%; top: 44%; transform: translate(-50%, -100%); color: var(--cp-color-red); }
+.biz-map .pin svg { width: 40px; height: 40px; fill: var(--cp-color-red); stroke: #fff; }
+.biz-map .hint { position: absolute; left: 12px; bottom: 12px; }
+.biz-upload { border-radius: var(--cp-radius-lg); border: 2px dashed var(--cp-border-strong); padding: 18px; display: flex; gap: 14px; align-items: center; color: var(--cp-text-muted); font-size: 14px; line-height: 20px; }
+.biz-upload b { color: var(--cp-text); display: block; font-size: 16px; }
+.biz-upload .ic { width: 48px; height: 48px; border-radius: 50%; background: var(--cp-surface-sunken); display: grid; place-items: center; flex: none; color: var(--cp-text); }
+.biz-upload.done { border-style: solid; border-color: var(--cp-success); background: var(--cp-success-wash); }
+.biz-upload.done .ic { background: var(--cp-success); color: #fff; }
+.biz-photos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.biz-photos > div { aspect-ratio: 1; border-radius: var(--cp-radius-md); position: relative; }
+.biz-photos .add { display: grid; place-items: center; border: 2px dashed var(--cp-border-strong); color: var(--cp-text-muted); }
+.biz-photos .cover { position: absolute; left: 6px; bottom: 6px; height: 22px; font-size: 11px; }
+.biz-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.biz-stat { background: var(--cp-surface); border-radius: var(--cp-radius-lg); padding: 14px; box-shadow: var(--cp-shadow-sm); }
+.biz-stat b { display: block; font-family: var(--cp-font-title); font-size: 26px; line-height: 30px; font-weight: 600; }
+.biz-stat span { font-size: 12px; line-height: 16px; color: var(--cp-text-muted); }
+.biz-stat em { font-style: normal; font-size: 12px; color: var(--cp-success); font-weight: 600; }
+.biz-avail { display: flex; gap: 8px; }
+.biz-avail span { flex: 1; text-align: center; padding: 12px 4px; border-radius: var(--cp-radius-pill); font-weight: 600; font-size: 14px; background: var(--cp-surface-sunken); }
+.biz-avail span.on { background: var(--cp-success); color: #fff; }
+.biz-sticky { position: sticky; bottom: 0; padding-top: 14px; background: linear-gradient(transparent, var(--cp-bg) 30%); }
+.biz-sticky .row2 { display: flex; gap: 10px; }
+.biz-sticky .row2 .cp-btn { flex: 1; }
 </style>
 </head>
 <body>
@@ -839,6 +878,8 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     <symbol id="i-bolt2" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
     <symbol id="i-heli" viewBox="0 0 24 24"><path d="M3 4.5h14M10 4.5v3"/><path d="M5 12.5a5 4 0 0 1 5-4h1.5a4.5 4.5 0 0 1 4.5 4.5v1.5H5v-2Z"/><path d="m16 11 5-2v4.5l-5 1M6.5 18.5h9M9 16v2.5M13 16v2.5"/></symbol>
     <symbol id="i-city" viewBox="0 0 24 24"><path d="M4 20.5V10l6-3v13.5M10 20.5V4l10 4v12.5M2.5 20.5h19M13.5 10.5h3M13.5 14.5h3M6.5 12.5h1M6.5 16h1"/></symbol>
+    <symbol id="i-briefcase" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="3"/><path d="M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7M3 12.5h18M10.5 12.5v2h3v-2"/></symbol>
+    <symbol id="i-store" viewBox="0 0 24 24"><path d="M4 9.5 5.5 4h13L20 9.5a2.7 2.7 0 0 1-5.3 0 2.7 2.7 0 0 1-5.4 0 2.7 2.7 0 0 1-5.3 0Z"/><path d="M5 11.5v9h14v-9M10 20.5v-5h4v5"/></symbol>
     <symbol id="i-checks" viewBox="0 0 24 24"><path d="m2.5 12.5 4.5 4.5L14.5 8.5M10 16.5l1 1L21 7.5"/></symbol>
   </defs>
 </svg>
@@ -1104,7 +1145,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
   <div class="panel">
     <div class="row" style="gap:16px">
       <button class="cp-btn cp-btn-primary">Start today's stage</button>
-      <button class="cp-btn cp-btn-gold"><svg class="cp-icon sm"><use href="#i-shell"/></svg>Join for $11.99 / year</button>
+      <button class="cp-btn cp-btn-gold"><svg class="cp-icon sm"><use href="#i-shell"/></svg>Join for $12 / year</button>
       <button class="cp-btn cp-btn-secondary">View on map</button>
       <button class="cp-btn cp-btn-ghost">Skip for now</button>
       <button class="cp-btn cp-btn-danger"><svg class="cp-icon sm"><use href="#i-sos"/></svg>SOS</button>
@@ -1507,7 +1548,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
 <section class="doc" id="screens">
   <p class="eyebrow">14 · Screens @ 390 × 844</p>
   <h2>The app, tab by tab</h2>
-  <p class="intro">Reference layouts at iPhone 15 size. Scroll sideways to see all of them. Me has three sub-tabs, an inbox, a two-step write flow, a share screen and a stamp pop-up. Maps has two layers: helicopter view and city view. Stays opens into Airbnb / Agoda-style detail pages for stays and cafes. Explore has a second screen for the photo marketplace.</p>
+  <p class="intro">Reference layouts at iPhone 15 size. Scroll sideways to see all of them. Me has three sub-tabs, an inbox, a two-step write flow, a share screen and a stamp pop-up. Maps has two layers: helicopter view and city view. Stays opens into Airbnb / Agoda-style detail pages for stays and cafes. Explore has a second screen for the photo marketplace. Settings opens the business-owner flow: a welcome page, five registration steps, the review status and the owner dashboard.</p>
 
   <div class="phones">
 
@@ -2202,7 +2243,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     </div>
 
     <div class="phone-wrap">
-      <p class="phone-label"><b>Settings</b>Billing · Password · Smartwatch</p>
+      <p class="phone-label"><b>Settings</b>Billing · Password · Smartwatch · For business</p>
       <div class="phone">
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
         <div class="scroll">
@@ -2213,7 +2254,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           </div>
           <div class="cp-card" style="padding:22px;background:var(--cp-color-gold-wash);box-shadow:inset 0 0 0 1.5px var(--cp-color-gold-soft)">
             <div style="display:flex;justify-content:space-between;align-items:center"><span class="cp-badge gold"><svg class="cp-icon sm"><use href="#i-shell"/></svg>Pilgrim Plus</span><span style="font-family:var(--cp-font-accent);font-size:24px;color:var(--cp-color-gold-ink)">Ultreia!</span></div>
-            <p style="font-family:var(--cp-font-title);font-size:24px;line-height:30px;font-weight:600;margin:14px 0 4px">$11.99 / year</p>
+            <p style="font-family:var(--cp-font-title);font-size:24px;line-height:30px;font-weight:600;margin:14px 0 4px">$12 / year</p>
             <p class="note" style="margin:0 0 16px">Offline maps, every route and 5 GB photo storage (1.2 GB used). Extra 5 GB: $5 / year. Renews 4 Nov 2027.</p>
             <button class="cp-btn cp-btn-secondary md block">Manage billing</button>
           </div>
@@ -2227,12 +2268,224 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
             <div class="s-row"><svg class="cp-icon"><use href="#i-watch"/></svg><span class="lbl">Apple Watch</span><span class="cp-badge green"><span class="cp-dot"></span>Connected</span></div>
             <div class="s-row"><svg class="cp-icon"><use href="#i-watch"/></svg><span class="lbl">Garmin</span><span class="val">Connect</span></div>
           </div>
+          <p class="s-cap">For business</p>
+          <div class="s-group">
+            <div class="s-row"><svg class="cp-icon"><use href="#i-briefcase"/></svg><span class="lbl">List your business<br><span class="note">Albergue, hotel, café, shop</span></span><span class="cp-badge gold">Free</span></div>
+          </div>
           <p class="s-cap">App</p>
           <div class="s-group">
             <div class="s-row"><svg class="cp-icon"><use href="#i-offline"/></svg><span class="lbl">Offline maps</span><span class="cp-switch on"></span></div>
             <div class="s-row"><svg class="cp-icon"><use href="#i-bell"/></svg><span class="lbl">Crowd alerts</span><span class="cp-switch on"></span></div>
             <div class="s-row" style="color:var(--cp-color-red)"><svg class="cp-icon"><use href="#i-logout"/></svg><span class="lbl">Sign out</span></div>
           </div>
+        </div>
+        <div class="tabdock"><nav class="cp-tabbar">
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Explore</div>
+          <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-settings"/></svg></span>Settings</div>
+        </nav></div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Business · List your place</b>Settings → For business · Agoda-extranet style</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll">
+
+          <div class="biz-top"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon "><use href="#i-back"/></svg></button></div>
+          
+          <span class="cp-badge gold" style="margin-top:12px"><svg class="cp-icon sm"><use href="#i-briefcase"/></svg>For business owners</span>
+          <h1 class="scr-title" style="margin-top:14px">Welcome pilgrims to your door</h1>
+          <p class="scr-sub">Albergue, hotel, café, shop or service on the Camino? List it for free and reach pilgrims walking past today.</p>
+          <div class="cp-img v4" style="height:150px;border-radius:var(--cp-radius-lg)"></div>
+          <div style="margin-top:22px">
+            <div class="d-hl"><span class="ico"><svg class="cp-icon "><use href="#i-shield"/></svg></span><div><b>Verified owner badge</b><span>Stand out in Stays and on the map</span></div></div>
+            <div class="d-hl"><span class="ico"><svg class="cp-icon "><use href="#i-bed-full"/></svg></span><div><b>Beds free or full, in one tap</b><span>Pilgrims see it live, even on the trail</span></div></div>
+            <div class="d-hl"><span class="ico"><svg class="cp-icon "><use href="#i-chat"/></svg></span><div><b>Answer reviews and messages</b><span>Views, saves and taps on your dashboard</span></div></div>
+          </div>
+          <p class="note" style="margin:6px 0 0">5 short steps · about 10 minutes · we check every listing within 2 working days.</p>
+          <div class="biz-sticky"><button class="cp-btn cp-btn-gold block">Get started · it's free</button>
+          <p class="note" style="text-align:center;margin:10px 0 0">Already on CaminoPlus? <u>Claim your place</u></p></div>
+        </div>
+        <div class="tabdock"><nav class="cp-tabbar">
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Explore</div>
+          <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-settings"/></svg></span>Settings</div>
+        </nav></div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Business · 1 Type</b>What kind of place is it?</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll">
+
+          <div class="biz-top"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon "><use href="#i-back"/></svg></button><span class="stepno">Step 1 of 5</span></div>
+          <div class="biz-bar"><i class="on"></i><i></i><i></i><i></i><i></i></div>
+          <h1 class="scr-title" style="font-size:30px;line-height:36px">What kind of place do you run?</h1>
+          <p class="scr-sub">Pick the closest one. You can add more places later.</p>
+          <div class="biz-types"><div class="biz-type on"><span class="ic"><svg class="cp-icon "><use href="#i-stays"/></svg></span><span>Albergue<small>Municipal, parish or private</small></span></div><div class="biz-type"><span class="ic"><svg class="cp-icon "><use href="#i-stays"/></svg></span><span>Hotel or pensión<small>Hostal, casa rural, apartment</small></span></div><div class="biz-type"><span class="ic"><svg class="cp-icon "><use href="#i-cup"/></svg></span><span>Café or bar<small>Breakfast, bocadillos</small></span></div><div class="biz-type"><span class="ic"><svg class="cp-icon "><use href="#i-utensils"/></svg></span><span>Restaurant<small>Menú del peregrino</small></span></div><div class="biz-type"><span class="ic"><svg class="cp-icon "><use href="#i-store"/></svg></span><span>Shop or pharmacy<small>Supplies, blisters, SIM</small></span></div><div class="biz-type"><span class="ic"><svg class="cp-icon "><use href="#i-bike"/></svg></span><span>Pilgrim service<small>Bikes, luggage, tours</small></span></div></div>
+          <p class="cp-label" style="margin:22px 0 10px">Albergue type</p>
+          <div class="cp-segment"><span>Municipal</span><span>Parish</span><span class="on">Private</span></div>
+          <div class="biz-sticky"><button class="cp-btn cp-btn-primary block">Continue</button></div>
+        </div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Business · 2 Name & location</b>Search address, drag the pin</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll">
+
+          <div class="biz-top"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon "><use href="#i-back"/></svg></button><span class="stepno">Step 2 of 5</span></div>
+          <div class="biz-bar"><i class="on"></i><i class="on"></i><i></i><i></i><i></i></div>
+          <h1 class="scr-title" style="font-size:30px;line-height:36px">Where are you on the Way?</h1>
+          <div style="display:flex;flex-direction:column;gap:18px;margin-top:14px">
+            <div class="cp-field"><label class="cp-label">Name pilgrims will see</label><input class="cp-input" value="Albergue Casa Ana"></div>
+            <div class="cp-field"><label class="cp-label">Address</label><input class="cp-input" value="Calle Real 12, Hontanas"></div>
+            <div class="biz-map"><span class="pin"><svg class="cp-icon"><use href="#i-pin"/></svg></span><span class="cp-badge glass hint"><svg class="cp-icon sm"><use href="#i-locate"/></svg>Drag the pin to your door</span></div>
+            <div class="cp-quest" style="background:var(--cp-color-blue-50);box-shadow:inset 0 0 0 1.5px var(--cp-color-blue-100)"><span class="ic" style="background:var(--cp-color-blue)"><svg class="cp-icon "><use href="#i-flag"/></svg></span><div style="flex:1"><div class="t">Camino Francés · stage 14</div><div class="m">On the route · 40 m from the yellow arrows</div></div></div>
+          </div>
+          <div class="biz-sticky"><div class="row2"><button class="cp-btn cp-btn-secondary">Back</button><button class="cp-btn cp-btn-primary">Continue</button></div></div>
+        </div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Business · 3 Photos & details</b>At least 3 photos · amenities · hours</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll">
+
+          <div class="biz-top"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon "><use href="#i-back"/></svg></button><span class="stepno">Step 3 of 5</span></div>
+          <div class="biz-bar"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></div>
+          <h1 class="scr-title" style="font-size:30px;line-height:36px">Show pilgrims inside</h1>
+          <p class="scr-sub" style="margin-bottom:14px">Add at least 3 photos. The first one is your cover.</p>
+          <div class="biz-photos"><div class="cp-img"><span class="cp-badge glass cover">Cover</span></div><div class="cp-img v2"></div><div class="cp-img v4"></div><div class="cp-img v3"></div><div class="add"><svg class="cp-icon "><use href="#i-camera"/></svg></div></div>
+          <p class="cp-label" style="margin:22px 0 10px">Amenities</p>
+          <div class="row" style="gap:8px;flex-wrap:wrap"><span class="cp-chip sm on"><svg class="cp-icon sm"><use href="#i-wifi"/></svg>Wi-Fi</span><span class="cp-chip sm on"><svg class="cp-icon sm"><use href="#i-utensils"/></svg>Kitchen</span><span class="cp-chip sm on"><svg class="cp-icon sm"><use href="#i-wash"/></svg>Laundry</span><span class="cp-chip sm"><svg class="cp-icon sm"><use href="#i-lock"/></svg>Lockers</span><span class="cp-chip sm on"><svg class="cp-icon sm"><use href="#i-bike"/></svg>Bike storage</span><span class="cp-chip sm"><svg class="cp-icon sm"><use href="#i-plug"/></svg>Charging</span></div>
+          <p class="cp-label" style="margin:22px 0 10px">Opening hours</p>
+          <div class="s-group" style="box-shadow:inset 0 0 0 1px var(--cp-border)">
+            <div class="s-row"><svg class="cp-icon "><use href="#i-clock"/></svg><span class="lbl">Check-in</span><span class="val">12:00 – 22:00</span></div>
+            <div class="s-row"><svg class="cp-icon "><use href="#i-sun"/></svg><span class="lbl">Open</span><span class="val">March – October</span></div>
+          </div>
+          <div class="biz-sticky"><div class="row2"><button class="cp-btn cp-btn-secondary">Back</button><button class="cp-btn cp-btn-primary">Continue</button></div></div>
+        </div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Business · 4 Prices & booking</b>How pilgrims pay and book</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll">
+
+          <div class="biz-top"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon "><use href="#i-back"/></svg></button><span class="stepno">Step 4 of 5</span></div>
+          <div class="biz-bar"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div>
+          <h1 class="scr-title" style="font-size:30px;line-height:36px">Prices and how to book</h1>
+          <div style="display:flex;gap:12px;margin-top:14px">
+            <div class="cp-field" style="flex:1"><label class="cp-label">Dorm bed</label><input class="cp-input" value="€ 14"></div>
+            <div class="cp-field" style="flex:1"><label class="cp-label">Private room</label><input class="cp-input" value="€ 42"></div>
+          </div>
+          <div class="row" style="gap:8px;margin-top:14px"><span class="cp-chip sm on"><svg class="cp-icon sm"><use href="#i-check"/></svg>Pilgrim menu €12</span><span class="cp-chip sm">Donativo</span><span class="cp-chip sm">Pilgrims only</span></div>
+          <p class="cp-label" style="margin:22px 0 10px">How pilgrims book</p>
+          <div class="s-group" style="box-shadow:inset 0 0 0 1px var(--cp-border)"><div class="s-row" style="opacity:.55"><svg class="cp-icon "><use href="#i-bolt"/></svg><span class="lbl">In-app booking<br><span class="note">Coming soon</span></span><span class="cp-badge gold">Soon</span></div><div class="s-row" style=""><svg class="cp-icon "><use href="#i-chat"/></svg><span class="lbl">WhatsApp<br><span class="note">+34 600 000 000</span></span><span class="cp-switch on"></span></div><div class="s-row" style=""><svg class="cp-icon "><use href="#i-msg"/></svg><span class="lbl">Email<br><span class="note">casaana@example.com</span></span><span class="cp-switch"></span></div><div class="s-row" style=""><svg class="cp-icon "><use href="#i-stays"/></svg><span class="lbl">Walk-in only<br><span class="note">First come, first served</span></span><span class="cp-switch"></span></div></div>
+          <p class="note" style="margin:12px 0 0">Every stay shows its booking method, so pilgrims know what to expect.</p>
+          <div class="biz-sticky"><div class="row2"><button class="cp-btn cp-btn-secondary">Back</button><button class="cp-btn cp-btn-primary">Continue</button></div></div>
+        </div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Business · 5 Verify you own it</b>Proof of ownership · private to our team</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll">
+
+          <div class="biz-top"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon "><use href="#i-back"/></svg></button><span class="stepno">Step 5 of 5</span></div>
+          <div class="biz-bar"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></div>
+          <h1 class="scr-title" style="font-size:30px;line-height:36px">Show us it's yours</h1>
+          <p class="scr-sub" style="margin-bottom:16px">Only the CaminoPlus team sees these files. They are never shown to pilgrims.</p>
+          <div class="cp-field"><label class="cp-label">Business or tax ID (NIF / CIF)</label><input class="cp-input" value="B12345678"></div>
+          <p class="cp-label" style="margin:20px 0 10px">One document</p>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div class="biz-upload done"><span class="ic"><svg class="cp-icon "><use href="#i-check"/></svg></span><div><b>Registro de turismo.pdf</b>Tourism register · 1.2 MB</div></div>
+            <div class="biz-upload"><span class="ic"><svg class="cp-icon "><use href="#i-image"/></svg></span><div><b>Or add another</b>Business licence, utility bill at this address</div></div>
+          </div>
+          <div class="s-group" style="margin-top:16px;box-shadow:inset 0 0 0 1px var(--cp-border)">
+            <div class="s-row"><svg class="cp-icon "><use href="#i-phone"/></svg><span class="lbl">Phone confirmed</span><span class="cp-badge green"><span class="cp-dot"></span>+34 600…</span></div>
+          </div>
+          <div class="biz-sticky"><button class="cp-btn cp-btn-gold block"><svg class="cp-icon sm"><use href="#i-shield"/></svg>Send for review</button>
+          <p class="note" style="text-align:center;margin:10px 0 0">By sending you accept the <u>Business terms</u></p></div>
+        </div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Business · In review</b>Pending → approved / changes needed</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll">
+
+          <div class="biz-top"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon "><use href="#i-x"/></svg></button></div>
+          
+          <div style="text-align:center;margin:18px 0 8px"><span style="display:inline-grid;place-items:center;width:84px;height:84px;border-radius:50%;background:var(--cp-color-gold-wash);color:var(--cp-color-gold-ink);box-shadow:inset 0 0 0 2px var(--cp-color-gold-soft)"><svg class="cp-icon" style="width:40px;height:40px"><use href="#i-shell"/></svg></span></div>
+          <h1 class="scr-title" style="text-align:center;font-size:30px;line-height:36px">Thanks, Ana!</h1>
+          <p class="scr-sub" style="text-align:center">We check every place by hand. Most are live within 2 working days.</p>
+          <div class="cp-card" style="padding:20px">
+            <div class="cp-step done"><span class="dot"><svg class="cp-icon sm"><use href="#i-check"/></svg></span><div class="c"><div class="t">Sent<span>Today 10:42</span></div></div></div>
+            <div class="cp-step today"><span class="dot">2</span><div class="c"><div class="t">In review<span>now</span></div><div class="note">We may call +34 600 000 000</div></div></div>
+            <div class="cp-step"><span class="dot">3</span><div class="c"><div class="t">Live in Stays<span>soon</span></div><div class="note">With the Verified owner badge</div></div></div>
+          </div>
+          <div class="cp-alert" style="margin-top:16px;box-shadow:inset 0 0 0 1.5px var(--cp-border)"><span class="bubble" style="background:var(--cp-color-red-100);color:var(--cp-color-red-700)"><svg class="cp-icon "><use href="#i-pencil"/></svg></span><div><div class="t">If we need changes</div><div class="m">You get a note in your inbox and can fix and resend.</div></div></div>
+          <div class="biz-sticky"><button class="cp-btn cp-btn-secondary block">Go to my business</button></div>
+        </div>
+        <div class="tabdock"><nav class="cp-tabbar">
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Explore</div>
+          <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-settings"/></svg></span>Settings</div>
+        </nav></div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Business · Dashboard</b>Extranet home: status, beds, stats, reviews</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll">
+
+          <div style="display:flex;align-items:center;gap:12px"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon "><use href="#i-back"/></svg></button><span class="cp-badge green" style="margin-left:auto"><span class="cp-dot"></span>Live</span><button class="cp-icon-btn flat" aria-label="Edit listing"><svg class="cp-icon "><use href="#i-pencil"/></svg></button></div>
+          <h1 class="scr-title" style="font-size:30px;line-height:36px">Albergue Casa Ana</h1>
+          <div class="d-sub" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">Hontanas · 24 beds <span class="cp-badge blue" style="height:24px"><svg class="cp-icon sm"><use href="#i-shield"/></svg>Verified owner</span></div>
+          <p class="cp-label" style="margin:22px 0 10px">Tonight · Fri 14 Nov</p>
+          <div class="biz-avail"><span class="on">Beds free</span><span>Few left</span><span>Full</span></div>
+          <p class="note" style="margin:8px 0 0">9 beds free · pilgrims see this on the map</p>
+          <p class="cp-label" style="margin:22px 0 10px">Last 30 days</p>
+          <div class="biz-stats"><div class="biz-stat"><b>1.8k</b><span>Views</span> <em>+24%</em></div><div class="biz-stat"><b>212</b><span>Saves</span> <em>+9%</em></div><div class="biz-stat"><b>64</b><span>WhatsApp taps</span></div></div>
+          <p class="cp-label" style="margin:22px 0 10px">New review · reply to it</p>
+          <div class="cp-card" style="padding:18px">
+            <div style="display:flex;gap:10px;align-items:center"><span class="cp-avatar" style="width:36px;height:36px"></span><div style="flex:1"><b>Hannah</b> <span class="note">· ★ 5 · 2 days ago</span></div></div>
+            <p style="margin:10px 0 14px;font-size:15px;line-height:22px">Warm welcome and the best communal dinner of my Camino.</p>
+            <button class="cp-btn cp-btn-secondary sm"><svg class="cp-icon sm"><use href="#i-chat"/></svg>Reply as owner</button>
+          </div>
+          <div class="cp-quest" style="margin-top:16px"><span class="ic" style="background:var(--cp-color-gold);color:var(--cp-color-blue)"><svg class="cp-icon "><use href="#i-bolt"/></svg></span><div style="flex:1"><div class="t">Boost your listing</div><div class="m">Featured spot in Stays · coming soon</div></div><span class="cp-badge gold">Soon</span></div>
         </div>
         <div class="tabdock"><nav class="cp-tabbar">
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
@@ -2283,7 +2536,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     <div class="icon-cell"><svg class="cp-icon"><use href="#i-chat"/></svg>whatsapp</div>
     <div class="icon-cell"><svg class="cp-icon"><use href="#i-msg"/></svg>message</div>
     <div class="icon-cell"><svg class="cp-icon"><use href="#i-bolt"/></svg>instant</div>
-    <div class="icon-cell"><svg class="cp-icon"><use href="#i-sos"/></svg>sos</div><div class="icon-cell"><svg class="cp-icon"><use href="#i-heli"/></svg>helicopter</div><div class="icon-cell"><svg class="cp-icon"><use href="#i-city"/></svg>city</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-pencil"/></svg>write</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-link"/></svg>link</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-wifi"/></svg>wifi</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-utensils"/></svg>food</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-wash"/></svg>laundry</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-bike"/></svg>bike</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-plug"/></svg>charging</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-clock"/></svg>hours</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-image"/></svg>photo</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-copy"/></svg>copy</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-book"/></svg>article</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-shield"/></svg>policy</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-phone"/></svg>call</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-tagpeople"/></svg>tag people</div>
+    <div class="icon-cell"><svg class="cp-icon"><use href="#i-sos"/></svg>sos</div><div class="icon-cell"><svg class="cp-icon"><use href="#i-heli"/></svg>helicopter</div><div class="icon-cell"><svg class="cp-icon"><use href="#i-city"/></svg>city</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-pencil"/></svg>write</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-link"/></svg>link</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-wifi"/></svg>wifi</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-utensils"/></svg>food</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-wash"/></svg>laundry</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-bike"/></svg>bike</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-plug"/></svg>charging</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-clock"/></svg>hours</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-image"/></svg>photo</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-copy"/></svg>copy</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-book"/></svg>article</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-shield"/></svg>policy</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-phone"/></svg>call</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-tagpeople"/></svg>tag people</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-briefcase"/></svg>business</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-store"/></svg>shop</div>
   </div>
 </section>
 
