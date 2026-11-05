@@ -13,17 +13,16 @@ In Expo Go and on web the tab shows the old SVG preview map with a red notice.
    npm install
    npx eas-cli login
    npx eas-cli init          # links the app to your Expo account (writes the projectId into app.json)
-   cp .env.example .env      # then fill in the values below
+   cp .env.example .env.local   # only needed for the MapTiler key
    ```
-3. `.env` values (all public keys, safe inside the app):
+3. Keys. The Supabase URL and publishable key are already built in (`src/lib/config.ts`), so
+   you only need the optional MapTiler key:
    | Key | Where to get it |
    |---|---|
-   | `EXPO_PUBLIC_SUPABASE_URL` | already filled (EU project) |
-   | `EXPO_PUBLIC_SUPABASE_ANON_KEY` | Supabase dashboard → Project settings → API → `anon` / publishable key |
-   | `EXPO_PUBLIC_MAPTILER_KEY` | https://cloud.maptiler.com → Account → API keys (optional; restrict it to bundle id `plus.camino.app`) |
+   | `EXPO_PUBLIC_MAPTILER_KEY` | https://cloud.maptiler.com → Account → API keys (optional; restrict it to bundle id `plus.camino.app`). Leave empty to use the OSM offline style everywhere. |
 
-   For EAS cloud builds also add them as EAS environment variables
-   (`npx eas-cli env:create --name EXPO_PUBLIC_SUPABASE_ANON_KEY --value … --environment development`)
+   For EAS cloud builds add it as an EAS environment variable
+   (`npx eas-cli env:create --name EXPO_PUBLIC_MAPTILER_KEY --value … --environment development`)
    or on expo.dev → Project → Environment variables.
 
 ## 2. Build and install the dev build
@@ -66,12 +65,9 @@ place → old version deleted. Free users get `403 subscription_required` and se
 Pilgrim Plus prompt. "Update" appears when the monthly rebuild publishes a newer version.
 Files live in `<documents>/offline-packs/<stage_id>/`, index in `registry.json`.
 
-**Login.** The map module does not own auth. The auth module registers a token once:
-```ts
-import { setMapSession } from '@/features/map';
-setMapSession({ getAccessToken: async () => (await supabase.auth.getSession()).data.session?.access_token ?? null });
-```
-Until then downloads show "Sign in to download offline maps"; downloaded packs still work.
+**Login.** The map module does not own auth. `app/_layout.tsx` registers the Supabase token once
+with `setMapSession({ getAccessToken })`. Signed out, downloads show "Sign in to download offline
+maps"; downloaded packs still work.
 
 **GPS and battery (target < 15% in 7 h).** Default *Battery saver*: Balanced accuracy, one
 fix per 20 s and only after 25 m of movement, map at 30 fps. *Precise GPS* (tap the pill)

@@ -1,7 +1,7 @@
 import type { PackErrorCode } from './packs/api';
 
 export const packErrorText: Record<PackErrorCode, string> = {
-  not_configured: 'Downloads need the backend keys in .env (developer setting).',
+  not_configured: 'Downloads are not configured in this build.',
   not_signed_in: 'Sign in to download offline maps.',
   subscription_required: 'Offline maps are part of Pilgrim Plus.',
   pack_not_found: 'This stage map is not published yet.',

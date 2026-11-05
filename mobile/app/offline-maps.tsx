@@ -8,7 +8,7 @@ import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
 import { Pill } from '@/components/Pill';
 import { Card, SectionLabel } from '@/components/ui';
-import { ROUTE_ID, ROUTE_NAME, StageInfo, formatMb, hasMapTiler, hasSupabase, packs, stages, timeAgo, useOnline } from '@/features/map';
+import { ROUTE_ID, ROUTE_NAME, StageInfo, formatMb, hasMapTiler, packs, stages, timeAgo, useOnline } from '@/features/map';
 import { MapIcon } from '@/features/map/MapIcon';
 import { packErrorText } from '@/features/map/messages';
 import { c, layout, radius, role } from '@/theme';
@@ -56,7 +56,6 @@ export default function OfflineMaps() {
           <AppText variant="caption" muted>
             {online === false ? 'Offline now. Downloaded stages keep working.' : state.catalogAt ? `Checked for updates ${timeAgo(state.catalogAt)}` : 'Checking for map updates…'}
           </AppText>
-          {!hasSupabase() && <AppText variant="caption" color={c.red700}>Developer: set EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_ANON_KEY in mobile/.env.</AppText>}
           {state.catalogError === 'not_signed_in' && <AppText variant="caption" color={c.goldInk}>Sign in to see sizes and download stages.</AppText>}
           {!hasMapTiler() && <AppText variant="caption" muted>Online map style: not set, the OSM offline style is used everywhere.</AppText>}
         </Card>

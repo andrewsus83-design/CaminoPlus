@@ -1,9 +1,12 @@
 // Map module settings. Public values only (they ship inside the app).
+import { config } from '../../lib/config';
+
 const env = (k: string) => (process.env[k] ?? '').trim();
 
 export const mapConfig = {
-  supabaseUrl: env('EXPO_PUBLIC_SUPABASE_URL').replace(/\/$/, ''),
-  supabaseAnonKey: env('EXPO_PUBLIC_SUPABASE_ANON_KEY'),
+  // Same project and publishable key as the rest of the app (src/lib/config.ts).
+  supabaseUrl: config.supabaseUrl.replace(/\/$/, ''),
+  supabaseAnonKey: config.supabaseKey,
   // MapTiler is used ONLINE only. Its terms forbid bulk/offline caching of its tiles,
   // so offline packs always come from our own OSM build (tools/offline-maps).
   maptilerKey: env('EXPO_PUBLIC_MAPTILER_KEY'),

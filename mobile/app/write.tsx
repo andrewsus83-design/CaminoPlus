@@ -8,11 +8,29 @@ import { Pill } from '@/components/Pill';
 import { IconButton, Photo } from '@/components/ui';
 import { role } from '@/theme';
 import { tints } from '@/data/mock';
+import { useAuth } from '@/lib/auth';
+import { createJournalPost } from '@/lib/api';
+import { FormMessage } from '@/components/auth/Field';
 
 export default function Write() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const [text, setText] = useState('');
+  const { session, journey, refresh } = useAuth();
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const post = async () => {
+    if (!session || !text.trim()) return setError('Write a few words about today first.');
+    setBusy(true); setError(null);
+    try {
+      await createJournalPost({ userId: session.user.id, body: text.trim(), journeyId: journey?.id ?? null, routeId: journey?.route_id ?? null });
+      await refresh();
+      router.back();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
+      setBusy(false);
+    }
+  };
   return (
     <View style={{ flex: 1, backgroundColor: role.bg }}>
       <Screen>
@@ -27,7 +45,8 @@ export default function Write() {
         <AppText variant="mono" muted style={{ textAlign: 'right', fontSize: 12 }}>{text.length} / 600</AppText>
       </Screen>
       <View style={{ position: 'absolute', left: 24, right: 24, bottom: insets.bottom + 16, gap: 8 }}>
-        <Pill label="Post" onPress={() => router.back()} />
+        {!!error && <FormMessage>{error}</FormMessage>}
+        <Pill label="Post" onPress={post} loading={busy} disabled={!text.trim()} />
       </View>
     </View>
   );

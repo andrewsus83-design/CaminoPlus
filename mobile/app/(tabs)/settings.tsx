@@ -4,12 +4,12 @@ import { useRouter } from 'expo-router';
 import { Screen } from '@/components/Screen';
 import { AppText } from '@/components/AppText';
 import { Card, SectionLabel } from '@/components/ui';
+import { AccountSection } from '@/components/AccountSection';
 import { BusinessCard, IntroSheet } from '@/features/business/BusinessCard';
 import { useOwner } from '@/features/business/store';
 import { c, radius } from '@/theme';
 
 const rows = {
-  Account: [['Email', 'ana@example.com'], ['Password', 'Change']],
   'Plan and storage': [['CaminoPlus', '$12 / year'], ['Extra storage', '$5 per 5 GB / year']],
   Devices: [['Apple Watch', 'Connect'], ['Garmin', 'Connect']],
 } as const;
@@ -27,6 +27,7 @@ export default function Settings() {
   return (
     <Screen>
       <AppText variant="h2">Settings</AppText>
+      <AccountSection />
       <Card style={{ gap: 10 }}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
           <AppText variant="label">Cloud storage</AppText>

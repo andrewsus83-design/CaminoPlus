@@ -11,5 +11,6 @@
     "outDir": "node_modules/.cache/map-test",
     "rootDir": "src"
   },
+  "include": ["src/lib/config.ts"],
   "files": ["src/features/map/__tests__/map.test.ts"]
 }

@@ -38,9 +38,11 @@ Setup in the hosted project:
    confirmation and magic-link emails come from camino.plus.
 2. **Google**: create OAuth client IDs in Google Cloud (Web, iOS, Android). Put the Web client ID
    and secret in Auth > Providers > Google, and add the iOS and Android client IDs to
-   "Authorized Client IDs". The app uses native Google Sign-In and `supabase.auth.signInWithIdToken`.
-   "Skip nonce check" is on because iOS Google Sign-In does not send a nonce.
-3. **Redirect URLs**: `https://camino.plus/auth/callback` and `caminoplus://auth-callback`.
+   "Authorized Client IDs". The app currently signs in with Google through the system browser
+   (`signInWithOAuth`, PKCE), which needs only the Web client. Native Google Sign-In with
+   `signInWithIdToken` can be added later ("Skip nonce check" on for iOS). See `mobile/AUTH.md`.
+3. **Redirect URLs**: `https://camino.plus/auth/callback`, `caminoplus://auth-callback`,
+   `caminoplus://**` and (Expo Go testing only) `exp://**`.
 
 Local: set `SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID` and `SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET`
 before `supabase start`.
