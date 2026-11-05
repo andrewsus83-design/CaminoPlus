@@ -164,7 +164,7 @@ def page(slug, title, desc, body, active=None, jsonld=None):
 
 def cta(title="Your Camino starts with one download.", sub="CaminoPlus launches on iPhone and Android. Leave your email with us and we will tell you the day it is live."):
     return f'''<section class="section" id="download">
-  <div class="wrap"><div class="band cta">
+  <div class="wrap"><div class="band band-cathedral cta">
     <p class="script" style="color:var(--cp-color-gold-bright)">Buen Camino</p>
     <h2 style="margin-top:12px">{title}</h2>
     <p class="lead" style="margin:16px auto 0">{sub}</p>
@@ -173,8 +173,9 @@ def cta(title="Your Camino starts with one download.", sub="CaminoPlus launches 
   </div></div>
 </section>'''
 
-def head(eyebrow, h, lead, extra=""):
-    return f'''<section class="page-head"><div class="wrap">
+def head(eyebrow, h, lead, extra="", photo=None, pos="center", posm=None):
+    cls, st = ("page-head has-photo", f' style="--photo:url(/assets/photos/{photo}.webp);--pos:{pos};--pos-m:{posm or pos}"') if photo else ("page-head", "")
+    return f'''<section class="{cls}"{st}><div class="wrap">
   <p class="eyebrow">{eyebrow}</p>
   <h1>{h}</h1>
   <p class="lead">{lead}</p>{extra}
@@ -294,7 +295,7 @@ def home():
     routes = "".join(f'<li><a class="btn btn-ghost" href="/routes">{n}</a></li>' for n, *_ in ROUTES[:8])
     faq_short = [FAQ[1][2][0], FAQ[2][2][0], FAQ[1][2][1], FAQ[6][2][1]]
     qa = "".join(f'<details class="qa"><summary>{q}</summary><div class="ans">{a}</div></details>' for q, a in faq_short)
-    body = f'''<section class="hero"><div class="wrap hero-grid">
+    body = f'''<section class="hero hero-photo"><div class="wrap hero-grid">
   <div class="hero-copy">
     <p class="script">Buen Camino</p>
     <h1 class="display">Every step of the Way, <em>even offline.</em></h1>
@@ -317,7 +318,7 @@ def home():
 </ul></div></section>
 
 <section class="section"><div class="wrap">
-  <div class="head"><p class="eyebrow">Five tabs, one app</p><h2>Everything a pilgrim needs, in the bottom bar.</h2>
+  <div class="head center"><p class="eyebrow">Five tabs, one app</p><h2>Everything a pilgrim needs, in the bottom bar.</h2>
   <p class="lead" style="margin-top:16px">No more switching between a map app, a booking site, a notes app and a photo album. CaminoPlus keeps the whole Camino in five tabs.</p></div>
   <div class="grid c3">{tabs}
     <article class="card pad-lg stack" style="background:var(--cp-color-gold-wash);border-color:var(--cp-color-gold-soft)">
@@ -349,7 +350,7 @@ def home():
   </article>
 </div></section>
 
-<section class="section tight"><div class="wrap"><div class="band"><div class="band-grid">
+<section class="section tight"><div class="wrap"><div class="band band-hills"><div class="band-grid">
   <div class="stack-lg">
     <p class="eyebrow">Offline-first</p>
     <h2>Built for the hills where your signal disappears.</h2>
@@ -435,7 +436,7 @@ def features():
     cards = "".join(f'<article class="card"><span class="ic">{icon(a)}</span><h4>{b}</h4><p>{c}</p></article>' for a, b, c in extra)
     body = head("Features", "Five tabs. One Camino.",
         "Me, Stays, Maps, Explore and Settings. Here is what each tab does, with real screens from the app design.",
-        f'<nav class="tabs-nav" aria-label="Jump to" style="margin-top:32px;margin-bottom:0">{nav}</nav>')
+        f'<nav class="tabs-nav" aria-label="Jump to" style="margin-top:32px;margin-bottom:0">{nav}</nav>', photo="santiago-street", pos="center 62%")
     body += f'''<section class="section" style="padding-top:24px"><div class="wrap">{rows}</div></section>
 <section class="section tight" id="offline"><div class="wrap">
   <div class="head"><p class="eyebrow">Under the hood</p><h2>Made for real days on the trail.</h2></div>
@@ -456,7 +457,7 @@ def routes():
       <div class="route-meta"><span>~{km:,} km</span><span>{st} stages</span></div>
     </article>'''
     body = head("Routes", "Every Camino, from wherever you start.",
-        "CaminoPlus covers the Camino de Santiago routes across Spain, Portugal and France. Choose a route, choose your starting town, and the app builds your stages.")
+        "CaminoPlus covers the Camino de Santiago routes across Spain, Portugal and France. Choose a route, choose your starting town, and the app builds your stages.", photo="coast-boardwalk", pos="center 58%")
     body += f'''<section class="section" style="padding-top:24px"><div class="wrap">
   <div class="grid c3">{cards}</div>
   <p class="muted" style="margin-top:24px;font-size:15px">Distances and stage counts are approximate and depend on where you start and how far you walk each day.</p>
@@ -485,7 +486,7 @@ def pricing():
     tr = "".join(f"<tr><td>{a}</td>{cell(b)}{cell(c)}</tr>" for a, b, c in rows)
     qa = "".join(f'<details class="qa"><summary>{q}</summary><div class="ans">{a}</div></details>' for q, a in FAQ[2][2] + FAQ[3][2])
     body = head("Pricing", "Less than a café con leche a month.",
-        "Start free. When you are ready to walk, Pilgrim Plus unlocks offline maps and cloud storage for a whole year.")
+        "Start free. When you are ready to walk, Pilgrim Plus unlocks offline maps and cloud storage for a whole year.", photo="galician-galleries", pos="center 18%")
     body += f'''<section class="section" style="padding-top:32px"><div class="wrap">
   <div class="plans">
     <article class="card pad-lg plan">
@@ -600,7 +601,7 @@ def about():
             ("shield", "Your journey is yours", "You choose who sees what. We do not sell data and you can take your data with you.")]
     v = "".join(f'<article class="card"><span class="ic">{icon(a)}</span><h4>{b}</h4><p>{c}</p></article>' for a, b, c in vals)
     body = head("About", "Made for pilgrims, by people who love the Way.",
-        "CaminoPlus started from a simple wish: one app that works on the trail, keeps the memories, and helps you find a bed at the end of the day.")
+        "CaminoPlus started from a simple wish: one app that works on the trail, keeps the memories, and helps you find a bed at the end of the day.", photo="waymarker", pos="0% center", posm="64% center")
     body += f'''<section class="section" style="padding-top:24px"><div class="wrap">
   <div class="grid c2" style="align-items:center;gap:48px">
     <div class="prose">
