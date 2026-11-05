@@ -90,9 +90,14 @@ p { margin: 0; }
 }
 .site-header.scrolled { border-bottom-color: var(--cp-color-sand-300); }
 .nav { display: flex; align-items: center; justify-content: space-between; height: 72px; gap: 16px; }
-.brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; font-family: var(--cp-font-title); font-weight: 700; font-size: 25px; letter-spacing: -0.02em; color: var(--cp-color-ink-strong); }
-.brand-mark { width: 34px; height: 34px; flex: none; }
-.brand .plus { color: var(--cp-color-gold); }
+.brand { display: inline-flex; align-items: flex-start; text-decoration: none; color: var(--cp-color-ink-strong); line-height: 1; }
+.brand-word { display: inline-flex; align-items: baseline; font-family: var(--cp-font-title); font-weight: 700; font-size: 28px; letter-spacing: -0.02em; }
+/* the shell icon stands in for the "o" */
+.brand-o { width: 0.66em; height: 0.66em; margin-left: 0.04em; flex: none; align-self: baseline; transform: translateY(0.06em); }
+.brand-o .o-bg { fill: var(--cp-color-blue); }
+.brand-o .o-shell { fill: var(--cp-color-gold); }
+.brand-o .o-ray { stroke: var(--cp-color-blue); }
+.brand-plus { font-family: var(--cp-font-accent); font-weight: 700; font-size: 18px; line-height: 1; color: var(--cp-color-gold-ink); margin: -6px 0 0 2px; }
 .nav-links { display: none; list-style: none; margin: 0; padding: 0; gap: 4px; }
 .nav-links a { display: block; padding: 10px 14px; border-radius: 999px; text-decoration: none; font-weight: 500; font-size: 15px; color: var(--cp-color-ink); }
 .nav-links a:hover { background: var(--cp-color-sand-200); }
@@ -278,5 +283,9 @@ details.qa .ans > * + * { margin-top: 12px; }
 .foot-grid h4 { font-family: var(--cp-font-mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--cp-color-gold-bright); font-weight: 600; margin-bottom: 16px; }
 .foot-grid ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
 .site-footer .brand { color: var(--cp-color-parchment); }
+.site-footer .brand-o .o-bg { fill: var(--cp-color-gold-bright); }
+.site-footer .brand-o .o-shell { fill: var(--cp-color-ink-strong); }
+.site-footer .brand-o .o-ray { stroke: var(--cp-color-gold-bright); }
+.site-footer .brand-plus { color: var(--cp-color-gold-bright); }
 .foot-bottom { margin-top: 56px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.12); display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: space-between; font-size: 14px; }
 .foot-bottom .script { color: var(--cp-color-gold-bright); font-size: 26px; }
