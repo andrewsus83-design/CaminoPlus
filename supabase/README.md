@@ -188,7 +188,7 @@ erDiagram
   revenuecat_events }o..o| profiles : "webhook log"
 ```
 
-- `billing_products`: `plus_yearly` ($11.99/year, 5 GB) and `storage_5gb_yearly` ($5/year, +5 GB).
+- `billing_products`: `plus_yearly` ($12/year, 5 GB) and `storage_5gb_yearly` ($5/year, +5 GB).
 - `subscriptions` mirrors RevenueCat. Only the RevenueCat webhook edge function (service role) writes it,
   logging every event in `revenuecat_events` (event id is the primary key, so retries are harmless).
 - **Free = basic app**: 0 GB cloud storage and no offline route downloads. Everything else

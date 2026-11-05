@@ -252,7 +252,7 @@ FAQ = [
   ("How fresh is information like crowds and opening hours?", "<p>Live information such as crowd updates is shown with a “updated X ago” label, so you always know how old it is. When you are offline you see the last version you downloaded.</p>"),
  ]),
  ("pricing", "Pricing &amp; billing", [
-  ("How much does CaminoPlus cost?", "<p>The basic app is free. Pilgrim Plus costs <b>$11.99 per year</b> and adds offline route downloads and 5 GB of cloud storage. See <a href=\"/pricing\">Pricing</a> for details.</p>"),
+  ("How much does CaminoPlus cost?", "<p>The basic app is free. Pilgrim Plus costs <b>$12 per year</b> and adds offline route downloads and 5 GB of cloud storage. See <a href=\"/pricing\">Pricing</a> for details.</p>"),
   ("What can I do on the free plan?", "<p>You can use the basic app with a connection: browse routes and stages, look up stays and cafés, watch stories in Explore and keep your passport and journal on your phone. The free plan has no offline route downloads and no cloud storage.</p>"),
   ("How do I pay?", "<p>Subscriptions are bought through the App Store or Google Play, using the payment method on your store account. Prices may be shown in your local currency.</p>"),
   ("Does the subscription renew automatically?", "<p>Yes, yearly, until you cancel. You can turn off auto-renew at any time in your App Store or Google Play subscription settings, and you keep access until the end of the paid year.</p>"),
@@ -301,7 +301,7 @@ def home():
     <h1 class="display">Every step of the Way, <em>even offline.</em></h1>
     <p class="lead">CaminoPlus is the pilgrim's companion for the Camino de Santiago. Maps that work without signal, places to sleep and eat, a digital passport for your stamps, and a journal to share the journey. Every route, starting wherever you start.</p>
     {stores()}
-    <p class="hero-note">Launching on iPhone and Android. Free to start, $11.99 a year for offline maps.</p>
+    <p class="hero-note">Launching on iPhone and Android. Free to start, $12 a year for offline maps.</p>
   </div>
   <div class="phones" aria-label="App screens">
     {shot("me-journey", "Me tab with journey feed", False)}
@@ -314,7 +314,7 @@ def home():
   <li>{icon("route")}All Camino routes, start anywhere</li>
   <li>{icon("wifioff")}Works 6–8 hours with no signal</li>
   <li>{icon("watch")}Apple Watch &amp; Garmin</li>
-  <li>{icon("tag")}$11.99 a year, 5 GB cloud included</li>
+  <li>{icon("tag")}$12 a year, 5 GB cloud included</li>
 </ul></div></section>
 
 <section class="section"><div class="wrap">
@@ -382,7 +382,7 @@ def home():
     <article class="card pad-lg plan featured">
       <span class="badge-best">For the walk</span>
       <div><h3>Pilgrim Plus</h3><p class="muted" style="margin-top:6px">Everything, offline.</p></div>
-      <p class="price">$11.99<small> / year</small></p>
+      <p class="price">$12<small> / year</small></p>
       <div class="on-dark"><ul class="ticks"><li>Offline route downloads, stage by stage</li><li>5 GB cloud storage for photos and journal</li><li>Extra storage: $5 per 5 GB a year</li></ul></div>
       <a class="btn btn-gold" href="/pricing">See pricing</a>
     </article>
@@ -403,9 +403,9 @@ def home():
          "applicationCategory": "TravelApplication",
          "description": "Offline-first companion app for the Camino de Santiago.",
          "offers": [{"@type": "Offer", "price": "0", "priceCurrency": "USD", "name": "Free"},
-                    {"@type": "Offer", "price": "11.99", "priceCurrency": "USD", "name": "Pilgrim Plus (yearly)"}]}]}
+                    {"@type": "Offer", "price": "12.00", "priceCurrency": "USD", "name": "Pilgrim Plus (yearly)"}]}]}
     page("index", "CaminoPlus · The offline Camino de Santiago app",
-         "Offline maps, stays, a digital pilgrim passport and a shareable journal for every Camino de Santiago route. Works without signal. Free to start, $11.99 a year.",
+         "Offline maps, stays, a digital pilgrim passport and a shareable journal for every Camino de Santiago route. Works without signal. Free to start, $12 a year.",
          body, None, ld)
 
 def features():
@@ -499,7 +499,7 @@ def pricing():
     <article class="card pad-lg plan featured">
       <span class="badge-best">For the walk</span>
       <div><h3>Pilgrim Plus</h3><p class="muted" style="margin-top:6px">Everything in Free, plus offline.</p></div>
-      <p class="price">$11.99<small> / year</small></p>
+      <p class="price">$12<small> / year</small></p>
       <div class="on-dark"><ul class="ticks"><li>Download your route stage by stage</li><li>Offline map and GPS for 6–8 hours without signal</li><li>5 GB cloud storage for photos, posts and stamps</li><li>Syncs automatically when you are back online</li></ul></div>
       <a class="btn btn-gold" href="/#download">Get notified at launch</a>
     </article>
@@ -524,8 +524,8 @@ def pricing():
 {cta()}'''
     ld = {"@context": "https://schema.org", "@type": "Product", "name": "Pilgrim Plus",
           "description": "Yearly subscription with offline route downloads and 5 GB cloud storage.",
-          "offers": {"@type": "Offer", "price": "11.99", "priceCurrency": "USD"}}
-    page("pricing", "Pricing", "CaminoPlus is free to start. Pilgrim Plus is $11.99 a year with offline route downloads and 5 GB of cloud storage. Extra storage is $5 per 5 GB a year.", body, "pricing", ld)
+          "offers": {"@type": "Offer", "price": "12.00", "priceCurrency": "USD"}}
+    page("pricing", "Pricing", "CaminoPlus is free to start. Pilgrim Plus is $12 a year with offline route downloads and 5 GB of cloud storage. Extra storage is $5 per 5 GB a year.", body, "pricing", ld)
 
 def offline():
     steps = [("Pick your route", "Choose a Camino and the town you start from. CaminoPlus lists your stages."),
@@ -570,7 +570,7 @@ def offline():
   <span class="ic">{icon("globe")}</span>
   <h3>Built on OpenStreetMap</h3>
   <p class="muted">Offline maps are made from OpenStreetMap, the free, community-built map of the world, which is especially detailed along the Camino. Map data © <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap contributors</a>, available under the Open Database License.</p>
-  <p class="muted">Offline downloads are part of <a href="/pricing">Pilgrim Plus</a> ($11.99 a year).</p>
+  <p class="muted">Offline downloads are part of <a href="/pricing">Pilgrim Plus</a> ($12 a year).</p>
 </div></div></section>
 {cta()}'''
     page("offline-maps", "Offline maps", "How CaminoPlus offline maps work: download each Camino stage (about 2–5 MB) and walk 6–8 hours without signal with GPS, stays and points of interest.", body, "offline-maps")
@@ -706,7 +706,7 @@ def terms():
 <p>Keep your sign-in details safe and tell us if you think someone else is using your account. You are responsible for activity on your account.</p>
 <h2>3. Subscriptions and payment</h2>
 <ul>
-<li>The basic app is free. Pilgrim Plus is a yearly subscription (currently US$11.99 a year) that includes offline route downloads and 5 GB of cloud storage. Extra storage is sold in blocks of 5 GB for US$5 a year.</li>
+<li>The basic app is free. Pilgrim Plus is a yearly subscription (currently US$12 a year) that includes offline route downloads and 5 GB of cloud storage. Extra storage is sold in blocks of 5 GB for US$5 a year.</li>
 <li>Subscriptions are bought and managed through the App Store or Google Play and renew automatically each year until you cancel in your store account settings. Cancelling stops the next renewal; you keep access until the end of the paid period.</li>
 <li>Refunds are handled by Apple or Google under their policies. Local consumer rights are not affected.</li>
 <li>We may change prices for future periods. We will tell you in advance, and the store will ask for your consent where required.</li>
