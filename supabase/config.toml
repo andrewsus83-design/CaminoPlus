@@ -24,6 +24,8 @@ site_url = "https://camino.plus"
 additional_redirect_urls = [
   "https://camino.plus/auth/callback",
   "caminoplus://auth-callback",
+  "caminoplus://**",
+  "exp://**",
   "http://localhost:3000/auth/callback",
 ]
 enable_signup = true

@@ -2,11 +2,12 @@ import { View } from 'react-native';
 import { Screen } from '@/components/Screen';
 import { AppText } from '@/components/AppText';
 import { Card, SectionLabel } from '@/components/ui';
+import { AccountSection } from '@/components/AccountSection';
+import { config } from '@/lib/config';
 import { c, radius } from '@/theme';
 
 const rows = {
-  Account: [['Email', 'ana@example.com'], ['Password', 'Change']],
-  'Plan and storage': [['CaminoPlus', '$11.99 / year'], ['Extra storage', '$5 per 5 GB / year']],
+  'Plan and storage': [['CaminoPlus', config.priceLabel], ['Extra storage', '$5 per 5 GB / year']],
   Devices: [['Apple Watch', 'Connect'], ['Garmin', 'Connect']],
 } as const;
 
@@ -14,6 +15,7 @@ export default function Settings() {
   return (
     <Screen>
       <AppText variant="h2">Settings</AppText>
+      <AccountSection />
       <Card style={{ gap: 10 }}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
           <AppText variant="label">Cloud storage</AppText>
