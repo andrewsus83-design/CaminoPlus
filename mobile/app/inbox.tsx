@@ -74,7 +74,7 @@ export default function Inbox() {
       <View style={{ paddingTop: insets.top + layout.screenTop, paddingHorizontal: layout.screenMargin, paddingBottom: 12 }}>
         <ScreenHeader title="Inbox" onBack={() => goBack(router)} right={<IconButton name="compose" label="New chat" onPress={() => router.push('/chat/new')} />} />
       </View>
-      <View style={{ paddingHorizontal: 12 }}><SegmentedTabs tabs={tabs} value={tab} onChange={(k) => { setTab(k); router.setParams({ tab: k }); }} /></View>
+      <View style={{ paddingHorizontal: layout.screenMargin }}><SegmentedTabs tabs={tabs} value={tab} onChange={(k) => { setTab(k); router.setParams({ tab: k }); }} /></View>
       {!online && <Notice icon="wifi-off" text="You are offline. Showing what was loaded last." />}
 
       {tab === 'notifications' && (

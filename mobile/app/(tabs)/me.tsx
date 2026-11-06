@@ -257,7 +257,7 @@ export default function Me() {
       </Screen>
       <Modal visible={editBio} transparent animationType="slide" onRequestClose={() => setEditBio(false)}>
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(20,54,93,0.45)' }}>
-          <View style={{ backgroundColor: role.bg, borderTopLeftRadius: radius.lg, borderTopRightRadius: radius.lg, padding: 24, paddingBottom: insets.bottom + 24, gap: 16 }}>
+          <View style={{ backgroundColor: role.bg, borderTopLeftRadius: radius.lg, borderTopRightRadius: radius.lg, paddingHorizontal: layout.screenMargin, paddingTop: 24, paddingBottom: insets.bottom + 24, gap: 16 }}>
             <AppText variant="h4">Your description</AppText>
             <TextInput autoFocus multiline maxLength={160} value={bioDraft} onChangeText={setBioDraft} placeholder="Pilgrim from Jakarta, walking for my family…" placeholderTextColor={role.muted} style={{ minHeight: 110, textAlignVertical: 'top', fontFamily: fonts.body, fontSize: 19, lineHeight: 28, color: role.text, backgroundColor: role.surface, borderRadius: radius.lg, borderWidth: 1, borderColor: role.border, padding: 16 }} />
             <AppText variant="caption" muted style={{ textAlign: 'right' }}>{bioDraft.length} / 160</AppText>

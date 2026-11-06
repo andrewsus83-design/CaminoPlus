@@ -129,7 +129,7 @@ function Viewer({ posts, media, start, onClose }: { posts: Post[]; media: Record
                 ) : (
                   <PostVisual post={item} media={list[0]} index={index} active={index === cur} />
                 )}
-                <View pointerEvents="none" style={{ position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: 20, paddingTop: 60, paddingBottom: insets.bottom + 28, gap: 6, backgroundColor: 'rgba(0,0,0,0.35)' }}>
+                <View pointerEvents="none" style={{ position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: layout.screenMargin, paddingTop: 60, paddingBottom: insets.bottom + 28, gap: 6, backgroundColor: 'rgba(0,0,0,0.35)' }}>
                   <AppText variant="label" color="#FFFFFF">{[item.place_name, dateOf(item.published_at)].filter(Boolean).join(' · ') || 'On the Camino'}</AppText>
                   {!!item.body && list.length > 0 && <AppText variant="small" color="#FFFFFF" numberOfLines={4}>{item.body}</AppText>}
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>

@@ -16,7 +16,7 @@ import { useMapModel } from '@/features/map/useMapModel';
 import { CompassIcon, LightIcon, NearChips, Notice, RecenterPill, RoundBtn, WalkBanner, WalkCard, ZoomPair, walkTheme } from '@/features/map/WalkUi';
 import { useWalkSettings } from '@/features/map/walkSettings';
 import { POI_KINDS } from '@/features/map/walkLayers';
-import { c, radius, role, shadowStyle } from '@/theme';
+import { c, layout, radius, role, shadowStyle } from '@/theme';
 
 // 'Helicopter' = whole route, 'City' = the Walk view (tilted, heading-up, close around you). Shown with plain names.
 const LAYERS: { mode: MapLayerMode; label: string }[] = [{ mode: 'Helicopter', label: 'Whole route' }, { mode: 'City', label: 'Near me' }];
@@ -181,7 +181,7 @@ export default function Maps() {
       )}
 
       {m.glyphs && !m.useOnlineTiles && m.packSources.length === 0 && (
-        <View pointerEvents="none" style={{ position: 'absolute', left: 24, right: 24, top: '36%', backgroundColor: role.surface, borderRadius: radius.lg, padding: 24, gap: 8 }}>
+        <View pointerEvents="none" style={{ position: 'absolute', left: layout.screenMargin, right: layout.screenMargin, top: '36%', backgroundColor: role.surface, borderRadius: radius.lg, padding: 24, gap: 8 }}>
           <AppText variant="h4">No map tiles yet</AppText>
           <AppText variant="body" muted>{m.online === false ? 'You are offline and this stage has no offline pack. Download it in Offline maps.' : 'The online base map needs a MapTiler key (EXPO_PUBLIC_MAPTILER_KEY), or download this stage in Offline maps.'}</AppText>
         </View>
@@ -192,7 +192,7 @@ export default function Maps() {
         <Fragment key="walk">
           {/* Top: instruction banner and the "What is near" chips; below them notices on the left, round buttons on the right.
               The map keeps getting touches everywhere around them. */}
-          <View pointerEvents="box-none" style={{ position: 'absolute', top: insets.top + 8, left: 12, right: 12 }}>
+          <View pointerEvents="box-none" style={{ position: 'absolute', top: insets.top + 8, left: layout.screenMargin, right: layout.screenMargin }}>
             <View pointerEvents="box-none" style={{ gap: 8 }} onLayout={(e) => setAboveH(Math.round(e.nativeEvent.layout.height))}>
               <View onLayout={(e) => setBannerH(Math.round(e.nativeEvent.layout.height))}>
                 <WalkBanner banner={m.nav.banner} night={night} />
@@ -254,7 +254,7 @@ export default function Maps() {
           </View>
 
           {!poi && !follow && (
-            <View pointerEvents="box-none" style={{ position: 'absolute', left: 12, bottom: cardH + 12 }}>
+            <View pointerEvents="box-none" style={{ position: 'absolute', left: layout.screenMargin, bottom: cardH + 12 }}>
               <RecenterPill night={night} onPress={recenter} />
             </View>
           )}
@@ -285,7 +285,7 @@ export default function Maps() {
       ) : (
         <Fragment key="heli">
           {/* Top: layer switch + pack status */}
-          <View pointerEvents="box-none" style={{ position: 'absolute', top: insets.top + 8, left: 16, right: 16, gap: 10 }}>
+          <View pointerEvents="box-none" style={{ position: 'absolute', top: insets.top + 8, left: layout.screenMargin, right: layout.screenMargin, gap: 10 }}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
               <View style={{ flexDirection: 'row', padding: 4, borderRadius: radius.pill, backgroundColor: role.surface, ...shadowStyle('md') }}>
                 {LAYERS.map((l) => (
@@ -317,7 +317,7 @@ export default function Maps() {
           </View>
 
           {/* Right: GPS mode + locate me */}
-          {!poi && <View pointerEvents="box-none" style={{ position: 'absolute', right: 16, bottom: sheetBottom + 16, gap: 10, alignItems: 'flex-end' }}>
+          {!poi && <View pointerEvents="box-none" style={{ position: 'absolute', right: layout.screenMargin, bottom: sheetBottom + 16, gap: 10, alignItems: 'flex-end' }}>
             <HelpBellButton tone="day" size={48} onPress={() => setHelpOpen(true)} />
             <Pressable
               accessibilityRole="switch"
@@ -412,7 +412,7 @@ function StatusPill({ status, online, onPress }: { status: ReturnType<typeof use
 /** Pop-up card that appears over the map when a place is tapped. */
 function PoiPopup({ poi, bottom, onClose }: { poi: (typeof pois)[number]; bottom: number; onClose: () => void }) {
   return (
-    <View style={{ position: 'absolute', left: 16, right: 16, bottom, borderRadius: radius.lg, backgroundColor: role.surface, padding: 20, gap: 10, ...shadowStyle('lg') }}>
+    <View style={{ position: 'absolute', left: layout.screenMargin, right: layout.screenMargin, bottom, borderRadius: radius.lg, backgroundColor: role.surface, padding: 20, gap: 10, ...shadowStyle('lg') }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
         <View style={{ paddingHorizontal: 12, height: 30, borderRadius: radius.pill, backgroundColor: c.goldWash, justifyContent: 'center' }}>
           <AppText variant="caption" color={c.goldInk}>{KIND_LABEL[poi.kind]}{poi.xp ? ` · +${poi.xp} XP` : ''}</AppText>

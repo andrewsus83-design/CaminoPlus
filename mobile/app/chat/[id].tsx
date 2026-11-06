@@ -210,7 +210,7 @@ export default function ChatScreen() {
           listRef.current?.scrollToOffset({ offset: info.averageItemLength * info.index, animated: true });
           setTimeout(() => listRef.current?.scrollToIndex({ index: info.index, viewPosition: 0.5, animated: true }), 350);
         }}
-        contentContainerStyle={{ paddingHorizontal: 10, paddingVertical: 10 }}
+        contentContainerStyle={{ paddingHorizontal: layout.screenMargin, paddingVertical: 10 }}
         ListFooterComponent={chat.loadingMore ? <ActivityIndicator color={role.action} style={{ margin: 16 }} /> : !chat.hasMore ? <StartOfChat text={group ? 'This is the start of the group' : `This is the start of your chat with ${title}`} /> : undefined}
       />
     );
@@ -218,7 +218,7 @@ export default function ChatScreen() {
 
   return (
     <KeyboardAvoidingView behavior="padding" style={{ flex: 1, backgroundColor: role.bg }}>
-      <View style={{ paddingTop: insets.top + 8, paddingBottom: 10, paddingHorizontal: 12, flexDirection: 'row', alignItems: 'center', gap: 6, borderBottomWidth: 1, borderBottomColor: role.border, backgroundColor: role.bg }}>
+      <View style={{ paddingTop: insets.top + 8, paddingBottom: 10, paddingHorizontal: layout.screenMargin, flexDirection: 'row', alignItems: 'center', gap: 6, borderBottomWidth: 1, borderBottomColor: role.border, backgroundColor: role.bg }}>
         <IconButton name="back" label="Back" flat onPress={() => goBack(router)} />
         <Pressable accessibilityRole="button" accessibilityLabel={`${title}. ${group ? pilgrimsLabel(conv?.member_count ?? 0) : 'Friend'}. Open chat info`} onPress={() => router.push(`/chat/info/${id}`)} style={{ flex: 1, minHeight: 52, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
           {conv
@@ -268,7 +268,7 @@ function StartOfChat({ text }: { text: string }) {
 
 function LoadingBubbles() {
   return (
-    <View accessibilityRole="progressbar" accessibilityLabel="Loading messages" style={{ flex: 1, justifyContent: 'flex-end', padding: 14, gap: 10 }}>
+    <View accessibilityRole="progressbar" accessibilityLabel="Loading messages" style={{ flex: 1, justifyContent: 'flex-end', paddingHorizontal: layout.screenMargin, paddingVertical: 14, gap: 10 }}>
       {[[false, 190], [false, 120], [true, 150], [false, 230], [true, 100], [true, 210]].map(([mine, w], i) => (
         <View key={i} style={{ alignSelf: mine ? 'flex-end' : 'flex-start', width: w as number, height: 46, borderRadius: 20, backgroundColor: mine ? c.blue100 : c.sand200 }} />
       ))}
