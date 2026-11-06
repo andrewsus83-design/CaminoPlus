@@ -1,10 +1,12 @@
 name: Build and test the offline pack
 description: >
-  Installs the tools, builds the default pack of the stage named in $STAGE (3 km corridor, z15),
-  checks its quality band and proves it renders with the network blocked and with the device
-  offline. Both jobs of offline-maps.yml use it, so a pack that gets published is built and tested
-  exactly like a pack that is only measured. The pack files stay on the runner: this repository is
-  public, so never upload them as an artifact (that would bypass Pilgrim Plus).
+  Installs the tools, builds the default pack of the stage named in $STAGE (corridor width and max zoom
+  come from the stage file), checks its quality band and proves it renders with the network blocked and
+  with the device offline. The job environment names the stage: STAGE (stages/<slug>.json, relative to
+  tools/offline-maps), SLUG and PACK (<slug>-<buffer_km>km-z<maxzoom>). Both jobs of offline-maps.yml use
+  this action, so a pack that gets published is built and tested exactly like a pack that is only
+  measured. The pack files stay on the runner: this repository is public, so never upload them as an
+  artifact (that would bypass Pilgrim Plus).
 
 inputs:
   route-fallback:
@@ -48,12 +50,33 @@ runs:
         path: tools/offline-maps/data/sources
         key: planetiler-sources-v2
 
-    - name: Build default pack (3 km corridor, z15)
+    # The OSM extracts of this stage (Geofabrik, 60 to 340 MB each). build_stage.sh keeps them in data/osm
+    # and reuses a file that is already there. One cache entry per set of extract URLs and ISO week, so
+    # stages that share extracts download them once a week, not once per stage (Geofabrik asks for gentle use).
+    # A job saves the cache only when it ends green (actions/cache saves in its post step).
+    # No restore-keys on purpose: a fallback to an older week would restore an old extract, build_stage.sh
+    # would reuse it, and the post step would save it again under this week's key, so it would never refresh.
+    - name: Work out the extract cache key
+      id: extracts
+      shell: bash
+      working-directory: tools/offline-maps
+      run: |
+        hash="$(python3 -c 'import hashlib, json, sys; urls = sorted(json.load(open(sys.argv[1]))["osm_extracts"]); print(hashlib.sha256("\n".join(urls).encode()).hexdigest()[:16])' "$STAGE")"
+        {
+          echo "hash=$hash"
+          echo "week=$(date -u +%G-W%V)"
+        } >> "$GITHUB_OUTPUT"
+    - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: tools/offline-maps/data/osm
+        key: osm-extracts-v1-${{ steps.extracts.outputs.hash }}-${{ steps.extracts.outputs.week }}
+
+    - name: Build the pack (corridor width and zoom come from the stage file)
       shell: bash
       working-directory: tools/offline-maps
       env:
         ROUTE_FALLBACK: ${{ inputs.route-fallback }}
-      run: scripts/build_stage.sh "$STAGE" 3 15
+      run: scripts/build_stage.sh "$STAGE"
 
     - name: Quality gates (size, tiles, layers, route source)
       shell: bash
@@ -76,16 +99,34 @@ runs:
           --route "dist/$SLUG.route.geojson" --corridor "dist/$PACK.corridor.geojson"
       # The test exits 1 on any failed check, so the step summary below only prints for a pass.
 
+    # Shows, per view of the stage file, what was drawn next to the floor the stage file sets. A view
+    # without floors (or a stage without render_checks) still gets a line, and a summary that cannot be
+    # read never fails the job: the render test above is the gate.
     - name: Render summary
       shell: bash
       working-directory: tools/offline-maps
       run: |
         python3 - <<'PY' | tee -a "$GITHUB_STEP_SUMMARY"
         import json, os
-        r = json.load(open(f"dist/render/{os.environ['PACK']}.report.json"))
-        print(f"render ok: {r['ok']}, console/map errors: {len(r['errors'])}, requests that left the device: {len(r['blocked_requests'])}")
-        for v in r["views"][1:]:
-            f = v["features"]
-            print(f"- {v['name']}: " + ", ".join(f"{k} {f.get(k, 0)}" for k in ("poi", "transportation", "building", "mountain_peak")) + f"; labels: place {v['layers'].get('place', 0)}, peak {v['layers'].get('peak', 0)}")
-        print(f"- device offline overview: {sum(r['device_offline']['features'].values())} features")
+        try:
+            r = json.load(open(f"dist/render/{os.environ['PACK']}.report.json"))
+            checks = json.load(open(os.environ["STAGE"])).get("render_checks") or []
+            floors = {(c.get("name") or ",".join(map(str, c.get("at") or []))): c for c in checks}
+            views = r.get("views") or []
+            print(f"render ok: {r.get('ok')}, console/map errors: {len(r.get('errors') or [])}, requests that left the device: {len(r.get('blocked_requests') or [])}")
+            for v in views[1:]:  # views[0] is the overview of the whole pack
+                c = floors.get(v.get("name")) or {}
+                features, layers = v.get("features") or {}, v.get("layers") or {}
+                counts = [f"{k} {features.get(k, 0)} (min {n})" for k, n in (c.get("min_features") or {}).items()]
+                labels = [f"{k} {layers.get(k, 0)} (min {n})" for k, n in (c.get("min_labels") or {}).items()]
+                if counts or labels:
+                    print(f"- {v.get('name')}: " + "; ".join(x for x in (", ".join(counts), "labels: " + ", ".join(labels) if labels else "") if x))
+                else:
+                    top = ", ".join(f"{k} {n}" for k, n in sorted(features.items(), key=lambda kv: -kv[1])[:4]) or "nothing rendered"
+                    print(f"- {v.get('name')}: no floors set for this view; most features: {top}")
+            if len(views) < 2:
+                print("- the stage file has no render_checks, so only the overview of the pack was rendered")
+            print(f"- device offline overview: {sum((r.get('device_offline') or {}).get('features', {}).values())} features")
+        except Exception as e:  # cosmetic step: say what went wrong, do not fail the job
+            print(f"render summary unavailable: {type(e).__name__}: {e}")
         PY

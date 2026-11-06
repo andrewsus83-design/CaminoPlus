@@ -1,14 +1,21 @@
-# Offline map packs: build, measure, test offline rendering, and (on schedule or
-# by hand) publish to Supabase Storage (R2 later) + register in offline_packs.
+# Offline map packs: plan which stages to run, build them (one matrix job per stage), test offline
+# rendering, and (on schedule or by hand) publish to Supabase Storage (R2 later) + register in
+# offline_packs. How the jobs fit together, what they cost and how to run every stage by hand:
+# tools/offline-maps/docs/ci-matrix.md
 #
-# - build job (pull_request touching tools/offline-maps, or a manual run without "publish"):
-#   build stage 1 in several corridor widths / zooms, report the real sizes, prove the pack
-#   renders offline. Never uploads a pack and never sees a secret.
-# - publish job (monthly schedule, or a manual run with "publish"): the same build with the stricter
-#   gates (route must come from OSM, OSM data must be fresh, size and tile count inside the band
-#   of the stage file and close to the live pack), then upload + register through
-#   public.register_offline_pack. It runs in the GitHub Environment "pack-publish": the owner
-#   can add required reviewers there, so nothing reaches Pilgrim Plus users without an approval.
+# - plan job: decides the matrix with tools/offline-maps/scripts/list_stages.mjs.
+#     pull_request                      the stage files the pull request changed, plus stage 1 (the canary)
+#                                       when it touched the build tooling; at most PR_STAGE_CAP stages
+#     manual run without "publish"      the stages of the "stages" input (all, or a list of slugs)
+#     schedule, or manual with "publish"  the stages that have a "quality" band (calibrated ones), narrowed by "stages"
+# - build job (pull_request touching tools/offline-maps, or a manual run without "publish"): one job per
+#   planned stage, 6 at a time. Every stage proves its pack renders offline; stage 1 also builds several
+#   corridor widths / zooms and reports the real sizes. Never uploads a pack and never sees a secret.
+# - publish job (monthly schedule, or a manual run with "publish"): one job per calibrated stage, 2 at a
+#   time, the same build with the stricter gates (route must come from OSM, OSM data must be fresh, size
+#   and tile count inside the band of the stage file and close to the live pack), then upload + register
+#   through public.register_offline_pack. It runs in the GitHub Environment "pack-publish": the owner can
+#   add required reviewers there, so nothing reaches Pilgrim Plus users without an approval.
 #
 # Artifacts hold JSON only (manifest, measurements, render report). The .pmtiles files are never
 # uploaded: the repository is public, so an artifact is downloadable by any GitHub user and would
@@ -19,6 +26,8 @@ on:
   pull_request:
     paths:
       - 'tools/offline-maps/**'
+      - 'tools/offline-maps/stages/**'
+      - 'tools/offline-maps/catalog/**'
       - '.github/workflows/offline-maps.yml'
       - '.github/actions/build-offline-pack/**'
   schedule:
@@ -26,30 +35,132 @@ on:
   workflow_dispatch:
     inputs:
       publish:
-        description: 'Upload the pack and register it in Supabase'
+        description: 'Upload the packs and register them in Supabase (only stages with a quality band)'
         type: boolean
         default: false
+      stages:
+        description: 'Which stages: all, or slugs separated by commas (camino-frances-07,camino-frances-08)'
+        type: string
+        default: 'all'
 
 permissions:
   contents: read
 
 # No workflow-level concurrency: a newer run must never cancel a publish that is in flight.
-# Each job sets its own rule below.
+# Each job sets its own rule below, and the rule names the stage: a job-level group is shared by
+# every leg of a matrix, so without the slug the legs would cancel or queue each other.
 
 env:
-  STAGE: stages/camino-frances-01.json
-  SLUG: camino-frances-01
-  PACK: camino-frances-01-3km-z15
   PLANETILER_VERSION: '0.10.2'
+  # The most stages one pull request builds, the canary included. The rest: run the workflow by hand.
+  PR_STAGE_CAP: '12'
 
 jobs:
+  plan:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
+      count: ${{ steps.plan.outputs.count }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          # A pull request needs its history to see what it changed.
+          fetch-depth: ${{ github.event_name != 'pull_request' && '1' || '0' }}
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22'
+
+      - name: Plan the stages
+        id: plan
+        working-directory: tools/offline-maps
+        env:
+          # Inputs reach the script as environment variables only, never pasted into the script text.
+          EVENT_NAME: ${{ github.event_name }}
+          PUBLISH: ${{ inputs.publish }}
+          STAGES: ${{ inputs.stages || 'all' }}
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          set -euo pipefail
+
+          case "$EVENT_NAME" in
+            pull_request) mode="pr" ;;
+            schedule) mode="publish" ;;
+            workflow_dispatch)
+              if [ "$PUBLISH" = "true" ]; then mode="publish"; else mode="all"; fi ;;
+            *) echo "::error::unexpected event: $EVENT_NAME"; exit 1 ;;
+          esac
+
+          # "all" or comma separated slugs. Checked here, before it goes anywhere else.
+          if ! [[ "$STAGES" =~ ^[a-z0-9,-]+$ ]]; then
+            echo "::error title=stages input::stages must be 'all' or stage slugs separated by commas, like camino-frances-07,camino-frances-08 (lower-case letters, digits and hyphens, no spaces)"
+            exit 1
+          fi
+
+          args=(--mode "$mode")
+          if [ "$mode" = pr ]; then
+            changed="$RUNNER_TEMP/changed-files.txt"
+            git -C "$GITHUB_WORKSPACE" -c core.quotePath=false diff --name-only "origin/${BASE_REF}...HEAD" > "$changed"
+            echo "$(wc -l < "$changed") file(s) changed against $BASE_REF"
+            args+=(--changed-file "$changed" --cap "$PR_STAGE_CAP")
+          elif [ "$STAGES" != all ]; then
+            args+=(--only "$STAGES")
+          fi
+
+          plan="$RUNNER_TEMP/plan.json"
+          notes="$RUNNER_TEMP/plan.notes"
+          if ! node scripts/list_stages.mjs "${args[@]}" > "$plan" 2> "$notes"; then
+            cat "$notes" >&2
+            exit 1
+          fi
+
+          # list_stages prints {"include":[...],"count":N}. The matrix is only the include part.
+          count="$(jq -r '.count' "$plan")"
+          {
+            echo "matrix=$(jq -c '{include: .include}' "$plan")"
+            echo "count=$count"
+          } >> "$GITHUB_OUTPUT"
+
+          while IFS= read -r note; do
+            echo "::warning title=offline-maps plan::$note"
+          done < "$notes"
+          {
+            echo "### offline-maps plan: $mode mode, $count stage(s)"
+            echo
+            if [ "$count" = 0 ]; then
+              echo "Nothing to run."
+            else
+              jq -r '.include[] | "- " + .slug + " (" + .pack + ")"' "$plan"
+            fi
+            if [ -s "$notes" ]; then echo; sed 's/^/- /' "$notes"; fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          # Publishing nothing must be loud: a monthly run that quietly publishes no stage is a bug.
+          if [ "$mode" = publish ] && [ "$count" = 0 ]; then
+            echo "::error title=nothing to publish::No stage with a quality band was selected, so nothing can be published. A stage without a quality band is never published: calibrate it first (tools/offline-maps/docs/ci-matrix.md)."
+            exit 1
+          fi
+
   build:
-    if: github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && !inputs.publish)
+    name: build ${{ matrix.slug }}
+    needs: plan
+    # Nothing planned (for example a pull request that only touched the catalog): the job is skipped.
+    if: needs.plan.outputs.count != '0' && (github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && !inputs.publish))
     runs-on: ubuntu-24.04
     timeout-minutes: 60
+    strategy:
+      fail-fast: false # a red stage must not hide the others
+      max-parallel: 6 # the cost cap: Geofabrik and the other download servers ask to be treated gently
+      matrix: ${{ fromJson(needs.plan.outputs.matrix) }}
     concurrency:
-      group: offline-maps-build-${{ github.ref }}
+      group: offline-maps-build-${{ github.ref }}-${{ matrix.slug }}
       cancel-in-progress: true
+    env:
+      STAGE: ${{ matrix.stage }}
+      SLUG: ${{ matrix.slug }}
+      PACK: ${{ matrix.pack }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -60,14 +171,16 @@ jobs:
           route-fallback: allow
           publishing: 'false'
 
+      # Stage 1 is the canary: the one stage whose corridor widths and zooms are measured (README, "Measured sizes").
       - name: Measure other corridor widths and zooms
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && matrix.slug == 'camino-frances-01'
         working-directory: tools/offline-maps
         run: |
           for b in 2 5; do scripts/build_stage.sh "$STAGE" $b 15; done
           for b in 2 3 5; do scripts/build_stage.sh "$STAGE" $b 14; done
 
       - name: Size report
+        if: matrix.slug == 'camino-frances-01'
         working-directory: tools/offline-maps
         run: |
           {
@@ -88,7 +201,7 @@ jobs:
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
-          name: offline-pack-reports
+          name: offline-pack-reports-${{ matrix.slug }}
           # JSON only. Never add dist/*.pmtiles here (public repository, see the header).
           path: |
             tools/offline-maps/dist/*.json
@@ -97,13 +210,23 @@ jobs:
           if-no-files-found: warn
 
   publish:
-    if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.publish)
+    name: publish ${{ matrix.slug }}
+    needs: plan
+    if: needs.plan.outputs.count != '0' && (github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.publish))
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     environment: pack-publish
+    strategy:
+      fail-fast: false # each stage is registered on its own (one transaction), so one red stage blocks no other
+      max-parallel: 2
+      matrix: ${{ fromJson(needs.plan.outputs.matrix) }}
     concurrency:
-      group: offline-maps-publish
+      group: offline-maps-publish-${{ matrix.slug }}
       cancel-in-progress: false
+    env:
+      STAGE: ${{ matrix.stage }}
+      SLUG: ${{ matrix.slug }}
+      PACK: ${{ matrix.pack }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -128,16 +251,16 @@ jobs:
           R2_BUCKET: ${{ vars.R2_BUCKET || 'caminoplus-packs' }}
         run: |
           if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_SERVICE_ROLE_KEY" ]; then
-            echo "SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY secrets not set; quality gates only, no upload" | tee -a "$GITHUB_STEP_SUMMARY"
-            node scripts/publish_pack.mjs "dist/$PACK.json" --target "$PACK_TARGET" --dry-run
+            echo "$SLUG: SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY secrets not set; quality gates only, no upload" | tee -a "$GITHUB_STEP_SUMMARY"
+            node scripts/publish_pack.mjs "dist/$PACK.json" --stage "$STAGE" --target "$PACK_TARGET" --dry-run
             exit 0
           fi
-          node scripts/publish_pack.mjs "dist/$PACK.json" --target "$PACK_TARGET"
+          node scripts/publish_pack.mjs "dist/$PACK.json" --stage "$STAGE" --target "$PACK_TARGET"
 
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
-          name: offline-pack-reports
+          name: offline-pack-reports-${{ matrix.slug }}
           # JSON only. Never add dist/*.pmtiles here (public repository, see the header).
           path: |
             tools/offline-maps/dist/*.json
