@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View } from 'react-native';
+import { Image, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '@/components/AppText';
@@ -14,9 +14,13 @@ export default function Welcome() {
   const insets = useSafeAreaInsets();
   const [error, setError] = useState<string | null>(null);
   return (
-    <View style={{ flex: 1, backgroundColor: role.bg, paddingTop: insets.top + 48, paddingBottom: insets.bottom + 24, paddingHorizontal: layout.screenMargin }}>
-      <View style={{ flex: 1, justifyContent: 'center', gap: 20 }}>
-        <Wordmark size={52} />
+    <View style={{ flex: 1, backgroundColor: role.bg }}>
+      <View style={{ height: '34%', minHeight: 200, borderBottomLeftRadius: 36, borderBottomRightRadius: 36, overflow: 'hidden', backgroundColor: c.blue }}>
+        <Image source={require('../../assets/images/welcome-hero.webp')} resizeMode="cover" style={{ width: '100%', height: '100%' }} accessibilityLabel="Pilgrim path through golden wheat fields" />
+      </View>
+      <View style={{ flex: 1, paddingTop: 28, paddingBottom: insets.bottom + 24, paddingHorizontal: layout.screenMargin }}>
+      <View style={{ flex: 1, justifyContent: 'center', gap: 16 }}>
+        <Wordmark size={44} />
         <AppText variant="h3">Every Camino, every stage, even offline.</AppText>
         <AppText variant="lead" muted>Plan your pilgrimage, collect stamps, find a bed for tonight and share the way with friends.</AppText>
         <AppText variant="accent" color={c.goldInk}>Buen Camino!</AppText>
@@ -27,6 +31,7 @@ export default function Welcome() {
         <GoogleButton onError={setError} />
         <Pill variant="ghost" label="I already have an account" onPress={() => router.push('/sign-in')} />
         <AppText variant="caption" muted style={{ textAlign: 'center', marginTop: 4 }}>By continuing you agree to the Terms and Privacy Policy at camino.plus.</AppText>
+      </View>
       </View>
     </View>
   );

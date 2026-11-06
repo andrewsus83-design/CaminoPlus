@@ -1,30 +1,31 @@
 import { View } from 'react-native';
-import Svg, { Circle, Path } from 'react-native-svg';
+import Svg, { Circle, G, Path } from 'react-native-svg';
 import { AppText } from '../AppText';
 import { c, fonts } from '@/theme';
 
-// Camino+ wordmark: the "o" is a scallop shell in a circle, "+" in Caveat.
-function ShellO({ size }: { size: number }) {
-  const ribs = [-60, -40, -20, 0, 20, 40, 60];
+// Locked Camino+ logo (same geometry as web/favicon.svg and brand/svg):
+// navy circle with a gold 7-rib scallop shell, then "Camino" and a bold gold "+".
+function ShellMark({ size }: { size: number }) {
   return (
-    <Svg width={size} height={size} viewBox="0 0 48 48">
-      <Circle cx={24} cy={24} r={22} fill={c.gold} />
-      <Path d="M10 27c0-8 6.3-14 14-14s14 6 14 14c-1.6 1.4-3 1.4-4.6 0-1.6 1.4-3 1.4-4.6 0-1.6 1.4-3 1.4-4.8 0-1.6 1.4-3 1.4-4.6 0-1.6 1.4-3 1.4-4.6 0-.6.5-1.1.8-1.6.9Z" fill={c.parchment} />
-      {ribs.map((a) => {
-        const r = (a * Math.PI) / 180;
-        return <Path key={a} d={`M24 34L${24 + 13 * Math.sin(r)} ${34 - 19 * Math.cos(r)}`} stroke={c.goldInk} strokeWidth={1.4} strokeLinecap="round" />;
-      })}
-      <Path d="M20 34h8l-1.5 4h-5Z" fill={c.parchment} />
+    <Svg width={size} height={size} viewBox="0 0 40 40">
+      <Circle cx={20} cy={20} r={20} fill="#14365D" />
+      <G transform="translate(0 -2.12)">
+        <Path d="M20 28.5L5.84 22.20A2.84 2.84 0 0 1 8.64 17.96A2.84 2.84 0 0 1 12.66 14.85A2.84 2.84 0 0 1 17.46 13.21A2.84 2.84 0 0 1 22.54 13.21A2.84 2.84 0 0 1 27.34 14.85A2.84 2.84 0 0 1 31.36 17.96A2.84 2.84 0 0 1 34.16 22.20z" fill="#D9A21B" />
+        <Path d="M20 29.0Q14.09 22.35 8.49 17.82M20 29.0Q16.22 20.86 12.56 14.67M20 29.0Q18.70 20.07 17.43 13.01M20 29.0Q21.30 20.07 22.57 13.01M20 29.0Q23.78 20.86 27.44 14.67M20 29.0Q25.91 22.35 31.51 17.82" stroke="#14365D" strokeWidth={1.15} strokeLinecap="round" fill="none" />
+        <Path d="M15.2 31.4Q18 30.6 18.4 28.3H21.6Q22 30.6 24.8 31.4Q24.6 32.6 20 32.6Q15.4 32.6 15.2 31.4z" fill="#D9A21B" />
+      </G>
     </Svg>
   );
 }
 
 export function Wordmark({ size = 44, color = c.blue }: { size?: number; color?: string }) {
   return (
-    <View style={{ flexDirection: 'row', alignItems: 'flex-end' }} accessibilityRole="header" accessibilityLabel="Camino Plus">
-      <AppText style={{ fontFamily: fonts.title, fontSize: size, lineHeight: size * 1.15, color }}>Camin</AppText>
-      <View style={{ marginBottom: size * 0.12, marginLeft: 1 }}><ShellO size={size * 0.82} /></View>
-      <AppText style={{ fontFamily: fonts.accent, fontSize: size * 0.8, lineHeight: size * 0.8, color: c.gold, alignSelf: 'flex-start', marginLeft: 2 }}>+</AppText>
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: size * 0.22 }} accessibilityRole="header" accessibilityLabel="Camino Plus">
+      <ShellMark size={size * 1.05} />
+      <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
+        <AppText style={{ fontFamily: fonts.title, fontSize: size * 0.95, lineHeight: size * 1.15, color }}>Camino</AppText>
+        <AppText style={{ fontFamily: fonts.bodyBold, fontSize: size * 0.95, lineHeight: size * 1.15, color: c.gold, marginLeft: 1 }}>+</AppText>
+      </View>
     </View>
   );
 }
