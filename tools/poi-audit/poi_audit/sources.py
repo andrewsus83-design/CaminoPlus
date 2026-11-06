@@ -28,7 +28,14 @@ USER_AGENT = "CaminoPlus-POI-audit/0.1 (https://camino.plus; data quality checks
 OVERPASS_URLS = [
     "https://overpass-api.de/api/interpreter",
     "https://overpass.kumi.systems/api/interpreter",
+    "https://overpass.private.coffee/api/interpreter",
 ]
+# Overpass mirrors answer 502/504 whenever they are busy, so one pass over them is not enough: wait and
+# go round again (the wait doubles). The budget keeps a long outage from running into the job timeout:
+# no new round starts when the wait would take the request past it.
+OVERPASS_ROUNDS = 3
+OVERPASS_FIRST_WAIT_S = 20
+OVERPASS_BUDGET_S = 600
 WIKIDATA_SPARQL = "https://query.wikidata.org/sparql"
 COMMONS_API = "https://commons.wikimedia.org/w/api.php"
 OVERTURE_BUCKET = "overturemaps-us-west-2"
@@ -116,18 +123,29 @@ out geom;
 
 def fetch_overpass(cache: Cache, query: str, kind: str = "osm") -> dict:
     def go():
+        # The rounds live here, not in _retry(): _retry only catches requests errors, and "every mirror
+        # failed" is a RuntimeError, so wrapping this in _retry never retried anything (a CI audit gave up
+        # after one 502 and one 504).
         last = None
-        for url in OVERPASS_URLS:
-            try:
-                r = _session().post(url, data={"data": query}, timeout=240)
-                r.raise_for_status()
-                return r.json()
-            except Exception as e:  # try the next mirror
-                last = e
-                print(f"  overpass {url} failed: {e}")
+        wait = OVERPASS_FIRST_WAIT_S
+        started = time.monotonic()
+        for round_no in range(OVERPASS_ROUNDS):
+            for url in OVERPASS_URLS:
+                try:
+                    r = _session().post(url, data={"data": query}, timeout=240)
+                    r.raise_for_status()
+                    return r.json()
+                except Exception as e:  # HTTP error, timeout or a 200 that is not JSON: try the next mirror
+                    last = e
+                    print(f"  overpass {url} failed: {e}")
+            if round_no == OVERPASS_ROUNDS - 1 or time.monotonic() - started + wait > OVERPASS_BUDGET_S:
+                break
+            print(f"  every Overpass mirror failed, going round again in {wait}s")
+            time.sleep(wait)
+            wait *= 2
         raise RuntimeError(f"all Overpass mirrors failed: {last}")
 
-    return cache.get_or_fetch(kind, query, lambda: _retry(go, 2))
+    return cache.get_or_fetch(kind, query, go)
 
 
 # ---------------------------------------------------------------------------

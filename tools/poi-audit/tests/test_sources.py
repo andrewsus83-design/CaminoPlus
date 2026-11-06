@@ -91,6 +91,76 @@ def fake_response(payload):
     return resp
 
 
+def failing_response(status):
+    resp = mock.Mock()
+    resp.raise_for_status.side_effect = sources.requests.HTTPError(f"{status} Server Error")
+    return resp
+
+
+class OverpassFetch(unittest.TestCase):
+    """fetch_overpass goes round the mirrors again after a pause (it used to give up after one pass)."""
+
+    def run_fetch(self, replies, *, budget=None):
+        """replies: one entry per POST, in order: a response, or an exception to raise."""
+        sleeps = []
+        cache = sources.Cache(Path(tempfile.mkdtemp()))
+        with mock.patch.object(sources, "_session") as sess, \
+             mock.patch.object(sources.time, "sleep", side_effect=sleeps.append), \
+             mock.patch.object(sources, "OVERPASS_BUDGET_S", sources.OVERPASS_BUDGET_S if budget is None else budget):
+            sess.return_value.post.side_effect = list(replies)
+            try:
+                result, error = sources.fetch_overpass(cache, "[out:json];out;"), None
+            except RuntimeError as e:
+                result, error = None, e
+            urls = [c.args[0] for c in sess.return_value.post.call_args_list]
+        return result, error, urls, sleeps
+
+    def test_a_second_round_succeeds_after_every_mirror_failed_once(self):
+        n = len(sources.OVERPASS_URLS)
+        replies = [failing_response(502)] * (n - 1) + [sources.requests.ConnectionError("reset")] + [fake_response({"elements": [1]})]
+        result, error, urls, sleeps = self.run_fetch(replies)
+        self.assertIsNone(error)
+        self.assertEqual(result, {"elements": [1]})
+        self.assertEqual(urls, sources.OVERPASS_URLS + sources.OVERPASS_URLS[:1])
+        self.assertEqual(sleeps, [sources.OVERPASS_FIRST_WAIT_S])
+
+    def test_gives_up_after_the_last_round_and_says_why(self):
+        n, rounds = len(sources.OVERPASS_URLS), sources.OVERPASS_ROUNDS
+        result, error, urls, sleeps = self.run_fetch([failing_response(504)] * (n * rounds))
+        self.assertIsNone(result)
+        self.assertIn("all Overpass mirrors failed", str(error))
+        self.assertIn("504", str(error))
+        self.assertEqual(len(urls), n * rounds)
+        # the pause doubles and there is none after the last round
+        self.assertEqual(sleeps, [sources.OVERPASS_FIRST_WAIT_S * 2 ** i for i in range(rounds - 1)])
+
+    def test_the_budget_ends_the_rounds_early(self):
+        n = len(sources.OVERPASS_URLS)
+        result, error, urls, sleeps = self.run_fetch([failing_response(502)] * n, budget=1)
+        self.assertIn("all Overpass mirrors failed", str(error))
+        self.assertEqual(len(urls), n)
+        self.assertEqual(sleeps, [])
+
+    def test_a_200_that_is_not_json_counts_as_a_failed_mirror(self):
+        broken = mock.Mock()
+        broken.raise_for_status.return_value = None
+        broken.json.side_effect = ValueError("runtime error: Query timed out")
+        result, error, urls, sleeps = self.run_fetch([broken, fake_response({"elements": []})])
+        self.assertIsNone(error)
+        self.assertEqual(result, {"elements": []})
+        self.assertEqual(urls, sources.OVERPASS_URLS[:2])
+        self.assertEqual(sleeps, [])
+
+    def test_a_cached_answer_makes_no_request(self):
+        cache = sources.Cache(Path(tempfile.mkdtemp()))
+        with mock.patch.object(sources, "_session") as sess:
+            sess.return_value.post.return_value = fake_response({"elements": [7]})
+            first = sources.fetch_overpass(cache, "[out:json];out;")
+            second = sources.fetch_overpass(cache, "[out:json];out;")
+            self.assertEqual(sess.return_value.post.call_count, 1)
+        self.assertEqual(first, second)
+
+
 class OvertureRelease(unittest.TestCase):
     def setUp(self):
         env = mock.patch.dict(os.environ)  # restores the environment after each test

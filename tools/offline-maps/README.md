@@ -146,6 +146,13 @@ The numbers in `quality` and `render_checks` come from the 2026-11-04 measuremen
 the first monthly run on the real pack confirms them. After a Planetiler upgrade re-measure and edit the stage
 file in the same pull request. A stage without a `quality` band cannot be published.
 
+The `render_checks` floors were first guessed, and the first real CI build (2026-11-06) showed one guess was too
+high: the z15 view of Saint-Jean-Pied-de-Port renders **12** `building` features and Roncesvalles **4** (the pack
+is the same as the one the 2026-11-04 run measured, 1,536 tiles, same layer sizes), so the floors of 30 and 5
+failed a healthy pack. They are now 6 and 2, about half of what was measured. A floor proves the layer is drawn and
+catches a build that lost half its data; it is not a claim about how many buildings OpenStreetMap has there. Set the
+floors of a new stage from its first real build, never from an estimate.
+
 ## Publishing (Supabase Storage now, Cloudflare R2 later)
 
 Decision 2026-11-04: packs live in **Supabase Storage** for now and move to Cloudflare R2

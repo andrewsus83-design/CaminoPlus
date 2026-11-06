@@ -46,7 +46,7 @@
       "min_features": {
         "poi": 100,
         "transportation": 60,
-        "building": 30
+        "building": 6
       },
       "min_labels": {
         "place": 1
@@ -60,7 +60,7 @@
         15
       ],
       "min_features": {
-        "building": 5
+        "building": 2
       },
       "min_labels": {
         "place": 1
