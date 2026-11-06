@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '@/components/AppText';
 import { Pill } from '@/components/Pill';
 import { Choice, routeMeta } from '@/components/auth/Choice';
+import { RouteGuideCard } from '@/components/auth/RouteGuideCard';
 import { AuthShell } from '@/components/auth/AuthShell';
 import { Field, FormMessage } from '@/components/auth/Field';
 import { useAuth } from '@/lib/auth';
@@ -79,8 +80,11 @@ export default function Onboarding() {
 
       {step === 'route' && (routes ? (
         routes.length ? routes.map((r) => (
-          <Choice key={r.id} title={r.name} accent={r.color} selected={route?.id === r.id} onPress={() => setRoute(r)}
-            meta={routeMeta(r)} />
+          <View key={r.id} style={{ gap: 12 }}>
+            <Choice title={r.name} accent={r.color} selected={route?.id === r.id} onPress={() => setRoute(r)}
+              meta={routeMeta(r)} />
+            {route?.id === r.id && <RouteGuideCard slug={r.slug} stageCount={r.stage_count} />}
+          </View>
         )) : <FormMessage tone="info">No routes are published yet.</FormMessage>
       ) : <ActivityIndicator color={role.action} style={{ marginTop: layout.stackGap }} />)}
 

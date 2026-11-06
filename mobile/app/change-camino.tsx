@@ -8,6 +8,7 @@ import { Choice, routeMeta } from '@/components/auth/Choice';
 import { FormMessage } from '@/components/auth/Field';
 import { useAuth } from '@/lib/auth';
 import { listRoutes, listStages, Route, Stage, startJourney } from '@/lib/api';
+import { RouteGuideCard } from '@/components/auth/RouteGuideCard';
 import { layout, role } from '@/theme';
 
 /** Switch to another Camino from inside the app. Starts a new journey; the old one is kept. */
@@ -48,6 +49,7 @@ export default function ChangeCamino() {
       {routes ? routes.map((r) => (
         <View key={r.id} style={{ gap: 12 }}>
           <Choice title={r.name} accent={r.color} selected={route?.id === r.id} onPress={() => setRoute(r)} meta={routeMeta(r)} />
+          {route?.id === r.id && <RouteGuideCard slug={r.slug} stageCount={r.stage_count} />}
           {route?.id === r.id && stages && stages.length > 0 && (
             <View style={{ gap: 8, paddingLeft: 12 }}>
               <AppText variant="label">Start at</AppText>

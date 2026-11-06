@@ -191,7 +191,7 @@ export default function Me() {
         <View style={{ gap: 4 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
             <AppText variant="body" numberOfLines={1} style={{ fontFamily: 'Inter_600SemiBold', flexShrink: 1 }}>{name}</AppText>
-            <Pressable accessibilityRole="button" accessibilityLabel="Edit profile" hitSlop={8} onPress={() => router.push('/edit-account')} style={{ width: 34, height: 34, borderRadius: radius.pill, backgroundColor: role.surface, borderWidth: 1, borderColor: role.border, alignItems: 'center', justifyContent: 'center' }}>
+            <Pressable accessibilityRole="button" accessibilityLabel="Edit description" hitSlop={8} onPress={() => { setBioDraft(profile?.bio ?? ''); setEditBio(true); }} style={{ width: 34, height: 34, borderRadius: radius.pill, backgroundColor: role.surface, borderWidth: 1, borderColor: role.border, alignItems: 'center', justifyContent: 'center', marginRight: -6 }}>
               <Icon name="pen" color={c.blue} size={16} />
             </Pressable>
             <Pressable accessibilityRole="button" accessibilityLabel={isPrivate ? 'Private profile, tap to change' : 'Public profile, tap to change'} onPress={askVisibility} style={{ flexDirection: 'row', alignItems: 'center', gap: 6, height: 34, paddingHorizontal: 12, borderRadius: radius.pill, backgroundColor: isPrivate ? c.sand200 : c.successWash }}>
@@ -199,12 +199,7 @@ export default function Me() {
               <AppText variant="caption" color={isPrivate ? role.text : c.success} style={{ fontFamily: 'Inter_600SemiBold' }}>{isPrivate ? 'Private' : 'Public'}</AppText>
             </Pressable>
           </View>
-          <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 10 }}>
-            <AppText variant="body" muted={!profile?.bio} style={{ flex: 1 }}>{profile?.bio || 'Add a short description about you'}</AppText>
-            <Pressable accessibilityRole="button" accessibilityLabel="Edit description" hitSlop={10} onPress={() => { setBioDraft(profile?.bio ?? ''); setEditBio(true); }} style={{ width: 40, height: 40, borderRadius: radius.pill, backgroundColor: role.surface, borderWidth: 1, borderColor: role.border, alignItems: 'center', justifyContent: 'center' }}>
-              <Icon name="pen" color={c.blue} size={18} />
-            </Pressable>
-          </View>
+          <AppText variant="body" muted={!profile?.bio}>{profile?.bio || 'Add a short description about you'}</AppText>
           {journey?.route ? (
             <Pressable accessibilityRole="button" accessibilityLabel="Change Camino" onPress={() => router.push('/change-camino')} style={{ marginTop: 8, flexDirection: 'row', alignItems: 'center', gap: 14, padding: 14, borderRadius: radius.lg, backgroundColor: c.blue, ...shadowStyle('md') }}>
               <View style={{ width: 52, height: 52, borderRadius: radius.pill, backgroundColor: 'rgba(246,239,226,0.14)', alignItems: 'center', justifyContent: 'center' }}>

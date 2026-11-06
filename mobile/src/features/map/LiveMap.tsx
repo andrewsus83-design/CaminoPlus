@@ -22,6 +22,18 @@ function LiveMapImpl(p: MapViewProps) {
   const lastPoiPress = useRef(0);
   const mapRef = useRef<MapRef>(null);
   const camRef = useRef<CameraRef>(null);
+  // Recenter: fly back to the focus and zoom in close, even after the user panned or zoomed out.
+  const latest = useRef({ focus: p.focus, top: p.insets.top, bottom: p.insets.bottom });
+  latest.current = { focus: p.focus, top: p.insets.top, bottom: p.insets.bottom };
+  const recenterKey = p.recenterKey;
+  useEffect(() => {
+    if (!recenterKey) return;
+    const t = setTimeout(() => {
+      const l = latest.current;
+      camRef.current?.flyTo({ center: l.focus, zoom: 15.2, pitch: 45, bearing: 0, padding: { top: l.top + 24, bottom: l.bottom + 24, left: 32, right: 32 }, duration: 900 });
+    }, 50);
+    return () => clearTimeout(t);
+  }, [recenterKey]);
   const zoomN = p.zoomCmd?.n ?? 0;
   const zoomDir = p.zoomCmd?.dir ?? 1;
   useEffect(() => {
@@ -66,7 +78,7 @@ function LiveMapImpl(p: MapViewProps) {
         if (Date.now() - lastPoiPress.current > 400) p.onSelectPoi(undefined);
       }}
     >
-      <Camera ref={camRef} key={`${p.layer}-${p.recenterKey}`} {...camera} minZoom={4} maxZoom={18} />
+      <Camera ref={camRef} key={p.layer} {...camera} minZoom={4} maxZoom={18} />
 
       {/* Route: remaining = dashed, done = gold. Under labels, above the basemap. */}
       <GeoJSONSource id="route-remaining" data={line(p.remaining)}>
