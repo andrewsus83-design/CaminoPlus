@@ -22,7 +22,7 @@ const FILES = {
   },
 } as const;
 
-const VERSION = '1';
+const VERSION = '2';
 const root = () => new Directory(Paths.document, 'glyphs');
 
 let ready: Promise<string> | null = null;
@@ -50,6 +50,14 @@ async function install() {
         const target = new File(fontDir, `${range}.pbf`);
         if (target.exists) target.delete();
         new File(asset.localUri).copySync(target);
+      }
+      // Every other range gets an empty glyph file. An empty file is a valid "no glyphs here"
+      // answer, so MapLibre stops logging "Failed to load glyph range" for characters we do not bundle.
+      for (let start = 0; start < 65536; start += 256) {
+        const range = `${start}-${start + 255}`;
+        if (range in ranges) continue;
+        const empty = new File(fontDir, `${range}.pbf`);
+        if (!empty.exists) empty.create({ overwrite: true });
       }
     }
     marker.create({ overwrite: true });
