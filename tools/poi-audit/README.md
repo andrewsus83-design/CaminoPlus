@@ -129,3 +129,16 @@ roughly $20-40 per full run. Stays and cafes need no AI calls.
 3. Loader: write findings and scores into Supabase with the service role.
 4. Small admin screen for the review queue (no admin screen exists yet).
 5. Same pipeline for other routes: only the stage file changes.
+
+## Pilot result (stage 1, CI run 42194220473, 2026-11-06)
+
+Sample output in [`samples/camino-frances-01/`](samples/camino-frances-01/report.md), AI steps off
+(no API key yet). Route taken from the OSM relations; 448 places in the corridor
+(OSM 308, Overture 223, Wikidata 57 records).
+
+- 127 stays, 98 cafes/bars/restaurants, 21 churches and chapels, 117 sites, 85 services.
+- 6 closed signals (for example Overture says *Ultreïa* in Saint-Jean is permanently closed while OSM still has it),
+  8 likely duplicates, 8 coordinate disagreements, 93 places only in Overture, 27 stale stays/cafes.
+- 39 linked Commons photos, all with usable licences and taken near the place.
+- Most stays score low because OSM lacks beds, season and price: exactly the fields owners and pilgrims fill best.
+- Noise to tune: some Wikidata mountain passes and razed redoubts land in "sites"; `NO_PHOTO` is chatty.
