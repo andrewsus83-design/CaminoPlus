@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, TextInput, View } from 'react-native';
+import { Alert, Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, TextInput, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '@/components/AppText';
@@ -8,11 +8,12 @@ import { Pill } from '@/components/Pill';
 import { FormMessage } from '@/components/auth/Field';
 import { c, fonts, radius, role } from '@/theme';
 import { useAuth } from '@/lib/auth';
-import { createJournalPost } from '@/lib/api';
+import { PickedMedia, createJournalPost, uploadPostMedia } from '@/lib/api';
 
-// Instagram-story style composer: step 1 is the full-screen canvas (colour, text style,
-// location sticker); step 2 is the share screen (caption, audience, Share).
-// Photos need the image picker native module and arrive with the next dev build.
+// Story composer, TikTok / Reels / Shorts style: a post is a row of slides. Each slide is a
+// colour card or a photo / video with text on top and an optional location sticker.
+// Step 1 builds the slides; step 2 is the share screen (caption, audience, Share).
+// Choosing photos and videos needs the image-picker native module (current dev build or later).
 const BACKGROUNDS = [
   { bg: c.blue, fg: c.parchment },
   { bg: c.gold, fg: c.blue },
@@ -24,31 +25,117 @@ const BACKGROUNDS = [
 const STYLES = ['Classic', 'Bold', 'Handwritten'] as const;
 type TextStyleName = (typeof STYLES)[number];
 const styleFont = (s: TextStyleName) => (s === 'Classic' ? fonts.title : s === 'Bold' ? fonts.bodyBold : fonts.accent);
+const MAX_SLIDES = 10;
+
+type Slide = { id: string; media?: PickedMedia; text: string; bgIdx: number; style: TextStyleName; place: string };
+const newSlide = (over: Partial<Slide> = {}): Slide => ({ id: `s${Date.now()}${Math.random().toString(36).slice(2, 6)}`, text: '', bgIdx: 0, style: 'Classic', place: '', ...over });
+
+// expo-video is native too: use it when the build has it, otherwise show a play tile.
+let VideoModule: typeof import('expo-video') | null = null;
+try {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  VideoModule = require('expo-video');
+  if (!VideoModule?.useVideoPlayer) VideoModule = null;
+} catch {
+  VideoModule = null;
+}
+
+function LiveVideo({ uri }: { uri: string }) {
+  const { useVideoPlayer, VideoView } = VideoModule!;
+  const player = useVideoPlayer(uri, (p) => { p.loop = true; p.muted = true; p.play(); });
+  return <VideoView player={player} nativeControls={false} contentFit="cover" style={{ width: '100%', height: '100%' }} />;
+}
+
+/** Slide background: photo, video or plain colour. */
+function Backdrop({ slide }: { slide: Slide }) {
+  const bg = BACKGROUNDS[slide.bgIdx];
+  if (slide.media?.type === 'image') return <Image source={{ uri: slide.media.uri }} resizeMode="cover" style={{ position: 'absolute', width: '100%', height: '100%' }} />;
+  if (slide.media?.type === 'video') {
+    return (
+      <View style={{ position: 'absolute', width: '100%', height: '100%', backgroundColor: '#000', alignItems: 'center', justifyContent: 'center' }}>
+        {VideoModule ? <LiveVideo uri={slide.media.uri} /> : <Icon name="steps" color="#FFFFFF" size={48} />}
+      </View>
+    );
+  }
+  return <View style={{ position: 'absolute', width: '100%', height: '100%', backgroundColor: bg.bg }} />;
+}
+
+async function pickMedia(): Promise<PickedMedia[] | null> {
+  let Picker: typeof import('expo-image-picker');
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    Picker = require('expo-image-picker');
+    if (!Picker.launchImageLibraryAsync) throw new Error('missing');
+  } catch {
+    Alert.alert('Next build', 'Choosing photos and videos needs the next app build. Text slides work now.');
+    return null;
+  }
+  const perm = await Picker.requestMediaLibraryPermissionsAsync();
+  if (!perm.granted) {
+    Alert.alert('Photos are off', 'Allow photo access for CaminoPlus in Settings to add pictures and videos.');
+    return null;
+  }
+  const res = await Picker.launchImageLibraryAsync({ mediaTypes: ['images', 'videos'], allowsMultipleSelection: true, selectionLimit: MAX_SLIDES, quality: 0.8, videoMaxDuration: 60 });
+  if (res.canceled) return null;
+  return res.assets.map((a) => ({ uri: a.uri, type: a.type === 'video' ? 'video' : 'image', mimeType: a.mimeType, width: a.width, height: a.height, durationMs: a.duration, fileSize: a.fileSize }));
+}
 
 export default function Write() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { session, journey, refresh } = useAuth();
   const [step, setStep] = useState<1 | 2>(1);
-  const [text, setText] = useState('');
+  const [slides, setSlides] = useState<Slide[]>([newSlide()]);
+  const [idx, setIdx] = useState(0);
   const [caption, setCaption] = useState('');
-  const [bgIdx, setBgIdx] = useState(0);
-  const [style, setStyle] = useState<TextStyleName>('Classic');
-  const [place, setPlace] = useState('');
   const [editPlace, setEditPlace] = useState(false);
   const [audience, setAudience] = useState<'followers' | 'public'>('followers');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const bg = BACKGROUNDS[bgIdx];
-  const size = useMemo(() => (style === 'Handwritten' ? 44 : 32) - (text.length > 140 ? 8 : text.length > 70 ? 4 : 0), [style, text.length]);
+
+  const slide = slides[idx];
+  const bg = BACKGROUNDS[slide.bgIdx];
+  const onMedia = !!slide.media;
+  const fg = onMedia ? '#FFFFFF' : bg.fg;
+  const size = useMemo(() => (slide.style === 'Handwritten' ? 44 : 32) - (slide.text.length > 140 ? 8 : slide.text.length > 70 ? 4 : 0), [slide.style, slide.text.length]);
+  const patch = (p: Partial<Slide>) => setSlides((all) => all.map((s, i) => (i === idx ? { ...s, ...p } : s)));
+  const hasContent = slides.some((s) => s.text.trim() || s.media);
+
+  const addMedia = async () => {
+    const picked = await pickMedia();
+    if (!picked || picked.length === 0) return;
+    setSlides((all) => {
+      const empty = !all[idx].text.trim() && !all[idx].media;
+      const base = empty ? all.filter((_, i) => i !== idx) : all;
+      const at = empty ? idx : all.length;
+      const added = picked.slice(0, MAX_SLIDES - base.length).map((m) => newSlide({ media: m }));
+      return [...base.slice(0, at), ...added, ...base.slice(at)];
+    });
+    setIdx((i) => Math.min(i, MAX_SLIDES - 1));
+  };
+  const addSlide = () => {
+    if (slides.length >= MAX_SLIDES) return Alert.alert('Slide limit', `A post can have up to ${MAX_SLIDES} slides.`);
+    setSlides((all) => [...all, newSlide({ bgIdx: (all.length) % BACKGROUNDS.length })]);
+    setIdx(slides.length);
+  };
+  const removeSlide = () => {
+    if (slides.length === 1) return setSlides([newSlide()]);
+    setSlides((all) => all.filter((_, i) => i !== idx));
+    setIdx((i) => Math.max(0, i - 1));
+  };
 
   const share = async () => {
-    if (!session || !text.trim()) return setError('Write a few words about today first.');
+    if (!session || !hasContent) return setError('Add a few words or a photo about today first.');
     setBusy(true); setError(null);
     try {
-      const body = [text.trim(), caption.trim()].filter(Boolean).join('\n\n');
-      await createJournalPost({ userId: session.user.id, body, journeyId: journey?.id ?? null, routeId: journey?.route_id ?? null, placeName: place.trim() || null, visibility: audience });
+      const texts = slides.map((s) => s.text.trim()).filter(Boolean);
+      const body = [...texts, caption.trim()].filter(Boolean).join('\n\n');
+      const place = slides.map((s) => s.place.trim()).find(Boolean) ?? null;
+      const post = await createJournalPost({ userId: session.user.id, body, journeyId: journey?.id ?? null, routeId: journey?.route_id ?? null, placeName: place, visibility: audience });
+      const media = slides.flatMap((s) => (s.media ? [s.media] : []));
+      const failed = media.length ? await uploadPostMedia(session.user.id, post.id, media) : 0;
       await refresh();
+      if (failed > 0) Alert.alert('Posted without some media', `${failed} of ${media.length} photos or videos could not be uploaded. Cloud storage is part of the CaminoPlus plan.`);
       router.back();
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
@@ -56,25 +143,30 @@ export default function Write() {
     }
   };
 
-  const canvasText = (
-    <View style={{ flex: 1, justifyContent: 'center', paddingHorizontal: 28 }}>
-      {step === 1 ? (
-        <TextInput
-          multiline autoFocus maxLength={600} value={text} onChangeText={setText}
-          placeholder="Tap to write about today" placeholderTextColor={bg.fg + '88'}
-          style={{ fontFamily: styleFont(style), fontSize: size, lineHeight: size * 1.3, color: bg.fg, textAlign: 'center', textAlignVertical: 'center' }}
-        />
-      ) : (
-        <AppText style={{ fontFamily: styleFont(style), fontSize: size * 0.62, lineHeight: size * 0.8, color: bg.fg, textAlign: 'center' }} numberOfLines={8}>{text}</AppText>
-      )}
-      {!!place.trim() && (
-        <View style={{ alignSelf: 'center', marginTop: 20, flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, height: 40, borderRadius: radius.pill, backgroundColor: 'rgba(255,253,248,0.92)' }}>
-          <Icon name="pin" color={c.blue} size={18} />
-          <AppText variant="label" color={c.blue}>{place.trim()}</AppText>
-        </View>
-      )}
-    </View>
-  );
+  const slideBody = (s: Slide, editable: boolean, scale = 1) => {
+    const b = BACKGROUNDS[s.bgIdx];
+    const color = s.media ? '#FFFFFF' : b.fg;
+    const sz = (s.style === 'Handwritten' ? 44 : 32) - (s.text.length > 140 ? 8 : s.text.length > 70 ? 4 : 0);
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', paddingHorizontal: 28 * scale }}>
+        {editable ? (
+          <TextInput
+            multiline maxLength={600} value={s.text} onChangeText={(t) => patch({ text: t })}
+            placeholder={s.media ? 'Add text' : 'Tap to write about today'} placeholderTextColor={color + '99'}
+            style={{ fontFamily: styleFont(s.style), fontSize: sz, lineHeight: sz * 1.3, color, textAlign: 'center', textAlignVertical: 'center', textShadowColor: s.media ? 'rgba(0,0,0,0.5)' : 'transparent', textShadowRadius: 8 }}
+          />
+        ) : (
+          <AppText style={{ fontFamily: styleFont(s.style), fontSize: sz * 0.5 * scale, lineHeight: sz * 0.65 * scale, color, textAlign: 'center' }} numberOfLines={6}>{s.text}</AppText>
+        )}
+        {!!s.place.trim() && (
+          <View style={{ alignSelf: 'center', marginTop: 20 * scale, flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14 * scale, height: 40 * scale, borderRadius: radius.pill, backgroundColor: 'rgba(255,253,248,0.92)' }}>
+            <Icon name="pin" color={c.blue} size={18 * scale} />
+            {editable && <AppText variant="label" color={c.blue}>{s.place.trim()}</AppText>}
+          </View>
+        )}
+      </View>
+    );
+  };
 
   if (step === 2) {
     return (
@@ -85,7 +177,17 @@ export default function Write() {
             <AppText variant="h4">New journey post</AppText>
             <View style={{ width: 30 }} />
           </View>
-          <View style={{ height: 300, borderRadius: radius.lg, backgroundColor: bg.bg, overflow: 'hidden', alignSelf: 'center', width: 190 + 40 }}>{canvasText}</View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 12 }} style={{ flexGrow: 0, marginHorizontal: -24 }}>
+            <View style={{ width: 12 }} />
+            {slides.map((s) => (
+              <View key={s.id} style={{ width: 132, height: 232, borderRadius: radius.lg, overflow: 'hidden' }}>
+                <Backdrop slide={s} />
+                {slideBody(s, false, 0.55)}
+              </View>
+            ))}
+            <View style={{ width: 12 }} />
+          </ScrollView>
+          <AppText variant="caption" muted>{slides.length} {slides.length === 1 ? 'slide' : 'slides'}</AppText>
           <TextInput multiline maxLength={400} value={caption} onChangeText={setCaption} placeholder="Add a caption…" placeholderTextColor={role.muted} style={{ fontFamily: fonts.body, fontSize: 19, lineHeight: 28, color: role.text, minHeight: 80, textAlignVertical: 'top' }} />
           <View style={{ gap: 10 }}>
             <AppText variant="label">Who can see this</AppText>
@@ -100,46 +202,72 @@ export default function Write() {
         </ScrollView>
         <View style={{ position: 'absolute', left: 24, right: 24, bottom: insets.bottom + 16, gap: 8 }}>
           {!!error && <FormMessage>{error}</FormMessage>}
-          <Pill large label="Share" onPress={share} loading={busy} disabled={!text.trim()} />
+          <Pill large label="Share" onPress={share} loading={busy} disabled={!hasContent} />
         </View>
       </KeyboardAvoidingView>
     );
   }
 
+  const glass = { backgroundColor: 'rgba(255,253,248,0.9)' } as const;
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1, backgroundColor: bg.bg }}>
+    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1, backgroundColor: onMedia ? '#000' : bg.bg }}>
+      <Backdrop slide={slide} />
+      {onMedia && <View pointerEvents="none" style={{ position: 'absolute', width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.18)' }} />}
       <View style={{ paddingTop: insets.top + 8, paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
         <Pressable accessibilityRole="button" accessibilityLabel="Close" onPress={() => router.back()} hitSlop={12} style={{ width: 48, height: 48, alignItems: 'center', justifyContent: 'center' }}>
-          <Icon name="close" color={bg.fg} size={30} />
+          <Icon name="close" color={fg} size={30} />
         </Pressable>
         <View style={{ flexDirection: 'row', gap: 8 }}>
-          <Pressable accessibilityRole="button" accessibilityLabel="Add location" onPress={() => setEditPlace((v) => !v)} style={{ height: 48, paddingHorizontal: 16, borderRadius: radius.pill, flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: 'rgba(255,253,248,0.9)' }}>
+          <Pressable accessibilityRole="button" accessibilityLabel="Add location" onPress={() => setEditPlace((v) => !v)} style={{ height: 48, paddingHorizontal: 16, borderRadius: radius.pill, flexDirection: 'row', alignItems: 'center', gap: 6, ...glass }}>
             <Icon name="pin" color={c.blue} size={20} />
             <AppText variant="label" color={c.blue}>Location</AppText>
           </Pressable>
-          <Pressable accessibilityRole="button" accessibilityLabel="Change text style" onPress={() => setStyle(STYLES[(STYLES.indexOf(style) + 1) % STYLES.length])} style={{ height: 48, paddingHorizontal: 18, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,253,248,0.9)' }}>
-            <AppText variant="label" color={c.blue} style={{ fontFamily: styleFont(style) }}>Aa</AppText>
+          <Pressable accessibilityRole="button" accessibilityLabel="Change text style" onPress={() => patch({ style: STYLES[(STYLES.indexOf(slide.style) + 1) % STYLES.length] })} style={{ height: 48, paddingHorizontal: 18, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center', ...glass }}>
+            <AppText variant="label" color={c.blue} style={{ fontFamily: styleFont(slide.style) }}>Aa</AppText>
           </Pressable>
         </View>
       </View>
       {editPlace && (
         <View style={{ marginHorizontal: 16, marginTop: 8, height: 56, borderRadius: radius.pill, backgroundColor: 'rgba(255,253,248,0.95)', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 18, gap: 8 }}>
           <Icon name="pin" color={c.blue} size={20} />
-          <TextInput autoFocus value={place} onChangeText={setPlace} maxLength={60} placeholder="Where are you? (e.g. Burgos)" placeholderTextColor={role.muted} returnKeyType="done" onSubmitEditing={() => setEditPlace(false)} style={{ flex: 1, fontFamily: fonts.body, fontSize: 18, color: role.text }} />
+          <TextInput autoFocus value={slide.place} onChangeText={(t) => patch({ place: t })} maxLength={60} placeholder="Where are you? (e.g. Burgos)" placeholderTextColor={role.muted} returnKeyType="done" onSubmitEditing={() => setEditPlace(false)} style={{ flex: 1, fontFamily: fonts.body, fontSize: 18, color: role.text }} />
         </View>
       )}
-      {canvasText}
-      <View style={{ paddingHorizontal: 16, paddingBottom: insets.bottom + 12, gap: 14 }}>
+      {slideBody(slide, true)}
+      <View style={{ paddingHorizontal: 16, paddingBottom: insets.bottom + 12, gap: 12 }}>
         {!!error && <FormMessage>{error}</FormMessage>}
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 12, paddingVertical: 4 }}>
-          {BACKGROUNDS.map((b, i) => (
-            <Pressable key={b.bg} accessibilityRole="button" accessibilityLabel={`Background ${i + 1}`} onPress={() => setBgIdx(i)} style={{ width: 44, height: 44, borderRadius: radius.pill, backgroundColor: b.bg, borderWidth: 3, borderColor: bgIdx === i ? c.white : 'rgba(255,253,248,0.35)' }} />
+        {/* Slide strip: tap to edit a slide, + to add a text slide, gallery button for photos and videos. */}
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 10, alignItems: 'center', paddingVertical: 4 }}>
+          {slides.map((s, i) => (
+            <Pressable key={s.id} accessibilityRole="button" accessibilityLabel={`Slide ${i + 1}`} onPress={() => setIdx(i)} style={{ width: 48, height: 72, borderRadius: 10, overflow: 'hidden', borderWidth: 3, borderColor: i === idx ? '#FFFFFF' : 'rgba(255,253,248,0.35)' }}>
+              <Backdrop slide={s} />
+              {s.media?.type === 'video' && <View style={{ position: 'absolute', right: 3, bottom: 3 }}><Icon name="steps" color="#FFFFFF" size={14} /></View>}
+            </Pressable>
           ))}
+          <Pressable accessibilityRole="button" accessibilityLabel="Add slide" onPress={addSlide} style={{ width: 48, height: 72, borderRadius: 10, alignItems: 'center', justifyContent: 'center', ...glass }}>
+            <AppText variant="h4" color={c.blue}>+</AppText>
+          </Pressable>
+          <Pressable accessibilityRole="button" accessibilityLabel="Add photos or videos" onPress={addMedia} style={{ height: 72, paddingHorizontal: 16, borderRadius: 10, flexDirection: 'row', alignItems: 'center', gap: 8, ...glass }}>
+            <Icon name="camera" color={c.blue} size={22} />
+            <AppText variant="label" color={c.blue}>Photo / video</AppText>
+          </Pressable>
+          {(slides.length > 1 || hasContent) && (
+            <Pressable accessibilityRole="button" accessibilityLabel="Delete this slide" onPress={removeSlide} style={{ width: 48, height: 72, borderRadius: 10, alignItems: 'center', justifyContent: 'center', ...glass }}>
+              <Icon name="close" color={c.red} size={22} />
+            </Pressable>
+          )}
         </ScrollView>
+        {!onMedia && (
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 12, paddingVertical: 4 }}>
+            {BACKGROUNDS.map((b, i) => (
+              <Pressable key={b.bg} accessibilityRole="button" accessibilityLabel={`Background ${i + 1}`} onPress={() => patch({ bgIdx: i })} style={{ width: 44, height: 44, borderRadius: radius.pill, backgroundColor: b.bg, borderWidth: 3, borderColor: slide.bgIdx === i ? c.white : 'rgba(255,253,248,0.35)' }} />
+            ))}
+          </ScrollView>
+        )}
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-          <AppText variant="mono" color={bg.fg} style={{ opacity: 0.7 }}>{text.length} / 600</AppText>
-          <View style={{ width: 180 }}>
-            <Pill large variant="gold" label="Next" disabled={!text.trim()} onPress={() => setStep(2)} />
+          <AppText variant="mono" color={fg} style={{ opacity: 0.75 }}>Slide {idx + 1} of {slides.length} · {slide.text.length} / 600</AppText>
+          <View style={{ width: 160 }}>
+            <Pill large variant="gold" label="Next" disabled={!hasContent} onPress={() => setStep(2)} />
           </View>
         </View>
       </View>
