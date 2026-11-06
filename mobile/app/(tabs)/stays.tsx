@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Modal, Pressable, ScrollView, TextInput, View } from 'react-native';
+import { Modal, Pressable, ScrollView, Share, TextInput, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Screen } from '@/components/Screen';
 import { AppText } from '@/components/AppText';
@@ -66,6 +66,9 @@ function StayCard({ s, fav, onFav }: { s: Stay; fav: boolean; onFav: () => void 
     <Card style={{ padding: 12, gap: 12 }} onPress={() => router.push(`/stay/${s.id}`)}>
       <View>
         <Photo tint={s.tint} height={170} />
+        <Pressable accessibilityLabel="Share this stay" onPress={() => Share.share({ message: `${s.name} in ${s.town} on CaminoPlus: https://camino.plus` }).catch(() => {})} style={{ position: 'absolute', top: 10, right: 58, width: 40, height: 40, borderRadius: radius.pill, backgroundColor: role.surface, alignItems: 'center', justifyContent: 'center' }}>
+          <Icon name="share" color={c.blue} size={20} />
+        </Pressable>
         <Pressable accessibilityLabel={fav ? 'Remove favourite' : 'Add favourite'} onPress={onFav} style={{ position: 'absolute', top: 10, right: 10, width: 40, height: 40, borderRadius: radius.pill, backgroundColor: role.surface, alignItems: 'center', justifyContent: 'center' }}>
           <Icon name="heart" color={fav ? c.red : c.blue} size={20} filled={fav} />
         </Pressable>

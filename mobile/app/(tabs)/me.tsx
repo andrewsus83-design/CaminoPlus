@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Screen } from '@/components/Screen';
 import { AppText } from '@/components/AppText';
 import { Pill } from '@/components/Pill';
+import { ShellMark } from '@/components/auth/Wordmark';
 import { Icon } from '@/components/Icon';
 import { Avatar, Card, IconButton, Photo, SubTabs } from '@/components/ui';
 import { FormMessage } from '@/components/auth/Field';
@@ -15,6 +16,7 @@ import { Empty, ProgressBar, shortDate } from '@/features/me/shared';
 import { Health } from '@/features/me/Health';
 import { JourneyGrid } from '@/features/me/JourneyGrid';
 import { updateProfile } from '@/lib/api';
+import { copyText } from '@/lib/clipboard';
 import { PickerUnavailable, pickAndUploadAvatar } from '@/lib/avatar';
 import { c, fonts, layout, radius, role, shadowStyle } from '@/theme';
 
@@ -103,6 +105,9 @@ export default function Me() {
   const [bioDraft, setBioDraft] = useState('');
   const [savingBio, setSavingBio] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [bioOpen, setBioOpen] = useState(false);
+  const [bioLines, setBioLines] = useState(0);
+  const [copied, setCopied] = useState(false);
   const { posts, stamps, days, stages, error } = useMeData();
   const name = profile?.display_name || profile?.username || 'Pilgrim';
   const stagesDone = days?.filter((d) => d.status === 'done').length ?? 0;
@@ -115,6 +120,13 @@ export default function Me() {
       Alert.alert(e instanceof PickerUnavailable ? 'Next build' : 'Could not change photo', e instanceof Error ? e.message : String(e));
     } finally {
       setUploading(false);
+    }
+  };
+  const copyUsername = async () => {
+    if (!profile?.username) return;
+    if (await copyText(profile.username)) {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
     }
   };
   const saveBio = async () => {
@@ -164,9 +176,9 @@ export default function Me() {
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
           <AppText variant="h4" numberOfLines={1} style={{ flexShrink: 1 }}>{profile?.username ?? name}</AppText>
           {!!profile?.username && (
-            <View style={{ paddingHorizontal: 12, height: 32, borderRadius: radius.pill, backgroundColor: c.goldWash, justifyContent: 'center' }}>
-              <AppText variant="mono" color={role.accentText}>camino.plus/{profile.username}</AppText>
-            </View>
+            <Pressable accessibilityRole="button" accessibilityLabel={copied ? 'Username copied' : 'Copy username'} hitSlop={10} onPress={copyUsername} style={{ width: 26, height: 26, alignItems: 'center', justifyContent: 'center' }}>
+              <Icon name={copied ? 'check' : 'copy'} color={copied ? c.success : role.muted} size={16} />
+            </Pressable>
           )}
           <View style={{ marginLeft: 'auto' }}><IconButton name="bell" label="Notifications" onPress={() => router.push('/inbox')} flat /></View>
         </View>
@@ -175,8 +187,8 @@ export default function Me() {
             {profile?.avatar_url
               ? <Image source={{ uri: profile.avatar_url }} style={{ width: 92, height: 92, borderRadius: radius.pill, borderWidth: 3, borderColor: c.gold }} />
               : <Avatar size={92} ring />}
-            <View style={{ position: 'absolute', right: -2, bottom: -2, width: 32, height: 32, borderRadius: 16, backgroundColor: c.gold, borderWidth: 2, borderColor: role.bg, alignItems: 'center', justifyContent: 'center' }}>
-              {uploading ? <ActivityIndicator size="small" color={c.blue} /> : <Icon name="camera" color={c.blue} size={16} />}
+            <View style={{ position: 'absolute', right: -2, bottom: -2, width: 26, height: 26, borderRadius: 13, backgroundColor: c.gold, borderWidth: 2, borderColor: role.bg, alignItems: 'center', justifyContent: 'center' }}>
+              {uploading ? <ActivityIndicator size="small" color={c.blue} /> : <Icon name="camera" color={c.blue} size={13} />}
             </View>
           </Pressable>
           <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-around' }}>
@@ -199,11 +211,22 @@ export default function Me() {
               <AppText variant="caption" color={isPrivate ? role.text : c.success} style={{ fontFamily: 'Inter_600SemiBold' }}>{isPrivate ? 'Private' : 'Public'}</AppText>
             </Pressable>
           </View>
-          <AppText variant="body" muted={!profile?.bio}>{profile?.bio || 'Add a short description about you'}</AppText>
+          {/* Smaller text, 4 lines, then "Read more". The invisible copy measures the full length. */}
+          <View>
+            <AppText variant="small" muted={!profile?.bio} numberOfLines={bioOpen ? undefined : 4}>{profile?.bio || 'Add a short description about you'}</AppText>
+            {!!profile?.bio && (
+              <AppText variant="small" accessibilityElementsHidden importantForAccessibility="no-hide-descendants" onTextLayout={(e) => setBioLines(e.nativeEvent.lines.length)} style={{ position: 'absolute', left: 0, right: 0, opacity: 0 }} pointerEvents="none">{profile.bio}</AppText>
+            )}
+          </View>
+          {bioLines > 4 && (
+            <Pressable accessibilityRole="button" onPress={() => setBioOpen((v) => !v)} hitSlop={8} style={{ alignSelf: 'flex-start' }}>
+              <AppText variant="small" color={role.accentText} style={{ fontFamily: 'Inter_600SemiBold' }}>{bioOpen ? 'Show less' : 'Read more'}</AppText>
+            </Pressable>
+          )}
           {journey?.route ? (
             <Pressable accessibilityRole="button" accessibilityLabel="Change Camino" onPress={() => router.push('/change-camino')} style={{ marginTop: 8, flexDirection: 'row', alignItems: 'center', gap: 14, padding: 14, borderRadius: radius.lg, backgroundColor: c.blue, ...shadowStyle('md') }}>
-              <View style={{ width: 52, height: 52, borderRadius: radius.pill, backgroundColor: 'rgba(246,239,226,0.14)', alignItems: 'center', justifyContent: 'center' }}>
-                <Icon name="shell" color={c.gold} size={28} />
+              <View style={{ width: 52, height: 52, borderRadius: radius.pill, borderWidth: 1.5, borderColor: 'rgba(217,162,27,0.55)', alignItems: 'center', justifyContent: 'center' }}>
+                <ShellMark size={48} />
               </View>
               <View style={{ flex: 1, gap: 2 }}>
                 <AppText variant="accent" color={c.gold} style={{ fontSize: 24, lineHeight: 28 }}>Buen Camino!</AppText>
@@ -241,8 +264,8 @@ export default function Me() {
           </View>
         </KeyboardAvoidingView>
       </Modal>
-      <Pressable accessibilityRole="button" accessibilityLabel="Write a journey post" onPress={() => router.push('/write')} style={{ position: 'absolute', right: layout.screenMargin, bottom: Math.max(insets.bottom - 14, 10) + 88 + 8, width: 64, height: 64, borderRadius: radius.pill, backgroundColor: c.gold, alignItems: 'center', justifyContent: 'center', ...shadowStyle('gold') }}>
-        <Icon name="pen" color={c.blue} size={26} />
+      <Pressable accessibilityRole="button" accessibilityLabel="Write a journey post" onPress={() => router.push('/write')} style={{ position: 'absolute', right: layout.screenMargin, bottom: Math.max(insets.bottom - 14, 10) + 88 + 8, width: 52, height: 52, borderRadius: radius.pill, backgroundColor: c.gold, alignItems: 'center', justifyContent: 'center', ...shadowStyle('gold') }}>
+        <Icon name="pen" color={c.blue} size={22} />
       </Pressable>
     </View>
   );
