@@ -12,7 +12,7 @@ on conflict (key) do nothing;
 
 -- Billing products (prices are display/reference; stores are the source of truth)
 insert into public.billing_products (id, kind, name, price_cents, currency, billing_period, storage_bytes, revenuecat_entitlement, store_product_ids) values
-  ('plus_yearly', 'subscription', 'CaminoPlus yearly', 1200, 'USD', 'year', 5368709120, 'plus',
+  ('plus_yearly', 'subscription', 'Pilgrim Plus yearly', 1200, 'USD', 'year', 5368709120, 'plus',
      '{"app_store": "caminoplus_plus_yearly", "play_store": "caminoplus_plus_yearly"}'),
   ('storage_5gb_yearly', 'storage_addon', 'Extra 5 GB storage', 500, 'USD', 'year', 5368709120, null,
      '{"app_store": "caminoplus_storage_5gb_yearly", "play_store": "caminoplus_storage_5gb_yearly"}')
@@ -29,6 +29,20 @@ insert into public.stay_labels (slug, name, description, sort_order) values
   ('menu_peregrino',      'Pilgrim menu',        'Serves a menu del peregrino', 70),
   ('partner',             'CaminoPlus partner',  null, 80)
 on conflict (slug) do nothing;
+
+-- Labels a business owner may choose for their own listing (stay_labels.owner_assignable, added by
+-- the platform hardening migration). `partner` and `verified_owner` stay server-only. Written
+-- as dynamic SQL so this seed also loads on a database that does not have the column yet.
+do $$
+begin
+  if exists (select 1 from information_schema.columns
+             where table_schema = 'public' and table_name = 'stay_labels' and column_name = 'owner_assignable') then
+    execute $q$
+      update public.stay_labels set owner_assignable = true
+      where slug in ('pilgrims_only', 'donativo', 'open_all_year', 'pet_friendly', 'bike_friendly', 'accessible', 'menu_peregrino')
+    $q$;
+  end if;
+end $$;
 
 -- Achievements ------------------------------------------------------------------
 insert into public.achievements (slug, name, description, category, xp_reward, criteria) values
@@ -48,7 +62,7 @@ insert into public.routes (id, network_id, slug, name, short_name, countries, st
   ('20000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000001',
    'camino-frances', 'Camino Frances', 'Frances', '{FR,ES}', 'Saint-Jean-Pied-de-Port', 'Santiago de Compostela', 773, 33, 3, '#D9A21B', true),
   ('20000000-0000-0000-0000-000000000002', '10000000-0000-0000-0000-000000000001',
-   'camino-portugues', 'Camino Portugues', 'Portugues', '{PT,ES}', 'Porto', 'Santiago de Compostela', 240, 12, 2, '#14365D', true)
+   'camino-portugues', 'Camino Portugues Central', 'Portugues Central', '{PT,ES}', 'Porto', 'Santiago de Compostela', 240, 12, 2, '#14365D', true)
 on conflict (id) do nothing;
 
 -- Places (sample) -----------------------------------------------------------------
@@ -123,8 +137,6 @@ insert into private.hunt_step_answers (step_id, answer) values
   ('71000000-0000-0000-0000-000000000002', '790')
 on conflict (step_id) do nothing;
 
--- Sample offline pack (manifest only)
-insert into public.offline_packs (route_id, stage_id, kind, format, version, url, size_bytes) values
-  ('20000000-0000-0000-0000-000000000001', '40000000-0000-0000-0000-000000000001', 'tiles', 'pmtiles', 1,
-   'supabase://offline-packs/camino-frances/stage-01/tiles-v1.pmtiles', 3145728)
-on conflict do nothing;
+-- Offline packs: none on purpose. A demo manifest row points at a file that does not exist, and
+-- the app would offer a download that fails. Real packs are built and registered by
+-- tools/offline-maps (rpc register_offline_pack); tests that need a pack insert their own.
