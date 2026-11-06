@@ -1,0 +1,92 @@
+{
+  "slug": "camino-frances-23",
+  "name": "Astorga to Foncebadón",
+  "route_slug": "camino-frances",
+  "stage_number": 23,
+  "route_id": "20000000-0000-0000-0000-000000000001",
+  "stage_id": "40000000-0000-0000-0000-000000000023",
+  "osm_extracts": [
+    "https://download.geofabrik.de/europe/spain/castilla-y-leon-latest.osm.pbf"
+  ],
+  "search_bbox": [
+    -6.46,
+    42.37,
+    -5.93,
+    42.58
+  ],
+  "coastal": false,
+  "route_name_regex": "camino franc[eé]s|camiño franc[eé]s|chemin navarrais|nafar bidea",
+  "route_exclude_regex": "\\b(SL|PR)-[A-Z]{1,3} ?\\d",
+  "fallback_route": "camino-frances-23.route.geojson",
+  "clip_km": 6,
+  "min_route_km": 9.8,
+  "buffer_km": 3,
+  "maxzoom": 15,
+  "waypoints": [
+    {
+      "name": "Astorga",
+      "at": [
+        -6.05292,
+        42.4554
+      ]
+    },
+    {
+      "name": "Murias de Rechivaldo",
+      "at": [
+        -6.10605,
+        42.46012
+      ]
+    },
+    {
+      "name": "Santa Catalina de Somoza",
+      "at": [
+        -6.15898,
+        42.45494
+      ]
+    },
+    {
+      "name": "El Ganso",
+      "at": [
+        -6.20823,
+        42.46227
+      ]
+    },
+    {
+      "name": "Rabanal del Camino",
+      "at": [
+        -6.28427,
+        42.48169
+      ]
+    },
+    {
+      "name": "Foncebadón",
+      "at": [
+        -6.34248,
+        42.49124
+      ]
+    }
+  ],
+  "render_checks": [
+    {
+      "name": "Astorga z15",
+      "at": [
+        -6.05292,
+        42.4554,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    },
+    {
+      "name": "Foncebadón z15",
+      "at": [
+        -6.34248,
+        42.49124,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    }
+  ],
+  "generated_from": "catalog/camino-frances/23.json"
+}

@@ -1,0 +1,78 @@
+{
+  "slug": "camino-frances-19",
+  "name": "Bercianos del Real Camino to Mansilla de las Mulas",
+  "route_slug": "camino-frances",
+  "stage_number": 19,
+  "route_id": "20000000-0000-0000-0000-000000000001",
+  "stage_id": "40000000-0000-0000-0000-000000000019",
+  "osm_extracts": [
+    "https://download.geofabrik.de/europe/spain/castilla-y-leon-latest.osm.pbf"
+  ],
+  "search_bbox": [
+    -5.54,
+    42.3,
+    -5.02,
+    42.59
+  ],
+  "coastal": false,
+  "route_name_regex": "camino franc[eé]s|camiño franc[eé]s|chemin navarrais|nafar bidea",
+  "route_exclude_regex": "\\b(SL|PR)-[A-Z]{1,3} ?\\d",
+  "fallback_route": "camino-frances-19.route.geojson",
+  "clip_km": 6,
+  "min_route_km": 10.2,
+  "buffer_km": 3,
+  "maxzoom": 15,
+  "waypoints": [
+    {
+      "name": "Bercianos del Real Camino",
+      "at": [
+        -5.1452,
+        42.38768
+      ]
+    },
+    {
+      "name": "El Burgo Ranero",
+      "at": [
+        -5.21867,
+        42.42229
+      ]
+    },
+    {
+      "name": "Reliegos",
+      "at": [
+        -5.35481,
+        42.47491
+      ]
+    },
+    {
+      "name": "Mansilla de las Mulas",
+      "at": [
+        -5.41692,
+        42.4991
+      ]
+    }
+  ],
+  "render_checks": [
+    {
+      "name": "Bercianos del Real Camino z15",
+      "at": [
+        -5.1452,
+        42.38768,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    },
+    {
+      "name": "Mansilla de las Mulas z15",
+      "at": [
+        -5.41692,
+        42.4991,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    }
+  ],
+  "generated_from": "catalog/camino-frances/19.json"
+}

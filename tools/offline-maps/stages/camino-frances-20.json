@@ -1,0 +1,85 @@
+{
+  "slug": "camino-frances-20",
+  "name": "Mansilla de las Mulas to León",
+  "route_slug": "camino-frances",
+  "stage_number": 20,
+  "route_id": "20000000-0000-0000-0000-000000000001",
+  "stage_id": "40000000-0000-0000-0000-000000000020",
+  "osm_extracts": [
+    "https://download.geofabrik.de/europe/spain/castilla-y-leon-latest.osm.pbf"
+  ],
+  "search_bbox": [
+    -5.69,
+    42.41,
+    -5.29,
+    42.69
+  ],
+  "coastal": false,
+  "route_name_regex": "camino franc[eé]s|camiño franc[eé]s|chemin navarrais|nafar bidea",
+  "route_exclude_regex": "\\b(SL|PR)-[A-Z]{1,3} ?\\d",
+  "fallback_route": "camino-frances-20.route.geojson",
+  "clip_km": 6,
+  "min_route_km": 6.8,
+  "buffer_km": 3,
+  "maxzoom": 15,
+  "waypoints": [
+    {
+      "name": "Mansilla de las Mulas",
+      "at": [
+        -5.41692,
+        42.4991
+      ]
+    },
+    {
+      "name": "Puente Villarente",
+      "at": [
+        -5.45829,
+        42.54445
+      ]
+    },
+    {
+      "name": "Arcahueja",
+      "at": [
+        -5.49668,
+        42.56607
+      ]
+    },
+    {
+      "name": "Valdelafuente",
+      "at": [
+        -5.51446,
+        42.56948
+      ]
+    },
+    {
+      "name": "León",
+      "at": [
+        -5.56824,
+        42.599
+      ]
+    }
+  ],
+  "render_checks": [
+    {
+      "name": "Mansilla de las Mulas z15",
+      "at": [
+        -5.41692,
+        42.4991,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    },
+    {
+      "name": "León z15",
+      "at": [
+        -5.56824,
+        42.599,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    }
+  ],
+  "generated_from": "catalog/camino-frances/20.json"
+}

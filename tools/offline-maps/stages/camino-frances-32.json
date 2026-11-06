@@ -1,0 +1,92 @@
+{
+  "slug": "camino-frances-32",
+  "name": "Arzúa to O Pedrouzo",
+  "route_slug": "camino-frances",
+  "stage_number": 32,
+  "route_id": "20000000-0000-0000-0000-000000000001",
+  "stage_id": "40000000-0000-0000-0000-000000000032",
+  "osm_extracts": [
+    "https://download.geofabrik.de/europe/spain/galicia-latest.osm.pbf"
+  ],
+  "search_bbox": [
+    -8.49,
+    42.81,
+    -8.04,
+    43.02
+  ],
+  "coastal": false,
+  "route_name_regex": "camino franc[eé]s|camiño franc[eé]s|chemin navarrais|nafar bidea",
+  "route_exclude_regex": "\\b(SL|PR)-[A-Z]{1,3} ?\\d",
+  "fallback_route": "camino-frances-32.route.geojson",
+  "clip_km": 6,
+  "min_route_km": 6.8,
+  "buffer_km": 3,
+  "maxzoom": 15,
+  "waypoints": [
+    {
+      "name": "Arzúa",
+      "at": [
+        -8.16345,
+        42.92658
+      ]
+    },
+    {
+      "name": "A Salceda",
+      "at": [
+        -8.28002,
+        42.92633
+      ]
+    },
+    {
+      "name": "A Brea",
+      "at": [
+        -8.30551,
+        42.91891
+      ]
+    },
+    {
+      "name": "Santa Irene",
+      "at": [
+        -8.33179,
+        42.91654
+      ]
+    },
+    {
+      "name": "A Rúa",
+      "at": [
+        -8.35163,
+        42.91452
+      ]
+    },
+    {
+      "name": "O Pedrouzo",
+      "at": [
+        -8.36242,
+        42.90468
+      ]
+    }
+  ],
+  "render_checks": [
+    {
+      "name": "Arzúa z15",
+      "at": [
+        -8.16345,
+        42.92658,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    },
+    {
+      "name": "O Pedrouzo z15",
+      "at": [
+        -8.36242,
+        42.90468,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    }
+  ],
+  "generated_from": "catalog/camino-frances/32.json"
+}

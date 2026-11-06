@@ -1,0 +1,78 @@
+{
+  "slug": "camino-frances-14",
+  "name": "Hornillos del Camino to Castrojeriz",
+  "route_slug": "camino-frances",
+  "stage_number": 14,
+  "route_id": "20000000-0000-0000-0000-000000000001",
+  "stage_id": "40000000-0000-0000-0000-000000000014",
+  "osm_extracts": [
+    "https://download.geofabrik.de/europe/spain/castilla-y-leon-latest.osm.pbf"
+  ],
+  "search_bbox": [
+    -4.26,
+    42.2,
+    -3.8,
+    42.43
+  ],
+  "coastal": false,
+  "route_name_regex": "camino franc[eé]s|camiño franc[eé]s|chemin navarrais|nafar bidea",
+  "route_exclude_regex": "\\b(SL|PR)-[A-Z]{1,3} ?\\d",
+  "fallback_route": "camino-frances-14.route.geojson",
+  "clip_km": 6,
+  "min_route_km": 7.5,
+  "buffer_km": 3,
+  "maxzoom": 15,
+  "waypoints": [
+    {
+      "name": "Hornillos del Camino",
+      "at": [
+        -3.92595,
+        42.33854
+      ]
+    },
+    {
+      "name": "Hontanas",
+      "at": [
+        -4.04448,
+        42.3126
+      ]
+    },
+    {
+      "name": "Convento de San Antón",
+      "at": [
+        -4.09978,
+        42.29209
+      ]
+    },
+    {
+      "name": "Castrojeriz",
+      "at": [
+        -4.14064,
+        42.28837
+      ]
+    }
+  ],
+  "render_checks": [
+    {
+      "name": "Hornillos del Camino z15",
+      "at": [
+        -3.92595,
+        42.33854,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    },
+    {
+      "name": "Castrojeriz z15",
+      "at": [
+        -4.14064,
+        42.28837,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    }
+  ],
+  "generated_from": "catalog/camino-frances/14.json"
+}

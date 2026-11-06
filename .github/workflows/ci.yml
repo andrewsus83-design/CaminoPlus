@@ -146,17 +146,25 @@ jobs:
       - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: '3.12'
+          cache: pip
+          cache-dependency-path: tools/offline-maps/requirements.txt
       - run: npm ci --no-audit --no-fund
+      # osmium, shapely and pyproj are what route_from_osm.py needs; its tests build a tiny PBF and run the real script.
+      - run: pip install -q -r requirements.txt
       - name: Syntax of the scripts
         run: |
           for f in scripts/*.mjs scripts/lib/*.mjs test/*.mjs viewer/style.js; do node --check "$f"; done
           python -m py_compile scripts/*.py
           bash -n scripts/build_stage.sh
           shellcheck scripts/*.sh
-      - name: Unit tests (quality gates, publish against a mock Supabase, dev server, PMTiles header)
+      - name: Unit tests (quality gates, calibration, stage planner, publish against a mock Supabase, dev server, PMTiles header, stage generator, route selection)
         run: |
           npm test
           python -m unittest discover -s test -v
+      - name: Stage files are exactly what the catalog generates, and every stage file is valid
+        run: |
+          python scripts/make_stages.py --check
+          python scripts/check_stages.py
       - name: Render test on the fixture pack (network blocked, then device offline)
         run: |
           npx playwright install --with-deps chromium

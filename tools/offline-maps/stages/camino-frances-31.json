@@ -1,0 +1,99 @@
+{
+  "slug": "camino-frances-31",
+  "name": "Palas de Rei to Arzúa",
+  "route_slug": "camino-frances",
+  "stage_number": 31,
+  "route_id": "20000000-0000-0000-0000-000000000001",
+  "stage_id": "40000000-0000-0000-0000-000000000031",
+  "osm_extracts": [
+    "https://download.geofabrik.de/europe/spain/galicia-latest.osm.pbf"
+  ],
+  "search_bbox": [
+    -8.29,
+    42.78,
+    -7.75,
+    43.02
+  ],
+  "coastal": false,
+  "route_name_regex": "camino franc[eé]s|camiño franc[eé]s|chemin navarrais|nafar bidea",
+  "route_exclude_regex": "\\b(SL|PR)-[A-Z]{1,3} ?\\d",
+  "fallback_route": "camino-frances-31.route.geojson",
+  "clip_km": 6,
+  "min_route_km": 10.2,
+  "buffer_km": 3,
+  "maxzoom": 15,
+  "waypoints": [
+    {
+      "name": "Palas de Rei",
+      "at": [
+        -7.8698,
+        42.87391
+      ]
+    },
+    {
+      "name": "San Xiao do Camiño",
+      "at": [
+        -7.90271,
+        42.87438
+      ]
+    },
+    {
+      "name": "O Leboreiro",
+      "at": [
+        -7.96563,
+        42.88778
+      ]
+    },
+    {
+      "name": "Melide",
+      "at": [
+        -8.01361,
+        42.91457
+      ]
+    },
+    {
+      "name": "Boente de Abaixo",
+      "at": [
+        -8.07827,
+        42.91647
+      ]
+    },
+    {
+      "name": "Ribadiso de Abaixo",
+      "at": [
+        -8.13139,
+        42.93062
+      ]
+    },
+    {
+      "name": "Arzúa",
+      "at": [
+        -8.16345,
+        42.92658
+      ]
+    }
+  ],
+  "render_checks": [
+    {
+      "name": "Palas de Rei z15",
+      "at": [
+        -7.8698,
+        42.87391,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    },
+    {
+      "name": "Arzúa z15",
+      "at": [
+        -8.16345,
+        42.92658,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    }
+  ],
+  "generated_from": "catalog/camino-frances/31.json"
+}

@@ -1,0 +1,85 @@
+{
+  "slug": "camino-frances-21",
+  "name": "León to Villadangos del Páramo",
+  "route_slug": "camino-frances",
+  "stage_number": 21,
+  "route_id": "20000000-0000-0000-0000-000000000001",
+  "stage_id": "40000000-0000-0000-0000-000000000021",
+  "osm_extracts": [
+    "https://download.geofabrik.de/europe/spain/castilla-y-leon-latest.osm.pbf"
+  ],
+  "search_bbox": [
+    -5.89,
+    42.43,
+    -5.45,
+    42.69
+  ],
+  "coastal": false,
+  "route_name_regex": "camino franc[eé]s|camiño franc[eé]s|chemin navarrais|nafar bidea",
+  "route_exclude_regex": "\\b(SL|PR)-[A-Z]{1,3} ?\\d",
+  "fallback_route": "camino-frances-21.route.geojson",
+  "clip_km": 6,
+  "min_route_km": 7.6,
+  "buffer_km": 3,
+  "maxzoom": 15,
+  "waypoints": [
+    {
+      "name": "León",
+      "at": [
+        -5.56824,
+        42.599
+      ]
+    },
+    {
+      "name": "La Virgen del Camino",
+      "at": [
+        -5.64374,
+        42.58166
+      ]
+    },
+    {
+      "name": "Valverde de la Virgen",
+      "at": [
+        -5.68332,
+        42.56849
+      ]
+    },
+    {
+      "name": "San Miguel del Camino",
+      "at": [
+        -5.69713,
+        42.56309
+      ]
+    },
+    {
+      "name": "Villadangos del Páramo",
+      "at": [
+        -5.7668,
+        42.51729
+      ]
+    }
+  ],
+  "render_checks": [
+    {
+      "name": "León z15",
+      "at": [
+        -5.56824,
+        42.599,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    },
+    {
+      "name": "Villadangos del Páramo z15",
+      "at": [
+        -5.7668,
+        42.51729,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    }
+  ],
+  "generated_from": "catalog/camino-frances/21.json"
+}
