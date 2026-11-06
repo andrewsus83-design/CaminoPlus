@@ -53,3 +53,6 @@ $$;
 drop trigger if exists app_feedback_limit on public.app_feedback;
 create trigger app_feedback_limit before insert on public.app_feedback
   for each row execute function private.app_feedback_limit();
+
+-- Repo rule for client-writable tables: the server sets created_at, not the phone.
+select private.attach_server_time_triggers();
