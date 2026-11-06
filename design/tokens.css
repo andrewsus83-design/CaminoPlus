@@ -131,7 +131,7 @@
   --cp-web-max-width:      1200px;
   --cp-web-gutter:         32px;
   --cp-mobile-width:       390px; /* reference frame (iPhone 15)              */
-  --cp-tabbar-height:      84px;  /* incl. 34px home indicator                 */
+  --cp-tabbar-height:      100px;  /* incl. 34px home indicator                 */
   --cp-touch-min:          56px;  /* minimum tap target                        */
 
   /* ------------------------------------------------------------------------
