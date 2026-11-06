@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { ActivityIndicator, Image, Pressable, View } from 'react-native';
+import { ActivityIndicator, Image, Pressable, Share, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Screen } from '@/components/Screen';
 import { AppText } from '@/components/AppText';
+import { Pill } from '@/components/Pill';
 import { Icon } from '@/components/Icon';
 import { Avatar, Card, IconButton, Photo, SubTabs } from '@/components/ui';
 import { FormMessage } from '@/components/auth/Field';
@@ -156,34 +157,50 @@ export default function Me() {
   return (
     <View style={{ flex: 1 }}>
       <Screen>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 16 }}>
+        {/* Header follows the design system: handle pill + bell, avatar with stats, name and bio. */}
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+          <AppText variant="h4" numberOfLines={1} style={{ flexShrink: 1 }}>{profile?.username ?? name}</AppText>
+          {!!profile?.username && (
+            <View style={{ paddingHorizontal: 12, height: 32, borderRadius: radius.pill, backgroundColor: c.goldWash, justifyContent: 'center' }}>
+              <AppText variant="mono" color={role.accentText}>camino.plus/{profile.username}</AppText>
+            </View>
+          )}
+          <View style={{ marginLeft: 'auto' }}><IconButton name="bell" label="Notifications" onPress={() => router.push('/inbox')} flat /></View>
+        </View>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 20 }}>
           {profile?.avatar_url
-            ? <Image source={{ uri: profile.avatar_url }} style={{ width: 84, height: 84, borderRadius: radius.pill, borderWidth: 3, borderColor: c.gold }} />
-            : <Avatar size={84} ring />}
-          <View style={{ flex: 1, gap: 4 }}>
-            <AppText variant="h3" numberOfLines={1}>{name}</AppText>
-            {!!profile?.username && (
-              <View style={{ alignSelf: 'flex-start', paddingHorizontal: 10, height: 26, borderRadius: radius.pill, backgroundColor: c.goldWash, justifyContent: 'center' }}>
-                <AppText variant="mono" color={role.accentText} style={{ fontSize: 12 }}>camino.plus/{profile.username}</AppText>
+            ? <Image source={{ uri: profile.avatar_url }} style={{ width: 92, height: 92, borderRadius: radius.pill, borderWidth: 3, borderColor: c.gold }} />
+            : <Avatar size={92} ring />}
+          <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-around' }}>
+            {[[String(Math.round(Number(profile?.km_walked ?? 0))), 'km'], [String(profile?.stamps_count ?? 0), 'stamps'], [String(profile?.followers_count ?? 0), 'friends']].map(([n, l]) => (
+              <View key={l} style={{ alignItems: 'center' }}>
+                <AppText variant="h3">{n}</AppText>
+                <AppText variant="small" muted>{l}</AppText>
               </View>
-            )}
+            ))}
           </View>
-          <IconButton name="bell" label="Notifications" onPress={() => router.push('/inbox')} flat />
         </View>
-        {journey?.route && (
-          <AppText variant="small" muted>
-            {journey.route.name}{journey.start_stage ? ` · from stage ${journey.start_stage.stage_number}` : ''}
-          </AppText>
-        )}
-        <AppText variant="accent" color={role.accentText}>Buen Camino!</AppText>
-        <View style={{ flexDirection: 'row', gap: 12 }}>
-          {[[String(Math.round(Number(profile?.km_walked ?? 0))), 'km walked'], [String(stagesDone), 'stages'], [String(profile?.stamps_count ?? 0), 'stamps']].map(([n, l]) => (
-            <Card key={l} style={{ flex: 1, padding: 16, alignItems: 'center' }}>
-              <AppText variant="h4">{n}</AppText>
-              <AppText variant="caption" muted>{l}</AppText>
-            </Card>
-          ))}
+        <View style={{ gap: 4 }}>
+          <AppText variant="body" style={{ fontFamily: 'Inter_600SemiBold' }}>{name}</AppText>
+          {!!profile?.bio && <AppText variant="body">{profile.bio}</AppText>}
+          {journey?.route && (
+            <Pressable accessibilityRole="button" onPress={() => router.push('/change-camino')} style={{ flexDirection: 'row', alignItems: 'center', gap: 6, alignSelf: 'flex-start', paddingVertical: 6 }}>
+              <AppText variant="small" muted>
+                {journey.route.name}{journey.start_stage ? ` · from stage ${journey.start_stage.stage_number}` : ''} · {stagesDone} stages done
+              </AppText>
+              <AppText variant="small" color={c.blue} style={{ fontFamily: 'Inter_600SemiBold', textDecorationLine: 'underline' }}>Change</AppText>
+            </Pressable>
+          )}
+          <AppText variant="accent" color={role.accentText}>Buen Camino!</AppText>
         </View>
+        <Card style={{ gap: 14 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+            <AppText variant="h4">Camino friends</AppText>
+            <AppText variant="small" muted>{profile?.followers_count ?? 0} friends</AppText>
+          </View>
+          <AppText variant="small" muted>Walk together, share stamps and see where your friends are on the way.</AppText>
+          <Pill variant="gold" label="Invite friends" onPress={() => Share.share({ message: `Walk the Camino with me on CaminoPlus: https://camino.plus${profile?.username ? `/${profile.username}` : ''}` }).catch(() => {})} />
+        </Card>
         <SubTabs tabs={TABS} value={tab} onChange={setTab} />
         {!!error && <FormMessage>{`Could not load your data. ${error}`}</FormMessage>}
 

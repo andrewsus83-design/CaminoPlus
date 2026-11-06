@@ -6,6 +6,7 @@ import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
 import { Card, Chip, IconButton, Photo } from '@/components/ui';
 import { Stay, stays } from '@/data/mock';
+import { PromoBanner } from '@/components/PromoBanner';
 import { Badge } from '@/features/business/ui';
 import { BusinessFeedCard } from '@/features/business/BusinessCard';
 import { ownerStore, useOwner } from '@/features/business/store';
@@ -62,6 +63,11 @@ export default function Stays() {
         </View>
         <IconButton name="heart" label="Favourites" size={52} onPress={() => setOnlyFavs((v) => !v)} />
       </View>
+      <PromoBanner promos={[
+        { id: 'jubilee', eyebrow: 'Jubilee Year 2027', title: 'Holy Year beds in Santiago go fast', cta: 'Book early', icon: 'shell' },
+        { id: 'owners', eyebrow: 'For business owners', title: 'Run an albergue or café on the Way?', cta: 'List your business', icon: 'briefcase', onPress: () => router.push('/business') },
+        { id: 'stamp', eyebrow: 'Pilgrim tip', title: 'Stay where the stamp is: albergues with a sello', cta: 'See albergues', icon: 'stays', onPress: () => setFilter('Albergue') },
+      ]} />
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }} style={{ flexGrow: 0, marginHorizontal: -24 }}>
         <View style={{ width: 16 }} />
         {FILTERS.map((f) => (<Chip key={f} label={f} selected={filter === f} onPress={() => setFilter(f)} />))}

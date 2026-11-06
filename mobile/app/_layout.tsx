@@ -56,6 +56,7 @@ function RootStack() {
         <Stack.Screen name="write" options={{ presentation: 'fullScreenModal', animation: 'slide_from_bottom' }} />
         <Stack.Screen name="inbox" />
         <Stack.Screen name="offline-maps" />
+        <Stack.Screen name="change-camino" />
         <Stack.Screen name="business/index" />
         <Stack.Screen name="business/register" />
         <Stack.Screen name="business/status" />

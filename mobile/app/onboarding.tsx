@@ -3,30 +3,14 @@ import { ActivityIndicator, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '@/components/AppText';
 import { Pill } from '@/components/Pill';
-import { Icon } from '@/components/Icon';
-import { Card } from '@/components/ui';
+import { Choice, routeMeta } from '@/components/auth/Choice';
 import { AuthShell } from '@/components/auth/AuthShell';
 import { Field, FormMessage } from '@/components/auth/Field';
 import { useAuth } from '@/lib/auth';
 import { listRoutes, listStages, Route, Stage, startJourney, updateProfile } from '@/lib/api';
-import { c, layout, radius, role } from '@/theme';
+import { layout, role } from '@/theme';
 
 type Step = 'name' | 'route' | 'stage';
-
-function Choice({ title, meta, selected, onPress, accent }: { title: string; meta?: string; selected: boolean; onPress: () => void; accent?: string | null }) {
-  return (
-    <Card onPress={onPress} style={{ flexDirection: 'row', alignItems: 'center', gap: 14, padding: 18, borderWidth: 2, borderColor: selected ? c.gold : 'transparent' }}>
-      <View style={{ width: 12, alignSelf: 'stretch', borderRadius: radius.pill, backgroundColor: accent ?? c.goldSoft }} />
-      <View style={{ flex: 1, gap: 2 }}>
-        <AppText variant="label">{title}</AppText>
-        {!!meta && <AppText variant="caption" muted>{meta}</AppText>}
-      </View>
-      <View style={{ width: 28, height: 28, borderRadius: radius.pill, borderWidth: selected ? 0 : 1, borderColor: role.border, backgroundColor: selected ? c.gold : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
-        {selected && <Icon name="check" color={c.blue} size={18} />}
-      </View>
-    </Card>
-  );
-}
 
 export default function Onboarding() {
   const { session, profile, refresh, signOut } = useAuth();
@@ -85,7 +69,7 @@ export default function Onboarding() {
   return (
     <AuthShell back={false} footer={footer}
       title={step === 'name' ? 'Hola, pilgrim' : step === 'route' ? 'Which Camino?' : 'Where do you start?'}
-      lead={step === 'name' ? 'What should other pilgrims call you?' : step === 'route' ? 'You can add more routes later.' : 'Pick your first stage. Your day plan follows the official stages from there.'}>
+      lead={step === 'name' ? 'What should other pilgrims call you?' : step === 'route' ? 'Pick the Camino you are starting with. You can switch to another Camino anytime inside the app (Settings, My Camino).' : 'Pick your first stage. Your day plan follows the official stages from there.'}>
       <AppText variant="mono" muted style={{ fontSize: 12, marginTop: -8 }}>STEP {stepNo} OF 3</AppText>
       {!!error && <FormMessage>{error}</FormMessage>}
 
@@ -96,7 +80,7 @@ export default function Onboarding() {
       {step === 'route' && (routes ? (
         routes.length ? routes.map((r) => (
           <Choice key={r.id} title={r.name} accent={r.color} selected={route?.id === r.id} onPress={() => setRoute(r)}
-            meta={[r.start_name && r.end_name ? `${r.start_name} to ${r.end_name}` : null, r.distance_km ? `~${Math.round(r.distance_km)} km` : null, r.stage_count ? `${r.stage_count} stages` : null].filter(Boolean).join(' · ')} />
+            meta={routeMeta(r)} />
         )) : <FormMessage tone="info">No routes are published yet.</FormMessage>
       ) : <ActivityIndicator color={role.action} style={{ marginTop: layout.stackGap }} />)}
 

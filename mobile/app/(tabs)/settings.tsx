@@ -7,6 +7,7 @@ import { Card, SectionLabel } from '@/components/ui';
 import { AccountSection, LogoutButton } from '@/components/AccountSection';
 import { BusinessCard, IntroSheet } from '@/features/business/BusinessCard';
 import { useOwner } from '@/features/business/store';
+import { useAuth } from '@/lib/auth';
 import { c, radius } from '@/theme';
 
 const rows = {
@@ -17,6 +18,7 @@ const rows = {
 export default function Settings() {
   const router = useRouter();
   const owner = useOwner();
+  const { journey } = useAuth();
   const [sheet, setSheet] = useState(false);
   const openCard = () => {
     if (owner.state === 'none') setSheet(true);
@@ -31,6 +33,13 @@ export default function Settings() {
         <LogoutButton />
       </View>
       <AccountSection />
+      <Card onPress={() => router.push('/change-camino')} style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
+        <View style={{ flex: 1, gap: 2 }}>
+          <AppText variant="label">My Camino</AppText>
+          <AppText variant="small" muted>{journey?.route?.name ?? 'Pick a Camino'} · tap to switch to another Camino</AppText>
+        </View>
+        <AppText variant="label" color={c.blue}>Change</AppText>
+      </Card>
       <Card style={{ gap: 10 }}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
           <AppText variant="label">Cloud storage</AppText>
