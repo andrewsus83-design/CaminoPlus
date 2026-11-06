@@ -210,7 +210,7 @@ export default function ChatScreen() {
           listRef.current?.scrollToOffset({ offset: info.averageItemLength * info.index, animated: true });
           setTimeout(() => listRef.current?.scrollToIndex({ index: info.index, viewPosition: 0.5, animated: true }), 350);
         }}
-        contentContainerStyle={{ paddingHorizontal: 10, paddingVertical: 10 }}
+        contentContainerStyle={{ paddingHorizontal: layout.screenMargin, paddingVertical: 10 }}
         ListFooterComponent={chat.loadingMore ? <ActivityIndicator color={role.action} style={{ margin: 16 }} /> : !chat.hasMore ? <StartOfChat text={group ? 'This is the start of the group' : `This is the start of your chat with ${title}`} /> : undefined}
       />
     );
@@ -218,7 +218,7 @@ export default function ChatScreen() {
 
   return (
     <KeyboardAvoidingView behavior="padding" style={{ flex: 1, backgroundColor: role.bg }}>
-      <View style={{ paddingTop: insets.top + 8, paddingBottom: 10, paddingHorizontal: 12, flexDirection: 'row', alignItems: 'center', gap: 6, borderBottomWidth: 1, borderBottomColor: role.border, backgroundColor: role.bg }}>
+      <View style={{ paddingTop: insets.top + 8, paddingBottom: 10, paddingHorizontal: layout.screenMargin, flexDirection: 'row', alignItems: 'center', gap: 6, borderBottomWidth: 1, borderBottomColor: role.border, backgroundColor: role.bg }}>
         <IconButton name="back" label="Back" flat onPress={() => goBack(router)} />
         <Pressable accessibilityRole="button" accessibilityLabel={`${title}. ${group ? pilgrimsLabel(conv?.member_count ?? 0) : 'Friend'}. Open chat info`} onPress={() => router.push(`/chat/info/${id}`)} style={{ flex: 1, minHeight: 52, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
           {conv
@@ -237,7 +237,7 @@ export default function ChatScreen() {
         {showJump && chat.phase === 'ready' && (
           <Pressable
             accessibilityRole="button" accessibilityLabel={missed ? `Go to the newest messages, ${missed} new` : 'Go to the newest messages'} onPress={scrollToBottom}
-            style={{ position: 'absolute', right: 16, bottom: 12, width: 52, height: 52, borderRadius: radius.pill, backgroundColor: role.surface, borderWidth: 1, borderColor: role.border, alignItems: 'center', justifyContent: 'center', ...shadowStyle('md') }}
+            style={{ position: 'absolute', right: layout.screenMargin, bottom: 12, width: 52, height: 52, borderRadius: radius.pill, backgroundColor: role.surface, borderWidth: 1, borderColor: role.border, alignItems: 'center', justifyContent: 'center', ...shadowStyle('md') }}
           >
             <Icon name="arrow-down" color={c.blue} size={26} />
             {missed > 0 && <CountBadge count={missed} tone="blue" style={{ position: 'absolute', top: -9, left: -7 }} />}

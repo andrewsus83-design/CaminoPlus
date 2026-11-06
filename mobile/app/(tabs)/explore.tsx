@@ -6,7 +6,7 @@ import { Icon } from '@/components/Icon';
 import { useAuth } from '@/lib/auth';
 import { localStore, userKey } from '@/lib/localStore';
 import { exploreItems } from '@/data/mock';
-import { c, fonts, radius, role } from '@/theme';
+import { c, fonts, layout, radius, role } from '@/theme';
 // Sample content is never shared outside the app: share the invitation instead of an invented place or caption.
 const SHARE_APP = 'Walking the Camino? CaminoPlus has offline maps, stays and a pilgrim passport: https://camino.plus';
 
@@ -84,7 +84,7 @@ export default function Discover() {
           <View style={{ width, height, backgroundColor: item.tint, justifyContent: 'flex-end', padding: 24, paddingBottom: insets.bottom + 120 }}>
             <AppText variant="h3" color={c.blue900}>{item.caption}</AppText>
             <AppText variant="mono" color={c.blue900}>@{item.user}</AppText>
-            <View style={{ position: 'absolute', right: 16, bottom: insets.bottom + 120, gap: 14, alignItems: 'center' }}>
+            <View style={{ position: 'absolute', right: layout.screenMargin, bottom: insets.bottom + 120, gap: 14, alignItems: 'center' }}>
               {(['loved', 'saved'] as const).map((k) => {
                 const on = favs[k].includes(item.id);
                 return (
@@ -107,7 +107,7 @@ export default function Discover() {
         )}
       />
       <View style={{ position: 'absolute', top: insets.top + 12, left: 0, right: 0 }}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ minWidth: width, justifyContent: 'center', gap: 22, paddingHorizontal: 16 }}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ minWidth: width, justifyContent: 'center', gap: 22, paddingHorizontal: layout.screenMargin }}>
           {TABS.map((t) => (
             <Pressable key={t} accessibilityRole="tab" accessibilityState={{ selected: tab === t }} onPress={() => goTab(t)} hitSlop={10} style={{ paddingVertical: 8, borderBottomWidth: 3, borderBottomColor: tab === t ? c.white : 'transparent' }}>
               <AppText variant="body" color={tab === t ? c.white : 'rgba(255,255,255,0.65)'} style={{ fontFamily: fonts.bodyBold, textShadowColor: 'rgba(0,0,0,0.35)', textShadowRadius: 6 }}>{t}</AppText>

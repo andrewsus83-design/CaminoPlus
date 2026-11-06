@@ -268,7 +268,7 @@ export default function Me() {
           </View>
         </KeyboardAvoidingView>
       </Modal>
-      <Pressable accessibilityRole="button" accessibilityLabel="Write a journey post" onPress={() => router.push('/write')} style={{ position: 'absolute', right: 16, bottom: Math.max(insets.bottom - 14, 10) + 88 + 8, width: 52, height: 52, borderRadius: radius.pill, backgroundColor: c.gold, alignItems: 'center', justifyContent: 'center', ...shadowStyle('gold') }}>
+      <Pressable accessibilityRole="button" accessibilityLabel="Write a journey post" onPress={() => router.push('/write')} style={{ position: 'absolute', right: layout.screenMargin, bottom: Math.max(insets.bottom - 14, 10) + 88 + 8, width: 52, height: 52, borderRadius: radius.pill, backgroundColor: c.gold, alignItems: 'center', justifyContent: 'center', ...shadowStyle('gold') }}>
         <Icon name="pen" color={c.blue} size={22} />
       </Pressable>
     </View>
