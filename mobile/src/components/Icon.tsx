@@ -48,6 +48,19 @@ const PATHS = {
   compose: ['M11.5 4.5h-5A2.5 2.5 0 0 0 4 7v10.5A2.5 2.5 0 0 0 6.5 20H17a2.5 2.5 0 0 0 2.5-2.5v-5', 'M17.8 3.2a2.1 2.1 0 0 1 3 3L12.2 14.8 8 16l1.2-4.2 8.6-8.6Z'],
   block: ['M5.6 5.6l12.8 12.8'],
   refresh: ['M20.5 12a8.5 8.5 0 1 1-2.5-6', 'M20.5 3.5V8H16'],
+  // Map walk view: direction arrows for the instruction banner, light/dark switch, re-center arrow.
+  'arrow-up': ['M12 20V5', 'm6 11 6-6 6 6'],
+  'turn-left': ['M17 20v-7a4 4 0 0 0-4-4H5', 'm9 5-4 4 4 4'],
+  'turn-right': ['M7 20v-7a4 4 0 0 1 4-4h8', 'm15 5 4 4-4 4'],
+  'turn-slight-left': ['M15 20v-6l-7-7', 'M13 7H8v5'],
+  'turn-slight-right': ['M9 20v-6l7-7', 'M11 7h5v5'],
+  'turn-sharp-left': ['M18 20V9l-9 9', 'M9 12v6h6'],
+  'turn-sharp-right': ['M6 20V9l9 9', 'M15 12v6H9'],
+  'u-turn': ['M8 20V10a4 4 0 0 1 8 0v7', 'm12.5 13.5 3.5 3.5 3.5-3.5'],
+  sun: ['M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6'],
+  moon: ['M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5a8.5 8.5 0 1 0 10.7 10.7Z'],
+  navigation: ['M3 11 22 2l-9 19-2-8-8-2Z'],
+  building: ['M5 21V4.5A1.5 1.5 0 0 1 6.5 3h7A1.5 1.5 0 0 1 15 4.5V21', 'M15 9.5h2.5A1.5 1.5 0 0 1 19 11v10', 'M3 21h18', 'M8.5 7h2M8.5 11h2M8.5 15h2'],
 } as const;
 
 export type IconName = keyof typeof PATHS;
@@ -68,6 +81,7 @@ export function Icon({ name, color, size = 24, strokeWidth = 1.75, filled }: { n
       {(name === 'clock' || name === 'info' || name === 'block') && <Circle cx="12" cy="12" r="9" {...p} />}
       {name === 'image' && <Circle cx="8.5" cy="9" r="1.6" {...p} />}
       {(name === 'group' || name === 'user-plus') && <Circle cx="9" cy="8" r="3.5" {...p} />}
+      {name === 'sun' && <Circle cx="12" cy="12" r="4.2" {...p} />}
       {name === 'more' && [5, 12, 19].map((cx) => <Circle key={cx} cx={cx} cy="12" r="1.9" {...p} fill={color} />)}
       {PATHS[name].map((d) => (<Path key={d} d={d} {...p} />))}
     </Svg>

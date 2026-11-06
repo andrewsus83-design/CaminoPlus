@@ -85,6 +85,18 @@ export const pois: Poi[] = [
 export const SAMPLE_PROGRESS_M = 9000;
 export const samplePosition = pointAlong(routeLine, SAMPLE_PROGRESS_M);
 
+// Where each stage ends along routeLine (it is the stage lines joined end to end), and the stage that holds a
+// distance along the route. Past the last stage: the last one. The Walk view uses this so the stage changes the
+// moment the walker passes a stage end, not halfway to the next vertex.
+export const stageEndAlongM: number[] = (() => {
+  let acc = 0;
+  return stages.map((s) => (acc += lineLengthM(s.line)));
+})();
+export const stageForAlong = (alongM: number) => {
+  const i = stageEndAlongM.findIndex((end) => alongM <= end + 30);
+  return stages[i < 0 ? stages.length - 1 : i];
+};
+
 export const stageForPoint = (p: LngLat) => {
   // Closest stage by its line, or the last one if beyond.
   let best = stages[0];

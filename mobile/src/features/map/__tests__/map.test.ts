@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict';
 import { distanceM, lineLengthM, nearestOnLine, pointAlong, splitLine, type LngLat } from '../geo';
 import { buildStyle } from '../style';
-import { pois, routeBounds, routeLine, samplePosition, stageForPoint, stages } from '../sampleRoute';
+import { pois, routeBounds, routeLine, samplePosition, stageEndAlongM, stageForAlong, stageForPoint, stages } from '../sampleRoute';
 import { formatMb, timeAgo } from '../timeAgo';
 
 let n = 0;
@@ -40,6 +40,17 @@ test('a point 1 km off the route snaps back with ~1 km distance', () => {
 test('stageForPoint finds stage 1 near Orisson and stage 3 near Pamplona', () => {
   assert.equal(stageForPoint([-1.2268, 43.1335]).number, 1);
   assert.equal(stageForPoint([-1.62, 42.83]).number, 3);
+});
+
+test('stageForAlong changes stage the moment the walker passes a stage end', () => {
+  assert.equal(stageForAlong(0).number, 1);
+  assert.equal(stageForAlong(9000).number, 1);
+  assert.equal(stageForAlong(stageEndAlongM[0] - 5).number, 1);
+  assert.equal(stageForAlong(stageEndAlongM[0] + 100).number, 2, '100 m into stage 2 (stageForPoint would still say stage 1 here)');
+  assert.equal(stageForAlong(stageEndAlongM[1] + 100).number, 3);
+  assert.equal(stageForAlong(stageEndAlongM[2] + 5000).number, 3, 'past the last stage: the last one');
+  assert.equal(stageForPoint(pointAlong(routeLine, stageEndAlongM[0] + 100)).number, 1);
+  assert.ok(Math.abs(stageEndAlongM[0] - lineLengthM(stages[0].line)) < 1e-6);
 });
 
 test('route bounds cover St-Jean and Santiago', () => {

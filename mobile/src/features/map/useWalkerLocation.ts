@@ -9,6 +9,7 @@
 // - Updates stop completely when the Maps tab is not visible or the app is in the
 //   background (no background location in release 1).
 // - The map renders at 30 fps in saver mode and the camera does not chase every fix.
+// - The Walk view never turns precise GPS on by itself: the pilgrim asks for it with the GPS button.
 // "precise" is for short moments (finding an albergue door, a hunt step): High
 // accuracy, 5 m / 3 s. The UI drops back to saver after PRECISE_TIMEOUT_MS.
 import { useEffect, useState } from 'react';
@@ -17,7 +18,15 @@ import * as Location from 'expo-location';
 import type { LngLat } from './geo';
 
 export type GpsMode = 'saver' | 'precise' | 'off';
-export type WalkerFix = { at: LngLat; accuracyM: number | null; timestamp: number };
+export type WalkerFix = {
+  at: LngLat;
+  accuracyM: number | null;
+  timestamp: number;
+  /** direction of travel over the ground in degrees (null when the phone has none, e.g. standing still) */
+  courseDeg: number | null;
+  /** speed over the ground in m/s (null when unknown) */
+  speedMps: number | null;
+};
 export type GpsPermission = 'unknown' | 'granted' | 'denied';
 
 export const PRECISE_TIMEOUT_MS = 10 * 60 * 1000;
@@ -73,8 +82,13 @@ export function useWalkerLocation(mode: GpsMode, visible: boolean) {
   return { fix, permission };
 }
 
+// expo-location reports -1 (or null) for a heading or speed it does not have.
+const valid = (n: number | null | undefined) => (typeof n === 'number' && Number.isFinite(n) && n >= 0 ? n : null);
+
 const toFix = (l: Location.LocationObject): WalkerFix => ({
   at: [l.coords.longitude, l.coords.latitude],
   accuracyM: l.coords.accuracy,
   timestamp: l.timestamp,
+  courseDeg: valid(l.coords.heading),
+  speedMps: valid(l.coords.speed),
 });
