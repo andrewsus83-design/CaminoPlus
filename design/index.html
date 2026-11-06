@@ -1403,7 +1403,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           <div style="width:150px"><div class="cp-photo"><div class="cp-img v5"></div><span class="wm">CaminoPlus</span><span class="cp-badge glass face"><svg class="cp-icon sm"><use href="#i-face"/></svg>You</span><span class="sel on"><svg class="cp-icon sm" style="width:14px;height:14px;stroke-width:3px"><use href="#i-check"/></svg></span><span class="cp-badge glass price">€2.99</span></div></div>
           <div style="flex:1;min-width:180px">
             <div class="cp-story-progress" style="background:var(--cp-color-blue);padding:10px;border-radius:var(--cp-radius-pill)"><i class="done"></i><i class="done"></i><i class="now"></i><i></i><i></i></div>
-            <p class="note" style="margin:14px 0 0">Explore is full screen: stories fill the phone and move <b>left / right</b>, not up and down. Tabs sit small at the very top. No on-screen swipe hint; a 1–2x coach-mark tutorial teaches the gesture the first time a user opens Explore. Watermarked photo tiles with a face-match tag feed the "Photos of you" marketplace.</p>
+            <p class="note" style="margin:14px 0 0">Discover is full screen: stories fill the phone and move <b>left / right</b>, not up and down. Tabs sit small at the very top. No on-screen swipe hint; a 1–2x coach-mark tutorial teaches the gesture the first time a user opens Explore. Watermarked photo tiles with a face-match tag feed the "Photos of you" marketplace.</p>
             <p class="spec" style="margin:10px 0 0">.cp-story-progress · .deck · .cp-photo</p>
           </div>
         </div>
@@ -1581,14 +1581,14 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
 <section class="doc" id="tabbar">
   <p class="eyebrow">13 · Navigation</p>
   <h2>Floating tab bar</h2>
-  <p class="intro">Five tabs in a floating pill, 12px from the screen edges: <b>Me</b>, <b>Stays</b>, <b>Maps</b>, <b>Explore</b>, <b>Settings</b>. The active tab gets a gold-soft pill behind its icon and a bold label. Labels are always visible. Inside a tab, sub-sections use underline sub-tabs.</p>
+  <p class="intro">Five tabs in a floating pill, 12px from the screen edges: <b>Me</b>, <b>Stays</b>, <b>Maps</b>, <b>Discover</b>, <b>Settings</b>. The active tab gets a gold-soft pill behind its icon and a bold label. Labels are always visible. Inside a tab, sub-sections use underline sub-tabs.</p>
   <div class="grid g2" style="align-items:start">
     <div class="panel" style="padding:32px 12px;background:var(--cp-color-sand-200)">
       <nav class="cp-tabbar" style="margin:0 12px">
         <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
         <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
         <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
-        <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Explore</div>
+        <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Discover</div>
         <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-settings"/></svg></span>Settings</div>
       </nav>
     </div>
@@ -1693,7 +1693,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     clearTimeout(toast.t); toast.t = setTimeout(function () { toastEl.classList.remove('on'); }, 1400);
   }
   function tabbar() {
-    return '<div class="tabdock"><nav class="cp-tabbar">' + [['me', 'Me'], ['stays', 'Stays'], ['maps', 'Maps'], ['explore', 'Explore'], ['settings', 'Settings']].map(function (t) {
+    return '<div class="tabdock"><nav class="cp-tabbar">' + [['me', 'Me'], ['stays', 'Stays'], ['maps', 'Maps'], ["explore", "Discover"], ['settings', 'Settings']].map(function (t) {
       return '<div class="cp-tab' + (t[0] === 'settings' ? ' on' : '') + '"><span class="ico">' + ic(t[0], '') + '</span>' + t[1] + '</div>';
     }).join('') + '</nav></div>';
   }
@@ -1859,7 +1859,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
-          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Explore</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Discover</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-settings"/></svg></span>Settings</div>
         </nav></div>
         <span class="home-ind"></span>
@@ -1976,7 +1976,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
-          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Explore</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Discover</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-settings"/></svg></span>Settings</div>
         </nav></div>
         <span class="home-ind"></span>
@@ -2007,7 +2007,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           <div class="cp-tab on"><span class="ico"><svg class="cp-icon "><use href="#i-me"/></svg></span>Me</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-stays"/></svg></span>Stays</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-maps"/></svg></span>Maps</div>
-          <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-explore"/></svg></span>Explore</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-explore"/></svg></span>Discover</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-settings"/></svg></span>Settings</div>
         </nav></div>
         <span class="home-ind"></span>
@@ -2040,7 +2040,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
-          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Explore</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Discover</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-settings"/></svg></span>Settings</div>
         </nav></div>
         <span class="home-ind"></span>
@@ -2068,7 +2068,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           <div class="cp-tab on"><span class="ico"><svg class="cp-icon "><use href="#i-me"/></svg></span>Me</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-stays"/></svg></span>Stays</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-maps"/></svg></span>Maps</div>
-          <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-explore"/></svg></span>Explore</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-explore"/></svg></span>Discover</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-settings"/></svg></span>Settings</div>
         </nav></div>
         <span class="home-ind"></span>
@@ -2094,7 +2094,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           <div class="cp-tab on"><span class="ico"><svg class="cp-icon "><use href="#i-me"/></svg></span>Me</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-stays"/></svg></span>Stays</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-maps"/></svg></span>Maps</div>
-          <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-explore"/></svg></span>Explore</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-explore"/></svg></span>Discover</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-settings"/></svg></span>Settings</div>
         </nav></div>
         <span class="home-ind"></span>
@@ -2172,7 +2172,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
           <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
-          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Explore</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Discover</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-settings"/></svg></span>Settings</div>
         </nav></div>
         <span class="home-ind"></span>
@@ -2344,7 +2344,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-me"/></svg></span>Me</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-stays"/></svg></span>Stays</div>
           <div class="cp-tab on"><span class="ico"><svg class="cp-icon "><use href="#i-maps"/></svg></span>Maps</div>
-          <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-explore"/></svg></span>Explore</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-explore"/></svg></span>Discover</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-settings"/></svg></span>Settings</div>
         </nav></div>
         <span class="home-ind"></span>
@@ -2412,7 +2412,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
           <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
-          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Explore</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Discover</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-settings"/></svg></span>Settings</div>
         </nav></div>
         <span class="home-ind"></span>
@@ -2439,7 +2439,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-me"/></svg></span>Me</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-stays"/></svg></span>Stays</div>
           <div class="cp-tab on"><span class="ico"><svg class="cp-icon "><use href="#i-maps"/></svg></span>Maps</div>
-          <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-explore"/></svg></span>Explore</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-explore"/></svg></span>Discover</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-settings"/></svg></span>Settings</div>
         </nav></div>
         <span class="home-ind"></span>
@@ -2447,7 +2447,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     </div>
 
     <div class="phone-wrap">
-      <p class="phone-label"><b>Explore</b>Full-screen stories, swipe left / right</p>
+      <p class="phone-label"><b>Discover</b>Full-screen stories, swipe left / right</p>
       <div class="phone explore-full">
         <div class="cp-img v5" style="position:absolute;inset:0;border-radius:0"></div>
         <div class="shade-full"></div>
@@ -2474,7 +2474,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
-          <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Explore</div>
+          <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Discover</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-settings"/></svg></span>Settings</div>
         </nav></div>
         <span class="home-ind" style="background:#fff"></span>
@@ -2482,7 +2482,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     </div>
 
     <div class="phone-wrap">
-      <p class="phone-label"><b>Explore · Photos of you</b>Buy photos others took of you</p>
+      <p class="phone-label"><b>Discover · Photos of you</b>Buy photos others took of you</p>
       <div class="phone">
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
         <div class="scroll">
@@ -2506,7 +2506,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
-          <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Explore</div>
+          <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Discover</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-settings"/></svg></span>Settings</div>
         </nav></div>
         <span class="home-ind"></span>
@@ -2552,7 +2552,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
-          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Explore</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Discover</div>
           <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-settings"/></svg></span>Settings</div>
         </nav></div>
         <span class="home-ind"></span>
@@ -2584,7 +2584,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
-          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Explore</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Discover</div>
           <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-settings"/></svg></span>Settings</div>
         </nav></div>
         <span class="home-ind"></span>
@@ -2727,7 +2727,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
-          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Explore</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Discover</div>
           <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-settings"/></svg></span>Settings</div>
         </nav></div>
         <span class="home-ind"></span>
@@ -2760,7 +2760,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
-          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Explore</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Discover</div>
           <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-settings"/></svg></span>Settings</div>
         </nav></div>
         <span class="home-ind"></span>

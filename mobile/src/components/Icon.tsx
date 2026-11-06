@@ -23,6 +23,7 @@ const PATHS = {
   briefcase: ['M5.5 7h13A2.5 2.5 0 0 1 21 9.5v8a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 17.5v-8A2.5 2.5 0 0 1 5.5 7Z', 'M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7M3 12.5h18'],
   camera: ['M4 8.5A2.5 2.5 0 0 1 6.5 6H8l1.5-2h5L16 6h1.5A2.5 2.5 0 0 1 20 8.5v8a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 16.5v-8Z', 'M12 9a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Z'],
   chat: ['M20 12a8 8 0 0 1-11.8 7L4 20l1-4A8 8 0 1 1 20 12Z'],
+  filter: ['M4 7h8M18 7h2M4 17h2M12 17h8'],
   chevron: ['m9 5 7 7-7 7'],
   logout: ['M14 4h3.5A2.5 2.5 0 0 1 20 6.5v11a2.5 2.5 0 0 1-2.5 2.5H14', 'M9.5 8 5.5 12l4 4M5.5 12H15'],
 } as const;
@@ -30,14 +31,16 @@ const PATHS = {
 export type IconName = keyof typeof PATHS;
 
 // 24px outline icons, stroke 1.75, matching the design system sprite.
-export function Icon({ name, color, size = 24, strokeWidth = 1.75 }: { name: IconName; color: string; size?: number; strokeWidth?: number }) {
-  const p = { stroke: color, strokeWidth, fill: 'none', strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const };
+export function Icon({ name, color, size = 24, strokeWidth = 1.75, filled }: { name: IconName; color: string; size?: number; strokeWidth?: number; filled?: boolean }) {
+  const p = { stroke: color, strokeWidth, fill: filled ? color : 'none', strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const };
   return (
     <View style={{ width: size, height: size, flexShrink: 0 }}>
     <Svg width={size} height={size} viewBox="0 0 24 24">
       {name === 'me' && <Circle cx="12" cy="8" r="4" {...p} />}
       {name === 'stays' && <Circle cx="6.5" cy="11" r="1.6" {...p} />}
       {name === 'settings' && <Circle cx="12" cy="12" r="3" {...p} />}
+      {name === 'filter' && <Circle cx="15" cy="7" r="2.4" {...p} />}
+      {name === 'filter' && <Circle cx="9" cy="17" r="2.4" {...p} />}
       {name === 'search' && <Circle cx="11" cy="11" r="7" {...p} />}
       {PATHS[name].map((d) => (<Path key={d} d={d} {...p} />))}
     </Svg>

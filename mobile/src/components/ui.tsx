@@ -17,10 +17,10 @@ export function Chip({ label, selected, onPress }: { label: string; selected?: b
   );
 }
 
-export function IconButton({ name, onPress, label, badge, size = 48, flat }: { name: IconName; onPress?: () => void; label: string; badge?: number; size?: number; flat?: boolean }) {
+export function IconButton({ name, onPress, label, badge, size = 48, flat, active }: { name: IconName; onPress?: () => void; label: string; badge?: number; size?: number; flat?: boolean; active?: boolean }) {
   return (
     <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} style={{ width: size, height: size, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center', backgroundColor: flat ? 'transparent' : role.surface, borderWidth: flat ? 0 : 1, borderColor: role.border }}>
-      <Icon name={name} color={role.text} />
+      <Icon name={name} color={active ? c.red : role.text} filled={active} />
       {!!badge && (
         <View style={{ position: 'absolute', top: 2, right: 2, minWidth: 20, height: 20, paddingHorizontal: 5, borderRadius: radius.pill, backgroundColor: c.red, alignItems: 'center', justifyContent: 'center' }}>
           <AppText variant="caption" color={c.white} style={{ fontSize: 11, lineHeight: 14 }}>{badge}</AppText>
