@@ -9,17 +9,15 @@ import { c, radius, role, shadowStyle } from '@/theme';
 export function TabBar({ state, descriptors, navigateToTab }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
   return (
-    <View style={{ position: 'absolute', left: 12, right: 12, bottom: insets.bottom + 8, height: 88, borderRadius: radius.pill, backgroundColor: role.surface, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 6, ...shadowStyle('lg') }}>
+    <View style={{ position: 'absolute', left: 12, right: 12, bottom: Math.max(insets.bottom - 14, 10), height: 88, borderRadius: radius.pill, backgroundColor: role.surface, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 6, ...shadowStyle('lg') }}>
       {state.routes.map((route, i) => {
         const focused = state.index === i;
         const label = descriptors[route.key].options.title ?? route.name;
-        const color = focused ? c.blue : c.stone500;
+        const color = focused ? c.blue : 'rgba(20,54,93,0.42)';
         return (
-          <Pressable key={route.key} accessibilityRole="tab" accessibilityState={{ selected: focused }} onPress={() => navigateToTab(route.key)} style={{ flex: 1, alignItems: 'center', gap: 3 }}>
-            <View style={{ width: 64, height: 38, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center', backgroundColor: focused ? c.goldSoft : 'transparent' }}>
-              <Icon name={route.name as IconName} color={color} size={28} />
-            </View>
-            <AppText variant="caption" color={color} style={{ fontFamily: 'Inter_600SemiBold', fontSize: 14, lineHeight: 18 }}>{label}</AppText>
+          <Pressable key={route.key} accessibilityRole="tab" accessibilityState={{ selected: focused }} onPress={() => navigateToTab(route.key)} style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 4 }}>
+            <Icon name={route.name as IconName} color={color} size={28} strokeWidth={focused ? 2.6 : 1.6} />
+            <AppText variant="caption" color={color} style={{ fontFamily: focused ? 'Inter_600SemiBold' : 'Inter_400Regular', fontSize: 14, lineHeight: 18 }}>{label}</AppText>
           </Pressable>
         );
       })}

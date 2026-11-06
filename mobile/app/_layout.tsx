@@ -53,7 +53,7 @@ function RootStack() {
       <Stack.Protected guard={onboarded}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="stay/[id]" />
-        <Stack.Screen name="write" />
+        <Stack.Screen name="write" options={{ presentation: 'fullScreenModal', animation: 'slide_from_bottom' }} />
         <Stack.Screen name="inbox" />
         <Stack.Screen name="offline-maps" />
         <Stack.Screen name="business/index" />
