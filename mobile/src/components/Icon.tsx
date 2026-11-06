@@ -30,8 +30,8 @@ const PATHS = {
 export type IconName = keyof typeof PATHS;
 
 // 24px outline icons, stroke 1.75, matching the design system sprite.
-export function Icon({ name, color, size = 24 }: { name: IconName; color: string; size?: number }) {
-  const p = { stroke: color, strokeWidth: 1.75, fill: 'none', strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const };
+export function Icon({ name, color, size = 24, strokeWidth = 1.75 }: { name: IconName; color: string; size?: number; strokeWidth?: number }) {
+  const p = { stroke: color, strokeWidth, fill: 'none', strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const };
   return (
     <View style={{ width: size, height: size, flexShrink: 0 }}>
     <Svg width={size} height={size} viewBox="0 0 24 24">

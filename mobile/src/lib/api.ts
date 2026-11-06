@@ -143,11 +143,11 @@ export async function listMyPosts(userId: string) {
 }
 
 /** Text journal post (photos come with the media upload flow). Followers only by default. */
-export async function createJournalPost(opts: { userId: string; body: string; journeyId: string | null; routeId: string | null }) {
+export async function createJournalPost(opts: { userId: string; body: string; journeyId: string | null; routeId: string | null; placeName?: string | null; visibility?: 'followers' | 'public' }) {
   return must(
     await supabase
       .from('posts')
-      .insert({ user_id: opts.userId, kind: 'journal', visibility: 'followers', status: 'published', body: opts.body, journey_id: opts.journeyId, route_id: opts.routeId, client_created_at: new Date().toISOString() })
+      .insert({ user_id: opts.userId, kind: 'journal', visibility: opts.visibility ?? 'followers', status: 'published', body: opts.body, place_name: opts.placeName ?? null, journey_id: opts.journeyId, route_id: opts.routeId, client_created_at: new Date().toISOString() })
       .select('id')
       .single(),
   ) as { id: string };

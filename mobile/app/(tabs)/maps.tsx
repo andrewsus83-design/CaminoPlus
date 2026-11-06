@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Alert, Pressable, View } from 'react-native';
+import { Alert, Pressable, View, useWindowDimensions } from 'react-native';
 import { useRouter, useIsFocused } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '@/components/AppText';
@@ -12,11 +12,12 @@ import { c, radius, role, shadowStyle } from '@/theme';
 
 const LAYERS: MapLayerMode[] = ['Helicopter', 'City'];
 const KIND_LABEL = { church: 'Church', albergue: 'Albergue', water: 'Drinking water', cafe: 'Café', quest: 'Quest', stamp: 'Stamp point' } as const;
-const SHEET_PEEK = 112;
-const SHEET_FULL = 300;
+const SHEET_PEEK = 150;
 
 export default function Maps() {
   const insets = useSafeAreaInsets();
+  const { height: screenH } = useWindowDimensions();
+  const SHEET_FULL = Math.min(Math.round(screenH * 0.6), 560);
   const router = useRouter();
   const focused = useIsFocused();
   const [layer, setLayer] = useState<MapLayerMode>('Helicopter');

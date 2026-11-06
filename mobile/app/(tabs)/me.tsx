@@ -14,6 +14,114 @@ import { c, layout, radius, role, shadowStyle } from '@/theme';
 
 const TABS = ['Journey', 'Passport', 'Plan'] as const;
 
+type StampT = NonNullable<ReturnType<typeof useMeData>['stamps']>[number];
+type StageT = ReturnType<typeof useMeData>['stages'][number];
+type DayT = NonNullable<ReturnType<typeof useMeData>['days']>[number];
+
+const norm = (t: string | null | undefined) => (t ?? '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+
+function ProgressBar({ value }: { value: number }) {
+  return (
+    <View style={{ height: 12, borderRadius: radius.pill, backgroundColor: c.sand200, overflow: 'hidden' }}>
+      <View style={{ width: `${Math.max(2, Math.min(100, value * 100))}%`, height: 12, borderRadius: radius.pill, backgroundColor: c.gold }} />
+    </View>
+  );
+}
+
+/** Passport = the towns of your route as stamp slots. Collected ones are filled in. */
+function Passport({ stamps, stages }: { stamps: StampT[]; stages: StageT[] }) {
+  const towns: string[] = [];
+  stages.forEach((s, i) => {
+    if (i === 0 && s.start?.name) towns.push(s.start.name);
+    if (s.end?.name && !towns.includes(s.end.name)) towns.push(s.end.name);
+  });
+  const got = new Set(stamps.map((s) => norm(s.place_name)));
+  const collected = towns.filter((t) => got.has(norm(t))).length;
+  const extra = stamps.filter((s) => !towns.some((t) => norm(t) === norm(s.place_name)));
+  const slot = (name: string, done: boolean, key: string, date?: string) => (
+    <View key={key} style={{ width: '33.33%', alignItems: 'center', gap: 6, paddingHorizontal: 4 }}>
+      <View style={{ width: 78, height: 78, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center', backgroundColor: done ? c.goldSoft : 'transparent', borderWidth: done ? 0 : 2, borderStyle: 'dashed', borderColor: c.sand300, transform: [{ rotate: done ? '-8deg' : '0deg' }] }}>
+        <Icon name="shell" color={done ? c.blue : c.sand300} size={32} />
+      </View>
+      <AppText variant="caption" color={done ? role.text : role.muted} numberOfLines={2} style={{ textAlign: 'center', fontFamily: done ? 'Inter_600SemiBold' : 'Inter_500Medium' }}>{name}</AppText>
+      {!!date && <AppText variant="mono" muted style={{ fontSize: 12 }}>{date}</AppText>}
+    </View>
+  );
+  return (
+    <View style={{ gap: 16 }}>
+      <Card style={{ gap: 12 }}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
+          <AppText variant="h4">Pilgrim passport</AppText>
+          <AppText variant="label" color={role.accentText}>{collected} of {towns.length || '-'} towns</AppText>
+        </View>
+        <ProgressBar value={towns.length ? collected / towns.length : 0} />
+        <AppText variant="small" muted>Ask for a sello (stamp) at your albergue, a church or a café each day. For the Compostela certificate, collect two stamps a day on the last 100 km.</AppText>
+      </Card>
+      {towns.length === 0 && extra.length === 0 && <Empty text="The towns of your route will appear here as stamp slots." />}
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', rowGap: 20 }}>
+        {towns.map((t) => {
+          const hit = stamps.find((s) => norm(s.place_name) === norm(t));
+          return slot(t, !!hit, `t-${t}`, hit ? shortDate(hit.stamped_at) : undefined);
+        })}
+        {extra.map((s) => slot(s.place_name ?? 'Stamp', true, s.id, shortDate(s.stamped_at)))}
+      </View>
+    </View>
+  );
+}
+
+/** Plan as a tracker: overall progress on top, then a timeline of days. */
+function PlanTracker({ days }: { days: DayT[] }) {
+  if (days.length === 0) return <Empty text="Stages for your route are coming soon. Your day plan will appear here." />;
+  const total = days.reduce((a, d) => a + Number(d.planned_distance_km ?? 0), 0);
+  const doneKm = days.filter((d) => d.status === 'done').reduce((a, d) => a + Number(d.planned_distance_km ?? 0), 0);
+  const doneN = days.filter((d) => d.status === 'done').length;
+  const next = days.find((d) => d.status !== 'done');
+  const last = days[days.length - 1];
+  const title = (d: DayT) => (d.from_name && d.to_name ? `${d.from_name} → ${d.to_name}` : d.stage?.name ?? `Day ${d.day_number}`);
+  return (
+    <View style={{ gap: 16 }}>
+      <Card style={{ gap: 14 }}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
+          <AppText variant="h3">{Math.round(total ? (doneKm / total) * 100 : 0)}%</AppText>
+          <AppText variant="label" muted>Day {Math.min(doneN + 1, days.length)} of {days.length}</AppText>
+        </View>
+        <ProgressBar value={total ? doneKm / total : 0} />
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+          <AppText variant="small" muted>{Math.round(doneKm)} of {Math.round(total)} km</AppText>
+          <AppText variant="small" muted>{last.planned_date ? `Santiago ${shortDate(last.planned_date)}` : `${days.length - doneN} stages left`}</AppText>
+        </View>
+      </Card>
+      {next && (
+        <Card style={{ gap: 6, backgroundColor: c.blue }}>
+          <AppText variant="mono" color={c.goldSoft} style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 1.2 }}>Up next · Day {next.day_number}</AppText>
+          <AppText variant="h4" color={c.parchment}>{title(next)}</AppText>
+          <AppText variant="small" color={c.parchment}>{next.planned_distance_km ? `${Number(next.planned_distance_km).toFixed(1)} km` : ''}{next.planned_date ? ` · ${shortDate(next.planned_date)}` : ''}</AppText>
+        </Card>
+      )}
+      <View>
+        {days.map((d, i) => {
+          const done = d.status === 'done';
+          const isNext = next?.id === d.id;
+          return (
+            <View key={d.id} style={{ flexDirection: 'row', gap: 16 }}>
+              <View style={{ alignItems: 'center', width: 36 }}>
+                <View style={{ width: 36, height: 36, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center', backgroundColor: done ? c.success : isNext ? c.gold : role.surface, borderWidth: done || isNext ? 0 : 2, borderColor: c.sand300 }}>
+                  {done ? <Icon name="check" color={c.white} size={20} /> : <AppText variant="caption" color={isNext ? c.blue : role.muted} style={{ fontFamily: 'Inter_600SemiBold' }}>{d.day_number}</AppText>}
+                </View>
+                {i < days.length - 1 && <View style={{ width: 3, flex: 1, minHeight: 28, backgroundColor: done ? c.success : c.sand300 }} />}
+              </View>
+              <View style={{ flex: 1, paddingBottom: 22 }}>
+                <AppText variant="label" color={done ? role.muted : role.text}>{title(d)}</AppText>
+                <AppText variant="caption" muted>{d.planned_distance_km ? `${Number(d.planned_distance_km).toFixed(1)} km` : ''}{d.planned_date ? ` · ${shortDate(d.planned_date)}` : ''}{done ? ' · done' : isNext ? ' · up next' : ''}</AppText>
+              </View>
+            </View>
+          );
+        })}
+      </View>
+    </View>
+  );
+}
+
 function ago(iso: string | null) {
   if (!iso) return '';
   const d = new Date(iso);
@@ -40,7 +148,7 @@ export default function Me() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { profile, journey } = useAuth();
-  const { posts, stamps, days, error } = useMeData();
+  const { posts, stamps, days, stages, error } = useMeData();
   const name = profile?.display_name || profile?.username || 'Pilgrim';
   const stagesDone = days?.filter((d) => d.status === 'done').length ?? 0;
   const loading = <ActivityIndicator color={role.action} style={{ marginTop: 24 }} />;
@@ -96,40 +204,11 @@ export default function Me() {
             </Card>
           )))}
 
-        {tab === 'Passport' && (!stamps ? loading : stamps.length === 0
-          ? <Empty text="Your pilgrim passport is empty. Collect your first stamp at an albergue, church or café." />
-          : (
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
-              {stamps.map((s, i) => (
-                <Card key={s.id} style={{ width: '47.5%', alignItems: 'center', gap: 8 }}>
-                  <View style={{ width: 72, height: 72, borderRadius: radius.pill, backgroundColor: tints[i % tints.length], alignItems: 'center', justifyContent: 'center' }}>
-                    <Icon name="shell" color={c.blue} size={32} />
-                  </View>
-                  <AppText variant="label" numberOfLines={1}>{s.place_name ?? 'Stamp'}</AppText>
-                  <AppText variant="mono" muted style={{ fontSize: 12 }}>{shortDate(s.stamped_at)}{s.verified ? ' · ✓' : ''}</AppText>
-                </Card>
-              ))}
-            </View>
-          ))}
+        {tab === 'Passport' && (!stamps ? loading : <Passport stamps={stamps} stages={stages} />)}
 
-        {tab === 'Plan' && (!days ? loading : days.length === 0
-          ? <Empty text="Stages for your route are coming soon. Your day plan will appear here." />
-          : days.map((d) => {
-            const done = d.status === 'done';
-            return (
-              <Card key={d.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 14, padding: 16 }}>
-                <View style={{ width: 40, height: 40, borderRadius: radius.pill, backgroundColor: done ? c.successWash : c.sand200, alignItems: 'center', justifyContent: 'center' }}>
-                  <Icon name={done ? 'check' : 'flag'} color={done ? c.success : c.stone600} size={20} />
-                </View>
-                <View style={{ flex: 1 }}>
-                  <AppText variant="label">{d.from_name && d.to_name ? `${d.from_name} → ${d.to_name}` : d.stage?.name ?? `Day ${d.day_number}`}</AppText>
-                  <AppText variant="caption" muted>Day {d.day_number}{d.planned_distance_km ? ` · ${Number(d.planned_distance_km).toFixed(1)} km` : ''}{d.planned_date ? ` · ${shortDate(d.planned_date)}` : ''}</AppText>
-                </View>
-              </Card>
-            );
-          }))}
+        {tab === 'Plan' && (!days ? loading : <PlanTracker days={days} />)}
       </Screen>
-      <Pressable accessibilityRole="button" accessibilityLabel="Write a journey post" onPress={() => router.push('/write')} style={{ position: 'absolute', right: layout.screenMargin, bottom: insets.bottom + 96, width: 60, height: 60, borderRadius: radius.pill, backgroundColor: c.gold, alignItems: 'center', justifyContent: 'center', ...shadowStyle('gold') }}>
+      <Pressable accessibilityRole="button" accessibilityLabel="Write a journey post" onPress={() => router.push('/write')} style={{ position: 'absolute', right: layout.screenMargin, bottom: insets.bottom + 116, width: 64, height: 64, borderRadius: radius.pill, backgroundColor: c.gold, alignItems: 'center', justifyContent: 'center', ...shadowStyle('gold') }}>
         <Icon name="pen" color={c.blue} size={26} />
       </Pressable>
     </View>
