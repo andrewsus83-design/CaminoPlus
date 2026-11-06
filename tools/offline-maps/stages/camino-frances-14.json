@@ -22,6 +22,21 @@
   "min_route_km": 7.5,
   "buffer_km": 3,
   "maxzoom": 15,
+  "quality": {
+    "min_tiles": 520,
+    "max_tiles": 1390,
+    "min_size_mb": 1,
+    "max_size_mb": 2.8,
+    "required_layers": [
+      "building",
+      "place",
+      "poi",
+      "transportation",
+      "transportation_name"
+    ],
+    "max_change_ratio": 1.5,
+    "max_osm_age_days": 45
+  },
   "waypoints": [
     {
       "name": "Hornillos del Camino",
@@ -60,8 +75,13 @@
         42.33854,
         15
       ],
-      "min_features": {},
-      "min_labels": {}
+      "min_features": {
+        "poi": 10,
+        "transportation": 16
+      },
+      "min_labels": {
+        "place": 1
+      }
     },
     {
       "name": "Castrojeriz z15",
@@ -70,8 +90,15 @@
         42.28837,
         15
       ],
-      "min_features": {},
-      "min_labels": {}
+      "min_features": {
+        "poi": 63,
+        "transportation": 50,
+        "building": 4
+      },
+      "min_labels": {
+        "place": 1,
+        "peak": 1
+      }
     }
   ],
   "generated_from": "catalog/camino-frances/14.json"

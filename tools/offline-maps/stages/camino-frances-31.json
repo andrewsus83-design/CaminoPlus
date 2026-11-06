@@ -22,6 +22,21 @@
   "min_route_km": 10.2,
   "buffer_km": 3,
   "maxzoom": 15,
+  "quality": {
+    "min_tiles": 650,
+    "max_tiles": 1750,
+    "min_size_mb": 2.5,
+    "max_size_mb": 6.8,
+    "required_layers": [
+      "building",
+      "place",
+      "poi",
+      "transportation",
+      "transportation_name"
+    ],
+    "max_change_ratio": 1.5,
+    "max_osm_age_days": 45
+  },
   "waypoints": [
     {
       "name": "Palas de Rei",
@@ -81,8 +96,14 @@
         42.87391,
         15
       ],
-      "min_features": {},
-      "min_labels": {}
+      "min_features": {
+        "poi": 54,
+        "transportation": 40,
+        "building": 5
+      },
+      "min_labels": {
+        "place": 1
+      }
     },
     {
       "name": "Arzúa z15",
@@ -91,8 +112,14 @@
         42.92658,
         15
       ],
-      "min_features": {},
-      "min_labels": {}
+      "min_features": {
+        "poi": 101,
+        "transportation": 67,
+        "building": 10
+      },
+      "min_labels": {
+        "place": 1
+      }
     }
   ],
   "generated_from": "catalog/camino-frances/31.json"

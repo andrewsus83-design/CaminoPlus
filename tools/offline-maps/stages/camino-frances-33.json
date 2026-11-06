@@ -22,6 +22,21 @@
   "min_route_km": 6.3,
   "buffer_km": 3,
   "maxzoom": 15,
+  "quality": {
+    "min_tiles": 350,
+    "max_tiles": 940,
+    "min_size_mb": 2.9,
+    "max_size_mb": 8,
+    "required_layers": [
+      "building",
+      "place",
+      "poi",
+      "transportation",
+      "transportation_name"
+    ],
+    "max_change_ratio": 1.5,
+    "max_osm_age_days": 45
+  },
   "waypoints": [
     {
       "name": "O Pedrouzo",
@@ -74,8 +89,14 @@
         42.90468,
         15
       ],
-      "min_features": {},
-      "min_labels": {}
+      "min_features": {
+        "poi": 68,
+        "transportation": 46,
+        "building": 4
+      },
+      "min_labels": {
+        "place": 1
+      }
     },
     {
       "name": "Santiago de Compostela z15",
@@ -84,8 +105,15 @@
         42.88042,
         15
       ],
-      "min_features": {},
-      "min_labels": {}
+      "min_features": {
+        "poi": 1352,
+        "transportation": 526,
+        "building": 73
+      },
+      "min_labels": {
+        "place": 1,
+        "peak": 1
+      }
     }
   ],
   "generated_from": "catalog/camino-frances/33.json"

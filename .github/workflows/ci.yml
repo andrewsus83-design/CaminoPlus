@@ -57,12 +57,24 @@ jobs:
         with:
           persist-credentials: false
       - name: Install Postgres 16 with PostGIS
-        # A stalled apt mirror once held this step for 16 minutes (a normal run takes about 25 seconds):
-        # apt now gives up on a silent connection after 30 s and retries, and the step stops after 6 minutes.
-        timeout-minutes: 6
+        # apt has stalled on the runners without printing a line (twice in one afternoon it held this step for 6
+        # to 16 minutes; a normal run takes about 25 seconds). Each attempt now prints its progress and has its own
+        # limit; a stalled one is stopped, the processes holding apt are listed, and it is tried again.
+        timeout-minutes: 15
         run: |
-          sudo apt-get -o Acquire::Retries=3 -o Acquire::http::Timeout=30 update -qq
-          sudo apt-get -o Acquire::Retries=3 -o Acquire::http::Timeout=30 install -y -qq postgresql-16 postgresql-16-postgis-3
+          apt_opts=(-o Acquire::Retries=3 -o Acquire::http::Timeout=30 -o DPkg::Lock::Timeout=60)
+          for attempt in 1 2 3; do
+            if sudo timeout --kill-after=10 90 apt-get "${apt_opts[@]}" update \
+              && sudo timeout --kill-after=10 180 apt-get "${apt_opts[@]}" install -y postgresql-16 postgresql-16-postgis-3; then
+              exit 0
+            fi
+            echo "::warning::apt attempt $attempt failed or stalled. Processes holding apt right now:"
+            pgrep -a -f "apt-get|dpkg|unattended|apt.systemd" || true
+            sudo dpkg --configure -a || true
+            sleep 15
+          done
+          echo "::error::apt did not finish in 3 attempts"
+          exit 1
       - name: Migrations, seed and smoke tests
         run: supabase/dev/validate.sh
         env:
