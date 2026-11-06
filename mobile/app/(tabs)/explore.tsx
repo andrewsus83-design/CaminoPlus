@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { FlatList, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, Share, TextInput, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '@/components/AppText';
@@ -16,13 +16,19 @@ const SEED: Record<string, Comment[]> = {
 };
 type Favs = { loved: string[]; saved: string[] };
 
-// Full-screen, swipe left/right. The swipe tutorial shows on first open only (persist with storage later).
+// Full-screen. Swipe UP/DOWN for the next/previous story, LEFT/RIGHT to change category
+// (For you, Friends, ...). The swipe tutorial shows on first open only.
 let tutorialSeen = false;
 
 export default function Discover() {
   const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const [tab, setTab] = useState<(typeof TABS)[number]>('For you');
+  const pager = useRef<FlatList<(typeof TABS)[number]>>(null);
+  const goTab = (t: (typeof TABS)[number]) => {
+    setTab(t);
+    pager.current?.scrollToIndex({ index: TABS.indexOf(t), animated: true });
+  };
   const [showTip, setShowTip] = useState(!tutorialSeen);
   const [favs, setFavs] = useState<Favs>({ loved: [], saved: [] });
   useEffect(() => {
@@ -45,16 +51,30 @@ export default function Discover() {
   };
   const share = (item: (typeof exploreItems)[number]) =>
     Share.share({ message: `${item.caption} by @${item.user} on CaminoPlus: https://camino.plus` }).catch(() => {});
-  const items = useMemo(() => (tab === 'Favourites' ? exploreItems.filter((i) => favs.loved.includes(i.id) || favs.saved.includes(i.id)) : exploreItems), [tab, favs]);
+  const itemsFor = (t: (typeof TABS)[number]) => (t === 'Favourites' ? exploreItems.filter((i) => favs.loved.includes(i.id) || favs.saved.includes(i.id)) : exploreItems);
   const dismiss = () => { tutorialSeen = true; setShowTip(false); };
   return (
     <View style={{ flex: 1, backgroundColor: c.blue900 }}>
+      {/* Horizontal pager = categories. Each page is a vertical pager = stories. */}
       <FlatList
+        ref={pager}
         horizontal pagingEnabled showsHorizontalScrollIndicator={false}
-        data={items}
-        ListEmptyComponent={<View style={{ width, height, alignItems: 'center', justifyContent: 'center', padding: 40, gap: 12 }}><Icon name="heart" color="rgba(255,255,255,0.8)" size={44} /><AppText variant="lead" color={c.white} style={{ textAlign: 'center' }}>Nothing saved yet. Tap the heart or bookmark on a story to keep it here.</AppText></View>} keyExtractor={(i) => i.id}
+        data={TABS}
+        keyExtractor={(t) => t}
+        getItemLayout={(_, index) => ({ length: width, offset: width * index, index })}
         onScrollBeginDrag={dismiss}
-        renderItem={({ item }) => (
+        onMomentumScrollEnd={(e) => setTab(TABS[Math.max(0, Math.min(TABS.length - 1, Math.round(e.nativeEvent.contentOffset.x / width)))])}
+        renderItem={({ item: t }) => (
+          <FlatList
+            style={{ width, height }}
+            pagingEnabled snapToInterval={height} decelerationRate="fast" showsVerticalScrollIndicator={false}
+            nestedScrollEnabled
+            data={itemsFor(t)}
+            getItemLayout={(_, index) => ({ length: height, offset: height * index, index })}
+            onScrollBeginDrag={dismiss}
+            ListEmptyComponent={<View style={{ width, height, alignItems: 'center', justifyContent: 'center', padding: 40, gap: 12 }}><Icon name="heart" color="rgba(255,255,255,0.8)" size={44} /><AppText variant="lead" color={c.white} style={{ textAlign: 'center' }}>Nothing saved yet. Tap the heart or bookmark on a story to keep it here.</AppText></View>}
+            keyExtractor={(i) => i.id}
+            renderItem={({ item }) => (
           <View style={{ width, height, backgroundColor: item.tint, justifyContent: 'flex-end', padding: 24, paddingBottom: insets.bottom + 120 }}>
             <AppText variant="h3" color={c.blue900}>{item.caption}</AppText>
             <AppText variant="mono" color={c.blue900}>@{item.user}</AppText>
@@ -76,12 +96,14 @@ export default function Discover() {
               </Pressable>
             </View>
           </View>
+            )}
+          />
         )}
       />
       <View style={{ position: 'absolute', top: insets.top + 12, left: 0, right: 0 }}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ minWidth: width, justifyContent: 'center', gap: 22, paddingHorizontal: 16 }}>
           {TABS.map((t) => (
-            <Pressable key={t} accessibilityRole="tab" accessibilityState={{ selected: tab === t }} onPress={() => setTab(t)} hitSlop={10} style={{ paddingVertical: 8, borderBottomWidth: 3, borderBottomColor: tab === t ? c.white : 'transparent' }}>
+            <Pressable key={t} accessibilityRole="tab" accessibilityState={{ selected: tab === t }} onPress={() => goTab(t)} hitSlop={10} style={{ paddingVertical: 8, borderBottomWidth: 3, borderBottomColor: tab === t ? c.white : 'transparent' }}>
               <AppText variant="body" color={tab === t ? c.white : 'rgba(255,255,255,0.65)'} style={{ fontFamily: fonts.bodyBold, textShadowColor: 'rgba(0,0,0,0.35)', textShadowRadius: 6 }}>{t}</AppText>
             </Pressable>
           ))}
@@ -115,8 +137,11 @@ export default function Discover() {
       </Modal>
       {showTip && (
         <Pressable onPress={dismiss} style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(12,35,64,0.6)', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
-          <AppText variant="accent" color={c.parchment}>Swipe left or right</AppText>
-          <AppText variant="small" color={c.parchment}>Tap anywhere to start</AppText>
+          <AppText variant="accent" color={c.parchment}>Swipe up or down</AppText>
+          <AppText variant="small" color={c.parchment}>for the next story</AppText>
+          <AppText variant="accent" color={c.parchment} style={{ marginTop: 12 }}>Swipe left or right</AppText>
+          <AppText variant="small" color={c.parchment}>for For you, Friends and more</AppText>
+          <AppText variant="small" color={c.goldSoft} style={{ marginTop: 16 }}>Tap anywhere to start</AppText>
         </Pressable>
       )}
     </View>

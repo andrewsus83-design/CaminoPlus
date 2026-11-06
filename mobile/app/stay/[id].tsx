@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View } from 'react-native';
+import { Share, View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Screen } from '@/components/Screen';
@@ -22,7 +22,10 @@ export default function StayDetail() {
       <Screen>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
           <IconButton name="back" label="Back" onPress={() => router.back()} />
-          <IconButton name="heart" label={fav ? 'Remove favourite' : 'Add favourite'} active={fav} onPress={() => setFav((v) => !v)} />
+          <View style={{ flexDirection: 'row', gap: 8 }}>
+            <IconButton name="share" label="Share this stay" onPress={() => Share.share({ message: `${s.name} in ${s.town} on CaminoPlus: https://camino.plus` }).catch(() => {})} />
+            <IconButton name="heart" label={fav ? 'Remove favourite' : 'Add favourite'} active={fav} onPress={() => setFav((v) => !v)} />
+          </View>
         </View>
         <Photo tint={s.tint} height={260} style={{ borderRadius: radius.lg }} />
         <AppText variant="h2">{s.name}</AppText>

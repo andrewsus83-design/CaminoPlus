@@ -5,7 +5,7 @@ import { c, fonts } from '@/theme';
 
 // Locked Camino+ logo (same geometry as web/favicon.svg and brand/svg):
 // navy circle with a gold 7-rib scallop shell, then "Camino" and a bold gold "+".
-function ShellMark({ size }: { size: number }) {
+export function ShellMark({ size }: { size: number }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 40 40">
       <Circle cx={20} cy={20} r={20} fill="#14365D" />
