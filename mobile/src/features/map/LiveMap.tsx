@@ -1,7 +1,7 @@
 // The real map: MapLibre Native. Needs a dev build (expo-dev-client), not Expo Go.
 import { memo, useMemo, useRef } from 'react';
 import { Camera, GeoJSONSource, Layer, Map } from '@maplibre/maplibre-react-native';
-import { maptilerTilesUrl } from './config';
+import { onlineTilesUrl } from './config';
 import { pois, routeBounds, towns } from './sampleRoute';
 import { C, buildStyle } from './style';
 import type { MapViewProps } from './types';
@@ -22,7 +22,7 @@ function LiveMapImpl(p: MapViewProps) {
   const lastPoiPress = useRef(0);
 
   const mapStyle = useMemo(
-    () => buildStyle({ glyphs: p.glyphs, online: p.online, sources: p.online ? [{ id: 'omt', url: maptilerTilesUrl() }] : p.packSources }),
+    () => buildStyle({ glyphs: p.glyphs, online: p.online, sources: p.online ? [{ id: 'omt', url: onlineTilesUrl() }] : p.packSources }),
     // Rebuild only when the set of sources changes; a new style object reloads the map.
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [p.glyphs, p.online, p.packSources.map((s) => s.url).join('|')],

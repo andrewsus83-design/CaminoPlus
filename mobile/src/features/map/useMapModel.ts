@@ -1,7 +1,6 @@
 // Everything the Maps screen derives: which tiles to draw (online MapTiler vs offline
 // packs), the walker position and route progress, and the pack status line.
 import { useEffect, useMemo, useState } from 'react';
-import { hasMapTiler } from './config';
 import { LngLat, distanceM, lineLengthM, nearestOnLine, splitLine } from './geo';
 import { ensureGlyphs } from './glyphs';
 import { loadInstalled, packSourceUrl, refreshCatalog, usePacks } from './packs/store';
@@ -46,7 +45,7 @@ export function useMapModel({ gpsMode, visible }: { gpsMode: GpsMode; visible: b
   const nextTownKm = Math.max(0, Math.round(distanceM(progressAt, stage.line[stage.line.length - 1]) / 100) / 10);
 
   // MapTiler only when online (and a key exists). Offline: packs of this stage ±1.
-  const useOnlineTiles = online === true && hasMapTiler();
+  const useOnlineTiles = online === true; // MapTiler with a key, otherwise the keyless OpenFreeMap fallback
   const packSources: TileSource[] = useMemo(() => {
     const near = stages.filter((s) => Math.abs(s.number - stage.number) <= 1);
     return near.flatMap((s) => {

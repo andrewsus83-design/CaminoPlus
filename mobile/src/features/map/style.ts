@@ -4,7 +4,7 @@
 //   offline: our own OSM .pmtiles packs, one source per downloaded stage
 // Glyphs are always the bundled Noto Sans files copied to the device (glyphs.ts).
 import type { LayerSpecification, StyleSpecification } from '@maplibre/maplibre-react-native';
-import { MAPTILER_ATTRIBUTION, OSM_ATTRIBUTION } from './config';
+import { FALLBACK_ATTRIBUTION, MAPTILER_ATTRIBUTION, OSM_ATTRIBUTION, hasMapTiler } from './config';
 
 export const C = {
   parchment: '#F6EFE2', ink: '#2B2A26', gold: '#D9A21B', goldDark: '#7A5A0C', blue: '#14365D', red: '#A63D2F',
@@ -107,7 +107,7 @@ const templates: Template[] = [
 export const firstLabelLayerId = (sources: TileSource[]) => (sources.length ? `water-name-${sources[0].id}` : undefined);
 
 export function buildStyle({ glyphs, sources, online }: { glyphs: string; sources: TileSource[]; online: boolean }): StyleSpecification {
-  const attribution = online ? MAPTILER_ATTRIBUTION : OSM_ATTRIBUTION;
+  const attribution = online ? (hasMapTiler() ? MAPTILER_ATTRIBUTION : FALLBACK_ATTRIBUTION) : OSM_ATTRIBUTION;
   return {
     version: 8,
     name: online ? 'caminoplus-online' : 'caminoplus-offline',
