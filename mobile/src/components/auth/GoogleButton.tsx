@@ -14,7 +14,7 @@ export function GoogleButton({ onError, large }: { onError: (msg: string | null)
     if (!res.ok && !res.cancelled) onError(res.error ?? 'Google sign-in failed.');
   };
   return (
-    <Pressable accessibilityRole="button" disabled={busy} onPress={go} style={({ pressed }) => ({ minHeight: large ? 64 : layout.touchMin, borderRadius: radius.pill, backgroundColor: role.surface, borderWidth: 1, borderColor: role.border, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 12, opacity: busy ? 0.55 : pressed ? 0.85 : 1 })}>
+    <Pressable accessibilityRole="button" disabled={busy} onPress={go} style={({ pressed }) => ({ minHeight: large ? 68 : layout.touchMin, borderRadius: radius.pill, backgroundColor: role.surface, borderWidth: 1, borderColor: role.border, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 12, opacity: busy ? 0.55 : pressed ? 0.85 : 1 })}>
       <View>
         <Svg width={large ? 26 : 20} height={large ? 26 : 20} viewBox="0 0 48 48">
           <Path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.5l6.7-6.7C35.6 2.4 30.2 0 24 0 14.6 0 6.6 5.4 2.7 13.2l7.8 6.1C12.4 13.7 17.7 9.5 24 9.5z" />

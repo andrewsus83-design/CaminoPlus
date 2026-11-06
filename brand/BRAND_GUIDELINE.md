@@ -79,7 +79,7 @@ The source of truth for colours, type and spacing in code is [`design/tokens.jso
 
 ## 3. Logo
 
-The logo is **locked** (PR #9). Wordmark "Camino+" where the "o" is a scallop shell (7 ribs, wavy edge, centred in a circle), with a small bold "+" in Caveat at the top right. Master files: [`web/favicon.svg`](../web/favicon.svg), [`web/assets/apple-touch-icon.png`](../web/assets/apple-touch-icon.png), [`web/assets/og.png`](../web/assets/og.png).
+The logo is **locked** (PR #9). Navy circle mark with a gold 7-rib scallop shell, then "Camino" in Fraunces Bold and a bold gold "+" (Inter Bold). The earlier shell-as-"o" wordmark was retired. Master files: [`web/favicon.svg`](../web/favicon.svg), [`web/assets/apple-touch-icon.png`](../web/assets/apple-touch-icon.png), [`web/assets/og.png`](../web/assets/og.png).
 
 **Versions**
 

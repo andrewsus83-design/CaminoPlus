@@ -3,7 +3,7 @@ import { FlatList, Pressable, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '@/components/AppText';
 import { exploreItems } from '@/data/mock';
-import { c, radius } from '@/theme';
+import { c, fonts } from '@/theme';
 
 const TABS = ['For you', 'Following', 'Photos of you'] as const;
 
@@ -29,10 +29,10 @@ export default function Explore() {
           </View>
         )}
       />
-      <View style={{ position: 'absolute', top: insets.top + 8, left: 0, right: 0, flexDirection: 'row', justifyContent: 'center', gap: 8 }}>
+      <View style={{ position: 'absolute', top: insets.top + 12, left: 0, right: 0, flexDirection: 'row', justifyContent: 'center', gap: 28 }}>
         {TABS.map((t) => (
-          <Pressable key={t} onPress={() => setTab(t)} style={{ height: 32, paddingHorizontal: 14, borderRadius: radius.pill, justifyContent: 'center', backgroundColor: tab === t ? c.blue : 'rgba(255,253,248,0.7)' }}>
-            <AppText variant="caption" color={tab === t ? c.parchment : c.blue}>{t}</AppText>
+          <Pressable key={t} accessibilityRole="tab" accessibilityState={{ selected: tab === t }} onPress={() => setTab(t)} hitSlop={10} style={{ paddingVertical: 8, borderBottomWidth: 3, borderBottomColor: tab === t ? c.white : 'transparent' }}>
+            <AppText variant="lead" color={tab === t ? c.white : 'rgba(255,255,255,0.65)'} style={{ fontFamily: fonts.bodyBold, textShadowColor: 'rgba(0,0,0,0.35)', textShadowRadius: 6 }}>{t}</AppText>
           </Pressable>
         ))}
       </View>
