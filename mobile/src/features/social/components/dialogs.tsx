@@ -8,7 +8,7 @@ import { KeyboardAvoidingView, Modal, Pressable, ScrollView, TextInput, View } f
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '@/components/AppText';
 import { Icon, IconName } from '@/components/Icon';
-import { c, fonts, radius, role, shadowStyle } from '@/theme';
+import { c, fonts, radius, role, shadowStyle, layout } from '@/theme';
 import { Btn, noOutline } from './primitives';
 
 export type MenuOption<T extends string = string> = { key: T; label: string; icon?: IconName; destructive?: boolean; hint?: string };
@@ -137,7 +137,7 @@ function DialogHost({ state, close, toastText }: { state: State | null; close: (
       )}
 
       {!!toastText && (
-        <View pointerEvents="none" style={{ position: 'absolute', left: 24, right: 24, bottom: insets.bottom + 96, alignItems: 'center' }}>
+        <View pointerEvents="none" style={{ position: 'absolute', left: layout.screenMargin, right: layout.screenMargin, bottom: insets.bottom + 96, alignItems: 'center' }}>
           <View accessibilityLiveRegion="polite" accessibilityRole="alert" style={{ maxWidth: 420, backgroundColor: c.blue900, borderRadius: radius.pill, paddingHorizontal: 22, paddingVertical: 14, ...shadowStyle('lg') }}>
             <AppText variant="small" color={c.parchment} style={{ textAlign: 'center' }}>{toastText}</AppText>
           </View>

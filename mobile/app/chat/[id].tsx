@@ -16,7 +16,7 @@ import { MAX_PHOTO_BYTES, PickerUnavailable, pickPhoto } from '@/features/social
 import type { ChatMessage, MessageEntry, ReportReason, TimelineEntry } from '@/features/social/types';
 import { copyText } from '@/lib/clipboard';
 import { config } from '@/lib/config';
-import { c, radius, role, shadowStyle } from '@/theme';
+import { c, radius, role, shadowStyle, layout } from '@/theme';
 
 const ACTION: Record<MessageAction, { label: string; icon: IconName; danger?: boolean }> = {
   reply: { label: 'Reply', icon: 'reply' },
@@ -259,7 +259,7 @@ export default function ChatScreen() {
 
 function StartOfChat({ text }: { text: string }) {
   return (
-    <View style={{ alignItems: 'center', paddingVertical: 20, paddingHorizontal: 24, gap: 8 }}>
+    <View style={{ alignItems: 'center', paddingVertical: 20, paddingHorizontal: layout.screenMargin, gap: 8 }}>
       <Icon name="shell" color={c.gold} size={26} />
       <AppText variant="caption" muted style={{ textAlign: 'center', letterSpacing: 0 }}>{text}</AppText>
     </View>

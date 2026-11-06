@@ -8,7 +8,7 @@ import { Card } from '@/components/ui';
 import { useMeData } from '@/lib/useMeData';
 import { useAuth } from '@/lib/auth';
 import { localStore, userKey } from '@/lib/localStore';
-import { c, fonts, radius, role } from '@/theme';
+import { c, fonts, radius, role, layout } from '@/theme';
 
 // Task planner for one walking day: a ready-made checklist plus your own tasks.
 // Saved on this phone per day and per account (works offline).
@@ -67,7 +67,7 @@ export default function Planner() {
 
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1, backgroundColor: role.bg }}>
-      <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingTop: insets.top + 12, paddingHorizontal: 24, paddingBottom: insets.bottom + 40, gap: 18 }}>
+      <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingTop: insets.top + 12, paddingHorizontal: layout.screenMargin, paddingBottom: insets.bottom + 40, gap: 18 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
           <Pressable accessibilityRole="button" accessibilityLabel="Back" onPress={() => router.back()} hitSlop={12}><Icon name="back" color={role.text} size={30} /></Pressable>
           <AppText variant="h4">Day planner</AppText>
@@ -75,8 +75,8 @@ export default function Planner() {
         </View>
 
         {list.length > 1 && (
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }} style={{ flexGrow: 0, marginHorizontal: -24 }}>
-            <View style={{ width: 16 }} />
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }} style={{ flexGrow: 0, marginHorizontal: -layout.screenMargin }}>
+            <View style={{ width: layout.screenMargin }} />
             {list.map((d) => {
               const on = d.id === current?.id;
               return (
@@ -85,7 +85,7 @@ export default function Planner() {
                 </Pressable>
               );
             })}
-            <View style={{ width: 16 }} />
+            <View style={{ width: layout.screenMargin }} />
           </ScrollView>
         )}
 

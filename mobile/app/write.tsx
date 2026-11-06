@@ -6,7 +6,7 @@ import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
 import { Pill } from '@/components/Pill';
 import { FormMessage } from '@/components/auth/Field';
-import { c, fonts, radius, role } from '@/theme';
+import { c, fonts, radius, role, layout } from '@/theme';
 import { useAuth } from '@/lib/auth';
 import { PickedMedia, createJournalPost, uploadPostMedia } from '@/lib/api';
 
@@ -171,21 +171,21 @@ export default function Write() {
   if (step === 2) {
     return (
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1, backgroundColor: role.bg }}>
-        <ScrollView contentContainerStyle={{ paddingTop: insets.top + 12, paddingHorizontal: 24, paddingBottom: 160, gap: 20 }} keyboardShouldPersistTaps="handled">
+        <ScrollView contentContainerStyle={{ paddingTop: insets.top + 12, paddingHorizontal: layout.screenMargin, paddingBottom: 160, gap: 20 }} keyboardShouldPersistTaps="handled">
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
             <Pressable accessibilityRole="button" accessibilityLabel="Back" onPress={() => setStep(1)} hitSlop={12}><Icon name="back" color={role.text} size={30} /></Pressable>
             <AppText variant="h4">New journey post</AppText>
             <View style={{ width: 30 }} />
           </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 12 }} style={{ flexGrow: 0, marginHorizontal: -24 }}>
-            <View style={{ width: 12 }} />
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 12 }} style={{ flexGrow: 0, marginHorizontal: -layout.screenMargin }}>
+            <View style={{ width: layout.screenMargin }} />
             {slides.map((s) => (
               <View key={s.id} style={{ width: 132, height: 232, borderRadius: radius.lg, overflow: 'hidden' }}>
                 <Backdrop slide={s} />
                 {slideBody(s, false, 0.55)}
               </View>
             ))}
-            <View style={{ width: 12 }} />
+            <View style={{ width: layout.screenMargin }} />
           </ScrollView>
           <AppText variant="caption" muted>{slides.length} {slides.length === 1 ? 'slide' : 'slides'}</AppText>
           <TextInput multiline maxLength={400} value={caption} onChangeText={setCaption} placeholder="Add a caption…" placeholderTextColor={role.muted} style={{ fontFamily: fonts.body, fontSize: 19, lineHeight: 28, color: role.text, minHeight: 80, textAlignVertical: 'top' }} />
@@ -200,7 +200,7 @@ export default function Write() {
             </View>
           </View>
         </ScrollView>
-        <View style={{ position: 'absolute', left: 24, right: 24, bottom: insets.bottom + 16, gap: 8 }}>
+        <View style={{ position: 'absolute', left: layout.screenMargin, right: layout.screenMargin, bottom: insets.bottom + 16, gap: 8 }}>
           {!!error && <FormMessage>{error}</FormMessage>}
           <Pill large label="Share" onPress={share} loading={busy} disabled={!hasContent} />
         </View>
@@ -213,7 +213,7 @@ export default function Write() {
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1, backgroundColor: onMedia ? '#000' : bg.bg }}>
       <Backdrop slide={slide} />
       {onMedia && <View pointerEvents="none" style={{ position: 'absolute', width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.18)' }} />}
-      <View style={{ paddingTop: insets.top + 8, paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+      <View style={{ paddingTop: insets.top + 8, paddingHorizontal: layout.screenMargin, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
         <Pressable accessibilityRole="button" accessibilityLabel="Close" onPress={() => router.back()} hitSlop={12} style={{ width: 48, height: 48, alignItems: 'center', justifyContent: 'center' }}>
           <Icon name="close" color={fg} size={30} />
         </Pressable>
@@ -228,13 +228,13 @@ export default function Write() {
         </View>
       </View>
       {editPlace && (
-        <View style={{ marginHorizontal: 16, marginTop: 8, height: 56, borderRadius: radius.pill, backgroundColor: 'rgba(255,253,248,0.95)', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 18, gap: 8 }}>
+        <View style={{ marginHorizontal: layout.screenMargin, marginTop: 8, height: 56, borderRadius: radius.pill, backgroundColor: 'rgba(255,253,248,0.95)', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 18, gap: 8 }}>
           <Icon name="pin" color={c.blue} size={20} />
           <TextInput autoFocus value={slide.place} onChangeText={(t) => patch({ place: t })} maxLength={60} placeholder="Where are you? (e.g. Burgos)" placeholderTextColor={role.muted} returnKeyType="done" onSubmitEditing={() => setEditPlace(false)} style={{ flex: 1, fontFamily: fonts.body, fontSize: 18, color: role.text }} />
         </View>
       )}
       {slideBody(slide, true)}
-      <View style={{ paddingHorizontal: 16, paddingBottom: insets.bottom + 12, gap: 12 }}>
+      <View style={{ paddingHorizontal: layout.screenMargin, paddingBottom: insets.bottom + 12, gap: 12 }}>
         {!!error && <FormMessage>{error}</FormMessage>}
         {/* Slide strip: tap to edit a slide, + to add a text slide, gallery button for photos and videos. */}
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 10, alignItems: 'center', paddingVertical: 4 }}>

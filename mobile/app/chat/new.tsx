@@ -52,7 +52,7 @@ export default function NewChat() {
             <View>
               <Pressable
                 accessibilityRole="button" accessibilityLabel="New group" accessibilityHint="Chat with several friends at once" onPress={() => router.push('/chat/new-group')}
-                style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: 24, minHeight: 76, backgroundColor: pressed ? c.sand200 : 'transparent' })}
+                style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: layout.screenMargin, minHeight: 76, backgroundColor: pressed ? c.sand200 : 'transparent' })}
               >
                 <View style={{ width: 52, height: 52, borderRadius: radius.pill, backgroundColor: c.gold, alignItems: 'center', justifyContent: 'center' }}><Icon name="group" color={c.blue} size={26} /></View>
                 <View style={{ flex: 1 }}>
@@ -61,8 +61,8 @@ export default function NewChat() {
                 </View>
                 <Icon name="chevron" color={role.muted} size={22} />
               </Pressable>
-              {friends.length > 0 && <View style={{ paddingHorizontal: 24, paddingVertical: 10 }}><SearchField value={query} onChangeText={setQuery} placeholder="Search your friends" label="Search your friends" /></View>}
-              {friends.length > 0 && <AppText variant="mono" muted style={{ textTransform: 'uppercase', letterSpacing: 1.4, fontSize: 12, paddingHorizontal: 24, paddingTop: 10, paddingBottom: 2 }} accessibilityRole="header">Friends</AppText>}
+              {friends.length > 0 && <View style={{ paddingHorizontal: layout.screenMargin, paddingVertical: 10 }}><SearchField value={query} onChangeText={setQuery} placeholder="Search your friends" label="Search your friends" /></View>}
+              {friends.length > 0 && <AppText variant="mono" muted style={{ textTransform: 'uppercase', letterSpacing: 1.4, fontSize: 12, paddingHorizontal: layout.screenMargin, paddingTop: 10, paddingBottom: 2 }} accessibilityRole="header">Friends</AppText>}
             </View>
           }
           renderItem={({ item: f }) => (

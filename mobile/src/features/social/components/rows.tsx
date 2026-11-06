@@ -3,7 +3,7 @@ import { ReactNode } from 'react';
 import { Pressable, View } from 'react-native';
 import { AppText } from '@/components/AppText';
 import { Icon, IconName } from '@/components/Icon';
-import { c, fonts, radius, role } from '@/theme';
+import { c, fonts, radius, role, layout } from '@/theme';
 import { RequestState, conversationName, isMuted, notificationHeadline, notificationTime, personName, pilgrimsLabel, previewLine, smartTime } from '../logic';
 import type { Conversation, NotificationItem } from '../types';
 import { Btn, CountBadge, PilgrimAvatar } from './primitives';
@@ -20,7 +20,7 @@ export function ConversationRow({ conversation: cv, meId, now, onPress }: { conv
   const empty = !cv.last_message_id && !cv.last_message_preview;
   const label = [name, group ? pilgrimsLabel(cv.member_count) : null, unread > 0 ? `${unread} unread ${unread === 1 ? 'message' : 'messages'}` : null, muted ? 'muted' : null, preview, time || null].filter(Boolean).join('. ');
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={label} accessibilityHint="Opens the chat" onPress={onPress} style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: 24, paddingVertical: 12, minHeight: 80, backgroundColor: pressed ? c.sand200 : 'transparent' })}>
+    <Pressable accessibilityRole="button" accessibilityLabel={label} accessibilityHint="Opens the chat" onPress={onPress} style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: layout.screenMargin, paddingVertical: 12, minHeight: 80, backgroundColor: pressed ? c.sand200 : 'transparent' })}>
       <PilgrimAvatar name={name} uri={group ? cv.avatar_url : cv.peer_avatar_url} seed={cv.peer_id ?? cv.id} size={56} group={group} />
       <View style={{ flex: 1, gap: 2 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
@@ -101,7 +101,7 @@ export function NotificationRow({ n, now, request, busy, onPress, onAccept, onDe
   const actor = n.actor;
   const label = [`${name}${text}`, detail, when, unread ? 'unread' : null].filter(Boolean).join('. ');
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'flex-start', gap: 14, paddingHorizontal: 24, paddingVertical: 14, backgroundColor: pressed ? c.sand200 : unread ? c.goldWash : 'transparent' })}>
+    <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'flex-start', gap: 14, paddingHorizontal: layout.screenMargin, paddingVertical: 14, backgroundColor: pressed ? c.sand200 : unread ? c.goldWash : 'transparent' })}>
       <View style={{ width: 52, height: 52 }}>
         {actor
           ? <PilgrimAvatar name={personName(actor)} uri={actor.avatar_url} seed={actor.id} size={52} />

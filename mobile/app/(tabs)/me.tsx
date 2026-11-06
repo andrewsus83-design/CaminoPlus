@@ -202,7 +202,8 @@ export default function Me() {
             ))}
           </View>
         </View>
-        <View style={{ gap: 4 }}>
+        {/* The Screen stacks with a 16 gap. The name text sits centred in a 34 high row (3 px lower than the row top), so -11 leaves exactly 8 between the profile picture and the name. */}
+        <View style={{ gap: 4, marginTop: -11 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
             <AppText variant="body" numberOfLines={1} style={{ fontFamily: 'Inter_600SemiBold', flexShrink: 1 }}>{name}</AppText>
             <Pressable accessibilityRole="button" accessibilityLabel="Edit description" hitSlop={8} onPress={() => { setBioDraft(profile?.bio ?? ''); setEditBio(true); }} style={{ width: 34, height: 34, borderRadius: radius.pill, backgroundColor: role.surface, borderWidth: 1, borderColor: role.border, alignItems: 'center', justifyContent: 'center', marginRight: -6 }}>
@@ -267,7 +268,7 @@ export default function Me() {
           </View>
         </KeyboardAvoidingView>
       </Modal>
-      <Pressable accessibilityRole="button" accessibilityLabel="Write a journey post" onPress={() => router.push('/write')} style={{ position: 'absolute', right: layout.screenMargin, bottom: Math.max(insets.bottom - 14, 10) + 88 + 8, width: 52, height: 52, borderRadius: radius.pill, backgroundColor: c.gold, alignItems: 'center', justifyContent: 'center', ...shadowStyle('gold') }}>
+      <Pressable accessibilityRole="button" accessibilityLabel="Write a journey post" onPress={() => router.push('/write')} style={{ position: 'absolute', right: 16, bottom: Math.max(insets.bottom - 14, 10) + 88 + 8, width: 52, height: 52, borderRadius: radius.pill, backgroundColor: c.gold, alignItems: 'center', justifyContent: 'center', ...shadowStyle('gold') }}>
         <Icon name="pen" color={c.blue} size={22} />
       </Pressable>
     </View>

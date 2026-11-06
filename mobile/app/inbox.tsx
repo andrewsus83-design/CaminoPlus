@@ -167,11 +167,11 @@ function MessagesTab({ list, convs, meId, now, bottom, requests, onOpen, onReque
       ListHeaderComponent={
         <View>
           {convs.error && <Notice icon="info" tone="warn" text="Could not refresh. Pull down to try again." />}
-          {list.length > 0 && <View style={{ paddingHorizontal: 24, paddingTop: 14, paddingBottom: 6 }}><SearchField value={query} onChangeText={setQuery} placeholder="Search chats" label="Search chats" /></View>}
+          {list.length > 0 && <View style={{ paddingHorizontal: layout.screenMargin, paddingTop: 14, paddingBottom: 6 }}><SearchField value={query} onChangeText={setQuery} placeholder="Search chats" label="Search chats" /></View>}
           {requests > 0 && (
             <Pressable
               accessibilityRole="button" accessibilityLabel={`Friend requests, ${requests} waiting`} accessibilityHint="Opens your friend requests" onPress={onRequests}
-              style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 12, marginHorizontal: 24, marginTop: 10, marginBottom: 4, minHeight: 64, paddingHorizontal: 16, borderRadius: radius.md, backgroundColor: pressed ? c.goldSoft : c.goldWash })}
+              style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 12, marginHorizontal: layout.screenMargin, marginTop: 10, marginBottom: 4, minHeight: 64, paddingHorizontal: 16, borderRadius: radius.md, backgroundColor: pressed ? c.goldSoft : c.goldWash })}
             >
               <View style={{ width: 40, height: 40, borderRadius: radius.pill, backgroundColor: c.blue, alignItems: 'center', justifyContent: 'center' }}><Icon name="user-plus" color={c.parchment} size={20} /></View>
               <AppText variant="label" style={{ flex: 1 }}>Friend requests</AppText>
@@ -205,7 +205,7 @@ function GroupsTab({ list, convs, meId, now, bottom, onOpen, onNew }: ListProps 
       ListHeaderComponent={
         <View>
           {convs.error && <Notice icon="info" tone="warn" text="Could not refresh. Pull down to try again." />}
-          {list.length > 0 && <View style={{ paddingHorizontal: 24, paddingTop: 16, paddingBottom: 6 }}><Btn label="New group" icon="group" variant="gold" full onPress={onNew} /></View>}
+          {list.length > 0 && <View style={{ paddingHorizontal: layout.screenMargin, paddingTop: 16, paddingBottom: 6 }}><Btn label="New group" icon="group" variant="gold" full onPress={onNew} /></View>}
         </View>
       }
       renderItem={({ item: cv }) => <ConversationRow conversation={cv} meId={meId ?? ''} now={now} onPress={() => onOpen(cv)} />}

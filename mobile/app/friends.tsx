@@ -186,7 +186,7 @@ export default function FriendsScreen() {
         contentContainerStyle={{ paddingBottom: insets.bottom + 40, flexGrow: 1 }}
         ListHeaderComponent={
           <View style={{ gap: 16, paddingTop: 4 }}>
-            <View style={{ paddingHorizontal: 24 }}>
+            <View style={{ paddingHorizontal: layout.screenMargin }}>
               <Card style={{ gap: 12 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                   <AppText variant="h4">Camino friends</AppText>
@@ -198,7 +198,7 @@ export default function FriendsScreen() {
             </View>
             <View style={{ paddingHorizontal: 12 }}><SegmentedTabs tabs={tabs} value={tab} onChange={(k) => { setTab(k); router.setParams({ tab: k }); }} /></View>
             {data.error && !!data.friends && tab !== 'find' && <Notice icon="info" tone="warn" text="Could not refresh. Pull down to try again." />}
-            {tab === 'find' && <View style={{ paddingHorizontal: 24 }}><SearchField value={query} onChangeText={setQuery} placeholder="Search by name or @username" label="Search pilgrims" /></View>}
+            {tab === 'find' && <View style={{ paddingHorizontal: layout.screenMargin }}><SearchField value={query} onChangeText={setQuery} placeholder="Search by name or @username" label="Search pilgrims" /></View>}
           </View>
         }
         renderSectionHeader={({ section }) => (section.title ? <Section>{section.title}</Section> : null)}

@@ -47,7 +47,7 @@ export default function NewGroup() {
     return (
       <KeyboardAvoidingView behavior="padding" style={{ flex: 1, backgroundColor: role.bg }}>
         <View style={{ paddingTop: top, paddingHorizontal: layout.screenMargin, paddingBottom: 12 }}><ScreenHeader title="Name your group" variant="h3" onBack={back} /></View>
-        <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 24, gap: 20 }}>
+        <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingHorizontal: layout.screenMargin, paddingBottom: 24, gap: 20 }}>
           <View style={{ alignItems: 'center', paddingTop: 8 }}><PilgrimAvatar name={title.trim() || 'Group'} seed={title || 'group'} size={96} group /></View>
           <View style={{ gap: 8 }}>
             <AppText variant="label">Group name</AppText>
@@ -70,7 +70,7 @@ export default function NewGroup() {
             </View>
           </View>
         </ScrollView>
-        <View style={{ paddingHorizontal: 24, paddingTop: 8, paddingBottom: Math.max(insets.bottom, 12) + 8 }}>
+        <View style={{ paddingHorizontal: layout.screenMargin, paddingTop: 8, paddingBottom: Math.max(insets.bottom, 12) + 8 }}>
           <Btn label="Create group" icon="group" variant="gold" full loading={busy} disabled={!validGroupTitle(title)} onPress={create} />
         </View>
         {host}
@@ -87,10 +87,10 @@ export default function NewGroup() {
         <FriendPickList
           friends={friends} selected={picked} onToggle={toggle} bottomSpace={insets.bottom + 120}
           header={
-            <View style={{ paddingHorizontal: 24, gap: 10, paddingBottom: 4 }}>
+            <View style={{ paddingHorizontal: layout.screenMargin, gap: 10, paddingBottom: 4 }}>
               <AppText variant="small" muted>Pick at least 2 friends.</AppText>
               {chosen.length > 0 && (
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginHorizontal: -24 }} contentContainerStyle={{ gap: 8, paddingVertical: 4, paddingHorizontal: 24 }} keyboardShouldPersistTaps="handled">
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginHorizontal: -layout.screenMargin }} contentContainerStyle={{ gap: 8, paddingVertical: 4, paddingHorizontal: layout.screenMargin }} keyboardShouldPersistTaps="handled">
                   {chosen.map((f) => (
                     <Pressable key={f.id} accessibilityRole="button" accessibilityLabel={`Remove ${personName(f)}`} onPress={() => toggle(f)} style={{ minHeight: 48, flexDirection: 'row', alignItems: 'center', gap: 8, paddingLeft: 6, paddingRight: 14, borderRadius: radius.pill, backgroundColor: c.blue50, borderWidth: 1, borderColor: c.blue100 }}>
                       <PilgrimAvatar name={personName(f)} uri={f.avatar_url} seed={f.id} size={34} />
@@ -106,7 +106,7 @@ export default function NewGroup() {
         />
       )}
       {!!friends && friends.length > 0 && (
-        <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: 24, paddingTop: 12, paddingBottom: Math.max(insets.bottom, 12) + 8, backgroundColor: role.bg, borderTopWidth: 1, borderTopColor: role.border, gap: 8 }}>
+        <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: layout.screenMargin, paddingTop: 12, paddingBottom: Math.max(insets.bottom, 12) + 8, backgroundColor: role.bg, borderTopWidth: 1, borderTopColor: role.border, gap: 8 }}>
           <AppText variant="caption" muted style={{ textAlign: 'center', letterSpacing: 0 }} accessibilityLiveRegion="polite">{blocker ?? `${selected.length} friends picked`}</AppText>
           <Btn label="Next" variant="primary" full disabled={!canCreateGroup(selected.length)} onPress={() => setStep(2)} />
         </View>

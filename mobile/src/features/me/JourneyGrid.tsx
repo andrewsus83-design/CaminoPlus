@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
 import { Post, PostMediaUrl, listPostMediaUrls } from '@/lib/api';
-import { c, fonts, radius } from '@/theme';
+import { c, fonts, radius, layout } from '@/theme';
 
 // My journey: 9:16 tiles in a two-column masonry grid. Tap a tile to open the full-screen
 // viewer, which scrolls vertically one post at a time, like TikTok.
@@ -51,12 +51,12 @@ function PostVisual({ post, media, index, active, small }: { post: Post; media?:
   );
 }
 
-export function JourneyGrid({ posts }: { posts: Post[] }) {
+export function JourneyGrid({ posts, margin = layout.screenMargin }: { posts: Post[]; margin?: number }) {
   const [media, setMedia] = useState<Record<string, PostMediaUrl[]>>({});
   const [openAt, setOpenAt] = useState<number | null>(null);
   const { width } = useWindowDimensions();
   const gap = 10;
-  const colW = (width - 48 - gap) / 2;
+  const colW = (width - margin * 2 - gap) / 2; // `margin` = the screen's side padding, so the grid fills the width exactly
   const tileH = colW * (16 / 9);
 
   useEffect(() => {

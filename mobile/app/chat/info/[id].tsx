@@ -19,7 +19,7 @@ const FAR = '2100-01-01T00:00:00.000Z';
 const inHours = (h: number) => new Date(Date.now() + h * 3_600_000).toISOString();
 
 function Card({ children }: { children: ReactNode }) {
-  return <View style={{ marginHorizontal: 24, backgroundColor: role.surface, borderRadius: radius.md, borderWidth: 1, borderColor: role.border, overflow: 'hidden' }}>{children}</View>;
+  return <View style={{ marginHorizontal: layout.screenMargin, backgroundColor: role.surface, borderRadius: radius.md, borderWidth: 1, borderColor: role.border, overflow: 'hidden' }}>{children}</View>;
 }
 
 function InfoRow({ icon, label, value, onPress, danger, first, busy }: { icon: IconName; label: string; value?: string; onPress: () => void; danger?: boolean; first?: boolean; busy?: boolean }) {
@@ -143,7 +143,7 @@ export default function ChatInfo() {
     <View style={{ flex: 1, backgroundColor: role.bg }}>
       {head}
       <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 40, gap: 6 }}>
-        <View style={{ alignItems: 'center', gap: 8, paddingVertical: 16, paddingHorizontal: 24 }}>
+        <View style={{ alignItems: 'center', gap: 8, paddingVertical: 16, paddingHorizontal: layout.screenMargin }}>
           <PilgrimAvatar name={name} uri={group ? conv.avatar_url : conv.peer_avatar_url} seed={peerId ?? conv.id} size={104} group={group} />
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
             <AppText variant="h3" numberOfLines={2} style={{ textAlign: 'center', flexShrink: 1 }}>{name}</AppText>
@@ -181,7 +181,7 @@ export default function ChatInfo() {
                 </View>
               ))}
             </Card>
-            <View style={{ paddingHorizontal: 24, paddingTop: 18 }}><Btn label="Leave group" icon="logout" variant="dangerGhost" full onPress={leave} loading={info.busy} /></View>
+            <View style={{ paddingHorizontal: layout.screenMargin, paddingTop: 18 }}><Btn label="Leave group" icon="logout" variant="dangerGhost" full onPress={leave} loading={info.busy} /></View>
           </>
         )}
 
@@ -216,7 +216,7 @@ function AddPeople({ visible, inGroup, onClose, onAdd }: { visible: boolean; inG
   return (
     <Modal visible={visible} animationType="slide" onRequestClose={close} presentationStyle="pageSheet">
       <View style={{ flex: 1, backgroundColor: role.bg, paddingTop: 20 }}>
-        <View style={{ paddingHorizontal: 24, paddingBottom: 8 }}>
+        <View style={{ paddingHorizontal: layout.screenMargin, paddingBottom: 8 }}>
           <ScreenHeader title="Add pilgrims" variant="h3" right={<Pressable accessibilityRole="button" accessibilityLabel="Close" onPress={close} style={{ width: 48, height: 48, borderRadius: radius.pill, backgroundColor: role.surface, borderWidth: 1, borderColor: role.border, alignItems: 'center', justifyContent: 'center' }}><Icon name="close" color={role.text} size={22} /></Pressable>} />
         </View>
         {loading && <ActivityIndicator color={role.action} style={{ marginTop: 32 }} />}
@@ -227,7 +227,7 @@ function AddPeople({ visible, inGroup, onClose, onAdd }: { visible: boolean; inG
             empty={<EmptyState icon="group" title="No friends to add yet" text="Add friends first. Only your friends can join a group." />}
           />
         )}
-        <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: 24, paddingTop: 12, paddingBottom: Math.max(insets.bottom, 12) + 8, backgroundColor: role.bg, borderTopWidth: 1, borderTopColor: role.border }}>
+        <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: layout.screenMargin, paddingTop: 12, paddingBottom: Math.max(insets.bottom, 12) + 8, backgroundColor: role.bg, borderTopWidth: 1, borderTopColor: role.border }}>
           <Btn label={selected.length ? `Add ${selected.length} ${selected.length === 1 ? 'friend' : 'friends'}` : 'Pick friends to add'} variant="gold" full disabled={selected.length === 0} loading={busy} onPress={add} />
         </View>
       </View>

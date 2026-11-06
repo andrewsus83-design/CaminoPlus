@@ -9,7 +9,7 @@ import { Pill } from '@/components/Pill';
 import { SampleNotice } from '@/components/SampleNotice';
 import { Card, IconButton, Photo, SectionLabel } from '@/components/ui';
 import { reviews, rooms, stays } from '@/data/mock';
-import { c, radius, role } from '@/theme';
+import { c, radius, role, layout } from '@/theme';
 // Sample content is never shared outside the app: share the invitation instead of an invented place or caption.
 const SHARE_APP = 'Walking the Camino? CaminoPlus has offline maps, stays and a pilgrim passport: https://camino.plus';
 
@@ -57,7 +57,7 @@ export default function StayDetail() {
           </Card>
         ))}
       </Screen>
-      <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: 24, paddingTop: 12, paddingBottom: insets.bottom + 12, backgroundColor: role.surface, borderTopWidth: 1, borderTopColor: role.border, flexDirection: 'row', alignItems: 'center', gap: 16 }}>
+      <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: layout.screenMargin, paddingTop: 12, paddingBottom: insets.bottom + 12, backgroundColor: role.surface, borderTopWidth: 1, borderTopColor: role.border, flexDirection: 'row', alignItems: 'center', gap: 16 }}>
         <View style={{ flex: 1 }}>
           <AppText variant="h4">{s.price ? `€${s.price}` : 'Café'}</AppText>
           <AppText variant="caption" muted>{s.label}</AppText>

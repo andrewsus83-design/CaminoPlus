@@ -4,7 +4,7 @@ import { ReactNode, useEffect, useRef } from 'react';
 import { Animated, Platform, View } from 'react-native';
 import { AppText } from '@/components/AppText';
 import { Icon, IconName } from '@/components/Icon';
-import { c, radius } from '@/theme';
+import { c, radius, layout } from '@/theme';
 import { Btn } from './primitives';
 
 export function EmptyState({ icon = 'shell', title, text, action, secondary }: { icon?: IconName; title: string; text: string; action?: { label: string; onPress: () => void; icon?: IconName }; secondary?: { label: string; onPress: () => void } }) {
@@ -63,7 +63,7 @@ export function LoadingRows({ count = 6, avatar = 56 }: { count?: number; avatar
   return (
     <Animated.View accessibilityRole="progressbar" accessibilityLabel="Loading" style={{ opacity: pulse }}>
       {Array.from({ length: count }, (_, i) => (
-        <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: 24, paddingVertical: 12 }}>
+        <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: layout.screenMargin, paddingVertical: 12 }}>
           <View style={{ width: avatar, height: avatar, borderRadius: radius.pill, backgroundColor: c.sand200 }} />
           <View style={{ flex: 1, gap: 10 }}>
             <View style={{ height: 14, width: `${48 + ((i * 17) % 30)}%`, borderRadius: 7, backgroundColor: c.sand200 }} />
@@ -76,7 +76,7 @@ export function LoadingRows({ count = 6, avatar = 56 }: { count?: number; avatar
 }
 
 export const Section = ({ children, right }: { children: string; right?: ReactNode }) => (
-  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 24, paddingTop: 20, paddingBottom: 6 }}>
+  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: layout.screenMargin, paddingTop: 20, paddingBottom: 6 }}>
     <AppText variant="mono" muted style={{ textTransform: 'uppercase', letterSpacing: 1.4, fontSize: 12 }} accessibilityRole="header">{children}</AppText>
     {right}
   </View>
