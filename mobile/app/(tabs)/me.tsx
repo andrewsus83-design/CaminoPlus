@@ -129,6 +129,31 @@ export default function Me() {
       setSavingBio(false);
     }
   };
+  const isPrivate = !!profile?.is_private;
+  const askVisibility = () => {
+    if (!session) return;
+    const next = !isPrivate;
+    Alert.alert(
+      next ? 'Make your profile private?' : 'Make your profile public?',
+      next
+        ? 'Private: you disappear from other pilgrims\' maps, and only people you approve can see your profile and posts or message you.'
+        : 'Public: other pilgrims can find you on the map, see your profile and posts, and send you messages.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: next ? 'Make private' : 'Make public',
+          onPress: async () => {
+            try {
+              await updateProfile(session.user.id, { is_private: next });
+              await refresh();
+            } catch (e) {
+              Alert.alert('Could not change', e instanceof Error ? e.message : String(e));
+            }
+          },
+        },
+      ],
+    );
+  };
   const loading = <ActivityIndicator color={role.action} style={{ marginTop: 24 }} />;
 
   return (
@@ -163,22 +188,35 @@ export default function Me() {
           </View>
         </View>
         <View style={{ gap: 4 }}>
-          <AppText variant="body" style={{ fontFamily: 'Inter_600SemiBold' }}>{name}</AppText>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+            <AppText variant="body" numberOfLines={1} style={{ fontFamily: 'Inter_600SemiBold', flexShrink: 1 }}>{name}</AppText>
+            <Pressable accessibilityRole="button" accessibilityLabel={isPrivate ? 'Private profile, tap to change' : 'Public profile, tap to change'} onPress={askVisibility} style={{ flexDirection: 'row', alignItems: 'center', gap: 6, height: 34, paddingHorizontal: 12, borderRadius: radius.pill, backgroundColor: isPrivate ? c.sand200 : c.successWash }}>
+              <Icon name={isPrivate ? 'shield' : 'pin'} color={isPrivate ? role.text : c.success} size={16} />
+              <AppText variant="caption" color={isPrivate ? role.text : c.success} style={{ fontFamily: 'Inter_600SemiBold' }}>{isPrivate ? 'Private' : 'Public'}</AppText>
+            </Pressable>
+          </View>
           <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 10 }}>
             <AppText variant="body" muted={!profile?.bio} style={{ flex: 1 }}>{profile?.bio || 'Add a short description about you'}</AppText>
             <Pressable accessibilityRole="button" accessibilityLabel="Edit description" hitSlop={10} onPress={() => { setBioDraft(profile?.bio ?? ''); setEditBio(true); }} style={{ width: 40, height: 40, borderRadius: radius.pill, backgroundColor: role.surface, borderWidth: 1, borderColor: role.border, alignItems: 'center', justifyContent: 'center' }}>
               <Icon name="pen" color={c.blue} size={18} />
             </Pressable>
           </View>
+          <AppText variant="accent" color={role.accentText}>Buen Camino!</AppText>
           {journey?.route && (
-            <Pressable accessibilityRole="button" accessibilityLabel="Switch Camino" onPress={() => router.push('/change-camino')} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, alignSelf: 'flex-start', marginTop: 6, paddingLeft: 16, paddingRight: 10, height: 44, borderRadius: radius.pill, backgroundColor: c.goldWash, maxWidth: '100%' }}>
-              <AppText variant="label" color={role.accentText} numberOfLines={1} style={{ flexShrink: 1 }}>
-                {journey.route.name}{journey.start_stage ? ` · stage ${journey.start_stage.stage_number}` : ''} · {stagesDone} done
-              </AppText>
-              <Icon name="chevron" color={role.accentText} size={18} />
+            <Pressable accessibilityRole="button" accessibilityLabel="Change Camino" onPress={() => router.push('/change-camino')} style={{ marginTop: 8, flexDirection: 'row', alignItems: 'center', gap: 14, padding: 14, borderRadius: radius.lg, backgroundColor: c.blue, ...shadowStyle('md') }}>
+              <View style={{ width: 52, height: 52, borderRadius: radius.pill, backgroundColor: 'rgba(246,239,226,0.14)', alignItems: 'center', justifyContent: 'center' }}>
+                <Icon name="shell" color={c.gold} size={28} />
+              </View>
+              <View style={{ flex: 1, gap: 2 }}>
+                <AppText variant="caption" color={c.goldSoft} style={{ textTransform: 'uppercase', letterSpacing: 1.2 }}>My Camino</AppText>
+                <AppText variant="label" color={c.parchment} numberOfLines={1}>{journey.route.name}</AppText>
+                <AppText variant="caption" color={c.parchment} style={{ opacity: 0.85 }} numberOfLines={1}>{journey.start_stage ? `From stage ${journey.start_stage.stage_number} · ` : ''}{stagesDone} stages done</AppText>
+              </View>
+              <View style={{ height: 40, paddingHorizontal: 16, borderRadius: radius.pill, backgroundColor: c.gold, justifyContent: 'center' }}>
+                <AppText variant="label" color={c.blue}>Change</AppText>
+              </View>
             </Pressable>
           )}
-          <AppText variant="accent" color={role.accentText}>Buen Camino!</AppText>
         </View>
         <SubTabs tabs={TABS} value={tab} onChange={setTab} />
         {!!error && <FormMessage>{`Could not load your data. ${error}`}</FormMessage>}

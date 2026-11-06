@@ -5,7 +5,7 @@ import { supabase } from './supabase';
 export type Profile = {
   id: string; username: string; display_name: string | null; bio: string | null; avatar_url: string | null;
   xp: number; level: number; followers_count: number; following_count: number; posts_count: number;
-  stamps_count: number; km_walked: number;
+  stamps_count: number; km_walked: number; is_private: boolean;
 };
 export type Route = { id: string; slug: string; name: string; short_name: string | null; start_name: string | null; end_name: string | null; distance_km: number | null; stage_count: number | null; difficulty: number | null; color: string | null };
 export type Stage = { id: string; stage_number: number; name: string; distance_km: number; elevation_gain_m: number | null; difficulty: number | null; start: { name: string } | null; end: { name: string } | null };
@@ -14,7 +14,7 @@ export type JourneyDay = { id: string; day_number: number; planned_date: string 
 export type Stamp = { id: string; place_name: string | null; stamped_at: string; verified: boolean; method: string };
 export type Post = { id: string; body: string | null; place_name: string | null; published_at: string | null; like_count: number; comment_count: number; media_count: number; health_summary: { km?: number } | null };
 
-const PROFILE_COLS = 'id, username, display_name, bio, avatar_url, xp, level, followers_count, following_count, posts_count, stamps_count, km_walked';
+const PROFILE_COLS = 'id, username, display_name, bio, avatar_url, xp, level, followers_count, following_count, posts_count, stamps_count, km_walked, is_private';
 
 function must<T>(res: { data: T | null; error: { message: string } | null }): T {
   if (res.error) throw new Error(res.error.message);
@@ -25,7 +25,7 @@ export async function getProfile(userId: string) {
   return must(await supabase.from('profiles').select(PROFILE_COLS).eq('id', userId).maybeSingle()) as Profile | null;
 }
 
-export async function updateProfile(userId: string, patch: Partial<Pick<Profile, 'display_name' | 'bio' | 'username' | 'avatar_url'>>) {
+export async function updateProfile(userId: string, patch: Partial<Pick<Profile, 'display_name' | 'bio' | 'username' | 'avatar_url' | 'is_private'>>) {
   return must(await supabase.from('profiles').update(patch).eq('id', userId).select(PROFILE_COLS).single()) as Profile;
 }
 
