@@ -1,0 +1,55 @@
+{
+  "n": 30,
+  "name": "Portomarín to Palas de Rei",
+  "from": {
+    "name": "Portomarín",
+    "lat": 42.80816,
+    "lng": -7.61561,
+    "source": "photon.komoot.io node/802450874 place=village"
+  },
+  "to": {
+    "name": "Palas de Rei",
+    "lat": 42.87391,
+    "lng": -7.8698,
+    "source": "photon.komoot.io node/470353423 place=town"
+  },
+  "via": [
+    {
+      "name": "Castromaior",
+      "lat": 42.83209,
+      "lng": -7.70911,
+      "source": "photon.komoot.io node/801247958 place=hamlet"
+    },
+    {
+      "name": "Vendas de Narón",
+      "lat": 42.84425,
+      "lng": -7.74824,
+      "source": "photon.komoot.io node/1975382860 place=hamlet"
+    },
+    {
+      "name": "A Eirexe de Ligonde",
+      "lat": 42.86468,
+      "lng": -7.78678,
+      "source": "photon.komoot.io node/802218169 place=hamlet"
+    },
+    {
+      "name": "Portos",
+      "lat": 42.87355,
+      "lng": -7.80697,
+      "source": "photon.komoot.io node/802388868 place=hamlet"
+    },
+    {
+      "name": "Lestedo",
+      "lat": 42.87215,
+      "lng": -7.81449,
+      "source": "photon.komoot.io node/1975376311 place=hamlet"
+    }
+  ],
+  "extracts": [
+    "galicia"
+  ],
+  "coastal": false,
+  "distance_km": null,
+  "distance_source": null,
+  "notes": "For Gonzar and Ligonde Photon returned only civil-parish relations (R/12672594 centroid 42.82531,-7.69614 and R/12578544 centroid 42.85740,-7.77876), so they are not used as vias: Castromaior (hamlet node) stands in for Gonzar and A Eirexe de Ligonde (the Eirexe/Airexe of the guides) for Ligonde. Vendas de Narón is OSM's Galician spelling of Ventas de Narón. Hospital da Cruz was not looked up. Order checked by longitude. No variant is known to the author for this stage; Portos and Lestedo are only 0.6 km apart."
+}

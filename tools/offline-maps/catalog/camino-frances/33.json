@@ -1,0 +1,49 @@
+{
+  "n": 33,
+  "name": "O Pedrouzo to Santiago de Compostela",
+  "from": {
+    "name": "O Pedrouzo",
+    "lat": 42.90468,
+    "lng": -8.36242,
+    "source": "photon.komoot.io node/766526727 place=village"
+  },
+  "to": {
+    "name": "Santiago de Compostela",
+    "lat": 42.88042,
+    "lng": -8.54586,
+    "source": "photon.komoot.io node/998649870 place=city"
+  },
+  "via": [
+    {
+      "name": "O Amenal",
+      "lat": 42.90479,
+      "lng": -8.39135,
+      "source": "photon.komoot.io node/6080924039 place=hamlet"
+    },
+    {
+      "name": "A Lavacolla",
+      "lat": 42.90024,
+      "lng": -8.44654,
+      "source": "photon.komoot.io node/766307911 place=hamlet"
+    },
+    {
+      "name": "Vilamaior",
+      "lat": 42.89189,
+      "lng": -8.45031,
+      "source": "photon.komoot.io node/766511094 place=hamlet"
+    },
+    {
+      "name": "O Monte do Gozo",
+      "lat": 42.8867,
+      "lng": -8.49703,
+      "source": "photon.komoot.io node/766480314 place=locality"
+    }
+  ],
+  "extracts": [
+    "galicia"
+  ],
+  "coastal": false,
+  "distance_km": null,
+  "distance_source": null,
+  "notes": "Santiago de Compostela is the place=city node in the old town (node 998649870), 0.1 km from the cathedral point used in supabase/seed.sql (42.8806,-8.5446); Photon lists the municipality relation first (centroid 42.90646,-8.51930, 3.6 km north-east), which was not used. O Monte do Gozo is tagged place=locality (the hill with the pilgrim hostel); San Marcos and San Paio are on the Camino but were not looked up. O Amenal has a second OSM object tagged place=neighbourhood 0.3 km away; the hamlet node is used."
+}

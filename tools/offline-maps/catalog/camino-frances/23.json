@@ -1,0 +1,49 @@
+{
+  "n": 23,
+  "name": "Astorga to Foncebadón",
+  "from": {
+    "name": "Astorga",
+    "lat": 42.4554,
+    "lng": -6.05292,
+    "source": "photon.komoot.io relation/347413 place=town (point checked with Nominatim reverse geocoding: inside the town)"
+  },
+  "to": {
+    "name": "Foncebadón",
+    "lat": 42.49124,
+    "lng": -6.34248,
+    "source": "nominatim node/349248487 place=hamlet"
+  },
+  "via": [
+    {
+      "name": "Murias de Rechivaldo",
+      "lat": 42.46012,
+      "lng": -6.10605,
+      "source": "photon.komoot.io node/269230307 place=hamlet"
+    },
+    {
+      "name": "Santa Catalina de Somoza",
+      "lat": 42.45494,
+      "lng": -6.15898,
+      "source": "photon.komoot.io node/349248463 place=hamlet"
+    },
+    {
+      "name": "El Ganso",
+      "lat": 42.46227,
+      "lng": -6.20823,
+      "source": "photon.komoot.io node/349248617 place=hamlet"
+    },
+    {
+      "name": "Rabanal del Camino",
+      "lat": 42.48169,
+      "lng": -6.28427,
+      "source": "photon.komoot.io node/349248488 place=hamlet"
+    }
+  ],
+  "extracts": [
+    "castilla-y-leon"
+  ],
+  "coastal": false,
+  "distance_km": null,
+  "distance_source": null,
+  "notes": "Walking order checked from the coordinates: Murias de Rechivaldo, Santa Catalina de Somoza, El Ganso, then Rabanal del Camino, which comes BEFORE Foncebadón (about 5 km before, straight line); all vias lie strictly between Astorga and Foncebadón. El Ganso: Photon lists several localities with this name in Castilla y León; the one used is in the municipality of Brazuelo, between Santa Catalina and Rabanal. Astorga is the relation 347413 (place=town); reverse geocoding puts the point on Plaza Santocildes in the town centre. Foncebadón is a hamlet node at the foot of the climb; Cruz de Ferro is 1.6 km beyond it (stage 24). Common practice: many guides end the day at Rabanal del Camino."
+}

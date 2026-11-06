@@ -1,0 +1,43 @@
+{
+  "n": 29,
+  "name": "Sarria to Portomarín",
+  "from": {
+    "name": "Sarria",
+    "lat": 42.77842,
+    "lng": -7.41466,
+    "source": "photon.komoot.io node/768282714 place=town"
+  },
+  "to": {
+    "name": "Portomarín",
+    "lat": 42.80816,
+    "lng": -7.61561,
+    "source": "photon.komoot.io node/802450874 place=village"
+  },
+  "via": [
+    {
+      "name": "O Peruscallo",
+      "lat": 42.78078,
+      "lng": -7.49312,
+      "source": "photon.komoot.io node/762607290 place=hamlet"
+    },
+    {
+      "name": "Ferreiros",
+      "lat": 42.78328,
+      "lng": -7.53024,
+      "source": "photon.komoot.io node/470351319 place=hamlet"
+    },
+    {
+      "name": "Vilachá",
+      "lat": 42.79571,
+      "lng": -7.60268,
+      "source": "photon.komoot.io node/796758889 place=hamlet"
+    }
+  ],
+  "extracts": [
+    "galicia"
+  ],
+  "coastal": false,
+  "distance_km": null,
+  "distance_source": null,
+  "notes": "For Barbadelo (first village after Sarria) Photon found only the civil-parish relation 12613282 (centroid 42.76665,-7.46416), so it is not used; Mercadoiro returned no result and Morgade was not looked up. The names Ferreiros and Vilachá are duplicated across Lugo province: the chosen nodes are in Paradela municipality on the Camino (Vilachá is 1.7 km from Portomarín; the other Vilachá hits are more than 10 km away). O Peruscallo is OSM's spelling of Peruscallo. Portomarín coordinates are for the new town on the hill (the old town is under the Belesar reservoir). The stage is nearly straight, so only three vias."
+}

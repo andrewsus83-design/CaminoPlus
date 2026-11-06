@@ -1,0 +1,49 @@
+{
+  "n": 25,
+  "name": "Ponferrada to Villafranca del Bierzo",
+  "from": {
+    "name": "Ponferrada",
+    "lat": 42.54541,
+    "lng": -6.59387,
+    "source": "nominatim node/163298513 place=town"
+  },
+  "to": {
+    "name": "Villafranca del Bierzo",
+    "lat": 42.60558,
+    "lng": -6.81117,
+    "source": "nominatim node/194560303 place=village"
+  },
+  "via": [
+    {
+      "name": "Columbrianos",
+      "lat": 42.57391,
+      "lng": -6.61226,
+      "source": "photon.komoot.io node/349248124 place=village"
+    },
+    {
+      "name": "Camponaraya",
+      "lat": 42.57757,
+      "lng": -6.66759,
+      "source": "photon.komoot.io node/349248123 place=village"
+    },
+    {
+      "name": "Cacabelos",
+      "lat": 42.59902,
+      "lng": -6.72559,
+      "source": "photon.komoot.io node/302740403 place=village"
+    },
+    {
+      "name": "Pieros",
+      "lat": 42.6061,
+      "lng": -6.74893,
+      "source": "photon.komoot.io node/349248163 place=hamlet"
+    }
+  ],
+  "extracts": [
+    "castilla-y-leon"
+  ],
+  "coastal": false,
+  "distance_km": null,
+  "distance_source": null,
+  "notes": "Villafranca del Bierzo: the place=village node is used; Nominatim lists the municipality relation first, with a centroid 10 km to the north (42.69526,-6.79307) that must not be used. Columbrianos lies 2.4 km off the straight line (north-west of Ponferrada) but is on the Camino. Pieros lies between Cacabelos and Villafranca. Variant (general knowledge, not looked up): a quieter alternative between Cacabelos and Villafranca runs through the vineyards via Valtuille de Abajo. Fuentes Nuevas (between Columbrianos and Camponaraya) is on the Camino but was not looked up."
+}

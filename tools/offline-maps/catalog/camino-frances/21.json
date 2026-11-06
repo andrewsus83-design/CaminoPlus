@@ -1,0 +1,43 @@
+{
+  "n": 21,
+  "name": "León to Villadangos del Páramo",
+  "from": {
+    "name": "León",
+    "lat": 42.5990,
+    "lng": -5.56824,
+    "source": "photon.komoot.io node/31432063 place=city"
+  },
+  "to": {
+    "name": "Villadangos del Páramo",
+    "lat": 42.51729,
+    "lng": -5.7668,
+    "source": "photon.komoot.io relation/345869 place=village (point checked with Nominatim reverse geocoding: inside the village)"
+  },
+  "via": [
+    {
+      "name": "La Virgen del Camino",
+      "lat": 42.58166,
+      "lng": -5.64374,
+      "source": "photon.komoot.io node/276041115 place=village"
+    },
+    {
+      "name": "Valverde de la Virgen",
+      "lat": 42.56849,
+      "lng": -5.68332,
+      "source": "photon.komoot.io relation/341723 place=village (point checked with Nominatim reverse geocoding: inside the village)"
+    },
+    {
+      "name": "San Miguel del Camino",
+      "lat": 42.56309,
+      "lng": -5.69713,
+      "source": "photon.komoot.io node/349247482 place=hamlet"
+    }
+  ],
+  "extracts": [
+    "castilla-y-leon"
+  ],
+  "coastal": false,
+  "distance_km": null,
+  "distance_source": null,
+  "notes": "La Virgen del Camino, Valverde de la Virgen and San Miguel del Camino are all in the municipality of Valverde de la Virgen. Valverde de la Virgen is the relation 341723 (place=village); reverse geocoding puts the point on Calle el Pradico in the village. Villadangos del Páramo is the relation 345869 (place=village), point on Calle Real in the village. Variant (general knowledge, not checked): a quieter route from La Virgen del Camino via Chozas de Abajo and Villar de Mazarife leads to Hospital de Órbigo and does not pass Villadangos. Common practice: guides often split León to Astorga at San Martín del Camino or Hospital de Órbigo instead of Villadangos; the app keeps Villadangos."
+}

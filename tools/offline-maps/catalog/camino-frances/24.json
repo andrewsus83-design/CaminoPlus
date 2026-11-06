@@ -1,0 +1,55 @@
+{
+  "n": 24,
+  "name": "Foncebadón to Ponferrada",
+  "from": {
+    "name": "Foncebadón",
+    "lat": 42.49124,
+    "lng": -6.34248,
+    "source": "nominatim node/349248487 place=hamlet"
+  },
+  "to": {
+    "name": "Ponferrada",
+    "lat": 42.54541,
+    "lng": -6.59387,
+    "source": "nominatim node/163298513 place=town"
+  },
+  "via": [
+    {
+      "name": "Cruz de Ferro",
+      "lat": 42.48886,
+      "lng": -6.36147,
+      "source": "photon.komoot.io node/597664007 tourism=attraction"
+    },
+    {
+      "name": "Manjarín",
+      "lat": 42.49052,
+      "lng": -6.38647,
+      "source": "photon.komoot.io node/469524274 place=hamlet (OSM name 'Manjarin')"
+    },
+    {
+      "name": "El Acebo",
+      "lat": 42.49891,
+      "lng": -6.45703,
+      "source": "photon.komoot.io node/349248402 place=hamlet"
+    },
+    {
+      "name": "Riego de Ambrós",
+      "lat": 42.52231,
+      "lng": -6.47987,
+      "source": "photon.komoot.io node/349248245 place=hamlet"
+    },
+    {
+      "name": "Molinaseca",
+      "lat": 42.53784,
+      "lng": -6.52046,
+      "source": "photon.komoot.io node/269242491 place=village"
+    }
+  ],
+  "extracts": [
+    "castilla-y-leon"
+  ],
+  "coastal": false,
+  "distance_km": null,
+  "distance_source": null,
+  "notes": "Cruz de Ferro is a landmark, not a village: OSM node tourism=attraction, 1.6 km west of Foncebadón. Manjarín: Photon returns two unrelated 'Manjarín' localities (near Rabanal Viejo and near Astorga); the one used is the hamlet node 469524274 (OSM spells it Manjarin), 3.6 km from Foncebadón. Order checked by longitude: Foncebadón, Cruz de Ferro, Manjarín, El Acebo, Riego de Ambrós, Molinaseca, Ponferrada; the last 6 km into Ponferrada (through Campo) have no via. Ponferrada is the place=town node in the centre; the municipality relation centroid (42.49844,-6.56632) is 5.7 km away and was not used."
+}

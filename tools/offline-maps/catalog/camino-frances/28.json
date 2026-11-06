@@ -1,0 +1,49 @@
+{
+  "n": 28,
+  "name": "Triacastela to Sarria",
+  "from": {
+    "name": "Triacastela",
+    "lat": 42.75634,
+    "lng": -7.23975,
+    "source": "photon.komoot.io node/766653704 place=village"
+  },
+  "to": {
+    "name": "Sarria",
+    "lat": 42.77842,
+    "lng": -7.41466,
+    "source": "photon.komoot.io node/768282714 place=town"
+  },
+  "via": [
+    {
+      "name": "San Cristovo do Real",
+      "lat": 42.74052,
+      "lng": -7.27415,
+      "source": "photon.komoot.io node/1549515518 place=hamlet"
+    },
+    {
+      "name": "Samos",
+      "lat": 42.73066,
+      "lng": -7.32659,
+      "source": "photon.komoot.io node/470257179 place=village"
+    },
+    {
+      "name": "Teiguín",
+      "lat": 42.72436,
+      "lng": -7.34138,
+      "source": "photon.komoot.io node/1551140691 place=hamlet"
+    },
+    {
+      "name": "Aguiada",
+      "lat": 42.77374,
+      "lng": -7.36237,
+      "source": "photon.komoot.io node/766652331 place=hamlet"
+    }
+  ],
+  "extracts": [
+    "galicia"
+  ],
+  "coastal": false,
+  "distance_km": null,
+  "distance_source": null,
+  "notes": "Two common variants (general knowledge). These via points follow the Samos route (longer, through the monastery village): San Cristovo do Real, Samos, Teiguín and Aguiada, where the San Xil route joins. Samos was chosen on purpose for coverage: the shorter San Xil route (hamlet nodes San Xil 42.76598,-7.27020, Montán 42.76725,-7.29948, A Furela 42.77399,-7.32633, Pintín de Arriba 42.77367,-7.33928; Calvor only has a parish relation, so it is not listed) lies within 1.8 to 3.4 km of the Samos polyline and inside the latitude range of these points, whereas Samos and Teiguín are 4.5 and 5.5 km from a San Xil polyline and Teiguín is 4.9 km south of the straight Triacastela-Sarria line. The reviewer should confirm that the generator's bbox padding or corridor covers both variants."
+}

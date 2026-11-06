@@ -1,0 +1,43 @@
+{
+  "n": 20,
+  "name": "Mansilla de las Mulas to León",
+  "from": {
+    "name": "Mansilla de las Mulas",
+    "lat": 42.4991,
+    "lng": -5.41692,
+    "source": "photon.komoot.io relation/340885 place=village (point checked with Nominatim reverse geocoding: inside the village)"
+  },
+  "to": {
+    "name": "León",
+    "lat": 42.5990,
+    "lng": -5.56824,
+    "source": "photon.komoot.io node/31432063 place=city"
+  },
+  "via": [
+    {
+      "name": "Puente Villarente",
+      "lat": 42.54445,
+      "lng": -5.45829,
+      "source": "photon.komoot.io node/275424617 place=hamlet"
+    },
+    {
+      "name": "Arcahueja",
+      "lat": 42.56607,
+      "lng": -5.49668,
+      "source": "photon.komoot.io node/275424031 place=hamlet"
+    },
+    {
+      "name": "Valdelafuente",
+      "lat": 42.56948,
+      "lng": -5.51446,
+      "source": "photon.komoot.io node/275423960 place=hamlet"
+    }
+  ],
+  "extracts": [
+    "castilla-y-leon"
+  ],
+  "coastal": false,
+  "distance_km": null,
+  "distance_source": null,
+  "notes": "Via points are three hamlet nodes on the open stretch (Puente Villarente in Villaturiel municipality, Arcahueja and Valdelafuente in Valdefresno). The last 5.5 km into León have no via. León is the place=city node in the historic centre (Photon); Nominatim returns only administrative relations for León, and the municipality centroid (42.59345,-5.56164) is 0.8 km from that node and was not used. No variant known for this stage."
+}

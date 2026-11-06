@@ -1,0 +1,49 @@
+{
+  "n": 22,
+  "name": "Villadangos del Páramo to Astorga",
+  "from": {
+    "name": "Villadangos del Páramo",
+    "lat": 42.51729,
+    "lng": -5.7668,
+    "source": "photon.komoot.io relation/345869 place=village (point checked with Nominatim reverse geocoding: inside the village)"
+  },
+  "to": {
+    "name": "Astorga",
+    "lat": 42.4554,
+    "lng": -6.05292,
+    "source": "photon.komoot.io relation/347413 place=town (point checked with Nominatim reverse geocoding: inside the town)"
+  },
+  "via": [
+    {
+      "name": "San Martín del Camino",
+      "lat": 42.49513,
+      "lng": -5.80945,
+      "source": "photon.komoot.io node/349247743 place=hamlet"
+    },
+    {
+      "name": "Hospital de Órbigo",
+      "lat": 42.46359,
+      "lng": -5.88191,
+      "source": "photon.komoot.io relation/339586 place=village (point checked with Nominatim reverse geocoding: inside the village)"
+    },
+    {
+      "name": "Santibáñez de Valdeiglesia",
+      "lat": 42.45911,
+      "lng": -5.9300,
+      "source": "photon.komoot.io node/349247809 place=hamlet (OSM name 'Santibáñez de Valdeiglesias')"
+    },
+    {
+      "name": "San Justo de la Vega",
+      "lat": 42.45447,
+      "lng": -6.01456,
+      "source": "photon.komoot.io relation/339750 place=village (point checked with Nominatim reverse geocoding: inside the village)"
+    }
+  ],
+  "extracts": [
+    "castilla-y-leon"
+  ],
+  "coastal": false,
+  "distance_km": null,
+  "distance_source": null,
+  "notes": "Hospital de Órbigo is the relation 339586 (place=village); the point is on Calle Álvarez Vega in the village, 0.4 km west of the hamlet node Puente de Órbigo (node 350484041, at the Órbigo bridge). Variant to check (general knowledge): the Camino offers two onward routes to Astorga after Hospital de Órbigo; these via points pass Santibáñez de Valdeiglesia (OSM spells it with a final s) and San Justo de la Vega, and the reviewer must confirm the corridor also covers the other route. San Justo de la Vega is the relation 339750 (place=village), point on Calle Rúa. San Martín del Camino and Santibáñez are hamlet nodes."
+}
