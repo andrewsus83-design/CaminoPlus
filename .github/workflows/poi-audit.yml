@@ -1,0 +1,69 @@
+# Place / POI audit: cross-check OSM, Overture, Wikidata and Commons along a
+# stage and produce a report + human review queue.
+#
+# - pull_request touching tools/poi-audit: run the pilot stage, attach the report.
+# - workflow_dispatch: pick a stage file; AI drafts run if ANTHROPIC_API_KEY is set.
+# - schedule (monthly): fresh run so stale / closed places surface on their own.
+# Nothing is written to Supabase from here yet.
+name: poi-audit
+
+on:
+  pull_request:
+    paths:
+      - 'tools/poi-audit/**'
+      - '.github/workflows/poi-audit.yml'
+  schedule:
+    - cron: '41 4 3 * *'
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: 'Stage file under tools/offline-maps/stages'
+        default: 'camino-frances-01.json'
+      ai:
+        description: 'Run Claude description drafts + photo checks'
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: poi-audit-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: tools/poi-audit
+    env:
+      STAGE: ${{ inputs.stage || 'camino-frances-01.json' }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -q -r requirements.txt
+      - name: Unit tests
+        run: python -m unittest discover -s tests -v
+      - name: Audit
+        run: |
+          AI=""
+          if [ -n "$ANTHROPIC_API_KEY" ] && [ "${{ inputs.ai || 'true' }}" = "true" ]; then AI="--ai --ai-limit 15"; fi
+          python audit.py --stage ../offline-maps/stages/$STAGE --out out/${STAGE%.json} $AI
+      - name: Show report
+        run: |
+          D=out/${STAGE%.json}
+          cat $D/report.md >> "$GITHUB_STEP_SUMMARY"
+          echo "=====REPORT_MD_BEGIN====="; cat $D/report.md; echo "=====REPORT_MD_END====="
+          echo "=====QUEUE_CSV_BEGIN====="; cat $D/review_queue.csv; echo "=====QUEUE_CSV_END====="
+      - uses: actions/upload-artifact@v4
+        with:
+          name: poi-audit-${{ github.run_id }}
+          path: |
+            tools/poi-audit/out/
+            tools/poi-audit/cache/
+          retention-days: 30
