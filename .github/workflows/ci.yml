@@ -57,9 +57,12 @@ jobs:
         with:
           persist-credentials: false
       - name: Install Postgres 16 with PostGIS
+        # A stalled apt mirror once held this step for 16 minutes (a normal run takes about 25 seconds):
+        # apt now gives up on a silent connection after 30 s and retries, and the step stops after 6 minutes.
+        timeout-minutes: 6
         run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq postgresql-16 postgresql-16-postgis-3
+          sudo apt-get -o Acquire::Retries=3 -o Acquire::http::Timeout=30 update -qq
+          sudo apt-get -o Acquire::Retries=3 -o Acquire::http::Timeout=30 install -y -qq postgresql-16 postgresql-16-postgis-3
       - name: Migrations, seed and smoke tests
         run: supabase/dev/validate.sh
         env:
