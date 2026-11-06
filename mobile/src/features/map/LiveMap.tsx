@@ -1,6 +1,6 @@
 // The real map: MapLibre Native. Needs a dev build (expo-dev-client), not Expo Go.
-import { memo, useMemo, useRef } from 'react';
-import { Camera, GeoJSONSource, Layer, Map } from '@maplibre/maplibre-react-native';
+import { memo, useEffect, useMemo, useRef } from 'react';
+import { Camera, GeoJSONSource, Layer, Map, type CameraRef, type MapRef } from '@maplibre/maplibre-react-native';
 import { onlineTilesUrl } from './config';
 import { pois, routeBounds, towns } from './sampleRoute';
 import { C, buildStyle } from './style';
@@ -20,6 +20,16 @@ const line = (coords: number[][]): GeoJSON.Feature => ({ type: 'Feature', proper
 
 function LiveMapImpl(p: MapViewProps) {
   const lastPoiPress = useRef(0);
+  const mapRef = useRef<MapRef>(null);
+  const camRef = useRef<CameraRef>(null);
+  const zoomN = p.zoomCmd?.n ?? 0;
+  const zoomDir = p.zoomCmd?.dir ?? 1;
+  useEffect(() => {
+    if (!zoomN) return;
+    void mapRef.current?.getZoom().then((z) => {
+      camRef.current?.zoomTo(Math.min(18, Math.max(4, z + zoomDir)), { duration: 250 });
+    }).catch(() => {});
+  }, [zoomN, zoomDir]);
 
   const mapStyle = useMemo(
     () => buildStyle({ glyphs: p.glyphs, online: p.online, sources: p.online ? [{ id: 'omt', url: onlineTilesUrl() }] : p.packSources }),
@@ -39,6 +49,7 @@ function LiveMapImpl(p: MapViewProps) {
 
   return (
     <Map
+      ref={mapRef}
       style={{ flex: 1 }}
       mapStyle={mapStyle}
       logo={false}
@@ -55,7 +66,7 @@ function LiveMapImpl(p: MapViewProps) {
         if (Date.now() - lastPoiPress.current > 400) p.onSelectPoi(undefined);
       }}
     >
-      <Camera key={`${p.layer}-${p.recenterKey}`} {...camera} minZoom={4} maxZoom={18} />
+      <Camera ref={camRef} key={`${p.layer}-${p.recenterKey}`} {...camera} minZoom={4} maxZoom={18} />
 
       {/* Route: remaining = dashed, done = gold. Under labels, above the basemap. */}
       <GeoJSONSource id="route-remaining" data={line(p.remaining)}>

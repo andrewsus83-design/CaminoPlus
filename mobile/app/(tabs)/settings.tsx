@@ -7,7 +7,6 @@ import { Card, SectionLabel } from '@/components/ui';
 import { AccountSection, LogoutButton } from '@/components/AccountSection';
 import { BusinessCard, IntroSheet } from '@/features/business/BusinessCard';
 import { useOwner } from '@/features/business/store';
-import { useAuth } from '@/lib/auth';
 import { Icon } from '@/components/Icon';
 import { PlanCarousel } from '@/components/PlanCarousel';
 import { Alert, Pressable } from 'react-native';
@@ -16,7 +15,6 @@ import { c, radius } from '@/theme';
 export default function Settings() {
   const router = useRouter();
   const owner = useOwner();
-  const { journey } = useAuth();
   const [sheet, setSheet] = useState(false);
   const openCard = () => {
     if (owner.state === 'none') setSheet(true);
@@ -41,17 +39,6 @@ export default function Settings() {
         </View>
         <Icon name="chevron" color={c.gold} size={24} />
       </Pressable>
-      <Card onPress={() => router.push('/change-camino')} style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
-        <View style={{ flex: 1, gap: 2 }}>
-          <AppText variant="label">My Camino</AppText>
-          <AppText variant="small" muted>{journey?.route?.name ?? 'Pick a Camino'} · tap to switch to another Camino</AppText>
-        </View>
-        <AppText variant="label" color={c.blue}>Change</AppText>
-      </Card>
-      <View style={{ gap: 8 }}>
-        <SectionLabel>For business</SectionLabel>
-        <BusinessCard state={owner.state} name={owner.draft.name} stepsDone={owner.stepsDone} onPress={openCard} />
-      </View>
       <View style={{ gap: 12 }}>
         <SectionLabel>Plan and storage</SectionLabel>
         <PlanCarousel onPick={(id) => Alert.alert(id === 'free' ? 'Free plan' : id === 'plus' ? 'CaminoPlus' : 'Extra storage', id === 'free' ? 'This is your current plan.' : 'Subscriptions open when the app reaches the stores.')} />
@@ -64,6 +51,10 @@ export default function Settings() {
             <View style={{ width: '2%', height: 10, borderRadius: radius.pill, backgroundColor: c.gold }} />
           </View>
         </Card>
+      </View>
+      <View style={{ gap: 8 }}>
+        <SectionLabel>For business</SectionLabel>
+        <BusinessCard state={owner.state} name={owner.draft.name} stepsDone={owner.stepsDone} onPress={openCard} />
       </View>
       <IntroSheet visible={sheet} onClose={() => setSheet(false)}
         onStart={() => { setSheet(false); router.push('/business/register'); }}

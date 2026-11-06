@@ -17,6 +17,8 @@ export type MapViewProps = {
   focus: LngLat;
   /** Bumped by "locate me" to re-centre the camera. */
   recenterKey: number;
+  /** Zoom buttons: bump n to zoom one level in (dir 1) or out (dir -1). */
+  zoomCmd?: { dir: 1 | -1; n: number };
   selectedPoiId?: string;
   onSelectPoi: (id: string | undefined) => void;
   saver: boolean;
