@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import { Alert, Platform, Pressable, View } from 'react-native';
 import { AppText } from './AppText';
 import { Icon } from './Icon';
@@ -29,6 +30,7 @@ export function LogoutButton() {
 /** Settings > Account: who is signed in and how. */
 export function AccountSection() {
   const { session, profile } = useAuth();
+  const router = useRouter();
   const user = session?.user;
   const provider = user?.app_metadata?.provider === 'google' ? 'Google' : 'Email';
   const rows: [string, string][] = [
@@ -48,6 +50,11 @@ export function AccountSection() {
           </View>
         ))}
       </Card>
+      <Pressable accessibilityRole="button" accessibilityLabel="Edit account" onPress={() => router.push('/edit-account')}
+        style={({ pressed }) => ({ height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 8, backgroundColor: c.white, borderWidth: 1.5, borderColor: c.blue, opacity: pressed ? 0.8 : 1 })}>
+        <Icon name="pen" color={c.blue} size={22} />
+        <AppText variant="label" color={c.blue}>Edit account</AppText>
+      </Pressable>
     </View>
   );
 }

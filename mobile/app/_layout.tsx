@@ -59,6 +59,7 @@ function RootStack() {
         <Stack.Screen name="change-camino" />
         <Stack.Screen name="planner" />
         <Stack.Screen name="watches" />
+        <Stack.Screen name="edit-account" />
         <Stack.Screen name="journey" />
         <Stack.Screen name="passport" />
         <Stack.Screen name="friends" />

@@ -28,6 +28,7 @@ export default function Maps() {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [gpsMode, setGpsMode] = useState<GpsMode>('saver');
   const [recenterKey, setRecenterKey] = useState(0);
+  const [zoomCmd, setZoomCmd] = useState<{ dir: 1 | -1; n: number }>({ dir: 1, n: 0 });
   const m = useMapModel({ gpsMode, visible: focused });
 
   // Automatic: once a real GPS fix is on the route, switch to the close-up once.
@@ -71,6 +72,7 @@ export default function Maps() {
           walker={m.walker}
           focus={poi?.at ?? m.walker.at}
           recenterKey={recenterKey}
+          zoomCmd={zoomCmd}
           selectedPoiId={selId}
           onSelectPoi={onSelectPoi}
           saver={gpsMode !== 'precise'}
@@ -134,6 +136,15 @@ export default function Maps() {
         >
           <MapIcon name="locate" color={c.blue} />
         </RoundButton>
+        <View style={{ borderRadius: radius.pill, backgroundColor: role.surface, ...shadowStyle('md'), overflow: 'hidden' }}>
+          <Pressable accessibilityRole="button" accessibilityLabel="Zoom in" onPress={() => setZoomCmd((z) => ({ dir: 1, n: z.n + 1 }))} style={{ width: 48, height: 52, alignItems: 'center', justifyContent: 'center' }}>
+            <MapIcon name="plus" color={c.blue} size={24} />
+          </Pressable>
+          <View style={{ height: 1, backgroundColor: c.sand300 }} />
+          <Pressable accessibilityRole="button" accessibilityLabel="Zoom out" onPress={() => setZoomCmd((z) => ({ dir: -1, n: z.n + 1 }))} style={{ width: 48, height: 52, alignItems: 'center', justifyContent: 'center' }}>
+            <MapIcon name="minus" color={c.blue} size={24} />
+          </Pressable>
+        </View>
         <RoundButton label="Route details" onPress={() => setSheetOpen(true)}>
           <Icon name="flag" color={c.blue} size={24} />
         </RoundButton>
