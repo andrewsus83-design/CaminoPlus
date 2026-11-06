@@ -1,0 +1,49 @@
+{
+  "n": 6,
+  "name": "Estella to Los Arcos",
+  "from": {
+    "name": "Estella",
+    "lat": 42.67209,
+    "lng": -2.03148,
+    "source": "nominatim node/2755582754 place=town wikidata=Q24001318"
+  },
+  "to": {
+    "name": "Los Arcos",
+    "lat": 42.56974,
+    "lng": -2.19231,
+    "source": "nominatim relation/341045 boundary=administrative linked_place=village wikidata=Q742713"
+  },
+  "via": [
+    {
+      "name": "Ayegui",
+      "lat": 42.65883,
+      "lng": -2.03699,
+      "source": "nominatim relation/347266 boundary=administrative linked_place=village wikidata=Q792921"
+    },
+    {
+      "name": "Monasterio de Irache",
+      "lat": 42.65016,
+      "lng": -2.04319,
+      "source": "nominatim relation/1334004 amenity=place_of_worship wikidata=Q1725740"
+    },
+    {
+      "name": "Azqueta",
+      "lat": 42.63540,
+      "lng": -2.08701,
+      "source": "nominatim relation/3652691 boundary=administrative linked_place=hamlet wikidata=Q794088"
+    },
+    {
+      "name": "Villamayor de Monjardín",
+      "lat": 42.62938,
+      "lng": -2.10420,
+      "source": "nominatim relation/348835 boundary=administrative linked_place=village wikidata=Q597234"
+    }
+  ],
+  "extracts": [
+    "navarra"
+  ],
+  "coastal": false,
+  "distance_km": null,
+  "distance_source": null,
+  "notes": "from is Estella (place=town node/2755582754, same point as stage 5 end). via: Ayegui (adjoins Estella), Monasterio de Irache (amenity=place_of_worship relation/1334004, OSM name 'Monasterio de Santa María la Real de Irache'), Azqueta (OSM name 'Ázqueta'), Villamayor de Monjardín. Los Arcos = linked place=village relation/341045."
+}

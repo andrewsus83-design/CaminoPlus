@@ -1,0 +1,56 @@
+{
+  "n": 10,
+  "name": "Santo Domingo de la Calzada to Belorado",
+  "from": {
+    "name": "Santo Domingo de la Calzada",
+    "lat": 42.44067,
+    "lng": -2.95364,
+    "source": "nominatim relation/345346 boundary=administrative linked_place=town wikidata=Q646564"
+  },
+  "to": {
+    "name": "Belorado",
+    "lat": 42.41970,
+    "lng": -3.19178,
+    "source": "photon node/302893358 place=village"
+  },
+  "via": [
+    {
+      "name": "Grañón",
+      "lat": 42.45017,
+      "lng": -3.02729,
+      "source": "nominatim relation/340191 boundary=administrative linked_place=village wikidata=Q177714"
+    },
+    {
+      "name": "Redecilla del Camino",
+      "lat": 42.43797,
+      "lng": -3.06516,
+      "source": "nominatim relation/346892 boundary=administrative linked_place=village wikidata=Q1012965"
+    },
+    {
+      "name": "Castildelgado",
+      "lat": 42.43726,
+      "lng": -3.08486,
+      "source": "nominatim relation/340387 boundary=administrative linked_place=village wikidata=Q946296"
+    },
+    {
+      "name": "Viloria de Rioja",
+      "lat": 42.42647,
+      "lng": -3.10040,
+      "source": "nominatim relation/347751 boundary=administrative linked_place=village wikidata=Q956438"
+    },
+    {
+      "name": "Villamayor del Río",
+      "lat": 42.42764,
+      "lng": -3.13686,
+      "source": "nominatim node/492411673 place=hamlet wikidata=Q2526069"
+    }
+  ],
+  "extracts": [
+    "la-rioja",
+    "castilla-y-leon"
+  ],
+  "coastal": false,
+  "distance_km": null,
+  "distance_source": null,
+  "notes": "from is Santo Domingo de la Calzada (relation/345346, same point as stage 9 end). La Rioja ends and Castilla y León begins between Grañón and Redecilla del Camino, hence both extracts. Belorado: used photon node/302893358 place=village because Nominatim only offers the municipality relation/339728 (no linked place node), whose centroid is 0.9 km away. Villamayor del Río is a place=hamlet node (Fresneña municipality)."
+}

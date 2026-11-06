@@ -1,0 +1,37 @@
+{
+  "n": 14,
+  "name": "Hornillos del Camino to Castrojeriz",
+  "from": {
+    "name": "Hornillos del Camino",
+    "lat": 42.33854,
+    "lng": -3.92595,
+    "source": "nominatim relation/341162 boundary=administrative linked_place=village wikidata=Q958987"
+  },
+  "to": {
+    "name": "Castrojeriz",
+    "lat": 42.28837,
+    "lng": -4.14064,
+    "source": "nominatim relation/344779 boundary=administrative linked_place=village wikidata=Q255845"
+  },
+  "via": [
+    {
+      "name": "Hontanas",
+      "lat": 42.31260,
+      "lng": -4.04448,
+      "source": "nominatim relation/346130 boundary=administrative linked_place=village wikidata=Q959026"
+    },
+    {
+      "name": "Convento de San Antón",
+      "lat": 42.29209,
+      "lng": -4.09978,
+      "source": "nominatim relation/21274735 place=isolated_dwelling wikidata=Q3320336"
+    }
+  ],
+  "extracts": [
+    "castilla-y-leon"
+  ],
+  "coastal": false,
+  "distance_km": null,
+  "distance_source": null,
+  "notes": "from is Hornillos del Camino (relation/341162, same point as stage 13 end). Only 2 via because the meseta path is nearly straight between Hornillos, Hontanas and Castrojeriz. Convento de San Antón is relation/21274735 place=isolated_dwelling (ruins); a second object, way/1552032374 tourism=attraction with the same Wikidata id, lies 0.08 km away. Arroyo San Bol (between Hornillos and Hontanas) was not looked up."
+}

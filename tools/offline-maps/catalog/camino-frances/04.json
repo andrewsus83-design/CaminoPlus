@@ -1,0 +1,61 @@
+{
+  "n": 4,
+  "name": "Pamplona to Puente la Reina",
+  "from": {
+    "name": "Pamplona",
+    "lat": 42.8169,
+    "lng": -1.6432,
+    "source": "supabase/seed.sql places; photon node/28849760 place=city is 0.16 km away"
+  },
+  "to": {
+    "name": "Puente la Reina",
+    "lat": 42.67171,
+    "lng": -1.81553,
+    "source": "nominatim node/535088574 place=town wikidata=Q24012382"
+  },
+  "via": [
+    {
+      "name": "Cizur Menor",
+      "lat": 42.78671,
+      "lng": -1.67654,
+      "source": "nominatim relation/5491200 boundary=administrative linked_place=village wikidata=Q641816"
+    },
+    {
+      "name": "Zariquiegui",
+      "lat": 42.74799,
+      "lng": -1.72319,
+      "source": "nominatim relation/6289220 boundary=administrative linked_place=hamlet wikidata=Q147965"
+    },
+    {
+      "name": "Alto del Perdón",
+      "lat": 42.73588,
+      "lng": -1.74256,
+      "source": "nominatim node/3620864444 tourism=attraction wikidata=Q107484044 (OSM name 'Monumento al Peregrino', the pilgrim monument on the pass)"
+    },
+    {
+      "name": "Uterga",
+      "lat": 42.71021,
+      "lng": -1.75968,
+      "source": "nominatim relation/343740 boundary=administrative linked_place=village wikidata=Q984879"
+    },
+    {
+      "name": "Muruzábal",
+      "lat": 42.68876,
+      "lng": -1.77055,
+      "source": "nominatim relation/340956 boundary=administrative linked_place=village wikidata=Q120453"
+    },
+    {
+      "name": "Obanos",
+      "lat": 42.68082,
+      "lng": -1.78510,
+      "source": "nominatim relation/340960 boundary=administrative linked_place=village wikidata=Q984867"
+    }
+  ],
+  "extracts": [
+    "navarra"
+  ],
+  "coastal": false,
+  "distance_km": null,
+  "distance_source": null,
+  "notes": "from is Pamplona (seed.sql coordinates, same point as stage 3 end). Puente la Reina: used place=town node/535088574; the municipality relation/344396 has its centroid 2.2 km away and was not used. Alto del Perdón is represented by node/3620864444 (OSM name 'Monumento al Peregrino', tourism=attraction, Cizur municipality): it lies between Zariquiegui (2.1 km) and Uterga (3.2 km) and 0.5 km from their straight line. The OSM natural=peak node/3214318858 literally named 'Alto del Perdón' (42.73338,-1.70186) is 2.4 km off that line and was not used. Reviewer: confirm that the monument node is the pilgrim monument on the pass; its Wikidata id Q107484044 could not be checked because the Wikidata API rate-limited this session. Variant (from memory, not verified here): detour to Santa María de Eunate between Muruzábal and Obanos (not in via)."
+}

@@ -1,0 +1,43 @@
+{
+  "n": 15,
+  "name": "Castrojeriz to Frómista",
+  "from": {
+    "name": "Castrojeriz",
+    "lat": 42.28837,
+    "lng": -4.14064,
+    "source": "nominatim relation/344779 boundary=administrative linked_place=village wikidata=Q255845"
+  },
+  "to": {
+    "name": "Frómista",
+    "lat": 42.26769,
+    "lng": -4.40550,
+    "source": "nominatim relation/344989 boundary=administrative linked_place=village wikidata=Q988834"
+  },
+  "via": [
+    {
+      "name": "Puente Fitero",
+      "lat": 42.27803,
+      "lng": -4.24622,
+      "source": "nominatim way/95552938 highway=tertiary wikidata=Q2117352"
+    },
+    {
+      "name": "Itero de la Vega",
+      "lat": 42.28798,
+      "lng": -4.25797,
+      "source": "nominatim relation/342267 boundary=administrative linked_place=village wikidata=Q988840"
+    },
+    {
+      "name": "Boadilla del Camino",
+      "lat": 42.25778,
+      "lng": -4.34729,
+      "source": "nominatim relation/345619 boundary=administrative linked_place=village wikidata=Q592699"
+    }
+  ],
+  "extracts": [
+    "castilla-y-leon"
+  ],
+  "coastal": false,
+  "distance_km": null,
+  "distance_source": null,
+  "notes": "from is Castrojeriz (relation/344779, same point as stage 14 end). Puente Fitero is way/95552938 (highway=tertiary, the bridge over the Pisuerga; Burgos/Palencia provincial line, from memory); both provinces are in Castilla y León, so one extract. Alto de Mostelares (the climb just after Castrojeriz, from memory) had no OSM match in a bounded Nominatim search and is not in via."
+}

@@ -1,0 +1,49 @@
+{
+  "n": 16,
+  "name": "Frómista to Carrión de los Condes",
+  "from": {
+    "name": "Frómista",
+    "lat": 42.26769,
+    "lng": -4.40550,
+    "source": "nominatim relation/344989 boundary=administrative linked_place=village wikidata=Q988834"
+  },
+  "to": {
+    "name": "Carrión de los Condes",
+    "lat": 42.33854,
+    "lng": -4.60171,
+    "source": "nominatim relation/340273 boundary=administrative linked_place=town wikidata=Q986557"
+  },
+  "via": [
+    {
+      "name": "Población de Campos",
+      "lat": 42.26975,
+      "lng": -4.44713,
+      "source": "nominatim relation/343272 boundary=administrative linked_place=village wikidata=Q986562"
+    },
+    {
+      "name": "Revenga de Campos",
+      "lat": 42.28418,
+      "lng": -4.48204,
+      "source": "nominatim relation/344236 boundary=administrative linked_place=village wikidata=Q1908322"
+    },
+    {
+      "name": "Villarmentero de Campos",
+      "lat": 42.29716,
+      "lng": -4.49923,
+      "source": "nominatim relation/345885 boundary=administrative linked_place=village wikidata=Q1014717"
+    },
+    {
+      "name": "Villalcázar de Sirga",
+      "lat": 42.31671,
+      "lng": -4.54180,
+      "source": "nominatim relation/346167 boundary=administrative linked_place=village wikidata=Q1010261"
+    }
+  ],
+  "extracts": [
+    "castilla-y-leon"
+  ],
+  "coastal": false,
+  "distance_km": null,
+  "distance_source": null,
+  "notes": "from is Frómista (relation/344989, same point as stage 15 end). via in walking order: Población de Campos, Revenga de Campos, Villarmentero de Campos, Villalcázar de Sirga (all linked place=village relations). Variant (from memory, not verified here, not in via): a river-side alternative along the Río Ucieza via Villovieco is commonly described for this stage."
+}

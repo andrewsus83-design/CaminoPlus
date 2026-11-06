@@ -1,0 +1,49 @@
+{
+  "n": 5,
+  "name": "Puente la Reina to Estella",
+  "from": {
+    "name": "Puente la Reina",
+    "lat": 42.67171,
+    "lng": -1.81553,
+    "source": "nominatim node/535088574 place=town wikidata=Q24012382"
+  },
+  "to": {
+    "name": "Estella",
+    "lat": 42.67209,
+    "lng": -2.03148,
+    "source": "nominatim node/2755582754 place=town wikidata=Q24001318"
+  },
+  "via": [
+    {
+      "name": "Mañeru",
+      "lat": 42.66954,
+      "lng": -1.86207,
+      "source": "nominatim relation/342641 boundary=administrative linked_place=village wikidata=Q964849"
+    },
+    {
+      "name": "Cirauqui",
+      "lat": 42.67568,
+      "lng": -1.89097,
+      "source": "nominatim relation/341013 boundary=administrative linked_place=village wikidata=Q206308"
+    },
+    {
+      "name": "Lorca",
+      "lat": 42.67310,
+      "lng": -1.94488,
+      "source": "nominatim node/252418616 place=hamlet wikidata=Q535136"
+    },
+    {
+      "name": "Villatuerta",
+      "lat": 42.65952,
+      "lng": -1.99340,
+      "source": "nominatim relation/348837 boundary=administrative linked_place=village wikidata=Q984886"
+    }
+  ],
+  "extracts": [
+    "navarra"
+  ],
+  "coastal": false,
+  "distance_km": null,
+  "distance_source": null,
+  "notes": "from is Puente la Reina (place=town node/535088574, same point as stage 4 end). Estella: used place=town node/2755582754; the municipality relation/343593 has its centroid 1.3 km away and was not used. Lorca: used place=hamlet node/252418616 (the admin boundary relation/17730223 is 0.6 km away). via in walking order: Mañeru, Cirauqui, Lorca, Villatuerta."
+}

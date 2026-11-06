@@ -1,0 +1,44 @@
+{
+  "n": 7,
+  "name": "Los Arcos to Logroño",
+  "from": {
+    "name": "Los Arcos",
+    "lat": 42.56974,
+    "lng": -2.19231,
+    "source": "nominatim relation/341045 boundary=administrative linked_place=village wikidata=Q742713"
+  },
+  "to": {
+    "name": "Logroño",
+    "lat": 42.46612,
+    "lng": -2.43967,
+    "source": "nominatim relation/340516 boundary=administrative linked_place=city wikidata=Q14325"
+  },
+  "via": [
+    {
+      "name": "Sansol",
+      "lat": 42.55442,
+      "lng": -2.26643,
+      "source": "nominatim relation/339985 boundary=administrative linked_place=village wikidata=Q984870"
+    },
+    {
+      "name": "Torres del Río",
+      "lat": 42.55132,
+      "lng": -2.27201,
+      "source": "nominatim relation/339640 boundary=administrative linked_place=village wikidata=Q782995"
+    },
+    {
+      "name": "Viana",
+      "lat": 42.51547,
+      "lng": -2.37134,
+      "source": "nominatim relation/348839 boundary=administrative linked_place=village wikidata=Q907241"
+    }
+  ],
+  "extracts": [
+    "navarra",
+    "la-rioja"
+  ],
+  "coastal": false,
+  "distance_km": null,
+  "distance_source": null,
+  "notes": "from is Los Arcos (relation/341045, same point as stage 6 end). Sansol and Torres del Río are only 0.6 km apart; both are listed to keep the walking order. The Navarra to La Rioja border lies between Viana and Logroño, so both extracts are listed. pais-vasco is not listed: a Nominatim reverse lookup 3 km north of Viana (42.5425,-2.3713) is still Navarra. Logroño: used relation/340516 (linked place=city); a second place=city relation/18754428 without a name link lies 1.2 km away and was not used. Few villages between Viana and Logroño (from memory): reviewer should check that the corridor holds the OSM Camino across the Navarra/La Rioja border."
+}

@@ -1,0 +1,43 @@
+{
+  "n": 9,
+  "name": "Nájera to Santo Domingo de la Calzada",
+  "from": {
+    "name": "Nájera",
+    "lat": 42.41674,
+    "lng": -2.73369,
+    "source": "nominatim relation/341364 boundary=administrative linked_place=town wikidata=Q776113"
+  },
+  "to": {
+    "name": "Santo Domingo de la Calzada",
+    "lat": 42.44067,
+    "lng": -2.95364,
+    "source": "nominatim relation/345346 boundary=administrative linked_place=town wikidata=Q646564"
+  },
+  "via": [
+    {
+      "name": "Azofra",
+      "lat": 42.42346,
+      "lng": -2.80141,
+      "source": "nominatim relation/339909 boundary=administrative linked_place=village wikidata=Q661720"
+    },
+    {
+      "name": "Ciriñuela",
+      "lat": 42.42179,
+      "lng": -2.89271,
+      "source": "nominatim node/582970696 place=hamlet wikidata=Q5770224"
+    },
+    {
+      "name": "Cirueña",
+      "lat": 42.41175,
+      "lng": -2.89553,
+      "source": "nominatim relation/344620 boundary=administrative linked_place=village wikidata=Q986104"
+    }
+  ],
+  "extracts": [
+    "la-rioja"
+  ],
+  "coastal": false,
+  "distance_km": null,
+  "distance_source": null,
+  "notes": "from is Nájera (relation/341364, same point as stage 8 end). via in walking order: Azofra, Ciriñuela (node/582970696 place=hamlet), Cirueña. Ciriñuela and Cirueña are only 1.1 km apart; reviewer should confirm the OSM Camino passes both. Santo Domingo de la Calzada = relation/345346 (linked place=town)."
+}

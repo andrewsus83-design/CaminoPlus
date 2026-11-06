@@ -1,0 +1,43 @@
+{
+  "n": 17,
+  "name": "Carrión de los Condes to Terradillos de los Templarios",
+  "from": {
+    "name": "Carrión de los Condes",
+    "lat": 42.33854,
+    "lng": -4.60171,
+    "source": "nominatim relation/340273 boundary=administrative linked_place=town wikidata=Q986557"
+  },
+  "to": {
+    "name": "Terradillos de los Templarios",
+    "lat": 42.36299,
+    "lng": -4.89062,
+    "source": "nominatim node/268521664 place=hamlet wikidata=Q612880"
+  },
+  "via": [
+    {
+      "name": "Monasterio de San Zoilo",
+      "lat": 42.34027,
+      "lng": -4.61106,
+      "source": "nominatim relation/2953473 amenity=place_of_worship wikidata=Q6021380"
+    },
+    {
+      "name": "Calzadilla de la Cueza",
+      "lat": 42.32889,
+      "lng": -4.80395,
+      "source": "nominatim node/273221786 place=hamlet wikidata=Q2665269"
+    },
+    {
+      "name": "Ledigos",
+      "lat": 42.35463,
+      "lng": -4.86461,
+      "source": "nominatim relation/346492 boundary=administrative linked_place=village wikidata=Q956367"
+    }
+  ],
+  "extracts": [
+    "castilla-y-leon"
+  ],
+  "coastal": false,
+  "distance_km": null,
+  "distance_source": null,
+  "notes": "from is Carrión de los Condes (relation/340273, same point as stage 16 end). via: Monasterio de San Zoilo (amenity=place_of_worship relation/2953473; the Camino leaves Carrión past it, from memory), Calzadilla de la Cueza (node/273221786 place=hamlet; 16 km straight line from San Zoilo, with no village on the Camino in between, from memory), Ledigos. Terradillos de los Templarios = node/268521664 place=hamlet (Lagartos municipality); stage 18 must start at the same point. This is a long stage; common practice also stops at Calzadilla de la Cueza or Ledigos, but the app list ends at Terradillos."
+}
