@@ -175,14 +175,14 @@ export default function Me() {
     <View style={{ flex: 1 }}>
       <Screen>
         {/* Header follows the design system: handle pill + bell, avatar with stats, name and bio. */}
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 52 }}>
           <AppText variant="h4" numberOfLines={1} style={{ flexShrink: 1 }}>{profile?.username ?? name}</AppText>
           {!!profile?.username && (
             <Pressable accessibilityRole="button" accessibilityLabel={copied ? 'Username copied' : 'Copy username'} hitSlop={10} onPress={copyUsername} style={{ width: 26, height: 26, alignItems: 'center', justifyContent: 'center' }}>
               <Icon name={copied ? 'check' : 'copy'} color={copied ? c.success : role.muted} size={16} />
             </Pressable>
           )}
-          <View style={{ marginLeft: 'auto' }}><IconButton name="bell" label={unread.total ? `Inbox, ${unread.total} unread` : 'Inbox'} badge={Math.min(unread.total, 99)} onPress={() => router.push('/inbox')} flat /></View>
+          <View style={{ marginLeft: 'auto' }}><IconButton name="bell" label={unread.total ? `Inbox, ${unread.total} unread` : 'Inbox'} badge={Math.min(unread.total, 99)} onPress={() => router.push('/inbox')} size={52} flat /></View>
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 20 }}>
           <Pressable accessibilityRole="button" accessibilityLabel="Change profile picture" onPress={changePhoto} disabled={uploading}>
