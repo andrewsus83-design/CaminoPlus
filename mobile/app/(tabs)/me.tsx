@@ -13,6 +13,7 @@ import { useAuth } from '@/lib/auth';
 import { useMeData } from '@/lib/useMeData';
 import { Empty, ProgressBar, shortDate } from '@/features/me/shared';
 import { Health } from '@/features/me/Health';
+import { JourneyGrid } from '@/features/me/JourneyGrid';
 import { updateProfile } from '@/lib/api';
 import { PickerUnavailable, pickAndUploadAvatar } from '@/lib/avatar';
 import { c, fonts, layout, radius, role, shadowStyle } from '@/theme';
@@ -201,13 +202,13 @@ export default function Me() {
               <Icon name="pen" color={c.blue} size={18} />
             </Pressable>
           </View>
-          <AppText variant="accent" color={role.accentText}>Buen Camino!</AppText>
-          {journey?.route && (
+          {journey?.route ? (
             <Pressable accessibilityRole="button" accessibilityLabel="Change Camino" onPress={() => router.push('/change-camino')} style={{ marginTop: 8, flexDirection: 'row', alignItems: 'center', gap: 14, padding: 14, borderRadius: radius.lg, backgroundColor: c.blue, ...shadowStyle('md') }}>
               <View style={{ width: 52, height: 52, borderRadius: radius.pill, backgroundColor: 'rgba(246,239,226,0.14)', alignItems: 'center', justifyContent: 'center' }}>
                 <Icon name="shell" color={c.gold} size={28} />
               </View>
               <View style={{ flex: 1, gap: 2 }}>
+                <AppText variant="accent" color={c.gold} style={{ fontSize: 24, lineHeight: 28 }}>Buen Camino!</AppText>
                 <AppText variant="caption" color={c.goldSoft} style={{ textTransform: 'uppercase', letterSpacing: 1.2 }}>My Camino</AppText>
                 <AppText variant="label" color={c.parchment} numberOfLines={1}>{journey.route.name}</AppText>
                 <AppText variant="caption" color={c.parchment} style={{ opacity: 0.85 }} numberOfLines={1}>{journey.start_stage ? `From stage ${journey.start_stage.stage_number} · ` : ''}{stagesDone} stages done</AppText>
@@ -216,27 +217,14 @@ export default function Me() {
                 <AppText variant="label" color={c.blue}>Change</AppText>
               </View>
             </Pressable>
-          )}
+          ) : <AppText variant="accent" color={role.accentText}>Buen Camino!</AppText>}
         </View>
         <SubTabs tabs={TABS} value={tab} onChange={setTab} />
         {!!error && <FormMessage>{`Could not load your data. ${error}`}</FormMessage>}
 
         {tab === 'Journey' && (!posts ? loading : posts.length === 0
           ? <Empty text="No journey posts yet. Tap the pen to write about today's stage." />
-          : posts.map((p, i) => (
-            <Card key={p.id} style={{ gap: 12 }}>
-              {p.media_count > 0 && <Photo tint={tints[i % tints.length]} height={180} />}
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 12 }}>
-                <AppText variant="label" style={{ flex: 1 }} numberOfLines={1}>{[p.place_name, p.health_summary?.km ? `${p.health_summary.km} km` : null].filter(Boolean).join(' · ') || 'On the Camino'}</AppText>
-                <AppText variant="mono" muted style={{ fontSize: 12 }}>{ago(p.published_at)}</AppText>
-              </View>
-              {!!p.body && <AppText variant="small">{p.body}</AppText>}
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                <Icon name="heart" color={c.red} size={18} filled />
-                <AppText variant="caption" muted>{p.like_count}</AppText>
-              </View>
-            </Card>
-          )))}
+          : <JourneyGrid posts={posts} />)}
 
         {tab === 'Plan' && (!days ? loading : <PlanTracker days={days} />)}
 
