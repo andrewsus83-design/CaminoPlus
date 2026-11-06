@@ -139,7 +139,7 @@ export default function Maps() {
         </RoundButton>
       </View>}
 
-      {sheetShown && <ModalSheet height={SHEET_FULL} bottom={insets.bottom + 12} onClose={() => setSheetOpen(false)}>
+      {sheetShown && <ModalSheet half={SHEET_FULL} max={screenH - insets.top - 8} bottomInset={insets.bottom} onClose={() => setSheetOpen(false)}>
         {(
           <View style={{ gap: 6 }}>
             <AppText variant="h4">{ROUTE_NAME} · St-Jean → Santiago</AppText>

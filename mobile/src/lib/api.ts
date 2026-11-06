@@ -187,3 +187,21 @@ export async function uploadPostMedia(userId: string, postId: string, items: Pic
   }
   return failed;
 }
+
+export type PostMediaUrl = { type: 'image' | 'video'; url: string };
+/** Signed URLs (1 h) for the photos and videos of your posts, grouped by post id and in slide order. */
+export async function listPostMediaUrls(postIds: string[]) {
+  const out: Record<string, PostMediaUrl[]> = {};
+  if (postIds.length === 0) return out;
+  const rows = must(
+    await supabase.from('post_media').select('post_id, media_type, storage_path, sort_order').in('post_id', postIds).is('deleted_at', null).order('sort_order'),
+  ) as { post_id: string; media_type: 'image' | 'video'; storage_path: string }[];
+  if (rows.length === 0) return out;
+  const signed = await supabase.storage.from('user-media').createSignedUrls(rows.map((r) => r.storage_path), 3600);
+  if (signed.error || !signed.data) return out;
+  rows.forEach((r, i) => {
+    const url = signed.data[i]?.signedUrl;
+    if (url) (out[r.post_id] ??= []).push({ type: r.media_type, url });
+  });
+  return out;
+}
