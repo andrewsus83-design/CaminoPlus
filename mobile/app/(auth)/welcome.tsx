@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Image, View } from 'react-native';
+import { Image, Pressable, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '@/components/AppText';
@@ -27,9 +27,11 @@ export default function Welcome() {
       </View>
       <View style={{ gap: 12 }}>
         {!!error && <FormMessage>{error}</FormMessage>}
-        <Pill label="Create account" onPress={() => router.push('/sign-up')} />
-        <GoogleButton onError={setError} />
-        <Pill variant="ghost" label="I already have an account" onPress={() => router.push('/sign-in')} />
+        <Pill large label="Create account" onPress={() => router.push('/sign-up')} />
+        <GoogleButton large onError={setError} />
+        <Pressable accessibilityRole="link" onPress={() => router.push('/sign-in')} style={{ minHeight: 56, alignItems: 'center', justifyContent: 'center' }}>
+          <AppText variant="lead" color={c.blue} style={{ fontWeight: '600' }}>I already have an account</AppText>
+        </Pressable>
         <AppText variant="caption" muted style={{ textAlign: 'center', marginTop: 4 }}>By continuing you agree to the Terms and Privacy Policy at camino.plus.</AppText>
       </View>
       </View>
