@@ -11,7 +11,7 @@ export function Card({ children, style, onPress }: { children: ReactNode; style?
 
 export function Chip({ label, selected, onPress }: { label: string; selected?: boolean; onPress?: () => void }) {
   return (
-    <Pressable onPress={onPress} style={{ height: 40, paddingHorizontal: 16, borderRadius: radius.pill, justifyContent: 'center', backgroundColor: selected ? role.action : role.surface, borderWidth: 1, borderColor: selected ? role.action : role.border }}>
+    <Pressable onPress={onPress} style={{ height: 48, paddingHorizontal: 20, borderRadius: radius.pill, justifyContent: 'center', backgroundColor: selected ? role.action : role.surface, borderWidth: 1, borderColor: selected ? role.action : role.border }}>
       <AppText variant="label" color={selected ? role.onAction : role.text}>{label}</AppText>
     </Pressable>
   );

@@ -66,6 +66,13 @@ export default function Maps() {
         </View>
       )}
 
+      {m.glyphs && !m.useOnlineTiles && m.packSources.length === 0 && (
+        <View pointerEvents="none" style={{ position: 'absolute', left: 24, right: 24, top: '36%', backgroundColor: role.surface, borderRadius: radius.lg, padding: 24, gap: 8 }}>
+          <AppText variant="h4">No map tiles yet</AppText>
+          <AppText variant="body" muted>{m.online === false ? 'You are offline and this stage has no offline pack. Download it in Offline maps.' : 'The online base map needs a MapTiler key (EXPO_PUBLIC_MAPTILER_KEY), or download this stage in Offline maps.'}</AppText>
+        </View>
+      )}
+
       {/* Top: layer switch + pack status */}
       <View pointerEvents="box-none" style={{ position: 'absolute', top: insets.top + 8, left: 16, right: 16, gap: 10 }}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
