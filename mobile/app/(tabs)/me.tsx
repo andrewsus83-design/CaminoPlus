@@ -182,7 +182,7 @@ export default function Me() {
               <Icon name={copied ? 'check' : 'copy'} color={copied ? c.success : role.muted} size={16} />
             </Pressable>
           )}
-          <View style={{ marginLeft: 'auto' }}><IconButton name="bell" label={unread.total ? `Inbox, ${unread.total} unread` : 'Inbox'} badge={Math.min(unread.total, 99)} onPress={() => router.push('/inbox')} size={52} flat /></View>
+          <View style={{ marginLeft: 'auto' }}><IconButton name="bell" label={unread.total ? `Inbox, ${unread.total} unread` : 'Inbox'} badge={Math.min(unread.total, 99)} onPress={() => router.push('/inbox')} size={52} /></View>
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 20 }}>
           <Pressable accessibilityRole="button" accessibilityLabel="Change profile picture" onPress={changePhoto} disabled={uploading}>
