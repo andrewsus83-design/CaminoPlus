@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Privacy Policy · CaminoPlus</title>
-<meta name="description" content="How CaminoPlus collects, uses and protects your personal data, and your rights under the GDPR.">
+<meta name="description" content="How CaminoPlus collects, uses and protects your personal data, including messages and friends, and your rights under the GDPR.">
 <link rel="canonical" href="https://camino.plus/privacy">
 <meta name="theme-color" content="#F6EFE2">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -12,7 +12,7 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="CaminoPlus">
 <meta property="og:title" content="Privacy Policy · CaminoPlus">
-<meta property="og:description" content="How CaminoPlus collects, uses and protects your personal data, and your rights under the GDPR.">
+<meta property="og:description" content="How CaminoPlus collects, uses and protects your personal data, including messages and friends, and your rights under the GDPR.">
 <meta property="og:url" content="https://camino.plus/privacy">
 <meta property="og:image" content="https://camino.plus/assets/og.png">
 <meta property="og:image:width" content="1200">
@@ -21,12 +21,12 @@
 <meta property="og:locale" content="en_US">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Privacy Policy · CaminoPlus">
-<meta name="twitter:description" content="How CaminoPlus collects, uses and protects your personal data, and your rights under the GDPR.">
+<meta name="twitter:description" content="How CaminoPlus collects, uses and protects your personal data, including messages and friends, and your rights under the GDPR.">
 <meta name="twitter:image" content="https://camino.plus/assets/og.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="/assets/tokens.css">
-<link rel="stylesheet" href="/assets/site.css?v=20261105">
+<link rel="preload" href="/assets/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/fraunces-latin-opsz-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/tokens.css?v=0649273402">
+<link rel="stylesheet" href="/assets/site.css?v=b29a5bc51d">
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -48,7 +48,7 @@
 <section class="page-head"><div class="wrap">
   <p class="eyebrow">Privacy</p>
   <h1>Privacy Policy</h1>
-  <p class="lead">Last updated 4 November 2026.</p><div style="max-width:760px"><p class="notice">Draft for launch. This text is a plain-language summary of how we intend to operate and will be reviewed by legal counsel before the app is released.</p></div>
+  <p class="lead">Last updated 7 November 2026.</p><div style="max-width:760px"><p class="notice">Draft for launch. This text is a plain-language summary of how we intend to operate and will be reviewed by legal counsel before the app is released.</p></div>
 </div></section><section class="section" style="padding-top:8px"><div class="wrap"><div class="prose">
 <h2>Who we are</h2>
 <p>CaminoPlus (“we”, “us”) makes the CaminoPlus app and this website. We are the controller of the personal data described here. Contact us at <a href="mailto:privacy@camino.plus">privacy@camino.plus</a>.</p>
@@ -56,40 +56,58 @@
 <ul>
 <li><b>Account data:</b> your email address, name and profile photo, or the basic profile Google shares if you sign in with Google.</li>
 <li><b>Content you create:</b> journal posts, photos, captions, comments, passport stamps and your stage plan.</li>
+<li><b>Friends and messages:</b> your friend list and friend requests (who asked whom, and when), the people you block, the messages you send in direct chats and group chats (including photos you attach), and the names and members of your groups.</li>
 <li><b>Location:</b> your device location while you use the map, to show where you are and to record your route. You can turn location off at any time in your phone settings.</li>
 <li><b>Health and fitness data:</b> only if you connect Apple Watch or Garmin, and only the data you allow, such as steps, distance and heart rate.</li>
 <li><b>Purchase data:</b> your subscription status from the App Store or Google Play. We never see your card details.</li>
-<li><b>Technical data:</b> device type, app version and crash reports, so we can fix problems.</li>
+<li><b>Technical data:</b> device type and app version, and crash reports once crash reporting is switched on, so we can fix problems.</li>
 </ul>
 <h2>How we use it</h2>
 <ul>
 <li>To run the app: your account, your journey, offline downloads and sync (contract).</li>
 <li>To show your posts to the people you choose (contract, and your choices).</li>
+<li>To deliver your messages and friend requests to the people you send them to (contract).</li>
 <li>To process health data you connect (your explicit consent, which you can withdraw).</li>
 <li>To keep the service secure, prevent abuse and fix bugs (legitimate interests).</li>
 <li>To send service emails such as sign-in links and receipts, and launch news if you ask for it (contract or consent).</li>
 </ul>
 <p>We do not sell personal data and we do not use third-party advertising trackers in the app.</p>
-<h2>Who processes data for us</h2>
-<p>We use trusted service providers that act on our instructions under data processing agreements:</p>
+<h2>Friends</h2>
+<p>Friends are mutual: you become friends when you send a request and the other person accepts. We store the request, who sent it and when. Declining or cancelling a request deletes it, and so does removing a friend. People you block cannot send you friend requests or messages, and you do not appear in their search. A post you share with “Friends” is shown to your accepted friends and to anyone you have approved as a follower.</p>
+<h2>Chat messages and groups</h2>
 <ul>
-<li>Supabase: accounts, database and authentication</li>
-<li>Cloudflare: file storage, map downloads and content delivery</li>
+<li>Messages you send in direct chats and group chats are stored on our servers so they can reach the other people in the chat and appear on your other devices.</li>
+<li>Only the people in a chat can read its messages in the app. Group members can also see each other's names and photos, and whether a message has been read.</li>
+<li>Messages are protected in transit and at rest by our hosting provider, but they are <b>not end-to-end encrypted</b>. That means our team and our provider are technically able to read them. We only look at messages to investigate a report, to keep the service secure, or when the law requires it. If someone reports a message, our team can read that message.</li>
+<li>Please do not send passwords, card numbers or other secrets in chat.</li>
+<li>You can unsend your own messages; they disappear for everyone in the chat. When you delete your account your messages are deleted too.</li>
+<li>If you use the help bell, your position is sent only to the friends and groups you choose, as a chat message stored like any other message.</li>
+</ul>
+<h2>Who processes data for us</h2>
+<p>We use trusted service providers that act on our instructions under data processing agreements. In use today:</p>
+<ul>
+<li>Supabase: accounts and sign-in, the database, and file storage (photos, chat images and the offline map downloads)</li>
 <li>Vercel: hosting of this website</li>
-<li>RevenueCat: subscription status</li>
-<li>Sentry: crash and error reports</li>
-<li>Resend: transactional email</li>
-<li>Apple and Google: app distribution, payments and sign-in</li>
+<li>MapTiler and OpenFreeMap: the map tiles your phone loads while it is online. They receive your IP address and the area you are looking at. Offline maps come from our own storage, not from them.</li>
+<li>Apple and Google: app distribution and payments, and Google sign-in if you choose it</li>
+</ul>
+<p>Planned, and only used once switched on (we will update this page and its date first):</p>
+<ul>
+<li>RevenueCat: subscription status, when enabled</li>
+<li>Sentry: crash and error reports, when enabled</li>
+<li>Resend: sign-in and service emails from our own domain, when enabled</li>
 </ul>
 <p>Some of these providers may process data outside the European Economic Area. Where they do, we rely on safeguards such as the EU Standard Contractual Clauses.</p>
 <h2>How long we keep it</h2>
-<p>We keep your data while your account is active. When you delete your account we delete your data within 30 days, except records we must keep by law, such as billing records.</p>
+<p>We keep your data while your account is active. When you delete your account we delete your data, including your messages, within 30 days, except records we must keep by law, such as billing records.</p>
+<h2>Deleting your account</h2>
+<p>In the app, open Settings, then Account, then Delete account. That button is being finished and will be in the first release. Until it is in your version, email <a href="mailto:privacy@camino.plus">privacy@camino.plus</a> from the address you signed up with and we will delete your account for you within 30 days.</p>
 <h2>Your rights</h2>
 <p>Under the GDPR and similar laws you can access, correct, export or delete your data, object to or restrict some processing, and withdraw consent at any time. Most of this you can do in the app. For anything else, write to <a href="mailto:privacy@camino.plus">privacy@camino.plus</a>. You can also complain to your local data protection authority, in Spain the Agencia Española de Protección de Datos (AEPD).</p>
 <h2>Children</h2>
 <p>CaminoPlus is not intended for children under 16 without a parent or guardian's consent.</p>
 <h2>This website</h2>
-<p>This website does not use advertising cookies. If we add privacy-friendly analytics, we will list them here.</p>
+<p>This website does not use cookies, advertising trackers or analytics. Its fonts are served from our own server, not from Google Fonts. Our host, Vercel, processes technical request data such as your IP address to deliver the pages. The contact form only opens your email app with the message ready; nothing is sent until you send it from there. If we add privacy-friendly analytics, we will list them here.</p>
 <h2>Changes</h2>
 <p>If we make important changes, we will tell you in the app or by email before they take effect.</p>
 </div></div></section>
@@ -100,7 +118,7 @@
       <div class="stack">
         <a class="brand" href="/"><svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="20" fill="#14365D"/><g transform="translate(0 -2.12)"><path d="M20 28.5L5.84 22.20A2.84 2.84 0 0 1 8.64 17.96A2.84 2.84 0 0 1 12.66 14.85A2.84 2.84 0 0 1 17.46 13.21A2.84 2.84 0 0 1 22.54 13.21A2.84 2.84 0 0 1 27.34 14.85A2.84 2.84 0 0 1 31.36 17.96A2.84 2.84 0 0 1 34.16 22.20z" fill="#D9A21B"/><path d="M20 29.0Q14.09 22.35 8.49 17.82M20 29.0Q16.22 20.86 12.56 14.67M20 29.0Q18.70 20.07 17.43 13.01M20 29.0Q21.30 20.07 22.57 13.01M20 29.0Q23.78 20.86 27.44 14.67M20 29.0Q25.91 22.35 31.51 17.82" stroke="#14365D" stroke-width="1.15" stroke-linecap="round" fill="none"/><path d="M15.2 31.4Q18 30.6 18.4 28.3H21.6Q22 30.6 24.8 31.4Q24.6 32.6 20 32.6Q15.4 32.6 15.2 31.4z" fill="#D9A21B"/></g></svg><span>Camino<span class="plus">+</span></span></a>
         <p>The offline-first companion for every Camino de Santiago route. Maps, stays, stamps and stories, in one app.</p>
-        <div class="on-dark"><div class="stores"><span class="store" role="img" aria-label="Download on the App Store, coming soon"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.4 12.6c0-2.6 2.1-3.8 2.2-3.9-1.2-1.8-3.1-2-3.7-2-1.6-.2-3.1.9-3.9.9-.8 0-2-.9-3.4-.9-1.7 0-3.3 1-4.2 2.6-1.8 3.1-.5 7.7 1.3 10.2.9 1.2 1.9 2.6 3.2 2.6 1.3-.1 1.8-.8 3.3-.8s2 .8 3.4.8c1.4 0 2.3-1.3 3.1-2.5 1-1.4 1.4-2.8 1.4-2.9 0 0-2.7-1-2.7-4.1zM13.9 4.9c.7-.9 1.2-2 1-3.2-1 0-2.3.7-3 1.6-.7.8-1.2 2-1.1 3.1 1.2.1 2.3-.6 3.1-1.5z"/></svg><span><small>Download on the</small><b>App Store</b></span><span class="soon">Soon</span></span><span class="store" role="img" aria-label="Get it on Google Play, coming soon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 2.8v18.4c0 .5.5.8.9.6L15 12 4.9 2.2c-.4-.2-.9.1-.9.6z" fill="#E8B53A"/><path d="m15 12 3.3-3.3 2.9 1.7c1 .6 1 2.6 0 3.2l-2.9 1.7z" fill="#F6EFE2"/><path d="M4.9 2.2 15 12l3.3-3.3L6.2 1.9c-.5-.3-1-.1-1.3.3z" fill="#A63D2F" opacity=".9"/><path d="M4.9 21.8 15 12l3.3 3.3-12.1 6.8c-.5.3-1 .1-1.3-.3z" fill="#DCE5EF"/></svg><span><small>Get it on</small><b>Google Play</b></span><span class="soon">Soon</span></span></div></div>
+        <div class="on-dark"><div class="stores"><span class="store" aria-disabled="true">iOS: coming soon</span><span class="store" aria-disabled="true">Android: coming soon</span></div></div>
       </div>
       <div><h4>Product</h4><ul>
         <li><a href="/features">Features</a></li><li><a href="/routes">Routes</a></li>
@@ -110,14 +128,15 @@
         <li><a href="mailto:hello@camino.plus">hello@camino.plus</a></li></ul></div>
       <div><h4>Company</h4><ul>
         <li><a href="/about">About</a></li><li><a href="/privacy">Privacy</a></li>
-        <li><a href="/terms">Terms</a></li></ul></div>
+        <li><a href="/terms">Terms</a></li><li><a href="/licences">Licences</a></li></ul></div>
     </div>
+    <p class="foot-credit">Photos and backgrounds on this site are AI-generated illustrations, not photographs. Landmarks may differ from the real thing.</p>
     <div class="foot-bottom">
       <span>© 2026 CaminoPlus. Map data © <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap contributors</a>.</span>
       <span class="script">Buen Camino</span>
     </div>
   </div>
 </footer>
-<script src="/assets/site.js?v=20261105" defer></script>
+<script src="/assets/site.js?v=260f714cdb" defer></script>
 </body>
 </html>

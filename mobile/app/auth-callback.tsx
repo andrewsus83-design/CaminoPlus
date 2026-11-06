@@ -23,9 +23,12 @@ export default function AuthCallback() {
     (async () => {
       const isReset = /[?&#]next=reset/.test(url) || /type=recovery/.test(url);
       const res = await completeAuthFromUrl(url);
+      if (res.ok) { router.replace(isReset ? '/reset-password' : '/'); return; }
+      // Already signed in and the link was not meant for us: carry on. The new-password screen is only ever
+      // opened after a verified recovery code, never just because a session exists.
       const { data } = await supabase.auth.getSession();
-      if (res.ok || data.session) router.replace(isReset ? '/reset-password' : '/');
-      else setError(res.error ?? 'This link could not be used.');
+      if (data.session && !isReset) { router.replace('/'); return; }
+      setError(res.error ?? 'This link could not be used.');
     })();
   }, [url, router]);
 

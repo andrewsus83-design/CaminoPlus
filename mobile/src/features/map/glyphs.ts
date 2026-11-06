@@ -23,6 +23,7 @@ const FILES = {
 } as const;
 
 const VERSION = '2';
+const yieldToUi = () => new Promise<void>((r) => setTimeout(r, 0));
 const root = () => new Directory(Paths.document, 'glyphs');
 
 let ready: Promise<string> | null = null;
@@ -58,6 +59,7 @@ async function install() {
         if (range in ranges) continue;
         const empty = new File(fontDir, `${range}.pbf`);
         if (!empty.exists) empty.create({ overwrite: true });
+        if (start % 8192 === 0) await yieldToUi(); // keep taps responsive on the first map open
       }
     }
     marker.create({ overwrite: true });

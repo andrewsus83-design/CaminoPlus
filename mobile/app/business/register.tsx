@@ -9,14 +9,16 @@ import { Card, Chip, IconButton } from '@/components/ui';
 import { Badge, Field, OptionCard, Row, StepBar } from '@/features/business/ui';
 import { Sheet } from '@/features/business/BusinessCard';
 import { ownerStore } from '@/features/business/store';
+import { emailListingDetails } from '@/features/business/contact';
 import { amenityOptions, bookingOptions, businessTypes, Draft, proofKinds } from '@/data/business';
 import { tints } from '@/data/mock';
 import { c, radius, role } from '@/theme';
 
 const STEPS = ['Type', 'Name and location', 'Photos and details', 'Prices and booking', 'Proof of ownership'] as const;
 
-// Five-step registration. Sample state only; later this writes a draft to
-// business_listings (+ photos, verifications) and calls submit_business_listing.
+// Five-step registration. Listings are not live yet, so the last step emails the details to the team
+// (features/business/contact.ts). Later this writes a draft to business_listings (+ photos,
+// verifications) and calls submit_business_listing.
 export default function BusinessRegister() {
   const router = useRouter();
   const saved = ownerStore.get();
@@ -51,7 +53,8 @@ export default function BusinessRegister() {
     ownerStore.saveDraft(d, step);
     if (step < STEPS.length) { setStep(step + 1); showToast(); return; }
     setSending(true);
-    setTimeout(() => { ownerStore.submit(); router.replace('/business/status'); }, 900);
+    // Listings are not live yet: really send the owner's details to the team by email.
+    void emailListingDetails(d).then((sent) => { setSending(false); if (sent) { ownerStore.submit(); router.replace('/business/status'); } });
   };
   const back = () => (step > 1 ? setStep(step - 1) : router.back());
 
@@ -184,7 +187,7 @@ export default function BusinessRegister() {
               <ActivityIndicator color={c.blue} /><AppText variant="label" color={c.blue}>Sending…</AppText>
             </View>
           ) : (
-            <Pill variant={step === STEPS.length ? 'gold' : 'primary'} label={step === STEPS.length ? 'Send for review' : 'Continue'} onPress={next} />
+            <Pill variant={step === STEPS.length ? 'gold' : 'primary'} label={step === STEPS.length ? 'Email my details' : 'Continue'} onPress={next} />
           )}
         </View>
       </View>

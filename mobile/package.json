@@ -49,7 +49,9 @@
     "lint:bundle": "expo export --platform android",
     "build:dev:android": "eas build --profile development --platform android",
     "build:dev:ios": "eas build --profile development --platform ios",
-    "test:map": "tsc -p tsconfig.maptest.json && node node_modules/.cache/map-test/features/map/__tests__/map.test.js"
+    "test:map": "tsc -p tsconfig.maptest.json && node node_modules/.cache/map-test/features/map/__tests__/map.test.js && node node_modules/.cache/map-test/features/map/__tests__/nav.test.js && node node_modules/.cache/map-test/features/map/__tests__/walkstyle.test.js",
+    "test:social": "tsc -p tsconfig.socialtest.json && node node_modules/.cache/social-test/features/social/__tests__/social.test.js",
+    "test": "npm run test:map && npm run test:social"
   },
   "private": true
 }

@@ -20,6 +20,12 @@ begin
   assert (select count(*) from public.subscriptions where status = 'none') = 3, 'subscription rows';
 end $$;
 
+-- Fixture for the offline pack checks below. The seed ships no pack (a demo row would point at a
+-- file that does not exist); the pipeline registers real ones with register_offline_pack().
+insert into public.offline_packs (route_id, stage_id, kind, format, version, url, size_bytes, sha256) values
+  ('20000000-0000-0000-0000-000000000001', '40000000-0000-0000-0000-000000000001', 'tiles', 'pmtiles', 1,
+   'supabase://offline-packs/test/rls-smoke-tiles-v1.pmtiles', 3145728, repeat('ab', 32));
+
 -- ---------------------------------------------------------------- user A
 begin;
 select set_config('request.jwt.claims', '{"sub": "aaaaaaaa-0000-0000-0000-000000000001", "role": "authenticated"}', true);
@@ -249,7 +255,7 @@ begin;
 select set_config('request.jwt.claims', '', true);
 set local role anon;
 do $$ begin
-  assert (select count(*) from public.routes) = 2, 'anon reads routes';
+  assert (select count(*) from public.routes) = 15, 'anon reads routes (2 seeded + 13 from more_caminos)';
   assert (select count(*) from public.stays) = 1, 'anon reads stays';
   begin
     perform count(*) from public.posts;

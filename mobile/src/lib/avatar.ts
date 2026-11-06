@@ -21,10 +21,10 @@ export async function pickAndUploadAvatar(userId: string): Promise<string | null
   const asset = res.assets[0];
   const body = await (await fetch(asset.uri)).arrayBuffer();
   const ext = asset.mimeType === 'image/png' ? 'png' : 'jpg';
-  const path = `${userId}/avatar-${Date.now()}.${ext}`;
+  const path = `${userId}/avatar.${ext}`; // fixed name: a new photo replaces the old one instead of piling up in storage
   const up = await supabase.storage.from('avatars').upload(path, body, { contentType: asset.mimeType ?? 'image/jpeg', upsert: true });
   if (up.error) throw new Error(up.error.message);
-  const url = supabase.storage.from('avatars').getPublicUrl(path).data.publicUrl;
+  const url = `${supabase.storage.from('avatars').getPublicUrl(path).data.publicUrl}?v=${Date.now()}`; // busts the CDN/image cache
   await updateProfile(userId, { avatar_url: url });
   return url;
 }

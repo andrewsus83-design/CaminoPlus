@@ -2,6 +2,10 @@
 
 Stage `camino-frances-01` · generated 2026-11-06 09:20 UTC · route: OSM route relations: Camino Francés (Alternative); Camino Francés - 01
 
+## Run status: OK
+
+Every source answered.
+
 ## Sources
 
 | Source | Status |
@@ -22,18 +26,20 @@ Stage `camino-frances-01` · generated 2026-11-06 09:20 UTC · route: OSM route 
 | Water, pharmacy, ATM ... | 85 | 12 | 12 / 16 / 57 | 1 |
 | **All** | **448** | | | |
 
+Data check proposed for 36 of 448 places (score 75+ and no open high or medium finding). Every other place stays "Not verified yet".
+
 ## Findings by type
 
-| Code | Count | Meaning |
+| Code | Places | Meaning |
 |---|---|---|
 | `MISSING_FIELDS` | 199 | pilgrim-relevant info missing |
 | `NO_PHOTO` | 109 | no open-licence photo yet |
 | `ONLY_IN_OVERTURE` | 93 | missing in OSM, or closed |
 | `STALE` | 27 | no OSM edit or check_date for 3+ years |
 | `ONLY_IN_WIKIDATA` | 24 | notable place with no OSM feature nearby |
-| `NAME_DISAGREE` | 10 | linked by id but names differ |
+| `NAME_DISAGREE` | 9 | linked by id but names differ |
 | `DUPLICATE` | 8 | two OSM features look like the same place |
-| `COORD_DISAGREE` | 8 | sources put the place far apart |
+| `COORD_DISAGREE` | 5 | sources put the place far apart |
 | `NO_NAME` | 7 | no name anywhere |
 | `CLOSED_SIGNAL` | 6 | a source says closed or disused |
 
@@ -72,8 +78,6 @@ Stage `camino-frances-01` · generated 2026-11-06 09:20 UTC · route: OSM route 
 | Place | Type | Score | Label | Sources |
 |---|---|---|---|---|
 | Redoute de Château-Pignon | monument | 82 | Data cross-checked Nov 2026 · 2 open sources | [node/876403595](https://www.openstreetmap.org/node/876403595) overture `a1df47c5` |
-| Hôtel des Pyrénées | hotel | 80 | Data cross-checked Nov 2026 · 3 open sources | [node/3398123563](https://www.openstreetmap.org/node/3398123563) [Q111876853](https://www.wikidata.org/wiki/Q111876853) overture `d02eb781` |
-| Lepoeder | monument | 77 | Data cross-checked Nov 2026 · 2 open sources | [node/3400535360](https://www.openstreetmap.org/node/3400535360) [Q66121999](https://www.wikidata.org/wiki/Q66121999) |
 | Hostal Haizea | hostel | 77 | Data cross-checked Nov 2026 · 2 open sources | [node/2418091631](https://www.openstreetmap.org/node/2418091631) overture `6f454113` |
 | Le Refuge Orisson | hostel | 77 | Data cross-checked Nov 2026 · 2 open sources | [node/3337547778](https://www.openstreetmap.org/node/3337547778) overture `5998d40c` |
 | Beilari (formerly Esprit du Chemin) | hostel | 77 | Data cross-checked Nov 2026 · 2 open sources | [node/5209321423](https://www.openstreetmap.org/node/5209321423) overture `183129a9` |
@@ -91,4 +95,4 @@ Stage `camino-frances-01` · generated 2026-11-06 09:20 UTC · route: OSM route 
 - This compares open data sources. It does not visit places: a high score means the sources agree and look recent, not that an albergue is open, has beds, or is clean. Owners and pilgrim reports stay the ground truth.
 - OSM and Overture both miss places, and Overture includes some closed businesses. `ONLY_IN_OVERTURE` is a lead, not a fact.
 - AI output (descriptions, photo checks) is a draft for a human and is never published automatically.
-- Corridor: stays within 1500 m of the route, other places within 1000 m.
+- Corridor: only places near the route are audited: stays within 1500 m; cafes and restaurants, churches and sites within 1000 m; water and services and other places within 500 m.

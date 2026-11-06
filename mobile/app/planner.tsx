@@ -6,11 +6,12 @@ import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
 import { Card } from '@/components/ui';
 import { useMeData } from '@/lib/useMeData';
-import { secureStorage } from '@/lib/secureStorage';
-import { c, fonts, radius, role } from '@/theme';
+import { useAuth } from '@/lib/auth';
+import { localStore, userKey } from '@/lib/localStore';
+import { c, fonts, radius, role, layout } from '@/theme';
 
 // Task planner for one walking day: a ready-made checklist plus your own tasks.
-// Saved on this phone per day (works offline).
+// Saved on this phone per day and per account (works offline).
 type Task = { id: string; text: string; done: boolean };
 
 const shortDate = (iso: string) => new Date(iso).toLocaleDateString([], { day: 'numeric', month: 'short' });
@@ -19,7 +20,9 @@ export default function Planner() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { day } = useLocalSearchParams<{ day?: string }>();
-  const { days } = useMeData();
+  const { session } = useAuth();
+  const uid = session?.user.id;
+  const { days, offline } = useMeData();
   const [dayId, setDayId] = useState<string | undefined>(day);
   const list = days ?? [];
   const current = list.find((d) => d.id === dayId) ?? list.find((d) => d.status !== 'done') ?? list[0];
@@ -33,7 +36,7 @@ export default function Planner() {
     { id: 'weather', text: 'Check the weather and start time', done: false },
     { id: 'friend', text: 'Tell a friend where you are walking', done: false },
   ], [from, to]);
-  const key = current ? `plan.tasks.${current.id}` : null;
+  const key = current && uid ? userKey(uid, `planner.${current.id}`) : null;
   const [tasks, setTasks] = useState<Task[]>(defaults);
   const [loaded, setLoaded] = useState(false);
   const [draft, setDraft] = useState('');
@@ -42,17 +45,17 @@ export default function Planner() {
     if (!key) return;
     setLoaded(false);
     let live = true;
-    secureStorage.getItem(key).then((v) => {
+    localStore.getJSON<Task[]>(key).then((v) => {
       if (!live) return;
-      try { setTasks(v ? (JSON.parse(v) as Task[]) : defaults); } catch { setTasks(defaults); }
+      setTasks(Array.isArray(v) ? v : defaults);
       setLoaded(true);
-    }).catch(() => { if (live) { setTasks(defaults); setLoaded(true); } });
+    });
     return () => { live = false; };
   }, [key, defaults]);
 
   const save = (next: Task[]) => {
     setTasks(next);
-    if (key && loaded) secureStorage.setItem(key, JSON.stringify(next)).catch(() => {});
+    if (key && loaded) void localStore.setJSON(key, next);
   };
   const doneN = tasks.filter((t) => t.done).length;
   const add = () => {
@@ -64,7 +67,7 @@ export default function Planner() {
 
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1, backgroundColor: role.bg }}>
-      <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingTop: insets.top + 12, paddingHorizontal: 24, paddingBottom: insets.bottom + 40, gap: 18 }}>
+      <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingTop: insets.top + 12, paddingHorizontal: layout.screenMargin, paddingBottom: insets.bottom + 40, gap: 18 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
           <Pressable accessibilityRole="button" accessibilityLabel="Back" onPress={() => router.back()} hitSlop={12}><Icon name="back" color={role.text} size={30} /></Pressable>
           <AppText variant="h4">Day planner</AppText>
@@ -72,8 +75,8 @@ export default function Planner() {
         </View>
 
         {list.length > 1 && (
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }} style={{ flexGrow: 0, marginHorizontal: -24 }}>
-            <View style={{ width: 16 }} />
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }} style={{ flexGrow: 0, marginHorizontal: -layout.screenMargin }}>
+            <View style={{ width: layout.screenMargin }} />
             {list.map((d) => {
               const on = d.id === current?.id;
               return (
@@ -82,12 +85,12 @@ export default function Planner() {
                 </Pressable>
               );
             })}
-            <View style={{ width: 16 }} />
+            <View style={{ width: layout.screenMargin }} />
           </ScrollView>
         )}
 
         {!current ? (
-          <Card><AppText variant="small" muted>Your stages are still loading. Open this again in a moment.</AppText></Card>
+          <Card><AppText variant="small" muted>{offline ? 'You are offline and your plan is not saved on this phone yet. Open it once with a connection and it stays here.' : 'Your stages are still loading. Open this again in a moment.'}</AppText></Card>
         ) : (
           <>
             <Card style={{ gap: 8, backgroundColor: c.blue }}>

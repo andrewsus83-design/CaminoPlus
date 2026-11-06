@@ -26,7 +26,35 @@ the app.
 
 Email links (confirm, reset) and Google return to `caminoplus://auth-callback` (a build) or
 `exp://<host>/--/auth-callback` (Expo Go). PKCE means a link must be opened on the same phone that
-asked for it.
+asked for it. The callback accepts only a one-time `code` (or an error). Raw `access_token` /
+`refresh_token` values in a link are rejected on purpose: any web page or app can open
+`caminoplus://auth-callback#access_token=...`, and accepting tokens would sign the phone into someone
+else's account. The new-password screen only opens after a verified recovery code.
+
+## Starting without signal
+
+The app has to open on the trail, so it never waits for the network to decide what to show:
+
+- The session is read straight from the Keychain / Keystore (`readStoredSession`, `src/lib/supabase.ts`).
+  supabase-js cannot answer `getSession()` while an expired access token is being refreshed without a
+  network (it retries for about 30 s and then reports no session although the refresh token is still
+  stored). Storage decides whether someone is signed in; a real sign-out or a revoked refresh token
+  clears it.
+- The account (profile + current journey) is saved per user on the phone (`u.<userId>.account`, see
+  `src/lib/localStore.ts`) and shown immediately, then refreshed from the server. The Me tab data is cached
+  the same way (`useMeData`).
+- A load error is never treated as "no journey". With nothing saved and no signal the app shows
+  `AccountUnavailable` (try again / log out); only a successful load that returns no journey goes to onboarding.
+- `src/lib/net.ts` fails fast when the phone is offline (instead of waiting for the refresh retries) and
+  `startJourney` is one idempotent RPC with a client generated id, so a retry never creates a second journey.
+- Signing out also wipes everything saved for that user (`clearUserData`).
+
+## Deleting an account
+
+Settings > Account > Delete account (also under Edit account; `app/delete-account.tsx`). The pilgrim types DELETE;
+the app calls the `delete-account` edge function (service role: removes the user's files, then the auth
+user; the database cascades the rest) and signs out. Subscriptions are billed by the stores and are not
+cancelled by deletion; the screen says so.
 
 ## Owner setup (Supabase and Google), one time
 

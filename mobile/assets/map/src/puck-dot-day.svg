@@ -1,0 +1,12 @@
+<!-- Walk view puck (puck-dot-day). Rendered to PNG at 1x/2x/3x with a transparent background (name.png, name@2x.png, name@3x.png). -->
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <defs>
+    <filter id="s" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2.2"/></filter>
+    <filter id="g" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2.6"/></filter>
+  </defs>
+  
+  <circle cx="32" cy="35" r="24" fill="#000" fill-opacity=".30" filter="url(#s)"/>
+  <circle cx="32" cy="32" r="25" fill="#FFFFFF"/>
+  <circle cx="32" cy="32" r="20.5" fill="#1E4A7A"/>
+  <circle cx="32" cy="32" r="7" fill="#fff"/>
+</svg>

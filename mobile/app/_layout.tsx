@@ -1,4 +1,5 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
+import { ActivityIndicator, View } from 'react-native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
@@ -9,6 +10,7 @@ import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold } from '@expo-goog
 import { JetBrainsMono_400Regular } from '@expo-google-fonts/jetbrains-mono';
 import { Caveat_700Bold } from '@expo-google-fonts/caveat';
 import { AuthProvider, useAuth } from '@/lib/auth';
+import { AccountUnavailable } from '@/components/AccountUnavailable';
 import { setMapSession } from '@/features/map';
 import { supabase } from '@/lib/supabase';
 import { role } from '@/theme';
@@ -33,10 +35,19 @@ export default function RootLayout() {
 
 // Route guard: signed out -> (auth); signed in without a journey -> onboarding;
 // otherwise the app. auth-callback and reset-password are always reachable.
+// A load error is NOT "no journey": see AccountUnavailable and lib/auth.tsx.
 function RootStack() {
-  const { ready, session, journey } = useAuth();
-  useEffect(() => { if (ready) SplashScreen.hideAsync(); }, [ready]);
-  if (!ready) return null;
+  const { ready, status, session, journey, accountError, retry, signOut } = useAuth();
+  const splashHidden = useRef(false);
+  useEffect(() => { if (ready) { splashHidden.current = true; SplashScreen.hideAsync(); } }, [ready]);
+  if (!ready) {
+    // First launch: the native splash is still showing. Later (right after sign-in) show a spinner instead of a blank screen.
+    return splashHidden.current ? <View style={{ flex: 1, backgroundColor: role.bg, alignItems: 'center', justifyContent: 'center' }}><ActivityIndicator color={role.action} /></View> : null;
+  }
+  // Signed in, but the account could not be loaded and nothing is saved on this phone: say so, never guess "onboarding".
+  if (session && status !== 'ready') {
+    return <AccountUnavailable message={accountError} busy={status === 'loading'} onRetry={() => void retry()} onSignOut={() => void signOut()} />;
+  }
   const signedIn = !!session;
   const onboarded = signedIn && !!journey;
   return (
@@ -44,8 +55,12 @@ function RootStack() {
       <Stack.Screen name="index" />
       <Stack.Screen name="auth-callback" />
       <Stack.Screen name="reset-password" />
+      <Stack.Screen name="licences" />
       <Stack.Protected guard={!signedIn}>
         <Stack.Screen name="(auth)" />
+      </Stack.Protected>
+      <Stack.Protected guard={signedIn}>
+        <Stack.Screen name="delete-account" />
       </Stack.Protected>
       <Stack.Protected guard={signedIn && !onboarded}>
         <Stack.Screen name="onboarding" />
@@ -55,6 +70,10 @@ function RootStack() {
         <Stack.Screen name="stay/[id]" />
         <Stack.Screen name="write" options={{ presentation: 'fullScreenModal', animation: 'slide_from_bottom' }} />
         <Stack.Screen name="inbox" />
+        <Stack.Screen name="chat/[id]" />
+        <Stack.Screen name="chat/new" />
+        <Stack.Screen name="chat/new-group" />
+        <Stack.Screen name="chat/info/[id]" />
         <Stack.Screen name="offline-maps" />
         <Stack.Screen name="change-camino" />
         <Stack.Screen name="planner" />

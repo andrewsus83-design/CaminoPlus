@@ -14,6 +14,11 @@ Usage:
   pip install fonttools
   python3 tools/build_brand_svg.py            # downloads the fonts from Google Fonts
   python3 tools/build_brand_svg.py --fonts DIR  # or use Fraunces-Bold-28pt.ttf + Inter-Bold.ttf in DIR
+  python3 tools/build_brand_svg.py --icons-only # only the UI icons and preview.html (no fonts, no network)
+  python3 tools/build_brand_svg.py --out DIR    # write somewhere else (default: brand/svg)
+
+Only the generated folders (logo, wordmark, mark, app-icon, icons) and preview.html are replaced. Everything
+else in the output folder, notably the hand-written README.md, is left alone.
 """
 import argparse
 import os
@@ -27,7 +32,8 @@ from fontTools.pens.transformPen import TransformPen
 from fontTools.ttLib import TTFont
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT = os.path.join(ROOT, "brand", "svg")
+OUT = os.path.join(ROOT, "brand", "svg")  # replaced by --out in main()
+GENERATED = ("logo", "wordmark", "mark", "app-icon", "icons", "preview.html")
 
 # Brand palette (design/tokens.css)
 NAVY = "#14365D"       # Atlantic Blue
@@ -268,14 +274,6 @@ def build_icons():
                 f'{inner.strip()}</svg>\n')
         write(f"icons/{name}.svg", body)
         names.append(name)
-    # Store badges' glyphs used on the website (filled, own colours)
-    web = open(os.path.join(ROOT, "web", "index.html"), encoding="utf-8").read()
-    apple = re.search(r'<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">(<path d="M16\.4[^"]+"/>)</svg>', web)
-    gplay = re.search(r'<svg viewBox="0 0 24 24" aria-hidden="true">((?:<path[^>]+/>){4})</svg>', web)
-    if apple:
-        write("icons/store/apple.svg", f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">{apple.group(1)}</svg>\n')
-    if gplay:
-        write("icons/store/google-play.svg", f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">{gplay.group(1)}</svg>\n')
     return names
 
 
@@ -306,21 +304,45 @@ figure img{{max-width:100%;height:80px}}figcaption{{font:11px ui-monospace,monos
         f.write(page)
 
 
+def clean(keep=()):
+    """Remove what this script generates, never the rest (the folder holds a hand-written README.md)."""
+    for name in GENERATED:
+        if name in keep:
+            continue
+        path = os.path.join(OUT, name)
+        if os.path.isdir(path):
+            shutil.rmtree(path)
+        elif os.path.exists(path):
+            os.remove(path)
+
+
 def main():
-    ap = argparse.ArgumentParser()
+    global OUT
+    ap = argparse.ArgumentParser(description="Export the Camino+ brand as SVG files.")
     ap.add_argument("--fonts", help="folder with Fraunces-Bold-28pt.ttf and Inter-Bold.ttf")
+    ap.add_argument("--out", help="output folder (default: brand/svg)")
+    ap.add_argument("--icons-only", action="store_true",
+                    help="regenerate only icons/ and preview.html from design/index.html (needs no fonts)")
     a = ap.parse_args()
-    font_dir = a.fonts or tempfile.mkdtemp()
-    fetch_fonts(font_dir)
-    if os.path.isdir(OUT):
-        shutil.rmtree(OUT)
-    wm = Wordmark(font_dir)
-    build_logos(wm)
-    build_marks()
-    build_app_icons()
+    if a.out:
+        OUT = os.path.abspath(a.out)
+    os.makedirs(OUT, exist_ok=True)
+    if a.icons_only:
+        for d in ("logo", "wordmark", "mark", "app-icon"):
+            if not os.path.isdir(os.path.join(OUT, d)):
+                raise SystemExit(f"--icons-only needs {OUT}/{d} from a full run first")
+        clean(keep=("logo", "wordmark", "mark", "app-icon"))
+    else:
+        font_dir = a.fonts or tempfile.mkdtemp()
+        fetch_fonts(font_dir)
+        clean()
+        wm = Wordmark(font_dir)
+        build_logos(wm)
+        build_marks()
+        build_app_icons()
     names = build_icons()
     build_preview(names)
-    print(f"wrote {sum(len(f) for _, _, f in os.walk(OUT))} files to {OUT}")
+    print(f"wrote {len(names)} icons; {sum(len(f) for _, _, f in os.walk(OUT))} files in {OUT}")
 
 
 if __name__ == "__main__":

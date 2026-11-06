@@ -89,7 +89,7 @@ function StageRow({ stage, state, onUpgrade }: { stage: StageInfo; state: packs.
   const installed = state.installed[stage.id];
   const job = state.jobs[stage.id];
   const error = state.errors[stage.id];
-  const remote = state.catalog?.find((e) => e.stage_id === stage.id && e.kind === 'tiles');
+  const remote = packs.catalogTilesFor(stage.id);
   const size = remote?.size_bytes ?? installed?.sizeBytes ?? stage.estBytes;
   const update = packs.hasUpdate(stage.id);
   const notPublished = !!state.catalog && !remote;

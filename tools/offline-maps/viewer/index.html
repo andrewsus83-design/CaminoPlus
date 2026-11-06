@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Offline pack viewer</title>
+  <link rel="icon" href="data:,">
   <link rel="stylesheet" href="./vendor/maplibre-gl/maplibre-gl.css">
   <style>
     :root { --gold: #D9A21B; --blue: #14365D; --parchment: #F6EFE2; --ink: #2B2A26; --red: #A63D2F; }
@@ -52,9 +53,28 @@
     maplibregl.addProtocol('pmtiles', protocol.tile);
     let map;
 
+    // Route and corridor are fetched once: opening a second pack (the offline check of the render
+    // test does this with the device offline) must not need the network again.
+    let overlays;
     async function fetchJson(url) {
       if (!url) return null;
       try { const r = await fetch(url); return r.ok ? r.json() : null; } catch { return null; }
+    }
+    const loadOverlays = () => (overlays ??= Promise.all([fetchJson(params.get('route')), fetchJson(params.get('corridor'))]));
+
+    // Map errors (a missing glyph range, a tile that fails to decode) are kept for the render test.
+    window.__mapErrors = [];
+
+    // Everything that comes from a file name or from the pack's metadata goes in as text,
+    // never as HTML: a crafted .pmtiles must not be able to run script in this page.
+    function showInfo(rows) {
+      info.replaceChildren(...Object.entries(rows).flatMap(([k, v]) => {
+        const dt = document.createElement('dt');
+        dt.textContent = k;
+        const dd = document.createElement('dd');
+        dd.textContent = v ?? '';
+        return [dt, dd];
+      }));
     }
 
     async function open(archive, label) {
@@ -62,16 +82,15 @@
       const header = await archive.getHeader();
       const meta = await archive.getMetadata().catch(() => ({}));
       const bounds = [[header.minLon, header.minLat], [header.maxLon, header.maxLat]];
-      const rows = {
+      showInfo({
         File: label,
         Zooms: `${header.minZoom} to ${header.maxZoom}`,
         Tiles: header.numAddressedTiles?.toLocaleString(),
         Layers: (meta.vector_layers || []).map((l) => l.id).join(', '),
         Bounds: bounds.flat().map((n) => n.toFixed(3)).join(', '),
-      };
-      info.innerHTML = Object.entries(rows).map(([k, v]) => `<dt>${k}</dt><dd>${v ?? ''}</dd>`).join('');
+      });
 
-      const [route, corridor] = await Promise.all([fetchJson(params.get('route')), fetchJson(params.get('corridor'))]);
+      const [route, corridor] = await loadOverlays();
       if (map) map.remove();
       map = new maplibregl.Map({
         container: 'map',
@@ -81,6 +100,7 @@
         maxZoom: 18, // overzoom past the pack's z15 is fine for vector tiles
         attributionControl: { compact: false },
       });
+      map.on('error', (e) => window.__mapErrors.push(String((e.error && e.error.message) || e.message || e)));
       map.addControl(new maplibregl.NavigationControl(), 'top-right');
       map.addControl(new maplibregl.ScaleControl({ unit: 'metric' }), 'bottom-left');
       map.on('load', () => addOverlays(map, { route, corridor }));

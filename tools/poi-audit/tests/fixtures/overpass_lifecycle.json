@@ -1,0 +1,22 @@
+{
+  "version": 0.6,
+  "generator": "hand-made fixture in the shape of an Overpass 'out center tags meta' answer",
+  "elements": [
+    {"type": "node", "id": 1, "lat": 43.1630, "lon": -1.2370, "timestamp": "2026-09-01T10:00:00Z", "version": 4,
+     "tags": {"amenity": "cafe", "name": "Cafe Abierto", "opening_hours": "Mo-Su 08:00-20:00"}},
+    {"type": "node", "id": 2, "lat": 43.1631, "lon": -1.2372, "timestamp": "2022-02-01T10:00:00Z", "version": 3,
+     "tags": {"disused:amenity": "cafe", "name": "Cafe Cerrado", "disused:phone": "+34 600 000 000"}},
+    {"type": "node", "id": 3, "lat": 43.1632, "lon": -1.2374, "timestamp": "2021-05-01T10:00:00Z", "version": 2,
+     "tags": {"abandoned:tourism": "hostel", "name": "Albergue Abandonado"}},
+    {"type": "node", "id": 4, "lat": 43.1633, "lon": -1.2376, "timestamp": "2025-03-01T10:00:00Z", "version": 6,
+     "tags": {"shop": "supermarket", "name": "Supermercado Nuevo", "disused:amenity": "bar"}},
+    {"type": "node", "id": 5, "lat": 43.1634, "lon": -1.2378, "timestamp": "2020-01-01T10:00:00Z", "version": 1,
+     "tags": {"was:amenity": "restaurant", "name": "Antiguo Restaurante"}},
+    {"type": "node", "id": 6, "lat": 43.1635, "lon": -1.2380, "timestamp": "2023-06-01T10:00:00Z", "version": 2,
+     "tags": {"disused": "yes", "amenity": "cafe", "name": "Cafe Marked Disused"}},
+    {"type": "node", "id": 7, "lat": 43.1636, "lon": -1.2382, "timestamp": "2024-06-01T10:00:00Z", "version": 2,
+     "tags": {"disused:railway": "station", "name": "Old Halt"}},
+    {"type": "node", "id": 8, "lat": 43.1637, "lon": -1.2384, "timestamp": "2024-06-01T10:00:00Z", "version": 2,
+     "tags": {"amenity": "cafe", "name": "Cafe With Old Phone", "disused:phone": "+34 600 111 111"}}
+  ]
+}

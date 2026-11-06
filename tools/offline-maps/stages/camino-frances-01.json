@@ -19,5 +19,66 @@
   "route_name_regex": "camino|santiago|compostel|saint[- ]jacques|jacquaire|\\bgr ?65\\b|jakobsweg|done jakue",
   "fallback_route": "camino-frances-01.route.geojson",
   "buffer_km": 3,
-  "maxzoom": 15
+  "maxzoom": 15,
+  "quality": {
+    "min_tiles": 900,
+    "max_tiles": 2600,
+    "min_size_mb": 2,
+    "max_size_mb": 9,
+    "required_layers": [
+      "building",
+      "place",
+      "poi",
+      "transportation",
+      "transportation_name"
+    ],
+    "max_change_ratio": 1.5,
+    "max_osm_age_days": 45
+  },
+  "render_checks": [
+    {
+      "name": "Saint-Jean-Pied-de-Port z15",
+      "at": [
+        -1.2376,
+        43.1636,
+        15
+      ],
+      "min_features": {
+        "poi": 100,
+        "transportation": 60,
+        "building": 6
+      },
+      "min_labels": {
+        "place": 1
+      }
+    },
+    {
+      "name": "Roncesvalles z15",
+      "at": [
+        -1.3195,
+        43.0094,
+        15
+      ],
+      "min_features": {
+        "building": 2
+      },
+      "min_labels": {
+        "place": 1
+      }
+    },
+    {
+      "name": "Orisson z13",
+      "at": [
+        -1.2185,
+        43.1097,
+        13
+      ],
+      "min_features": {
+        "mountain_peak": 4
+      },
+      "min_labels": {
+        "peak": 1
+      }
+    }
+  ]
 }

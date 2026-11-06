@@ -1,10 +1,18 @@
 # Offline map packs: build, measure, test offline rendering, and (on schedule or
 # by hand) publish to Supabase Storage (R2 later) + register in offline_packs.
 #
-# - pull_request touching tools/offline-maps: build stage 1 in several corridor
-#   widths / zooms, report the real sizes, prove the pack renders offline. No upload.
-# - schedule (monthly) / workflow_dispatch: same build, then publish the default
-#   variant if the Supabase secrets exist (fresh OSM data each month).
+# - build job (pull_request touching tools/offline-maps, or a manual run without "publish"):
+#   build stage 1 in several corridor widths / zooms, report the real sizes, prove the pack
+#   renders offline. Never uploads a pack and never sees a secret.
+# - publish job (monthly schedule, or a manual run with "publish"): the same build with the stricter
+#   gates (route must come from OSM, OSM data must be fresh, size and tile count inside the band
+#   of the stage file and close to the live pack), then upload + register through
+#   public.register_offline_pack. It runs in the GitHub Environment "pack-publish": the owner
+#   can add required reviewers there, so nothing reaches Pilgrim Plus users without an approval.
+#
+# Artifacts hold JSON only (manifest, measurements, render report). The .pmtiles files are never
+# uploaded: the repository is public, so an artifact is downloadable by any GitHub user and would
+# bypass the Pilgrim Plus paywall.
 name: offline-maps
 
 on:
@@ -12,6 +20,7 @@ on:
     paths:
       - 'tools/offline-maps/**'
       - '.github/workflows/offline-maps.yml'
+      - '.github/actions/build-offline-pack/**'
   schedule:
     - cron: '17 3 2 * *' # 03:17 UTC on the 2nd of each month (Geofabrik extracts are daily)
   workflow_dispatch:
@@ -24,91 +33,90 @@ on:
 permissions:
   contents: read
 
-concurrency:
-  group: offline-maps-${{ github.ref }}
-  cancel-in-progress: true
+# No workflow-level concurrency: a newer run must never cancel a publish that is in flight.
+# Each job sets its own rule below.
 
 env:
   STAGE: stages/camino-frances-01.json
+  SLUG: camino-frances-01
+  PACK: camino-frances-01-3km-z15
   PLANETILER_VERSION: '0.10.2'
 
 jobs:
   build:
+    if: github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && !inputs.publish)
     runs-on: ubuntu-24.04
     timeout-minutes: 60
-    defaults:
-      run:
-        working-directory: tools/offline-maps
+    concurrency:
+      group: offline-maps-build-${{ github.ref }}
+      cancel-in-progress: true
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          python-version: '3.12'
-      - uses: actions/setup-node@v4
+          persist-credentials: false
+
+      - uses: ./.github/actions/build-offline-pack
         with:
-          node-version: '22'
-
-      - name: Install tools
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq osmium-tool
-          pip install -q -r requirements.txt
-          npm ci --no-audit --no-fund || npm install --no-audit --no-fund
-          docker pull -q ghcr.io/onthegomap/planetiler:$PLANETILER_VERSION
-
-      # Ocean polygons + Natural Earth (~1 GB) that Planetiler's OpenMapTiles profile needs.
-      - uses: actions/cache@v4
-        with:
-          path: tools/offline-maps/data/sources
-          key: planetiler-sources-v1
-
-      - name: Build default pack (3 km corridor, z15)
-        run: scripts/build_stage.sh "$STAGE" 3 15
+          route-fallback: allow
+          publishing: 'false'
 
       - name: Measure other corridor widths and zooms
         if: github.event_name == 'pull_request'
+        working-directory: tools/offline-maps
         run: |
           for b in 2 5; do scripts/build_stage.sh "$STAGE" $b 15; done
           for b in 2 3 5; do scripts/build_stage.sh "$STAGE" $b 14; done
 
       - name: Size report
+        working-directory: tools/offline-maps
         run: |
           {
             echo "### Offline pack sizes: Saint-Jean-Pied-de-Port to Roncesvalles"
             echo
-            echo "| file | corridor | max zoom | size | tiles source |"
-            echo "|---|---|---|---|---|"
+            echo "| file | corridor | max zoom | tiles | size | tiles source |"
+            echo "|---|---|---|---|---|---|"
             python3 - <<'PY'
           import glob, json
           for f in sorted(glob.glob("dist/*.json")):
               m = json.load(open(f))
               if "size_bytes" not in m or "buffer_km" not in m: continue
-              print(f"| {m['file']} | {m['buffer_km']:g} km | z{m['maxzoom']} | {m['size_bytes']/1048576:.2f} MB ({m['size_bytes']:,} B) | OSM {m['osm_timestamp']}, route: {m['route_source']} |")
+              print(f"| {m['file']} | {m['buffer_km']:g} km | z{m['maxzoom']} | {m.get('tiles', '?')} | {m['size_bytes']/1048576:.2f} MB ({m['size_bytes']:,} B) | OSM {m['osm_timestamp']}, route: {m['route_source']} |")
           PY
           } | tee -a "$GITHUB_STEP_SUMMARY"
           ls -la dist
 
-      - name: Render test, network blocked and device offline
-        run: |
-          npx playwright install --with-deps chromium
-          npm run setup
-          P=dist/camino-frances-01-3km-z15
-          node test/render_offline.mjs $P.pmtiles \
-            --route dist/camino-frances-01.route.geojson --corridor $P.corridor.geojson \
-            --at -1.3195,43.0094,15 --at -1.2376,43.1636,15 --at -1.2185,43.1097,13
-          python3 -c "import json;r=json.load(open('dist/render/camino-frances-01-3km-z15.report.json'));print('render ok:',r['ok']);[print(' ',v['at'],v['features']) for v in r['views']];print('  offline',r['device_offline']['features'])" | tee -a "$GITHUB_STEP_SUMMARY"
-
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
-          name: offline-packs
+          name: offline-pack-reports
+          # JSON only. Never add dist/*.pmtiles here (public repository, see the header).
           path: |
-            tools/offline-maps/dist/
-          retention-days: 14
+            tools/offline-maps/dist/*.json
+            tools/offline-maps/dist/render/*.report.json
+          retention-days: 3
+          if-no-files-found: warn
 
+  publish:
+    if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.publish)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    environment: pack-publish
+    concurrency:
+      group: offline-maps-publish
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/build-offline-pack
+        with:
+          route-fallback: deny
+          publishing: 'true'
+
+      # The only step that sees secrets. Everything before it (apt, pip, npm, Planetiler) ran without them.
       - name: Publish (Supabase Storage now, R2 later) and register in Supabase
-        if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.publish)
+        working-directory: tools/offline-maps
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
@@ -120,8 +128,19 @@ jobs:
           R2_BUCKET: ${{ vars.R2_BUCKET || 'caminoplus-packs' }}
         run: |
           if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_SERVICE_ROLE_KEY" ]; then
-            echo "SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY secrets not set; skipping upload" | tee -a "$GITHUB_STEP_SUMMARY"
-            node scripts/publish_pack.mjs dist/camino-frances-01-3km-z15.json --target "$PACK_TARGET" --dry-run
+            echo "SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY secrets not set; quality gates only, no upload" | tee -a "$GITHUB_STEP_SUMMARY"
+            node scripts/publish_pack.mjs "dist/$PACK.json" --target "$PACK_TARGET" --dry-run
             exit 0
           fi
-          node scripts/publish_pack.mjs dist/camino-frances-01-3km-z15.json --target "$PACK_TARGET"
+          node scripts/publish_pack.mjs "dist/$PACK.json" --target "$PACK_TARGET"
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: offline-pack-reports
+          # JSON only. Never add dist/*.pmtiles here (public repository, see the header).
+          path: |
+            tools/offline-maps/dist/*.json
+            tools/offline-maps/dist/render/*.report.json
+          retention-days: 3
+          if-no-files-found: warn

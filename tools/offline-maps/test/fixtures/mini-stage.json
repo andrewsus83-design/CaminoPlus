@@ -1,0 +1,31 @@
+{
+  "slug": "mini-test",
+  "name": "Made-up village for the render and publish tests (not a real stage)",
+  "route_slug": "mini-test",
+  "stage_number": 1,
+  "route_id": "20000000-0000-0000-0000-0000000000ff",
+  "stage_id": "40000000-0000-0000-0000-0000000000ff",
+  "quality": {
+    "min_tiles": 10,
+    "max_tiles": 40,
+    "min_size_mb": 0.001,
+    "max_size_mb": 1,
+    "required_layers": ["building", "place", "poi", "transportation", "transportation_name"],
+    "max_change_ratio": 1.5,
+    "max_osm_age_days": 45
+  },
+  "render_checks": [
+    {
+      "name": "village z15",
+      "at": [-1.2376, 43.1636, 15],
+      "min_features": { "poi": 3, "transportation": 3, "building": 3 },
+      "min_labels": { "place": 1, "poi-name": 1, "road-name": 1 }
+    },
+    {
+      "name": "peak z13",
+      "at": [-1.229, 43.1717, 13],
+      "min_features": { "mountain_peak": 1 },
+      "min_labels": { "peak": 1 }
+    }
+  ]
+}

@@ -43,13 +43,13 @@ export function BusinessCard({ state, name, stepsDone, onPress }: { state: Owner
     </PressCard>
   );
   if (state === 'in_review') return (
-    <PressCard label="Registration in review" onPress={onPress} style={row}>
+    <PressCard label="Waiting for listings to open" onPress={onPress} style={row}>
       <View style={{ width: 44, height: 44, borderRadius: radius.pill, backgroundColor: c.goldWash, alignItems: 'center', justifyContent: 'center' }}><Icon name="shell" color={c.goldInk} size={22} /></View>
       <View style={{ flex: 1 }}>
         <AppText variant="label">{name || 'Your place'}</AppText>
-        <AppText variant="caption" muted>In review · usually under 2 working days</AppText>
+        <AppText variant="caption" muted>Details sent · we write when listings open</AppText>
       </View>
-      <Badge label="In review" tone="gold" />
+      <Badge label="Waiting" tone="gold" />
     </PressCard>
   );
   if (state === 'changes_requested') return (

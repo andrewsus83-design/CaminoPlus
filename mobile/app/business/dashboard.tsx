@@ -5,6 +5,7 @@ import { Screen } from '@/components/Screen';
 import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
 import { Pill } from '@/components/Pill';
+import { SampleNotice } from '@/components/SampleNotice';
 import { Avatar, Card, IconButton, SectionLabel } from '@/components/ui';
 import { Badge } from '@/features/business/ui';
 import { Availability, myListing, statusCopy } from '@/data/business';
@@ -42,6 +43,7 @@ export default function BusinessDashboard() {
         <View style={{ marginLeft: 'auto' }}><Badge label={st.label} tone={st.tone} /></View>
         <IconButton name="pen" label="Edit listing" onPress={() => router.push('/business/register')} flat />
       </View>
+      <SampleNotice title="Sample dashboard">This is what owners will see once listings are live. The place, numbers, reviews and beds below are examples.</SampleNotice>
       <AppText variant="h2">{l.name}</AppText>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
         <AppText variant="small" muted>{l.town} · {l.beds} beds</AppText>

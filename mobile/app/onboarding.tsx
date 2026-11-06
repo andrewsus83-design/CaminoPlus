@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '@/components/AppText';
@@ -9,6 +9,7 @@ import { AuthShell } from '@/components/auth/AuthShell';
 import { Field, FormMessage } from '@/components/auth/Field';
 import { useAuth } from '@/lib/auth';
 import { listRoutes, listStages, Route, Stage, startJourney, updateProfile } from '@/lib/api';
+import { uuid } from '@/lib/uuid';
 import { layout, role } from '@/theme';
 
 type Step = 'name' | 'route' | 'stage';
@@ -33,6 +34,9 @@ export default function Onboarding() {
   }, [route]);
 
   const uid = session?.user.id;
+  // One id per (route, stage) choice: if the connection drops mid-request and the pilgrim taps again,
+  // the server returns the same journey instead of creating a second one.
+  const attemptId = useMemo(() => uuid(), [route?.id, stageId]); // eslint-disable-line react-hooks/exhaustive-deps
   const next = async () => {
     setError(null);
     if (!uid) return;
@@ -45,7 +49,7 @@ export default function Onboarding() {
         setStep('stage');
       } else if (route && stages) {
         setBusy(true);
-        await startJourney({ userId: uid, route, stages, startStageId: stageId, startDate: null });
+        await startJourney({ route, startStageId: stageId, startDate: null, journeyId: attemptId });
         await refresh(); // the route guard now opens the app
       }
     } catch (e) {

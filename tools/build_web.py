@@ -1,12 +1,46 @@
-"""Generates the static pages in web/ (shared head, header, footer).
+"""Generates the static pages in web/ (shared head, header, footer) and web/sitemap.xml.
 
-Usage: python3 tools/build_web.py web
-Edit the content here, re-run, and commit both this file and the output.
+Usage: python3 tools/build_web.py web [--previous DIR]
+Edit the content here, re-run, and commit both this file and the output. CI runs the generator
+into a temporary folder and fails if it differs from web/ (the "web-sync" job), so a page can
+never be edited by hand and forgotten here.
+
+Related: tools/sync_tokens.py keeps web/assets/tokens.css in step with design/tokens.css, and
+tools/render_screens.mjs re-renders web/assets/screens from design/index.html.
 """
-import json, sys, pathlib
+import datetime
+import hashlib
+import html
+import json
+import os
+import pathlib
+import re
+import sys
 
-OUT = pathlib.Path(sys.argv[1])
+ROOT = pathlib.Path(__file__).resolve().parent.parent
+WEB = ROOT / "web"  # the committed site: asset hashes and the previous sitemap dates come from here
 SITE = "https://camino.plus"
+LEGAL_UPDATED = "7 November 2026"  # bump by hand whenever the Privacy Policy or Terms change
+PAGES = {}  # file name -> html, filled by page()
+
+
+def esc(s):
+    """Text for an HTML attribute or a title (the page bodies below are written as HTML on purpose)."""
+    return html.escape(s, quote=True)
+
+
+def asset_url(name):
+    """/assets/site.css?v=<hash of the file>: the address changes whenever the file does, so a
+    browser or CDN never serves an old stylesheet next to new pages."""
+    digest = hashlib.sha256((WEB / "assets" / name).read_bytes()).hexdigest()[:10]
+    return f"/assets/{name}?v={digest}"
+
+
+def ld_json(obj):
+    """JSON for a <script type="application/ld+json"> block: "<" is escaped so a "</script>"
+    inside a string cannot end the block."""
+    return json.dumps(obj, ensure_ascii=False).replace("<", "\\u003c")
+
 
 I = {
  "user": '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',
@@ -51,13 +85,13 @@ MARK = ('<svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true">'
         '<g transform="translate(0 -2.12)"><path d="M20 28.5L5.84 22.20A2.84 2.84 0 0 1 8.64 17.96A2.84 2.84 0 0 1 12.66 14.85A2.84 2.84 0 0 1 17.46 13.21A2.84 2.84 0 0 1 22.54 13.21A2.84 2.84 0 0 1 27.34 14.85A2.84 2.84 0 0 1 31.36 17.96A2.84 2.84 0 0 1 34.16 22.20z" fill="#D9A21B"/><path d="M20 29.0Q14.09 22.35 8.49 17.82M20 29.0Q16.22 20.86 12.56 14.67M20 29.0Q18.70 20.07 17.43 13.01M20 29.0Q21.30 20.07 22.57 13.01M20 29.0Q23.78 20.86 27.44 14.67M20 29.0Q25.91 22.35 31.51 17.82" stroke="#14365D" stroke-width="1.15" stroke-linecap="round" fill="none"/><path d="M15.2 31.4Q18 30.6 18.4 28.3H21.6Q22 30.6 24.8 31.4Q24.6 32.6 20 32.6Q15.4 32.6 15.2 31.4z" fill="#D9A21B"/></g>'
         '</svg>')
 
-APPLE = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.4 12.6c0-2.6 2.1-3.8 2.2-3.9-1.2-1.8-3.1-2-3.7-2-1.6-.2-3.1.9-3.9.9-.8 0-2-.9-3.4-.9-1.7 0-3.3 1-4.2 2.6-1.8 3.1-.5 7.7 1.3 10.2.9 1.2 1.9 2.6 3.2 2.6 1.3-.1 1.8-.8 3.3-.8s2 .8 3.4.8c1.4 0 2.3-1.3 3.1-2.5 1-1.4 1.4-2.8 1.4-2.9 0 0-2.7-1-2.7-4.1zM13.9 4.9c.7-.9 1.2-2 1-3.2-1 0-2.3.7-3 1.6-.7.8-1.2 2-1.1 3.1 1.2.1 2.3-.6 3.1-1.5z"/></svg>'
-PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 2.8v18.4c0 .5.5.8.9.6L15 12 4.9 2.2c-.4-.2-.9.1-.9.6z" fill="#E8B53A"/><path d="m15 12 3.3-3.3 2.9 1.7c1 .6 1 2.6 0 3.2l-2.9 1.7z" fill="#F6EFE2"/><path d="M4.9 2.2 15 12l3.3-3.3L6.2 1.9c-.5-.3-1-.1-1.3.3z" fill="#A63D2F" opacity=".9"/><path d="M4.9 21.8 15 12l3.3 3.3-12.1 6.8c-.5.3-1 .1-1.3-.3z" fill="#DCE5EF"/></svg>'
-
 def stores():
+    """Plain text buttons until the apps are in the stores. No Apple / Google logos or badge
+    artwork: those are trademarks with their own usage rules, so the official badges are added at
+    launch (see web/README.md, "Before launch")."""
     return ('<div class="stores">'
-            f'<span class="store" role="img" aria-label="Download on the App Store, coming soon">{APPLE}<span><small>Download on the</small><b>App Store</b></span><span class="soon">Soon</span></span>'
-            f'<span class="store" role="img" aria-label="Get it on Google Play, coming soon">{PLAY}<span><small>Get it on</small><b>Google Play</b></span><span class="soon">Soon</span></span>'
+            '<span class="store" aria-disabled="true">iOS: coming soon</span>'
+            '<span class="store" aria-disabled="true">Android: coming soon</span>'
             '</div>')
 
 def shot(name, alt, lazy=True):
@@ -104,23 +138,31 @@ FOOTER = f'''<footer class="site-footer">
         <li><a href="mailto:hello@camino.plus">hello@camino.plus</a></li></ul></div>
       <div><h4>Company</h4><ul>
         <li><a href="/about">About</a></li><li><a href="/privacy">Privacy</a></li>
-        <li><a href="/terms">Terms</a></li></ul></div>
+        <li><a href="/terms">Terms</a></li><li><a href="/licences">Licences</a></li></ul></div>
     </div>
+    <p class="foot-credit">Photos and backgrounds on this site are AI-generated illustrations, not photographs. Landmarks may differ from the real thing.</p>
     <div class="foot-bottom">
       <span>© 2026 CaminoPlus. Map data © <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap contributors</a>.</span>
       <span class="script">Buen Camino</span>
     </div>
   </div>
 </footer>
-<script src="/assets/site.js?v=20261105" defer></script>'''
+<script src="{asset_url("site.js")}" defer></script>'''
+
+# Preloaded because every page draws its text with them above the fold (Inter) or in the heading (Fraunces).
+FONT_PRELOADS = "".join(
+    f'<link rel="preload" href="/assets/fonts/{f}" as="font" type="font/woff2" crossorigin>\n'
+    for f in ("inter-latin-wght-normal.woff2", "fraunces-latin-opsz-normal.woff2"))
+
 
 def page(slug, title, desc, body, active=None, jsonld=None):
     path = "/" if slug == "index" else f"/{slug}"
     url = SITE + path
-    full = title if slug == "index" else f"{title} · CaminoPlus"
+    full = esc(title if slug == "index" else f"{title} · CaminoPlus")
+    desc = esc(desc)
     canon = '<meta name="robots" content="noindex">' if slug == "404" else f'<link rel="canonical" href="{url}">'
-    ld = f'\n<script type="application/ld+json">{json.dumps(jsonld, ensure_ascii=False)}</script>' if jsonld else ""
-    html = f'''<!doctype html>
+    ld = f'\n<script type="application/ld+json">{ld_json(jsonld)}</script>' if jsonld else ""
+    html_doc = f'''<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -145,10 +187,8 @@ def page(slug, title, desc, body, active=None, jsonld=None):
 <meta name="twitter:title" content="{full}">
 <meta name="twitter:description" content="{desc}">
 <meta name="twitter:image" content="{SITE}/assets/og.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="/assets/tokens.css">
-<link rel="stylesheet" href="/assets/site.css?v=20261105">{ld}
+{FONT_PRELOADS}<link rel="stylesheet" href="{asset_url("tokens.css")}">
+<link rel="stylesheet" href="{asset_url("site.css")}">{ld}
 </head>
 <body>
 {header(active)}
@@ -159,8 +199,27 @@ def page(slug, title, desc, body, active=None, jsonld=None):
 </body>
 </html>
 '''
-    name = "index.html" if slug == "index" else f"{slug}.html"
-    (OUT / name).write_text(html)
+    PAGES["index.html" if slug == "index" else f"{slug}.html"] = html_doc
+
+# The background photos are AI-generated (see web/README.md). Every place that shows one carries a
+# visible credit saying so, and the footer says it on every page.
+PHOTOS = {
+    "meseta-wheat": "a path through wheat fields at sunset",
+    "pyrenees-ridge": "a walker on a mountain ridge path",
+    "santiago-cathedral": "Santiago Cathedral and the Obradoiro square",
+    "santiago-street": "pilgrims walking a street in Santiago",
+    "coast-boardwalk": "a wooden boardwalk through coastal dunes",
+    "galician-galleries": "the glazed galleries of a Galician town",
+    "offline-waymarker-hiker": "a pilgrim and a waymarker above the clouds",
+    "faq-boots-arrow": "hiking boots on a cobbled lane",
+    "waymarker": "a scallop waymarker with a yellow arrow",
+    "contact-backpack-church": "a backpack with a scallop shell, a church tower behind",
+}
+
+
+def ai_credit(photo):
+    return f'<p class="ai-credit"><b>AI-generated illustration:</b> {esc(PHOTOS[photo])}</p>'
+
 
 def cta(title="Your Camino starts with one download.", sub="CaminoPlus launches on iPhone and Android. Leave your email with us and we will tell you the day it is live."):
     return f'''<section class="section" id="download">
@@ -170,18 +229,26 @@ def cta(title="Your Camino starts with one download.", sub="CaminoPlus launches 
     <p class="lead" style="margin:16px auto 0">{sub}</p>
     <div class="on-dark">{stores()}</div>
     <p style="margin-top:24px"><a class="btn btn-gold" href="mailto:hello@camino.plus?subject=Tell%20me%20when%20CaminoPlus%20launches">Notify me at launch</a></p>
+    {ai_credit("santiago-cathedral")}
   </div></div>
 </section>'''
 
 def head(eyebrow, h, lead, extra="", photo=None, pos="center", posm=None):
     cls, st = ("page-head has-photo", f' style="--photo:url(/assets/photos/{photo}.webp);--pos:{pos};--pos-m:{posm or pos}"') if photo else ("page-head", "")
+    credit = ai_credit(photo) if photo else ""
     return f'''<section class="{cls}"{st}><div class="wrap">
   <p class="eyebrow">{eyebrow}</p>
   <h1>{h}</h1>
   <p class="lead">{lead}</p>{extra}
-</div></section>'''
+</div>{credit}</section>'''
+
 
 # ---------------------------------------------------------------- data
+# What exists today, said plainly: the app is in development. Offline packs hold the map (roads,
+# paths, towns, water, churches and albergues from OpenStreetMap), stage by stage. Stay details,
+# audio stories and elevation are not in the packs yet and are marked "coming".
+COMING = '<span class="tag gold">Coming</span>'
+
 TABS = [
  ("me", "user", "Me", "Your Camino, your story.",
   "A profile that feels like Instagram and a timeline like Facebook, built around the walk. Post your day, collect stamps in a digital credencial and keep track of every stage.",
@@ -189,7 +256,7 @@ TABS = [
    "Passport &amp; stamps: a digital credencial, each stamp with its story",
    "Plan: a stage-by-stage tracker for where you sleep tonight and tomorrow",
    "Health from your smartwatch: steps, distance and heart rate",
-   "Inbox behind the bell: notifications and messages with hosts and pilgrims"],
+   "Friends and messages behind the bell: friend requests, notifications, chats and group chats with pilgrims"],
   [("me-journey", "Me tab: profile and journey feed"), ("me-passport", "Passport with collected stamps")]),
  ("stays", "bed", "Stays", "Albergues, hostels and cafés on your stage.",
   "Search and filter places to sleep and eat along the way, then open a detail page with photos, beds, reviews and opening hours, the way you know from travel apps.",
@@ -201,17 +268,17 @@ TABS = [
  ("maps", "map", "Maps", "Navigation that feels like an adventure.",
   "A clear, Waze-style map with a touch of RPG. Zoom out to see the whole route from above, then pinch in to walk the streets of each town.",
   ["Two layers: helicopter view of the route and city view at street level",
-   "Churches, history and points of interest, with audio stories",
+   f"Churches, fountains and points of interest from OpenStreetMap. History pop-ups and audio stories {COMING}",
    "Scavenger hunts, achievements and XP as you walk",
    "Crowd updates from other pilgrims, and the weather ahead",
-   "Works offline with downloaded stage packs"],
+   "Offline map for every stage you download: route, towns, water, churches and albergues"],
   [("maps-helicopter", "Maps helicopter view of the whole route"), ("maps-city", "Maps city view at street level")]),
- ("explore", "play", "Explore", "Stories from the trail, full screen.",
+ ("discover", "play", "Discover", "Stories from the trail, full screen.",
   "Swipe through short, full-screen stories from pilgrims and places along the Way. Small tabs at the top switch topics, and a quick tutorial shows you how on your first visit.",
   ["Full-screen photo and video stories, swipe left and right",
    "Topic tabs at the top for the kind of stories you want",
    "Photos of you: buy shots other pilgrims took of you on the way <span class=\"tag gold\">Coming later</span>"],
-  [("explore", "Explore full-screen stories"), ("explore-photos", "Photos of you marketplace")]),
+  [("discover", "Discover full-screen stories"), ("discover-photos", "Photos of you marketplace")]),
  ("settings", "sliders", "Settings", "Everything else, kept simple.",
   "Manage your subscription and storage, change your password and connect your watch. No clutter.",
   ["Billing and subscription, with extra storage when you need it",
@@ -220,70 +287,93 @@ TABS = [
   [("settings", "Settings screen"), ("me-plan", "Plan stage tracker")]),
 ]
 
+# The routes of the route picker, in the order of the database (supabase/migrations/..._more_caminos.sql).
+# Kilometres are the database values; None where the database has none yet. Stage ranges are
+# editorial (the database only knows 33 stages for the Francés and 12 for the Portugués so far).
+# tools/tests/test_web.py keeps this list and the database in step.
+# Francés: the site, the design and the social posts all say ~780 km; the database says 773.
 ROUTES = [
- ("Camino Francés", "Saint-Jean-Pied-de-Port, France", 780, "31–35", "The classic. Across the Pyrenees, the Meseta and into Galicia.", "Most walked"),
- ("Camino Portugués (Central)", "Porto (or Lisbon), Portugal", 240, "10–13", "Through northern Portugal's villages and vineyards. About 620 km and 25–29 stages if you start in Lisbon.", "Popular"),
- ("Camino Portugués (Coastal)", "Porto, Portugal", 260, "11–13", "Atlantic beaches and fishing towns, joining the Central route at Redondela.", None),
- ("Camino del Norte", "Irún, Spain", 825, "33–38", "Along the Bay of Biscay through San Sebastián, Bilbao and Cantabria.", None),
- ("Camino Primitivo", "Oviedo, Spain", 310, "12–15", "The original route. Mountains, quiet paths and big climbs.", None),
- ("Vía de la Plata", "Seville, Spain", 1000, "38–42", "The longest in Spain, following an old Roman road north.", None),
- ("Camino Inglés", "Ferrol or A Coruña, Spain", 120, "5–6", "Short and green, the route of pilgrims who arrived by sea.", None),
- ("Camino Finisterre &amp; Muxía", "Santiago de Compostela", 120, "3–5", "Keep walking past Santiago to the coast at the 'end of the world'.", None),
- ("Camino Sanabrés", "Granja de Moreruela, Spain", 370, "15–17", "The Vía de la Plata's branch through Ourense and its hot springs.", None),
- ("Camino de Invierno", "Ponferrada, Spain", 265, "10–12", "The winter route through the Sil valley and Ribeira Sacra.", None),
- ("Camino de Madrid", "Madrid, Spain", 320, "12–14", "From the capital over the Guadarrama to join the Francés at Sahagún.", None),
- ("Camino Aragonés", "Somport, Spain", 160, "6–7", "Down from the Pyrenees to meet the Francés at Puente la Reina.", None),
- ("Via Podiensis (Le Puy)", "Le Puy-en-Velay, France", 740, "28–32", "France's best-known route, ending at Saint-Jean-Pied-de-Port.", None),
+ ("camino-frances", "Camino Francés", "Saint-Jean-Pied-de-Port, France", 780, "31–35", "The classic. Across the Pyrenees, the Meseta and into Galicia.", "Most walked"),
+ ("camino-portugues", "Camino Portugués (Central)", "Porto, Portugal", 240, "10–13", "Through northern Portugal's villages and vineyards.", "Popular"),
+ ("camino-portugues-costero", "Camino Portugués (Coastal)", "Porto, Portugal", 260, "11–13", "Atlantic beaches and fishing towns, joining the Central route at Redondela.", None),
+ ("camino-del-norte", "Camino del Norte", "Irún, Spain", 820, "33–38", "Along the Bay of Biscay through San Sebastián, Bilbao and Cantabria.", None),
+ ("camino-primitivo", "Camino Primitivo", "Oviedo, Spain", 320, "12–15", "The original route. Mountains, quiet paths and big climbs.", None),
+ ("camino-ingles", "Camino Inglés", "Ferrol or A Coruña, Spain", 120, "5–6", "Short and green, the route of pilgrims who arrived by sea.", None),
+ ("via-de-la-plata", "Vía de la Plata", "Seville, Spain", 1000, "38–42", "The longest in Spain, following an old Roman road north.", None),
+ ("camino-finisterre-muxia", "Camino Finisterre &amp; Muxía", "Santiago de Compostela", 90, "3–5", "Keep walking past Santiago to the coast at the 'end of the world'.", None),
+ ("camino-aragones", "Camino Aragonés", "Somport, Spain", 160, "6–7", "Down from the Pyrenees to meet the Francés at Puente la Reina.", None),
+ ("camino-de-invierno", "Camino de Invierno", "Ponferrada, Spain", 260, "10–12", "The winter route through the Sil valley and Ribeira Sacra.", None),
+ ("camino-del-salvador", "Camino del Salvador", "León, Spain", 120, "4–5", "Over the Cantabrian mountains from León to Oviedo, where it joins the Primitivo.", None),
+ ("camino-sanabres", "Camino Sanabrés", "Granja de Moreruela, Spain", 370, "15–17", "The Vía de la Plata's branch through Ourense and its hot springs.", None),
+ ("camino-de-madrid", "Camino de Madrid", "Madrid, Spain", 320, "12–14", "From the capital over the Guadarrama to join the Francés at Sahagún.", None),
+ ("camino-baztanes", "Camino Baztanés", "Bayonne, France", None, None, "From the French Basque coast through the Baztan valley to join the Francés at Pamplona.", None),
+ ("camino-portugues-lisboa", "Camino Portugués from Lisbon", "Lisbon, Portugal", 620, "25–29", "The long way along the Portuguese Central route, from the capital to Santiago.", None),
 ]
 
+# (group id, title, [(question id, question, answer HTML)]). Pages pick questions by id, never by position.
 FAQ = [
  ("start", "Getting started", [
-  ("What is CaminoPlus?", "<p>CaminoPlus is a mobile app for pilgrims walking the Camino de Santiago. It brings together offline maps, places to stay and eat, a digital pilgrim passport, a journal you can share, and stories from the trail, so you only need one app on the Way.</p>"),
-  ("When can I download it?", "<p>The app is in development for iPhone and Android. The App Store and Google Play buttons on this site will go live at launch. <a href=\"/contact\">Contact us</a> or tap “Notify me at launch” and we will email you on the day.</p>"),
-  ("Which phones are supported?", "<p>CaminoPlus is built for recent iPhones and Android phones. We will publish the exact minimum iOS and Android versions with the store listings.</p>"),
-  ("What language is the app in?", "<p>English for now. More languages are planned.</p>"),
-  ("Do I need an account?", "<p>Yes, a free account lets you save your plan, passport and journal. You can sign up with email or with Google.</p>"),
+  ("what-is", "What is CaminoPlus?", "<p>CaminoPlus is a mobile app for pilgrims walking the Camino de Santiago. It brings together offline maps, places to stay and eat, a digital pilgrim passport, a journal you can share, and stories from the trail, so you only need one app on the Way.</p>"),
+  ("when", "When can I download it?", "<p>The app is in development for iPhone and Android. The iOS and Android buttons on this site will turn into the store links at launch. <a href=\"/contact\">Contact us</a> or tap “Notify me at launch” and we will email you on the day.</p>"),
+  ("phones", "Which phones are supported?", "<p>CaminoPlus is built for recent iPhones and Android phones. We will publish the exact minimum iOS and Android versions with the store listings.</p>"),
+  ("language", "What language is the app in?", "<p>English for now. More languages are planned.</p>"),
+  ("account", "Do I need an account?", "<p>Yes, a free account lets you save your plan, passport and journal. You can sign up with email or with Google.</p>"),
  ]),
  ("offline", "Offline &amp; maps", [
-  ("Does CaminoPlus work without signal?", "<p>Yes. CaminoPlus is offline-first. With a subscription you download your route stage by stage, and the map, your position, stays, cafés and points of interest keep working for a full walking day without signal. Anything you post while offline waits in a queue and syncs when you are back online.</p>"),
-  ("How big are the offline downloads?", "<p>Each stage pack is roughly 2–5 MB. The first stage of the Camino Francés, Saint-Jean to Roncesvalles, is about 4.6 MB. You can download only the stages you need, and the app itself is designed to stay under 80 MB to install.</p>"),
-  ("Will GPS drain my battery?", "<p>GPS works without mobile data, and CaminoPlus uses a battery-saving location mode built for long days on foot. Our target is under 15% battery over a 7-hour walk. Real numbers depend on your phone, screen use and cold weather, so carrying a small power bank is still wise.</p>"),
-  ("Where does the map data come from?", "<p>Offline maps are built from <a href=\"https://www.openstreetmap.org/copyright\" rel=\"noopener\">OpenStreetMap</a>, the free map made by a worldwide community. Map data © OpenStreetMap contributors.</p>"),
-  ("How fresh is information like crowds and opening hours?", "<p>Live information such as crowd updates is shown with a “updated X ago” label, so you always know how old it is. When you are offline you see the last version you downloaded.</p>"),
+  ("offline-works", "Does CaminoPlus work without signal?", "<p>The map does. CaminoPlus is offline-first: with Pilgrim Plus you download your route stage by stage, and the map and your GPS position keep working for a full walking day without signal. The map shows roads, paths, towns, water, churches and albergues as they are mapped in OpenStreetMap. Details of stays, audio stories and elevation lines still need a connection for now; offline versions are coming. Anything you post while offline waits in a queue and syncs when you are back online.</p>"),
+  ("offline-size", "How big are the offline downloads?", "<p>Each stage pack is roughly 2–5 MB. The first stage of the Camino Francés, Saint-Jean to Roncesvalles, is about 4.6 MB. You can download only the stages you need.</p>"),
+  ("battery", "Will GPS drain my battery?", "<p>GPS works without mobile data, and CaminoPlus uses a battery-saving location mode built for long days on foot. Our target is under 15% battery over a 7-hour walk. Real numbers depend on your phone, screen use and cold weather, so carrying a small power bank is still wise.</p>"),
+  ("map-data", "Where does the map data come from?", "<p>Offline maps are built from <a href=\"https://www.openstreetmap.org/copyright\" rel=\"noopener\">OpenStreetMap</a>, the free map made by a worldwide community. Map data © OpenStreetMap contributors. See <a href=\"/licences\">Licences</a> for everything the app is built on.</p>"),
+  ("fresh", "How fresh is information like crowds and opening hours?", "<p>Live information such as crowd updates is shown with a “updated X ago” label, so you always know how old it is. When you are offline you see the last version you downloaded.</p>"),
  ]),
  ("pricing", "Pricing &amp; billing", [
-  ("How much does CaminoPlus cost?", "<p>The basic app is free. Pilgrim Plus costs <b>$12 per year</b> and adds offline route downloads and 5 GB of cloud storage. See <a href=\"/pricing\">Pricing</a> for details.</p>"),
-  ("What can I do on the free plan?", "<p>You can use the basic app with a connection: browse routes and stages, look up stays and cafés, watch stories in Explore and keep your passport and journal on your phone. The free plan has no offline route downloads and no cloud storage.</p>"),
-  ("How do I pay?", "<p>Subscriptions are bought through the App Store or Google Play, using the payment method on your store account. Prices may be shown in your local currency.</p>"),
-  ("Does the subscription renew automatically?", "<p>Yes, yearly, until you cancel. You can turn off auto-renew at any time in your App Store or Google Play subscription settings, and you keep access until the end of the paid year.</p>"),
-  ("Can I get a refund?", "<p>Because payments go through Apple or Google, refunds follow their policies. On iPhone, request one at reportaproblem.apple.com. On Android, request one from your Google Play order history. If something went wrong, <a href=\"/contact\">tell us</a> and we will help.</p>"),
+  ("cost", "How much does CaminoPlus cost?", "<p>The basic app is free. Pilgrim Plus costs <b>$12 per year</b> and adds offline route downloads and 5 GB of cloud storage. See <a href=\"/pricing\">Pricing</a> for details.</p>"),
+  ("free-plan", "What can I do on the free plan?", "<p>You can use the basic app with a connection: browse routes and stages, look up stays and cafés, watch stories in Discover and keep your passport and journal on your phone. The free plan has no offline route downloads and no cloud storage.</p>"),
+  ("pay", "How do I pay?", "<p>Subscriptions are bought through the App Store or Google Play, using the payment method on your store account. Prices may be shown in your local currency.</p>"),
+  ("renew", "Does the subscription renew automatically?", "<p>Yes, yearly, until you cancel. You can turn off auto-renew at any time in your App Store or Google Play subscription settings, and you keep access until the end of the paid year.</p>"),
+  ("refund", "Can I get a refund?", "<p>Because payments go through Apple or Google, refunds follow their policies. On iPhone, request one at reportaproblem.apple.com. On Android, request one from your Google Play order history. If something went wrong, <a href=\"/contact\">tell us</a> and we will help.</p>"),
  ]),
  ("storage", "Cloud storage", [
-  ("What is the 5 GB of cloud storage for?", "<p>It backs up your journal posts, photos, passport stamps and plan, so nothing is lost if your phone is lost or broken, and you can open your journey on a new phone.</p>"),
-  ("What happens if I need more space?", "<p>Add 5 GB more for $5 per year, as many times as you need.</p>"),
-  ("What happens to my photos if my subscription ends?", "<p>Your posts stay on your phone. We will remind you before anything in cloud storage changes, and you can export your data at any time.</p>"),
+  ("storage-what", "What is the 5 GB of cloud storage for?", "<p>It backs up your journal posts, photos, passport stamps and plan, so nothing is lost if your phone is lost or broken, and you can open your journey on a new phone.</p>"),
+  ("storage-more", "What happens if I need more space?", "<p>Add 5 GB more for $5 per year, as many times as you need.</p>"),
+  ("storage-end", "What happens to my photos if my subscription ends?", "<p>Your posts stay on your phone. We will remind you before anything in cloud storage changes, and you can export your data at any time.</p>"),
  ]),
  ("watch", "Smartwatch &amp; health", [
-  ("Which smartwatches work with CaminoPlus?", "<p>Apple Watch and Garmin. Connect them in Settings.</p>"),
-  ("What health data does it use?", "<p>With your permission, CaminoPlus reads walking data such as steps, distance and heart rate to show your daily progress on your profile. You choose what to share, and you can disconnect at any time.</p>"),
+  ("watch-which", "Which smartwatches work with CaminoPlus?", "<p>Apple Watch and Garmin. Connect them in Settings.</p>"),
+  ("watch-data", "What health data does it use?", "<p>With your permission, CaminoPlus reads walking data such as steps, distance and heart rate to show your daily progress on your profile. You choose what to share, and you can disconnect at any time.</p>"),
  ]),
  ("privacy", "Privacy &amp; data", [
-  ("Is CaminoPlus GDPR compliant?", "<p>We design CaminoPlus around the EU General Data Protection Regulation (GDPR). You can see, export, correct and delete your data, and we only use processors that offer GDPR-ready data processing terms. Read the <a href=\"/privacy\">Privacy Policy</a>.</p>"),
-  ("Who can see my journey?", "<p>You choose who sees each post you share. Your journey is yours.</p>"),
-  ("Do you sell my data?", "<p>No. We do not sell personal data, and we do not run third-party ad tracking in the app.</p>"),
-  ("How do I delete my account?", "<p>From Settings in the app, or by emailing <a href=\"mailto:privacy@camino.plus\">privacy@camino.plus</a>. Deleting your account removes your data from our systems, apart from what we must keep by law, such as billing records.</p>"),
+  ("gdpr", "Is CaminoPlus GDPR compliant?", "<p>We design CaminoPlus around the EU General Data Protection Regulation (GDPR). You can see, export, correct and delete your data, and we only use processors that offer GDPR-ready data processing terms. Read the <a href=\"/privacy\">Privacy Policy</a>.</p>"),
+  ("who-sees", "Who can see my journey?", "<p>You choose who sees each post you share. Your journey is yours.</p>"),
+  ("chat-privacy", "Are my messages private?", "<p>Messages in chats and group chats are only shown to the people in the chat, but they are stored on our servers and are <b>not end-to-end encrypted</b>. Do not send passwords or card numbers in chat. You can unsend your own messages, and they are deleted with your account. Details are in the <a href=\"/privacy\">Privacy Policy</a>.</p>"),
+  ("sell", "Do you sell my data?", "<p>No. We do not sell personal data, and we do not run third-party ad tracking in the app.</p>"),
+  ("delete", "How do I delete my account?", "<p>In the app, go to Settings, then Account, then Delete account. That button is being finished and will be in the first release; until it is in your version, email <a href=\"mailto:privacy@camino.plus\">privacy@camino.plus</a> from the address you signed up with and we will do it for you. We delete your account and your data, including your messages, within 30 days, apart from what we must keep by law, such as billing records.</p>"),
  ]),
  ("routes", "Routes", [
-  ("Which Camino routes are included?", "<p>All the main Camino de Santiago routes, including the Francés, Portugués (Central and Coastal), del Norte, Primitivo, Vía de la Plata, Inglés, Finisterre and Muxía, and more. See <a href=\"/routes\">Routes</a> for the full list.</p>"),
-  ("Can I start anywhere?", "<p>Yes. Pick your route and the town where you start, and CaminoPlus builds your stages from there. You can change the plan as you go.</p>"),
-  ("Does CaminoPlus give me a Compostela?", "<p>No. The Compostela is issued by the Pilgrim's Office in Santiago, based on the stamps in your paper credencial. To qualify you must walk at least the last 100 km (or cycle 200 km). The digital passport in CaminoPlus is a keepsake of your journey and does not replace the paper credencial.</p>"),
-  ("Will other pilgrimage routes be added?", "<p>That is the plan. CaminoPlus is built so new routes can be added over time.</p>"),
+  ("routes-which", "Which Camino routes are included?", "<p>All the main Camino de Santiago routes, including the Francés, Portugués (Central, Coastal and from Lisbon), del Norte, Primitivo, Vía de la Plata, Inglés, Finisterre and Muxía, and more. Stage plans and offline maps arrive route by route, starting with the Francés. See <a href=\"/routes\">Routes</a> for the full list.</p>"),
+  ("start-anywhere", "Can I start anywhere?", "<p>Yes. Pick your route and the town where you start, and CaminoPlus builds your stages from there. You can change the plan as you go.</p>"),
+  ("compostela", "Does CaminoPlus give me a Compostela?", "<p>No. The Compostela is issued by the Pilgrim's Office in Santiago, based on the stamps in your paper credencial. To qualify you must walk at least the last 100 km (or cycle 200 km). The digital passport in CaminoPlus is a keepsake of your journey and does not replace the paper credencial.</p>"),
+  ("more-routes", "Will other pilgrimage routes be added?", "<p>That is the plan. CaminoPlus is built so new routes can be added over time.</p>"),
  ]),
  ("community", "Community &amp; safety", [
-  ("How do you keep the community friendly?", "<p>You can report and block users and posts, and our team reviews reports. Our <a href=\"/terms\">Terms</a> explain what is not allowed.</p>"),
-  ("Is the trail information always right?", "<p>We work hard to keep it accurate, but paths, opening hours and conditions change. Always check signs on the ground, follow local advice and use your own judgement, especially in bad weather.</p>"),
+  ("friendly", "How do you keep the community friendly?", "<p>You can report and block users, posts and messages, and our team reviews reports. Our <a href=\"/terms\">Terms</a> explain what is not allowed.</p>"),
+  ("trail-info", "Is the trail information always right?", "<p>We work hard to keep it accurate, but paths, opening hours and conditions change. Always check signs on the ground, follow local advice and use your own judgement, especially in bad weather.</p>"),
  ]),
 ]
+
+
+def faq_group(gid):
+    return next(qs for k, _, qs in FAQ if k == gid)
+
+
+def faq_item(qid):
+    """(question, answer) of one FAQ entry, looked up by its id."""
+    for _, _, qs in FAQ:
+        for i, q, a in qs:
+            if i == qid:
+                return q, a
+    raise KeyError(qid)
+
 
 # ---------------------------------------------------------------- pages
 def home():
@@ -292,8 +382,8 @@ def home():
       <h3>{label}</h3><p class="muted">{tag}</p>
       <a href="/features#{key}" style="font-weight:600">See {label} →</a>
     </article>''' for key, ic, label, tag, *_ in TABS)
-    routes = "".join(f'<li><a class="btn btn-ghost" href="/routes">{n}</a></li>' for n, *_ in ROUTES[:8])
-    faq_short = [FAQ[1][2][0], FAQ[2][2][0], FAQ[1][2][1], FAQ[6][2][1]]
+    routes = "".join(f'<li><a class="btn btn-ghost" href="/routes">{r[1]}</a></li>' for r in ROUTES[:8])
+    faq_short = [faq_item(i) for i in ("offline-works", "cost", "offline-size", "start-anywhere")]
     qa = "".join(f'<details class="qa"><summary>{q}</summary><div class="ans">{a}</div></details>' for q, a in faq_short)
     body = f'''<section class="hero hero-photo"><div class="wrap hero-grid">
   <div class="hero-copy">
@@ -308,11 +398,11 @@ def home():
     {shot("maps-helicopter", "Map of the Camino Francés in helicopter view", False)}
     {shot("stays", "Stays and cafés list", False)}
   </div>
-</div></section>
+</div>{ai_credit("meseta-wheat")}</section>
 
 <section class="strip" aria-label="Highlights"><div class="wrap"><ul>
   <li>{icon("route")}All Camino routes, start anywhere</li>
-  <li>{icon("wifioff")}Works 6–8 hours with no signal</li>
+  <li>{icon("wifioff")}Offline maps for 6–8 hour walking days</li>
   <li>{icon("watch")}Apple Watch &amp; Garmin</li>
   <li>{icon("tag")}$12 a year, 5 GB cloud included</li>
 </ul></div></section>
@@ -324,7 +414,7 @@ def home():
     <article class="card pad-lg stack" style="background:var(--cp-color-gold-wash);border-color:var(--cp-color-gold-soft)">
       <span class="ic blue">{icon("compass")}</span>
       <h3>See it in action</h3><p class="muted">Screens, details and what is coming next.</p>
-      <a class="btn btn-primary" href="/features">Explore all features</a>
+      <a class="btn btn-primary" href="/features">See all features</a>
     </article>
   </div>
 </div></section>
@@ -344,8 +434,8 @@ def home():
     <div class="feature-copy">
       <span class="tab-pill">{icon("map")}Maps</span>
       <h2>A map that turns the Way into an adventure.</h2>
-      <p class="lead">See the whole route from above, then drop into each town street by street. Find churches, hear their stories, and pick up achievements as you go.</p>
-      <ul class="ticks"><li>Helicopter view and city view</li><li>Audio stories, scavenger hunts and XP</li><li>Crowd updates and weather, Waze style</li></ul>
+      <p class="lead">See the whole route from above, then drop into each town street by street. Find churches and landmarks, and pick up achievements as you go. Audio stories are coming.</p>
+      <ul class="ticks"><li>Helicopter view and city view</li><li>Scavenger hunts and XP, audio stories coming</li><li>Crowd updates and weather, Waze style</li></ul>
     </div>
   </article>
 </div></section>
@@ -354,16 +444,16 @@ def home():
   <div class="stack-lg">
     <p class="eyebrow">Offline-first</p>
     <h2>Built for the hills where your signal disappears.</h2>
-    <p class="lead">Download your stages over Wi-Fi at the albergue. Out on the trail, the map, your GPS position, stays and points of interest all keep working. Your posts wait in a queue and go up the moment you are back online.</p>
+    <p class="lead">Download your stages over Wi-Fi at the albergue. Out on the trail, the map and your GPS position keep working: roads, paths, towns, water, churches and albergues. Your posts wait in a queue and go up the moment you are back online.</p>
     <a class="btn btn-gold" href="/offline-maps">How offline maps work</a>
   </div>
   <div class="stat-row">
-    <div class="stat"><b>6–8 h</b><span>of walking with no signal</span></div>
+    <div class="stat"><b>6–8 h</b><span>walking days the offline map is built for</span></div>
     <div class="stat"><b>2–5 MB</b><span>per downloaded stage</span></div>
     <div class="stat"><b>&lt;15%</b><span>battery target for a 7-hour day</span></div>
-    <div class="stat"><b>&lt;80 MB</b><span>to install the app</span></div>
+    <div class="stat"><b>$12</b><span>a year for offline downloads</span></div>
   </div>
-</div></div></div></section>
+</div>{ai_credit("pyrenees-ridge")}</div></div></section>
 
 <section class="section"><div class="wrap">
   <div class="head center"><p class="eyebrow">Routes</p><h2>Every Camino. Start wherever you start.</h2>
@@ -376,7 +466,7 @@ def home():
     <article class="card pad-lg plan">
       <div><h3>Free</h3><p class="muted" style="margin-top:6px">The basic app, online.</p></div>
       <p class="price">$0</p>
-      <ul class="ticks"><li>Routes, stays, cafés and Explore</li><li>Passport and journal on your phone</li></ul>
+      <ul class="ticks"><li>Routes, stays, cafés and Discover</li><li>Passport and journal on your phone</li></ul>
       <a class="btn btn-ghost" href="/pricing">Compare plans</a>
     </article>
     <article class="card pad-lg plan featured">
@@ -424,43 +514,49 @@ def features():
       <ul class="ticks">{t}</ul>
     </div>
   </article>'''
-    extra = [("wifioff", "Offline-first", "Downloaded stages keep the map, GPS, stays and POIs working for a full day without signal."),
+    extra = [("wifioff", "Offline-first", "Downloaded stages keep the map and your GPS position working for a full day without signal. Details of stays and audio stories need a connection for now."),
              ("sync", "Syncs when you are back", "Posts and stamps go into an outbox and upload automatically when you reconnect."),
              ("battery", "Easy on battery", "A location mode tuned for long walking days. Target: under 15% over 7 hours."),
              ("users", "Crowd updates", "Pilgrims share how busy the trail, albergues and cafés are, with an “updated X ago” label."),
              ("sun", "Weather ahead", "See the forecast for where you will be this afternoon, not just where you are now."),
-             ("headphones", "Audio stories", "Listen to the history of churches, bridges and villages as you walk past."),
+             ("headphones", f"Audio stories {COMING}", "Listen to the history of churches, bridges and villages as you walk past."),
              ("trophy", "Hunts &amp; achievements", "Scavenger hunts, XP and levels add a little play to every stage."),
              ("watch", "Apple Watch &amp; Garmin", "Steps, distance and heart rate on your profile, with your permission."),
              ("shield", "Private by design", "You choose who sees each post. Export or delete your data any time.")]
     cards = "".join(f'<article class="card"><span class="ic">{icon(a)}</span><h4>{b}</h4><p>{c}</p></article>' for a, b, c in extra)
     body = head("Features", "Five tabs. One Camino.",
-        "Me, Stays, Maps, Explore and Settings. Here is what each tab does, with real screens from the app design.",
+        "Me, Stays, Maps, Discover and Settings. Here is what each tab does, with screens from our app design.",
         f'<nav class="tabs-nav" aria-label="Jump to" style="margin-top:32px;margin-bottom:0">{nav}</nav>', photo="santiago-street", pos="center 62%")
-    body += f'''<section class="section" style="padding-top:24px"><div class="wrap">{rows}</div></section>
+    body += f'''<section class="section" style="padding-top:24px"><div class="wrap">{rows}
+  <p class="muted" style="margin-top:8px;font-size:15px">The screens are previews rendered from our app design. The app is still in development, so details can change before launch.</p>
+</div></section>
 <section class="section tight" id="offline"><div class="wrap">
   <div class="head"><p class="eyebrow">Under the hood</p><h2>Made for real days on the trail.</h2></div>
   <div class="grid c3">{cards}</div>
 </div></section>
 {cta()}'''
-    page("features", "Features", "Me, Stays, Maps, Explore and Settings: see every feature of the CaminoPlus app, from offline maps and stamps to stays, stories and smartwatch sync.", body, "features")
+    page("features", "Features", "Me, Stays, Maps, Discover and Settings: see every feature of the CaminoPlus app, from offline maps and stamps to stays, stories and smartwatch sync.", body, "features")
 
 def routes():
     cards = ""
-    for n, frm, km, st, d, badge in ROUTES:
+    for _slug, n, frm, km, st, d, badge in ROUTES:
         b = f'<span class="tag gold">{badge}</span>' if badge else ""
+        if km is None:
+            meta, bar = '<span>Distance to be confirmed</span>', 0
+        else:
+            meta, bar = f"<span>~{km:,} km</span><span>{st} stages</span>", min(100, km / 10)
         cards += f'''<article class="card route">
       <div class="route-top"><h3>{n}</h3>{b}</div>
       <p class="from">From {frm}</p>
       <p class="muted">{d}</p>
-      <div class="route-line" aria-hidden="true"><i style="width:{min(100, km/10):.0f}%"></i></div>
-      <div class="route-meta"><span>~{km:,} km</span><span>{st} stages</span></div>
+      <div class="route-line" aria-hidden="true"><i style="width:{bar:.0f}%"></i></div>
+      <div class="route-meta">{meta}</div>
     </article>'''
     body = head("Routes", "Every Camino, from wherever you start.",
         "CaminoPlus covers the Camino de Santiago routes across Spain, Portugal and France. Choose a route, choose your starting town, and the app builds your stages.", photo="coast-boardwalk", pos="center 58%")
     body += f'''<section class="section" style="padding-top:24px"><div class="wrap">
   <div class="grid c3">{cards}</div>
-  <p class="muted" style="margin-top:24px;font-size:15px">Distances and stage counts are approximate and depend on where you start and how far you walk each day.</p>
+  <p class="muted" style="margin-top:24px;font-size:15px">Distances and stage counts are approximate and depend on where you start and how far you walk each day. Stage plans and offline maps arrive route by route, starting with the Camino Francés.</p>
 </div></section>
 <section class="section tight"><div class="wrap"><div class="grid c3">
   <article class="card"><span class="ic">{icon("pin")}</span><h4>Start anywhere</h4><p>Begin in Saint-Jean, Sarria, Porto or any town on the route. Your stages, distances and stays adjust to you.</p></article>
@@ -476,15 +572,16 @@ def routes():
 
 def pricing():
     rows = [("Routes and stages (online)", True, True), ("Stays and cafés, with filters", True, True),
-            ("Explore stories", True, True), ("Passport, stamps and journal on your phone", True, True),
-            ("Offline route downloads", False, True), ("Offline GPS navigation", False, True),
+            ("Discover stories", True, True), ("Passport, stamps and journal on your phone", True, True),
+            ("Offline route downloads", False, True), ("Offline map and GPS position", False, True),
             ("Cloud backup of photos and journal", "—", "5 GB"), ("Extra cloud storage", "—", "$5 / 5 GB / year")]
     def cell(v):
         if v is True: return '<td class="yes">✓<span class="sr-only">Included</span></td>'
         if v is False: return '<td class="no">—<span class="sr-only">Not included</span></td>'
         return f"<td>{v}</td>"
     tr = "".join(f"<tr><td>{a}</td>{cell(b)}{cell(c)}</tr>" for a, b, c in rows)
-    qa = "".join(f'<details class="qa"><summary>{q}</summary><div class="ans">{a}</div></details>' for q, a in FAQ[2][2] + FAQ[3][2])
+    qa = "".join(f'<details class="qa"><summary>{q}</summary><div class="ans">{a}</div></details>'
+                 for _, q, a in faq_group("pricing") + faq_group("storage"))
     body = head("Pricing", "Less than a café con leche a month.",
         "Start free. When you are ready to walk, Pilgrim Plus unlocks offline maps and cloud storage for a whole year.", photo="galician-galleries", pos="center 18%")
     body += f'''<section class="section" style="padding-top:32px"><div class="wrap">
@@ -492,7 +589,7 @@ def pricing():
     <article class="card pad-lg plan">
       <div><h3>Free</h3><p class="muted" style="margin-top:6px">The basic app, with a connection.</p></div>
       <p class="price">$0</p>
-      <ul class="ticks"><li>Browse every route and stage</li><li>Stays and cafés with filters</li><li>Explore stories</li><li>Passport and journal on your phone</li></ul>
+      <ul class="ticks"><li>Browse every route and stage</li><li>Stays and cafés with filters</li><li>Discover stories</li><li>Passport and journal on your phone</li></ul>
       <p class="muted" style="font-size:15px">No offline route downloads. No cloud storage.</p>
       <span class="btn btn-ghost" aria-disabled="true">Free at launch</span>
     </article>
@@ -500,7 +597,7 @@ def pricing():
       <span class="badge-best">For the walk</span>
       <div><h3>Pilgrim Plus</h3><p class="muted" style="margin-top:6px">Everything in Free, plus offline.</p></div>
       <p class="price">$12<small> / year</small></p>
-      <div class="on-dark"><ul class="ticks"><li>Download your route stage by stage</li><li>Offline map and GPS for 6–8 hours without signal</li><li>5 GB cloud storage for photos, posts and stamps</li><li>Syncs automatically when you are back online</li></ul></div>
+      <div class="on-dark"><ul class="ticks"><li>Download your route stage by stage</li><li>Offline map and GPS position for walking days without signal</li><li>5 GB cloud storage for photos, posts and stamps</li><li>Syncs automatically when you are back online</li></ul></div>
       <a class="btn btn-gold" href="/#download">Get notified at launch</a>
     </article>
   </div>
@@ -530,16 +627,16 @@ def pricing():
 def offline():
     steps = [("Pick your route", "Choose a Camino and the town you start from. CaminoPlus lists your stages."),
              ("Download over Wi-Fi", "At home or at the albergue, download the next stages. Each pack is about 2–5 MB."),
-             ("Walk without signal", "Map, GPS position, stays, cafés and points of interest all work offline."),
+             ("Walk without signal", "The map and your GPS position work offline: roads, paths, towns, water, churches and albergues."),
              ("Sync when you're back", "Posts and stamps you made offline upload on their own when you reconnect.")]
     st = "".join(f'<article class="card"><h4>{a}</h4><p>{b}</p></article>' for a, b in steps)
-    inside = [("map", "Vector map", "Paths, roads, buildings, water and terrain, crisp at every zoom level."),
-              ("route", "Your route line", "The waymarked route, stage start and end points and distances."),
-              ("bed", "Stays &amp; cafés", "Albergues, hostels and cafés on that stage, with the details you need."),
-              ("pin", "Points of interest", "Churches, fountains, pharmacies and more, with their stories.")]
+    inside = [("map", "Vector map", "Roads, paths, buildings, towns, villages and water, crisp at every zoom level, with place names that are drawn offline too."),
+              ("route", "Stage by stage", "Each pack covers one stage and a few kilometres either side of the route, so you only download what you walk."),
+              ("pin", "Churches, albergues and water", "Churches, albergues and drinking-water points, as they are mapped in OpenStreetMap."),
+              ("bed", f"Stays, stories, elevation {COMING}", "Details of stays, audio stories and elevation lines are not in the packs yet. They need a connection for now; we will add them.")]
     ins = "".join(f'<article class="card"><span class="ic">{icon(a)}</span><h4>{b}</h4><p>{c}</p></article>' for a, b, c in inside)
     body = head("Offline maps", "Signal drops. Your map doesn't.",
-        "Large parts of the Camino have weak or no mobile signal. CaminoPlus is built offline-first, so a full walking day works with your phone in airplane mode.", photo="offline-waymarker-hiker", pos="center 78%", posm="72% center")
+        "Large parts of the Camino have weak or no mobile signal. CaminoPlus is built offline-first, so the map and your position keep working with your phone in airplane mode.", photo="offline-waymarker-hiker", pos="center 78%", posm="72% center")
     body += f'''<section class="section" style="padding-top:32px"><div class="wrap">
   <div class="head"><p class="eyebrow">How it works</p><h2>Four steps, then just walk.</h2></div>
   <div class="steps">{st}</div>
@@ -548,13 +645,13 @@ def offline():
   <div class="stack-lg">
     <p class="eyebrow">Small downloads</p>
     <h2>A whole stage in a few megabytes.</h2>
-    <p class="lead">Stage packs are compact vector maps, not heavy images, so they download quickly even on albergue Wi-Fi and barely touch your phone storage. Stage 1 of the Camino Francés, Saint-Jean-Pied-de-Port to Roncesvalles over the Pyrenees, is about 4.6 MB.</p>
+    <p class="lead">Stage packs are compact vector maps, not heavy images, so they download quickly even on albergue Wi-Fi and barely touch your phone storage. Stage 1 of the Camino Francés, Saint-Jean-Pied-de-Port to Roncesvalles over the Pyrenees, is about 4.6 MB. More stages are being added.</p>
   </div>
   <div class="stat-row">
     <div class="stat"><b>2–5 MB</b><span>per stage pack</span></div>
     <div class="stat"><b>4.6 MB</b><span>Saint-Jean → Roncesvalles</span></div>
-    <div class="stat"><b>6–8 h</b><span>fully offline</span></div>
-    <div class="stat"><b>&lt;80 MB</b><span>app install size</span></div>
+    <div class="stat"><b>6–8 h</b><span>walking days it is built for</span></div>
+    <div class="stat"><b>&lt;15%</b><span>battery target over 7 hours</span></div>
   </div>
 </div></div></div></section>
 <section class="section"><div class="wrap">
@@ -569,22 +666,21 @@ def offline():
 <section class="section"><div class="wrap" style="max-width:860px"><div class="card pad-lg stack">
   <span class="ic">{icon("globe")}</span>
   <h3>Built on OpenStreetMap</h3>
-  <p class="muted">Offline maps are made from OpenStreetMap, the free, community-built map of the world, which is especially detailed along the Camino. Map data © <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap contributors</a>, available under the Open Database License.</p>
+  <p class="muted">Offline maps are made from OpenStreetMap, the free, community-built map of the world, which is especially detailed along the Camino. Map data © <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap contributors</a>, available under the Open Database License. See <a href="/licences">Licences</a> for the full list.</p>
   <p class="muted">Offline downloads are part of <a href="/pricing">Pilgrim Plus</a> ($12 a year).</p>
 </div></div></section>
 {cta()}'''
-    page("offline-maps", "Offline maps", "How CaminoPlus offline maps work: download each Camino stage (about 2–5 MB) and walk 6–8 hours without signal with GPS, stays and points of interest.", body, "offline-maps")
+    page("offline-maps", "Offline maps", "How CaminoPlus offline maps work: download each Camino stage (about 2–5 MB) and keep the map and your GPS position working without signal.", body, "offline-maps")
 
 def faq():
     toc = "".join(f'<li><a href="#{k}">{t}</a></li>' for k, t, _ in FAQ)
     groups = ""
     for k, t, qs in FAQ:
-        q = "".join(f'<details class="qa"><summary>{a}</summary><div class="ans">{b}</div></details>' for a, b in qs)
+        q = "".join(f'<details class="qa" id="{i}"><summary>{a}</summary><div class="ans">{b}</div></details>' for i, a, b in qs)
         groups += f'<section class="faq-group" id="{k}"><h2>{t}</h2>{q}</section>'
-    import re
     ld = {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [
-        {"@type": "Question", "name": a, "acceptedAnswer": {"@type": "Answer", "text": re.sub("<[^>]+>", "", b).replace("&amp;", "&")}}
-        for _, _, qs in FAQ for a, b in qs]}
+        {"@type": "Question", "name": a.replace("&amp;", "&"), "acceptedAnswer": {"@type": "Answer", "text": re.sub("<[^>]+>", "", b).replace("&amp;", "&")}}
+        for _, _, qs in FAQ for _, a, b in qs]}
     body = head("FAQ", "Questions, answered.",
         "Offline use, pricing, storage, privacy, smartwatches, routes and more. Can't find yours? <a href=\"/contact\">Ask us</a>.", photo="faq-boots-arrow", pos="center 60%", posm="40% center")
     body += f'''<section class="section" style="padding-top:24px"><div class="wrap faq-layout">
@@ -650,7 +746,7 @@ def contact():
 LEGAL_NOTE = '<p class="notice">Draft for launch. This text is a plain-language summary of how we intend to operate and will be reviewed by legal counsel before the app is released.</p>'
 
 def privacy():
-    body = head("Privacy", "Privacy Policy", "Last updated 4 November 2026.", f'<div style="max-width:760px">{LEGAL_NOTE}</div>')
+    body = head("Privacy", "Privacy Policy", f"Last updated {LEGAL_UPDATED}.", f'<div style="max-width:760px">{LEGAL_NOTE}</div>')
     body += '''<section class="section" style="padding-top:8px"><div class="wrap"><div class="prose">
 <h2>Who we are</h2>
 <p>CaminoPlus (“we”, “us”) makes the CaminoPlus app and this website. We are the controller of the personal data described here. Contact us at <a href="mailto:privacy@camino.plus">privacy@camino.plus</a>.</p>
@@ -658,47 +754,65 @@ def privacy():
 <ul>
 <li><b>Account data:</b> your email address, name and profile photo, or the basic profile Google shares if you sign in with Google.</li>
 <li><b>Content you create:</b> journal posts, photos, captions, comments, passport stamps and your stage plan.</li>
+<li><b>Friends and messages:</b> your friend list and friend requests (who asked whom, and when), the people you block, the messages you send in direct chats and group chats (including photos you attach), and the names and members of your groups.</li>
 <li><b>Location:</b> your device location while you use the map, to show where you are and to record your route. You can turn location off at any time in your phone settings.</li>
 <li><b>Health and fitness data:</b> only if you connect Apple Watch or Garmin, and only the data you allow, such as steps, distance and heart rate.</li>
 <li><b>Purchase data:</b> your subscription status from the App Store or Google Play. We never see your card details.</li>
-<li><b>Technical data:</b> device type, app version and crash reports, so we can fix problems.</li>
+<li><b>Technical data:</b> device type and app version, and crash reports once crash reporting is switched on, so we can fix problems.</li>
 </ul>
 <h2>How we use it</h2>
 <ul>
 <li>To run the app: your account, your journey, offline downloads and sync (contract).</li>
 <li>To show your posts to the people you choose (contract, and your choices).</li>
+<li>To deliver your messages and friend requests to the people you send them to (contract).</li>
 <li>To process health data you connect (your explicit consent, which you can withdraw).</li>
 <li>To keep the service secure, prevent abuse and fix bugs (legitimate interests).</li>
 <li>To send service emails such as sign-in links and receipts, and launch news if you ask for it (contract or consent).</li>
 </ul>
 <p>We do not sell personal data and we do not use third-party advertising trackers in the app.</p>
-<h2>Who processes data for us</h2>
-<p>We use trusted service providers that act on our instructions under data processing agreements:</p>
+<h2>Friends</h2>
+<p>Friends are mutual: you become friends when you send a request and the other person accepts. We store the request, who sent it and when. Declining or cancelling a request deletes it, and so does removing a friend. People you block cannot send you friend requests or messages, and you do not appear in their search. A post you share with “Friends” is shown to your accepted friends and to anyone you have approved as a follower.</p>
+<h2>Chat messages and groups</h2>
 <ul>
-<li>Supabase: accounts, database and authentication</li>
-<li>Cloudflare: file storage, map downloads and content delivery</li>
+<li>Messages you send in direct chats and group chats are stored on our servers so they can reach the other people in the chat and appear on your other devices.</li>
+<li>Only the people in a chat can read its messages in the app. Group members can also see each other's names and photos, and whether a message has been read.</li>
+<li>Messages are protected in transit and at rest by our hosting provider, but they are <b>not end-to-end encrypted</b>. That means our team and our provider are technically able to read them. We only look at messages to investigate a report, to keep the service secure, or when the law requires it. If someone reports a message, our team can read that message.</li>
+<li>Please do not send passwords, card numbers or other secrets in chat.</li>
+<li>You can unsend your own messages; they disappear for everyone in the chat. When you delete your account your messages are deleted too.</li>
+<li>If you use the help bell, your position is sent only to the friends and groups you choose, as a chat message stored like any other message.</li>
+</ul>
+<h2>Who processes data for us</h2>
+<p>We use trusted service providers that act on our instructions under data processing agreements. In use today:</p>
+<ul>
+<li>Supabase: accounts and sign-in, the database, and file storage (photos, chat images and the offline map downloads)</li>
 <li>Vercel: hosting of this website</li>
-<li>RevenueCat: subscription status</li>
-<li>Sentry: crash and error reports</li>
-<li>Resend: transactional email</li>
-<li>Apple and Google: app distribution, payments and sign-in</li>
+<li>MapTiler and OpenFreeMap: the map tiles your phone loads while it is online. They receive your IP address and the area you are looking at. Offline maps come from our own storage, not from them.</li>
+<li>Apple and Google: app distribution and payments, and Google sign-in if you choose it</li>
+</ul>
+<p>Planned, and only used once switched on (we will update this page and its date first):</p>
+<ul>
+<li>RevenueCat: subscription status, when enabled</li>
+<li>Sentry: crash and error reports, when enabled</li>
+<li>Resend: sign-in and service emails from our own domain, when enabled</li>
 </ul>
 <p>Some of these providers may process data outside the European Economic Area. Where they do, we rely on safeguards such as the EU Standard Contractual Clauses.</p>
 <h2>How long we keep it</h2>
-<p>We keep your data while your account is active. When you delete your account we delete your data within 30 days, except records we must keep by law, such as billing records.</p>
+<p>We keep your data while your account is active. When you delete your account we delete your data, including your messages, within 30 days, except records we must keep by law, such as billing records.</p>
+<h2>Deleting your account</h2>
+<p>In the app, open Settings, then Account, then Delete account. That button is being finished and will be in the first release. Until it is in your version, email <a href="mailto:privacy@camino.plus">privacy@camino.plus</a> from the address you signed up with and we will delete your account for you within 30 days.</p>
 <h2>Your rights</h2>
 <p>Under the GDPR and similar laws you can access, correct, export or delete your data, object to or restrict some processing, and withdraw consent at any time. Most of this you can do in the app. For anything else, write to <a href="mailto:privacy@camino.plus">privacy@camino.plus</a>. You can also complain to your local data protection authority, in Spain the Agencia Española de Protección de Datos (AEPD).</p>
 <h2>Children</h2>
 <p>CaminoPlus is not intended for children under 16 without a parent or guardian's consent.</p>
 <h2>This website</h2>
-<p>This website does not use advertising cookies. If we add privacy-friendly analytics, we will list them here.</p>
+<p>This website does not use cookies, advertising trackers or analytics. Its fonts are served from our own server, not from Google Fonts. Our host, Vercel, processes technical request data such as your IP address to deliver the pages. The contact form only opens your email app with the message ready; nothing is sent until you send it from there. If we add privacy-friendly analytics, we will list them here.</p>
 <h2>Changes</h2>
 <p>If we make important changes, we will tell you in the app or by email before they take effect.</p>
 </div></div></section>'''
-    page("privacy", "Privacy Policy", "How CaminoPlus collects, uses and protects your personal data, and your rights under the GDPR.", body, None)
+    page("privacy", "Privacy Policy", "How CaminoPlus collects, uses and protects your personal data, including messages and friends, and your rights under the GDPR.", body, None)
 
 def terms():
-    body = head("Terms", "Terms of Service", "Last updated 4 November 2026.", f'<div style="max-width:760px">{LEGAL_NOTE}</div>')
+    body = head("Terms", "Terms of Service", f"Last updated {LEGAL_UPDATED}.", f'<div style="max-width:760px">{LEGAL_NOTE}</div>')
     body += '''<section class="section" style="padding-top:8px"><div class="wrap"><div class="prose">
 <h2>1. Agreement</h2>
 <p>By creating an account or using CaminoPlus you agree to these Terms and to our <a href="/privacy">Privacy Policy</a>. If you do not agree, please do not use the app.</p>
@@ -715,26 +829,131 @@ def terms():
 <p>You own what you post. You give us a licence to store, process and display it only to run CaminoPlus and to show it to the audience you choose. You can delete it at any time.</p>
 <h2>5. Community rules</h2>
 <p>Be kind. Do not post anything illegal, hateful, harassing, sexually explicit, or that shares someone else's private information. Only upload photos you have the right to share, and respect people who do not want to be photographed. We may remove content or suspend accounts that break these rules.</p>
-<h2>6. Safety on the trail</h2>
+<h2>6. Friends, messages and groups</h2>
+<ul>
+<li>Friends are mutual: you can message someone directly once you are friends. Do not send unwanted, repeated or abusive messages, and do not add people to groups to spam them.</li>
+<li>You can block and report people and messages. Our team reviews reports and may remove content or suspend accounts.</li>
+<li>Messages are stored on our servers and are not end-to-end encrypted; see the <a href="/privacy">Privacy Policy</a>. Do not share passwords or payment details in chat, and do not share your live location with people you do not know.</li>
+</ul>
+<h2>7. Safety on the trail</h2>
 <p>CaminoPlus is a guide, not a guarantee. Paths, opening hours, prices, availability and conditions change, and information may be incomplete or out of date. Follow waymarks and local advice, check the weather, and use your own judgement. You are responsible for your own safety while walking.</p>
-<h2>7. Third-party services</h2>
+<h2>8. Third-party services</h2>
 <p>Some stays or services may be booked with third parties. Those bookings are between you and that provider, under their terms. Listings that can be booked are labelled in the app.</p>
-<h2>8. Map data</h2>
-<p>Maps use data from OpenStreetMap. Map data © <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap contributors</a>, available under the Open Database License (ODbL).</p>
-<h2>9. Liability</h2>
+<h2>9. Map data</h2>
+<p>Maps use data from OpenStreetMap. Map data © <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap contributors</a>, available under the Open Database License (ODbL). The full list of data and software we build on is on the <a href="/licences">Licences</a> page.</p>
+<h2>10. Liability</h2>
 <p>To the extent the law allows, CaminoPlus is provided “as is”, and we are not liable for indirect losses or for losses caused by relying on trail information. Nothing in these Terms limits liability that cannot be limited by law.</p>
-<h2>10. Ending your use</h2>
-<p>You can stop using CaminoPlus and delete your account at any time. We may suspend accounts that seriously or repeatedly break these Terms.</p>
-<h2>11. Changes and contact</h2>
+<h2>11. Ending your use</h2>
+<p>You can stop using CaminoPlus and delete your account at any time (in the app: Settings, Account, Delete account; see the <a href="/privacy">Privacy Policy</a>). We may suspend accounts that seriously or repeatedly break these Terms.</p>
+<h2>12. Changes and contact</h2>
 <p>We may update these Terms and will tell you about important changes in advance. Questions: <a href="mailto:hello@camino.plus">hello@camino.plus</a>.</p>
 </div></div></section>'''
-    page("terms", "Terms of Service", "The terms for using the CaminoPlus app and subscriptions.", body, None)
+    page("terms", "Terms of Service", "The terms for using the CaminoPlus app, subscriptions, friends and messaging.", body, None)
+
+# (name, what we use it for, licence, link). Mirrors the app's Licences screen (mobile/app/licences.tsx).
+LICENCES_DATA = [
+ ("OpenStreetMap", "Map data: routes, towns, water, churches, albergues", "Open Database Licence (ODbL) 1.0. © OpenStreetMap contributors", "https://www.openstreetmap.org/copyright"),
+ ("OpenMapTiles", "The vector tile schema behind our offline maps", "CC BY 4.0. © OpenMapTiles", "https://openmaptiles.org/"),
+ ("Natural Earth", "World map data for the lowest zoom levels", "Public domain", "https://www.naturalearthdata.com/about/terms-of-use/"),
+ ("OpenFreeMap and MapTiler", "Online base map tiles, only while you are online", "Their terms of use. Data © OpenStreetMap contributors; MapTiler tiles © MapTiler", "https://openfreemap.org/"),
+ ("Overture Maps", "Cross-checking places in our data audit", "CDLA-Permissive-2.0", "https://overturemaps.org/"),
+ ("Wikidata", "Facts about notable places", "CC0 (public domain dedication)", "https://www.wikidata.org/wiki/Wikidata:Licensing"),
+ ("Wikipedia", "Text summaries of places, where we use them", "CC BY-SA 4.0 (credited and linked where shown)", "https://creativecommons.org/licenses/by-sa/4.0/"),
+ ("Wikimedia Commons", "Photos of places, where we use them", "Each file has its own licence (CC0, CC BY, CC BY-SA ...); the author and licence are credited where a photo is shown", "https://commons.wikimedia.org/wiki/Commons:Licensing"),
+]
+LICENCES_SOFTWARE = [
+ ("Noto Sans", "Map label glyphs, bundled in the app so labels work offline", "SIL Open Font License 1.1", "https://openfontlicense.org/"),
+ ("Fraunces", "Headlines in the app and on this website", "SIL Open Font License 1.1", "/assets/fonts/OFL-Fraunces.txt"),
+ ("Inter", "Body text in the app and on this website", "SIL Open Font License 1.1", "/assets/fonts/OFL-Inter.txt"),
+ ("JetBrains Mono", "Numbers and labels in the app and on this website", "SIL Open Font License 1.1", "/assets/fonts/OFL-JetBrainsMono.txt"),
+ ("Caveat", "Handwritten accents in the app and on this website", "SIL Open Font License 1.1", "/assets/fonts/OFL-Caveat.txt"),
+ ("MapLibre", "The map engine: MapLibre Native in the app, MapLibre GL JS in our build tools", "BSD-2-Clause (MapLibre Native), BSD-3-Clause (MapLibre GL JS)", "https://maplibre.org/"),
+ ("PMTiles", "The file format of the offline map packs", "BSD-3-Clause", "https://github.com/protomaps/PMTiles"),
+ ("Planetiler", "Builds the offline map packs from OpenStreetMap", "Apache-2.0", "https://github.com/onthegomap/planetiler"),
+ ("Expo, React Native and React", "The app framework", "MIT", "https://github.com/expo/expo/blob/main/LICENSE"),
+ ("Supabase", "Database, sign-in and file storage (the supabase-js library is MIT licensed)", "MIT (client library); Supabase is also one of our processors, see the Privacy Policy", "https://supabase.com/"),
+]
+
+def licences():
+    def table(rows):
+        tr = "".join(
+            f'<tr><th scope="row"><a href="{esc(u)}" rel="noopener">{esc(n)}</a></th><td>{esc(w)}</td><td>{esc(l)}</td></tr>'
+            for n, w, l, u in rows)
+        return (f'<div class="table-scroll"><table class="compare licences"><thead><tr><th scope="col">Name</th>'
+                f'<th scope="col">What we use it for</th><th scope="col">Licence</th></tr></thead><tbody>{tr}</tbody></table></div>')
+    body = head("Licences", "Licences and credits",
+        "CaminoPlus stands on the shoulders of many open projects. Thank you to everyone who maps the Way.")
+    body += f'''<section class="section" style="padding-top:8px"><div class="wrap"><div class="prose">
+<p>Map data © <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap contributors</a>, available under the Open Database Licence (ODbL). Map design © <a href="https://openmaptiles.org/" rel="noopener">OpenMapTiles</a>. The app shows the same list on its Licences screen.</p>
+<h2>Map and place data</h2>
+</div>
+{table(LICENCES_DATA)}
+<div class="prose">
+<h2>Software and fonts</h2>
+</div>
+{table(LICENCES_SOFTWARE)}
+<div class="prose">
+<h2>Photos on this website</h2>
+<p>The background photos on this website are AI-generated illustrations, not photographs, and are marked as such wherever they appear. App screens are rendered from our own design.</p>
+<h2>Questions</h2>
+<p>If we have missed a credit or got a licence wrong, please write to <a href="mailto:hello@camino.plus">hello@camino.plus</a> and we will fix it.</p>
+</div></div></section>'''
+    page("licences", "Licences", "The open data, fonts and software CaminoPlus is built on, with their licences and credits: OpenStreetMap, OpenMapTiles, Natural Earth, Overture, Wikidata and more.", body, None)
+
 
 def notfound():
     body = head("404", "You've wandered off the Way.", "This page doesn't exist. Follow the yellow arrows back home.",
                 '<p style="margin-top:32px"><a class="btn btn-primary" href="/">Back to home</a></p>')
     page("404", "Page not found", "This page does not exist.", body, None)
 
-for f in (home, features, routes, pricing, offline, faq, about, contact, privacy, terms, notfound):
-    f()
-print("ok")
+PAGE_FUNCS = (home, features, routes, pricing, offline, faq, about, contact, privacy, terms, licences, notfound)
+SITEMAP_ORDER = ("index", "features", "routes", "offline-maps", "pricing", "faq", "about", "contact", "privacy", "terms", "licences")
+
+
+def sitemap(previous_dir):
+    """sitemap.xml. A page's <lastmod> is the day its content last changed: the date of the previous
+    sitemap when the generated page is identical to the committed one, otherwise the build day
+    (SITEMAP_LASTMOD, or today). So re-running the generator on unchanged content changes nothing,
+    which is what lets CI compare the output with the committed files."""
+    today = os.environ.get("SITEMAP_LASTMOD") or datetime.date.today().isoformat()
+    old = {}
+    prev = pathlib.Path(previous_dir) / "sitemap.xml"
+    if prev.exists():
+        old = dict(re.findall(r"<loc>([^<]+)</loc><lastmod>([^<]+)</lastmod>", prev.read_text(encoding="utf-8")))
+    urls = []
+    for slug in SITEMAP_ORDER:
+        name = "index.html" if slug == "index" else f"{slug}.html"
+        loc = SITE + ("/" if slug == "index" else f"/{slug}")
+        before = pathlib.Path(previous_dir) / name
+        same = before.exists() and before.read_text(encoding="utf-8") == PAGES[name]
+        urls.append(f"  <url><loc>{loc}</loc><lastmod>{old.get(loc, today) if same else today}</lastmod></url>")
+    return '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "\n".join(urls) + "\n</urlset>\n"
+
+
+def build_all(previous_dir=WEB):
+    """Generate every page in memory: {file name: content}, including sitemap.xml."""
+    PAGES.clear()
+    for f in PAGE_FUNCS:
+        f()
+    PAGES["sitemap.xml"] = sitemap(previous_dir)
+    return dict(PAGES)
+
+
+def main(argv):
+    args = argv[1:]
+    previous = WEB
+    if "--previous" in args:  # compare with another copy of the site (an empty folder: every page counts as changed)
+        i = args.index("--previous")
+        previous = pathlib.Path(args[i + 1])
+        del args[i:i + 2]
+    if len(args) != 1:
+        sys.exit(__doc__)
+    out = pathlib.Path(args[0])
+    out.mkdir(parents=True, exist_ok=True)
+    for name, content in build_all(previous).items():
+        (out / name).write_text(content, encoding="utf-8")
+    print("ok")
+
+
+if __name__ == "__main__":
+    main(sys.argv)

@@ -124,11 +124,11 @@ end $$;
 -- availability + reply + stats
 insert into public.stay_availability (stay_id, day, status, beds_free)
 select stay_id, current_date, 'few_left', 3 from public.business_listings where id = 'b1000000-0000-0000-0000-000000000001';
-select public.track_stay_event(stay_id, 'view') from public.business_listings where id = 'b1000000-0000-0000-0000-000000000001';
+-- one call: a pilgrim counts once per place, event and day (repeats are covered in platform_hardening_smoke.sql)
 select public.track_stay_event(stay_id, 'view') from public.business_listings where id = 'b1000000-0000-0000-0000-000000000001';
 do $$ begin
   assert (select views from public.business_stay_summary(
-            (select stay_id from public.business_listings where id = 'b1000000-0000-0000-0000-000000000001'))) = 2, 'stats';
+            (select stay_id from public.business_listings where id = 'b1000000-0000-0000-0000-000000000001'))) = 1, 'stats';
 end $$;
 
 -- sensitive edit goes back to review, live name unchanged

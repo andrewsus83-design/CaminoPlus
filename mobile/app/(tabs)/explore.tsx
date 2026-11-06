@@ -3,9 +3,12 @@ import { FlatList, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView,
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
-import { secureStorage } from '@/lib/secureStorage';
+import { useAuth } from '@/lib/auth';
+import { localStore, userKey } from '@/lib/localStore';
 import { exploreItems } from '@/data/mock';
 import { c, fonts, radius, role } from '@/theme';
+// Sample content is never shared outside the app: share the invitation instead of an invented place or caption.
+const SHARE_APP = 'Walking the Camino? CaminoPlus has offline maps, stays and a pilgrim passport: https://camino.plus';
 
 const TABS = ['For you', 'Friends', 'Photos of you', 'Favourites'] as const;
 const FAV_KEY = 'discover.favs';
@@ -31,13 +34,16 @@ export default function Discover() {
   };
   const [showTip, setShowTip] = useState(!tutorialSeen);
   const [favs, setFavs] = useState<Favs>({ loved: [], saved: [] });
+  const { session } = useAuth();
+  const favKey = session ? userKey(session.user.id, FAV_KEY) : null;
   useEffect(() => {
-    secureStorage.getItem(FAV_KEY).then((v) => { if (v) setFavs(JSON.parse(v) as Favs); }).catch(() => {});
-  }, []);
+    if (!favKey) return;
+    localStore.getJSON<Favs>(favKey).then((v) => { if (v && Array.isArray(v.loved) && Array.isArray(v.saved)) setFavs(v); });
+  }, [favKey]);
   const toggle = (kind: keyof Favs, id: string) => setFavs((f) => {
     const list = f[kind].includes(id) ? f[kind].filter((x) => x !== id) : [...f[kind], id];
     const next = { ...f, [kind]: list };
-    secureStorage.setItem(FAV_KEY, JSON.stringify(next)).catch(() => {});
+    if (favKey) void localStore.setJSON(favKey, next);
     return next;
   });
   const [comments, setComments] = useState<Record<string, Comment[]>>(SEED);
@@ -50,7 +56,7 @@ export default function Discover() {
     setDraft('');
   };
   const share = (item: (typeof exploreItems)[number]) =>
-    Share.share({ message: `${item.caption} by @${item.user} on CaminoPlus: https://camino.plus` }).catch(() => {});
+    Share.share({ message: SHARE_APP }).catch(() => {});
   const itemsFor = (t: (typeof TABS)[number]) => (t === 'Favourites' ? exploreItems.filter((i) => favs.loved.includes(i.id) || favs.saved.includes(i.id)) : exploreItems);
   const dismiss = () => { tutorialSeen = true; setShowTip(false); };
   return (
@@ -108,6 +114,9 @@ export default function Discover() {
             </Pressable>
           ))}
         </ScrollView>
+        <View accessibilityLabel="Sample stories" style={{ alignSelf: 'center', marginTop: 8, paddingHorizontal: 14, height: 30, borderRadius: 15, backgroundColor: 'rgba(255,253,248,0.92)', justifyContent: 'center' }}>
+          <AppText variant="caption" color={c.goldInk}>Sample stories · real ones from pilgrims are coming</AppText>
+        </View>
       </View>
       <Modal visible={!!openId} transparent animationType="slide" onRequestClose={() => setOpenId(null)}>
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(12,35,64,0.5)' }}>

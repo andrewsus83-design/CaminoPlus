@@ -1,0 +1,7 @@
+<!-- Walk view destination pin (Cross Red, white outline), tip at the bottom centre. Rendered to PNG at 1x/2x/3x, transparent background. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="64" viewBox="0 0 48 64">
+  <defs><filter id="s" x="-40%" y="-80%" width="180%" height="260%"><feGaussianBlur stdDeviation="1.6"/></filter></defs>
+  <ellipse cx="24" cy="60.5" rx="10" ry="3" fill="#000" fill-opacity=".32" filter="url(#s)"/>
+  <path d="M24 61C24 61 5 39.5 5 22.5a19 19 0 0 1 38 0C43 39.5 24 61 24 61Z" fill="#A63D2F" stroke="#fff" stroke-width="3" stroke-linejoin="round"/>
+  <circle cx="24" cy="22.5" r="8" fill="#fff"/>
+</svg>

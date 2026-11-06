@@ -12,6 +12,7 @@ import { FormMessage } from '@/components/auth/Field';
 import { tints } from '@/data/mock';
 import { useAuth } from '@/lib/auth';
 import { useMeData } from '@/lib/useMeData';
+import { useUnreadTotals } from '@/features/social';
 import { Empty, ProgressBar, shortDate } from '@/features/me/shared';
 import { Health } from '@/features/me/Health';
 import { JourneyGrid } from '@/features/me/JourneyGrid';
@@ -100,7 +101,8 @@ export default function Me() {
   const [tab, setTab] = useState<(typeof TABS)[number]>('Journey');
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { profile, journey, session, refresh } = useAuth();
+  const { profile, journey, session, refresh, stale } = useAuth();
+  const unread = useUnreadTotals();
   const [editBio, setEditBio] = useState(false);
   const [bioDraft, setBioDraft] = useState('');
   const [savingBio, setSavingBio] = useState(false);
@@ -108,7 +110,7 @@ export default function Me() {
   const [bioOpen, setBioOpen] = useState(false);
   const [bioLines, setBioLines] = useState(0);
   const [copied, setCopied] = useState(false);
-  const { posts, stamps, days, stages, error } = useMeData();
+  const { posts, stamps, days, stages, error, offline } = useMeData();
   const name = profile?.display_name || profile?.username || 'Pilgrim';
   const stagesDone = days?.filter((d) => d.status === 'done').length ?? 0;
   const changePhoto = async () => {
@@ -149,8 +151,8 @@ export default function Me() {
     Alert.alert(
       next ? 'Make your profile private?' : 'Make your profile public?',
       next
-        ? 'Private: you disappear from other pilgrims\' maps, and only people you approve can see your profile and posts or message you.'
-        : 'Public: other pilgrims can find you on the map, see your profile and posts, and send you messages.',
+        ? 'Private: only your friends see your profile and posts. Other pilgrims can still find you by username to send a friend request.'
+        : 'Public: other pilgrims can find you, see your profile and posts, and send you friend requests. Only friends can message you.',
       [
         { text: 'Cancel', style: 'cancel' },
         {
@@ -180,7 +182,7 @@ export default function Me() {
               <Icon name={copied ? 'check' : 'copy'} color={copied ? c.success : role.muted} size={16} />
             </Pressable>
           )}
-          <View style={{ marginLeft: 'auto' }}><IconButton name="bell" label="Notifications" onPress={() => router.push('/inbox')} flat /></View>
+          <View style={{ marginLeft: 'auto' }}><IconButton name="bell" label={unread.total ? `Inbox, ${unread.total} unread` : 'Inbox'} badge={Math.min(unread.total, 99)} onPress={() => router.push('/inbox')} flat /></View>
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 20 }}>
           <Pressable accessibilityRole="button" accessibilityLabel="Change profile picture" onPress={changePhoto} disabled={uploading}>
@@ -192,7 +194,7 @@ export default function Me() {
             </View>
           </Pressable>
           <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-around' }}>
-            {[[String(Math.round(Number(profile?.km_walked ?? 0))), 'km'], [String(profile?.stamps_count ?? 0), 'stamps'], [String(profile?.followers_count ?? 0), 'friends']].map(([n, l]) => (
+            {[[String(Math.round(Number(profile?.km_walked ?? 0))), 'km'], [String(profile?.stamps_count ?? 0), 'stamps'], [String(profile?.friends_count ?? 0), 'friends']].map(([n, l]) => (
               <Pressable key={l} accessibilityRole="button" onPress={() => router.push(l === 'km' ? '/journey' : l === 'stamps' ? '/passport' : '/friends')} style={{ alignItems: 'center' }}>
                 <AppText variant="h3">{n}</AppText>
                 <AppText variant="small" muted style={{ textDecorationLine: 'underline' }}>{l}</AppText>
@@ -200,7 +202,8 @@ export default function Me() {
             ))}
           </View>
         </View>
-        <View style={{ gap: 4 }}>
+        {/* The Screen stacks with a 16 gap. The name text sits centred in a 34 high row (3 px lower than the row top), so -11 leaves exactly 8 between the profile picture and the name. */}
+        <View style={{ gap: 4, marginTop: -11 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
             <AppText variant="body" numberOfLines={1} style={{ fontFamily: 'Inter_600SemiBold', flexShrink: 1 }}>{name}</AppText>
             <Pressable accessibilityRole="button" accessibilityLabel="Edit description" hitSlop={8} onPress={() => { setBioDraft(profile?.bio ?? ''); setEditBio(true); }} style={{ width: 34, height: 34, borderRadius: radius.pill, backgroundColor: role.surface, borderWidth: 1, borderColor: role.border, alignItems: 'center', justifyContent: 'center', marginRight: -6 }}>
@@ -241,13 +244,14 @@ export default function Me() {
           ) : <AppText variant="accent" color={role.accentText}>Buen Camino!</AppText>}
         </View>
         <SubTabs tabs={TABS} value={tab} onChange={setTab} />
+        {(offline || stale) && <FormMessage tone="info">You are offline. Showing what is saved on this phone.</FormMessage>}
         {!!error && <FormMessage>{`Could not load your data. ${error}`}</FormMessage>}
 
-        {tab === 'Journey' && (!posts ? loading : posts.length === 0
+        {tab === 'Journey' && (!posts ? (offline ? <Empty text="You are offline. Your journey posts will show up when you are back online." /> : loading) : posts.length === 0
           ? <Empty text="No journey posts yet. Tap the pen to write about today's stage." />
           : <JourneyGrid posts={posts} />)}
 
-        {tab === 'Plan' && (!days ? loading : <PlanTracker days={days} />)}
+        {tab === 'Plan' && (!days ? (offline ? <Empty text="You are offline and your plan is not saved on this phone yet. Open it once with a connection." /> : loading) : <PlanTracker days={days} />)}
 
         {tab === 'Health' && <Health />}
       </Screen>
@@ -264,7 +268,7 @@ export default function Me() {
           </View>
         </KeyboardAvoidingView>
       </Modal>
-      <Pressable accessibilityRole="button" accessibilityLabel="Write a journey post" onPress={() => router.push('/write')} style={{ position: 'absolute', right: layout.screenMargin, bottom: Math.max(insets.bottom - 14, 10) + 88 + 8, width: 52, height: 52, borderRadius: radius.pill, backgroundColor: c.gold, alignItems: 'center', justifyContent: 'center', ...shadowStyle('gold') }}>
+      <Pressable accessibilityRole="button" accessibilityLabel="Write a journey post" onPress={() => router.push('/write')} style={{ position: 'absolute', right: 16, bottom: Math.max(insets.bottom - 14, 10) + 88 + 8, width: 52, height: 52, borderRadius: radius.pill, backgroundColor: c.gold, alignItems: 'center', justifyContent: 'center', ...shadowStyle('gold') }}>
         <Icon name="pen" color={c.blue} size={22} />
       </Pressable>
     </View>

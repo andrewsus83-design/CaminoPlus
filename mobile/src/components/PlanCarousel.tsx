@@ -2,16 +2,18 @@ import { useState } from 'react';
 import { FlatList, Pressable, View, useWindowDimensions } from 'react-native';
 import { AppText } from './AppText';
 import { Icon } from './Icon';
+import { config } from '@/lib/config';
 import { c, layout, radius, shadowStyle } from '@/theme';
 
 // Swipeable plan / storage cards. The first card is the plan you are on now.
 const PLANS = [
-  { id: 'free', name: 'Free', price: '$0', note: 'Browse every route and stage, stays and Discover.', perks: ['Basic app', 'Journal and passport'], bg: c.parchment, fg: c.blue, current: true },
-  { id: 'plus', name: 'CaminoPlus', price: '$12 / year', note: 'Walk the whole Camino offline.', perks: ['Offline maps per stage', '5 GB cloud storage', 'Smartwatch sync'], bg: c.blue, fg: c.parchment, current: false },
-  { id: 'storage', name: 'Extra storage', price: '$5 / year', note: 'Add 5 GB for photos and packs.', perks: ['+5 GB cloud storage', 'Stack as many as you need'], bg: c.gold, fg: c.blue, current: false },
+  { id: 'free', name: 'Free', price: '$0', note: 'Browse every route and stage, stays and Discover.', perks: ['Basic app', 'Journal and passport'], bg: c.parchment, fg: c.blue },
+  { id: 'plus', name: 'Pilgrim Plus', price: config.priceLabel, note: 'Walk the whole Camino offline.', perks: ['Offline maps per stage', '5 GB cloud storage'], bg: c.blue, fg: c.parchment },
+  { id: 'storage', name: 'Extra storage', price: '$5 / year', note: 'Add 5 GB for photos and videos.', perks: ['+5 GB cloud storage', 'Stack as many as you need'], bg: c.gold, fg: c.blue },
 ] as const;
 
-export function PlanCarousel({ onPick }: { onPick: (id: string) => void }) {
+/** `plan` is the plan the pilgrim is on now (from the server); the badge follows it. */
+export function PlanCarousel({ plan, onPick }: { plan: 'free' | 'plus'; onPick: (id: string) => void }) {
   const { width } = useWindowDimensions();
   const cardW = width - layout.screenMargin * 2 - 28;
   const gap = 14;
@@ -29,7 +31,7 @@ export function PlanCarousel({ onPick }: { onPick: (id: string) => void }) {
           <Pressable accessibilityRole="button" onPress={() => onPick(p.id)} style={{ width: cardW, minHeight: 230, borderRadius: radius.lg, padding: 22, gap: 8, backgroundColor: p.bg, borderWidth: p.bg === c.parchment ? 1 : 0, borderColor: c.sand300, ...shadowStyle('md') }}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
               <AppText variant="h4" color={p.fg}>{p.name}</AppText>
-              {p.current && (
+              {p.id === plan && (
                 <View style={{ paddingHorizontal: 12, height: 30, borderRadius: radius.pill, backgroundColor: c.blue, justifyContent: 'center' }}>
                   <AppText variant="caption" color={c.parchment}>Your plan</AppText>
                 </View>

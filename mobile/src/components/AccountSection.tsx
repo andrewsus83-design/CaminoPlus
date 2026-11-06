@@ -55,6 +55,10 @@ export function AccountSection() {
         <Icon name="pen" color={c.blue} size={22} />
         <AppText variant="label" color={c.blue}>Edit account</AppText>
       </Pressable>
+      <Pressable accessibilityRole="button" accessibilityLabel="Delete account" onPress={() => router.push('/delete-account')} hitSlop={8}
+        style={{ minHeight: 48, alignItems: 'center', justifyContent: 'center' }}>
+        <AppText variant="label" color={c.red}>Delete account</AppText>
+      </Pressable>
     </View>
   );
 }

@@ -1,0 +1,61 @@
+# Weekly dependency updates, one grouped pull request per area so they stay reviewable.
+# Third-party GitHub Actions are pinned by commit SHA (with the tag in a comment): Dependabot
+# updates both the SHA and the comment.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directories:
+      - /
+      - /.github/actions/build-offline-pack
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ['*']
+
+  # The Expo app. Expo, React Native and their companions move together with the Expo SDK
+  # (pinned with ~ in package.json): bump the SDK on purpose, not through Dependabot majors.
+  - package-ecosystem: npm
+    directory: /mobile
+    schedule:
+      interval: weekly
+    groups:
+      mobile-minor-and-patch:
+        update-types: [minor, patch]
+    ignore:
+      - dependency-name: expo
+        update-types: ['version-update:semver-major']
+      - dependency-name: 'expo-*'
+        update-types: ['version-update:semver-major']
+      - dependency-name: react
+        update-types: ['version-update:semver-major']
+      - dependency-name: react-dom
+        update-types: ['version-update:semver-major']
+      - dependency-name: react-native
+        update-types: ['version-update:semver-major']
+      - dependency-name: 'react-native-*'
+        update-types: ['version-update:semver-major']
+
+  - package-ecosystem: npm
+    directory: /tools/offline-maps
+    schedule:
+      interval: weekly
+    groups:
+      offline-maps-node:
+        patterns: ['*']
+
+  - package-ecosystem: pip
+    directory: /tools/poi-audit
+    schedule:
+      interval: weekly
+    groups:
+      poi-audit-python:
+        patterns: ['*']
+
+  - package-ecosystem: pip
+    directory: /tools/offline-maps
+    schedule:
+      interval: weekly
+    groups:
+      offline-maps-python:
+        patterns: ['*']
