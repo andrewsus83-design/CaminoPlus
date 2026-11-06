@@ -22,6 +22,21 @@
   "min_route_km": 7.2,
   "buffer_km": 3,
   "maxzoom": 15,
+  "quality": {
+    "min_tiles": 640,
+    "max_tiles": 1710,
+    "min_size_mb": 2.3,
+    "max_size_mb": 6.3,
+    "required_layers": [
+      "building",
+      "place",
+      "poi",
+      "transportation",
+      "transportation_name"
+    ],
+    "max_change_ratio": 1.5,
+    "max_osm_age_days": 45
+  },
   "waypoints": [
     {
       "name": "Estella",
@@ -74,8 +89,16 @@
         42.67209,
         15
       ],
-      "min_features": {},
-      "min_labels": {}
+      "min_features": {
+        "poi": 221,
+        "transportation": 180,
+        "building": 7,
+        "mountain_peak": 2
+      },
+      "min_labels": {
+        "place": 1,
+        "peak": 1
+      }
     },
     {
       "name": "Los Arcos z15",
@@ -84,8 +107,14 @@
         42.56974,
         15
       ],
-      "min_features": {},
-      "min_labels": {}
+      "min_features": {
+        "poi": 25,
+        "transportation": 56,
+        "building": 3
+      },
+      "min_labels": {
+        "place": 1
+      }
     }
   ],
   "generated_from": "catalog/camino-frances/06.json"

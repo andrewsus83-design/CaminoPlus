@@ -22,6 +22,21 @@
   "min_route_km": 7.3,
   "buffer_km": 3,
   "maxzoom": 15,
+  "quality": {
+    "min_tiles": 570,
+    "max_tiles": 1530,
+    "min_size_mb": 0.7,
+    "max_size_mb": 2,
+    "required_layers": [
+      "building",
+      "place",
+      "poi",
+      "transportation",
+      "transportation_name"
+    ],
+    "max_change_ratio": 1.5,
+    "max_osm_age_days": 45
+  },
   "waypoints": [
     {
       "name": "Frómista",
@@ -74,8 +89,13 @@
         42.26769,
         15
       ],
-      "min_features": {},
-      "min_labels": {}
+      "min_features": {
+        "poi": 46,
+        "transportation": 59
+      },
+      "min_labels": {
+        "place": 1
+      }
     },
     {
       "name": "Carrión de los Condes z15",
@@ -84,8 +104,14 @@
         42.33854,
         15
       ],
-      "min_features": {},
-      "min_labels": {}
+      "min_features": {
+        "poi": 82,
+        "transportation": 83,
+        "building": 6
+      },
+      "min_labels": {
+        "place": 1
+      }
     }
   ],
   "generated_from": "catalog/camino-frances/16.json"

@@ -22,6 +22,21 @@
   "min_route_km": 7.6,
   "buffer_km": 3,
   "maxzoom": 15,
+  "quality": {
+    "min_tiles": 770,
+    "max_tiles": 2070,
+    "min_size_mb": 2.8,
+    "max_size_mb": 7.7,
+    "required_layers": [
+      "building",
+      "place",
+      "poi",
+      "transportation",
+      "transportation_name"
+    ],
+    "max_change_ratio": 1.5,
+    "max_osm_age_days": 45
+  },
   "waypoints": [
     {
       "name": "León",
@@ -67,8 +82,14 @@
         42.599,
         15
       ],
-      "min_features": {},
-      "min_labels": {}
+      "min_features": {
+        "poi": 668,
+        "transportation": 676,
+        "building": 38
+      },
+      "min_labels": {
+        "place": 1
+      }
     },
     {
       "name": "Villadangos del Páramo z15",
@@ -77,8 +98,14 @@
         42.51729,
         15
       ],
-      "min_features": {},
-      "min_labels": {}
+      "min_features": {
+        "poi": 16,
+        "transportation": 52,
+        "building": 3
+      },
+      "min_labels": {
+        "place": 1
+      }
     }
   ],
   "generated_from": "catalog/camino-frances/21.json"
