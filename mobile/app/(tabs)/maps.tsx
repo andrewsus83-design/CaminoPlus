@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Alert, Pressable, View, useWindowDimensions } from 'react-native';
 import { useRouter, useIsFocused } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -10,7 +10,8 @@ import { MapIcon } from '@/features/map/MapIcon';
 import { useMapModel } from '@/features/map/useMapModel';
 import { c, radius, role, shadowStyle } from '@/theme';
 
-const LAYERS: MapLayerMode[] = ['Helicopter', 'City'];
+// 'Helicopter' = whole route, 'City' = close-up around you. Shown with plain names.
+const LAYERS: { mode: MapLayerMode; label: string }[] = [{ mode: 'Helicopter', label: 'Whole route' }, { mode: 'City', label: 'Near me' }];
 const KIND_LABEL = { church: 'Church', albergue: 'Albergue', water: 'Drinking water', cafe: 'Café', quest: 'Quest', stamp: 'Stamp point' } as const;
 const SHEET_PEEK = 150;
 
@@ -26,6 +27,12 @@ export default function Maps() {
   const [gpsMode, setGpsMode] = useState<GpsMode>('saver');
   const [recenterKey, setRecenterKey] = useState(0);
   const m = useMapModel({ gpsMode, visible: focused });
+
+  // Automatic: once a real GPS fix is on the route, switch to the close-up once.
+  const autoDone = useRef(false);
+  useEffect(() => {
+    if (!autoDone.current && !m.walker.sample) { autoDone.current = true; setLayer('City'); }
+  }, [m.walker.sample]);
 
   // Precise GPS is a short burst; fall back to saver automatically.
   useEffect(() => {
@@ -79,8 +86,8 @@ export default function Maps() {
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <View style={{ flexDirection: 'row', padding: 4, borderRadius: radius.pill, backgroundColor: role.surface, ...shadowStyle('md') }}>
             {LAYERS.map((l) => (
-              <Pressable key={l} accessibilityRole="tab" accessibilityState={{ selected: layer === l }} onPress={() => setLayer(l)} style={{ height: 40, paddingHorizontal: 18, borderRadius: radius.pill, justifyContent: 'center', backgroundColor: layer === l ? c.blue : 'transparent' }}>
-                <AppText variant="label" color={layer === l ? c.parchment : c.blue}>{l}</AppText>
+              <Pressable key={l.mode} accessibilityRole="tab" accessibilityState={{ selected: layer === l.mode }} onPress={() => setLayer(l.mode)} style={{ height: 40, paddingHorizontal: 18, borderRadius: radius.pill, justifyContent: 'center', backgroundColor: layer === l.mode ? c.blue : 'transparent' }}>
+                <AppText variant="label" color={layer === l.mode ? c.parchment : c.blue}>{l.label}</AppText>
               </Pressable>
             ))}
           </View>
@@ -133,7 +140,7 @@ export default function Maps() {
               <AppText variant="small" muted>{m.stage.name} · {m.stage.distanceKm} km</AppText>
               <View style={{ flexDirection: 'row', gap: 10 }}>
                 <Pill label="Offline maps" onPress={() => router.push('/offline-maps')} />
-                <Pill variant="ghost" label="City view" onPress={() => setLayer('City')} />
+                <Pill variant="ghost" label="Near me" onPress={() => setLayer('City')} />
               </View>
             </View>
           </View>

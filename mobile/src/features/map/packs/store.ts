@@ -175,7 +175,7 @@ export async function downloadStage(stageId: string) {
     }
   } catch (e) {
     const code: PackErrorCode = abort.signal.aborted ? 'cancelled' : e instanceof PackError ? e.code : 'unknown';
-    if (code !== 'cancelled') console.warn('offline pack download failed', stageId, e);
+    if (code !== 'cancelled' && !(e instanceof Error && e.message === 'not_built_yet')) console.warn('offline pack download failed', stageId, e);
     setError(stageId, code === 'cancelled' ? null : code);
     try { part?.delete(); } catch { /* ignore */ }
   } finally {

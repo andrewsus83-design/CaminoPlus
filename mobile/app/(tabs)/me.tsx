@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ActivityIndicator, Image, Pressable, Share, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -11,9 +11,10 @@ import { FormMessage } from '@/components/auth/Field';
 import { tints } from '@/data/mock';
 import { useAuth } from '@/lib/auth';
 import { useMeData } from '@/lib/useMeData';
+import { Friend, listFriends } from '@/lib/api';
 import { c, layout, radius, role, shadowStyle } from '@/theme';
 
-const TABS = ['Journey', 'Passport', 'Plan'] as const;
+const TABS = ['Journey', 'Passport', 'Plan', 'Friends'] as const;
 
 type StampT = NonNullable<ReturnType<typeof useMeData>['stamps']>[number];
 type StageT = ReturnType<typeof useMeData>['stages'][number];
@@ -128,6 +129,32 @@ function PlanTracker({ days }: { days: DayT[] }) {
   );
 }
 
+/** People you follow, under the Camino friends card. */
+function FriendList() {
+  const { session } = useAuth();
+  const [friends, setFriends] = useState<Friend[] | null>(null);
+  const [err, setErr] = useState(false);
+  useEffect(() => {
+    if (!session) return;
+    listFriends(session.user.id).then(setFriends).catch(() => { setErr(true); setFriends([]); });
+  }, [session]);
+  if (!friends) return <ActivityIndicator color={role.action} style={{ marginTop: 12 }} />;
+  if (friends.length === 0) return <Empty text={err ? 'Could not load your friends. Pull to retry later.' : 'No friends yet. Invite someone to walk with you.'} />;
+  return (
+    <View style={{ gap: 10 }}>
+      {friends.map((f) => (
+        <Card key={f.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 14, padding: 14 }}>
+          {f.avatar_url ? <Image source={{ uri: f.avatar_url }} style={{ width: 56, height: 56, borderRadius: radius.pill }} /> : <Avatar size={56} />}
+          <View style={{ flex: 1 }}>
+            <AppText variant="label" numberOfLines={1}>{f.display_name || f.username || 'Pilgrim'}</AppText>
+            <AppText variant="caption" muted>{f.username ? `@${f.username} · ` : ''}{Math.round(Number(f.km_walked ?? 0))} km walked</AppText>
+          </View>
+        </Card>
+      ))}
+    </View>
+  );
+}
+
 function ago(iso: string | null) {
   if (!iso) return '';
   const d = new Date(iso);
@@ -178,10 +205,10 @@ export default function Me() {
             : <Avatar size={92} ring />}
           <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-around' }}>
             {[[String(Math.round(Number(profile?.km_walked ?? 0))), 'km'], [String(profile?.stamps_count ?? 0), 'stamps'], [String(profile?.followers_count ?? 0), 'friends']].map(([n, l]) => (
-              <View key={l} style={{ alignItems: 'center' }}>
+              <Pressable key={l} accessibilityRole={l === 'km' ? 'button' : undefined} onPress={l === 'km' ? () => router.push('/journey') : l === 'friends' ? () => setTab('Friends') : undefined} style={{ alignItems: 'center' }}>
                 <AppText variant="h3">{n}</AppText>
-                <AppText variant="small" muted>{l}</AppText>
-              </View>
+                <AppText variant="small" muted style={l === 'km' ? { textDecorationLine: 'underline' } : undefined}>{l}</AppText>
+              </Pressable>
             ))}
           </View>
         </View>
@@ -198,14 +225,6 @@ export default function Me() {
           )}
           <AppText variant="accent" color={role.accentText}>Buen Camino!</AppText>
         </View>
-        <Card style={{ gap: 14 }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-            <AppText variant="h4">Camino friends</AppText>
-            <AppText variant="small" muted>{profile?.followers_count ?? 0} friends</AppText>
-          </View>
-          <AppText variant="small" muted>Walk together, share stamps and see where your friends are on the way.</AppText>
-          <Pill variant="gold" label="Invite friends" onPress={() => Share.share({ message: `Walk the Camino with me on CaminoPlus: https://camino.plus${profile?.username ? `/${profile.username}` : ''}` }).catch(() => {})} />
-        </Card>
         <SubTabs tabs={TABS} value={tab} onChange={setTab} />
         {!!error && <FormMessage>{`Could not load your data. ${error}`}</FormMessage>}
 
@@ -229,8 +248,22 @@ export default function Me() {
         {tab === 'Passport' && (!stamps ? loading : <Passport stamps={stamps} stages={stages} />)}
 
         {tab === 'Plan' && (!days ? loading : <PlanTracker days={days} />)}
+
+        {tab === 'Friends' && (
+          <>
+            <Card style={{ gap: 14 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                <AppText variant="h4">Camino friends</AppText>
+                <AppText variant="small" muted>{profile?.followers_count ?? 0} friends</AppText>
+              </View>
+              <AppText variant="small" muted>Walk together, share stamps and see where your friends are on the way.</AppText>
+              <Pill variant="gold" label="Invite friends" onPress={() => Share.share({ message: `Walk the Camino with me on CaminoPlus: https://camino.plus${profile?.username ? `/${profile.username}` : ''}` }).catch(() => {})} />
+            </Card>
+            <FriendList />
+          </>
+        )}
       </Screen>
-      <Pressable accessibilityRole="button" accessibilityLabel="Write a journey post" onPress={() => router.push('/write')} style={{ position: 'absolute', right: layout.screenMargin, bottom: insets.bottom + 116, width: 64, height: 64, borderRadius: radius.pill, backgroundColor: c.gold, alignItems: 'center', justifyContent: 'center', ...shadowStyle('gold') }}>
+      <Pressable accessibilityRole="button" accessibilityLabel="Write a journey post" onPress={() => router.push('/write')} style={{ position: 'absolute', right: layout.screenMargin, bottom: Math.max(insets.bottom - 14, 10) + 88 + 4, width: 64, height: 64, borderRadius: radius.pill, backgroundColor: c.gold, alignItems: 'center', justifyContent: 'center', ...shadowStyle('gold') }}>
         <Icon name="pen" color={c.blue} size={26} />
       </Pressable>
     </View>
