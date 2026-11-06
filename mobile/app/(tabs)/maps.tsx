@@ -37,7 +37,7 @@ export default function Maps() {
   const poi = pois.find((p) => p.id === selId);
   const onSelectPoi = useCallback((id: string | undefined) => {
     setSelId(id);
-    setSheetOpen(!!id);
+    if (id) setSheetOpen(false);
   }, []);
 
   const tabBarSpace = insets.bottom + 88;
@@ -97,7 +97,7 @@ export default function Maps() {
       </View>
 
       {/* Right: GPS mode + locate me */}
-      <View pointerEvents="box-none" style={{ position: 'absolute', right: 16, bottom: sheetBottom + SHEET_PEEK + 16, gap: 10, alignItems: 'flex-end' }}>
+      {!poi && <View pointerEvents="box-none" style={{ position: 'absolute', right: 16, bottom: sheetBottom + SHEET_PEEK + 16, gap: 10, alignItems: 'flex-end' }}>
         <Pressable
           accessibilityRole="switch"
           accessibilityState={{ checked: gpsMode === 'saver' }}
@@ -119,26 +119,10 @@ export default function Maps() {
         >
           <MapIcon name="locate" color={c.blue} />
         </RoundButton>
-      </View>
+      </View>}
 
-      <BottomSheet open={sheetOpen} onOpenChange={setSheetOpen} peek={SHEET_PEEK} full={SHEET_FULL} bottom={sheetBottom}>
-        {poi ? (
-          <View style={{ gap: 8 }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-              <AppText variant="mono" muted style={{ textTransform: 'uppercase', fontSize: 12, letterSpacing: 1.2 }}>{KIND_LABEL[poi.kind]}{poi.xp ? ` · +${poi.xp} XP` : ''}</AppText>
-              <Pressable accessibilityLabel="Close" onPress={() => onSelectPoi(undefined)} hitSlop={12}>
-                <Icon name="close" color={role.muted} size={20} />
-              </Pressable>
-            </View>
-            <AppText variant="h4">{poi.name}</AppText>
-            <AppText variant="small" muted>{poi.blurb}</AppText>
-            <View style={{ flexDirection: 'row', gap: 10, marginTop: 8 }}>
-              {poi.audioMin ? <Pill label={`Play story · ${poi.audioMin} min`} onPress={() => Alert.alert('Audio stories', 'Coming in the next build.')} /> : null}
-              {poi.kind === 'quest' ? <Pill variant="gold" label="Start quest" onPress={() => Alert.alert('Quests', 'Coming in the next build.')} /> : null}
-              {!poi.audioMin && poi.kind !== 'quest' ? <Pill variant="ghost" label="Save" onPress={() => Alert.alert('Saved', 'Saved to your plan (sample).')} /> : null}
-            </View>
-          </View>
-        ) : (
+      {!poi && <BottomSheet open={sheetOpen} onOpenChange={setSheetOpen} peek={SHEET_PEEK} full={SHEET_FULL} bottom={sheetBottom}>
+        {(
           <View style={{ gap: 6 }}>
             <AppText variant="h4">{ROUTE_NAME} · St-Jean → Santiago</AppText>
             <AppText variant="small" muted>
@@ -154,7 +138,9 @@ export default function Maps() {
             </View>
           </View>
         )}
-      </BottomSheet>
+      </BottomSheet>}
+
+      {poi && <PoiPopup poi={poi} bottom={sheetBottom + 12} onClose={() => onSelectPoi(undefined)} />}
     </View>
   );
 }
@@ -182,4 +168,27 @@ function StatusPill({ status, online, onPress }: { status: ReturnType<typeof use
   if (status.kind === 'missing')
     return pill(c.red100, c.red700, `${online ? '' : 'Offline · '}No map pack for stage ${status.stageNumber} · Download`, online ? undefined : <MapIcon name="wifiOff" color={c.red700} size={14} />);
   return null;
+}
+
+/** Pop-up card that appears over the map when a place is tapped. */
+function PoiPopup({ poi, bottom, onClose }: { poi: (typeof pois)[number]; bottom: number; onClose: () => void }) {
+  return (
+    <View style={{ position: 'absolute', left: 16, right: 16, bottom, borderRadius: radius.lg, backgroundColor: role.surface, padding: 20, gap: 10, ...shadowStyle('lg') }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+        <View style={{ paddingHorizontal: 12, height: 30, borderRadius: radius.pill, backgroundColor: c.goldWash, justifyContent: 'center' }}>
+          <AppText variant="caption" color={c.goldInk}>{KIND_LABEL[poi.kind]}{poi.xp ? ` · +${poi.xp} XP` : ''}</AppText>
+        </View>
+        <Pressable accessibilityRole="button" accessibilityLabel="Close" onPress={onClose} hitSlop={14} style={{ width: 40, height: 40, alignItems: 'center', justifyContent: 'center' }}>
+          <Icon name="close" color={role.muted} size={24} />
+        </Pressable>
+      </View>
+      <AppText variant="h4">{poi.name}</AppText>
+      <AppText variant="small" muted>{poi.blurb}</AppText>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 6 }}>
+        {poi.audioMin ? <Pill label={`Play story · ${poi.audioMin} min`} onPress={() => Alert.alert('Audio stories', 'Coming in the next build.')} /> : null}
+        {poi.kind === 'quest' ? <Pill variant="gold" label="Start quest" onPress={() => Alert.alert('Quests', 'Coming in the next build.')} /> : null}
+        <Pill variant="ghost" label="Save" onPress={() => Alert.alert('Saved', 'Saved to your plan (sample).')} />
+      </View>
+    </View>
+  );
 }

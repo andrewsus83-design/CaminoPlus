@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -13,6 +14,7 @@ export default function StayDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const [fav, setFav] = useState(false);
   const s = stays.find((x) => x.id === id);
   if (!s) return <Screen><AppText>Stay not found.</AppText></Screen>;
   return (
@@ -20,7 +22,7 @@ export default function StayDetail() {
       <Screen>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
           <IconButton name="back" label="Back" onPress={() => router.back()} />
-          <IconButton name="heart" label="Favourite" />
+          <IconButton name="heart" label={fav ? 'Remove favourite' : 'Add favourite'} active={fav} onPress={() => setFav((v) => !v)} />
         </View>
         <Photo tint={s.tint} height={260} style={{ borderRadius: radius.lg }} />
         <AppText variant="h2">{s.name}</AppText>

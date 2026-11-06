@@ -72,6 +72,7 @@ function Passport({ stamps, stages }: { stamps: StampT[]; stages: StageT[] }) {
 
 /** Plan as a tracker: overall progress on top, then a timeline of days. */
 function PlanTracker({ days }: { days: DayT[] }) {
+  const router = useRouter();
   if (days.length === 0) return <Empty text="Stages for your route are coming soon. Your day plan will appear here." />;
   const total = days.reduce((a, d) => a + Number(d.planned_distance_km ?? 0), 0);
   const doneKm = days.filter((d) => d.status === 'done').reduce((a, d) => a + Number(d.planned_distance_km ?? 0), 0);
@@ -81,19 +82,23 @@ function PlanTracker({ days }: { days: DayT[] }) {
   const title = (d: DayT) => (d.from_name && d.to_name ? `${d.from_name} → ${d.to_name}` : d.stage?.name ?? `Day ${d.day_number}`);
   return (
     <View style={{ gap: 16 }}>
-      <Card style={{ gap: 14 }}>
+      <Card style={{ gap: 14 }} onPress={() => router.push({ pathname: '/planner', params: next ? { day: next.id } : {} })}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
           <AppText variant="h3">{Math.round(total ? (doneKm / total) * 100 : 0)}%</AppText>
           <AppText variant="label" muted>Day {Math.min(doneN + 1, days.length)} of {days.length}</AppText>
         </View>
         <ProgressBar value={total ? doneKm / total : 0} />
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          <AppText variant="label" color={role.accentText}>Open day planner</AppText>
+          <Icon name="chevron" color={role.accentText} size={18} />
+        </View>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
           <AppText variant="small" muted>{Math.round(doneKm)} of {Math.round(total)} km</AppText>
           <AppText variant="small" muted>{last.planned_date ? `Santiago ${shortDate(last.planned_date)}` : `${days.length - doneN} stages left`}</AppText>
         </View>
       </Card>
       {next && (
-        <Card style={{ gap: 6, backgroundColor: c.blue }}>
+        <Card style={{ gap: 6, backgroundColor: c.blue }} onPress={() => router.push({ pathname: '/planner', params: { day: next.id } })}>
           <AppText variant="mono" color={c.goldSoft} style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 1.2 }}>Up next · Day {next.day_number}</AppText>
           <AppText variant="h4" color={c.parchment}>{title(next)}</AppText>
           <AppText variant="small" color={c.parchment}>{next.planned_distance_km ? `${Number(next.planned_distance_km).toFixed(1)} km` : ''}{next.planned_date ? ` · ${shortDate(next.planned_date)}` : ''}</AppText>
@@ -215,7 +220,7 @@ export default function Me() {
               </View>
               {!!p.body && <AppText variant="small">{p.body}</AppText>}
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                <Icon name="heart" color={c.red} size={18} />
+                <Icon name="heart" color={c.red} size={18} filled />
                 <AppText variant="caption" muted>{p.like_count}</AppText>
               </View>
             </Card>

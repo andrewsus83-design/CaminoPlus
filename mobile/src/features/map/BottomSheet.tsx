@@ -50,9 +50,12 @@ export function BottomSheet({ open, onOpenChange, peek, full, bottom, children }
           <View style={{ width: 52, height: 6, borderRadius: radius.pill, backgroundColor: role.border }} />
         </Pressable>
       </View>
-      <ScrollView scrollEnabled={open} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 24 }}>
-        {children}
-      </ScrollView>
+      {/* While peeking, the whole card is a drag handle; once open the content scrolls. */}
+      <View style={{ flex: 1 }} {...(open ? {} : pan.panHandlers)}>
+        <ScrollView scrollEnabled={open} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 24 }}>
+          {children}
+        </ScrollView>
+      </View>
     </Animated.View>
   );
 }
