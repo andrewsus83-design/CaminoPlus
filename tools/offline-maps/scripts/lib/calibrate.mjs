@@ -504,7 +504,13 @@ export function patchStageText(text, writes) {
   const first = root.members[0];
   const ctx = { nl: text.includes('\r\n') ? '\r\n' : '\n', unit: (first && lineIndent(text, first.keyStart)) || '  ' };
   const edits = [];
-  if (writes.quality !== undefined) edits.push(...setMembers(text, root, [['quality', writes.quality]], ctx, 'render_checks'));
+  if (writes.quality !== undefined) {
+    // New `quality` goes where scripts/make_stages.py writes it (CI's `make_stages.py --check` compares the text):
+    // right after `maxzoom`, which is also where stage 1 has it. Without a maxzoom: before render_checks.
+    const at = root.members.findIndex((m) => m.key === 'maxzoom');
+    const next = at >= 0 ? root.members[at + 1] : undefined;
+    edits.push(...setMembers(text, root, [['quality', writes.quality]], ctx, next ? next.key : 'render_checks'));
+  }
   if (writes.views?.length) {
     const checks = lastMember(root, 'render_checks').value;
     for (const w of writes.views) {
