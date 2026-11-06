@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import { Screen } from '@/components/Screen';
 import { AppText } from '@/components/AppText';
 import { Card, SectionLabel } from '@/components/ui';
-import { AccountSection, LogoutButton } from '@/components/AccountSection';
+import { AccountSection, LogoutButton, ThemeToggle } from '@/components/AccountSection';
 import { BusinessCard, IntroSheet } from '@/features/business/BusinessCard';
 import { useOwner } from '@/features/business/store';
 import { Icon } from '@/components/Icon';
@@ -33,7 +33,10 @@ export default function Settings() {
     <Screen>
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
         <AppText variant="h2">Settings</AppText>
-        <LogoutButton />
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+          <ThemeToggle />
+          <LogoutButton />
+        </View>
       </View>
       <AccountSection />
       <Pressable accessibilityRole="button" accessibilityLabel="Connect smartwatch" onPress={() => router.push('/watches')} style={{ borderRadius: radius.lg, backgroundColor: c.blue, padding: 20, flexDirection: 'row', alignItems: 'center', gap: 16, overflow: 'hidden' }}>

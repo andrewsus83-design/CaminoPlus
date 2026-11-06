@@ -4,6 +4,7 @@ import { AppText } from './AppText';
 import { Icon } from './Icon';
 import { Card, SectionLabel } from './ui';
 import { useAuth } from '@/lib/auth';
+import { useTheme } from '@/lib/theme';
 import { c } from '@/theme';
 
 /** Round log out button for the top right of Settings; asks before signing out. */
@@ -23,6 +24,18 @@ export function LogoutButton() {
     <Pressable accessibilityRole="button" accessibilityLabel="Log out" onPress={confirm} hitSlop={8}
       style={({ pressed }) => ({ width: 56, height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center', backgroundColor: c.white, borderWidth: 1, borderColor: c.sand300, opacity: pressed ? 0.8 : 1 })}>
       <Icon name="logout" color={c.blue} size={26} />
+    </Pressable>
+  );
+}
+
+/** Round light/dark mode button for the top right of Settings, next to log out. Shows the mode you would switch to. */
+export function ThemeToggle() {
+  const { scheme, toggle } = useTheme();
+  const dark = scheme === 'dark';
+  return (
+    <Pressable accessibilityRole="button" accessibilityLabel={dark ? 'Switch to light mode' : 'Switch to dark mode'} onPress={toggle} hitSlop={8}
+      style={({ pressed }) => ({ width: 56, height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center', backgroundColor: c.white, borderWidth: 1, borderColor: c.sand300, opacity: pressed ? 0.8 : 1 })}>
+      <Icon name={dark ? 'sun' : 'moon'} color={dark ? c.gold : c.blue} size={26} />
     </Pressable>
   );
 }

@@ -10,7 +10,8 @@ import { supabase } from '@/lib/supabase';
 import { authRedirectUrl } from '@/lib/authLinks';
 import { c, fonts, layout, radius, role } from '@/theme';
 
-const input = { height: 56, fontFamily: fonts.body, fontSize: 19, color: role.text, backgroundColor: role.surface, borderRadius: radius.lg, borderWidth: 1, borderColor: role.border, paddingHorizontal: 16 } as const;
+// Getters, so the colours follow the light/dark theme (read each time the style is used).
+const input = { height: 56, fontFamily: fonts.body, fontSize: 19, get color() { return role.text; }, get backgroundColor() { return role.surface; }, borderRadius: radius.lg, borderWidth: 1, get borderColor() { return role.border; }, paddingHorizontal: 16 };
 
 export default function EditAccount() {
   const router = useRouter();
