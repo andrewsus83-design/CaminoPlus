@@ -66,6 +66,22 @@ export default function Settings() {
         <BusinessCard state={owner.state} name={owner.draft.name} stepsDone={owner.stepsDone} onPress={openCard} />
       </View>
       <View style={{ gap: 8 }}>
+        <SectionLabel>Support</SectionLabel>
+        <Card style={{ padding: 4 }}>
+          {[
+            { label: 'Help', icon: 'info', path: '/help' },
+            { label: 'Send feedback', icon: 'chat', path: '/feedback' },
+            { label: 'Rate CaminoPlus', icon: 'star', path: '/rate' },
+          ].map((r, i) => (
+            <Pressable key={r.label} accessibilityRole="button" accessibilityLabel={r.label} onPress={() => router.push(r.path as never)} style={{ minHeight: 56, flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: 16, borderTopWidth: i ? 1 : 0, borderTopColor: c.sand300 }}>
+              <Icon name={r.icon as 'info'} color={c.blue} size={22} />
+              <AppText variant="label" style={{ flex: 1 }}>{r.label}</AppText>
+              <Icon name="chevron" color={c.blue} size={20} />
+            </Pressable>
+          ))}
+        </Card>
+      </View>
+      <View style={{ gap: 8 }}>
         <SectionLabel>About</SectionLabel>
         <Card style={{ padding: 4 }}>
           {[
