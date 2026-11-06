@@ -1,0 +1,15 @@
+{
+  "n": 4,
+  "name": "Fixture Delta to Fixture Echo",
+  "from": {"name": "Fixture Delta", "lat": 42.45, "lng": -2.75, "source": "fixture"},
+  "to": {"name": "Fixture Echo", "lat": 42.4, "lng": -3.0, "source": "fixture"},
+  "via": [
+    {"name": "Fixture Via One", "lat": 42.44, "lng": -2.82, "source": "fixture"},
+    {"name": "Fixture Via Two", "lat": 42.42, "lng": -2.91, "source": "fixture"}
+  ],
+  "extracts": ["la-rioja", "castilla-y-leon"],
+  "coastal": false,
+  "distance_km": null,
+  "distance_source": null,
+  "notes": "Test fixture, made-up places. Two via points."
+}

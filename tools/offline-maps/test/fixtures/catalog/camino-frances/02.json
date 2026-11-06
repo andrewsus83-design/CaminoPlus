@@ -1,0 +1,14 @@
+{
+  "n": 2,
+  "name": "Fixture Bravo to Fixture Charlie",
+  "from": {"name": "Fixture Bravo", "lat": 42.5505, "lng": -2.2495, "source": "fixture"},
+  "to": {"name": "Fixture Charlie", "lat": 42.5, "lng": -2.5, "source": "fixture"},
+  "via": [
+    {"name": "Fixture Mid", "lat": 42.53, "lng": -2.38, "source": "fixture"}
+  ],
+  "extracts": ["navarra", "la-rioja"],
+  "coastal": false,
+  "distance_km": 21.4,
+  "distance_source": "made-up number for the test",
+  "notes": "Test fixture, made-up places."
+}

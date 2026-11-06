@@ -1,0 +1,6 @@
+{
+  "navarra": "https://download.geofabrik.de/europe/spain/navarra-latest.osm.pbf",
+  "la-rioja": "https://download.geofabrik.de/europe/spain/la-rioja-latest.osm.pbf",
+  "castilla-y-leon": "https://download.geofabrik.de/europe/spain/castilla-y-leon-latest.osm.pbf",
+  "aragon": "https://download.geofabrik.de/europe/spain/aragon-latest.osm.pbf"
+}

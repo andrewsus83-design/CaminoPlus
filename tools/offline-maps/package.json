@@ -11,6 +11,8 @@
     "test:render": "node test/render_offline.mjs",
     "test:render-fixture": "node test/render_offline.mjs test/fixtures/mini.pmtiles --stage test/fixtures/mini-stage.json",
     "check-pack": "node scripts/check_pack.mjs",
+    "stages": "python3 scripts/make_stages.py",
+    "check-stages": "python3 scripts/check_stages.py",
     "publish-pack": "node scripts/publish_pack.mjs"
   },
   "dependencies": {

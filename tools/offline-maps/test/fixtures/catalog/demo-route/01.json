@@ -1,0 +1,12 @@
+{
+  "n": 1,
+  "name": "Demo Start to Demo Hill",
+  "from": {"name": "Demo Start", "lat": 41.8, "lng": -1.5, "source": "fixture"},
+  "to": {"name": "Demo Hill", "lat": 41.75, "lng": -1.75, "source": "fixture"},
+  "via": [],
+  "extracts": ["aragon"],
+  "coastal": false,
+  "distance_km": 20,
+  "distance_source": "made-up number for the test",
+  "notes": "Test fixture, made-up places. Stage 1 of this route is not hand-written, so it is generated."
+}
