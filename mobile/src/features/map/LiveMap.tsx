@@ -68,7 +68,7 @@ function LiveMapImpl(p: MapViewProps) {
       </GeoJSONSource>
 
       {heli ? (
-        <GeoJSONSource id="towns" data={townData}>
+        <GeoJSONSource key="towns" id="towns" data={townData}>
           <Layer id="town-dot" type="circle" paint={{ 'circle-radius': ['case', ['get', 'major'], 7, 4.5], 'circle-color': '#FFFFFF', 'circle-stroke-color': C.blue, 'circle-stroke-width': 2.5 }} />
           <Layer
             id="town-label"
@@ -80,6 +80,7 @@ function LiveMapImpl(p: MapViewProps) {
         </GeoJSONSource>
       ) : (
         <GeoJSONSource
+          key="pois"
           id="pois"
           data={poiData}
           hitbox={{ top: 22, right: 22, bottom: 22, left: 22 }}
