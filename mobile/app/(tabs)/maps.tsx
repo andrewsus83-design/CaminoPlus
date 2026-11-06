@@ -5,7 +5,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
 import { Pill } from '@/components/Pill';
-import { BottomSheet, GpsMode, MapLayerMode, MapView, PRECISE_TIMEOUT_MS, ROUTE_NAME, pois, routeLengthKm } from '@/features/map';
+import { ModalSheet } from '@/features/map/ModalSheet';
+import { setTabBarHidden } from '@/lib/tabBarVisibility';
+import { GpsMode, MapLayerMode, MapView, PRECISE_TIMEOUT_MS, ROUTE_NAME, pois, routeLengthKm } from '@/features/map';
 import { MapIcon } from '@/features/map/MapIcon';
 import { useMapModel } from '@/features/map/useMapModel';
 import { c, radius, role, shadowStyle } from '@/theme';
@@ -13,12 +15,12 @@ import { c, radius, role, shadowStyle } from '@/theme';
 // 'Helicopter' = whole route, 'City' = close-up around you. Shown with plain names.
 const LAYERS: { mode: MapLayerMode; label: string }[] = [{ mode: 'Helicopter', label: 'Whole route' }, { mode: 'City', label: 'Near me' }];
 const KIND_LABEL = { church: 'Church', albergue: 'Albergue', water: 'Drinking water', cafe: 'Café', quest: 'Quest', stamp: 'Stamp point' } as const;
-const SHEET_PEEK = 150;
 
 export default function Maps() {
   const insets = useSafeAreaInsets();
   const { height: screenH } = useWindowDimensions();
   const SHEET_FULL = Math.min(Math.round(screenH * 0.6), 560);
+  const TAB_H = 88;
   const router = useRouter();
   const focused = useIsFocused();
   const [layer, setLayer] = useState<MapLayerMode>('Helicopter');
@@ -47,8 +49,14 @@ export default function Maps() {
     if (id) setSheetOpen(false);
   }, []);
 
-  const tabBarSpace = insets.bottom + 88;
+  const tabBarSpace = insets.bottom + TAB_H;
   const sheetBottom = tabBarSpace;
+  // The tab bar is hidden while the sheet is open and comes back when it closes (or you leave Maps).
+  const sheetShown = sheetOpen && !poi && focused;
+  useEffect(() => {
+    setTabBarHidden(sheetShown);
+    return () => setTabBarHidden(false);
+  }, [sheetShown]);
 
   return (
     <View style={{ flex: 1, backgroundColor: role.bg }}>
@@ -66,7 +74,7 @@ export default function Maps() {
           selectedPoiId={selId}
           onSelectPoi={onSelectPoi}
           saver={gpsMode !== 'precise'}
-          insets={{ top: insets.top + 100, bottom: sheetBottom + SHEET_PEEK }}
+          insets={{ top: insets.top + 100, bottom: sheetBottom }}
         />
       ) : (
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
@@ -104,7 +112,7 @@ export default function Maps() {
       </View>
 
       {/* Right: GPS mode + locate me */}
-      {!poi && <View pointerEvents="box-none" style={{ position: 'absolute', right: 16, bottom: sheetBottom + SHEET_PEEK + 16, gap: 10, alignItems: 'flex-end' }}>
+      {!poi && <View pointerEvents="box-none" style={{ position: 'absolute', right: 16, bottom: sheetBottom + 16, gap: 10, alignItems: 'flex-end' }}>
         <Pressable
           accessibilityRole="switch"
           accessibilityState={{ checked: gpsMode === 'saver' }}
@@ -126,9 +134,12 @@ export default function Maps() {
         >
           <MapIcon name="locate" color={c.blue} />
         </RoundButton>
+        <RoundButton label="Route details" onPress={() => setSheetOpen(true)}>
+          <Icon name="flag" color={c.blue} size={24} />
+        </RoundButton>
       </View>}
 
-      {!poi && <BottomSheet open={sheetOpen} onOpenChange={setSheetOpen} peek={SHEET_PEEK} full={SHEET_FULL} bottom={sheetBottom}>
+      {sheetShown && <ModalSheet height={SHEET_FULL} bottom={insets.bottom + 12} onClose={() => setSheetOpen(false)}>
         {(
           <View style={{ gap: 6 }}>
             <AppText variant="h4">{ROUTE_NAME} · St-Jean → Santiago</AppText>
@@ -145,7 +156,7 @@ export default function Maps() {
             </View>
           </View>
         )}
-      </BottomSheet>}
+      </ModalSheet>}
 
       {poi && <PoiPopup poi={poi} bottom={sheetBottom + 12} onClose={() => onSelectPoi(undefined)} />}
     </View>
