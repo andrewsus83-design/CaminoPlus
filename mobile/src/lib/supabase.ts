@@ -1,3 +1,4 @@
+import './cryptoPolyfill'; // first: gives supabase-js the WebCrypto it needs for the S256 PKCE challenge
 import { AppState, Platform } from 'react-native';
 import { createClient } from '@supabase/supabase-js';
 import { config } from './config';

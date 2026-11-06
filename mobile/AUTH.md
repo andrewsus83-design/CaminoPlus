@@ -31,6 +31,15 @@ asked for it. The callback accepts only a one-time `code` (or an error). Raw `ac
 `caminoplus://auth-callback#access_token=...`, and accepting tokens would sign the phone into someone
 else's account. The new-password screen only opens after a verified recovery code.
 
+**PKCE needs WebCrypto, and React Native has none.** supabase-js builds the S256 challenge with
+`crypto.subtle.digest('SHA-256')` and the verifier with `crypto.getRandomValues`. Without them it logs
+`WebCrypto API is not supported. Code challenge method will default to use plain instead of sha256` and sends
+the verifier itself as the challenge, so anyone who can see the request can replay the code. `src/lib/cryptoPolyfill.ts`
+fills the two functions in from `expo-crypto` on iOS and Android (browsers have their own), and
+`src/lib/__tests__/cryptoPolyfill.test.ts` checks the result against the RFC 7636 test vector. `expo-crypto` is a
+native module: Expo Go already contains it, a development build needs to be rebuilt once after this change.
+If that warning ever shows up in the Metro log again, sign-in is on the weak method.
+
 ## Starting without signal
 
 The app has to open on the trail, so it never waits for the network to decide what to show:
