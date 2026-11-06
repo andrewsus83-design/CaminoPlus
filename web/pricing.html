@@ -23,10 +23,10 @@
 <meta name="twitter:title" content="Pricing · CaminoPlus">
 <meta name="twitter:description" content="CaminoPlus is free to start. Pilgrim Plus is $12 a year with offline route downloads and 5 GB of cloud storage. Extra storage is $5 per 5 GB a year.">
 <meta name="twitter:image" content="https://camino.plus/assets/og.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="/assets/tokens.css">
-<link rel="stylesheet" href="/assets/site.css?v=20261105">
+<link rel="preload" href="/assets/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/fraunces-latin-opsz-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/tokens.css?v=3b8897ec35">
+<link rel="stylesheet" href="/assets/site.css?v=b29a5bc51d">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Product", "name": "Pilgrim Plus", "description": "Yearly subscription with offline route downloads and 5 GB cloud storage.", "offers": {"@type": "Offer", "price": "12.00", "priceCurrency": "USD"}}</script>
 </head>
 <body>
@@ -50,12 +50,12 @@
   <p class="eyebrow">Pricing</p>
   <h1>Less than a café con leche a month.</h1>
   <p class="lead">Start free. When you are ready to walk, Pilgrim Plus unlocks offline maps and cloud storage for a whole year.</p>
-</div></section><section class="section" style="padding-top:32px"><div class="wrap">
+</div><p class="ai-credit"><b>AI-generated illustration:</b> the glazed galleries of a Galician town</p></section><section class="section" style="padding-top:32px"><div class="wrap">
   <div class="plans">
     <article class="card pad-lg plan">
       <div><h3>Free</h3><p class="muted" style="margin-top:6px">The basic app, with a connection.</p></div>
       <p class="price">$0</p>
-      <ul class="ticks"><li>Browse every route and stage</li><li>Stays and cafés with filters</li><li>Explore stories</li><li>Passport and journal on your phone</li></ul>
+      <ul class="ticks"><li>Browse every route and stage</li><li>Stays and cafés with filters</li><li>Discover stories</li><li>Passport and journal on your phone</li></ul>
       <p class="muted" style="font-size:15px">No offline route downloads. No cloud storage.</p>
       <span class="btn btn-ghost" aria-disabled="true">Free at launch</span>
     </article>
@@ -63,7 +63,7 @@
       <span class="badge-best">For the walk</span>
       <div><h3>Pilgrim Plus</h3><p class="muted" style="margin-top:6px">Everything in Free, plus offline.</p></div>
       <p class="price">$12<small> / year</small></p>
-      <div class="on-dark"><ul class="ticks"><li>Download your route stage by stage</li><li>Offline map and GPS for 6–8 hours without signal</li><li>5 GB cloud storage for photos, posts and stamps</li><li>Syncs automatically when you are back online</li></ul></div>
+      <div class="on-dark"><ul class="ticks"><li>Download your route stage by stage</li><li>Offline map and GPS position for walking days without signal</li><li>5 GB cloud storage for photos, posts and stamps</li><li>Syncs automatically when you are back online</li></ul></div>
       <a class="btn btn-gold" href="/#download">Get notified at launch</a>
     </article>
   </div>
@@ -77,20 +77,21 @@
   <h2 style="margin-bottom:24px">Compare plans</h2>
   <div class="table-scroll"><table class="compare">
     <thead><tr><th scope="col">Feature</th><th scope="col">Free</th><th scope="col">Pilgrim Plus</th></tr></thead>
-    <tbody><tr><td>Routes and stages (online)</td><td class="yes">✓<span class="sr-only">Included</span></td><td class="yes">✓<span class="sr-only">Included</span></td></tr><tr><td>Stays and cafés, with filters</td><td class="yes">✓<span class="sr-only">Included</span></td><td class="yes">✓<span class="sr-only">Included</span></td></tr><tr><td>Explore stories</td><td class="yes">✓<span class="sr-only">Included</span></td><td class="yes">✓<span class="sr-only">Included</span></td></tr><tr><td>Passport, stamps and journal on your phone</td><td class="yes">✓<span class="sr-only">Included</span></td><td class="yes">✓<span class="sr-only">Included</span></td></tr><tr><td>Offline route downloads</td><td class="no">—<span class="sr-only">Not included</span></td><td class="yes">✓<span class="sr-only">Included</span></td></tr><tr><td>Offline GPS navigation</td><td class="no">—<span class="sr-only">Not included</span></td><td class="yes">✓<span class="sr-only">Included</span></td></tr><tr><td>Cloud backup of photos and journal</td><td>—</td><td>5 GB</td></tr><tr><td>Extra cloud storage</td><td>—</td><td>$5 / 5 GB / year</td></tr></tbody>
+    <tbody><tr><td>Routes and stages (online)</td><td class="yes">✓<span class="sr-only">Included</span></td><td class="yes">✓<span class="sr-only">Included</span></td></tr><tr><td>Stays and cafés, with filters</td><td class="yes">✓<span class="sr-only">Included</span></td><td class="yes">✓<span class="sr-only">Included</span></td></tr><tr><td>Discover stories</td><td class="yes">✓<span class="sr-only">Included</span></td><td class="yes">✓<span class="sr-only">Included</span></td></tr><tr><td>Passport, stamps and journal on your phone</td><td class="yes">✓<span class="sr-only">Included</span></td><td class="yes">✓<span class="sr-only">Included</span></td></tr><tr><td>Offline route downloads</td><td class="no">—<span class="sr-only">Not included</span></td><td class="yes">✓<span class="sr-only">Included</span></td></tr><tr><td>Offline map and GPS position</td><td class="no">—<span class="sr-only">Not included</span></td><td class="yes">✓<span class="sr-only">Included</span></td></tr><tr><td>Cloud backup of photos and journal</td><td>—</td><td>5 GB</td></tr><tr><td>Extra cloud storage</td><td>—</td><td>$5 / 5 GB / year</td></tr></tbody>
   </table></div>
 </div></section>
 <section class="section"><div class="wrap" style="max-width:860px">
   <div class="head center"><p class="eyebrow">Billing questions</p><h2>Pricing FAQ</h2></div>
-  <details class="qa"><summary>How much does CaminoPlus cost?</summary><div class="ans"><p>The basic app is free. Pilgrim Plus costs <b>$12 per year</b> and adds offline route downloads and 5 GB of cloud storage. See <a href="/pricing">Pricing</a> for details.</p></div></details><details class="qa"><summary>What can I do on the free plan?</summary><div class="ans"><p>You can use the basic app with a connection: browse routes and stages, look up stays and cafés, watch stories in Explore and keep your passport and journal on your phone. The free plan has no offline route downloads and no cloud storage.</p></div></details><details class="qa"><summary>How do I pay?</summary><div class="ans"><p>Subscriptions are bought through the App Store or Google Play, using the payment method on your store account. Prices may be shown in your local currency.</p></div></details><details class="qa"><summary>Does the subscription renew automatically?</summary><div class="ans"><p>Yes, yearly, until you cancel. You can turn off auto-renew at any time in your App Store or Google Play subscription settings, and you keep access until the end of the paid year.</p></div></details><details class="qa"><summary>Can I get a refund?</summary><div class="ans"><p>Because payments go through Apple or Google, refunds follow their policies. On iPhone, request one at reportaproblem.apple.com. On Android, request one from your Google Play order history. If something went wrong, <a href="/contact">tell us</a> and we will help.</p></div></details><details class="qa"><summary>What is the 5 GB of cloud storage for?</summary><div class="ans"><p>It backs up your journal posts, photos, passport stamps and plan, so nothing is lost if your phone is lost or broken, and you can open your journey on a new phone.</p></div></details><details class="qa"><summary>What happens if I need more space?</summary><div class="ans"><p>Add 5 GB more for $5 per year, as many times as you need.</p></div></details><details class="qa"><summary>What happens to my photos if my subscription ends?</summary><div class="ans"><p>Your posts stay on your phone. We will remind you before anything in cloud storage changes, and you can export your data at any time.</p></div></details>
+  <details class="qa"><summary>How much does CaminoPlus cost?</summary><div class="ans"><p>The basic app is free. Pilgrim Plus costs <b>$12 per year</b> and adds offline route downloads and 5 GB of cloud storage. See <a href="/pricing">Pricing</a> for details.</p></div></details><details class="qa"><summary>What can I do on the free plan?</summary><div class="ans"><p>You can use the basic app with a connection: browse routes and stages, look up stays and cafés, watch stories in Discover and keep your passport and journal on your phone. The free plan has no offline route downloads and no cloud storage.</p></div></details><details class="qa"><summary>How do I pay?</summary><div class="ans"><p>Subscriptions are bought through the App Store or Google Play, using the payment method on your store account. Prices may be shown in your local currency.</p></div></details><details class="qa"><summary>Does the subscription renew automatically?</summary><div class="ans"><p>Yes, yearly, until you cancel. You can turn off auto-renew at any time in your App Store or Google Play subscription settings, and you keep access until the end of the paid year.</p></div></details><details class="qa"><summary>Can I get a refund?</summary><div class="ans"><p>Because payments go through Apple or Google, refunds follow their policies. On iPhone, request one at reportaproblem.apple.com. On Android, request one from your Google Play order history. If something went wrong, <a href="/contact">tell us</a> and we will help.</p></div></details><details class="qa"><summary>What is the 5 GB of cloud storage for?</summary><div class="ans"><p>It backs up your journal posts, photos, passport stamps and plan, so nothing is lost if your phone is lost or broken, and you can open your journey on a new phone.</p></div></details><details class="qa"><summary>What happens if I need more space?</summary><div class="ans"><p>Add 5 GB more for $5 per year, as many times as you need.</p></div></details><details class="qa"><summary>What happens to my photos if my subscription ends?</summary><div class="ans"><p>Your posts stay on your phone. We will remind you before anything in cloud storage changes, and you can export your data at any time.</p></div></details>
 </div></section>
 <section class="section" id="download">
   <div class="wrap"><div class="band band-cathedral cta">
     <p class="script" style="color:var(--cp-color-gold-bright)">Buen Camino</p>
     <h2 style="margin-top:12px">Your Camino starts with one download.</h2>
     <p class="lead" style="margin:16px auto 0">CaminoPlus launches on iPhone and Android. Leave your email with us and we will tell you the day it is live.</p>
-    <div class="on-dark"><div class="stores"><span class="store" role="img" aria-label="Download on the App Store, coming soon"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.4 12.6c0-2.6 2.1-3.8 2.2-3.9-1.2-1.8-3.1-2-3.7-2-1.6-.2-3.1.9-3.9.9-.8 0-2-.9-3.4-.9-1.7 0-3.3 1-4.2 2.6-1.8 3.1-.5 7.7 1.3 10.2.9 1.2 1.9 2.6 3.2 2.6 1.3-.1 1.8-.8 3.3-.8s2 .8 3.4.8c1.4 0 2.3-1.3 3.1-2.5 1-1.4 1.4-2.8 1.4-2.9 0 0-2.7-1-2.7-4.1zM13.9 4.9c.7-.9 1.2-2 1-3.2-1 0-2.3.7-3 1.6-.7.8-1.2 2-1.1 3.1 1.2.1 2.3-.6 3.1-1.5z"/></svg><span><small>Download on the</small><b>App Store</b></span><span class="soon">Soon</span></span><span class="store" role="img" aria-label="Get it on Google Play, coming soon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 2.8v18.4c0 .5.5.8.9.6L15 12 4.9 2.2c-.4-.2-.9.1-.9.6z" fill="#E8B53A"/><path d="m15 12 3.3-3.3 2.9 1.7c1 .6 1 2.6 0 3.2l-2.9 1.7z" fill="#F6EFE2"/><path d="M4.9 2.2 15 12l3.3-3.3L6.2 1.9c-.5-.3-1-.1-1.3.3z" fill="#A63D2F" opacity=".9"/><path d="M4.9 21.8 15 12l3.3 3.3-12.1 6.8c-.5.3-1 .1-1.3-.3z" fill="#DCE5EF"/></svg><span><small>Get it on</small><b>Google Play</b></span><span class="soon">Soon</span></span></div></div>
+    <div class="on-dark"><div class="stores"><span class="store" aria-disabled="true">iOS: coming soon</span><span class="store" aria-disabled="true">Android: coming soon</span></div></div>
     <p style="margin-top:24px"><a class="btn btn-gold" href="mailto:hello@camino.plus?subject=Tell%20me%20when%20CaminoPlus%20launches">Notify me at launch</a></p>
+    <p class="ai-credit"><b>AI-generated illustration:</b> Santiago Cathedral and the Obradoiro square</p>
   </div></div>
 </section>
 </main>
@@ -100,7 +101,7 @@
       <div class="stack">
         <a class="brand" href="/"><svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="20" fill="#14365D"/><g transform="translate(0 -2.12)"><path d="M20 28.5L5.84 22.20A2.84 2.84 0 0 1 8.64 17.96A2.84 2.84 0 0 1 12.66 14.85A2.84 2.84 0 0 1 17.46 13.21A2.84 2.84 0 0 1 22.54 13.21A2.84 2.84 0 0 1 27.34 14.85A2.84 2.84 0 0 1 31.36 17.96A2.84 2.84 0 0 1 34.16 22.20z" fill="#D9A21B"/><path d="M20 29.0Q14.09 22.35 8.49 17.82M20 29.0Q16.22 20.86 12.56 14.67M20 29.0Q18.70 20.07 17.43 13.01M20 29.0Q21.30 20.07 22.57 13.01M20 29.0Q23.78 20.86 27.44 14.67M20 29.0Q25.91 22.35 31.51 17.82" stroke="#14365D" stroke-width="1.15" stroke-linecap="round" fill="none"/><path d="M15.2 31.4Q18 30.6 18.4 28.3H21.6Q22 30.6 24.8 31.4Q24.6 32.6 20 32.6Q15.4 32.6 15.2 31.4z" fill="#D9A21B"/></g></svg><span>Camino<span class="plus">+</span></span></a>
         <p>The offline-first companion for every Camino de Santiago route. Maps, stays, stamps and stories, in one app.</p>
-        <div class="on-dark"><div class="stores"><span class="store" role="img" aria-label="Download on the App Store, coming soon"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.4 12.6c0-2.6 2.1-3.8 2.2-3.9-1.2-1.8-3.1-2-3.7-2-1.6-.2-3.1.9-3.9.9-.8 0-2-.9-3.4-.9-1.7 0-3.3 1-4.2 2.6-1.8 3.1-.5 7.7 1.3 10.2.9 1.2 1.9 2.6 3.2 2.6 1.3-.1 1.8-.8 3.3-.8s2 .8 3.4.8c1.4 0 2.3-1.3 3.1-2.5 1-1.4 1.4-2.8 1.4-2.9 0 0-2.7-1-2.7-4.1zM13.9 4.9c.7-.9 1.2-2 1-3.2-1 0-2.3.7-3 1.6-.7.8-1.2 2-1.1 3.1 1.2.1 2.3-.6 3.1-1.5z"/></svg><span><small>Download on the</small><b>App Store</b></span><span class="soon">Soon</span></span><span class="store" role="img" aria-label="Get it on Google Play, coming soon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 2.8v18.4c0 .5.5.8.9.6L15 12 4.9 2.2c-.4-.2-.9.1-.9.6z" fill="#E8B53A"/><path d="m15 12 3.3-3.3 2.9 1.7c1 .6 1 2.6 0 3.2l-2.9 1.7z" fill="#F6EFE2"/><path d="M4.9 2.2 15 12l3.3-3.3L6.2 1.9c-.5-.3-1-.1-1.3.3z" fill="#A63D2F" opacity=".9"/><path d="M4.9 21.8 15 12l3.3 3.3-12.1 6.8c-.5.3-1 .1-1.3-.3z" fill="#DCE5EF"/></svg><span><small>Get it on</small><b>Google Play</b></span><span class="soon">Soon</span></span></div></div>
+        <div class="on-dark"><div class="stores"><span class="store" aria-disabled="true">iOS: coming soon</span><span class="store" aria-disabled="true">Android: coming soon</span></div></div>
       </div>
       <div><h4>Product</h4><ul>
         <li><a href="/features">Features</a></li><li><a href="/routes">Routes</a></li>
@@ -110,14 +111,15 @@
         <li><a href="mailto:hello@camino.plus">hello@camino.plus</a></li></ul></div>
       <div><h4>Company</h4><ul>
         <li><a href="/about">About</a></li><li><a href="/privacy">Privacy</a></li>
-        <li><a href="/terms">Terms</a></li></ul></div>
+        <li><a href="/terms">Terms</a></li><li><a href="/licences">Licences</a></li></ul></div>
     </div>
+    <p class="foot-credit">Photos and backgrounds on this site are AI-generated illustrations, not photographs. Landmarks may differ from the real thing.</p>
     <div class="foot-bottom">
       <span>© 2026 CaminoPlus. Map data © <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap contributors</a>.</span>
       <span class="script">Buen Camino</span>
     </div>
   </div>
 </footer>
-<script src="/assets/site.js?v=20261105" defer></script>
+<script src="/assets/site.js?v=260f714cdb" defer></script>
 </body>
 </html>

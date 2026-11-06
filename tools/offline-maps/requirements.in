@@ -1,0 +1,7 @@
+# Direct dependencies of the offline-map build (route_from_osm.py, corridor.py). requirements.txt is the pinned lock:
+#   uv pip compile requirements.in --python-version 3.12 --python-platform x86_64-manylinux_2_28 -o requirements.txt
+# (CI runs Python 3.12 on Linux.) Edit this file, recompile, commit both. Dependabot bumps requirements.txt.
+osmium==4.3.2
+pyproj==3.8.0
+shapely==2.2.0
+numpy

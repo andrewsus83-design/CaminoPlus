@@ -90,15 +90,57 @@ def name_tokens(s: str | None) -> set[str]:
     return core or toks
 
 
+# Generic words are dropped before comparing, so "Albergue Municipal de Zubiri" and "Hostal Zubiri"
+# both shrink to {"zubiri"}: the village, not the business. Two names that only share the village
+# must not be merged when they name DIFFERENT kinds of place or DIFFERENT operators. These are the
+# words that carry that information. One group = one kind of place (an albergue is a hostel).
+KIND_GROUPS = {
+    "albergue": {"albergue", "auberge", "gite", "gîte", "refugio", "aterpetxea", "hostel", "peregrinos",
+                 "pelerins", "pèlerins", "pilgrim", "pilgrims"},
+    "hostal": {"hostal", "pension", "pensión"},
+    "hotel": {"hotel"},
+    "casa_rural": {"rural"},  # not "casa": "Casa Sabina" is a name, "Casa Rural X" is a kind
+    "food": {"cafe", "café", "bar", "restaurante", "restaurant", "cafeteria", "cafetería"},
+    "church": {"iglesia", "eglise", "église", "church", "capilla", "chapelle", "ermita", "parroquia"},
+}
+OPERATOR_WORDS = {"municipal", "parroquial", "privado"}
+CONFLICT_CAP = 0.3  # below every match threshold (0.55 to 0.6) and below the NAME_DISAGREE limit (0.4)
+_KIND_FOLDED = {k: {fold(w) for w in ws} for k, ws in KIND_GROUPS.items()}
+_OPERATOR_FOLDED = {fold(w) for w in OPERATOR_WORDS}
+
+
+def _kinds(tokens: set[str]) -> set[str]:
+    return {k for k, ws in _KIND_FOLDED.items() if tokens & ws}
+
+
+def names_conflict(a: str | None, b: str | None) -> bool:
+    """True when both names say what they are and disagree: albergue vs hostal, municipal vs parroquial."""
+    ta, tb = set(fold(a or "").split()), set(fold(b or "").split())
+    ka, kb = _kinds(ta), _kinds(tb)
+    if ka and kb and ka.isdisjoint(kb):
+        return True
+    oa, ob = ta & _OPERATOR_FOLDED, tb & _OPERATOR_FOLDED
+    return bool(oa and ob and oa.isdisjoint(ob))
+
+
 def name_similarity(a: str | None, b: str | None) -> float:
-    """0..1. Token overlap on the distinctive words, plus a containment bonus."""
+    """0..1. Token overlap on the distinctive words, plus a containment bonus.
+
+    Sharing only the village name is not enough: names that disagree on the kind of place or the
+    operator ("Albergue Municipal de Zubiri" vs "Hostal Zubiri") score at most CONFLICT_CAP. A name
+    that is only the place ("Roncesvalles") still matches "Albergue de Peregrinos de Roncesvalles":
+    one side says nothing about the kind, so there is no conflict.
+    """
     ta, tb = name_tokens(a), name_tokens(b)
     if not ta or not tb:
         return 0.0
     inter = len(ta & tb)
     jacc = inter / len(ta | tb)
     contain = inter / min(len(ta), len(tb))
-    return round(max(jacc, 0.85 * contain), 3)
+    score = round(max(jacc, 0.85 * contain), 3)
+    if names_conflict(a, b):
+        return min(score, CONFLICT_CAP)
+    return score
 
 
 def is_generic_name(s: str | None) -> bool:
@@ -219,9 +261,48 @@ def osm_category(t: dict[str, str]) -> str | None:
     return None
 
 
+# Mappers do not delete a place that closed, they prefix its tags: "disused:amenity=cafe",
+# "abandoned:tourism=hostel", "was:shop=bakery". The audit asks Overpass for these too (otherwise the
+# closed places never arrive) and keeps the original tags on the record, which is how CLOSED_SIGNAL
+# sees them.
+LIFECYCLE_PREFIXES = ("disused", "abandoned", "was", "demolished")
+PRIMARY_KEYS = ("tourism", "amenity", "shop", "historic", "building", "man_made")
+BUSINESS_KEYS = ("tourism", "amenity", "shop", "historic", "man_made")  # a live one means "still a place"
+
+
+def strip_lifecycle(tags: dict) -> dict:
+    """Tags as they were while the place was open: "disused:amenity=cafe" gives "amenity=cafe".
+    Live tags always win, so a supermarket that used to be a bar stays a supermarket."""
+    out = dict(tags)
+    for k, v in tags.items():
+        prefix, _, key = k.partition(":")
+        if prefix in LIFECYCLE_PREFIXES and key in PRIMARY_KEYS and key not in tags:
+            out[key] = v
+    return out
+
+
+def closed_signal_keys(tags: dict) -> list[str]:
+    """Tag keys that say the place is closed: a lifecycle prefix on a primary key while the place has
+    no live business tag ("disused:amenity=cafe" and no amenity / tourism / shop left), or
+    disused=yes / abandoned=yes. Not closures: "disused:phone" (an old number), or "disused:amenity=bar"
+    on a place that is a live "shop=supermarket" today (a bar that was replaced). A bare building=yes
+    does not count as live: closed cafes keep their building outline."""
+    live = any(k in tags for k in BUSINESS_KEYS)
+    keys = []
+    for k, v in tags.items():
+        prefix, _, key = k.partition(":")
+        if prefix in LIFECYCLE_PREFIXES and key in PRIMARY_KEYS and not live:
+            keys.append(k)
+        elif k in ("disused", "abandoned") and str(v).lower() == "yes":
+            keys.append(k)
+    return keys
+
+
 def from_osm(el: dict) -> Record | None:
     t = el.get("tags") or {}
     cat = osm_category(t)
+    if not cat:
+        cat = osm_category(strip_lifecycle(t))  # a place that only has disused: / abandoned: tags left
     if not cat:
         return None
     if el["type"] == "node":

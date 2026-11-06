@@ -13,7 +13,7 @@ from __future__ import annotations
 from datetime import datetime, timedelta, timezone
 
 from .conflate import Entity
-from .normalize import Record, distance_m, is_generic_name, name_similarity
+from .normalize import Record, closed_signal_keys, distance_m, is_generic_name, name_similarity
 
 SEVERITY_WEIGHT = {"high": 25, "medium": 10, "low": 3, "info": 0}
 
@@ -72,7 +72,7 @@ def run_checks(entities: list[Entity], now: datetime, sources_ok: set[str] | Non
         fam = p.family
 
         # --- closed / disused signals -------------------------------------------------
-        closed_keys = [k for k in p.tags if k.split(":", 1)[0] in {"disused", "abandoned", "was", "demolished"}]
+        closed_keys = closed_signal_keys(p.tags)
         if closed_keys:
             _f(e, "CLOSED_SIGNAL", "high", "OSM marks it as disused or abandoned", tags=closed_keys)
         if str(p.tags.get("opening_hours", "")).strip().lower() in {"closed", "off"}:
@@ -243,18 +243,59 @@ def band(s: int) -> str:
     return "high" if s >= 75 else "medium" if s >= 50 else "low"
 
 
+# A place earns the "data_check" level only with a high score and no open finding that could make
+# the label wrong: every finding of a run is open until a reviewer decides, and a high or medium
+# one (closed signal, coordinates far apart, duplicate, licence, stale ...) is exactly that.
+DATA_CHECK_MIN_SCORE = 75
+BLOCKING_SEVERITIES = {"high", "medium"}
+
+
+def earns_data_check(e: Entity) -> bool:
+    return e.score >= DATA_CHECK_MIN_SCORE and not any(f["severity"] in BLOCKING_SEVERITIES for f in e.findings)
+
+
 def verification_label(e: Entity, run_date: datetime) -> dict:
-    """What the app may show. A data check never claims a place is open or good."""
+    """What the app may show. A data check never claims a place is open or good, and a place
+    that has not earned it stays "unverified" (the app shows "Not verified yet")."""
     n = len({r.source for r in e.records})
     names = {"osm": "OpenStreetMap", "overture": "Overture", "wikidata": "Wikidata"}
     srcs = ", ".join(names[s] for s in sorted({r.source for r in e.records}))
+    earned = earns_data_check(e)
     return {
-        "level": "data_check",            # owner > pilgrim > editor > data_check > unverified
+        "level": "data_check" if earned else "unverified",   # owner > pilgrim > editor > data_check > unverified
         "checked_at": run_date.date().isoformat(),
-        "label": f"Data cross-checked {run_date:%b %Y} · {n} open source{'s' if n > 1 else ''}",
+        "label": (f"Data cross-checked {run_date:%b %Y} · {n} open source{'s' if n > 1 else ''}" if earned
+                  else "Not verified yet"),
         "sources": srcs,
-        "note": "Not a visit. Opening, beds and cleanliness are confirmed only by owners and pilgrims.",
+        "note": ("Not a visit. Opening, beds and cleanliness are confirmed only by owners and pilgrims." if earned
+                 else f"Needs a review first: score {e.score} (data check needs {DATA_CHECK_MIN_SCORE}+) "
+                      "or an open high / medium finding."),
     }
+
+
+def aggregate_findings(findings: list[dict]) -> list[dict]:
+    """One finding per code, worst severity first.
+
+    A place can trigger the same check several times (two sources far away, two duplicates nearby).
+    data_audit_findings has unique (entity_key, code), so anything that loads these results must see
+    ONE row per code or the rows would silently overwrite each other. The occurrences are kept:
+    "count" and "details.occurrences" (each with its own message and details).
+    """
+    by_code: dict[str, list[dict]] = {}
+    for f in findings:
+        by_code.setdefault(f["code"], []).append(f)
+    out = []
+    for code, group in by_code.items():
+        severity = max((f["severity"] for f in group), key=lambda x: SEVERITY_WEIGHT[x])
+        messages = list(dict.fromkeys(f["message"] for f in group))
+        out.append({
+            "code": code,
+            "severity": severity,
+            "message": " | ".join(messages),
+            "count": len(group),
+            "details": {"occurrences": [{"message": f["message"], **(f.get("details") or {})} for f in group]},
+        })
+    return sorted(out, key=lambda f: (-SEVERITY_WEIGHT[f["severity"]], f["code"]))
 
 
 def review_priority(e: Entity) -> int:

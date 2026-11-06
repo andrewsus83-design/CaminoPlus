@@ -4,7 +4,8 @@
 # - pull_request touching tools/poi-audit: run the pilot stage, attach the report.
 # - workflow_dispatch: pick a stage file; AI drafts run if ANTHROPIC_API_KEY is set.
 # - schedule (monthly): fresh run so stale / closed places surface on their own.
-# Nothing is written to Supabase from here yet.
+# The audit runs with --strict: a source that failed or was skipped fails the job (the report
+# is still printed and uploaded). Nothing is written to Supabase from here yet.
 name: poi-audit
 
 on:
@@ -39,31 +40,53 @@ jobs:
       run:
         working-directory: tools/poi-audit
     env:
+      # Inputs reach the scripts as environment variables only, never pasted into the script text.
       STAGE: ${{ inputs.stage || 'camino-frances-01.json' }}
-      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: '3.12'
+          cache: pip
+          cache-dependency-path: tools/poi-audit/requirements.txt
+      # No secret in this step's environment: the pinned lock is installed without the API key.
       - run: pip install -q -r requirements.txt
       - name: Unit tests
         run: python -m unittest discover -s tests -v
+      - name: Check the stage input
+        run: |
+          case "$STAGE" in
+            ''|*[!A-Za-z0-9._-]*|.*|*..*) echo "stage must be a plain file name like camino-frances-01.json" >&2; exit 1 ;;
+          esac
+          test -f "../offline-maps/stages/$STAGE" || { echo "no such stage file: $STAGE" >&2; exit 1; }
       - name: Audit
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          AI_REQUESTED: ${{ inputs.ai }}
         run: |
           AI=""
-          if [ -n "$ANTHROPIC_API_KEY" ] && [ "${{ inputs.ai || 'true' }}" = "true" ]; then AI="--ai --ai-limit 15"; fi
-          python audit.py --stage ../offline-maps/stages/$STAGE --out out/${STAGE%.json} $AI
+          if [ -n "$ANTHROPIC_API_KEY" ] && [ "${AI_REQUESTED:-true}" = "true" ]; then AI="--ai --ai-limit 15"; fi
+          # shellcheck disable=SC2086
+          python audit.py --strict --stage "../offline-maps/stages/$STAGE" --out "out/${STAGE%.json}" $AI
       - name: Show report
+        if: always()
         run: |
-          D=out/${STAGE%.json}
-          cat $D/report.md >> "$GITHUB_STEP_SUMMARY"
-          echo "=====REPORT_MD_BEGIN====="; cat $D/report.md; echo "=====REPORT_MD_END====="
-          echo "=====QUEUE_CSV_BEGIN====="; cat $D/review_queue.csv; echo "=====QUEUE_CSV_END====="
-      - uses: actions/upload-artifact@v4
+          D="out/${STAGE%.json}"
+          if [ -f "$D/report.md" ]; then
+            cat "$D/report.md" >> "$GITHUB_STEP_SUMMARY"
+            echo "=====REPORT_MD_BEGIN====="; cat "$D/report.md"; echo "=====REPORT_MD_END====="
+            echo "=====QUEUE_CSV_BEGIN====="; cat "$D/review_queue.csv"; echo "=====QUEUE_CSV_END====="
+          else
+            echo "no report was written (the audit stopped before the outputs)" | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
         with:
           name: poi-audit-${{ github.run_id }}
           path: |
             tools/poi-audit/out/
             tools/poi-audit/cache/
           retention-days: 30
+          if-no-files-found: warn

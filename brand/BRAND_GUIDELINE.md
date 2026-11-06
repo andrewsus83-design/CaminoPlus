@@ -41,7 +41,7 @@ The source of truth for colours, type and spacing in code is [`design/tokens.jso
 
 1. **Talk like a fellow pilgrim.** Second person, short sentences, plain English. "Your feet will thank you" beats "Optimise your trekking experience".
 2. **Lead with something useful.** Every post gives a fact, a tip, a feeling, or a decision. Ideally two.
-3. **Be specific.** Name the place, the km, the stage. "Sarria to Santiago is ~115 km, the minimum for the Compostela" beats "the last stretch".
+3. **Be specific.** Name the place, the km, the stage. "Sarria to Santiago is ~115 km, the most popular start for the last 100 km of the Compostela" beats "the last stretch".
 4. **Warm, never cheesy.** One emoji per caption is fine, three is the limit. Allowed favourites: 🐚 🥾 ☀️ 🗺️ ☕ 🌧️.
 5. **Spanish/Portuguese words are welcome** when pilgrims really use them: *Buen Camino*, *albergue*, *credencial*, *café con leche*, *hospitalero*, *sello*. Explain the first time if needed.
 6. **"The Way" and "the Camino"** are capitalised. "Pilgrim", not "user" or "customer".
@@ -92,7 +92,7 @@ The logo is **locked** (PR #9). Navy circle mark with a gold 7-rib scallop shell
 **Rules**
 
 - Profile picture on all platforms: shell icon, Shell Gold circle on Atlantic Blue (or reverse), centred, no text.
-- Clear space around the logo = the height of the shell "o" on every side.
+- Clear space around the logo = the height of the capital "C" in "Camino" on every side (about half the height of the shell mark).
 - Minimum size: wordmark 96 px wide, icon 32 px.
 - Watermark on posts: small icon or wordmark, bottom right or bottom centre, 70 to 100% opacity, inside the safe zone (see section 7).
 - Do not: recolour outside the palette, stretch, rotate, add shadows/outlines, rebuild the shell, separate the "+" and move it, put it on a busy part of a photo.
@@ -146,7 +146,7 @@ Max ~25 words of on-image text per frame. If it needs more, it belongs in the ca
 
 ## 6. Photography and imagery
 
-The look is **natural documentary travel photography**: true-to-life colour, soft light, real textures, lots of breathing space. It is the same look as the website (see [`web/image-prompts.md`](../web/image-prompts.md) in project files).
+The look is **natural documentary travel photography**: true-to-life colour, soft light, real textures, lots of breathing space. It is the same look as the website; the prompt builder for AI images is in [`content-factory/templates.md`](content-factory/templates.md#6-ai-image-prompt-builder).
 
 **Do**
 
@@ -166,7 +166,7 @@ The look is **natural documentary travel photography**: true-to-life colour, sof
 
 **User-generated content (UGC).** Always ask permission in writing (DM or comment "yes"), credit with @handle in the first line, keep their original colours (light crop only).
 
-**App screens.** Use the real screens from [`web/assets/screens/`](../web/assets/screens/) inside a simple phone frame. Don't mock features that don't exist yet; if a feature is "coming soon", say so.
+**App screens.** Use the screens from [`web/assets/screens/`](../web/assets/screens/) (rendered from the app design, `tools/render_screens.mjs`) inside a simple phone frame. The app is still in development, so call them previews. Don't mock features that don't exist yet; if a feature is "coming soon", say so. The fourth tab is called **Discover**.
 
 ---
 

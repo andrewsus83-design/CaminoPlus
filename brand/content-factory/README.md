@@ -28,7 +28,7 @@ Fill the **Post brief** in [`templates.md`](templates.md#1-post-brief) in the sh
 
 - Captions: caption formulas in [`templates.md`](templates.md#3-caption-formulas).
 - Video: script templates in [`templates.md`](templates.md#4-reel--tiktok-scripts).
-- Carousels: slide template in [`templates.md`](templates.md#5-carousel-template).
+- Carousels: slide template in [`templates.md`](templates.md#5-carousel-template-f02-f07).
 - Images: real photo or UGC first; otherwise AI with the prompt builder in [`templates.md`](templates.md#6-ai-image-prompt-builder).
 - Design: Canva (or Figma) with the brand kit: 4 fonts, 8 colours, logo files, the 5 series layouts from the [Brand Guideline](../BRAND_GUIDELINE.md#7-layout-for-social).
 

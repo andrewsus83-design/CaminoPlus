@@ -1,0 +1,10 @@
+Self-hosted web fonts (SIL Open Font License 1.1, texts in the OFL-*.txt files next to them).
+Source: the Fontsource packages on npm (latin subsets of the Google Fonts releases), copied unchanged.
+
+@fontsource-variable/fraunces@5.3.0  fraunces-latin-opsz-normal.woff2  7234ed860a9cc83045413c4faee63c960a8f2d1917adcf728119307d56e0d783
+@fontsource-variable/fraunces@5.3.0  fraunces-latin-opsz-italic.woff2  066710ce7ed235a339d3d6cdcc8b55c0bea5632232662d83aacea25852108271
+@fontsource-variable/inter@5.3.0  inter-latin-wght-normal.woff2  3100e775e8616cd2611beecfa23a4263d7037586789b43f035236a2e6fbd4c62
+@fontsource-variable/jetbrains-mono@5.3.0  jetbrains-mono-latin-wght-normal.woff2  18be452724bfdc236c074ca94a249a7f41a86752c7d04ab258ce9ed5651f6a7e
+@fontsource-variable/caveat@5.3.0  caveat-latin-wght-normal.woff2  891951df5e8b5b0f0bc760d31375405e795c666b5add70437de12d4a6482b33f
+
+To update: npm pack the package at the new version, copy the same file names, replace the hash here, and re-check the pages (tools/build_web.py preloads inter and fraunces).

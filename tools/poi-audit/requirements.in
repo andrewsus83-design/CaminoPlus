@@ -1,0 +1,6 @@
+# Direct dependencies of the POI audit. requirements.txt is the pinned lock compiled from this file:
+#   uv pip compile requirements.in --python-version 3.12 --python-platform x86_64-manylinux_2_28 -o requirements.txt
+# (CI runs Python 3.12 on Linux.) Edit this file, recompile, commit both. Dependabot bumps requirements.txt.
+requests>=2.31
+pyarrow>=17
+anthropic>=2.6

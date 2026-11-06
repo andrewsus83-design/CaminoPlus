@@ -14,11 +14,15 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 import time
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
 
 import requests
+
+from .normalize import LIFECYCLE_PREFIXES
 
 USER_AGENT = "CaminoPlus-POI-audit/0.1 (https://camino.plus; data quality checks)"
 OVERPASS_URLS = [
@@ -28,7 +32,8 @@ OVERPASS_URLS = [
 WIKIDATA_SPARQL = "https://query.wikidata.org/sparql"
 COMMONS_API = "https://commons.wikimedia.org/w/api.php"
 OVERTURE_BUCKET = "overturemaps-us-west-2"
-OVERTURE_RELEASE = os.environ.get("OVERTURE_RELEASE", "2026-10-21.0")
+OVERTURE_STAC = "https://stac.overturemaps.org/catalog.json"
+RELEASE_RX = re.compile(r"^\d{4}-\d{2}-\d{2}\.\d+$")  # 2026-10-21.0
 
 
 class Cache:
@@ -74,21 +79,29 @@ def _retry(fn, tries: int = 4):
 # ---------------------------------------------------------------------------
 # OpenStreetMap
 # ---------------------------------------------------------------------------
+# What the audit asks OSM for. Values are alternatives of one key.
+POI_TAGS = {
+    "tourism": "hostel|guest_house|hotel|motel|apartment|camp_site|alpine_hut|wilderness_hut|chalet|attraction|museum|viewpoint|artwork|information",
+    "amenity": "place_of_worship|monastery|cafe|bar|pub|restaurant|fast_food|drinking_water|fountain|pharmacy|hospital|clinic|atm|bank|post_office|toilets|shelter",
+    "shop": "supermarket|bakery|convenience|bicycle",
+}
+
+
 def overpass_poi_query(bbox: list[float]) -> str:
+    """Places in the bbox. For the businesses that can close (tourism, amenity, shop) it also selects
+    the lifecycle spellings ("disused:amenity=cafe", "abandoned:tourism=hostel", "was:shop=bakery"):
+    a closed place keeps its name but loses the live tag, so asking only for live tags would never
+    deliver the very places CLOSED_SIGNAL is meant to find."""
     w, s, e, n = bbox
     b = f"({s},{w},{n},{e})"
-    return f"""
-[out:json][timeout:180];
-(
-  nwr["tourism"~"^(hostel|guest_house|hotel|motel|apartment|camp_site|alpine_hut|wilderness_hut|chalet|attraction|museum|viewpoint|artwork|information)$"]{b};
-  nwr["amenity"~"^(place_of_worship|monastery|cafe|bar|pub|restaurant|fast_food|drinking_water|fountain|pharmacy|hospital|clinic|atm|bank|post_office|toilets|shelter)$"]{b};
-  nwr["historic"]{b};
-  nwr["building"~"^(church|cathedral|chapel|monastery)$"]{b};
-  nwr["shop"~"^(supermarket|bakery|convenience|bicycle)$"]{b};
-  nwr["man_made"="cross"]{b};
-);
-out center tags meta;
-"""
+    prefixes = [""] + [f"{p}:" for p in LIFECYCLE_PREFIXES]
+    lines = [f'  nwr["{prefix}{key}"~"^({values})$"]{b};' for key, values in POI_TAGS.items() for prefix in prefixes]
+    lines += [
+        f'  nwr["historic"]{b};',
+        f'  nwr["building"~"^(church|cathedral|chapel|monastery)$"]{b};',
+        f'  nwr["man_made"="cross"]{b};',
+    ]
+    return "\n[out:json][timeout:180];\n(\n" + "\n".join(lines) + "\n);\nout center tags meta;\n"
 
 
 def overpass_route_query(bbox: list[float], name_regex: str) -> str:
@@ -126,20 +139,92 @@ OVERTURE_COLUMNS = [
 ]
 
 
-def fetch_overture(cache: Cache, bbox: list[float]) -> list[dict]:
-    key = f"{OVERTURE_RELEASE}:{bbox}"
+def _s3():
+    import pyarrow.fs as pfs
+
+    proxy = os.environ.get("HTTPS_PROXY") or os.environ.get("https_proxy")
+    kw = {"proxy_options": proxy} if proxy else {}
+    return pfs.S3FileSystem(anonymous=True, region="us-west-2", **kw)
+
+
+def _release_key(name: str) -> tuple[str, int]:
+    date, _, n = name.partition(".")
+    return date, int(n or 0)
+
+
+def _latest_from_stac() -> str:
+    """The STAC catalog lists the releases that still exist and says which is the latest."""
+    def go():
+        r = _session().get(OVERTURE_STAC, timeout=60)
+        r.raise_for_status()
+        return r.json()
+
+    data = _retry(go)
+    latest = data.get("latest")
+    if isinstance(latest, str) and RELEASE_RX.match(latest):
+        return latest
+    children = []
+    for link in data.get("links", []):
+        m = re.search(r"(\d{4}-\d{2}-\d{2}\.\d+)/catalog\.json$", link.get("href") or "") if link.get("rel") == "child" else None
+        if m:
+            children.append(m.group(1))
+    if not children:
+        raise RuntimeError("the STAC catalog lists no releases")
+    return max(children, key=_release_key)
+
+
+def _latest_from_s3() -> str:
+    import pyarrow.fs as pfs
+
+    infos = _s3().get_file_info(pfs.FileSelector(f"{OVERTURE_BUCKET}/release/", recursive=False))
+    names = [i.base_name for i in infos if RELEASE_RX.match(i.base_name)]
+    if not names:
+        raise RuntimeError("no release folders in the Overture bucket")
+    return max(names, key=_release_key)
+
+
+def resolve_overture_release(cache: Cache) -> str:
+    """Which Overture release to read. Old releases disappear from the bucket, so a hard-coded one
+    breaks the audit sooner or later.
+
+    1. $OVERTURE_RELEASE (YYYY-MM-DD.N) wins: pin a release to repeat a run.
+    2. The latest release from the STAC catalog, then the newest folder in the S3 bucket.
+    3. --offline replays use the release of the last online run (cache/).
+    Fails with a message that says how to pin one by hand."""
+    forced = os.environ.get("OVERTURE_RELEASE", "").strip()
+    if forced:
+        if not RELEASE_RX.match(forced):
+            raise RuntimeError(f"OVERTURE_RELEASE={forced!r} is not a release name like 2026-10-21.0")
+        return forced
+    marker = cache.path("overture-release", "latest")
+    if cache.offline:
+        if marker.exists():
+            return json.loads(marker.read_text())["release"]
+        raise RuntimeError("offline mode and no cached Overture release: run once online, or set OVERTURE_RELEASE=YYYY-MM-DD.N")
+    problems = []
+    for name, find in (("STAC catalog", _latest_from_stac), ("S3 listing", _latest_from_s3)):
+        try:
+            release = find()
+        except Exception as e:
+            problems.append(f"{name}: {e}")
+            continue
+        marker.write_text(json.dumps({"release": release, "resolved_at": datetime.now(timezone.utc).isoformat(timespec="seconds")}))
+        return release
+    raise RuntimeError("could not find the latest Overture release (" + "; ".join(problems) +
+                       "). Set OVERTURE_RELEASE=YYYY-MM-DD.N to pin one.")
+
+
+def fetch_overture(cache: Cache, bbox: list[float], release: str | None = None) -> list[dict]:
+    release = release or resolve_overture_release(cache)
+    key = f"{release}:{bbox}"
 
     def go():
         import pyarrow.compute as pc
         import pyarrow.dataset as ds
-        import pyarrow.fs as pfs
 
-        proxy = os.environ.get("HTTPS_PROXY") or os.environ.get("https_proxy")
-        kw = {"proxy_options": proxy} if proxy else {}
-        fs = pfs.S3FileSystem(anonymous=True, region="us-west-2", **kw)
         d = ds.dataset(
-            f"{OVERTURE_BUCKET}/release/{OVERTURE_RELEASE}/theme=places/type=place/",
-            filesystem=fs, format="parquet",
+            f"{OVERTURE_BUCKET}/release/{release}/theme=places/type=place/",
+            filesystem=_s3(), format="parquet",
         )
         w, s, e, n = bbox
         f = ((pc.field("bbox", "xmin") > w) & (pc.field("bbox", "xmax") < e)
@@ -288,23 +373,6 @@ def fetch_commons_info(cache: Cache, filenames: Iterable[str]) -> dict[str, dict
                 "height": ii.get("height"),
             }
     return out
-
-
-def fetch_commons_nearby(cache: Cache, lat: float, lon: float, radius_m: int = 150, limit: int = 8) -> list[str]:
-    """Geotagged Commons files near a point (candidate photos for places without one)."""
-    params = {
-        "action": "query", "format": "json", "formatversion": "2", "list": "geosearch",
-        "gscoord": f"{lat:.6f}|{lon:.6f}", "gsradius": str(radius_m), "gsnamespace": "6",
-        "gslimit": str(limit),
-    }
-
-    def go():
-        r = _session().get(COMMONS_API, params=params, timeout=60)
-        r.raise_for_status()
-        return r.json()
-
-    raw = cache.get_or_fetch("commons-geo", json.dumps(params, sort_keys=True), lambda: _retry(go))
-    return [g["title"].split(":", 1)[1] for g in raw.get("query", {}).get("geosearch", [])]
 
 
 def _strip_html(s: Any) -> str | None:

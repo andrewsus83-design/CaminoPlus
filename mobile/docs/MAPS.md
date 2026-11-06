@@ -65,6 +65,13 @@ place → old version deleted. Free users get `403 subscription_required` and se
 Pilgrim Plus prompt. "Update" appears when the monthly rebuild publishes a newer version.
 Files live in `<documents>/offline-packs/<stage_id>/`, index in `registry.json`.
 
+**Where packs come from.** `tools/offline-maps` builds one `.pmtiles` per stage every month and publishes it only
+after its quality gates pass (OSM route, fresh data, size and tile count in the expected band, labels still drawn
+offline). Registering a new version is one database call, `register_offline_pack` (service role only), which
+makes the new row current and retires the old ones in a single transaction, so a stage always has exactly one
+current pack and "Update" never points at nothing. Only map tiles exist today: there are no stay-detail or audio packs
+yet, so those screens need a connection. See `tools/offline-maps/README.md`.
+
 **Login.** The map module does not own auth. `app/_layout.tsx` registers the Supabase token once
 with `setMapSession({ getAccessToken })`. Signed out, downloads show "Sign in to download offline
 maps"; downloaded packs still work.

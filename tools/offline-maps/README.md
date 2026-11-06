@@ -5,8 +5,9 @@ so the map works for 6 to 8 hours with no signal. This folder builds, tests and
 publishes that file. The first stage done end to end is **Camino Francés stage 1,
 Saint-Jean-Pied-de-Port to Roncesvalles**.
 
-Nothing here touches the mobile app (not scaffolded yet). The "client side" part
-below only describes how the app will use the pack.
+The app already reads these packs (`mobile/src/features/map`, see "The app side" below). This
+folder is the producer: it builds, tests and publishes the files, and registers them in the
+`offline_packs` table through one database function.
 
 ```
 OSM extracts ──► osmium (merge + cut) ──► route from OSM ──► corridor (buffer)
@@ -67,33 +68,44 @@ offline style (same palette, same layers) so switching is not jarring.
 
 | Path | What it does |
 |---|---|
-| `stages/camino-frances-01.json` | Stage config: ids from the `stages`/`routes` tables, OSM extracts, search bbox, corridor width, max zoom |
-| `stages/camino-frances-01.route.geojson` | Hand-placed fallback route (Napoleon + Valcarlos), used only if OSM lookup fails |
-| `scripts/build_stage.sh` | Whole build: download, cut, route, corridor, Planetiler, manifest |
+| `stages/camino-frances-01.json` | Stage config: ids from the `stages`/`routes` tables, OSM extracts, search bbox, corridor width, max zoom, and the **quality band** and **render checks** every build must meet |
+| `stages/camino-frances-01.route.geojson` | Hand-placed fallback route (Napoleon + Valcarlos). Measurement builds may use it; a build that gets published may not |
+| `scripts/build_stage.sh` | Whole build: download (checksummed), cut, route, corridor, Planetiler (image pinned by digest), manifest |
 | `scripts/route_from_osm.py` | Takes the real route from OSM hiking relations (Camino de Santiago / GR 65) |
 | `scripts/corridor.py` | Buffers the route (default 3 km each side) into the `.poly` Planetiler uses |
-| `scripts/publish_pack.mjs` | Uploads to Supabase Storage (or R2 with `--target r2`) and registers the `offline_packs` row (or writes the SQL) |
+| `scripts/pmtiles_info.py` | Reads tile count, zoom range and layer names from the PMTiles header (stdlib only) for the manifest |
+| `scripts/check_pack.mjs` + `scripts/lib/quality.mjs` | Quality gates: size, tile count, layers, route source, OSM age, change against the previous pack |
+| `scripts/publish_pack.mjs` | Gates, upload, read-back check, then ONE call to `register_offline_pack` (or R2 with `--target r2`) |
+| `scripts/planetiler_image.sh` | Prints the pinned Planetiler image reference |
 | `viewer/` | MapLibre GL JS page that opens a `.pmtiles` with no network; CaminoPlus palette |
-| `test/render_offline.mjs` | Playwright test: renders with all outside requests blocked, then with the browser offline |
-| `../../supabase/functions/offline-pack-url/` | Edge function: signed download link only for CaminoPlus subscribers |
+| `test/render_offline.mjs` | Playwright test: renders with all outside requests blocked, then with the device offline; checks feature counts, labels and console errors |
+| `test/*.test.mjs`, `test/test_pmtiles_info.py` | Unit tests: quality gates, publish against a mock Supabase, dev server, PMTiles header |
+| `test/fixtures/` | A tiny made-up pack (`mini.pmtiles`, 8 KB) + its stage file, so the render test runs in seconds without Planetiler |
+| `../../supabase/functions/offline-pack-url/` | Edge function: signed download link only for Pilgrim Plus subscribers |
 | `../../supabase/migrations/20261104170000_offline_packs_bucket.sql` | Private Storage bucket `offline-packs` |
-| `../../.github/workflows/offline-maps.yml` | Builds + measures on PRs, rebuilds monthly, publishes when secrets exist |
+| `../../.github/workflows/offline-maps.yml` + `../../.github/actions/build-offline-pack/` | Builds + measures on PRs; rebuilds monthly and publishes (after approval) |
 
 ## Run it locally
 
 ```bash
 cd tools/offline-maps
-pip install -r requirements.txt          # osmium, shapely, pyproj
+pip install -r requirements.txt          # osmium, shapely, pyproj, numpy (pinned lock of requirements.in)
 sudo apt install osmium-tool             # or: brew install osmium-tool
-npm install && npm run setup             # MapLibre, pmtiles, glyphs into viewer/
+npm ci && npm run setup                  # MapLibre, pmtiles, glyphs into viewer/ (glyphs are pinned and hash-checked)
 scripts/build_stage.sh stages/camino-frances-01.json          # needs Docker
 #   or with a local jar (Java 25+): PLANETILER="java -jar planetiler.jar" scripts/build_stage.sh ...
+npm run check-pack -- dist/camino-frances-01-3km-z15.json     # quality gates (add --publishing for the strict ones)
 npm run viewer                            # http://localhost:8787/viewer/  then "Open a .pmtiles file"
-node test/render_offline.mjs dist/camino-frances-01-3km-z15.pmtiles
+node test/render_offline.mjs dist/camino-frances-01-3km-z15.pmtiles --stage stages/camino-frances-01.json
+npm test && npm run test:python           # unit tests
+npm run test:render-fixture               # render test on the committed fixture pack (needs: npx playwright install chromium)
 ```
 
 First run downloads ~1 GB of Planetiler sources (ocean polygons, Natural Earth) into
-`data/sources`, plus the two Geofabrik extracts (Aquitaine and Navarra).
+`data/sources`, plus the two Geofabrik extracts (Aquitaine and Navarra). The files that never change upstream are
+checked against a pinned SHA-256 (Natural Earth, lake centerlines, Planetiler's placeholder water file); the ocean polygons are
+rebuilt upstream every day, so they cannot be pinned and are only checked to be a complete zip. The Planetiler image is pinned by
+digest (`scripts/planetiler_image.sh`). Set `ROUTE_FALLBACK=deny` to make the build fail instead of using the hand-placed route.
 
 Flags: `scripts/build_stage.sh <stage.json> [buffer_km] [maxzoom]`.
 
@@ -111,6 +123,29 @@ Flags: `scripts/build_stage.sh <stage.json> [buffer_km] [maxzoom]`.
   separate tiny low-zoom pack (z0 to z10 for the whole Camino, likely 2 to 4 MB). That is the
   next step after this prototype.
 
+## Quality gates
+
+A pack is only published if all of these hold (`stages/<slug>.json`, key `quality`; code in
+`scripts/lib/quality.mjs`, tests in `test/quality.test.mjs`). A failure stops the run with a plain message and
+nothing is uploaded or registered:
+
+| Gate | Where it runs |
+|---|---|
+| size in MB and addressed tiles inside the band (stage 1: 2 to 9 MB, 900 to 2,600 tiles; measured 4.6 MB, 1,536 tiles) | every default build (PR and publish) |
+| required vector layers present (building, place, poi, transportation, transportation_name) | every default build |
+| render test: with outside requests blocked and with the device offline, each view in `render_checks` has at least the stated number of features per source layer (`min_features`) and of drawn labels per style layer (`min_labels`), **and the console, page and map error lists are empty** | every default build |
+| `route_source` is `osm` (the hand-drawn fallback is never published) | publish only |
+| the OSM extract is at most 45 days old | publish only |
+| size and tile count within 1.5x of the pack that is live now (read from `offline_packs`) | publish only |
+| the uploaded object is read back and its SHA-256 matches | publish only |
+
+If a real build logs a console message that is known to be harmless, list its text as a regex in `render_allow_errors` of the
+stage file (empty today; add one only after a real run shows the need).
+
+The numbers in `quality` and `render_checks` come from the 2026-11-04 measurement (see "Measured sizes");
+the first monthly run on the real pack confirms them. After a Planetiler upgrade re-measure and edit the stage
+file in the same pull request. A stage without a `quality` band cannot be published.
+
 ## Publishing (Supabase Storage now, Cloudflare R2 later)
 
 Decision 2026-11-04: packs live in **Supabase Storage** for now and move to Cloudflare R2
@@ -121,22 +156,32 @@ later. `offline_packs.url` says where each file is, so the move needs no app cha
 | `supabase://offline-packs/<key>` | private Supabase Storage bucket `offline-packs` (now) |
 | `r2://<bucket>/<key>` | private Cloudflare R2 bucket (later) |
 
-`publish_pack.mjs [--target supabase|r2]` (and the scheduled workflow) do:
+`publish_pack.mjs [--target supabase|r2]` (and the monthly workflow) do:
 
-1. Check the file against its manifest (size + sha256).
-2. Upload to `<route_slug>/stage-<NN>/tiles-v<YYYYMMDD>.pmtiles`.
+1. Check the file against its manifest (size + sha256) and run the quality gates above.
+2. Compare with the live pack (size), still before anything is uploaded.
+3. Upload to `<route_slug>/stage-<NN>/tiles-v<YYYYMMDD>.pmtiles`.
    Version = date of the OSM data, so each monthly build gets a new immutable key
    (`Cache-Control: immutable`). Old versions can be deleted after 60 days, once no app
-   still points at them.
-3. Upsert the `offline_packs` row: `kind 'tiles'`, `format 'pmtiles'`, `version`, `url`,
-   `size_bytes`, `sha256`, `is_current true`, and set `is_current = false` on older
-   versions of that stage.
-4. Always writes `<pack>.offline_packs.sql` with the same statements so the row can be
-   applied by hand.
+   still points at them. Read the object back and compare its SHA-256.
+4. Register it with **one call**: `POST /rest/v1/rpc/register_offline_pack` (service role only) =
+   `public.register_offline_pack(route, stage, 'tiles', 'pmtiles', version, url, size_bytes, sha256)`. The function runs in one
+   transaction: the new row becomes the current one and every other current row of that stage is retired, and a
+   partial unique index allows only one current pack per (route, stage, kind). The old script retired the old rows first and
+   inserted the new one second, so a failure or a cancelled run in between left the stage with no current pack.
+5. Always writes `<pack>.offline_packs.sql`: a single `select public.register_offline_pack(...)` that can be run by hand
+   (SQL editor, as postgres) when the API keys are not set.
 
 **Moving to R2 later:** create the bucket and tokens, set the R2 secrets (GitHub + Supabase),
 set the repo variable `PACK_TARGET=r2`, run the workflow once. New rows point at `r2://`;
 the edge function signs both kinds, so old rows keep working until they are retired.
+
+### Artifacts: never the packs
+
+This repository is public, so a GitHub Actions artifact can be downloaded by anyone with a GitHub account, and a
+`.pmtiles` pack in an artifact would bypass the Pilgrim Plus paywall. The workflows therefore upload **JSON only**
+(manifest, measurements, render report) with `retention-days: 3`. Do not add `dist/*.pmtiles` to any
+`upload-artifact` step, and delete old runs' artifacts if one ever slipped through (Actions, the run, "Delete").
 
 ## Download links only for subscribers
 
@@ -156,28 +201,24 @@ the edge function signs both kinds, so old rows keep working until they are reti
 The bucket is never public and never has a custom domain for packs, so a link cannot be
 reused after it expires. Free users still see pack sizes through `rpc('offline_pack_catalog')`.
 
-## Client side (for later, when the app exists)
+## The app side (`mobile/src/features/map`, details in `mobile/docs/MAPS.md`)
 
-- **Storage**: download the presigned URL to app storage, verify `sha256`, then move it
-  into place atomically. Keep the previous version until the new one is verified.
-- **Rendering**: MapLibre Native (via `@maplibre/maplibre-react-native`) reads the file
-  directly as a vector source. Two options to confirm when we scaffold:
-  `pmtiles://file:///…/stage-01.pmtiles` (PMTiles support in recent MapLibre Native) or
-  convert to MBTiles at build time (`pmtiles convert`) and use `mbtiles:///…`. Planetiler can
-  write either; `offline_packs.format` already allows both.
-- **Style**: the same layers as `viewer/style.js`, shipped inside the app as JSON.
-  One style, many packs: the app adds one source per downloaded stage, or merges them.
-- **Fonts (glyphs)**: bundle Noto Sans Regular, Medium and Italic, ranges `0-255`,
-  `256-511`, `8192-8447` (Latin + accents for French, Spanish, Basque, Galician, plus
-  typographic punctuation), about 0.8 MB total. Point `glyphs` at the bundled folder
-  (`asset://` on Android, bundle path on iOS). Source: Protomaps basemaps-assets, OFL licence.
-  Add more ranges only if we add languages with other scripts (Japanese for Shikoku etc.).
-- **Sprites (icons)**: build our own sprite (albergue, church, fountain, café, pharmacy,
-  stamp, viewpoint) from the design-system icons with `spreet` into `sprite.png/.json`
-  plus `@2x`, and bundle it. The prototype uses circles, so it needs no sprite.
-- **Elevation**: OpenMapTiles has no contour lines or hillshade. Stage 1 climbs 1,390 m,
-  so a later pack should add contours (e.g. from Copernicus DEM, 20 m interval) as a
-  separate layer or file.
+- **Catalog and download**: `rpc offline_pack_catalog` lists sizes and versions (free users see them too), then
+  `functions/v1/offline-pack-url` returns the signed link (Pilgrim Plus only, see below). The download goes to
+  `<documents>/offline-packs/<stage_id>/`, is checked against `size_bytes` and `sha256`, moved into place, and the previous
+  version is deleted (`packs/api.ts`, `packs/store.ts`). "Update available" appears when a newer `version` is current.
+- **Rendering**: MapLibre Native (`@maplibre/maplibre-react-native`) reads the file as a vector source,
+  `pmtiles://file:///.../stage-01.pmtiles`. Whether both platforms accept that still has to be confirmed on devices
+  (checklist in `mobile/docs/MAPS.md`); the fallback is MBTiles (`pmtiles convert`), which `offline_packs.format` already allows.
+- **Style**: `src/features/map/style.ts` draws the same OpenMapTiles layers as `viewer/style.js`. Online it uses MapTiler
+  or OpenFreeMap tiles in the same schema; offline, our packs. MapTiler tiles are never put in a pack.
+- **Fonts (glyphs)**: Noto Sans Regular, Medium and Italic, ranges `0-255`, `256-511`, `8192-8447` (Latin + accents for French,
+  Spanish, Basque, Galician, plus typographic punctuation), bundled in the app (`mobile/assets/glyphs`, byte for byte the files
+  `npm run setup` fetches, pinned by commit and SHA-256). Every other range is an empty file, so MapLibre does not log an error
+  for characters we do not ship; the viewer server and the render test do the same.
+- **Not built yet**: sprites (POIs are circles), elevation (OpenMapTiles has no contour lines or hillshade; stage 1 climbs 1,390 m,
+  so a later pack should add contours, for example from Copernicus DEM, 20 m interval), and any non-map offline data
+  (stay details, audio stories). There are no data or audio packs yet, only map tile packs.
 
 ## Attribution (required by ODbL)
 
@@ -193,9 +234,16 @@ database we must do so under ODbL.
 
 ## Monthly rebuild
 
-`.github/workflows/offline-maps.yml` runs at 03:17 UTC on the 2nd of every month and on demand
-(**Actions → offline-maps → Run workflow → publish**). It downloads fresh Geofabrik
-extracts, rebuilds, runs the offline render test, and publishes if the secrets below are set.
+`.github/workflows/offline-maps.yml` has two jobs that share one composite action
+(`.github/actions/build-offline-pack`), so a published pack is built and tested exactly like a measured one:
+
+- **build** (pull requests touching this folder, or a manual run without "publish"): builds stage 1 in several corridor widths
+  and zooms, reports the real sizes, runs the quality gates and the offline render test. The hand-drawn route is allowed, nothing is
+  uploaded, no secret is available.
+- **publish** (03:17 UTC on the 2nd of every month, or **Actions, offline-maps, Run workflow, publish**): downloads fresh Geofabrik
+  extracts, rebuilds with `ROUTE_FALLBACK=deny`, runs the strict gates and the render test, then uploads and registers.
+  It runs in the GitHub Environment **`pack-publish`**, and its concurrency group never cancels a run in progress.
+
 The app checks `offline_packs` (version / `is_current`) when online and offers
 "Map update available (3.1 MB)" for stages the user already downloaded.
 
@@ -203,6 +251,8 @@ The app checks `offline_packs` (version / `is_current`) when online and offers
 
 | Item | Where | Notes |
 |---|---|---|
-| Supabase URL + service role key | GitHub secrets `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` | Lets the monthly build upload packs and register rows |
-| Later, for Cloudflare: R2 bucket `caminoplus-packs` (private) + tokens | GitHub secrets `R2_*`, Supabase function secrets `R2_*`, repo variable `PACK_TARGET=r2` | Read-only token for the function, read/write for the build |
+| GitHub Environment `pack-publish` | Settings, Environments | Add yourself as a required reviewer: the monthly publish then waits for your approval. Move the secrets below into this environment so no other workflow can read them |
+| Supabase URL + service role key | secrets `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (environment `pack-publish`) | Lets the publish job upload packs and call `register_offline_pack`. Only the last step of the job sees them |
+| Latest migrations applied | `supabase db push` | The migration that adds `public.register_offline_pack` (service role only) must be in the database before the first publish |
+| Later, for Cloudflare: R2 bucket `caminoplus-packs` (private) + tokens | secrets `R2_*`, Supabase function secrets `R2_*`, repo variable `PACK_TARGET=r2` | Read-only token for the function, read/write for the build |
 | Deploy the function | `supabase functions deploy offline-pack-url` | Needs no extra secrets for Supabase Storage |
