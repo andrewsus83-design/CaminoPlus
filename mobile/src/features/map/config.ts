@@ -21,3 +21,9 @@ export const maptilerTilesUrl = () => `https://api.maptiler.com/tiles/v3/tiles.j
 
 export const OSM_ATTRIBUTION = '© OpenMapTiles © OpenStreetMap contributors';
 export const MAPTILER_ATTRIBUTION = '© MapTiler © OpenStreetMap contributors';
+
+// Keyless online fallback so the map is never blank while no MapTiler key is set:
+// OpenFreeMap serves the same OpenMapTiles schema, free, no API key. Online only.
+export const FALLBACK_TILES_URL = 'https://tiles.openfreemap.org/planet';
+export const onlineTilesUrl = () => (hasMapTiler() ? maptilerTilesUrl() : FALLBACK_TILES_URL);
+export const FALLBACK_ATTRIBUTION = 'OpenFreeMap © OpenMapTiles Data from OpenStreetMap';
