@@ -6,6 +6,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
 import { c, fonts, radius, role } from '@/theme';
+import { HelpBody, LinkedText, helpSpoken, linkTarget, openUrl } from '../help/bubble';
+import { isHelpMessage } from '../help/logic';
 import { MessageAction, clockTime, deliveryLabel, messageActions, nameColor } from '../logic';
 import { useChatImage } from '../media';
 import type { MessageEntry, SystemEntry } from '../types';
@@ -75,12 +77,13 @@ type BubbleProps = {
   onJump: (messageId: string) => void;
 };
 
-function DeliveryMark({ entry }: { entry: MessageEntry }) {
+// onLight = on the pale red bubble of a help request (the light marks of the blue bubble would disappear there).
+function DeliveryMark({ entry, onLight }: { entry: MessageEntry; onLight?: boolean }) {
   switch (entry.delivery) {
-    case 'sending': return <Icon name="clock" color={MINE_TIME} size={14} strokeWidth={2} />;
-    case 'sent': return <Icon name="check" color={MINE_TIME} size={15} strokeWidth={2.2} />;
-    case 'seen': return <Icon name="check-double" color={c.gold} size={17} strokeWidth={2.2} />;
-    case 'failed': return <Icon name="info" color="#FFB4A8" size={15} strokeWidth={2.2} />;
+    case 'sending': return <Icon name="clock" color={onLight ? role.muted : MINE_TIME} size={14} strokeWidth={2} />;
+    case 'sent': return <Icon name="check" color={onLight ? role.muted : MINE_TIME} size={15} strokeWidth={2.2} />;
+    case 'seen': return <Icon name="check-double" color={onLight ? c.blue : c.gold} size={17} strokeWidth={2.2} />;
+    case 'failed': return <Icon name="info" color={onLight ? c.red700 : '#FFB4A8'} size={15} strokeWidth={2.2} />;
     default: return null;
   }
 }
@@ -90,7 +93,10 @@ export const MessageBubble = memo(function MessageBubble({ entry, isGroup, sende
   const unsent = !!m.deleted_at;
   const failed = entry.delivery === 'failed';
   const time = clockTime(m.created_at);
-  const fg = mine ? c.parchment : role.text;
+  // A help request from the help bell: its own red bubble. Links in any text message are tappable (http and https only).
+  const help = !unsent && m.kind === 'text' && isHelpMessage(m.body);
+  const link = unsent ? null : linkTarget(m.body);
+  const fg = mine && !help ? c.parchment : role.text;
   const actions = messageActions(m, mine);
   const senderName = sender?.name ?? 'Pilgrim';
   const radii = mine
@@ -98,7 +104,7 @@ export const MessageBubble = memo(function MessageBubble({ entry, isGroup, sende
     : { borderTopRightRadius: BIG, borderBottomRightRadius: BIG, borderTopLeftRadius: first ? BIG : SMALL, borderBottomLeftRadius: last ? BIG : SMALL };
   const spoken = unsent
     ? `${mine ? 'You' : senderName}, ${time}: message unsent`
-    : `${mine ? 'You' : senderName}, ${time}: ${m.kind === 'image' ? `photo${m.body ? `, ${m.body}` : ''}` : m.body ?? ''}${entry.delivery ? `. ${deliveryLabel(entry.delivery, entry.seenLabel)}` : ''}`;
+    : `${mine ? 'You' : senderName}, ${time}: ${help && m.body ? helpSpoken(m.body) : m.kind === 'image' ? `photo${m.body ? `, ${m.body}` : ''}` : m.body ?? ''}${entry.delivery ? `. ${deliveryLabel(entry.delivery, entry.seenLabel)}` : ''}`;
 
   return (
     <View style={{ marginTop: first ? 10 : 2, paddingHorizontal: 4 }}>
@@ -110,12 +116,18 @@ export const MessageBubble = memo(function MessageBubble({ entry, isGroup, sende
         )}
         <Pressable
           accessible accessibilityRole="button" accessibilityLabel={spoken} accessibilityHint={failed ? 'Tap to try again' : actions.length ? 'Hold for more options' : undefined}
-          accessibilityActions={actions.map((a) => ({ name: a, label: { reply: 'Reply', copy: 'Copy', unsend: 'Unsend', report: 'Report', retry: 'Try again', delete: 'Delete' }[a] }))}
-          onAccessibilityAction={(e) => onAction(entry, e.nativeEvent.actionName as MessageAction)}
+          accessibilityActions={[
+            ...actions.map((a) => ({ name: a, label: { reply: 'Reply', copy: 'Copy', unsend: 'Unsend', report: 'Report', retry: 'Try again', delete: 'Delete' }[a] })),
+            ...(link ? [{ name: 'openLink', label: help ? 'Open map' : 'Open link' }] : []), // a screen reader cannot reach a link inside the bubble
+          ]}
+          onAccessibilityAction={(e) => {
+            const name = e.nativeEvent.actionName;
+            if (name === 'openLink') { if (link) void openUrl(link); } else onAction(entry, name as MessageAction);
+          }}
           onPress={failed ? () => onRetry(entry) : undefined}
           onLongPress={actions.length ? () => onMenu(entry) : undefined} delayLongPress={380}
           style={[
-            { maxWidth: '80%', paddingHorizontal: 14, paddingTop: 9, paddingBottom: 7, backgroundColor: unsent ? 'transparent' : mine ? c.blue : role.surface, borderWidth: failed ? 2 : 1, borderColor: failed ? c.red : unsent ? c.sand400 : mine ? c.blue : role.border, borderStyle: unsent ? 'dashed' : 'solid' },
+            { maxWidth: help ? '90%' : '80%', paddingHorizontal: 14, paddingTop: 9, paddingBottom: 7, backgroundColor: unsent ? 'transparent' : help ? c.red100 : mine ? c.blue : role.surface, borderWidth: failed || help ? 2 : 1, borderColor: failed || help ? c.red : unsent ? c.sand400 : mine ? c.blue : role.border, borderStyle: unsent ? 'dashed' : 'solid' },
             radii,
           ]}
         >
@@ -140,12 +152,16 @@ export const MessageBubble = memo(function MessageBubble({ entry, isGroup, sende
                     corners={{ topLeft: Math.max(0, radii.borderTopLeftRadius - 1), topRight: Math.max(0, radii.borderTopRightRadius - 1) }}
                   />
                 )}
-                {!!m.body && <AppText variant="body" color={fg} style={{ fontSize: 18, lineHeight: 26, marginTop: m.kind === 'image' ? 6 : 0 }}>{m.body}</AppText>}
+                {!!m.body && (
+                  <View style={{ marginTop: m.kind === 'image' ? 6 : 0 }}>
+                    {help ? <HelpBody body={m.body} /> : <LinkedText text={m.body} color={fg} linkColor={mine ? c.goldSoft : c.blue700} />}
+                  </View>
+                )}
               </>
             )}
           <View style={{ flexDirection: 'row', alignSelf: 'flex-end', alignItems: 'center', gap: 5, marginTop: 2 }}>
-            <AppText variant="mono" color={mine && !unsent ? MINE_TIME : role.muted} style={{ fontSize: 12, lineHeight: 16 }}>{time}</AppText>
-            {mine && !unsent && <DeliveryMark entry={entry} />}
+            <AppText variant="mono" color={mine && !unsent && !help ? MINE_TIME : role.muted} style={{ fontSize: 12, lineHeight: 16 }}>{time}</AppText>
+            {mine && !unsent && <DeliveryMark entry={entry} onLight={help} />}
           </View>
         </Pressable>
       </View>

@@ -15,3 +15,4 @@ export { useChatInfo, reportMessage } from './hooks/chatInfo';
 export { useMeId, useNow, useOnlineStatus } from './hooks/base';
 export { useRealtimeStatus } from './realtime';
 export { flush as flushChatOutbox } from './outbox';
+export { HelpBellButton, HelpSheet, useHelp, isHelpMessage } from './help';

@@ -779,6 +779,7 @@ def privacy():
 <li>Messages are protected in transit and at rest by our hosting provider, but they are <b>not end-to-end encrypted</b>. That means our team and our provider are technically able to read them. We only look at messages to investigate a report, to keep the service secure, or when the law requires it. If someone reports a message, our team can read that message.</li>
 <li>Please do not send passwords, card numbers or other secrets in chat.</li>
 <li>You can unsend your own messages; they disappear for everyone in the chat. When you delete your account your messages are deleted too.</li>
+<li>If you use the help bell, your position is sent only to the friends and groups you choose, as a chat message stored like any other message.</li>
 </ul>
 <h2>Who processes data for us</h2>
 <p>We use trusted service providers that act on our instructions under data processing agreements. In use today:</p>

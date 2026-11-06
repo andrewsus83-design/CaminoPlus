@@ -9,6 +9,7 @@ import { ModalSheet } from '@/features/map/ModalSheet';
 import { setTabBarHidden } from '@/lib/tabBarVisibility';
 import { GpsMode, MapLayerMode, MapView, PRECISE_TIMEOUT_MS, ROUTE_NAME, nativeMapAvailable, pois, routeLengthKm } from '@/features/map';
 import type { PoiKind } from '@/features/map';
+import { HelpBellButton, HelpSheet } from '@/features/social';
 import { useAuth } from '@/lib/auth';
 import { MapIcon } from '@/features/map/MapIcon';
 import { useMapModel } from '@/features/map/useMapModel';
@@ -33,6 +34,7 @@ export default function Maps() {
   const [layer, setLayer] = useState<MapLayerMode>('Helicopter');
   const [selId, setSelId] = useState<string | undefined>();
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
   const [gpsMode, setGpsMode] = useState<GpsMode>('saver');
   const [recenterKey, setRecenterKey] = useState(0);
   const [zoomCmd, setZoomCmd] = useState<{ dir: 1 | -1; n: number }>({ dir: 1, n: 0 });
@@ -138,8 +140,8 @@ export default function Maps() {
   const mapInsets = walk ? { top: insets.top + 8 + bannerH + 8, bottom: cardH } : { top: insets.top + 100, bottom: sheetBottom };
   // The Walk view's button stack takes the room between the banner and the card: 56, 52 or 48 dp buttons, scrolling only if even 48 does not fit.
   const stackMax = Math.max(0, screenH - (insets.top + 8) - aboveH - 8 - cardH - 16);
-  const btn = [56, 52, 48].find((s) => 7 * s + 40 <= stackMax) ?? 48;
-  const stackScrolls = 7 * btn + 40 > stackMax;
+  const btn = [56, 52, 48].find((s) => 8 * s + 48 <= stackMax) ?? 48; // 8 = help bell, compass, near, GPS, light, route details and the zoom pair (2)
+  const stackScrolls = 8 * btn + 48 > stackMax;
   const gpsColor = gpsMode === 'saver' ? (night ? '#7FD6A4' : c.success) : c.gold;
 
   return (
@@ -221,6 +223,7 @@ export default function Maps() {
                   {(() => {
                     const stack = (
                       <View pointerEvents="box-none" style={{ alignItems: 'flex-end', gap: 8 }}>
+                        <HelpBellButton tone={night ? 'night' : 'day'} size={btn} onPress={() => setHelpOpen(true)} />
                         <RoundBtn
                           night={night} size={btn}
                           label={headingUp ? 'Compass. The map turns as you walk. Tap to keep north at the top.' : 'Compass. North is at the top. Tap to turn the map as you walk.'}
@@ -315,6 +318,7 @@ export default function Maps() {
 
           {/* Right: GPS mode + locate me */}
           {!poi && <View pointerEvents="box-none" style={{ position: 'absolute', right: 16, bottom: sheetBottom + 16, gap: 10, alignItems: 'flex-end' }}>
+            <HelpBellButton tone="day" size={48} onPress={() => setHelpOpen(true)} />
             <Pressable
               accessibilityRole="switch"
               accessibilityState={{ checked: gpsMode === 'saver' }}
@@ -368,6 +372,14 @@ export default function Maps() {
       </ModalSheet>}
 
       {poi && <PoiPopup poi={poi} bottom={(walk ? insets.bottom : sheetBottom) + 12} onClose={() => onSelectPoi(undefined)} />}
+
+      {/* Help bell: private alert to the friends and groups the pilgrim picks, plus a one-tap 112 call. Only a REAL fix is passed on, never the sample position. */}
+      <HelpSheet
+        visible={helpOpen}
+        onClose={() => setHelpOpen(false)}
+        position={m.fix ? { lat: m.fix.at[1], lng: m.fix.at[0], accuracyM: m.fix.accuracyM, at: m.fix.timestamp } : null}
+        placeText={m.nav.live ? `about ${m.nextTownKm} km before ${m.stage.name.split('→')[1]?.trim() ?? 'the next town'}, stage ${m.stage.number}` : null}
+      />
     </View>
   );
 }

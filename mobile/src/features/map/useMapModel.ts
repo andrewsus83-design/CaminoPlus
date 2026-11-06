@@ -145,6 +145,7 @@ export function useMapModel({ gpsMode, visible }: { gpsMode: GpsMode; visible: b
     status,
     permission,
     walker,
+    fix, // the raw GPS fix (null until there is one): the help bell sends this, never the sample position
     gpsOffRoute: !!fix && !onRoute,
     done,
     remaining,
