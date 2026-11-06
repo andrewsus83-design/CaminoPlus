@@ -118,6 +118,7 @@ function LiveMapImpl(p: MapViewProps) {
         <GeoJSONSource id="walker" data={{ type: 'Feature', properties: { acc: p.walker.accuracyM ?? 0, sample: p.walker.sample }, geometry: { type: 'Point', coordinates: p.walker.at } }}>
           {!heli && (
             <Layer
+              key="walker-accuracy"
               id="walker-accuracy"
               type="circle"
               paint={{
@@ -128,8 +129,8 @@ function LiveMapImpl(p: MapViewProps) {
               }}
             />
           )}
-          <Layer id="walker-halo" type="circle" paint={{ 'circle-radius': heli ? 10 : 13, 'circle-color': '#FFFFFF' }} />
-          <Layer id="walker-dot" type="circle" paint={{ 'circle-radius': heli ? 6.5 : 8.5, 'circle-color': ['case', ['get', 'sample'], C.stone, C.blue] }} />
+          <Layer key="walker-halo" id="walker-halo" type="circle" paint={{ 'circle-radius': heli ? 10 : 13, 'circle-color': '#FFFFFF' }} />
+          <Layer key="walker-dot" id="walker-dot" type="circle" paint={{ 'circle-radius': heli ? 6.5 : 8.5, 'circle-color': ['case', ['get', 'sample'], C.stone, C.blue] }} />
         </GeoJSONSource>
       )}
     </Map>

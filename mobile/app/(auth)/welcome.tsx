@@ -34,16 +34,18 @@ export default function Welcome() {
           <Rect x="0" y="0" width="100%" height="100%" fill="url(#fade)" />
         </Svg>
       </View>
+      <View pointerEvents="none" style={{ position: 'absolute', top: insets.top + 14, left: 0, right: 0, alignItems: 'center' }}>
+        <Wordmark size={30} />
+      </View>
       <ScrollView
         bounces={false}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ flexGrow: 1, paddingTop: height * 0.3, paddingBottom: insets.bottom + 24, paddingHorizontal: layout.screenMargin, gap: 28 }}
+        contentContainerStyle={{ flexGrow: 1, paddingTop: height * 0.4, paddingBottom: insets.bottom + 24, paddingHorizontal: layout.screenMargin, gap: 28 }}
       >
-        <View style={{ gap: 14 }}>
-          <Wordmark size={44} />
+        <View style={{ gap: 12 }}>
+          <AppText variant="accent" color={c.goldInk}>Buen Camino!</AppText>
           <AppText variant="h3">Every Camino, every stage, even offline.</AppText>
           <AppText variant="lead" muted>Plan your pilgrimage, collect stamps, find a bed for tonight and share the way with friends.</AppText>
-          <AppText variant="accent" color={c.goldInk}>Buen Camino!</AppText>
         </View>
         <View style={{ gap: 12, marginTop: 'auto' }}>
           {!!error && <FormMessage>{error}</FormMessage>}
