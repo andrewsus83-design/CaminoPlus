@@ -165,3 +165,25 @@ export async function listFriends(userId: string) {
   ) as unknown as { friend: Friend | null }[];
   return rows.map((r) => r.friend).filter((f): f is Friend => !!f);
 }
+
+export type PickedMedia = { uri: string; type: 'image' | 'video'; mimeType?: string | null; width?: number; height?: number; durationMs?: number | null; fileSize?: number | null };
+
+/** Upload photos/videos of a post to the private user-media bucket and register them in post_media.
+ *  Returns how many failed (cloud storage quota is 0 on the free plan, so uploads can be refused). */
+export async function uploadPostMedia(userId: string, postId: string, items: PickedMedia[]) {
+  let failed = 0;
+  for (let i = 0; i < items.length; i++) {
+    const m = items[i];
+    try {
+      const ext = m.type === 'video' ? (m.mimeType === 'video/quicktime' ? 'mov' : 'mp4') : m.mimeType === 'image/png' ? 'png' : 'jpg';
+      const path = `${userId}/posts/${postId}-${i}.${ext}`;
+      const body = await (await fetch(m.uri)).arrayBuffer();
+      const up = await supabase.storage.from('user-media').upload(path, body, { contentType: m.mimeType ?? (m.type === 'video' ? 'video/mp4' : 'image/jpeg'), upsert: true });
+      if (up.error) throw new Error(up.error.message);
+      must(await supabase.from('post_media').insert({ post_id: postId, user_id: userId, sort_order: i, media_type: m.type, storage_path: path, width: m.width ?? null, height: m.height ?? null, duration_ms: m.durationMs ? Math.round(m.durationMs) : null, size_bytes: m.fileSize ?? body.byteLength, upload_status: 'uploaded' }));
+    } catch {
+      failed++;
+    }
+  }
+  return failed;
+}
