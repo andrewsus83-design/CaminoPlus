@@ -60,6 +60,8 @@ function RootStack() {
         <Stack.Screen name="planner" />
         <Stack.Screen name="watches" />
         <Stack.Screen name="journey" />
+        <Stack.Screen name="passport" />
+        <Stack.Screen name="friends" />
         <Stack.Screen name="business/index" />
         <Stack.Screen name="business/register" />
         <Stack.Screen name="business/status" />

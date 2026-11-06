@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Image, Pressable, Share, View } from 'react-native';
+import { ActivityIndicator, Alert, Image, KeyboardAvoidingView, Modal, Platform, Pressable, TextInput, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Screen } from '@/components/Screen';
@@ -11,65 +11,18 @@ import { FormMessage } from '@/components/auth/Field';
 import { tints } from '@/data/mock';
 import { useAuth } from '@/lib/auth';
 import { useMeData } from '@/lib/useMeData';
-import { Friend, listFriends } from '@/lib/api';
-import { c, layout, radius, role, shadowStyle } from '@/theme';
+import { Empty, ProgressBar, shortDate } from '@/features/me/shared';
+import { Health } from '@/features/me/Health';
+import { updateProfile } from '@/lib/api';
+import { PickerUnavailable, pickAndUploadAvatar } from '@/lib/avatar';
+import { c, fonts, layout, radius, role, shadowStyle } from '@/theme';
 
-const TABS = ['Journey', 'Passport', 'Plan', 'Friends'] as const;
+const TABS = ['Journey', 'Plan', 'Health'] as const;
 
 type StampT = NonNullable<ReturnType<typeof useMeData>['stamps']>[number];
 type StageT = ReturnType<typeof useMeData>['stages'][number];
 type DayT = NonNullable<ReturnType<typeof useMeData>['days']>[number];
 
-const norm = (t: string | null | undefined) => (t ?? '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
-
-function ProgressBar({ value }: { value: number }) {
-  return (
-    <View style={{ height: 12, borderRadius: radius.pill, backgroundColor: c.sand200, overflow: 'hidden' }}>
-      <View style={{ width: `${Math.max(2, Math.min(100, value * 100))}%`, height: 12, borderRadius: radius.pill, backgroundColor: c.gold }} />
-    </View>
-  );
-}
-
-/** Passport = the towns of your route as stamp slots. Collected ones are filled in. */
-function Passport({ stamps, stages }: { stamps: StampT[]; stages: StageT[] }) {
-  const towns: string[] = [];
-  stages.forEach((s, i) => {
-    if (i === 0 && s.start?.name) towns.push(s.start.name);
-    if (s.end?.name && !towns.includes(s.end.name)) towns.push(s.end.name);
-  });
-  const got = new Set(stamps.map((s) => norm(s.place_name)));
-  const collected = towns.filter((t) => got.has(norm(t))).length;
-  const extra = stamps.filter((s) => !towns.some((t) => norm(t) === norm(s.place_name)));
-  const slot = (name: string, done: boolean, key: string, date?: string) => (
-    <View key={key} style={{ width: '33.33%', alignItems: 'center', gap: 6, paddingHorizontal: 4 }}>
-      <View style={{ width: 78, height: 78, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center', backgroundColor: done ? c.goldSoft : 'transparent', borderWidth: done ? 0 : 2, borderStyle: 'dashed', borderColor: c.sand300, transform: [{ rotate: done ? '-8deg' : '0deg' }] }}>
-        <Icon name="shell" color={done ? c.blue : c.sand300} size={32} />
-      </View>
-      <AppText variant="caption" color={done ? role.text : role.muted} numberOfLines={2} style={{ textAlign: 'center', fontFamily: done ? 'Inter_600SemiBold' : 'Inter_500Medium' }}>{name}</AppText>
-      {!!date && <AppText variant="mono" muted style={{ fontSize: 12 }}>{date}</AppText>}
-    </View>
-  );
-  return (
-    <View style={{ gap: 16 }}>
-      <Card style={{ gap: 12 }}>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
-          <AppText variant="h4">Pilgrim passport</AppText>
-          <AppText variant="label" color={role.accentText}>{collected} of {towns.length || '-'} towns</AppText>
-        </View>
-        <ProgressBar value={towns.length ? collected / towns.length : 0} />
-        <AppText variant="small" muted>Ask for a sello (stamp) at your albergue, a church or a café each day. For the Compostela certificate, collect two stamps a day on the last 100 km.</AppText>
-      </Card>
-      {towns.length === 0 && extra.length === 0 && <Empty text="The towns of your route will appear here as stamp slots." />}
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', rowGap: 20 }}>
-        {towns.map((t) => {
-          const hit = stamps.find((s) => norm(s.place_name) === norm(t));
-          return slot(t, !!hit, `t-${t}`, hit ? shortDate(hit.stamped_at) : undefined);
-        })}
-        {extra.map((s) => slot(s.place_name ?? 'Stamp', true, s.id, shortDate(s.stamped_at)))}
-      </View>
-    </View>
-  );
-}
 
 /** Plan as a tracker: overall progress on top, then a timeline of days. */
 function PlanTracker({ days }: { days: DayT[] }) {
@@ -129,32 +82,6 @@ function PlanTracker({ days }: { days: DayT[] }) {
   );
 }
 
-/** People you follow, under the Camino friends card. */
-function FriendList() {
-  const { session } = useAuth();
-  const [friends, setFriends] = useState<Friend[] | null>(null);
-  const [err, setErr] = useState(false);
-  useEffect(() => {
-    if (!session) return;
-    listFriends(session.user.id).then(setFriends).catch(() => { setErr(true); setFriends([]); });
-  }, [session]);
-  if (!friends) return <ActivityIndicator color={role.action} style={{ marginTop: 12 }} />;
-  if (friends.length === 0) return <Empty text={err ? 'Could not load your friends. Pull to retry later.' : 'No friends yet. Invite someone to walk with you.'} />;
-  return (
-    <View style={{ gap: 10 }}>
-      {friends.map((f) => (
-        <Card key={f.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 14, padding: 14 }}>
-          {f.avatar_url ? <Image source={{ uri: f.avatar_url }} style={{ width: 56, height: 56, borderRadius: radius.pill }} /> : <Avatar size={56} />}
-          <View style={{ flex: 1 }}>
-            <AppText variant="label" numberOfLines={1}>{f.display_name || f.username || 'Pilgrim'}</AppText>
-            <AppText variant="caption" muted>{f.username ? `@${f.username} · ` : ''}{Math.round(Number(f.km_walked ?? 0))} km walked</AppText>
-          </View>
-        </Card>
-      ))}
-    </View>
-  );
-}
-
 function ago(iso: string | null) {
   if (!iso) return '';
   const d = new Date(iso);
@@ -165,25 +92,43 @@ function ago(iso: string | null) {
   if (days < 7) return `${days} days ago`;
   return d.toLocaleDateString([], { day: 'numeric', month: 'short' });
 }
-const shortDate = (iso: string) => new Date(iso).toLocaleDateString([], { day: 'numeric', month: 'short' });
-
-function Empty({ text }: { text: string }) {
-  return (
-    <Card style={{ alignItems: 'center', gap: 10, paddingVertical: 32 }}>
-      <Icon name="shell" color={c.gold} size={32} />
-      <AppText variant="small" muted style={{ textAlign: 'center' }}>{text}</AppText>
-    </Card>
-  );
-}
 
 export default function Me() {
   const [tab, setTab] = useState<(typeof TABS)[number]>('Journey');
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { profile, journey } = useAuth();
+  const { profile, journey, session, refresh } = useAuth();
+  const [editBio, setEditBio] = useState(false);
+  const [bioDraft, setBioDraft] = useState('');
+  const [savingBio, setSavingBio] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const { posts, stamps, days, stages, error } = useMeData();
   const name = profile?.display_name || profile?.username || 'Pilgrim';
   const stagesDone = days?.filter((d) => d.status === 'done').length ?? 0;
+  const changePhoto = async () => {
+    if (!session) return;
+    setUploading(true);
+    try {
+      if (await pickAndUploadAvatar(session.user.id)) await refresh();
+    } catch (e) {
+      Alert.alert(e instanceof PickerUnavailable ? 'Next build' : 'Could not change photo', e instanceof Error ? e.message : String(e));
+    } finally {
+      setUploading(false);
+    }
+  };
+  const saveBio = async () => {
+    if (!session) return;
+    setSavingBio(true);
+    try {
+      await updateProfile(session.user.id, { bio: bioDraft.trim() || null });
+      await refresh();
+      setEditBio(false);
+    } catch (e) {
+      Alert.alert('Could not save', e instanceof Error ? e.message : String(e));
+    } finally {
+      setSavingBio(false);
+    }
+  };
   const loading = <ActivityIndicator color={role.action} style={{ marginTop: 24 }} />;
 
   return (
@@ -200,27 +145,37 @@ export default function Me() {
           <View style={{ marginLeft: 'auto' }}><IconButton name="bell" label="Notifications" onPress={() => router.push('/inbox')} flat /></View>
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 20 }}>
-          {profile?.avatar_url
-            ? <Image source={{ uri: profile.avatar_url }} style={{ width: 92, height: 92, borderRadius: radius.pill, borderWidth: 3, borderColor: c.gold }} />
-            : <Avatar size={92} ring />}
+          <Pressable accessibilityRole="button" accessibilityLabel="Change profile picture" onPress={changePhoto} disabled={uploading}>
+            {profile?.avatar_url
+              ? <Image source={{ uri: profile.avatar_url }} style={{ width: 92, height: 92, borderRadius: radius.pill, borderWidth: 3, borderColor: c.gold }} />
+              : <Avatar size={92} ring />}
+            <View style={{ position: 'absolute', right: -2, bottom: -2, width: 32, height: 32, borderRadius: 16, backgroundColor: c.gold, borderWidth: 2, borderColor: role.bg, alignItems: 'center', justifyContent: 'center' }}>
+              {uploading ? <ActivityIndicator size="small" color={c.blue} /> : <Icon name="camera" color={c.blue} size={16} />}
+            </View>
+          </Pressable>
           <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-around' }}>
             {[[String(Math.round(Number(profile?.km_walked ?? 0))), 'km'], [String(profile?.stamps_count ?? 0), 'stamps'], [String(profile?.followers_count ?? 0), 'friends']].map(([n, l]) => (
-              <Pressable key={l} accessibilityRole={l === 'km' ? 'button' : undefined} onPress={l === 'km' ? () => router.push('/journey') : l === 'friends' ? () => setTab('Friends') : undefined} style={{ alignItems: 'center' }}>
+              <Pressable key={l} accessibilityRole="button" onPress={() => router.push(l === 'km' ? '/journey' : l === 'stamps' ? '/passport' : '/friends')} style={{ alignItems: 'center' }}>
                 <AppText variant="h3">{n}</AppText>
-                <AppText variant="small" muted style={l === 'km' ? { textDecorationLine: 'underline' } : undefined}>{l}</AppText>
+                <AppText variant="small" muted style={{ textDecorationLine: 'underline' }}>{l}</AppText>
               </Pressable>
             ))}
           </View>
         </View>
         <View style={{ gap: 4 }}>
           <AppText variant="body" style={{ fontFamily: 'Inter_600SemiBold' }}>{name}</AppText>
-          {!!profile?.bio && <AppText variant="body">{profile.bio}</AppText>}
+          <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 10 }}>
+            <AppText variant="body" muted={!profile?.bio} style={{ flex: 1 }}>{profile?.bio || 'Add a short description about you'}</AppText>
+            <Pressable accessibilityRole="button" accessibilityLabel="Edit description" hitSlop={10} onPress={() => { setBioDraft(profile?.bio ?? ''); setEditBio(true); }} style={{ width: 40, height: 40, borderRadius: radius.pill, backgroundColor: role.surface, borderWidth: 1, borderColor: role.border, alignItems: 'center', justifyContent: 'center' }}>
+              <Icon name="pen" color={c.blue} size={18} />
+            </Pressable>
+          </View>
           {journey?.route && (
-            <Pressable accessibilityRole="button" onPress={() => router.push('/change-camino')} style={{ flexDirection: 'row', alignItems: 'center', gap: 6, alignSelf: 'flex-start', paddingVertical: 6 }}>
-              <AppText variant="small" muted>
-                {journey.route.name}{journey.start_stage ? ` · from stage ${journey.start_stage.stage_number}` : ''} · {stagesDone} stages done
+            <Pressable accessibilityRole="button" accessibilityLabel="Switch Camino" onPress={() => router.push('/change-camino')} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, alignSelf: 'flex-start', marginTop: 6, paddingLeft: 16, paddingRight: 10, height: 44, borderRadius: radius.pill, backgroundColor: c.goldWash, maxWidth: '100%' }}>
+              <AppText variant="label" color={role.accentText} numberOfLines={1} style={{ flexShrink: 1 }}>
+                {journey.route.name}{journey.start_stage ? ` · stage ${journey.start_stage.stage_number}` : ''} · {stagesDone} done
               </AppText>
-              <AppText variant="small" color={c.blue} style={{ fontFamily: 'Inter_600SemiBold', textDecorationLine: 'underline' }}>Change</AppText>
+              <Icon name="chevron" color={role.accentText} size={18} />
             </Pressable>
           )}
           <AppText variant="accent" color={role.accentText}>Buen Camino!</AppText>
@@ -245,25 +200,24 @@ export default function Me() {
             </Card>
           )))}
 
-        {tab === 'Passport' && (!stamps ? loading : <Passport stamps={stamps} stages={stages} />)}
-
         {tab === 'Plan' && (!days ? loading : <PlanTracker days={days} />)}
 
-        {tab === 'Friends' && (
-          <>
-            <Card style={{ gap: 14 }}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                <AppText variant="h4">Camino friends</AppText>
-                <AppText variant="small" muted>{profile?.followers_count ?? 0} friends</AppText>
-              </View>
-              <AppText variant="small" muted>Walk together, share stamps and see where your friends are on the way.</AppText>
-              <Pill variant="gold" label="Invite friends" onPress={() => Share.share({ message: `Walk the Camino with me on CaminoPlus: https://camino.plus${profile?.username ? `/${profile.username}` : ''}` }).catch(() => {})} />
-            </Card>
-            <FriendList />
-          </>
-        )}
+        {tab === 'Health' && <Health />}
       </Screen>
-      <Pressable accessibilityRole="button" accessibilityLabel="Write a journey post" onPress={() => router.push('/write')} style={{ position: 'absolute', right: layout.screenMargin, bottom: Math.max(insets.bottom - 14, 10) + 88 + 4, width: 64, height: 64, borderRadius: radius.pill, backgroundColor: c.gold, alignItems: 'center', justifyContent: 'center', ...shadowStyle('gold') }}>
+      <Modal visible={editBio} transparent animationType="slide" onRequestClose={() => setEditBio(false)}>
+        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(20,54,93,0.45)' }}>
+          <View style={{ backgroundColor: role.bg, borderTopLeftRadius: radius.lg, borderTopRightRadius: radius.lg, padding: 24, paddingBottom: insets.bottom + 24, gap: 16 }}>
+            <AppText variant="h4">Your description</AppText>
+            <TextInput autoFocus multiline maxLength={160} value={bioDraft} onChangeText={setBioDraft} placeholder="Pilgrim from Jakarta, walking for my family…" placeholderTextColor={role.muted} style={{ minHeight: 110, textAlignVertical: 'top', fontFamily: fonts.body, fontSize: 19, lineHeight: 28, color: role.text, backgroundColor: role.surface, borderRadius: radius.lg, borderWidth: 1, borderColor: role.border, padding: 16 }} />
+            <AppText variant="caption" muted style={{ textAlign: 'right' }}>{bioDraft.length} / 160</AppText>
+            <View style={{ flexDirection: 'row', gap: 12 }}>
+              <View style={{ flex: 1 }}><Pill large variant="ghost" label="Cancel" onPress={() => setEditBio(false)} /></View>
+              <View style={{ flex: 1 }}><Pill large label="Save" onPress={saveBio} loading={savingBio} /></View>
+            </View>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
+      <Pressable accessibilityRole="button" accessibilityLabel="Write a journey post" onPress={() => router.push('/write')} style={{ position: 'absolute', right: layout.screenMargin, bottom: Math.max(insets.bottom - 14, 10) + 88 + 8, width: 64, height: 64, borderRadius: radius.pill, backgroundColor: c.gold, alignItems: 'center', justifyContent: 'center', ...shadowStyle('gold') }}>
         <Icon name="pen" color={c.blue} size={26} />
       </Pressable>
     </View>

@@ -1,14 +1,19 @@
 import { useEffect, useMemo, useState } from 'react';
-import { FlatList, Pressable, ScrollView, View, useWindowDimensions } from 'react-native';
+import { FlatList, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, Share, TextInput, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
 import { secureStorage } from '@/lib/secureStorage';
 import { exploreItems } from '@/data/mock';
-import { c, fonts } from '@/theme';
+import { c, fonts, radius, role } from '@/theme';
 
-const TABS = ['For you', 'Following', 'Photos of you', 'Favourites'] as const;
+const TABS = ['For you', 'Friends', 'Photos of you', 'Favourites'] as const;
 const FAV_KEY = 'discover.favs';
+type Comment = { id: string; user: string; text: string };
+const SEED: Record<string, Comment[]> = {
+  e1: [{ id: 'a', user: 'lucas', text: 'Golden light! Which stage was this?' }],
+  e2: [{ id: 'b', user: 'hannah', text: 'Left my stone here too.' }, { id: 'c', user: 'ana', text: 'Buen Camino!' }],
+};
 type Favs = { loved: string[]; saved: string[] };
 
 // Full-screen, swipe left/right. The swipe tutorial shows on first open only (persist with storage later).
@@ -29,6 +34,17 @@ export default function Discover() {
     secureStorage.setItem(FAV_KEY, JSON.stringify(next)).catch(() => {});
     return next;
   });
+  const [comments, setComments] = useState<Record<string, Comment[]>>(SEED);
+  const [openId, setOpenId] = useState<string | null>(null);
+  const [draft, setDraft] = useState('');
+  const sendComment = () => {
+    const t = draft.trim();
+    if (!t || !openId) return;
+    setComments((cm) => ({ ...cm, [openId]: [...(cm[openId] ?? []), { id: `c${Date.now()}`, user: 'you', text: t }] }));
+    setDraft('');
+  };
+  const share = (item: (typeof exploreItems)[number]) =>
+    Share.share({ message: `${item.caption} by @${item.user} on CaminoPlus: https://camino.plus` }).catch(() => {});
   const items = useMemo(() => (tab === 'Favourites' ? exploreItems.filter((i) => favs.loved.includes(i.id) || favs.saved.includes(i.id)) : exploreItems), [tab, favs]);
   const dismiss = () => { tutorialSeen = true; setShowTip(false); };
   return (
@@ -42,7 +58,7 @@ export default function Discover() {
           <View style={{ width, height, backgroundColor: item.tint, justifyContent: 'flex-end', padding: 24, paddingBottom: insets.bottom + 120 }}>
             <AppText variant="h3" color={c.blue900}>{item.caption}</AppText>
             <AppText variant="mono" color={c.blue900}>@{item.user}</AppText>
-            <View style={{ position: 'absolute', right: 16, bottom: insets.bottom + 130, gap: 18, alignItems: 'center' }}>
+            <View style={{ position: 'absolute', right: 16, bottom: insets.bottom + 120, gap: 14, alignItems: 'center' }}>
               {(['loved', 'saved'] as const).map((k) => {
                 const on = favs[k].includes(item.id);
                 return (
@@ -51,6 +67,13 @@ export default function Discover() {
                   </Pressable>
                 );
               })}
+              <Pressable accessibilityRole="button" accessibilityLabel="Comments" onPress={() => setOpenId(item.id)} style={{ width: 56, height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,253,248,0.85)' }}>
+                <Icon name="chat" color={c.blue} size={26} />
+                <AppText variant="caption" color={c.blue} style={{ fontSize: 11, lineHeight: 13 }}>{(comments[item.id] ?? []).length}</AppText>
+              </Pressable>
+              <Pressable accessibilityRole="button" accessibilityLabel="Share" onPress={() => share(item)} style={{ width: 56, height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,253,248,0.85)' }}>
+                <Icon name="share" color={c.blue} size={26} />
+              </Pressable>
             </View>
           </View>
         )}
@@ -64,6 +87,32 @@ export default function Discover() {
           ))}
         </ScrollView>
       </View>
+      <Modal visible={!!openId} transparent animationType="slide" onRequestClose={() => setOpenId(null)}>
+        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(12,35,64,0.5)' }}>
+          <Pressable accessibilityLabel="Close comments" onPress={() => setOpenId(null)} style={{ flex: 1 }} />
+          <View style={{ maxHeight: height * 0.65, backgroundColor: role.bg, borderTopLeftRadius: radius.lg, borderTopRightRadius: radius.lg, padding: 20, paddingBottom: insets.bottom + 16, gap: 14 }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+              <AppText variant="h4">Comments</AppText>
+              <Pressable accessibilityLabel="Close" onPress={() => setOpenId(null)} hitSlop={12}><Icon name="close" color={role.text} size={26} /></Pressable>
+            </View>
+            <ScrollView style={{ flexGrow: 0 }} contentContainerStyle={{ gap: 12 }}>
+              {(openId ? comments[openId] ?? [] : []).length === 0 && <AppText variant="small" muted>No comments yet. Be the first.</AppText>}
+              {(openId ? comments[openId] ?? [] : []).map((cm) => (
+                <View key={cm.id} style={{ gap: 2 }}>
+                  <AppText variant="caption" muted>@{cm.user}</AppText>
+                  <AppText variant="small">{cm.text}</AppText>
+                </View>
+              ))}
+            </ScrollView>
+            <View style={{ flexDirection: 'row', alignItems: 'center', height: 56, borderRadius: radius.pill, backgroundColor: role.surface, borderWidth: 1, borderColor: role.border, paddingLeft: 18, paddingRight: 6 }}>
+              <TextInput value={draft} onChangeText={setDraft} onSubmitEditing={sendComment} returnKeyType="send" maxLength={200} placeholder="Add a comment…" placeholderTextColor={role.muted} style={{ flex: 1, fontFamily: fonts.body, fontSize: 17, color: role.text }} />
+              <Pressable accessibilityRole="button" accessibilityLabel="Send comment" onPress={sendComment} style={{ height: 44, paddingHorizontal: 18, borderRadius: radius.pill, backgroundColor: c.gold, justifyContent: 'center' }}>
+                <AppText variant="label" color={c.blue}>Send</AppText>
+              </Pressable>
+            </View>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
       {showTip && (
         <Pressable onPress={dismiss} style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(12,35,64,0.6)', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
           <AppText variant="accent" color={c.parchment}>Swipe left or right</AppText>
