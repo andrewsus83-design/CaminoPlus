@@ -3,7 +3,7 @@ import { ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { layout, role } from '@/theme';
 
-// Spacious screen: 24 margin (or `margin`), scrolls above the floating tab bar.
+// Spacious screen: layout.screenMargin (16) left/right, or `margin`, scrolls above the floating tab bar.
 export function Screen({ children, scroll = true, margin = layout.screenMargin }: { children: ReactNode; scroll?: boolean; margin?: number }) {
   const insets = useSafeAreaInsets();
   const pad = { paddingTop: insets.top + layout.screenTop, paddingHorizontal: margin };

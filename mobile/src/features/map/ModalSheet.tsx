@@ -4,7 +4,7 @@
 import { ReactNode, useEffect, useMemo, useRef } from 'react';
 import { Animated, PanResponder, Pressable, ScrollView, View } from 'react-native';
 import { Icon } from '@/components/Icon';
-import { radius, role, shadowStyle } from '@/theme';
+import { layout, radius, role, shadowStyle } from '@/theme';
 
 type Props = { half: number; max: number; bottomInset: number; onClose: () => void; children: ReactNode };
 
@@ -56,11 +56,11 @@ export function ModalSheet({ half, max, bottomInset, onClose, children }: Props)
       <Animated.View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: max, borderTopLeftRadius: 28, borderTopRightRadius: 28, backgroundColor: role.surface, ...shadowStyle('lg'), transform: [{ translateY: y }] }}>
         <View {...pan.panHandlers} style={{ height: 64, justifyContent: 'center', alignItems: 'center' }}>
           <View style={{ width: 56, height: 6, borderRadius: radius.pill, backgroundColor: role.border }} />
-          <Pressable accessibilityRole="button" accessibilityLabel="Close details" onPress={close} hitSlop={8} style={{ position: 'absolute', right: 14, top: 6, width: 52, height: 52, borderRadius: 26, backgroundColor: role.bg, alignItems: 'center', justifyContent: 'center' }}>
+          <Pressable accessibilityRole="button" accessibilityLabel="Close details" onPress={close} hitSlop={8} style={{ position: 'absolute', right: layout.screenMargin, top: 6, width: 52, height: 52, borderRadius: 26, backgroundColor: role.bg, alignItems: 'center', justifyContent: 'center' }}>
             <Icon name="close" color={role.text} size={30} strokeWidth={2.2} />
           </Pressable>
         </View>
-        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: bottomInset + 32 }}>
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: layout.screenMargin, paddingBottom: bottomInset + 32 }}>
           {children}
         </ScrollView>
       </Animated.View>

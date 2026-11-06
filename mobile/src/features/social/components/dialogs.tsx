@@ -59,7 +59,7 @@ function Sheet({ children, onClose, label }: { children: ReactNode; onClose: () 
     <Modal visible transparent animationType="fade" onRequestClose={onClose} statusBarTranslucent>
       <KeyboardAvoidingView behavior="padding" style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(20,54,93,0.45)' }}>
         <Pressable accessibilityLabel={`Close ${label}`} accessibilityRole="button" onPress={onClose} style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 }} />
-        <View accessibilityViewIsModal style={{ backgroundColor: role.bg, borderTopLeftRadius: radius.lg, borderTopRightRadius: radius.lg, paddingTop: 12, paddingHorizontal: 24, paddingBottom: Math.max(insets.bottom, 12) + 16, gap: 16, maxHeight: '88%', ...shadowStyle('xl') }}>
+        <View accessibilityViewIsModal style={{ backgroundColor: role.bg, borderTopLeftRadius: radius.lg, borderTopRightRadius: radius.lg, paddingTop: 12, paddingHorizontal: layout.screenMargin, paddingBottom: Math.max(insets.bottom, 12) + 16, gap: 16, maxHeight: '88%', ...shadowStyle('xl') }}>
           <View style={{ alignSelf: 'center', width: 48, height: 5, borderRadius: radius.pill, backgroundColor: role.border }} />
           {children}
         </View>

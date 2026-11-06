@@ -6,7 +6,7 @@ import { Icon } from '@/components/Icon';
 import { Pill } from '@/components/Pill';
 import { Badge, Highlight } from './ui';
 import { OwnerState } from './store';
-import { c, radius, role, shadowStyle } from '@/theme';
+import { c, layout, radius, role, shadowStyle } from '@/theme';
 
 // Press feedback shared by every card: scale to 98%, 120 ms.
 function PressCard({ onPress, children, style, label }: { onPress: () => void; children: ReactNode; style: object; label: string }) {
@@ -107,7 +107,7 @@ export function Sheet({ visible, onClose, children }: { visible: boolean; onClos
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <Pressable accessibilityLabel="Close" onPress={onClose} style={{ flex: 1, backgroundColor: 'rgba(12,35,64,0.45)' }} />
-      <View style={{ backgroundColor: role.surface, borderTopLeftRadius: radius.xl, borderTopRightRadius: radius.xl, padding: 24, paddingBottom: insets.bottom + 24, gap: 14 }}>
+      <View style={{ backgroundColor: role.surface, borderTopLeftRadius: radius.xl, borderTopRightRadius: radius.xl, paddingHorizontal: layout.screenMargin, paddingTop: 24, paddingBottom: insets.bottom + 24, gap: 14 }}>
         <View style={{ width: 44, height: 5, borderRadius: radius.pill, backgroundColor: c.sand400, alignSelf: 'center', marginBottom: 6 }} />
         {children}
       </View>

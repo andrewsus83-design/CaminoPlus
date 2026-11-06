@@ -81,7 +81,7 @@ export default function Discover() {
             ListEmptyComponent={<View style={{ width, height, alignItems: 'center', justifyContent: 'center', padding: 40, gap: 12 }}><Icon name="heart" color="rgba(255,255,255,0.8)" size={44} /><AppText variant="lead" color={c.white} style={{ textAlign: 'center' }}>Nothing saved yet. Tap the heart or bookmark on a story to keep it here.</AppText></View>}
             keyExtractor={(i) => i.id}
             renderItem={({ item }) => (
-          <View style={{ width, height, backgroundColor: item.tint, justifyContent: 'flex-end', padding: 24, paddingBottom: insets.bottom + 120 }}>
+          <View style={{ width, height, backgroundColor: item.tint, justifyContent: 'flex-end', paddingHorizontal: layout.screenMargin, paddingTop: 24, paddingBottom: insets.bottom + 120 }}>
             <AppText variant="h3" color={c.blue900}>{item.caption}</AppText>
             <AppText variant="mono" color={c.blue900}>@{item.user}</AppText>
             <View style={{ position: 'absolute', right: layout.screenMargin, bottom: insets.bottom + 120, gap: 14, alignItems: 'center' }}>
@@ -121,7 +121,7 @@ export default function Discover() {
       <Modal visible={!!openId} transparent animationType="slide" onRequestClose={() => setOpenId(null)}>
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(12,35,64,0.5)' }}>
           <Pressable accessibilityLabel="Close comments" onPress={() => setOpenId(null)} style={{ flex: 1 }} />
-          <View style={{ maxHeight: height * 0.65, backgroundColor: role.bg, borderTopLeftRadius: radius.lg, borderTopRightRadius: radius.lg, padding: 20, paddingBottom: insets.bottom + 16, gap: 14 }}>
+          <View style={{ maxHeight: height * 0.65, backgroundColor: role.bg, borderTopLeftRadius: radius.lg, borderTopRightRadius: radius.lg, paddingHorizontal: layout.screenMargin, paddingTop: 20, paddingBottom: insets.bottom + 16, gap: 14 }}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
               <AppText variant="h4">Comments</AppText>
               <Pressable accessibilityLabel="Close" onPress={() => setOpenId(null)} hitSlop={12}><Icon name="close" color={role.text} size={26} /></Pressable>

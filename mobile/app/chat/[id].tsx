@@ -268,7 +268,7 @@ function StartOfChat({ text }: { text: string }) {
 
 function LoadingBubbles() {
   return (
-    <View accessibilityRole="progressbar" accessibilityLabel="Loading messages" style={{ flex: 1, justifyContent: 'flex-end', padding: 14, gap: 10 }}>
+    <View accessibilityRole="progressbar" accessibilityLabel="Loading messages" style={{ flex: 1, justifyContent: 'flex-end', paddingHorizontal: layout.screenMargin, paddingVertical: 14, gap: 10 }}>
       {[[false, 190], [false, 120], [true, 150], [false, 230], [true, 100], [true, 210]].map(([mine, w], i) => (
         <View key={i} style={{ alignSelf: mine ? 'flex-end' : 'flex-start', width: w as number, height: 46, borderRadius: 20, backgroundColor: mine ? c.blue100 : c.sand200 }} />
       ))}

@@ -152,7 +152,7 @@ function UpgradePrompt({ visible, onClose, onSeePlans }: { visible: boolean; onC
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <Pressable onPress={onClose} style={{ flex: 1, backgroundColor: 'rgba(12,35,64,0.35)' }} />
-      <View style={{ backgroundColor: role.surface, borderTopLeftRadius: radius.lg, borderTopRightRadius: radius.lg, padding: 24, paddingBottom: insets.bottom + 24, gap: 12 }}>
+      <View style={{ backgroundColor: role.surface, borderTopLeftRadius: radius.lg, borderTopRightRadius: radius.lg, paddingHorizontal: layout.screenMargin, paddingTop: 24, paddingBottom: insets.bottom + 24, gap: 12 }}>
         <AppText variant="accent" color={c.goldInk}>Pilgrim Plus</AppText>
         <AppText variant="h3">Walk all day without signal</AppText>
         {['Offline maps for every stage', 'Route, albergues, water and churches offline', '5 GB cloud storage for your journey'].map((t) => (
