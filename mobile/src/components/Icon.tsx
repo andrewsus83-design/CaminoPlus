@@ -5,7 +5,7 @@ const PATHS = {
   me: ['M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7'],
   stays: ['M3 19V6M3 15h18v4M21 15v-3a3 3 0 0 0-3-3h-8v6'],
   maps: ['M9 4 3 6.5v13L9 17l6 3 6-2.5v-13L15 7 9 4Z', 'M9 4v13M15 7v13'],
-  explore: ['M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6Z', 'm10 9 5 3-5 3V9Z'],
+  explore: ['m15.8 8.2-2 5.6-5.6 2 2-5.6 5.6-2Z'],
   settings: ['M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1'],
   search: ['m21 21-4.3-4.3'],
   heart: ['M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z'],
@@ -24,6 +24,8 @@ const PATHS = {
   camera: ['M4 8.5A2.5 2.5 0 0 1 6.5 6H8l1.5-2h5L16 6h1.5A2.5 2.5 0 0 1 20 8.5v8a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 16.5v-8Z', 'M12 9a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Z'],
   chat: ['M20 12a8 8 0 0 1-11.8 7L4 20l1-4A8 8 0 1 1 20 12Z'],
   filter: ['M4 7h8M18 7h2M4 17h2M12 17h8'],
+  watch: ['M9 7h6a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2Z', 'M9.5 7 10 4h4l.5 3M9.5 17l.5 3h4l.5-3', 'M12 10.3v2l1.4 1'],
+  bookmark: ['M7 4h10v16l-5-3.6L7 20V4Z'],
   chevron: ['m9 5 7 7-7 7'],
   logout: ['M14 4h3.5A2.5 2.5 0 0 1 20 6.5v11a2.5 2.5 0 0 1-2.5 2.5H14', 'M9.5 8 5.5 12l4 4M5.5 12H15'],
 } as const;
@@ -41,6 +43,7 @@ export function Icon({ name, color, size = 24, strokeWidth = 1.75, filled }: { n
       {name === 'settings' && <Circle cx="12" cy="12" r="3" {...p} />}
       {name === 'filter' && <Circle cx="15" cy="7" r="2.4" {...p} />}
       {name === 'filter' && <Circle cx="9" cy="17" r="2.4" {...p} />}
+      {name === 'explore' && <Circle cx="12" cy="12" r="9" {...p} />}
       {name === 'search' && <Circle cx="11" cy="11" r="7" {...p} />}
       {PATHS[name].map((d) => (<Path key={d} d={d} {...p} />))}
     </Svg>

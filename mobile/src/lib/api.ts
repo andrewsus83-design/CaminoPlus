@@ -10,7 +10,7 @@ export type Profile = {
 export type Route = { id: string; slug: string; name: string; short_name: string | null; start_name: string | null; end_name: string | null; distance_km: number | null; stage_count: number | null; difficulty: number | null; color: string | null };
 export type Stage = { id: string; stage_number: number; name: string; distance_km: number; elevation_gain_m: number | null; difficulty: number | null; start: { name: string } | null; end: { name: string } | null };
 export type Journey = { id: string; route_id: string; start_stage_id: string | null; status: string; walked_km: number; planned_start_date: string | null; route: { name: string; short_name: string | null } | null; start_stage: { stage_number: number; name: string } | null };
-export type JourneyDay = { id: string; day_number: number; planned_date: string | null; from_name: string | null; to_name: string | null; planned_distance_km: number | null; status: string; stage: { name: string } | null };
+export type JourneyDay = { id: string; day_number: number; planned_date: string | null; from_name: string | null; to_name: string | null; planned_distance_km: number | null; actual_distance_km: number | null; started_at: string | null; finished_at: string | null; notes: string | null; status: string; stage: { name: string } | null };
 export type Stamp = { id: string; place_name: string | null; stamped_at: string; verified: boolean; method: string };
 export type Post = { id: string; body: string | null; place_name: string | null; published_at: string | null; like_count: number; comment_count: number; media_count: number; health_summary: { km?: number } | null };
 
@@ -115,7 +115,7 @@ export async function listJourneyDays(journeyId: string) {
   return must(
     await supabase
       .from('journey_days')
-      .select('id, day_number, planned_date, from_name, to_name, planned_distance_km, status, stage:stages(name)')
+      .select('id, day_number, planned_date, from_name, to_name, planned_distance_km, actual_distance_km, started_at, finished_at, notes, status, stage:stages(name)')
       .eq('journey_id', journeyId)
       .is('deleted_at', null)
       .order('day_number'),
@@ -151,4 +151,17 @@ export async function createJournalPost(opts: { userId: string; body: string; jo
       .select('id')
       .single(),
   ) as { id: string };
+}
+
+export type Friend = { id: string; username: string | null; display_name: string | null; avatar_url: string | null; km_walked: number | null };
+/** People you follow (accepted). */
+export async function listFriends(userId: string) {
+  const rows = must(
+    await supabase
+      .from('follows')
+      .select('friend:profiles!followee_id(id, username, display_name, avatar_url, km_walked)')
+      .eq('follower_id', userId)
+      .eq('status', 'accepted'),
+  ) as unknown as { friend: Friend | null }[];
+  return rows.map((r) => r.friend).filter((f): f is Friend => !!f);
 }

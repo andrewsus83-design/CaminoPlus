@@ -2,6 +2,7 @@
 // Content scrolls inside once the sheet is open, so nothing is ever cut off.
 import { ReactNode, useEffect, useMemo, useRef } from 'react';
 import { Animated, PanResponder, Pressable, ScrollView, View } from 'react-native';
+import { Icon } from '@/components/Icon';
 import { radius, role, shadowStyle } from '@/theme';
 
 type Props = { open: boolean; onOpenChange: (open: boolean) => void; peek: number; full: number; bottom: number; children: ReactNode };
@@ -45,10 +46,15 @@ export function BottomSheet({ open, onOpenChange, peek, full, bottom, children }
         transform: [{ translateY: y }],
       }}
     >
-      <View {...pan.panHandlers}>
-        <Pressable accessibilityRole="button" accessibilityLabel={open ? 'Collapse details' : 'Expand details'} onPress={() => onOpenChange(!openRef.current)} style={{ alignItems: 'center', paddingTop: 14, paddingBottom: 12 }}>
+      <View {...pan.panHandlers} style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <Pressable accessibilityRole="button" accessibilityLabel={open ? 'Collapse details' : 'Expand details'} onPress={() => onOpenChange(!openRef.current)} style={{ flex: 1, height: 48, alignItems: 'center', justifyContent: 'center' }}>
           <View style={{ width: 52, height: 6, borderRadius: radius.pill, backgroundColor: role.border }} />
         </Pressable>
+        {open && (
+          <Pressable accessibilityRole="button" accessibilityLabel="Close details" onPress={() => onOpenChange(false)} hitSlop={8} style={{ position: 'absolute', right: 8, top: 4, width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}>
+            <Icon name="close" color={role.muted} size={24} />
+          </Pressable>
+        )}
       </View>
       {/* While peeking, the whole card is a drag handle; once open the content scrolls. */}
       <View style={{ flex: 1 }} {...(open ? {} : pan.panHandlers)}>

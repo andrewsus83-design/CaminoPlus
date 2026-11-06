@@ -8,12 +8,10 @@ import { AccountSection, LogoutButton } from '@/components/AccountSection';
 import { BusinessCard, IntroSheet } from '@/features/business/BusinessCard';
 import { useOwner } from '@/features/business/store';
 import { useAuth } from '@/lib/auth';
+import { Icon } from '@/components/Icon';
+import { PlanCarousel } from '@/components/PlanCarousel';
+import { Alert, Pressable } from 'react-native';
 import { c, radius } from '@/theme';
-
-const rows = {
-  'Plan and storage': [['CaminoPlus', '$12 / year'], ['Extra storage', '$5 per 5 GB / year']],
-  Devices: [['Apple Watch', 'Connect'], ['Garmin', 'Connect']],
-} as const;
 
 export default function Settings() {
   const router = useRouter();
@@ -33,6 +31,16 @@ export default function Settings() {
         <LogoutButton />
       </View>
       <AccountSection />
+      <Pressable accessibilityRole="button" accessibilityLabel="Connect smartwatch" onPress={() => router.push('/watches')} style={{ borderRadius: radius.lg, backgroundColor: c.blue, padding: 20, flexDirection: 'row', alignItems: 'center', gap: 16, overflow: 'hidden' }}>
+        <View style={{ width: 64, height: 64, borderRadius: radius.pill, backgroundColor: 'rgba(246,239,226,0.14)', alignItems: 'center', justifyContent: 'center' }}>
+          <Icon name="watch" color={c.gold} size={34} />
+        </View>
+        <View style={{ flex: 1, gap: 2 }}>
+          <AppText variant="label" color={c.parchment}>Connect your smartwatch</AppText>
+          <AppText variant="small" color={c.parchment} style={{ opacity: 0.85 }}>Apple Watch, Garmin and more. Add steps and heart rate to your journey.</AppText>
+        </View>
+        <Icon name="chevron" color={c.gold} size={24} />
+      </Pressable>
       <Card onPress={() => router.push('/change-camino')} style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
         <View style={{ flex: 1, gap: 2 }}>
           <AppText variant="label">My Camino</AppText>
@@ -40,31 +48,22 @@ export default function Settings() {
         </View>
         <AppText variant="label" color={c.blue}>Change</AppText>
       </Card>
-      <Card style={{ gap: 10 }}>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-          <AppText variant="label">Cloud storage</AppText>
-          <AppText variant="mono" muted style={{ fontSize: 12 }}>1.8 of 5 GB</AppText>
-        </View>
-        <View style={{ height: 10, borderRadius: radius.pill, backgroundColor: c.sand200 }}>
-          <View style={{ width: '36%', height: 10, borderRadius: radius.pill, backgroundColor: c.gold }} />
-        </View>
-      </Card>
-      {Object.entries(rows).map(([title, items]) => (
-        <View key={title} style={{ gap: 8 }}>
-          <SectionLabel>{title}</SectionLabel>
-          <Card style={{ padding: 4 }}>
-            {items.map(([k, v], i) => (
-              <View key={k} style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 16, borderTopWidth: i ? 1 : 0, borderTopColor: c.sand300 }}>
-                <AppText variant="label">{k}</AppText>
-                <AppText variant="small" muted>{v}</AppText>
-              </View>
-            ))}
-          </Card>
-        </View>
-      ))}
       <View style={{ gap: 8 }}>
         <SectionLabel>For business</SectionLabel>
         <BusinessCard state={owner.state} name={owner.draft.name} stepsDone={owner.stepsDone} onPress={openCard} />
+      </View>
+      <View style={{ gap: 12 }}>
+        <SectionLabel>Plan and storage</SectionLabel>
+        <PlanCarousel onPick={(id) => Alert.alert(id === 'free' ? 'Free plan' : id === 'plus' ? 'CaminoPlus' : 'Extra storage', id === 'free' ? 'This is your current plan.' : 'Subscriptions open when the app reaches the stores.')} />
+        <Card style={{ gap: 10 }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+            <AppText variant="label">Cloud storage</AppText>
+            <AppText variant="mono" muted style={{ fontSize: 12 }}>0 GB used</AppText>
+          </View>
+          <View style={{ height: 10, borderRadius: radius.pill, backgroundColor: c.sand200 }}>
+            <View style={{ width: '2%', height: 10, borderRadius: radius.pill, backgroundColor: c.gold }} />
+          </View>
+        </Card>
       </View>
       <IntroSheet visible={sheet} onClose={() => setSheet(false)}
         onStart={() => { setSheet(false); router.push('/business/register'); }}

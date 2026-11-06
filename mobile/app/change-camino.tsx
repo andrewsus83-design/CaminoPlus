@@ -42,7 +42,7 @@ export default function ChangeCamino() {
   };
 
   return (
-    <AuthShell title="Change Camino" lead={journey?.route ? `You are walking ${journey.route.name}. Pick another Camino any time; your stamps and posts stay with you.` : 'Pick the Camino you want to walk. You can switch again any time.'}
+    <AuthShell hero title="Change Camino" lead={journey?.route ? `You are walking ${journey.route.name}. Pick another Camino any time; your stamps and posts stay with you.` : 'Pick the Camino you want to walk. You can switch again any time.'}
       footer={<Pill large label={route ? `Switch to ${route.short_name ?? route.name}` : 'Pick a Camino'} onPress={start} loading={busy} disabled={!route || !stages} />}>
       {!!error && <FormMessage>{error}</FormMessage>}
       {routes ? routes.map((r) => (
