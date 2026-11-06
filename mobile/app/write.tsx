@@ -135,7 +135,7 @@ export default function Write() {
       const media = slides.flatMap((s) => (s.media ? [s.media] : []));
       const failed = media.length ? await uploadPostMedia(session.user.id, post.id, media) : 0;
       await refresh();
-      if (failed > 0) Alert.alert('Posted without some media', `${failed} of ${media.length} photos or videos could not be uploaded. Cloud storage is part of the CaminoPlus plan.`);
+      if (failed > 0) Alert.alert('Posted without some media', `${failed} of ${media.length} photos or videos could not be uploaded. Cloud storage is part of Pilgrim Plus.`);
       router.back();
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));

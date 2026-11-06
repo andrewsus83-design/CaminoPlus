@@ -6,9 +6,12 @@ import { Screen } from '@/components/Screen';
 import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
 import { Pill } from '@/components/Pill';
+import { SampleNotice } from '@/components/SampleNotice';
 import { Card, IconButton, Photo, SectionLabel } from '@/components/ui';
 import { reviews, rooms, stays } from '@/data/mock';
 import { c, radius, role } from '@/theme';
+// Sample content is never shared outside the app: share the invitation instead of an invented place or caption.
+const SHARE_APP = 'Walking the Camino? CaminoPlus has offline maps, stays and a pilgrim passport: https://camino.plus';
 
 export default function StayDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -23,11 +26,12 @@ export default function StayDetail() {
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
           <IconButton name="back" label="Back" onPress={() => router.back()} />
           <View style={{ flexDirection: 'row', gap: 8 }}>
-            <IconButton name="share" label="Share this stay" onPress={() => Share.share({ message: `${s.name} in ${s.town} on CaminoPlus: https://camino.plus` }).catch(() => {})} />
+            <IconButton name="share" label="Share this stay" onPress={() => Share.share({ message: SHARE_APP }).catch(() => {})} />
             <IconButton name="heart" label={fav ? 'Remove favourite' : 'Add favourite'} active={fav} onPress={() => setFav((v) => !v)} />
           </View>
         </View>
         <Photo tint={s.tint} height={260} style={{ borderRadius: radius.lg }} />
+        <SampleNotice title="Sample stay">This place, its rooms, prices and reviews are examples. Real stays are coming soon.</SampleNotice>
         <AppText variant="h2">{s.name}</AppText>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
           <Icon name="star" color={c.gold} size={18} />
@@ -58,7 +62,7 @@ export default function StayDetail() {
           <AppText variant="h4">{s.price ? `€${s.price}` : 'Café'}</AppText>
           <AppText variant="caption" muted>{s.label}</AppText>
         </View>
-        <View style={{ flex: 1 }}><Pill label="Contact" /></View>
+        <View style={{ flex: 1 }}><Pill label="Contact opens soon" disabled /></View>
       </View>
     </View>
   );

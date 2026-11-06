@@ -9,23 +9,26 @@ WebBrowser.maybeCompleteAuthSession();
 export const authRedirectUrl = (next?: string) => Linking.createURL(config.authCallbackPath, next ? { queryParams: { next } } : undefined);
 
 /**
- * Finish a Supabase redirect. Handles the PKCE `code` (email confirm, password
- * reset, Google) and the older `#access_token=` fragment, and surfaces errors.
+ * Finish a Supabase redirect (email confirm, password reset, Google). The app uses the PKCE flow, so the
+ * only thing a valid link carries is a one-time `code`, which can be exchanged only on the phone that
+ * started the flow (it holds the matching code verifier). Errors come back as `error_description`.
+ *
+ * Raw `access_token` / `refresh_token` values in a link are deliberately NOT accepted: any web page or app
+ * can open caminoplus://auth-callback#access_token=..., and accepting tokens would silently sign this phone
+ * into someone else's account (login CSRF) so the pilgrim's posts and photos would land in that account.
  */
 export async function completeAuthFromUrl(url: string): Promise<{ ok: boolean; error?: string }> {
-  const parsed = new URL(url.replace('#', url.includes('?') ? '&' : '?'));
-  const p = parsed.searchParams;
+  let p: URLSearchParams;
+  try {
+    p = new URL(url.replace('#', url.includes('?') ? '&' : '?')).searchParams;
+  } catch {
+    return { ok: false, error: 'This link is incomplete or has expired.' };
+  }
   const err = p.get('error_description') || p.get('error');
   if (err) return { ok: false, error: err.replace(/\+/g, ' ') };
   const code = p.get('code');
   if (code) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
-    return error ? { ok: false, error: error.message } : { ok: true };
-  }
-  const access_token = p.get('access_token');
-  const refresh_token = p.get('refresh_token');
-  if (access_token && refresh_token) {
-    const { error } = await supabase.auth.setSession({ access_token, refresh_token });
     return error ? { ok: false, error: error.message } : { ok: true };
   }
   return { ok: false, error: 'This link is incomplete or has expired.' };

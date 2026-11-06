@@ -6,11 +6,12 @@ import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
 import { Card } from '@/components/ui';
 import { useMeData } from '@/lib/useMeData';
-import { secureStorage } from '@/lib/secureStorage';
+import { useAuth } from '@/lib/auth';
+import { localStore, userKey } from '@/lib/localStore';
 import { c, fonts, radius, role } from '@/theme';
 
 // Task planner for one walking day: a ready-made checklist plus your own tasks.
-// Saved on this phone per day (works offline).
+// Saved on this phone per day and per account (works offline).
 type Task = { id: string; text: string; done: boolean };
 
 const shortDate = (iso: string) => new Date(iso).toLocaleDateString([], { day: 'numeric', month: 'short' });
@@ -19,7 +20,9 @@ export default function Planner() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { day } = useLocalSearchParams<{ day?: string }>();
-  const { days } = useMeData();
+  const { session } = useAuth();
+  const uid = session?.user.id;
+  const { days, offline } = useMeData();
   const [dayId, setDayId] = useState<string | undefined>(day);
   const list = days ?? [];
   const current = list.find((d) => d.id === dayId) ?? list.find((d) => d.status !== 'done') ?? list[0];
@@ -33,7 +36,7 @@ export default function Planner() {
     { id: 'weather', text: 'Check the weather and start time', done: false },
     { id: 'friend', text: 'Tell a friend where you are walking', done: false },
   ], [from, to]);
-  const key = current ? `plan.tasks.${current.id}` : null;
+  const key = current && uid ? userKey(uid, `planner.${current.id}`) : null;
   const [tasks, setTasks] = useState<Task[]>(defaults);
   const [loaded, setLoaded] = useState(false);
   const [draft, setDraft] = useState('');
@@ -42,17 +45,17 @@ export default function Planner() {
     if (!key) return;
     setLoaded(false);
     let live = true;
-    secureStorage.getItem(key).then((v) => {
+    localStore.getJSON<Task[]>(key).then((v) => {
       if (!live) return;
-      try { setTasks(v ? (JSON.parse(v) as Task[]) : defaults); } catch { setTasks(defaults); }
+      setTasks(Array.isArray(v) ? v : defaults);
       setLoaded(true);
-    }).catch(() => { if (live) { setTasks(defaults); setLoaded(true); } });
+    });
     return () => { live = false; };
   }, [key, defaults]);
 
   const save = (next: Task[]) => {
     setTasks(next);
-    if (key && loaded) secureStorage.setItem(key, JSON.stringify(next)).catch(() => {});
+    if (key && loaded) void localStore.setJSON(key, next);
   };
   const doneN = tasks.filter((t) => t.done).length;
   const add = () => {
@@ -87,7 +90,7 @@ export default function Planner() {
         )}
 
         {!current ? (
-          <Card><AppText variant="small" muted>Your stages are still loading. Open this again in a moment.</AppText></Card>
+          <Card><AppText variant="small" muted>{offline ? 'You are offline and your plan is not saved on this phone yet. Open it once with a connection and it stays here.' : 'Your stages are still loading. Open this again in a moment.'}</AppText></Card>
         ) : (
           <>
             <Card style={{ gap: 8, backgroundColor: c.blue }}>

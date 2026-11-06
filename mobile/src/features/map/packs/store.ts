@@ -78,7 +78,9 @@ export async function loadInstalled() {
 
 /** Current tiles pack for a stage from the catalog, if published. */
 export const catalogTilesFor = (stageId: string) =>
-  state.catalog?.find((c) => c.stage_id === stageId && c.kind === 'tiles' && (c.format === 'pmtiles' || c.format === 'mbtiles'));
+  state.catalog
+    ?.filter((c) => c.stage_id === stageId && c.kind === 'tiles' && (c.format === 'pmtiles' || c.format === 'mbtiles'))
+    .sort((a, b) => b.version - a.version)[0];
 
 export const hasUpdate = (stageId: string) => {
   const local = state.installed[stageId];

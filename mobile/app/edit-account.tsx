@@ -81,6 +81,9 @@ export default function EditAccount() {
             <AppText variant="label" color={c.blue}>Change password by email</AppText>
           </Pressable>
         )}
+        <Pressable accessibilityRole="button" accessibilityLabel="Delete account" onPress={() => router.push('/delete-account')} hitSlop={8} style={{ minHeight: 56, alignItems: 'center', justifyContent: 'center', marginTop: 12 }}>
+          <AppText variant="label" color={c.red}>Delete account</AppText>
+        </Pressable>
       </ScrollView>
     </KeyboardAvoidingView>
   );

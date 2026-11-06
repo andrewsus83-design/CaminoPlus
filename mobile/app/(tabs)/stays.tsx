@@ -11,7 +11,10 @@ import { Badge } from '@/features/business/ui';
 import { BusinessFeedCard } from '@/features/business/BusinessCard';
 import { ownerStore, useOwner } from '@/features/business/store';
 import { Pill } from '@/components/Pill';
+import { SampleNotice, SampleTag } from '@/components/SampleNotice';
 import { c, radius, role } from '@/theme';
+// Sample content is never shared outside the app: share the invitation instead of an invented place or caption.
+const SHARE_APP = 'Walking the Camino? CaminoPlus has offline maps, stays and a pilgrim passport: https://camino.plus';
 
 const KINDS = ['All', 'Albergue', 'Hotel', 'Café'] as const;
 const DISTANCES = [{ l: 'Any', v: Infinity }, { l: 'Under 1 km', v: 1 }, { l: 'Under 5 km', v: 5 }] as const;
@@ -66,7 +69,8 @@ function StayCard({ s, fav, onFav }: { s: Stay; fav: boolean; onFav: () => void 
     <Card style={{ padding: 12, gap: 12 }} onPress={() => router.push(`/stay/${s.id}`)}>
       <View>
         <Photo tint={s.tint} height={170} />
-        <Pressable accessibilityLabel="Share this stay" onPress={() => Share.share({ message: `${s.name} in ${s.town} on CaminoPlus: https://camino.plus` }).catch(() => {})} style={{ position: 'absolute', top: 10, right: 58, width: 40, height: 40, borderRadius: radius.pill, backgroundColor: role.surface, alignItems: 'center', justifyContent: 'center' }}>
+        <View style={{ position: 'absolute', top: 10, left: 10 }}><SampleTag /></View>
+        <Pressable accessibilityLabel="Share this stay" onPress={() => Share.share({ message: SHARE_APP }).catch(() => {})} style={{ position: 'absolute', top: 10, right: 58, width: 40, height: 40, borderRadius: radius.pill, backgroundColor: role.surface, alignItems: 'center', justifyContent: 'center' }}>
           <Icon name="share" color={c.blue} size={20} />
         </Pressable>
         <Pressable accessibilityLabel={fav ? 'Remove favourite' : 'Add favourite'} onPress={onFav} style={{ position: 'absolute', top: 10, right: 10, width: 40, height: 40, borderRadius: radius.pill, backgroundColor: role.surface, alignItems: 'center', justifyContent: 'center' }}>
@@ -117,6 +121,7 @@ export default function Stays() {
         </View>
         <IconButton name="heart" label="Favourites" size={52} active={onlyFavs} onPress={() => setOnlyFavs((v) => !v)} />
       </View>
+      <SampleNotice title="Sample stays">Real albergues, hotels and cafés from OpenStreetMap are coming soon. The places, prices and reviews below are examples that show how Stays will look.</SampleNotice>
       <PromoBanner promos={[
         { id: 'jubilee', eyebrow: 'Jubilee Year 2027', title: 'Holy Year beds in Santiago go fast', cta: 'Book early', icon: 'shell' },
         { id: 'owners', eyebrow: 'For business owners', title: 'Run an albergue or café on the Way?', cta: 'List your business', icon: 'briefcase', onPress: () => router.push('/business') },

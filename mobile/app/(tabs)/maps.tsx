@@ -7,7 +7,8 @@ import { Icon } from '@/components/Icon';
 import { Pill } from '@/components/Pill';
 import { ModalSheet } from '@/features/map/ModalSheet';
 import { setTabBarHidden } from '@/lib/tabBarVisibility';
-import { GpsMode, MapLayerMode, MapView, PRECISE_TIMEOUT_MS, ROUTE_NAME, pois, routeLengthKm } from '@/features/map';
+import { GpsMode, MapLayerMode, MapView, PRECISE_TIMEOUT_MS, ROUTE_NAME, nativeMapAvailable, pois, routeLengthKm } from '@/features/map';
+import { useAuth } from '@/lib/auth';
 import { MapIcon } from '@/features/map/MapIcon';
 import { useMapModel } from '@/features/map/useMapModel';
 import { c, radius, role, shadowStyle } from '@/theme';
@@ -30,6 +31,11 @@ export default function Maps() {
   const [recenterKey, setRecenterKey] = useState(0);
   const [zoomCmd, setZoomCmd] = useState<{ dir: 1 | -1; n: number }>({ dir: 1, n: 0 });
   const m = useMapModel({ gpsMode, visible: focused });
+  const { journey } = useAuth();
+  // The map data in this build is a preview of the Camino Frances. Say so when someone walks another Camino.
+  const otherRoute = !!journey?.route && journey.route.slug !== 'camino-frances' ? (journey.route.short_name ?? journey.route.name) : null;
+  // Without the native map (web, Expo Go) the SVG preview needs no map fonts, so do not wait for them.
+  const canDraw = !!m.glyphs || !nativeMapAvailable;
 
   // Automatic: once a real GPS fix is on the route, switch to the close-up once.
   const autoDone = useRef(false);
@@ -61,12 +67,12 @@ export default function Maps() {
 
   return (
     <View style={{ flex: 1, backgroundColor: role.bg }}>
-      {m.glyphs ? (
+      {canDraw ? (
         <MapView
           layer={layer}
           online={m.useOnlineTiles}
           packSources={m.packSources}
-          glyphs={m.glyphs}
+          glyphs={m.glyphs ?? ''}
           done={m.done}
           remaining={m.remaining}
           walker={m.walker}
@@ -106,6 +112,11 @@ export default function Maps() {
           </RoundButton>
         </View>
         <StatusPill status={m.status} online={m.online} onPress={() => router.push('/offline-maps')} />
+        {!!otherRoute && (
+          <View style={{ alignSelf: 'flex-start', paddingHorizontal: 12, minHeight: 28, paddingVertical: 4, justifyContent: 'center', borderRadius: radius.pill, backgroundColor: c.goldWash }}>
+            <AppText variant="caption" color={c.goldInk}>{`Maps for ${otherRoute} are coming. This is a preview of the Camino Francés.`}</AppText>
+          </View>
+        )}
         {m.gpsOffRoute && (
           <View style={{ alignSelf: 'flex-start', paddingHorizontal: 12, height: 28, justifyContent: 'center', borderRadius: radius.pill, backgroundColor: c.blue50 }}>
             <AppText variant="caption" color={c.blue}>You are not on the Camino yet · showing a sample position</AppText>
@@ -157,6 +168,7 @@ export default function Maps() {
             <AppText variant="small" muted>
               {m.walkedKm} of {routeLengthKm} km walked · stage {m.stage.number} · {m.nextTownKm} km to {m.stage.name.split('→')[1]?.trim()}
             </AppText>
+            <AppText variant="caption" muted>Preview data: the first three stages are hand-placed and the rest is drawn as straight lines between towns. Do not navigate with it yet.</AppText>
             <View style={{ marginTop: 12, gap: 10 }}>
               <AppText variant="label">This stage</AppText>
               <AppText variant="small" muted>{m.stage.name} · {m.stage.distanceKm} km</AppText>
@@ -213,6 +225,7 @@ function PoiPopup({ poi, bottom, onClose }: { poi: (typeof pois)[number]; bottom
       </View>
       <AppText variant="h4">{poi.name}</AppText>
       <AppText variant="small" muted>{poi.blurb}</AppText>
+      <AppText variant="caption" muted>Preview pin. Opening hours, beds and water can change: check locally.</AppText>
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 6 }}>
         {poi.audioMin ? <Pill label={`Play story · ${poi.audioMin} min`} onPress={() => Alert.alert('Audio stories', 'Coming in the next build.')} /> : null}
         {poi.kind === 'quest' ? <Pill variant="gold" label="Start quest" onPress={() => Alert.alert('Quests', 'Coming in the next build.')} /> : null}

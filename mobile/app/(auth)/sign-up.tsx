@@ -48,7 +48,7 @@ export default function SignUp() {
   }
 
   return (
-    <AuthShell title="Start your Camino" lead="Create a free account. You can upgrade to CaminoPlus later.">
+    <AuthShell title="Start your Camino" lead="Create a free account. You can upgrade to Pilgrim Plus later.">
       {!!error && <FormMessage>{error}</FormMessage>}
       <Field label="Your name" value={name} onChangeText={setName} autoComplete="name" textContentType="name" placeholder="Ana Torres" maxLength={60} />
       <Field label="Email" value={email} onChangeText={setEmail} autoCapitalize="none" autoComplete="email" keyboardType="email-address" textContentType="emailAddress" placeholder="you@example.com" />

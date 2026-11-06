@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { AppText } from '@/components/AppText';
@@ -9,6 +9,7 @@ import { FormMessage } from '@/components/auth/Field';
 import { useAuth } from '@/lib/auth';
 import { listRoutes, listStages, Route, Stage, startJourney } from '@/lib/api';
 import { RouteGuideCard } from '@/components/auth/RouteGuideCard';
+import { uuid } from '@/lib/uuid';
 import { layout, role } from '@/theme';
 
 /** Switch to another Camino from inside the app. Starts a new journey; the old one is kept. */
@@ -29,11 +30,12 @@ export default function ChangeCamino() {
     listStages(route.id).then((s) => { setStages(s); setStageId(s[0]?.id ?? null); }).catch((e) => setError(e.message));
   }, [route]);
 
+  const attemptId = useMemo(() => uuid(), [route?.id, stageId]); // same id on a retry of the same choice
   const start = async () => {
     if (!session || !route || !stages) return;
     setBusy(true); setError(null);
     try {
-      await startJourney({ userId: session.user.id, route, stages, startStageId: stageId, startDate: null });
+      await startJourney({ route, startStageId: stageId, startDate: null, journeyId: attemptId });
       await refresh();
       router.replace('/(tabs)/me');
     } catch (e) {
