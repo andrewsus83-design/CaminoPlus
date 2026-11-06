@@ -46,8 +46,8 @@ Rules of the `pr` mode, in the order they matter:
 2. The canary `camino-frances-01` is added when any other file under `tools/offline-maps/` (outside `stages/`
    and `catalog/`), the workflow, or `.github/actions/build-offline-pack/` changed. That includes docs and
    tests: the canary is the cheap proof that the tooling still builds a pack.
-3. At most `PR_STAGE_CAP` stages (12, set at the top of the workflow). The canary always stays in, the rest
-   are taken in stage order, and the run warns which stages were not built.
+3. At most `PR_STAGE_CAP` stages (40, set at the top of the workflow: enough for every stage of one route).
+   The canary always stays in, the rest are taken in stage order, and the run warns which stages were not built.
 
 Every stage file is checked, whichever mode runs, because its values end up in file names, an artifact name
 and the cache key: `slug` equals the file name, `stage_number` is a whole number, `buffer_km` and `maxzoom` are
@@ -118,7 +118,7 @@ here has been measured on the matrix yet.
 |---|---|---|---|
 | PR changing one stage | 1 | 5 to 10 min | 5 to 10 min |
 | PR touching the tooling only | 1: the canary, which builds 6 packs (see above), so longer than the others | longer | longer |
-| PR changing 33 stages | 12 (the cap) | 1 to 2 h | 10 to 20 min |
+| PR changing 33 stages | 33, six at a time (the cap is 40) | 3 to 5.5 h | 30 to 60 min |
 | manual `stages=all`, 33 stages | 33, six at a time | 3 to 5.5 h | 30 to 60 min |
 | monthly publish, 33 stages | 33, two at a time | 3 to 5.5 h | 1.5 to 3 h |
 
@@ -127,8 +127,8 @@ runs queue behind other work, raise them with care (see the Geofabrik section).
 
 ## Running every stage by hand
 
-The cap only limits pull requests. To build everything, for example before merging the PR that adds many stage
-files:
+The cap only limits pull requests (40 stages). To build everything by hand, for example after a change to the
+build tooling, or when a pull request changed more stage files than the cap:
 
 - GitHub: **Actions → offline-maps → Run workflow**, pick the branch, leave `publish` off, `stages` = `all`
   (or slugs separated by commas, no spaces: `camino-frances-07,camino-frances-08`).
@@ -184,7 +184,7 @@ One red leg never hides the others (`fail-fast: false`). Re-run only the failed 
 | `publish <slug>` | Build steps | Same as above, with stricter gates: the route must come from OSM and the OSM data must be fresh | The same logs |
 | | Publish | Size or tile count jumped against the live pack, Storage upload or read-back failed, or `register_offline_pack` is missing | `publish_pack.mjs` output; nothing was registered |
 
-Warnings, not failures: `list_stages: pr: capped at 12 ...` means the PR changed more stages than it built, and
+Warnings, not failures: `list_stages: pr: capped at 40 ...` means the PR changed more stages than it built, and
 `publish: N stage(s) have no quality band ...` lists the stages waiting for calibration.
 
 Skipped `build` or `publish` jobs mean the plan found nothing to run.

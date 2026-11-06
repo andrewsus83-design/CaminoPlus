@@ -52,8 +52,10 @@ permissions:
 
 env:
   PLANETILER_VERSION: '0.10.2'
-  # The most stages one pull request builds, the canary included. The rest: run the workflow by hand.
-  PR_STAGE_CAP: '12'
+  # The most stages one pull request builds, the canary included. 40 covers every stage of one route (the
+  # Camino Francés has 33), so a pull request that regenerates the stage files proves all of them, six at a
+  # time. A pull request that changes more stage files than this builds the first ones: run the rest by hand.
+  PR_STAGE_CAP: '40'
 
 jobs:
   plan:
