@@ -31,6 +31,7 @@
     "plugins": [
       "expo-router",
       "expo-asset",
+      ["expo-image-picker", { "photosPermission": "CaminoPlus uses your photos so you can choose a profile picture and add pictures to your journey posts." }],
       [
         "expo-location",
         {

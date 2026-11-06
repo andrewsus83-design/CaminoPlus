@@ -25,7 +25,7 @@ export async function getProfile(userId: string) {
   return must(await supabase.from('profiles').select(PROFILE_COLS).eq('id', userId).maybeSingle()) as Profile | null;
 }
 
-export async function updateProfile(userId: string, patch: Partial<Pick<Profile, 'display_name' | 'bio' | 'username'>>) {
+export async function updateProfile(userId: string, patch: Partial<Pick<Profile, 'display_name' | 'bio' | 'username' | 'avatar_url'>>) {
   return must(await supabase.from('profiles').update(patch).eq('id', userId).select(PROFILE_COLS).single()) as Profile;
 }
 
