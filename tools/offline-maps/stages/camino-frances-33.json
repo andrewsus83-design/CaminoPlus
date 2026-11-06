@@ -1,0 +1,92 @@
+{
+  "slug": "camino-frances-33",
+  "name": "O Pedrouzo to Santiago de Compostela",
+  "route_slug": "camino-frances",
+  "stage_number": 33,
+  "route_id": "20000000-0000-0000-0000-000000000001",
+  "stage_id": "40000000-0000-0000-0000-000000000033",
+  "osm_extracts": [
+    "https://download.geofabrik.de/europe/spain/galicia-latest.osm.pbf"
+  ],
+  "search_bbox": [
+    -8.67,
+    42.79,
+    -8.24,
+    42.99
+  ],
+  "coastal": false,
+  "route_name_regex": "camino franc[eé]s|camiño franc[eé]s|chemin navarrais|nafar bidea",
+  "route_exclude_regex": "\\b(SL|PR)-[A-Z]{1,3} ?\\d",
+  "fallback_route": "camino-frances-33.route.geojson",
+  "clip_km": 6,
+  "min_route_km": 6.3,
+  "buffer_km": 3,
+  "maxzoom": 15,
+  "waypoints": [
+    {
+      "name": "O Pedrouzo",
+      "at": [
+        -8.36242,
+        42.90468
+      ]
+    },
+    {
+      "name": "O Amenal",
+      "at": [
+        -8.39135,
+        42.90479
+      ]
+    },
+    {
+      "name": "A Lavacolla",
+      "at": [
+        -8.44654,
+        42.90024
+      ]
+    },
+    {
+      "name": "Vilamaior",
+      "at": [
+        -8.45031,
+        42.89189
+      ]
+    },
+    {
+      "name": "O Monte do Gozo",
+      "at": [
+        -8.49703,
+        42.8867
+      ]
+    },
+    {
+      "name": "Santiago de Compostela",
+      "at": [
+        -8.54586,
+        42.88042
+      ]
+    }
+  ],
+  "render_checks": [
+    {
+      "name": "O Pedrouzo z15",
+      "at": [
+        -8.36242,
+        42.90468,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    },
+    {
+      "name": "Santiago de Compostela z15",
+      "at": [
+        -8.54586,
+        42.88042,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    }
+  ],
+  "generated_from": "catalog/camino-frances/33.json"
+}

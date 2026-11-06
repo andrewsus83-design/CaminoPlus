@@ -1,0 +1,106 @@
+{
+  "slug": "camino-frances-04",
+  "name": "Pamplona to Puente la Reina",
+  "route_slug": "camino-frances",
+  "stage_number": 4,
+  "route_id": "20000000-0000-0000-0000-000000000001",
+  "stage_id": "40000000-0000-0000-0000-000000000004",
+  "osm_extracts": [
+    "https://download.geofabrik.de/europe/spain/navarra-latest.osm.pbf"
+  ],
+  "search_bbox": [
+    -1.94,
+    42.58,
+    -1.52,
+    42.91
+  ],
+  "coastal": false,
+  "route_name_regex": "camino franc[eé]s|camiño franc[eé]s|chemin navarrais|nafar bidea",
+  "route_exclude_regex": "\\b(SL|PR)-[A-Z]{1,3} ?\\d",
+  "fallback_route": "camino-frances-04.route.geojson",
+  "clip_km": 6,
+  "min_route_km": 8.8,
+  "buffer_km": 3,
+  "maxzoom": 15,
+  "waypoints": [
+    {
+      "name": "Pamplona",
+      "at": [
+        -1.6432,
+        42.8169
+      ]
+    },
+    {
+      "name": "Cizur Menor",
+      "at": [
+        -1.67654,
+        42.78671
+      ]
+    },
+    {
+      "name": "Zariquiegui",
+      "at": [
+        -1.72319,
+        42.74799
+      ]
+    },
+    {
+      "name": "Alto del Perdón",
+      "at": [
+        -1.74256,
+        42.73588
+      ]
+    },
+    {
+      "name": "Uterga",
+      "at": [
+        -1.75968,
+        42.71021
+      ]
+    },
+    {
+      "name": "Muruzábal",
+      "at": [
+        -1.77055,
+        42.68876
+      ]
+    },
+    {
+      "name": "Obanos",
+      "at": [
+        -1.7851,
+        42.68082
+      ]
+    },
+    {
+      "name": "Puente la Reina",
+      "at": [
+        -1.81553,
+        42.67171
+      ]
+    }
+  ],
+  "render_checks": [
+    {
+      "name": "Pamplona z15",
+      "at": [
+        -1.6432,
+        42.8169,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    },
+    {
+      "name": "Puente la Reina z15",
+      "at": [
+        -1.81553,
+        42.67171,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    }
+  ],
+  "generated_from": "catalog/camino-frances/04.json"
+}

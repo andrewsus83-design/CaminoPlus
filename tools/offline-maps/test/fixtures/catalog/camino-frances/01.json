@@ -1,0 +1,12 @@
+{
+  "n": 1,
+  "name": "Fixture Alpha to Fixture Bravo",
+  "from": {"name": "Fixture Alpha", "lat": 42.6, "lng": -2.0, "source": "fixture"},
+  "to": {"name": "Fixture Bravo", "lat": 42.55, "lng": -2.25, "source": "fixture"},
+  "via": [],
+  "extracts": ["navarra"],
+  "coastal": false,
+  "distance_km": null,
+  "distance_source": null,
+  "notes": "Test fixture, made-up places. Stage 1 of camino-frances is hand-written: the generator checks this entry (the next stage must join it) but writes nothing for it."
+}

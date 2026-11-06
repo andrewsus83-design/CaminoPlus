@@ -1,0 +1,92 @@
+{
+  "slug": "camino-frances-22",
+  "name": "Villadangos del Páramo to Astorga",
+  "route_slug": "camino-frances",
+  "stage_number": 22,
+  "route_id": "20000000-0000-0000-0000-000000000001",
+  "stage_id": "40000000-0000-0000-0000-000000000022",
+  "osm_extracts": [
+    "https://download.geofabrik.de/europe/spain/castilla-y-leon-latest.osm.pbf"
+  ],
+  "search_bbox": [
+    -6.18,
+    42.36,
+    -5.64,
+    42.61
+  ],
+  "coastal": false,
+  "route_name_regex": "camino franc[eé]s|camiño franc[eé]s|chemin navarrais|nafar bidea",
+  "route_exclude_regex": "\\b(SL|PR)-[A-Z]{1,3} ?\\d",
+  "fallback_route": "camino-frances-22.route.geojson",
+  "clip_km": 6,
+  "min_route_km": 10.1,
+  "buffer_km": 3,
+  "maxzoom": 15,
+  "waypoints": [
+    {
+      "name": "Villadangos del Páramo",
+      "at": [
+        -5.7668,
+        42.51729
+      ]
+    },
+    {
+      "name": "San Martín del Camino",
+      "at": [
+        -5.80945,
+        42.49513
+      ]
+    },
+    {
+      "name": "Hospital de Órbigo",
+      "at": [
+        -5.88191,
+        42.46359
+      ]
+    },
+    {
+      "name": "Santibáñez de Valdeiglesia",
+      "at": [
+        -5.93,
+        42.45911
+      ]
+    },
+    {
+      "name": "San Justo de la Vega",
+      "at": [
+        -6.01456,
+        42.45447
+      ]
+    },
+    {
+      "name": "Astorga",
+      "at": [
+        -6.05292,
+        42.4554
+      ]
+    }
+  ],
+  "render_checks": [
+    {
+      "name": "Villadangos del Páramo z15",
+      "at": [
+        -5.7668,
+        42.51729,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    },
+    {
+      "name": "Astorga z15",
+      "at": [
+        -6.05292,
+        42.4554,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    }
+  ],
+  "generated_from": "catalog/camino-frances/22.json"
+}

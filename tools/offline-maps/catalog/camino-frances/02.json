@@ -1,0 +1,61 @@
+{
+  "n": 2,
+  "name": "Roncesvalles to Zubiri",
+  "from": {
+    "name": "Roncesvalles",
+    "lat": 43.0094,
+    "lng": -1.3195,
+    "source": "supabase/seed.sql places; nominatim relation/342291 boundary=administrative linked_place=village is 0.06 km away"
+  },
+  "to": {
+    "name": "Zubiri",
+    "lat": 42.9300,
+    "lng": -1.5036,
+    "source": "supabase/seed.sql places; nominatim relation/11918288 boundary=administrative linked_place=village is 0.09 km away"
+  },
+  "via": [
+    {
+      "name": "Burguete",
+      "lat": 42.98901,
+      "lng": -1.33499,
+      "source": "nominatim relation/348083 boundary=administrative linked_place=village wikidata=Q5431"
+    },
+    {
+      "name": "Espinal",
+      "lat": 42.97921,
+      "lng": -1.36901,
+      "source": "nominatim relation/13605628 boundary=administrative linked_place=hamlet wikidata=Q476985"
+    },
+    {
+      "name": "Alto de Mezkiritz",
+      "lat": 42.97980,
+      "lng": -1.38677,
+      "source": "nominatim node/5405446636 mountain_pass=yes wikidata=Q12263509"
+    },
+    {
+      "name": "Viscarret-Guerendiáin",
+      "lat": 42.96757,
+      "lng": -1.41735,
+      "source": "nominatim relation/13605627 boundary=administrative linked_place=hamlet wikidata=Q640157"
+    },
+    {
+      "name": "Linzoáin",
+      "lat": 42.96238,
+      "lng": -1.43791,
+      "source": "nominatim relation/13605625 boundary=administrative linked_place=village wikidata=Q385445"
+    },
+    {
+      "name": "Alto de Erro",
+      "lat": 42.94157,
+      "lng": -1.47053,
+      "source": "nominatim node/248108441 mountain_pass=yes"
+    }
+  ],
+  "extracts": [
+    "navarra"
+  ],
+  "coastal": false,
+  "distance_km": 21.4,
+  "distance_source": "supabase/seed.sql",
+  "notes": "from and to use the supabase/seed.sql place coordinates; nominatim cross-check: Roncesvalles relation/342291 is 0.06 km from the seed point, Zubiri relation/11918288 is 0.09 km. distance_km 21.4 is the seed.sql value and was not independently verified. via in walking order: Burguete (Auritz), Espinal (Aurizperri), Alto de Mezkiritz (mountain_pass node), Viscarret-Guerendiáin (Bizkarreta), Linzoáin (Lintzoain), Alto de Erro (OSM name 'Alto Erro', mountain_pass node); the Basque forms are the eu: Wikipedia titles in the OSM tags. extracts: navarra only; a Nominatim reverse lookup 3.1 km NNE of Roncesvalles (43.0345,-1.3040) is still Navarra, so the French border is beyond the 3 km corridor at the start. Add aquitaine if the corridor is ever widened."
+}

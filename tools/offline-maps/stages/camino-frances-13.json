@@ -1,0 +1,85 @@
+{
+  "slug": "camino-frances-13",
+  "name": "Burgos to Hornillos del Camino",
+  "route_slug": "camino-frances",
+  "stage_number": 13,
+  "route_id": "20000000-0000-0000-0000-000000000001",
+  "stage_id": "40000000-0000-0000-0000-000000000013",
+  "osm_extracts": [
+    "https://download.geofabrik.de/europe/spain/castilla-y-leon-latest.osm.pbf"
+  ],
+  "search_bbox": [
+    -4.05,
+    42.25,
+    -3.58,
+    42.44
+  ],
+  "coastal": false,
+  "route_name_regex": "camino franc[eé]s|camiño franc[eé]s|chemin navarrais|nafar bidea",
+  "route_exclude_regex": "\\b(SL|PR)-[A-Z]{1,3} ?\\d",
+  "fallback_route": "camino-frances-13.route.geojson",
+  "clip_km": 6,
+  "min_route_km": 7.7,
+  "buffer_km": 3,
+  "maxzoom": 15,
+  "waypoints": [
+    {
+      "name": "Burgos",
+      "at": [
+        -3.69698,
+        42.34393
+      ]
+    },
+    {
+      "name": "Villalbilla de Burgos",
+      "at": [
+        -3.77961,
+        42.34709
+      ]
+    },
+    {
+      "name": "Tardajos",
+      "at": [
+        -3.81861,
+        42.34887
+      ]
+    },
+    {
+      "name": "Rabé de las Calzadas",
+      "at": [
+        -3.83411,
+        42.34019
+      ]
+    },
+    {
+      "name": "Hornillos del Camino",
+      "at": [
+        -3.92595,
+        42.33854
+      ]
+    }
+  ],
+  "render_checks": [
+    {
+      "name": "Burgos z15",
+      "at": [
+        -3.69698,
+        42.34393,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    },
+    {
+      "name": "Hornillos del Camino z15",
+      "at": [
+        -3.92595,
+        42.33854,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    }
+  ],
+  "generated_from": "catalog/camino-frances/13.json"
+}

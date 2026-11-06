@@ -1,0 +1,85 @@
+{
+  "slug": "camino-frances-15",
+  "name": "Castrojeriz to Frómista",
+  "route_slug": "camino-frances",
+  "stage_number": 15,
+  "route_id": "20000000-0000-0000-0000-000000000001",
+  "stage_id": "40000000-0000-0000-0000-000000000015",
+  "osm_extracts": [
+    "https://download.geofabrik.de/europe/spain/castilla-y-leon-latest.osm.pbf"
+  ],
+  "search_bbox": [
+    -4.53,
+    42.17,
+    -4.02,
+    42.38
+  ],
+  "coastal": false,
+  "route_name_regex": "camino franc[eé]s|camiño franc[eé]s|chemin navarrais|nafar bidea",
+  "route_exclude_regex": "\\b(SL|PR)-[A-Z]{1,3} ?\\d",
+  "fallback_route": "camino-frances-15.route.geojson",
+  "clip_km": 6,
+  "min_route_km": 9.3,
+  "buffer_km": 3,
+  "maxzoom": 15,
+  "waypoints": [
+    {
+      "name": "Castrojeriz",
+      "at": [
+        -4.14064,
+        42.28837
+      ]
+    },
+    {
+      "name": "Puente Fitero",
+      "at": [
+        -4.24622,
+        42.27803
+      ]
+    },
+    {
+      "name": "Itero de la Vega",
+      "at": [
+        -4.25797,
+        42.28798
+      ]
+    },
+    {
+      "name": "Boadilla del Camino",
+      "at": [
+        -4.34729,
+        42.25778
+      ]
+    },
+    {
+      "name": "Frómista",
+      "at": [
+        -4.4055,
+        42.26769
+      ]
+    }
+  ],
+  "render_checks": [
+    {
+      "name": "Castrojeriz z15",
+      "at": [
+        -4.14064,
+        42.28837,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    },
+    {
+      "name": "Frómista z15",
+      "at": [
+        -4.4055,
+        42.26769,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    }
+  ],
+  "generated_from": "catalog/camino-frances/15.json"
+}

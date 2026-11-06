@@ -71,7 +71,10 @@ offline style (same palette, same layers) so switching is not jarring.
 | `stages/camino-frances-01.json` | Stage config: ids from the `stages`/`routes` tables, OSM extracts, search bbox, corridor width, max zoom, and the **quality band** and **render checks** every build must meet |
 | `stages/camino-frances-01.route.geojson` | Hand-placed fallback route (Napoleon + Valcarlos). Measurement builds may use it; a build that gets published may not |
 | `scripts/build_stage.sh` | Whole build: download (checksummed), cut, route, corridor, Planetiler (image pinned by digest), manifest |
-| `scripts/route_from_osm.py` | Takes the real route from OSM hiking relations (Camino de Santiago / GR 65) |
+| `scripts/route_from_osm.py` | Takes the real route from OSM hiking relations (Camino de Santiago / GR 65). Optional stage keys `route_exclude_regex`, `clip_km`, `min_route_km` (see "Catalog and generator") |
+| `catalog/` | The human-checked list of stages per route (from, via, to, extract ids): the source the stage files are generated from. Schema and steps in [catalog/README.md](catalog/README.md) |
+| `scripts/make_stages.py`, `scripts/check_stages.py` | `npm run stages` generates `stages/<slug>.json` and its fallback route from the catalog (`-- --check` is the CI guard); `npm run check-stages` validates every stage file |
+| `scripts/geofabrik_extracts.json` | Allowlist of OSM extracts: id to Geofabrik URL. The catalog and `check_stages.py` accept no other |
 | `scripts/corridor.py` | Buffers the route (default 3 km each side) into the `.poly` Planetiler uses |
 | `scripts/pmtiles_info.py` | Reads tile count, zoom range and layer names from the PMTiles header (stdlib only) for the manifest |
 | `scripts/check_pack.mjs` + `scripts/lib/quality.mjs` | Quality gates: size, tile count, layers, route source, OSM age, change against the previous pack |
@@ -79,8 +82,8 @@ offline style (same palette, same layers) so switching is not jarring.
 | `scripts/planetiler_image.sh` | Prints the pinned Planetiler image reference |
 | `viewer/` | MapLibre GL JS page that opens a `.pmtiles` with no network; CaminoPlus palette |
 | `test/render_offline.mjs` | Playwright test: renders with all outside requests blocked, then with the device offline; checks feature counts, labels and console errors |
-| `test/*.test.mjs`, `test/test_pmtiles_info.py` | Unit tests: quality gates, publish against a mock Supabase, dev server, PMTiles header |
-| `test/fixtures/` | A tiny made-up pack (`mini.pmtiles`, 8 KB) + its stage file, so the render test runs in seconds without Planetiler |
+| `test/*.test.mjs`, `test/test_*.py` | Unit tests: quality gates, publish against a mock Supabase, dev server, PMTiles header, the stage generator and checker, `route_from_osm.py` on a made-up OSM extract written at test time |
+| `test/fixtures/` | A tiny made-up pack (`mini.pmtiles`, 8 KB) + its stage file, so the render test runs in seconds without Planetiler; `catalog/` is a made-up catalog for the generator tests |
 | `../../supabase/functions/offline-pack-url/` | Edge function: signed download link only for Pilgrim Plus subscribers |
 | `../../supabase/migrations/20261104170000_offline_packs_bucket.sql` | Private Storage bucket `offline-packs` |
 | `../../.github/workflows/offline-maps.yml` + `../../.github/actions/build-offline-pack/` | Builds + measures on PRs; rebuilds monthly and publishes (after approval) |
@@ -122,6 +125,30 @@ Flags: `scripts/build_stage.sh <stage.json> [buffer_km] [maxzoom]`.
   "helicopter view" shows context, but the whole-route overview should come from a
   separate tiny low-zoom pack (z0 to z10 for the whole Camino, likely 2 to 4 MB). That is the
   next step after this prototype.
+
+## Catalog and generator
+
+Stage 1 is hand-written. The other stages of a route are generated from a human-checked catalog
+(schema and steps: [catalog/README.md](catalog/README.md)), so one CI matrix can build them all:
+
+```bash
+npm run stages              # catalog/<route>/NN.json -> stages/<slug>.json + stages/<slug>.route.geojson
+npm run stages -- --check   # writes nothing; exit 1 if a generated file is out of date or the catalog is invalid (the CI guard)
+npm run check-stages        # validates every stages/*.json: keys, ids, extract URLs, bbox, fallback route, zoom, buffer
+```
+
+A generated stage has no `quality` band, so it builds in measure mode and can never be published. After its first real
+build you set the band and the render floors in the stage file from the measured numbers, then run `npm run stages` once
+more: the generator keeps `quality`, `render_allow_errors` and the render floors and rewrites everything else from the catalog.
+
+Generated stages use three optional keys of `route_from_osm.py` that stage 1 does not have. They fix the over-selection in the
+real CI log of stage 1 (117 km of route inside the bbox for a 24 km stage, a 481 km2 corridor):
+
+- `route_exclude_regex`: a relation whose label matches is dropped even if it matches `route_name_regex` (local `SL-` and `PR-` trails), and so are its child relations unless something else reaches them.
+- `clip_km`: keep only the route within this many km of the fallback route, instead of everything inside `search_bbox`.
+- `min_route_km`: with less route than this the script exits 2, and the build falls back or stops (default 15).
+
+The script prints the relations it kept and the ones it excluded. A stage file without these keys behaves exactly as before.
 
 ## Quality gates
 

@@ -1,0 +1,10 @@
+{
+  "route_slug": "demo-route",
+  "route_index": 7,
+  "route_id": "20000000-0000-0000-0000-000000000009",
+  "route_name_regex": "demo way",
+  "clip_km": 4,
+  "buffer_km": 2,
+  "maxzoom": 14,
+  "margin_km": 2
+}

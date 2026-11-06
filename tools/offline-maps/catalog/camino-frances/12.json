@@ -1,0 +1,55 @@
+{
+  "n": 12,
+  "name": "San Juan de Ortega to Burgos",
+  "from": {
+    "name": "San Juan de Ortega",
+    "lat": 42.37527,
+    "lng": -3.43625,
+    "source": "nominatim node/490767631 place=hamlet wikidata=Q3471530"
+  },
+  "to": {
+    "name": "Burgos",
+    "lat": 42.34393,
+    "lng": -3.69698,
+    "source": "photon node/166920565 place=city"
+  },
+  "via": [
+    {
+      "name": "Agés",
+      "lat": 42.36992,
+      "lng": -3.47924,
+      "source": "nominatim node/416511643 place=hamlet wikidata=Q399630"
+    },
+    {
+      "name": "Atapuerca",
+      "lat": 42.37682,
+      "lng": -3.50735,
+      "source": "nominatim relation/348919 boundary=administrative linked_place=village wikidata=Q753459"
+    },
+    {
+      "name": "Cardeñuela Riopico",
+      "lat": 42.35936,
+      "lng": -3.56002,
+      "source": "nominatim relation/342156 boundary=administrative linked_place=village wikidata=Q946310"
+    },
+    {
+      "name": "Orbaneja Riopico",
+      "lat": 42.36007,
+      "lng": -3.58494,
+      "source": "nominatim relation/340682 boundary=administrative linked_place=village wikidata=Q946797"
+    },
+    {
+      "name": "Villafría",
+      "lat": 42.36556,
+      "lng": -3.61650,
+      "source": "nominatim node/1902213681 place=neighbourhood wikidata=Q926945"
+    }
+  ],
+  "extracts": [
+    "castilla-y-leon"
+  ],
+  "coastal": false,
+  "distance_km": null,
+  "distance_source": null,
+  "notes": "from is San Juan de Ortega (node/490767631, same point as stage 11 end). Burgos: used photon node/166920565 place=city; Nominatim only offers the municipality relation/344165 (no linked place node), whose centroid is 1.3 km from the city node. Villafría is a place=neighbourhood node of Burgos. Variant (from memory, not verified here): the way into Burgos can be urban (via Gamonal) or along the Arlanzón river; both are inside the corridor."
+}

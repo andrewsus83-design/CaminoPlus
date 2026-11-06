@@ -1,0 +1,49 @@
+{
+  "n": 11,
+  "name": "Belorado to San Juan de Ortega",
+  "from": {
+    "name": "Belorado",
+    "lat": 42.41970,
+    "lng": -3.19178,
+    "source": "photon node/302893358 place=village"
+  },
+  "to": {
+    "name": "San Juan de Ortega",
+    "lat": 42.37527,
+    "lng": -3.43625,
+    "source": "nominatim node/490767631 place=hamlet wikidata=Q3471530"
+  },
+  "via": [
+    {
+      "name": "Tosantos",
+      "lat": 42.41411,
+      "lng": -3.24242,
+      "source": "nominatim relation/341391 boundary=administrative linked_place=village wikidata=Q958974"
+    },
+    {
+      "name": "Villambistia",
+      "lat": 42.40516,
+      "lng": -3.26180,
+      "source": "nominatim relation/347447 boundary=administrative linked_place=village wikidata=Q958629"
+    },
+    {
+      "name": "Espinosa del Camino",
+      "lat": 42.40556,
+      "lng": -3.27967,
+      "source": "nominatim relation/341886 boundary=administrative linked_place=village wikidata=Q946759"
+    },
+    {
+      "name": "Villafranca Montes de Oca",
+      "lat": 42.38838,
+      "lng": -3.30861,
+      "source": "nominatim relation/343198 boundary=administrative linked_place=village wikidata=Q959000"
+    }
+  ],
+  "extracts": [
+    "castilla-y-leon"
+  ],
+  "coastal": false,
+  "distance_km": null,
+  "distance_source": null,
+  "notes": "from is Belorado (photon node/302893358, same point as stage 10 end). via: Tosantos, Villambistia, Espinosa del Camino, Villafranca Montes de Oca. San Juan de Ortega = node/490767631 place=hamlet (Barrios de Colina municipality). The Montes de Oca forest section after Villafranca has no villages (from memory); the longest via gap is Villafranca to San Juan de Ortega."
+}

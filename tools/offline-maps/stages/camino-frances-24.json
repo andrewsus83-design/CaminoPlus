@@ -1,0 +1,99 @@
+{
+  "slug": "camino-frances-24",
+  "name": "Foncebadón to Ponferrada",
+  "route_slug": "camino-frances",
+  "stage_number": 24,
+  "route_id": "20000000-0000-0000-0000-000000000001",
+  "stage_id": "40000000-0000-0000-0000-000000000024",
+  "osm_extracts": [
+    "https://download.geofabrik.de/europe/spain/castilla-y-leon-latest.osm.pbf"
+  ],
+  "search_bbox": [
+    -6.72,
+    42.4,
+    -6.22,
+    42.64
+  ],
+  "coastal": false,
+  "route_name_regex": "camino franc[eé]s|camiño franc[eé]s|chemin navarrais|nafar bidea",
+  "route_exclude_regex": "\\b(SL|PR)-[A-Z]{1,3} ?\\d",
+  "fallback_route": "camino-frances-24.route.geojson",
+  "clip_km": 6,
+  "min_route_km": 9.0,
+  "buffer_km": 3,
+  "maxzoom": 15,
+  "waypoints": [
+    {
+      "name": "Foncebadón",
+      "at": [
+        -6.34248,
+        42.49124
+      ]
+    },
+    {
+      "name": "Cruz de Ferro",
+      "at": [
+        -6.36147,
+        42.48886
+      ]
+    },
+    {
+      "name": "Manjarín",
+      "at": [
+        -6.38647,
+        42.49052
+      ]
+    },
+    {
+      "name": "El Acebo",
+      "at": [
+        -6.45703,
+        42.49891
+      ]
+    },
+    {
+      "name": "Riego de Ambrós",
+      "at": [
+        -6.47987,
+        42.52231
+      ]
+    },
+    {
+      "name": "Molinaseca",
+      "at": [
+        -6.52046,
+        42.53784
+      ]
+    },
+    {
+      "name": "Ponferrada",
+      "at": [
+        -6.59387,
+        42.54541
+      ]
+    }
+  ],
+  "render_checks": [
+    {
+      "name": "Foncebadón z15",
+      "at": [
+        -6.34248,
+        42.49124,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    },
+    {
+      "name": "Ponferrada z15",
+      "at": [
+        -6.59387,
+        42.54541,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    }
+  ],
+  "generated_from": "catalog/camino-frances/24.json"
+}

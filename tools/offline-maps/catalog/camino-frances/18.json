@@ -1,0 +1,49 @@
+{
+  "n": 18,
+  "name": "Terradillos de los Templarios to Bercianos del Real Camino",
+  "from": {
+    "name": "Terradillos de los Templarios",
+    "lat": 42.36299,
+    "lng": -4.89062,
+    "source": "nominatim node/268521664 place=hamlet"
+  },
+  "to": {
+    "name": "Bercianos del Real Camino",
+    "lat": 42.38768,
+    "lng": -5.1452,
+    "source": "nominatim relation/342394 boundary=administrative (Photon lists the same relation as place=village; point checked with Nominatim reverse geocoding: inside the village)"
+  },
+  "via": [
+    {
+      "name": "Moratinos",
+      "lat": 42.36052,
+      "lng": -4.92665,
+      "source": "photon.komoot.io relation/347824 place=village (point checked with Nominatim reverse geocoding: inside the village)"
+    },
+    {
+      "name": "San Nicolás del Real Camino",
+      "lat": 42.36336,
+      "lng": -4.9523,
+      "source": "photon.komoot.io node/268090492 place=hamlet"
+    },
+    {
+      "name": "Sahagún",
+      "lat": 42.3719,
+      "lng": -5.03131,
+      "source": "photon.komoot.io relation/345049 place=town (point checked with Nominatim reverse geocoding: inside the town)"
+    },
+    {
+      "name": "Calzada del Coto",
+      "lat": 42.3886,
+      "lng": -5.08013,
+      "source": "photon.komoot.io relation/340417 place=village (point checked with Nominatim reverse geocoding: inside the village)"
+    }
+  ],
+  "extracts": [
+    "castilla-y-leon"
+  ],
+  "coastal": false,
+  "distance_km": null,
+  "distance_source": null,
+  "notes": "Start Terradillos de los Templarios is Nominatim's only hit (hamlet node). Stage 17 ends in the same town and was looked up independently, so the generator should check both agree within 1.5 km. Moratinos and San Nicolás del Real Camino are in Palencia province, Sahagún, Calzada del Coto and Bercianos in León province (Photon), all Castilla y León, so one extract. Bercianos del Real Camino has no separate place node: the only object is the municipality relation 342394 (Photon tags it place=village) and Nominatim reverse geocoding puts its point on Travesía Mayor inside the village. Variant (general knowledge, geometry not checked): at Calzada del Coto the Camino splits between the Camino Real Francés via Bercianos (used here) and the Calzada Romana (Via Trajana) via Calzadilla de los Hermanillos, which rejoins near Reliegos (stage 19). Common practice: many guides end the day at Sahagún."
+}

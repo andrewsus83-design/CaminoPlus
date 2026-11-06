@@ -1,0 +1,12 @@
+{
+  "n": 3,
+  "name": "Fixture Charlie to Fixture Delta",
+  "from": {"name": "Fixture Charlie", "lat": 42.5, "lng": -2.5, "source": "fixture"},
+  "to": {"name": "Fixture Delta", "lat": 42.45, "lng": -2.75, "source": "unverified"},
+  "via": [],
+  "extracts": ["la-rioja"],
+  "coastal": false,
+  "distance_km": null,
+  "distance_source": null,
+  "notes": "Test fixture, made-up places. No via points, no distance."
+}

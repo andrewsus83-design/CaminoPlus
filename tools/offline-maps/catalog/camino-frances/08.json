@@ -1,0 +1,43 @@
+{
+  "n": 8,
+  "name": "Logroño to Nájera",
+  "from": {
+    "name": "Logroño",
+    "lat": 42.46612,
+    "lng": -2.43967,
+    "source": "nominatim relation/340516 boundary=administrative linked_place=city wikidata=Q14325"
+  },
+  "to": {
+    "name": "Nájera",
+    "lat": 42.41674,
+    "lng": -2.73369,
+    "source": "nominatim relation/341364 boundary=administrative linked_place=town wikidata=Q776113"
+  },
+  "via": [
+    {
+      "name": "Navarrete",
+      "lat": 42.42897,
+      "lng": -2.56162,
+      "source": "nominatim relation/341359 boundary=administrative linked_place=village wikidata=Q916230"
+    },
+    {
+      "name": "Sotés",
+      "lat": 42.40029,
+      "lng": -2.60194,
+      "source": "nominatim relation/341989 boundary=administrative linked_place=village wikidata=Q608044"
+    },
+    {
+      "name": "Ventosa",
+      "lat": 42.40421,
+      "lng": -2.62634,
+      "source": "nominatim relation/341704 boundary=administrative linked_place=village wikidata=Q1905613"
+    }
+  ],
+  "extracts": [
+    "la-rioja"
+  ],
+  "coastal": false,
+  "distance_km": null,
+  "distance_source": null,
+  "notes": "from is Logroño (relation/340516, same point as stage 7 end). via: Navarrete, Sotés, Ventosa; Sotés lies 4.2 km south of the straight Logroño to Nájera line, so a reviewer should confirm the OSM Camino passes through it. The Alto de San Antón hill between Ventosa and Nájera was not looked up. extracts: la-rioja only; a Nominatim reverse lookup 3.0 km east of Logroño (42.4680,-2.4030) is La Rioja, so the Navarra border is beyond the 3 km corridor at the start. Nájera = relation/341364 (linked place=town)."
+}

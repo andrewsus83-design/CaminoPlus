@@ -1,0 +1,55 @@
+{
+  "n": 31,
+  "name": "Palas de Rei to Arzúa",
+  "from": {
+    "name": "Palas de Rei",
+    "lat": 42.87391,
+    "lng": -7.8698,
+    "source": "photon.komoot.io node/470353423 place=town"
+  },
+  "to": {
+    "name": "Arzúa",
+    "lat": 42.92658,
+    "lng": -8.16345,
+    "source": "photon.komoot.io node/764265956 place=town"
+  },
+  "via": [
+    {
+      "name": "San Xiao do Camiño",
+      "lat": 42.87438,
+      "lng": -7.90271,
+      "source": "photon.komoot.io node/764257101 place=hamlet (OSM name 'San Xiao')"
+    },
+    {
+      "name": "O Leboreiro",
+      "lat": 42.88778,
+      "lng": -7.96563,
+      "source": "photon.komoot.io node/6110688572 place=hamlet"
+    },
+    {
+      "name": "Melide",
+      "lat": 42.91457,
+      "lng": -8.01361,
+      "source": "photon.komoot.io node/766643452 place=town"
+    },
+    {
+      "name": "Boente de Abaixo",
+      "lat": 42.91647,
+      "lng": -8.07827,
+      "source": "photon.komoot.io node/6083648742 place=hamlet"
+    },
+    {
+      "name": "Ribadiso de Abaixo",
+      "lat": 42.93062,
+      "lng": -8.13139,
+      "source": "photon.komoot.io node/470949929 place=hamlet"
+    }
+  ],
+  "extracts": [
+    "galicia"
+  ],
+  "coastal": false,
+  "distance_km": null,
+  "distance_source": null,
+  "notes": "San Xiao do Camiño is the Galician name of what guides call San Xulián do Camiño (OSM hamlet 'San Xiao'). Boente has an upper and a lower hamlet (Boente de Arriba, node 6083648741, is 0.3 km east); the lower one is used. Ribadiso de Abaixo is at the medieval bridge over the Iso; A Castañeda (between Boente and Ribadiso) was not looked up. Melide is where the Camino Primitivo joins and Arzúa where the Camino del Norte joins (general knowledge). Arzúa: the place=town node 764265956 is used. Nominatim's search returns only the municipality relation 342625, whose centroid (42.92375,-8.15282) falls on road DP-7901 in the hamlet of Ponte Lema, 0.9 km from the town, so do not use it."
+}

@@ -1,0 +1,92 @@
+{
+  "slug": "camino-frances-16",
+  "name": "Frómista to Carrión de los Condes",
+  "route_slug": "camino-frances",
+  "stage_number": 16,
+  "route_id": "20000000-0000-0000-0000-000000000001",
+  "stage_id": "40000000-0000-0000-0000-000000000016",
+  "osm_extracts": [
+    "https://download.geofabrik.de/europe/spain/castilla-y-leon-latest.osm.pbf"
+  ],
+  "search_bbox": [
+    -4.72,
+    42.18,
+    -4.28,
+    42.43
+  ],
+  "coastal": false,
+  "route_name_regex": "camino franc[eé]s|camiño franc[eé]s|chemin navarrais|nafar bidea",
+  "route_exclude_regex": "\\b(SL|PR)-[A-Z]{1,3} ?\\d",
+  "fallback_route": "camino-frances-16.route.geojson",
+  "clip_km": 6,
+  "min_route_km": 7.3,
+  "buffer_km": 3,
+  "maxzoom": 15,
+  "waypoints": [
+    {
+      "name": "Frómista",
+      "at": [
+        -4.4055,
+        42.26769
+      ]
+    },
+    {
+      "name": "Población de Campos",
+      "at": [
+        -4.44713,
+        42.26975
+      ]
+    },
+    {
+      "name": "Revenga de Campos",
+      "at": [
+        -4.48204,
+        42.28418
+      ]
+    },
+    {
+      "name": "Villarmentero de Campos",
+      "at": [
+        -4.49923,
+        42.29716
+      ]
+    },
+    {
+      "name": "Villalcázar de Sirga",
+      "at": [
+        -4.5418,
+        42.31671
+      ]
+    },
+    {
+      "name": "Carrión de los Condes",
+      "at": [
+        -4.60171,
+        42.33854
+      ]
+    }
+  ],
+  "render_checks": [
+    {
+      "name": "Frómista z15",
+      "at": [
+        -4.4055,
+        42.26769,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    },
+    {
+      "name": "Carrión de los Condes z15",
+      "at": [
+        -4.60171,
+        42.33854,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    }
+  ],
+  "generated_from": "catalog/camino-frances/16.json"
+}

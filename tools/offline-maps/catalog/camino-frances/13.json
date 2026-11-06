@@ -1,0 +1,43 @@
+{
+  "n": 13,
+  "name": "Burgos to Hornillos del Camino",
+  "from": {
+    "name": "Burgos",
+    "lat": 42.34393,
+    "lng": -3.69698,
+    "source": "photon node/166920565 place=city"
+  },
+  "to": {
+    "name": "Hornillos del Camino",
+    "lat": 42.33854,
+    "lng": -3.92595,
+    "source": "nominatim relation/341162 boundary=administrative linked_place=village wikidata=Q958987"
+  },
+  "via": [
+    {
+      "name": "Villalbilla de Burgos",
+      "lat": 42.34709,
+      "lng": -3.77961,
+      "source": "nominatim relation/343191 boundary=administrative linked_place=village wikidata=Q526762"
+    },
+    {
+      "name": "Tardajos",
+      "lat": 42.34887,
+      "lng": -3.81861,
+      "source": "nominatim node/302893055 place=village wikidata=Q24010345"
+    },
+    {
+      "name": "Rabé de las Calzadas",
+      "lat": 42.34019,
+      "lng": -3.83411,
+      "source": "nominatim relation/346891 boundary=administrative linked_place=village wikidata=Q1012982"
+    }
+  ],
+  "extracts": [
+    "castilla-y-leon"
+  ],
+  "coastal": false,
+  "distance_km": null,
+  "distance_source": null,
+  "notes": "from is Burgos (photon node/166920565, same point as stage 12 end). Tardajos: used place=village node/302893055; the municipality relation/343709 has its centroid 0.5 km away. Villalbilla de Burgos, Rabé de las Calzadas and Hornillos del Camino are linked place=village relations. Reviewer: check the first kilometres of the corridor around Burgos."
+}

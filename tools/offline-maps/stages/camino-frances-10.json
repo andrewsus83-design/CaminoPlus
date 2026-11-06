@@ -1,0 +1,100 @@
+{
+  "slug": "camino-frances-10",
+  "name": "Santo Domingo de la Calzada to Belorado",
+  "route_slug": "camino-frances",
+  "stage_number": 10,
+  "route_id": "20000000-0000-0000-0000-000000000001",
+  "stage_id": "40000000-0000-0000-0000-000000000010",
+  "osm_extracts": [
+    "https://download.geofabrik.de/europe/spain/la-rioja-latest.osm.pbf",
+    "https://download.geofabrik.de/europe/spain/castilla-y-leon-latest.osm.pbf"
+  ],
+  "search_bbox": [
+    -3.31,
+    42.33,
+    -2.83,
+    42.54
+  ],
+  "coastal": false,
+  "route_name_regex": "camino franc[eé]s|camiño franc[eé]s|chemin navarrais|nafar bidea",
+  "route_exclude_regex": "\\b(SL|PR)-[A-Z]{1,3} ?\\d",
+  "fallback_route": "camino-frances-10.route.geojson",
+  "clip_km": 6,
+  "min_route_km": 8.2,
+  "buffer_km": 3,
+  "maxzoom": 15,
+  "waypoints": [
+    {
+      "name": "Santo Domingo de la Calzada",
+      "at": [
+        -2.95364,
+        42.44067
+      ]
+    },
+    {
+      "name": "Grañón",
+      "at": [
+        -3.02729,
+        42.45017
+      ]
+    },
+    {
+      "name": "Redecilla del Camino",
+      "at": [
+        -3.06516,
+        42.43797
+      ]
+    },
+    {
+      "name": "Castildelgado",
+      "at": [
+        -3.08486,
+        42.43726
+      ]
+    },
+    {
+      "name": "Viloria de Rioja",
+      "at": [
+        -3.1004,
+        42.42647
+      ]
+    },
+    {
+      "name": "Villamayor del Río",
+      "at": [
+        -3.13686,
+        42.42764
+      ]
+    },
+    {
+      "name": "Belorado",
+      "at": [
+        -3.19178,
+        42.4197
+      ]
+    }
+  ],
+  "render_checks": [
+    {
+      "name": "Santo Domingo de la Calzada z15",
+      "at": [
+        -2.95364,
+        42.44067,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    },
+    {
+      "name": "Belorado z15",
+      "at": [
+        -3.19178,
+        42.4197,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    }
+  ],
+  "generated_from": "catalog/camino-frances/10.json"
+}

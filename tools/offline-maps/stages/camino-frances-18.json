@@ -1,0 +1,92 @@
+{
+  "slug": "camino-frances-18",
+  "name": "Terradillos de los Templarios to Bercianos del Real Camino",
+  "route_slug": "camino-frances",
+  "stage_number": 18,
+  "route_id": "20000000-0000-0000-0000-000000000001",
+  "stage_id": "40000000-0000-0000-0000-000000000018",
+  "osm_extracts": [
+    "https://download.geofabrik.de/europe/spain/castilla-y-leon-latest.osm.pbf"
+  ],
+  "search_bbox": [
+    -5.27,
+    42.27,
+    -4.77,
+    42.48
+  ],
+  "coastal": false,
+  "route_name_regex": "camino franc[eé]s|camiño franc[eé]s|chemin navarrais|nafar bidea",
+  "route_exclude_regex": "\\b(SL|PR)-[A-Z]{1,3} ?\\d",
+  "fallback_route": "camino-frances-18.route.geojson",
+  "clip_km": 6,
+  "min_route_km": 8.6,
+  "buffer_km": 3,
+  "maxzoom": 15,
+  "waypoints": [
+    {
+      "name": "Terradillos de los Templarios",
+      "at": [
+        -4.89062,
+        42.36299
+      ]
+    },
+    {
+      "name": "Moratinos",
+      "at": [
+        -4.92665,
+        42.36052
+      ]
+    },
+    {
+      "name": "San Nicolás del Real Camino",
+      "at": [
+        -4.9523,
+        42.36336
+      ]
+    },
+    {
+      "name": "Sahagún",
+      "at": [
+        -5.03131,
+        42.3719
+      ]
+    },
+    {
+      "name": "Calzada del Coto",
+      "at": [
+        -5.08013,
+        42.3886
+      ]
+    },
+    {
+      "name": "Bercianos del Real Camino",
+      "at": [
+        -5.1452,
+        42.38768
+      ]
+    }
+  ],
+  "render_checks": [
+    {
+      "name": "Terradillos de los Templarios z15",
+      "at": [
+        -4.89062,
+        42.36299,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    },
+    {
+      "name": "Bercianos del Real Camino z15",
+      "at": [
+        -5.1452,
+        42.38768,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    }
+  ],
+  "generated_from": "catalog/camino-frances/18.json"
+}

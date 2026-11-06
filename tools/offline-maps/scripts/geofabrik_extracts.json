@@ -1,0 +1,12 @@
+{
+  "aquitaine": "https://download.geofabrik.de/europe/france/aquitaine-latest.osm.pbf",
+  "navarra": "https://download.geofabrik.de/europe/spain/navarra-latest.osm.pbf",
+  "la-rioja": "https://download.geofabrik.de/europe/spain/la-rioja-latest.osm.pbf",
+  "pais-vasco": "https://download.geofabrik.de/europe/spain/pais-vasco-latest.osm.pbf",
+  "castilla-y-leon": "https://download.geofabrik.de/europe/spain/castilla-y-leon-latest.osm.pbf",
+  "galicia": "https://download.geofabrik.de/europe/spain/galicia-latest.osm.pbf",
+  "cantabria": "https://download.geofabrik.de/europe/spain/cantabria-latest.osm.pbf",
+  "asturias": "https://download.geofabrik.de/europe/spain/asturias-latest.osm.pbf",
+  "aragon": "https://download.geofabrik.de/europe/spain/aragon-latest.osm.pbf",
+  "portugal": "https://download.geofabrik.de/europe/portugal-latest.osm.pbf"
+}

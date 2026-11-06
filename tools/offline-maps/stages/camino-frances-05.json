@@ -1,0 +1,92 @@
+{
+  "slug": "camino-frances-05",
+  "name": "Puente la Reina to Estella",
+  "route_slug": "camino-frances",
+  "stage_number": 5,
+  "route_id": "20000000-0000-0000-0000-000000000001",
+  "stage_id": "40000000-0000-0000-0000-000000000005",
+  "osm_extracts": [
+    "https://download.geofabrik.de/europe/spain/navarra-latest.osm.pbf"
+  ],
+  "search_bbox": [
+    -2.15,
+    42.57,
+    -1.69,
+    42.77
+  ],
+  "coastal": false,
+  "route_name_regex": "camino franc[eé]s|camiño franc[eé]s|chemin navarrais|nafar bidea",
+  "route_exclude_regex": "\\b(SL|PR)-[A-Z]{1,3} ?\\d",
+  "fallback_route": "camino-frances-05.route.geojson",
+  "clip_km": 6,
+  "min_route_km": 7.3,
+  "buffer_km": 3,
+  "maxzoom": 15,
+  "waypoints": [
+    {
+      "name": "Puente la Reina",
+      "at": [
+        -1.81553,
+        42.67171
+      ]
+    },
+    {
+      "name": "Mañeru",
+      "at": [
+        -1.86207,
+        42.66954
+      ]
+    },
+    {
+      "name": "Cirauqui",
+      "at": [
+        -1.89097,
+        42.67568
+      ]
+    },
+    {
+      "name": "Lorca",
+      "at": [
+        -1.94488,
+        42.6731
+      ]
+    },
+    {
+      "name": "Villatuerta",
+      "at": [
+        -1.9934,
+        42.65952
+      ]
+    },
+    {
+      "name": "Estella",
+      "at": [
+        -2.03148,
+        42.67209
+      ]
+    }
+  ],
+  "render_checks": [
+    {
+      "name": "Puente la Reina z15",
+      "at": [
+        -1.81553,
+        42.67171,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    },
+    {
+      "name": "Estella z15",
+      "at": [
+        -2.03148,
+        42.67209,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    }
+  ],
+  "generated_from": "catalog/camino-frances/05.json"
+}

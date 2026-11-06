@@ -1,0 +1,62 @@
+{
+  "n": 26,
+  "name": "Villafranca del Bierzo to O Cebreiro",
+  "from": {
+    "name": "Villafranca del Bierzo",
+    "lat": 42.60558,
+    "lng": -6.81117,
+    "source": "nominatim node/194560303 place=village"
+  },
+  "to": {
+    "name": "O Cebreiro",
+    "lat": 42.70784,
+    "lng": -7.04348,
+    "source": "photon.komoot.io node/766650410 place=hamlet"
+  },
+  "via": [
+    {
+      "name": "Trabadelo",
+      "lat": 42.64959,
+      "lng": -6.88165,
+      "source": "photon.komoot.io node/349248038 place=village"
+    },
+    {
+      "name": "La Portela de Valcarce",
+      "lat": 42.66006,
+      "lng": -6.91976,
+      "source": "photon.komoot.io node/349248612 place=hamlet"
+    },
+    {
+      "name": "Vega de Valcarce",
+      "lat": 42.66444,
+      "lng": -6.94541,
+      "source": "photon.komoot.io node/349247999 place=village"
+    },
+    {
+      "name": "Ruitelán",
+      "lat": 42.6730,
+      "lng": -6.96724,
+      "source": "photon.komoot.io node/349248623 place=hamlet"
+    },
+    {
+      "name": "Las Herrerías de Valcarce",
+      "lat": 42.67077,
+      "lng": -6.98101,
+      "source": "photon.komoot.io node/349248618 place=hamlet"
+    },
+    {
+      "name": "La Faba",
+      "lat": 42.68527,
+      "lng": -7.00962,
+      "source": "photon.komoot.io node/349248525 place=hamlet"
+    }
+  ],
+  "extracts": [
+    "castilla-y-leon",
+    "galicia"
+  ],
+  "coastal": false,
+  "distance_km": null,
+  "distance_source": null,
+  "notes": "Region border: the climb is in León (El Bierzo) and O Cebreiro is in Galicia (Lugo, concello Pedrafita do Cebreiro). La Laguna de Castilla (hamlet node 349248620 at 42.70131,-7.02153, León) is 1.9 km from O Cebreiro, so the León/Lugo boundary lies in that gap and both extracts are needed. Walking order checked: Trabadelo, La Portela de Valcarce, Vega de Valcarce, Ruitelán, Las Herrerías de Valcarce, La Faba, then La Laguna de Castilla and O Cebreiro (Pereje and Ambasmestas are on the Camino too but not used). Variants (general knowledge, not mapped): the high-level Camino Duro via Pradela instead of the Valcarce valley road; the reviewer must check the corridor covers it if the app wants it. Common practice: a steep day that many guides split at Vega de Valcarce or La Faba."
+}

@@ -1,0 +1,55 @@
+{
+  "n": 3,
+  "name": "Zubiri to Pamplona",
+  "from": {
+    "name": "Zubiri",
+    "lat": 42.9300,
+    "lng": -1.5036,
+    "source": "supabase/seed.sql places; nominatim relation/11918288 boundary=administrative linked_place=village is 0.09 km away"
+  },
+  "to": {
+    "name": "Pamplona",
+    "lat": 42.8169,
+    "lng": -1.6432,
+    "source": "supabase/seed.sql places; photon node/28849760 place=city is 0.16 km away"
+  },
+  "via": [
+    {
+      "name": "Larrasoaña",
+      "lat": 42.90192,
+      "lng": -1.54190,
+      "source": "nominatim relation/11918282 boundary=administrative linked_place=hamlet wikidata=Q641827"
+    },
+    {
+      "name": "Zuriáin",
+      "lat": 42.88003,
+      "lng": -1.56657,
+      "source": "nominatim node/473826875 place=hamlet wikidata=Q230434"
+    },
+    {
+      "name": "Zabaldika",
+      "lat": 42.85597,
+      "lng": -1.58104,
+      "source": "nominatim relation/11918271 boundary=administrative linked_place=hamlet wikidata=Q136705"
+    },
+    {
+      "name": "Arre",
+      "lat": 42.84288,
+      "lng": -1.61046,
+      "source": "nominatim relation/10093055 boundary=administrative linked_place=village wikidata=Q2863587"
+    },
+    {
+      "name": "Villava",
+      "lat": 42.83190,
+      "lng": -1.60713,
+      "source": "nominatim relation/348842 boundary=administrative linked_place=town wikidata=Q600671"
+    }
+  ],
+  "extracts": [
+    "navarra"
+  ],
+  "coastal": false,
+  "distance_km": 20.4,
+  "distance_source": "supabase/seed.sql",
+  "notes": "from and to use the supabase/seed.sql place coordinates; cross-check: Zubiri nominatim relation/11918288 is 0.09 km from the seed point, Pamplona photon node/28849760 place=city is 0.16 km. distance_km 20.4 is the seed.sql value and was not independently verified. via follows the main path over Zabaldika (OSM name 'Zabaldica'): Larrasoaña, Zuriáin, Zabaldika, Arre, Villava. Variant (from memory, not verified here): a river route along the Arga through Irotz to Arre/Trinidad de Arre avoids the Zabaldika hill path, and the last kilometres into Pamplona can follow the river park instead of Villava/Burlada. Both stay inside the 3 km corridor; a reviewer should check which one the OSM Camino relations carry."
+}

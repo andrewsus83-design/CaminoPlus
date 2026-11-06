@@ -1,0 +1,12 @@
+{
+  "n": 2,
+  "name": "Demo Hill to Demo Coast",
+  "from": {"name": "Demo Hill", "lat": 41.75, "lng": -1.75, "source": "fixture"},
+  "to": {"name": "Demo Coast", "lat": 41.7, "lng": -2.0, "source": "fixture"},
+  "via": [],
+  "extracts": ["aragon", "navarra"],
+  "coastal": true,
+  "distance_km": null,
+  "distance_source": null,
+  "notes": "Test fixture, made-up places. Marked coastal to check the flag is copied."
+}

@@ -1,0 +1,49 @@
+{
+  "n": 32,
+  "name": "Arzúa to O Pedrouzo",
+  "from": {
+    "name": "Arzúa",
+    "lat": 42.92658,
+    "lng": -8.16345,
+    "source": "photon.komoot.io node/764265956 place=town"
+  },
+  "to": {
+    "name": "O Pedrouzo",
+    "lat": 42.90468,
+    "lng": -8.36242,
+    "source": "photon.komoot.io node/766526727 place=village"
+  },
+  "via": [
+    {
+      "name": "A Salceda",
+      "lat": 42.92633,
+      "lng": -8.28002,
+      "source": "photon.komoot.io node/6080543511 place=hamlet"
+    },
+    {
+      "name": "A Brea",
+      "lat": 42.91891,
+      "lng": -8.30551,
+      "source": "photon.komoot.io node/476505158 place=hamlet"
+    },
+    {
+      "name": "Santa Irene",
+      "lat": 42.91654,
+      "lng": -8.33179,
+      "source": "photon.komoot.io node/6080924014 place=hamlet"
+    },
+    {
+      "name": "A Rúa",
+      "lat": 42.91452,
+      "lng": -8.35163,
+      "source": "photon.komoot.io node/766526856 place=hamlet"
+    }
+  ],
+  "extracts": [
+    "galicia"
+  ],
+  "coastal": false,
+  "distance_km": null,
+  "distance_source": null,
+  "notes": "O Pedrouzo is also written Pedrouzo or Arca (general knowledge; concello O Pino). Photon lists several hamlets called O Pedrouzo in Galicia (Boqueixón, Santiso, Ordes, Trazo, Vilasantar); the one used (node 766526727) is the only one on the Camino, 16.4 km west-south-west of Arzúa and 15.2 km from Santiago in straight lines. A Rúa also has two hits near O Pedrouzo: the used node 766526856 is 1.4 km from O Pedrouzo, the other one (42.95795,-8.37634) is 6 km north and not on the Camino. A Salceda, A Brea and Santa Irene are hamlet nodes in O Pino; A Calzada, Calle and Boavista (between Arzúa and A Salceda) were not looked up."
+}

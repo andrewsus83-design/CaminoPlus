@@ -1,0 +1,50 @@
+{
+  "n": 27,
+  "name": "O Cebreiro to Triacastela",
+  "from": {
+    "name": "O Cebreiro",
+    "lat": 42.70784,
+    "lng": -7.04348,
+    "source": "photon.komoot.io node/766650410 place=hamlet"
+  },
+  "to": {
+    "name": "Triacastela",
+    "lat": 42.75634,
+    "lng": -7.23975,
+    "source": "photon.komoot.io node/766653704 place=village"
+  },
+  "via": [
+    {
+      "name": "Hospital da Condesa",
+      "lat": 42.70517,
+      "lng": -7.1013,
+      "source": "photon.komoot.io node/469847627 place=hamlet"
+    },
+    {
+      "name": "O Poio",
+      "lat": 42.71242,
+      "lng": -7.12614,
+      "source": "photon.komoot.io node/470065455 place=neighbourhood"
+    },
+    {
+      "name": "Fonfría",
+      "lat": 42.73155,
+      "lng": -7.15771,
+      "source": "photon.komoot.io node/3727940618 place=hamlet"
+    },
+    {
+      "name": "O Biduedo",
+      "lat": 42.74387,
+      "lng": -7.17823,
+      "source": "photon.komoot.io node/1969233508 place=hamlet"
+    }
+  ],
+  "extracts": [
+    "castilla-y-leon",
+    "galicia"
+  ],
+  "coastal": false,
+  "distance_km": null,
+  "distance_source": null,
+  "notes": "O Cebreiro is the hamlet node in Pedrafita do Cebreiro (Lugo, Galicia) and lies 1.9 km from La Laguna de Castilla (León), so castilla-y-leon is listed as well because a 3 km corridor at the start reaches it; drop it if the corridor is narrower than 1.9 km. O Poio is tagged place=neighbourhood (the Alto do Poio pass). Fonfría: a query with the Triacastela context returned nothing; searching the name alone near the pass found hamlet node 3727940618 in Pedrafita do Cebreiro (the other Fonfría hamlets are far away in Lugo). Order checked by longitude. Liñares, Alto de San Roque, Filloval, Pasantes and Ramil are on the Camino but not used (Ramil is only 0.7 km from Triacastela). Triacastela is where the San Xil and Samos variants of stage 28 split."
+}

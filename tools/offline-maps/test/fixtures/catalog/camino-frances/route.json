@@ -1,0 +1,11 @@
+{
+  "route_slug": "camino-frances",
+  "route_index": 0,
+  "route_id": "20000000-0000-0000-0000-000000000001",
+  "route_name_regex": "camino franc[eé]s|camiño franc[eé]s|chemin navarrais|nafar bidea",
+  "route_exclude_regex": "\\b(SL|PR)-[A-Z]{1,3} ?\\d",
+  "clip_km": 6,
+  "buffer_km": 3,
+  "maxzoom": 15,
+  "margin_km": 4
+}
