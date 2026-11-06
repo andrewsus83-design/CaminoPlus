@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import { Screen } from '@/components/Screen';
 import { AppText } from '@/components/AppText';
 import { Card, SectionLabel } from '@/components/ui';
-import { AccountSection } from '@/components/AccountSection';
+import { AccountSection, LogoutButton } from '@/components/AccountSection';
 import { BusinessCard, IntroSheet } from '@/features/business/BusinessCard';
 import { useOwner } from '@/features/business/store';
 import { c, radius } from '@/theme';
@@ -26,7 +26,10 @@ export default function Settings() {
   };
   return (
     <Screen>
-      <AppText variant="h2">Settings</AppText>
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+        <AppText variant="h2">Settings</AppText>
+        <LogoutButton />
+      </View>
       <AccountSection />
       <Card style={{ gap: 10 }}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>

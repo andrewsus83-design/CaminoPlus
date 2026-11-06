@@ -1,22 +1,36 @@
-import { Alert, Platform, View } from 'react-native';
+import { Alert, Platform, Pressable, View } from 'react-native';
 import { AppText } from './AppText';
-import { Pill } from './Pill';
+import { Icon } from './Icon';
 import { Card, SectionLabel } from './ui';
 import { useAuth } from '@/lib/auth';
 import { c } from '@/theme';
 
-/** Settings > Account: who is signed in, how, and sign out. */
-export function AccountSection() {
-  const { session, profile, signOut } = useAuth();
-  const user = session?.user;
-  const provider = user?.app_metadata?.provider === 'google' ? 'Google' : 'Email';
-  const confirmSignOut = () => {
-    if (Platform.OS === 'web') return void signOut();
-    Alert.alert('Sign out?', 'Downloaded stages stay on this phone.', [
+/** Round log out button for the top right of Settings; asks before signing out. */
+export function LogoutButton() {
+  const { signOut } = useAuth();
+  const confirm = () => {
+    if (Platform.OS === 'web') {
+      if (typeof window !== 'undefined' && !window.confirm('Log out of CaminoPlus?')) return;
+      return void signOut();
+    }
+    Alert.alert('Log out?', 'Are you sure you want to log out? Downloaded stages stay on this phone.', [
       { text: 'Cancel', style: 'cancel' },
-      { text: 'Sign out', style: 'destructive', onPress: () => void signOut() },
+      { text: 'Log out', style: 'destructive', onPress: () => void signOut() },
     ]);
   };
+  return (
+    <Pressable accessibilityRole="button" accessibilityLabel="Log out" onPress={confirm} hitSlop={8}
+      style={({ pressed }) => ({ width: 56, height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center', backgroundColor: c.white, borderWidth: 1, borderColor: c.sand300, opacity: pressed ? 0.8 : 1 })}>
+      <Icon name="logout" color={c.blue} size={26} />
+    </Pressable>
+  );
+}
+
+/** Settings > Account: who is signed in and how. */
+export function AccountSection() {
+  const { session, profile } = useAuth();
+  const user = session?.user;
+  const provider = user?.app_metadata?.provider === 'google' ? 'Google' : 'Email';
   const rows: [string, string][] = [
     ['Name', profile?.display_name || '-'],
     ['Username', profile?.username ? `@${profile.username}` : '-'],
@@ -34,7 +48,6 @@ export function AccountSection() {
           </View>
         ))}
       </Card>
-      <Pill variant="ghost" label="Sign out" onPress={confirmSignOut} />
     </View>
   );
 }
