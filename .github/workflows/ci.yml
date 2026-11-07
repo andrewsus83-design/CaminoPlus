@@ -7,6 +7,9 @@
 #   python            compile every Python tool, run the poi-audit and tools tests, check the docs links
 #   offline-maps      scripts of the offline map pipeline: syntax, shellcheck, unit tests, and the
 #                     render test (network blocked, then device offline) on a tiny fixture pack
+#   web-smoke         the web export of the app, every screen opened in light and dark, signed in and signed out,
+#                     online and offline: any page error, console error, dropped promise, blank or error screen,
+#                     or call to a host nobody mocked fails it (tools/web-smoke/README.md)
 #   workflows         actionlint over every workflow
 #
 # The long jobs of the pipelines themselves live in offline-maps.yml and poi-audit.yml.
@@ -182,6 +185,49 @@ jobs:
           npx playwright install --with-deps chromium
           npm run setup
           npm run test:render-fixture
+
+  web-smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: |
+            mobile/package-lock.json
+            tools/web-smoke/package-lock.json
+      - name: Install the packages of the app
+        working-directory: mobile
+        run: npm ci --no-audit --no-fund
+      - name: Install the packages of the test, and Chromium
+        working-directory: tools/web-smoke
+        run: |
+          npm ci --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      # First, so a harness that cannot fail never gets to say "green": the test is run against an app built to misbehave.
+      - name: Self-test of the smoke test (it must go red on planted failures)
+        working-directory: tools/web-smoke
+        run: npm test
+      - name: Web export of the app
+        working-directory: mobile
+        run: npx expo export --platform web --output-dir ../tools/web-smoke/dist/app
+        env:
+          CI: '1'
+      - name: Every screen, light and dark, signed in and signed out, online and offline
+        working-directory: tools/web-smoke
+        run: npm run smoke
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: failure()
+        with:
+          name: web-smoke-failures
+          # screenshot, report and Playwright trace of every check that failed (open a trace with: npx playwright show-trace <file>)
+          path: tools/web-smoke/artifacts
+          retention-days: 7
+          if-no-files-found: ignore
 
   workflows:
     runs-on: ubuntu-24.04
