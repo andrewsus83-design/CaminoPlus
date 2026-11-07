@@ -837,11 +837,16 @@ export const finished = (async () => {
     await h.clk.advance(AUTOSAVE_MS);
     assert.equal(writes(), w0 + 2, 'and then one write for all of it');
     assert.equal((await h.store.loadEntries(UID))[0].place?.name, 'Hontanas');
+    const w2 = writes();
+    h.saver.setPlace({ lat: 999, lon: 0, at: 'x' } as never);
+    await settle();
+    assert.equal(h.saver.view().place?.name, 'Hontanas', 'a place that is not one is ignored: the place that is on the page stays');
+    assert.equal(writes(), w2, 'and nothing is written for it');
     h.saver.setPlace(null);
     await settle();
     assert.ok(!(await h.store.loadEntries(UID))[0].place, 'taken off');
     h.saver.setPlace({ lat: 999, lon: 0, at: 'x' } as never);
-    assert.equal(h.saver.view().place, null, 'a place that is not one is ignored');
+    assert.equal(h.saver.view().place, null, 'a place that is not one puts nothing on the page');
     const w1 = writes();
     h.saver.removeMedia('does-not-exist');
     await h.saver.flush();
