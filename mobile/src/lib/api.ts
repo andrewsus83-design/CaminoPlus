@@ -3,7 +3,9 @@
 import { supabase } from './supabase';
 import { assertOnline } from './net';
 import { uuid } from './uuid';
-import { parseEngagementRows, withEngagement, type PostEngagement } from './postEngagement';
+import { isCount } from './engagement';
+import { parseEngagementRows, parsePostIds, withEngagement, type PostEngagement } from './postEngagement';
+import { parseComments, type PostComment } from './postComments';
 
 export type Profile = {
   id: string; username: string; display_name: string | null; bio: string | null; avatar_url: string | null;
@@ -139,6 +141,88 @@ export async function listPostEngagement(postIds: string[]): Promise<Map<string,
   } catch {
     return null;
   }
+}
+
+/**
+ * Likes, bookmarks, shares and comments of a post: the actions behind the action rail. They write to the tables that
+ * already exist (post_likes, post_saves, post_comments and the rpc record_post_share), under their row level security:
+ * a pilgrim can like, bookmark and comment as themselves on a post they can see, and remove their own like and bookmark.
+ * Every one needs the network (assertOnline), so offline they fail at once, before any request, with OfflineError.
+ */
+
+/** Which of these posts this person has liked and bookmarked. A kind that could not be read is null: never guessed, never thrown. */
+export type MyReactions = { liked: Set<string> | null; saved: Set<string> | null };
+
+export async function listMyReactions(userId: string, postIds: string[]): Promise<MyReactions> {
+  if (postIds.length === 0) return { liked: new Set(), saved: new Set() };
+  try {
+    await assertOnline();
+  } catch {
+    return { liked: null, saved: null };
+  }
+  const read = (q: PromiseLike<{ data: unknown; error: unknown }>) => q.then((res) => (res.error ? null : parsePostIds(res.data)), () => null);
+  const [liked, saved] = await Promise.all([
+    read(supabase.from('post_likes').select('post_id').eq('user_id', userId).in('post_id', postIds)),
+    read(supabase.from('post_saves').select('post_id').eq('user_id', userId).in('post_id', postIds)),
+  ]);
+  return { liked, saved };
+}
+
+// A like and a bookmark are written with "on conflict do nothing", so a second try (a dropped connection, a double tap
+// that got through) changes nothing and is not an error. post_saves has no UPDATE for the app at all.
+export async function likePost(userId: string, postId: string) {
+  await assertOnline();
+  must(await supabase.from('post_likes').upsert({ post_id: postId, user_id: userId }, { onConflict: 'post_id,user_id', ignoreDuplicates: true }));
+}
+
+export async function unlikePost(userId: string, postId: string) {
+  await assertOnline();
+  must(await supabase.from('post_likes').delete().eq('post_id', postId).eq('user_id', userId));
+}
+
+export async function savePost(userId: string, postId: string) {
+  await assertOnline();
+  must(await supabase.from('post_saves').upsert({ post_id: postId, user_id: userId }, { onConflict: 'post_id,user_id', ignoreDuplicates: true }));
+}
+
+export async function unsavePost(userId: string, postId: string) {
+  await assertOnline();
+  must(await supabase.from('post_saves').delete().eq('post_id', postId).eq('user_id', userId));
+}
+
+/** The pilgrim shared the post out of the app. Counts once per pilgrim and post. Answers the post's new share_count (null if unreadable). */
+export async function recordPostShare(postId: string): Promise<number | null> {
+  await assertOnline();
+  const n = must(await supabase.rpc('record_post_share', { p_post_id: postId }));
+  return isCount(n) ? Math.floor(n) : null;
+}
+
+/** The latest comments of a post (newest first, at most 50) with their author's name. Hidden and removed ones are not in it. */
+export async function listPostComments(postId: string): Promise<PostComment[]> {
+  await assertOnline();
+  const rows = must(
+    await supabase
+      .from('post_comments')
+      .select('id, user_id, body, created_at, author:profiles(username, display_name)')
+      .eq('post_id', postId)
+      .is('deleted_at', null)
+      .eq('moderation_status', 'ok')
+      .order('created_at', { ascending: false })
+      .limit(50),
+  );
+  const list = parseComments(rows);
+  if (!list) throw new Error('Could not read the comments.');
+  return list;
+}
+
+/**
+ * Adds a comment as this pilgrim. The id is made by the app, so sending the same comment again (a connection that dropped
+ * after the server had it) answers "already there" (23505), which is what the pilgrim wanted.
+ */
+export async function addPostComment(o: { id: string; userId: string; postId: string; body: string }) {
+  await assertOnline();
+  const res = await supabase.from('post_comments').insert({ id: o.id, post_id: o.postId, user_id: o.userId, body: o.body, client_created_at: new Date().toISOString() });
+  if (res.error && (res.error as { code?: string }).code !== '23505') throw new Error(res.error.message);
 }
 
 /** Text journal post (photos come with the media upload flow). Followers only by default. */

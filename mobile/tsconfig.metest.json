@@ -13,6 +13,7 @@
   },
   "files": [
     "src/features/me/__tests__/engagement.test.ts",
-    "src/features/me/__tests__/engagementQuery.test.ts"
+    "src/features/me/__tests__/engagementQuery.test.ts",
+    "src/features/me/__tests__/postActionsApi.test.ts"
   ]
 }

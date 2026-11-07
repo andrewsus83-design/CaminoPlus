@@ -45,7 +45,10 @@ function client(script: Script, log: Call[]) {
   };
 }
 
-const postEngagement = run(compile('src/lib/postEngagement.ts'), () => { throw new Error('postEngagement.ts imports nothing'); });
+const nothing = () => { throw new Error('this file imports nothing'); };
+const postEngagement = run(compile('src/lib/postEngagement.ts'), nothing);
+const engagement = run(compile('src/lib/engagement.ts'), nothing);
+const postComments = run(compile('src/lib/postComments.ts'), nothing);
 const apiCode = compile('src/lib/api.ts');
 const load = (script: Script, log: Call[] = [], net: { assertOnline(): Promise<void> } = { assertOnline: async () => {} }) =>
   run(apiCode, (id) => {
@@ -53,6 +56,8 @@ const load = (script: Script, log: Call[] = [], net: { assertOnline(): Promise<v
     if (id === './net') return net;
     if (id === './uuid') return { uuid: () => 'id' };
     if (id === './postEngagement') return postEngagement;
+    if (id === './engagement') return engagement;
+    if (id === './postComments') return postComments;
     throw new Error(`api.ts imports ${id}: add it to this test`);
   }) as unknown as Api;
 
