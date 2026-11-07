@@ -1,0 +1,230 @@
+# OSM import: turn the OpenStreetMap places along Camino Francés stages into rows for the Supabase tables stays,
+# pois, stage_stays and stage_pois (tools/poi-audit/import_osm.py, README section "Import to Supabase").
+#
+# Started by hand only (workflow_dispatch), with two inputs:
+#   stages  which stages: digits, commas and dashes only, like 1-3 or 1,5,9
+#   apply   false (default): write the NDJSON files and a summary, send nothing anywhere
+#           true: after that, send the same files to Supabase
+#
+# Two jobs, so that nothing with a secret ever runs next to a download or an install:
+#   import  (no environment, no secret) runs the unit tests, then the importer for the stages ONE AT A TIME with a
+#           pause between stages and between the two Overpass requests of a stage (Overpass asks to be treated
+#           gently), writes a summary of every stage to this page and attaches the files as the artifact
+#           osm-import-files. A stage that fails does not stop the others; the job is red at the end.
+#   apply   only when apply is true and the import job went green. It runs in the GitHub Environment "osm-import":
+#           the owner can add required reviewers there, so nothing reaches the database before somebody has looked
+#           at the summary and the files of the import job. It downloads that artifact (the very files that were
+#           attached for review) and sends them with --from-ndjson --apply, without reading OSM again. The secrets
+#           SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are set on the one step that needs them: not on the
+#           checkout, not on pip install, not on the download.
+#
+# One-time setup by the owner: Settings > Environments > New environment "osm-import", add the two secrets there
+# (and, to be safe, required reviewers). Repository-level secrets are not read by this workflow.
+# Third-party actions are pinned to a commit (the tag is in the comment); Dependabot bumps them.
+#
+# Data (c) OpenStreetMap contributors, ODbL. The imported tables are a derived database: see the README.
+name: osm-import
+
+on:
+  workflow_dispatch:
+    inputs:
+      stages:
+        description: 'Which Camino Francés stages: numbers, ranges and commas only, like 1-3 or 1,5,9'
+        type: string
+        default: '1'
+        required: true
+      apply:
+        description: 'Send the rows to Supabase after the import job (waits for approval in the osm-import environment)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+# Two imports at the same time would double the load on Overpass and could write the same rows twice.
+concurrency:
+  group: osm-import
+  cancel-in-progress: false
+
+env:
+  # Inputs reach the scripts as environment variables only, never pasted into the script text.
+  STAGES: ${{ inputs.stages }}
+
+jobs:
+  import:
+    runs-on: ubuntu-24.04
+    # Up to 33 stages one after the other: 2 to 5 minutes each in practice (Overpass), so about 1.5 to 3 hours.
+    timeout-minutes: 350
+    defaults:
+      run:
+        working-directory: tools/poi-audit
+    steps:
+      - name: Check the stages input
+        # Before anything is fetched or installed (so before the checkout: the job's default working directory does
+        # not exist yet). The same whitelist as the poi-audit workflow uses for its input; import_osm.py
+        # --expand-stages below checks the rest (ranges, stages that have a file).
+        working-directory: ${{ github.workspace }}
+        run: |
+          case "$STAGES" in
+            ''|*[!0-9,-]*) echo "::error title=stages input::stages must be digits, commas and dashes only, like 1-3 or 1,5,9" ; exit 1 ;;
+          esac
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: tools/poi-audit/requirements.txt
+
+      # No secret exists in this job: the pinned lock is installed with nothing in the environment.
+      - run: pip install -q -r requirements.txt
+
+      - name: Unit tests
+        run: python -m unittest discover -s tests -v
+
+      - name: List the stages
+        run: |
+          set -euo pipefail
+          mkdir -p out
+          if ! python import_osm.py --expand-stages "$STAGES" > out/stage-files.txt; then
+            echo "::error title=stages input::see the message above (stages that have a file: 1-33)"
+            exit 1
+          fi
+          {
+            echo "## OSM import: stages $STAGES"
+            echo
+            echo "Stage files: $(tr '\n' ' ' < out/stage-files.txt)"
+            echo
+            echo "Data (c) OpenStreetMap contributors, ODbL."
+            echo
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Import, one stage at a time
+        env:
+          PAUSE_BETWEEN_STAGES: '30'     # seconds
+          PAUSE_BETWEEN_REQUESTS: '15'   # seconds, between the route request and the places request of one stage
+        run: |
+          set -euo pipefail
+          failed=()
+          first=1
+          while read -r file; do
+            slug="${file%.json}"
+            if [ "$first" = 0 ]; then
+              echo "waiting $PAUSE_BETWEEN_STAGES s before the next stage (Overpass etiquette)"
+              sleep "$PAUSE_BETWEEN_STAGES"
+            fi
+            first=0
+            echo "::group::$slug"
+            if python import_osm.py --stage "../offline-maps/stages/$file" --out "out/import/$slug" --cache cache --pause "$PAUSE_BETWEEN_REQUESTS"; then
+              cat "out/import/$slug/summary.md" >> "$GITHUB_STEP_SUMMARY"
+            else
+              failed+=("$slug")
+              printf '### %s\n\nFAILED: nothing was written for this stage, see the log of this step.\n\n' "$slug" >> "$GITHUB_STEP_SUMMARY"
+            fi
+            echo "::endgroup::"
+          done < out/stage-files.txt
+          if [ "${#failed[@]}" -gt 0 ]; then
+            echo "::error title=osm-import::these stages failed: ${failed[*]}"
+            exit 1
+          fi
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          # The apply job downloads this artifact by name: it sends exactly these files.
+          name: osm-import-files
+          path: tools/poi-audit/out/import
+          retention-days: 14
+          if-no-files-found: warn
+
+  apply:
+    needs: import
+    if: inputs.apply
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    environment: osm-import
+    permissions:
+      contents: read
+      actions: read     # gh run download reads the artifact of this run
+    defaults:
+      run:
+        working-directory: tools/poi-audit
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: tools/poi-audit/requirements.txt
+
+      # The environment's secrets are not in this step's environment, nor in the next one's.
+      - run: pip install -q -r requirements.txt
+
+      - name: Download the files the import job attached for review
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          gh run download "$RUN_ID" --name osm-import-files --dir out/import
+          python import_osm.py --expand-stages "$STAGES" > out/stage-files.txt
+          while read -r file; do
+            test -f "out/import/${file%.json}/stays.ndjson" || { echo "::error::the artifact has no files for ${file%.json}"; exit 1; }
+          done < out/stage-files.txt
+
+      # The only step that sees the secrets. The key is never printed, written or put in an error by import_osm.py
+      # (tests prove it), and GitHub masks it in the log as well.
+      - name: Apply to Supabase
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          set -euo pipefail
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_SERVICE_ROLE_KEY" ]; then
+            echo "::error title=osm-import::the osm-import environment has no SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY secret"
+            exit 1
+          fi
+          failed=()
+          {
+            echo "## Apply to Supabase: stages $STAGES"
+            echo
+          } >> "$GITHUB_STEP_SUMMARY"
+          while read -r file; do
+            slug="${file%.json}"
+            echo "::group::apply $slug"
+            if python import_osm.py --stage "../offline-maps/stages/$file" --from-ndjson "out/import/$slug" --apply > "out/apply-$slug.log" 2>&1; then
+              status=ok
+            else
+              status=FAILED
+              failed+=("$slug")
+            fi
+            cat "out/apply-$slug.log"
+            {
+              printf '### %s: %s\n\n```\n' "$slug" "$status"
+              cat "out/apply-$slug.log"
+              printf '```\n\n'
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "::endgroup::"
+          done < out/stage-files.txt
+          if [ "${#failed[@]}" -gt 0 ]; then
+            echo "::error title=osm-import::these stages were refused or did not read back: ${failed[*]} (the summary says why; places that were written stay written, a run again is safe)"
+            exit 1
+          fi
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: osm-import-apply-reports
+          # counts and problems only: apply_report.json holds no secret and no row
+          path: |
+            tools/poi-audit/out/import/*/apply_report.json
+            tools/poi-audit/out/apply-*.log
+          retention-days: 14
+          if-no-files-found: warn

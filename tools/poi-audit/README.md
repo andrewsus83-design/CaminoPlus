@@ -8,6 +8,9 @@ against each other, scores every place, and writes a review queue.
 Pilot: **Camino Francés stage 1, Saint-Jean-Pied-de-Port to Roncesvalles**
 (same stage file as `tools/offline-maps`). Any stage file works, on any route.
 
+The same folder holds the importer that turns the OSM places along a stage into database rows
+(`import_osm.py`): see [Import to Supabase](#import-to-supabase-osm-importer).
+
 ```
  OSM (Overpass) ─┐
  Overture places ┼─► normalise to CaminoPlus categories ─► keep what is near the route
@@ -160,6 +163,205 @@ roughly $20-40 per full run. Stays and cafes need no AI calls.
 3. Loader: write findings and scores into Supabase with the service role.
 4. Small admin screen for the review queue (no admin screen exists yet).
 5. Same pipeline for other routes: only the stage file changes.
+
+## Import to Supabase (OSM importer)
+
+`import_osm.py` turns the OpenStreetMap places along one stage into rows for the Supabase tables `stays`, `pois`,
+`stage_stays` and `stage_pois`. It reuses what the audit does (the same Overpass requests and cache, `normalize.from_osm`
+for the CaminoPlus categories, `audit.load_route` for the real route, `audit.BUFFER_M` for how far from the route a place
+may be) and adds what the audit never did: rows. **A dry run is the default.** It writes files and needs no database;
+`--apply` sends them.
+
+```
+ stage file ─► OSM route ways (Overpass) ─► ONE ordered line, start town to end town
+ OSM places (Overpass) ─► from_osm: CaminoPlus categories ─► keep what is within the corridor of THIS line
+        closed, or a stay / cafe without a name ─► skipped.ndjson
+        the rest ─► stays + pois rows, and stage_stays + stage_pois rows (km along the stage, metres off it)
+                          │  NDJSON files in --out: read them, edit them if you must
+                          ▼  --apply: service role, PostgREST upsert on (osm_type, osm_id), then read back and count
+                  Supabase: new rows, refreshed rows, links
+```
+
+### Run it
+
+```bash
+cd tools/poi-audit
+pip install -r requirements.txt
+python import_osm.py --stage ../offline-maps/stages/camino-frances-01.json --out out/import/camino-frances-01
+python import_osm.py ... --offline              # replay from cache/, no network
+python import_osm.py ... --audit out/camino-frances-01/entities.json   # data_confidence from an audit.py run of the same stage
+# look at out/import/camino-frances-01/summary.md and the files, then send exactly those files:
+export SUPABASE_URL=...  SUPABASE_SERVICE_ROLE_KEY=...      # the service role key: server side only, never in the app
+python import_osm.py --stage ... --from-ndjson out/import/camino-frances-01 --apply
+python import_osm.py ... --apply                # or: read OSM and send in one go (the files are written first and read back)
+python import_osm.py --expand-stages 1-3,7      # the stage files a list of stage numbers stands for
+python -m unittest discover -s tests            # offline tests (trimmed real OSM answers, a mock PostgREST)
+```
+
+Exit code 0: done. 1: the OSM route or places could not be read (or came back partial), no line could be drawn through the
+route, the rows are not valid, or `--apply` refused something or did not read back what it wrote. 2: wrong command line.
+Overpass etiquette: stages are imported one at a time, `--pause` (10 s) waits between the route request and the places request
+of a stage, and the workflow waits between stages. overpass-api.de, overpass.kumi.systems and overpass.private.coffee are tried
+in that order, as the audit does.
+
+### What comes out
+
+| File in `--out` | What it is |
+|---|---|
+| `stays.ndjson` | one JSON object per line = one row of `public.stays`, with the database's column names, in column order |
+| `pois.ndjson` | the same for `public.pois` |
+| `stage_stays.ndjson`, `stage_pois.ndjson` | link rows: `stage_id`, `osm_type`, `osm_id`, `km_from_stage_start`, `detour_m`. They carry the place's OSM key instead of `stay_id` / `poi_id`, because those uuids are made by the database when the place is inserted; `--apply` swaps the key for the id |
+| `skipped.ndjson` | the places that were left out, with `reason` (`closed` or `unnamed`) and the `detail` |
+| `summary.md`, `summary.json` | counts per table and category, how many stays have an address, phone, email, website, beds and hours, what was skipped, the length of the stage line and how far the start and end towns are from it, and the date of the OSM data |
+| `apply_report.json` | only after `--apply`: counts and problems, never a secret |
+
+The files do not depend on the clock or on the order OSM happened to answer in: the same input gives byte-identical files
+(rows are sorted node, way, relation and then by id; links in stage order). A row, taken from stage 1:
+
+```json
+{"source":"osm","osm_type":"node","osm_id":1896340970,"category":"hotel","name":"Erromesen aterpetxea","route_id":"20000000-0000-0000-0000-000000000001","address":"Carretera Francia, 31650 Roncesvalles","country_code":null,"location":"SRID=4326;POINT(-1.3192808 43.0103845)","phone":"+34 948 76 00 00","email":"info@alberguederoncesvalles.com","whatsapp":null,"website":"https://alberguederoncesvalles.com/","beds":183,"opening_hours":"Mar-Oct: 13:00-22:00","data_confidence":null,"verification_level":"unverified"}
+{"stage_id":"40000000-0000-0000-0000-000000000001","osm_type":"node","osm_id":1896340970,"km_from_stage_start":24.12,"detour_m":112}
+```
+
+Measured on real Overpass answers cached on 2026-11-07 (OSM data of 2026-06 and 2026-07: the mirrors that answered lag behind
+the live map, and the importer warns when the data is more than 60 days old):
+
+| Stage | Line | In the search box | In the stage corridor | Stays + food | Pois | Skipped |
+|---|---|---|---|---|---|---|
+| 1 Saint-Jean-Pied-de-Port to Roncesvalles | 24.1 km | 768 | 194 | 81 | 109 | 4 unnamed |
+| 8 Logroño to Nájera (a city start) | 29.0 km | 1957 | 819 | 436 | 356 | 7 closed, 20 unnamed |
+| 15 Castrojeriz to Frómista | 24.6 km | 464 | 160 | 76 | 83 | 1 unnamed |
+| 22 Villadangos del Páramo to Astorga | 27.2 km | 607 | 200 | 91 | 105 | 2 closed, 2 unnamed |
+| 29 Sarria to Portomarín | 22.1 km | 1044 | 376 | 204 | 154 | 15 closed, 3 unnamed |
+
+The audit's own corridor (every route way in the search box) keeps 307 places for stage 1, the importer's 194: the rest lies
+along the next stage and the Valcarlos variant, and linking those places to stage 1 would put the albergues of Burguete on it.
+
+### The rules
+
+**Which places.** A place becomes a row when it is within `audit.BUFFER_M` of the line of *this* stage (stays 1500 m, cafes and
+restaurants 1000 m, churches and sites 1000 m, services 500 m). The line is the shortest way through the OSM route ways from the
+stage's start town to its end town (the first and last point of the stage's `fallback_route`: the catalog's coordinates). Route
+pieces that stop up to 50 m short of each other are joined. The importer refuses, and writes nothing, when the route came from
+the hand-drawn fallback, when a town is more than 1.5 km from every route way, when the ways do not connect the two towns, or when
+the line is more than twice as long as the towns are apart: a guess cannot say which places belong to a stage.
+
+**Closed and unnamed.** A place is skipped as closed when `closed_signal_keys` says so (`disused:amenity=cafe`,
+`abandoned:tourism=hostel`, `was:shop=bakery`, `disused=yes` ...), when `opening_hours` is `closed` or `off` (the audit calls that
+CLOSED_SIGNAL too), or, with `--audit`, when the audit has a CLOSED_SIGNAL finding for it (for example Overture says closed). An
+old `disused:phone` or a bar that became a supermarket is not a closure. Stays and food places without a `name` are skipped
+(`name` is NOT NULL and an unnamed albergue cannot be told from another). Unnamed pois get a neutral name from their category
+("Drinking water", "Wayside cross", "Viewpoint"...) and `tags: {"name_default": true}`, so the app can show its own translation.
+
+**Columns.** Only what OSM says, cleaned but not rewritten:
+
+| Column | From |
+|---|---|
+| `stays.category`, `pois.category` | `normalize.from_osm` (the tests prove every category is accepted by the CHECK lists in the migrations) |
+| `name` | the `name` tag (non-breaking hyphens and invisible characters removed) |
+| `address` | `addr:street` (or `addr:place`), `addr:housenumber` (before the street for French streets), `addr:postcode`, `addr:city`; `addr:full` only when none of those exists |
+| `country_code` | `addr:country`, when it is two letters |
+| `location` | `'SRID=4326;POINT(lon lat)'`; the centre of an outline for ways and relations |
+| `phone` | the first usable number of `phone`, `contact:phone`, `mobile`, `contact:mobile` (several numbers in one tag are separated by `;`; "3631" is not a number) |
+| `email`, `whatsapp` | `email` / `contact:email`; `contact:whatsapp` |
+| `website` | `website`, `contact:website`, `url`: http or https only (a bare domain gets `https://`); anything else is dropped because the app opens it |
+| `beds` | `beds` as a whole number; `capacity` only for albergues and hostels (for a hotel or a camp site it can mean rooms or pitches) |
+| `opening_hours` | as written, in OSM syntax (`Mar-Oct: 13:00-22:00`) |
+| `pois.wikidata_id` | `wikidata`, when it is `Q` and digits |
+| `stays.route_id` | the route of the stage file |
+| `source`, `verification_level` | always `osm` and `unverified`: an import never proposes a higher level |
+| `data_confidence` | the audit score of the place when `--audit` gives one, else null |
+
+`km_from_stage_start` is the distance along the line from its start, in km with two decimals; `detour_m` is the distance from the
+line in metres. A place before the start of the line gets km 0, one beyond the end gets the length of the line, each with its distance to that
+end (in stage 1, 41 of the 81 stays are in or beside Saint-Jean-Pied-de-Port, before the point where the OSM route way begins,
+so they all have km 0).
+
+### Writing to the database
+
+`--apply` reads `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` from the environment before it does anything slow. They are never
+printed, never written to a file and never put into an error: messages carry the HTTP status and the database's own error, never
+the address or the key (an address that is not `https://` is refused unless it is localhost). In order:
+
+1. **Read first.** The stage row (it must exist for this route and number), the route row (the stays point at it, so a missing
+   route stops everything before any write), and which of these places already exist. Nothing is written when a read fails.
+2. **Places**, `stays` then `pois`: `POST /rest/v1/<table>?on_conflict=osm_type,osm_id` with `Prefer: resolution=merge-duplicates`,
+   batches of 500, the ids read from the answer. A busy server (429, 5xx, no answer) is tried up to three times, a 4xx is not.
+3. **Links**, `stage_stays` then `stage_pois`, with those ids: `on_conflict=stage_id,stay_id` (or `poi_id`).
+4. **Read back.** Every place is there and the number of link rows the database holds for the stage equals the number written.
+
+An upsert overwrites every column it sends and leaves the others alone, so what is sent depends on what is already there:
+
+| Row in the database | What `--apply` does |
+|---|---|
+| none | inserts the whole row, including `source`, `route_id`, `data_confidence` and `verification_level` |
+| from OSM, unverified or `data_check`, not claimed | refreshes the OSM columns only (name, category, address, location, contact, beds, hours; a phone that is gone from OSM is removed), and leaves `source`, `route_id`, `data_confidence` and `verification_level` as they are |
+| verified by an owner, a pilgrim or an editor (`verification_level` or `verified_at`), claimed by a business (`business_id`, `owner_verified_at`: the owner edits the phone, the hours and the beds there) or owned by another `source` | not sent at all; the place is still linked to the stage |
+| deleted (`deleted_at`) | left deleted and not linked |
+
+So a re-run never lowers a trust level, never overwrites what an owner entered and never brings a deleted place back.
+
+**A stage that is missing in the database.** Its link rows are refused, the message names the stage and how many rows were held
+back, and the run exits 1. The places themselves are still written (they do not need a stage); add the stage row (it can stay
+unpublished) and run again. The seed data has the stages 1 to 3 only, and when this was written the live database had 3 of the 33
+Camino Francés stages.
+
+**Cost of a re-run.** The database's touch trigger bumps `updated_at` on every update, so every row a second run writes is one
+more change for the apps' sync, although nothing in it differs. Apply when OSM data changed, not on a timer.
+
+**Never deleted.** The importer only adds and refreshes. A place that closes in OSM later is skipped on the next run, but its old
+row (and its link) stays until someone removes it.
+
+### The workflow
+
+[`osm-import.yml`](../../.github/workflows/osm-import.yml) is started by hand (Actions > osm-import > Run workflow) with `stages`
+(digits, commas and dashes only: `1-3`, `1,5,9`) and `apply` (false by default).
+
+* Job **import** (no secret anywhere) runs the unit tests, then the importer for the stages one at a time with pauses (30 s
+  between stages, 15 s between the two requests of a stage), writes one summary per stage to the run page, and attaches the files
+  as the artifact `osm-import-files`. A stage that fails does not stop the others; the job is red at the end and names it.
+  Allow 2 to 5 minutes per stage.
+* Job **apply** runs only when `apply` is true and the import job is green, in the GitHub Environment **`osm-import`**. It
+  downloads that artifact (the files that were attached for review) and sends them with `--from-ndjson --apply`. The two secrets
+  are set on that one step, not on `pip install` or the download.
+
+One-time setup, by the repository owner: Settings > Environments > New environment `osm-import`; add the secrets `SUPABASE_URL`
+and `SUPABASE_SERVICE_ROLE_KEY` there (repository secrets are not read); add required reviewers, so that the apply job waits until
+somebody has looked at the summary and the files. The workflow does not run the audit, so `data_confidence` stays null there; run
+`audit.py` and the importer by hand with `--audit` to fill it for new rows.
+
+### The database side
+
+The upsert needs a **full** unique key on `(osm_type, osm_id)`: PostgREST cannot send the `WHERE` of a partial index, and
+Postgres answers 42P10 without a matching key. Both tables already have one, as the table-level `unique (osm_type, osm_id)` of the
+first migrations, so
+[`20261110000000_osm_import_keys.sql`](../../supabase/migrations/20261110000000_osm_import_keys.sql) changes nothing on a database
+built from the migrations (it says so in a NOTICE) and adds the key to one that was built or edited by hand. Rows without an OSM
+key (editorial, partner, user, owner) may repeat. [`osm_import_smoke.sql`](../../supabase/dev/osm_import_smoke.sql) proves it on a
+real Postgres with PostGIS, with the importer's own rows: EWKT text goes into the geography columns, the upsert statement works,
+every category is accepted, a refresh leaves the trust columns alone. `supabase/dev/validate.sh` runs it.
+
+### Data from OpenStreetMap: attribution and ODbL
+
+The data is (c) OpenStreetMap contributors, available under the [ODbL](https://opendatacommons.org/licenses/odbl/1-0/). The rows
+of `stays`, `pois` and their stage links that come from this importer are a **derived database**: show "Data (c) OpenStreetMap
+contributors" with a link to https://www.openstreetmap.org/copyright wherever they are shown, and be ready to publish an export of
+them under the ODbL (share-alike) when the database, or a substantial part of it, is made available. Every imported row keeps
+`osm_type` and `osm_id` and `source = 'osm'`, which is what makes "the OSM-derived part" easy to select. The importer never copies
+who edited a place in OSM (the `user`, `uid` and `changeset` of an element). This is a description, not legal advice.
+
+### What it does not do
+
+* **Prices, ratings, reviews: never.** OSM has none (`price_*`, `rating_*`, `review_count` are not written, nothing is invented).
+* **Photos.** `image` and `wikimedia_commons` are not turned into `image_url`: their licence is not checked yet (the audit checks
+  Commons licences; the importer waits for that). No `description`, `story`, `cover_url`, `amenities`, `labels`, `mass_times`
+  or `place_id` either.
+* **Opening hours of most places.** Few places have `opening_hours` in OSM and the rest stay null. Seasons, beds and phone numbers
+  are as complete as the mappers made them (stage 1, stays and food places together: address 75%, phone 77%, email 43%, website
+  43%, beds 30%, hours 26%).
+* **Verification.** Every row is `unverified`; `data_confidence` is only a copy of the audit score, and only when a row is created.
+* **Deleting.** Nothing is ever removed or hidden (see above), and a place that moved is a new row only if OSM gave it a new id.
+* **Variants.** A place along a variant (the Valcarlos route) is not linked to the main stage; a variant needs its own stage row.
 
 ## Pilot result (stage 1, CI run 42194220473, 2026-11-06)
 
