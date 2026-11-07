@@ -123,6 +123,9 @@ First run downloads ~1 GB of Planetiler sources (ocean polygons, Natural Earth) 
 checked against a pinned SHA-256 (Natural Earth, lake centerlines, Planetiler's placeholder water file); the ocean polygons are
 rebuilt upstream every day, so they cannot be pinned and are only checked to be a complete zip. The Planetiler image is pinned by
 digest (`scripts/planetiler_image.sh`). Set `ROUTE_FALLBACK=deny` to make the build fail instead of using the hand-placed route.
+`OCEAN_FALLBACK=deny` does the same for a coastal stage whose ocean polygons cannot be downloaded (osmdata.openstreetmap.de is
+often unreachable from GitHub's runners): by default (`allow`, for measuring) the build carries on with Planetiler's placeholder
+and the manifest says `ocean_polygons: placeholder`, a pack that has no sea and can be neither published nor calibrated from.
 
 Flags: `scripts/build_stage.sh <stage.json> [buffer_km] [maxzoom]`.
 
@@ -176,6 +179,7 @@ nothing is uploaded or registered:
 | required vector layers present (building, place, poi, transportation, transportation_name) | every default build |
 | render test: with outside requests blocked and with the device offline, each view in `render_checks` has at least the stated number of features per source layer (`min_features`) and of drawn labels per style layer (`min_labels`), **and the console, page and map error lists are empty** | every default build |
 | `route_source` is `osm` (the hand-drawn fallback is never published) | publish only |
+| `ocean_polygons` is `osmdata` for a coastal stage (a measurement build may use the placeholder, which has no sea; it only warns there) | publish only |
 | the OSM extract is at most 45 days old | publish only |
 | size and tile count within 1.5x of the pack that is live now (read from `offline_packs`) | publish only |
 | the uploaded object is read back and its SHA-256 matches | publish only |
