@@ -861,6 +861,7 @@ LICENCES_DATA = [
  ("Wikidata", "Facts about notable places", "CC0 (public domain dedication)", "https://www.wikidata.org/wiki/Wikidata:Licensing"),
  ("Wikipedia", "Text summaries of places, where we use them", "CC BY-SA 4.0 (credited and linked where shown)", "https://creativecommons.org/licenses/by-sa/4.0/"),
  ("Wikimedia Commons", "Photos of places, where we use them", "Each file has its own licence (CC0, CC BY, CC BY-SA ...); the author and licence are credited where a photo is shown", "https://commons.wikimedia.org/wiki/Commons:Licensing"),
+ ("AI-generated sample pictures and clips", "The sample journey in the app, shown before you have posts of your own", "Made by CaminoPlus with Google Nano Banana 2 and Veo 3.1 through OpenArt. AI-generated, not photographs of real places or people", "https://openart.ai/"),
 ]
 LICENCES_SOFTWARE = [
  ("Noto Sans", "Map label glyphs, bundled in the app so labels work offline", "SIL Open Font License 1.1", "https://openfontlicense.org/"),

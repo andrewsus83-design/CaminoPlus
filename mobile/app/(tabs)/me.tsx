@@ -16,6 +16,7 @@ import { useUnreadTotals } from '@/features/social';
 import { Empty, ProgressBar, shortDate } from '@/features/me/shared';
 import { Health } from '@/features/me/Health';
 import { JourneyGrid } from '@/features/me/JourneyGrid';
+import { SampleJourney } from '@/features/me/SampleJourney';
 import { updateProfile } from '@/lib/api';
 import { copyText } from '@/lib/clipboard';
 import { PickerUnavailable, pickAndUploadAvatar } from '@/lib/avatar';
@@ -248,7 +249,7 @@ export default function Me() {
         {!!error && <FormMessage>{`Could not load your data. ${error}`}</FormMessage>}
 
         {tab === 'Journey' && (!posts ? (offline ? <Empty text="You are offline. Your journey posts will show up when you are back online." /> : loading) : posts.length === 0
-          ? <Empty text="No journey posts yet. Tap the pen to write about today's stage." />
+          ? <SampleJourney />
           : <JourneyGrid posts={posts} />)}
 
         {tab === 'Plan' && (!days ? (offline ? <Empty text="You are offline and your plan is not saved on this phone yet. Open it once with a connection." /> : loading) : <PlanTracker days={days} />)}
