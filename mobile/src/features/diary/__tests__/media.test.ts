@@ -109,7 +109,7 @@ function setup(storageOpts: StorageOpts = {}, filesOpts: FilesOpts = {}) {
   return { st, fs, store, log };
 }
 
-// Run from diary.test.ts (the package's test script names only that file and wiring.test.ts, and its scripts are part of the app's native fingerprint).
+// Run from diary.test.ts (the package's test script names only that file and wiring.test.ts, so this one needs no entry of its own).
 export const finished = (async () => {
   /* ---------------------------------------------------------------- what a page keeps */
 

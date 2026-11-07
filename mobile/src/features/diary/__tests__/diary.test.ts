@@ -5,9 +5,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { AUTOSAVE_MS, createPageSaver, type SaverDeps, type SaverView } from '../autosave';
-// The rich text, and the photos, videos and place, have their own files. They run from here, because the package's test script names
-// only this file and wiring.test.ts, and the scripts of package.json are part of the app's native fingerprint: editing them would
-// make every installed app refuse the next update.
+// The rich text, and the photos, videos and place, have their own files. They run from here, so the package's test script (which
+// names only this file and wiring.test.ts) runs them without being edited.
 import './richtext.test';
 import { finished as mediaTests } from './media.test';
 import { EMPTY_CARD_LINE, PRIVACY_LINE, UNTITLED, clip, dateLine, firstLine, pagePreview, pageTitle, pagesLabel, problemMessage, thousands } from '../present';

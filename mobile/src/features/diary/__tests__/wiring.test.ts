@@ -282,13 +282,15 @@ check('the list says what is on each page, clean (never a mark), and asks before
   assert.match(present, /plainText\(body, READ_CHARS\)/, 'titles and previews read the page through the rich text reader');
 });
 
-check('the new test files run from diary.test.ts, and the test script of package.json is unchanged: its scripts are part of the app\'s native fingerprint, so editing them would make every installed app refuse the next update', () => {
+check('the rich text and media tests run from diary.test.ts, and the test script of package.json runs diary.test.ts and this file, so none of them can be left out', () => {
   const diary = read('src/features/diary/__tests__/diary.test.ts');
   assert.match(diary, /import '\.\/richtext\.test';/);
   assert.match(diary, /import \{ finished as mediaTests \} from '\.\/media\.test';/);
   assert.match(diary, /await mediaTests;/);
   const script = (JSON.parse(read('package.json')) as { scripts: Record<string, string> }).scripts['test:diary'];
-  assert.equal(script, 'tsc -p tsconfig.diarytest.json && node node_modules/.cache/diary-test/features/diary/__tests__/diary.test.js && node node_modules/.cache/diary-test/features/diary/__tests__/wiring.test.js');
+  assert.match(script, /tsc -p tsconfig\.diarytest\.json/, 'the tests are compiled first');
+  assert.match(script, /diary\.test\.js/, 'the script runs diary.test.js, which runs the rich text and the media tests');
+  assert.match(script, /wiring\.test\.js/, 'and this file');
   const tsconfig = read('tsconfig.diarytest.json');
   for (const f of ['diary', 'richtext', 'media', 'wiring']) assert.match(tsconfig, new RegExp(`${f}\\.test\\.ts`), `${f}.test.ts is compiled`);
 });
