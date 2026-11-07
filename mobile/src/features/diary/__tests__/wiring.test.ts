@@ -15,7 +15,7 @@ check('the diary uses no network and no console, and the logic files import noth
     ...fs.readdirSync(path.join(root, 'src/features/diary')).filter((f) => /\.tsx?$/.test(f)).map((f) => `src/features/diary/${f}`),
     ...fs.readdirSync(path.join(root, 'app/diary')).map((f) => `app/diary/${f}`),
   ];
-  assert.ok(files.length >= 9, `the scan must see every diary file: ${files.join(', ')}`);
+  assert.ok(files.length >= 20, `the scan must see every diary file: ${files.join(', ')}`);
   const offenders: string[] = [];
   for (const f of files) {
     read(f).split('\n').forEach((line, i) => {
@@ -90,9 +90,8 @@ check('storage.ts reads strictly, in the same places localStore writes: nothing 
   assert.doesNotMatch(storage, /createDiaryStore\(localStore\)/);
 });
 
-check('the list and the Library card read again when the screen comes back, so a page written a moment ago shows', () => {
+check('the list reads again when the screen comes back, so a page written a moment ago shows', () => {
   assert.match(read('src/features/diary/useDiary.ts'), /useFocusEffect\(/);
-  assert.match(read('src/features/diary/DiaryCard.tsx'), /useDiary\(\)/);
   assert.match(read('app/diary/index.tsx'), /useDiary\(\)/);
 });
 
@@ -103,7 +102,8 @@ check('the two pushed screens use the shared Screen without room for a tab bar, 
     const buttons = [...src.matchAll(/<IconButton\b/g)];
     assert.ok(buttons.length >= 1, f);
     for (const m of buttons) assert.match(src.slice(m.index, src.indexOf('/>', m.index)), /\blabel="|\blabel=\{/, `${f}: an IconButton without a label`);
-    for (const m of src.matchAll(/<Pressable\b/g)) assert.match(src.slice(m.index, (m.index ?? 0) + 400), /accessibilityLabel=/, `${f}: a Pressable without a label`);
+    // (a wrapper marked accessible={false} is no button for a screen reader: it hides nothing and has no label to give)
+    for (const m of src.matchAll(/<Pressable\b/g)) assert.match(src.slice(m.index, (m.index ?? 0) + 400), /accessibilityLabel=|accessible=\{false\}/, `${f}: a Pressable without a label`);
   }
   // the parts the editor is made of: every Pressable says what it does, every field has a label
   for (const f of ['FormatBar.tsx', 'MediaTiles.tsx', 'PlaceParts.tsx']) {
@@ -113,7 +113,6 @@ check('the two pushed screens use the shared Screen without room for a tab bar, 
   }
   const editor = read('app/diary/[id].tsx');
   for (const m of editor.matchAll(/<TextInput\b/g)) assert.match(editor.slice(m.index, (m.index ?? 0) + 1400), /accessibilityLabel=/, 'a field of the editor without a label');
-  assert.match(read('src/features/diary/DiaryCard.tsx'), /<Pressable accessibilityRole="button" accessibilityLabel=/);
   assert.match(read('app/diary/index.tsx'), /Write a new page/);
 });
 

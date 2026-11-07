@@ -35,8 +35,10 @@ function Tool({ icon, label, on, onPress, disabled }: { icon: IconName; label: s
  * then, when this phone can do them, a photo or video from the library and the place you are at. Edge to edge, one row of buttons
  * that are at least 48 wide; on a screen too narrow for all of them the row scrolls. Pressing a button never takes the keyboard away.
  */
-export function FormatBar({ formats, onFormat, onMedia, onPlace, mediaBusy, hasPlace }: {
+export function FormatBar({ formats, formatsOff, onFormat, onMedia, onPlace, mediaBusy, hasPlace }: {
   formats: Formats;
+  /** True while the title has the keyboard: the formats are for the text, so they are dimmed and do nothing. */
+  formatsOff?: boolean;
   onFormat: (a: FormatAction) => void;
   /** Absent when this phone cannot choose photos and videos: the button is not drawn. */
   onMedia?: () => void;
@@ -48,7 +50,7 @@ export function FormatBar({ formats, onFormat, onMedia, onPlace, mediaBusy, hasP
   return (
     <View accessibilityRole="toolbar" style={{ backgroundColor: role.surface, borderTopWidth: 1, borderTopColor: role.border }}>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} keyboardShouldPersistTaps="always" contentContainerStyle={{ flexGrow: 1, alignItems: 'center' }}>
-        {TOOLS.map((t) => <Tool key={t.action} icon={t.icon} label={t.label} on={on[t.action]} onPress={() => onFormat(t.action)} />)}
+        {TOOLS.map((t) => <Tool key={t.action} icon={t.icon} label={t.label} on={on[t.action]} disabled={formatsOff} onPress={() => onFormat(t.action)} />)}
         {(onMedia || onPlace) && <View style={{ width: 1, height: 28, backgroundColor: role.border, marginHorizontal: 2 }} />}
         {onMedia && <Tool icon="image" label="Add photos or videos" onPress={onMedia} disabled={mediaBusy} />}
         {onPlace && <Tool icon="pin" label={hasPlace ? 'Change place' : 'Add place'} onPress={onPlace} />}

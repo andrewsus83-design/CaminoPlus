@@ -88,6 +88,12 @@ export const POSTS = [
   { id: '80000000-0000-4000-8000-000000000002', body: 'Pilgrim menu in Zubiri: soup, trout, and a stamp for the credencial.', place_name: null, published_at: iso(2 * DAY), like_count: 0, comment_count: 0, media_count: 0, health_summary: null, save_count: 0, share_count: 0, user_id: UID, status: 'published', kind: 'journal', deleted_at: null },
 ];
 
+// The first post is bookmarked (the bookmark button of the journey viewer writes post_saves). The Bookmarks screen under Library reads this
+// list, then the posts it names, so the full account sweeps that screen with a row in it.
+export const POST_SAVES = [
+  { post_id: POSTS[0].id, user_id: UID, created_at: iso(DAY / 2) },
+];
+
 // ---------------------------------------------------------------- other people
 
 const HANNAH = { id: '22222222-2222-4222-8222-222222222222', username: 'hannah', display_name: 'Hannah Meyer', avatar_url: null };
@@ -162,6 +168,7 @@ function tables({ persona, data }) {
     journey_days: full ? JOURNEY_DAYS : [],
     user_stamps: full ? STAMPS : [],
     posts: full ? POSTS : [],
+    post_saves: full ? POST_SAVES : [],
     notifications: full ? NOTIFICATIONS.map((n) => ({ user_id: UID, ...n })) : [],
     messages: full ? [...MESSAGES].reverse() : [], // the app asks for the newest first
   };

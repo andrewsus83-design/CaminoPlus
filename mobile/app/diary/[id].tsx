@@ -83,6 +83,7 @@ function PageEditor({ uid, initial, goBack }: { uid: string; initial: DiaryEntry
   const [title, setTitle] = useState(initial?.title ?? '');
   const [body, setBody] = useState(initial?.body ?? '');
   const [focused, setFocused] = useState(false);
+  const [titleFocus, setTitleFocus] = useState(false);
   const [deleteFailed, setDeleteFailed] = useState(false);
   const [date] = useState(() => dateLine(initial?.createdAt ?? new Date().toISOString()));
   const { saver, view } = usePageSaver(uid, initial);
@@ -242,7 +243,9 @@ function PageEditor({ uid, initial, goBack }: { uid: string; initial: DiaryEntry
           {topBar}
           <AppText variant="small" muted>{date}</AppText>
           {!!title.trim() && <AppText variant="h3" accessibilityRole="header">{title.trim()}</AppText>}
-          <Pressable accessibilityRole="button" accessibilityLabel="Edit this page" accessibilityHint="Opens the page for writing" onPress={toggleMode}>
+          {/* A tap on the words opens the page for writing. The Edit button above is the way in for a screen reader: this wrapper is not a
+              labelled button of its own, so it cannot hide the words from one. */}
+          <Pressable accessible={false} onPress={toggleMode}>
             {body.trim() ? <RichText text={body} /> : <AppText muted>No words on this page yet. Tap to write.</AppText>}
           </Pressable>
           <MediaGrid uid={uid} items={view.media} onOpen={setViewing} />
@@ -268,8 +271,8 @@ function PageEditor({ uid, initial, goBack }: { uid: string; initial: DiaryEntry
             <TextInput
               value={title}
               onChangeText={(t) => { setTitle(t); saver.edit({ title: t }); }}
-              onFocus={() => setFocused(true)}
-              onBlur={() => setFocused(false)}
+              onFocus={() => { setFocused(true); setTitleFocus(true); }}
+              onBlur={() => { setFocused(false); setTitleFocus(false); }}
               onSubmitEditing={() => bodyRef.current?.focus()}
               returnKeyType="next"
               submitBehavior="submit"
@@ -326,7 +329,7 @@ function PageEditor({ uid, initial, goBack }: { uid: string; initial: DiaryEntry
         </View>
       </Screen>
       <View style={{ paddingBottom: keyboard ? 0 : Math.max(insets.bottom, 0), backgroundColor: role.surface }}>
-        <FormatBar formats={formats} onFormat={format} onMedia={canMedia ? () => void addMedia() : undefined} onPlace={canPlace ? addPlace : undefined} mediaBusy={busy !== 'idle'} hasPlace={view.place !== null} />
+        <FormatBar formats={formats} formatsOff={titleFocus} onFormat={format} onMedia={canMedia ? () => void addMedia() : undefined} onPlace={canPlace ? addPlace : undefined} mediaBusy={busy !== 'idle'} hasPlace={view.place !== null} />
       </View>
       {viewer}
     </KeyboardAvoidingView>

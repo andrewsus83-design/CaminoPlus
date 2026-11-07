@@ -117,6 +117,69 @@ export const SCENARIOS = [
     },
   },
   {
+    name: 'Library: no diary card; a search field, the Bookmarks button and the diary button are the top row, and the diary button opens /diary',
+    persona: 'in',
+    async run(ctx) {
+      const { page, step, go } = ctx;
+      step('open Library');
+      await go('/library');
+      step('look for the search field and the two round buttons');
+      await page.getByRole('textbox', { name: 'Search the library' }).waitFor();
+      await page.getByRole('button', { name: 'Bookmarks', exact: true }).waitFor();
+      await page.getByRole('button', { name: 'My diary', exact: true }).waitFor();
+      step('the diary card is gone: nothing on the screen has the text "My diary"');
+      await eventually(() => page.getByText('My diary', { exact: true }).count(), (n) => n === 0, { what: 'the number of "My diary" texts on Library' });
+      step('tap the diary button');
+      await page.getByRole('button', { name: 'My diary', exact: true }).click();
+      await waitPath(page, '/diary', 'the address after the diary button');
+      await back(ctx);
+      await waitPath(page, '/library', 'the address after Back');
+    },
+  },
+  {
+    name: 'Library search: all three tabs at once, grouped, a calm "nothing found", and Clear search brings the tabs back',
+    persona: 'in',
+    async run({ page, step, go }) {
+      step('open Library');
+      await go('/library');
+      const field = page.getByRole('textbox', { name: 'Search the library' });
+      step('type "pray"');
+      await field.fill('pray');
+      await page.getByText('2 results for “pray”', { exact: true }).waitFor();
+      await page.getByText('Prayers for the road', { exact: true }).waitFor();
+      await page.getByText('Prayers and blessings', { exact: true }).waitFor();
+      step('type something that is nowhere');
+      await field.fill('zzz');
+      await page.getByText('Nothing found for “zzz”', { exact: true }).waitFor();
+      step('tap Clear search');
+      await page.getByRole('button', { name: 'Clear search', exact: true }).first().click();
+      await page.getByText('Scripture for the long road', { exact: true }).waitFor();
+    },
+  },
+  {
+    name: 'Library: the Bookmarks button opens Bookmarks (Back, no tab bar) with the bookmarked row and post, and Back returns to Library',
+    persona: 'in',
+    async run(ctx) {
+      const { page, step, go } = ctx;
+      const shown = (text) => page.getByText(text, { exact: true }).filter({ visible: true }).first(); // Library stays mounted under Bookmarks
+      step('open Library');
+      await go('/library');
+      step('bookmark a row of the Bible tab');
+      await page.getByRole('button', { name: 'Bookmark: The Gospels', exact: true }).click();
+      await page.getByRole('button', { name: 'Remove bookmark: The Gospels', exact: true }).waitFor();
+      step('tap the Bookmarks button');
+      await page.getByRole('button', { name: 'Bookmarks', exact: true }).click();
+      await waitPath(page, '/library/bookmarks', 'the address after the Bookmarks button');
+      await page.getByRole('heading', { name: 'Bookmarks', exact: true }).waitFor();
+      step('the row and the bookmarked post are listed');
+      await shown('The Gospels').waitFor();
+      await page.getByText(/Sunrise over the meseta/).filter({ visible: true }).first().waitFor();
+      await eventually(() => page.getByRole('tab').count(), (n) => n === 0, { what: 'the number of tabs shown on Bookmarks (there is no tab bar there)' });
+      await back(ctx);
+      await waitPath(page, '/library', 'the address after Back');
+    },
+  },
+  {
     name: 'Stays: the stays of the stage are listed, and one opens with its details',
     persona: 'in',
     async run({ page, step, go }) {
