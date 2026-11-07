@@ -319,6 +319,27 @@ class ApplyEndToEnd(Base):
         self.assertTrue((self.tmp / "dry" / "apply_report.json").exists())
         self.assertNotIn("route:", r.stdout, "it did not read OSM")
 
+    def test_apply_in_one_go_sends_what_it_reads_back_from_the_files(self):
+        # --apply without --from-ndjson writes the files, reads them again (and checks them) and sends what it read:
+        # a file that changes after it was written, here through a patched writer, is what arrives
+        real_write = export.write_plan
+
+        def write_then_edit(plan, out):
+            real_write(plan, out)
+            path = Path(out) / "stays.ndjson"
+            rows = [json.loads(l) for l in path.read_text(encoding="utf-8").splitlines()]
+            rows[0]["name"] = "Changed on disk after it was written"
+            path.write_text("".join(export.dumps(r) + "\n" for r in rows), encoding="utf-8")
+
+        with self.mock() as m:
+            env = {"SUPABASE_URL": m.url, "SUPABASE_SERVICE_ROLE_KEY": m.key, "NO_PROXY": "127.0.0.1", "no_proxy": "127.0.0.1"}
+            with mock.patch.dict(os.environ, env), mock.patch("import_osm.export.write_plan", write_then_edit), \
+                    contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+                code = import_osm.main(self.argv("out", "--apply"))
+        self.assertEqual(code, 0)
+        first = json.loads((self.tmp / "out" / "stays.ndjson").read_text(encoding="utf-8").splitlines()[0])
+        self.assertEqual(m.places["stays"][(first["osm_type"], first["osm_id"])]["name"], "Changed on disk after it was written")
+
     def test_a_file_that_is_no_longer_valid_sends_nothing(self):
         run_main(self.argv("dry"))
         path = self.tmp / "dry" / "pois.ndjson"

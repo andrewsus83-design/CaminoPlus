@@ -229,7 +229,9 @@ the live map, and the importer warns when the data is more than 60 days old):
 | Stage | Line | In the search box | In the stage corridor | Stays + food | Pois | Skipped |
 |---|---|---|---|---|---|---|
 | 1 Saint-Jean-Pied-de-Port to Roncesvalles | 24.1 km | 768 | 194 | 81 | 109 | 4 unnamed |
+| 8 Logroño to Nájera (a city start) | 29.0 km | 1957 | 819 | 436 | 356 | 7 closed, 20 unnamed |
 | 15 Castrojeriz to Frómista | 24.6 km | 464 | 160 | 76 | 83 | 1 unnamed |
+| 22 Villadangos del Páramo to Astorga | 27.2 km | 607 | 200 | 91 | 105 | 2 closed, 2 unnamed |
 | 29 Sarria to Portomarín | 22.1 km | 1044 | 376 | 204 | 154 | 15 closed, 3 unnamed |
 
 The audit's own corridor (every route way in the search box) keeps 307 places for stage 1, the importer's 194: the rest lies

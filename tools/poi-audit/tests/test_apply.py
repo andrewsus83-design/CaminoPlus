@@ -173,7 +173,7 @@ class RowsSomebodyElseLooksAfter(unittest.TestCase):
 
     def setUp(self):
         self.mock = healthy()
-        rows = [r for r in self.plan.stays if r["osm_type"] == "node"][:8]
+        rows = [r for r in self.plan.stays if r["osm_type"] == "node"][:9]
         self.keys = [(r["osm_type"], r["osm_id"]) for r in rows]
         k = self.keys
         m = self.mock
@@ -181,11 +181,12 @@ class RowsSomebodyElseLooksAfter(unittest.TestCase):
             "editor": m.add_place("stays", *k[0], verification_level="editor", name="Edited by hand", phone="+34 111 111 111"),
             "owner": m.add_place("stays", *k[1], verification_level="owner", name="Owner's name"),
             "editorial": m.add_place("stays", *k[2], source="editorial", name="Editorial row"),
-            "claimed": m.add_place("stays", *k[3], business_id="b0000000-0000-0000-0000-000000000001",
-                                   owner_verified_at="2026-10-01T00:00:00Z", verified_at="2026-10-01T00:00:00Z", name="Claimed by a business"),
-            "verified_at": m.add_place("stays", *k[4], verified_at="2026-09-01T00:00:00Z", name="Checked"),
-            "data_check": m.add_place("stays", *k[5], verification_level="data_check", data_confidence=88, name="Old OSM name"),
-            "deleted": m.add_place("stays", *k[6], deleted_at="2026-08-01T00:00:00Z", name="Deleted by an editor"),
+            # each way of being looked after, on its own: removing one rule from classify() must fail a test
+            "claimed": m.add_place("stays", *k[3], business_id="b0000000-0000-0000-0000-000000000001", name="Claimed by a business"),
+            "owner_verified_at": m.add_place("stays", *k[4], owner_verified_at="2026-10-01T00:00:00Z", name="Verified by its owner"),
+            "verified_at": m.add_place("stays", *k[5], verified_at="2026-09-01T00:00:00Z", name="Checked"),
+            "data_check": m.add_place("stays", *k[6], verification_level="data_check", data_confidence=88, name="Old OSM name"),
+            "deleted": m.add_place("stays", *k[7], deleted_at="2026-08-01T00:00:00Z", name="Deleted by an editor"),
         }
 
     def apply(self):
@@ -197,20 +198,21 @@ class RowsSomebodyElseLooksAfter(unittest.TestCase):
 
     def test_rows_that_people_or_other_sources_look_after_are_not_written_at_all(self):
         report = self.apply()
-        for i, name in ((0, "Edited by hand"), (1, "Owner's name"), (2, "Editorial row"), (3, "Claimed by a business"), (4, "Checked")):
-            self.assertEqual(self.stored(i)["name"], name, "the importer must not overwrite it")
+        for i, name in ((0, "Edited by hand"), (1, "Owner's name"), (2, "Editorial row"), (3, "Claimed by a business"),
+                        (4, "Verified by its owner"), (5, "Checked")):
+            self.assertEqual(self.stored(i)["name"], name, f"the importer must not overwrite row {i}")
         self.assertEqual(self.stored(0)["phone"], "+34 111 111 111")
         self.assertEqual(self.stored(0)["verification_level"], "editor")
-        self.assertEqual(report["places"]["stays"]["left_alone"], 5)
+        self.assertEqual(report["places"]["stays"]["left_alone"], 6)
 
     def test_but_they_are_still_on_the_stage(self):
         self.apply()
-        for i in range(5):
+        for i in range(6):
             self.assertIn((STAGE_ID, self.stored(i)["id"]), self.mock.links["stage_stays"], f"row {i} is on the stage whoever looks after it")
 
     def test_a_row_the_audit_checked_is_refreshed_but_keeps_its_trust_columns(self):
         report = self.apply()
-        row = self.stored(5)
+        row = self.stored(6)
         self.assertNotEqual(row["name"], "Old OSM name")
         self.assertEqual((row["verification_level"], row["data_confidence"]), ("data_check", 88))
         self.assertEqual(self.ids["data_check"], row["id"])
@@ -218,7 +220,7 @@ class RowsSomebodyElseLooksAfter(unittest.TestCase):
 
     def test_a_deleted_place_stays_deleted_and_is_not_linked(self):
         report = self.apply()
-        row = self.stored(6)
+        row = self.stored(7)
         self.assertEqual((row["deleted_at"], row["name"]), ("2026-08-01T00:00:00Z", "Deleted by an editor"))
         self.assertNotIn((STAGE_ID, self.ids["deleted"]), self.mock.links["stage_stays"])
         self.assertEqual(report["places"]["stays"]["deleted"], 1)
@@ -226,7 +228,7 @@ class RowsSomebodyElseLooksAfter(unittest.TestCase):
 
     def test_the_rest_of_the_places_are_new(self):
         report = self.apply()
-        self.assertEqual(report["places"]["stays"]["new"], len(self.plan.stays) - 7)
+        self.assertEqual(report["places"]["stays"]["new"], len(self.plan.stays) - 8)
         self.assertTrue(report["verified"])
 
 
