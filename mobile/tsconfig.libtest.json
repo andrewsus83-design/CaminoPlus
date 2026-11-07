@@ -24,6 +24,7 @@
     "src/lib/__tests__/actionRail.test.ts",
     "src/lib/__tests__/optimistic.test.ts",
     "src/lib/__tests__/postActions.test.ts",
-    "src/lib/__tests__/railStandard.test.ts"
+    "src/lib/__tests__/railStandard.test.ts",
+    "src/lib/__tests__/navigation.test.ts"
   ]
 }

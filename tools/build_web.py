@@ -59,6 +59,7 @@ I = {
  "sync": '<path d="M20 11a8 8 0 0 0-14.9-3M4 4v4h4M4 13a8 8 0 0 0 14.9 3M20 20v-4h-4"/>',
  "users": '<circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-3.5 3-5.5 7-5.5s7 2 7 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M22 20c0-3-2-5-5-5.4"/>',
  "stamp": '<circle cx="12" cy="12" r="9"/><path d="M12 6.5v11M7.5 10.5h9"/>',
+ "book": '<path d="M12 7.5C10.7 6.3 8.7 5.5 6.2 5.5H3.5v12h2.7c2.5 0 4.5.8 5.8 2 1.3-1.2 3.3-2 5.8-2h2.7v-12h-2.7c-2.5 0-4.5.8-5.8 2Z"/><path d="M12 7.5v12"/>',
  "headphones": '<path d="M3 18v-6a9 9 0 0 1 18 0v6"/><rect x="3" y="14" width="4" height="7" rx="2"/><rect x="17" y="14" width="4" height="7" rx="2"/>',
  "trophy": '<path d="M8 4h8v5a4 4 0 0 1-8 0V4zM8 6H4.5a3.5 3.5 0 0 0 4 4.5M16 6h3.5a3.5 3.5 0 0 1-4 4.5M12 13v4M8 21h8M9.5 17h5"/>',
  "sun": '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5 19 19M5 19l1.5-1.5M17.5 6.5 19 5"/>',
@@ -256,7 +257,8 @@ TABS = [
    "Passport &amp; stamps: a digital credencial, each stamp with its story",
    "Plan: a stage-by-stage tracker for where you sleep tonight and tomorrow",
    "Health from your smartwatch: steps, distance and heart rate",
-   "Friends and messages behind the bell: friend requests, notifications, chats and group chats with pilgrims"],
+   "Friends and messages behind the bell: friend requests, notifications, chats and group chats with pilgrims",
+   "Settings behind the gear at the top right: subscription and storage, account and password, light or dark mode, your smartwatch and your business listing"],
   [("me-journey", "Me tab: profile and journey feed"), ("me-passport", "Passport with collected stamps")]),
  ("stays", "bed", "Stays", "Albergues, hostels and cafés on your stage.",
   "Search and filter places to sleep and eat along the way, then open a detail page with photos, beds, reviews and opening hours, the way you know from travel apps.",
@@ -279,12 +281,12 @@ TABS = [
    "Topic tabs at the top for the kind of stories you want",
    "Photos of you: buy shots other pilgrims took of you on the way <span class=\"tag gold\">Coming later</span>"],
   [("discover", "Discover full-screen stories"), ("discover-photos", "Photos of you marketplace")]),
- ("settings", "sliders", "Settings", "Everything else, kept simple.",
-  "Manage your subscription and storage, change your password and connect your watch. No clutter.",
-  ["Billing and subscription, with extra storage when you need it",
-   "Account and password, sign in with email or Google",
-   "Connect Apple Watch or Garmin"],
-  [("settings", "Settings screen"), ("me-plan", "Plan stage tracker")]),
+ ("library", "book", "Library", "Scripture, books and music for the road.",
+  "A banner, your private diary and three tabs: Bible, Books and Music. We are still choosing which Bible translation, which books and which music we are allowed to include, so those tabs show examples today and say so.",
+  [f"Bible, Books and Music, one tab each {COMING}",
+   "A private diary: tap the gold button, write, and the page is saved on your phone. It is not uploaded or shared, so it is not backed up either",
+   "The diary works without a signal and stays on your phone when you log out"],
+  [("library", "Library tab with the banner, the diary and the Bible tab")]),
 ]
 
 # The routes of the route picker, in the order of the database (supabase/migrations/..._more_caminos.sql).
@@ -348,7 +350,7 @@ FAQ = [
   ("who-sees", "Who can see my journey?", "<p>You choose who sees each post you share. Your journey is yours.</p>"),
   ("chat-privacy", "Are my messages private?", "<p>Messages in chats and group chats are only shown to the people in the chat, but they are stored on our servers and are <b>not end-to-end encrypted</b>. Do not send passwords or card numbers in chat. You can unsend your own messages, and they are deleted with your account. Details are in the <a href=\"/privacy\">Privacy Policy</a>.</p>"),
   ("sell", "Do you sell my data?", "<p>No. We do not sell personal data, and we do not run third-party ad tracking in the app.</p>"),
-  ("delete", "How do I delete my account?", "<p>In the app, go to Settings, then Account, then Delete account. That button is being finished and will be in the first release; until it is in your version, email <a href=\"mailto:privacy@camino.plus\">privacy@camino.plus</a> from the address you signed up with and we will do it for you. We delete your account and your data, including your messages, within 30 days, apart from what we must keep by law, such as billing records.</p>"),
+  ("delete", "How do I delete my account?", "<p>In the app, go to Settings (the gear at the top right of Me), then Account, then Delete account. That button is being finished and will be in the first release; until it is in your version, email <a href=\"mailto:privacy@camino.plus\">privacy@camino.plus</a> from the address you signed up with and we will do it for you. We delete your account and your data, including your messages, within 30 days, apart from what we must keep by law, such as billing records.</p>"),
  ]),
  ("routes", "Routes", [
   ("routes-which", "Which Camino routes are included?", "<p>All the main Camino de Santiago routes, including the Francés, Portugués (Central, Coastal and from Lisbon), del Norte, Primitivo, Vía de la Plata, Inglés, Finisterre and Muxía, and more. Stage plans and offline maps arrive route by route, starting with the Francés. See <a href=\"/routes\">Routes</a> for the full list.</p>"),
@@ -526,7 +528,7 @@ def features():
              ("shield", "Private by design", "You choose who sees each post. Export or delete your data any time.")]
     cards = "".join(f'<article class="card"><span class="ic">{icon(a)}</span><h4>{b}</h4><p>{c}</p></article>' for a, b, c in extra)
     body = head("Features", "Five tabs. One Camino.",
-        "Me, Stays, Maps, Discover and Settings. Here is what each tab does, with screens from our app design.",
+        "Me, Stays, Maps, Discover and Library. Here is what each tab does, with screens from our app design.",
         f'<nav class="tabs-nav" aria-label="Jump to" style="margin-top:32px;margin-bottom:0">{nav}</nav>', photo="santiago-street", pos="center 62%")
     body += f'''<section class="section" style="padding-top:24px"><div class="wrap">{rows}
   <p class="muted" style="margin-top:8px;font-size:15px">The screens are previews rendered from our app design. The app is still in development, so details can change before launch.</p>
@@ -536,7 +538,7 @@ def features():
   <div class="grid c3">{cards}</div>
 </div></section>
 {cta()}'''
-    page("features", "Features", "Me, Stays, Maps, Discover and Settings: see every feature of the CaminoPlus app, from offline maps and stamps to stays, stories and smartwatch sync.", body, "features")
+    page("features", "Features", "Me, Stays, Maps, Discover and Library: see every feature of the CaminoPlus app, from offline maps and stamps to stays, stories and smartwatch sync.", body, "features")
 
 def routes():
     cards = ""

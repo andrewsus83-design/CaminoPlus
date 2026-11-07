@@ -17,7 +17,7 @@ const FAQ: { q: string; a: string }[] = [
   { q: 'What does the help bell do?', a: 'It sends your last known position and a short message to the friends you choose. In an emergency call 112 first. CaminoPlus does not call anyone for you and cannot promise that a friend will see your message in time.' },
   { q: 'Why can I not upload photos or videos?', a: 'Photos and videos in posts and chats are saved in the cloud, which is part of Pilgrim Plus, together with offline maps. The rest of the basic app, including your plan, is free.' },
   { q: 'A place on the map is wrong or missing', a: 'Thank you for telling us. Choose Send feedback, pick "A problem" and write the name of the place and the stage. We cross-check it against the open map data before we change anything.' },
-  { q: 'How do I delete my account?', a: 'Open Settings, then Edit account, then Delete account. Cancel Pilgrim Plus in the App Store or Google Play first, because deleting your account does not cancel the subscription.' },
+  { q: 'How do I delete my account?', a: 'Open Me, tap the gear at the top right to open Settings, then Edit account, then Delete account. Cancel Pilgrim Plus in the App Store or Google Play first, because deleting your account does not cancel the subscription.' },
 ];
 
 function Question({ q, a, first }: { q: string; a: string; first: boolean }) {

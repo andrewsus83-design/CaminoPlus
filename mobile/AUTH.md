@@ -20,8 +20,8 @@ The app signs people in with Supabase Auth on the EU project `xgikdabgdqmbdgagow
 Flow: signed out goes to **Welcome**. After sign-in the `on_auth_user_created` trigger has already
 created `profiles`, `user_settings`, storage and subscription rows. If the user has no `journeys`
 row yet they see **Onboarding**, which saves the display name, creates a journey on the chosen route
-and a `journey_days` plan from the chosen stage onward. Then the five tabs open. Sign out is in
-**Settings > Account**. Everything goes through RLS with the publishable key; no service key is in
+and a `journey_days` plan from the chosen stage onward. Then the five tabs open. Sign out is the round
+button at the top right of **Settings**, which opens from the gear at the top right of Me. Everything goes through RLS with the publishable key; no service key is in
 the app.
 
 Email links (confirm, reset) and Google return to `caminoplus://auth-callback` (a build) or
@@ -60,7 +60,7 @@ The app has to open on the trail, so it never waits for the network to decide wh
 
 ## Deleting an account
 
-Settings > Account > Delete account (also under Edit account; `app/delete-account.tsx`). The pilgrim types DELETE;
+Me > gear > Settings > Account > Delete account (also under Edit account; `app/delete-account.tsx`). The pilgrim types DELETE;
 the app calls the `delete-account` edge function (service role: removes the user's files, then the auth
 user; the database cascades the rest) and signs out. Subscriptions are billed by the stores and are not
 cancelled by deletion; the screen says so.
