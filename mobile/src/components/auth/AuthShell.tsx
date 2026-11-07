@@ -31,7 +31,9 @@ export function AuthShell({ title, lead, back = true, hero, children, footer }: 
       )}
       <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ flexGrow: 1, paddingTop: insets.top + layout.screenTop, paddingBottom: insets.bottom + 24, paddingHorizontal: layout.screenMargin, gap: 24 }}>
         {back && <IconButton name="back" label="Back" onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))} />}
-        <View style={{ gap: 8, marginTop: hero ? 90 : back ? 0 : 24 }}>
+        {/* Only the hero title is pushed down (it sits below the photo). Without a back button the title is the first
+            element and starts at the same distance from the camera as everything else: no margin of its own. */}
+        <View style={{ gap: 8, marginTop: hero ? 90 : 0 }}>
           <AppText variant="h2">{title}</AppText>
           {!!lead && <AppText variant="lead" muted>{lead}</AppText>}
         </View>
