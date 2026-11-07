@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node10",
+    "ignoreDeprecations": "6.0",
+    "target": "es2022",
+    "strict": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "types": ["node"],
+    "outDir": "node_modules/.cache/diary-test",
+    "rootDir": "src"
+  },
+  "files": [
+    "src/features/diary/__tests__/diary.test.ts",
+    "src/features/diary/__tests__/wiring.test.ts"
+  ]
+}

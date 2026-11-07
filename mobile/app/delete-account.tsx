@@ -7,6 +7,7 @@ import { Icon } from '@/components/Icon';
 import { Pill } from '@/components/Pill';
 import { Card, IconButton } from '@/components/ui';
 import { FormMessage } from '@/components/auth/Field';
+import { clearDiary } from '@/features/diary/storage';
 import { useAuth } from '@/lib/auth';
 import { supabase } from '@/lib/supabase';
 import { assertOnline, isOfflineError } from '@/lib/net';
@@ -20,12 +21,13 @@ const WILL_GO = [
   'Your posts, photos and videos',
   'Your friends, chats and group memberships',
   'Everything saved for you in the cloud',
+  'The pages of your diary on this phone',
 ];
 
 export default function DeleteAccount() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { signOut } = useAuth();
+  const { session, signOut } = useAuth();
   const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -35,10 +37,17 @@ export default function DeleteAccount() {
     if (!confirmed || busy) return;
     setBusy(true);
     setError(null);
+    const uid = session?.user.id; // read now: once signed out there is no session to ask
     try {
       await assertOnline();
       const { error: e } = await supabase.functions.invoke('delete-account', { body: { confirm: 'DELETE' } });
       if (e) throw e;
+      // The account is gone, so is the diary. It exists only on this phone and is the one thing signing out keeps
+      // (src/features/diary/store.ts), so it is cleared here, and only after the server said yes. Nothing that goes
+      // wrong while clearing it may stop the deletion from finishing: the sign-out below must always happen.
+      if (uid) {
+        try { await clearDiary(uid); } catch { /* clearDiary does not throw; this keeps it that way for the flow */ }
+      }
       Alert.alert('Account deleted', 'Your account and your data were deleted. Thank you for walking with us. Buen Camino!');
       await signOut(); // clears this phone; the route guard then returns to the welcome screen
     } catch (e) {
