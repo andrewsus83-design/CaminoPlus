@@ -14,6 +14,13 @@ inputs:
       allow: measurement run, the hand-placed route may stand in when OSM has too little of the route.
       deny: publishing run, the build fails instead (a pack from the wrong corridor must not ship).
     default: 'allow'
+  ocean-fallback:
+    description: >
+      allow: measurement run, a coastal stage may be built with Planetiler's placeholder instead of the real ocean
+      polygons when osmdata.openstreetmap.de cannot be reached (it often cannot from GitHub's runners). That pack has no sea:
+      its manifest says so, and it can be neither published nor calibrated from.
+      deny: publishing run, the build fails instead (a coastal pack without the sea must not ship).
+    default: 'allow'
   publishing:
     description: "'true' adds the publishing gates (route from OSM, fresh OSM data) to the quality check."
     default: 'false'
@@ -76,6 +83,7 @@ runs:
       working-directory: tools/offline-maps
       env:
         ROUTE_FALLBACK: ${{ inputs.route-fallback }}
+        OCEAN_FALLBACK: ${{ inputs.ocean-fallback }}
       run: scripts/build_stage.sh "$STAGE"
 
     - name: Quality gates (size, tiles, layers, route source)

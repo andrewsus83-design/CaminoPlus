@@ -142,6 +142,16 @@ test('a fallback route is refused before anything touches the network', async ()
   assert.equal(mock.calls.length, 0);
 });
 
+test('a coastal pack built without the ocean polygons is refused before anything touches the network', async () => {
+  const mock = await mockSupabase();
+  const f = await fixture({ coastal: true, ocean_polygons: 'placeholder' });
+  const r = await publish(f, mock);
+  await mock.close();
+  assert.equal(r.code, 1);
+  assert.match(r.out, /this stage is coastal but its ocean polygons are 'placeholder', not 'osmdata'/);
+  assert.equal(mock.calls.length, 0);
+});
+
 test('a dry run enforces the gates too', async () => {
   const f = await fixture({ tiles: 3 });
   const r = await publish(f, null, ['--dry-run']);

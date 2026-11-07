@@ -10,10 +10,13 @@
 #     schedule, or manual with "publish"  the stages that have a "quality" band (calibrated ones), narrowed by "stages"
 # - build job (pull_request touching tools/offline-maps, or a manual run without "publish"): one job per
 #   planned stage, 6 at a time. Every stage proves its pack renders offline; stage 1 also builds several
-#   corridor widths / zooms and reports the real sizes. Never uploads a pack and never sees a secret.
+#   corridor widths / zooms and reports the real sizes. Never uploads a pack and never sees a secret. A coastal
+#   stage whose ocean polygons cannot be downloaded (osmdata.openstreetmap.de is often unreachable from the
+#   runners) is built here with a placeholder and a warning: it proves the stage builds and renders, nothing more.
 # - publish job (monthly schedule, or a manual run with "publish"): one job per calibrated stage, 2 at a
-#   time, the same build with the stricter gates (route must come from OSM, OSM data must be fresh, size
-#   and tile count inside the band of the stage file and close to the live pack), then upload + register
+#   time, the same build with the stricter gates (route must come from OSM, the ocean polygons of a coastal stage
+#   must be the real ones, OSM data must be fresh, size and tile count inside the band of the stage file and
+#   close to the live pack), then upload + register
 #   through public.register_offline_pack. It runs in the GitHub Environment "pack-publish": the owner can
 #   add required reviewers there, so nothing reaches Pilgrim Plus users without an approval.
 #
@@ -171,6 +174,7 @@ jobs:
       - uses: ./.github/actions/build-offline-pack
         with:
           route-fallback: allow
+          ocean-fallback: allow
           publishing: 'false'
 
       # Stage 1 is the canary: the one stage whose corridor widths and zooms are measured (README, "Measured sizes").
@@ -237,6 +241,7 @@ jobs:
       - uses: ./.github/actions/build-offline-pack
         with:
           route-fallback: deny
+          ocean-fallback: deny
           publishing: 'true'
 
       # The only step that sees secrets. Everything before it (apt, pip, npm, Planetiler) ran without them.
