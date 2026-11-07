@@ -168,15 +168,22 @@ const diaryFiles = (): string[] => [
 ];
 const code = (f: string) => read(f).split('\n').map((line) => line.replace(/\/\/.*$/, '')).join('\n');
 
-check('every native module the diary can use is asked for first (requireOptionalNativeModule) and only then required, and nothing imports one at the top: an older app must not crash on a module it does not have', () => {
+check('every native module the diary can use is asked for first (hasNativeModule, which asks requireOptionalNativeModule) and only then required, and nothing imports one at the top: an older app must not crash on a module it does not have', () => {
   const device = code('src/features/diary/device.ts');
-  for (const [native, pkg] of [['ExponentImagePicker', 'expo-image-picker'], ['ExpoLocation', 'expo-location'], ['ExpoVideo', 'expo-video']]) {
-    const asked = device.indexOf(`requireOptionalNativeModule('${native}')`);
+  const helper = read('src/lib/optionalNative.ts');
+  for (const [key, native, pkg] of [['imagePicker', 'ExponentImagePicker', 'expo-image-picker'], ['location', 'ExpoLocation', 'expo-location'], ['video', 'ExpoVideo', 'expo-video']]) {
+    const asked = device.indexOf(`hasNativeModule(NativeName.${key})`);
     const required = device.indexOf(`require('${pkg}')`);
-    assert.ok(asked > 0 && required > asked, `${pkg}: the phone is asked for ${native} before the package is required`);
+    assert.ok(asked > 0 && required > asked && required - asked < 400, `${pkg}: the phone is asked for ${native} right before the package is required`);
     assert.equal(device.split(`require('${pkg}')`).length - 1, 1, `${pkg} is required in one place`);
+    assert.ok(helper.includes(`${key}: '${native}'`), `the helper knows the name ${native}`);
+    const build = path.join(root, 'node_modules', pkg, 'build');
+    if (fs.existsSync(build)) {
+      const text = fs.readdirSync(build).filter((f) => f.endsWith('.js')).map((f) => fs.readFileSync(path.join(build, f), 'utf8')).join('\n');
+      assert.ok(text.includes(`('${native}')`), `${pkg} asks for a native module called ${native}: a wrong name would switch the feature off for everybody`);
+    }
   }
-  assert.match(device, /import \{ requireOptionalNativeModule \} from 'expo';/);
+  assert.match(device, /import \{ NativeName, hasNativeModule \} from '@\/lib\/optionalNative';/);
   assert.match(device, /Platform\.OS === 'web'/, 'and the web is guarded as well');
   for (const f of diaryFiles()) {
     const src = code(f);

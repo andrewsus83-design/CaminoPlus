@@ -2,15 +2,16 @@
 //
 // Every one of them is a native module that an older installed app may not have, and in a development build Metro shows a module
 // whose evaluation throws as a fatal red screen even when the require sits in a try/catch (it did for expo-updates on Settings).
-// So each module is first asked for by its native name with requireOptionalNativeModule, and only when the phone has it is the
-// package required; when it is missing the matching button is not drawn and the screen says, in one line, that it needs the newest
-// app. Nothing is imported at the top of this file except React Native and expo itself. On the web (device.web.ts) none of it exists.
+// So each module is first asked for by its native name (hasNativeModule, src/lib/optionalNative.ts, which asks
+// requireOptionalNativeModule), and only when the phone has it is the package required; when it is missing the matching button is
+// not drawn and the screen says, in one line, that it needs the newest app. Nothing is imported at the top of this file except
+// React Native and the helper. On the web (device.web.ts) none of it exists.
 //
 // Nothing here sends anything anywhere. The one thing that can reach a server is outside this app's code: the phone's own map
 // service, asked by expo-location's reverse geocoding for the name of a place (Apple Maps on an iPhone, Google on Android), which is
 // why the screen says so before the position is read.
 import { Linking, Platform } from 'react-native';
-import { requireOptionalNativeModule } from 'expo';
+import { NativeName, hasNativeModule } from '@/lib/optionalNative';
 import { mediaUri } from './files';
 import type { PickedAsset } from './media';
 import { mapsUrl, nameFromAddress, placeFromFix, type PlaceFailure } from './place';
@@ -27,9 +28,8 @@ let video: Vid | null | undefined;
 function loadPicker(): Picker | null {
   if (picker !== undefined) return picker;
   picker = null;
-  if (Platform.OS === 'web') return picker;
+  if (Platform.OS === 'web' || !hasNativeModule(NativeName.imagePicker)) return picker;
   try {
-    if (requireOptionalNativeModule('ExponentImagePicker') == null) return picker;
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const m = require('expo-image-picker') as Picker;
     if (typeof m.launchImageLibraryAsync === 'function') picker = m;
@@ -42,9 +42,8 @@ function loadPicker(): Picker | null {
 function loadLocation(): Loc | null {
   if (location !== undefined) return location;
   location = null;
-  if (Platform.OS === 'web') return location;
+  if (Platform.OS === 'web' || !hasNativeModule(NativeName.location)) return location;
   try {
-    if (requireOptionalNativeModule('ExpoLocation') == null) return location;
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const m = require('expo-location') as Loc;
     if (typeof m.getCurrentPositionAsync === 'function') location = m;
@@ -57,9 +56,8 @@ function loadLocation(): Loc | null {
 function loadVideo(): Vid | null {
   if (video !== undefined) return video;
   video = null;
-  if (Platform.OS === 'web') return video;
+  if (Platform.OS === 'web' || !hasNativeModule(NativeName.video)) return video;
   try {
-    if (requireOptionalNativeModule('ExpoVideo') == null) return video;
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const m = require('expo-video') as Vid;
     if (typeof m.useVideoPlayer === 'function') video = m;
