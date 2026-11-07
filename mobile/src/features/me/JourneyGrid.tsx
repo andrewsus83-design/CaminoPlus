@@ -84,9 +84,11 @@ function PostVisual({ post, media, index, active, small }: { post: Post; media?:
   );
 }
 
-export function JourneyGrid({ posts, margin = layout.screenMargin, sample }: { posts: Post[]; margin?: number; sample?: Record<string, Visual[]> }) {
+export function JourneyGrid({ posts, margin = layout.screenMargin, sample, media: given, only }: { posts: Post[]; margin?: number; sample?: Record<string, Visual[]>; media?: Record<string, Visual[]>; only?: ReadonlySet<string> | null }) {
   // `sample`: the bundled sample journey. Its pictures and clips come with the app, so nothing is fetched.
-  const [media, setMedia] = useState<Record<string, Visual[]>>(sample ?? {});
+  // `media`: the pictures when the screen has already fetched them (Me shares one fetch with the highlights), so nothing is fetched here either.
+  const [own, setOwn] = useState<Record<string, Visual[]>>(sample ?? {});
+  const media = given ?? own;
   const [openAt, setOpenAt] = useState<number | null>(null);
   const { width } = useWindowDimensions();
   // The rail's state lives here, not in the viewer: the grid stays while the viewer opens and closes, so a like keeps its count.
@@ -95,13 +97,16 @@ export function JourneyGrid({ posts, margin = layout.screenMargin, sample }: { p
   const { colW, tileH, gap, marginHorizontal } = gridMetrics(width, { margin, pixelRatio: PixelRatio.get() });
 
   useEffect(() => {
-    if (sample) return;
+    if (sample || given) return;
     const ids = posts.filter((p) => p.media_count > 0).map((p) => p.id);
-    listPostMediaUrls(ids).then(setMedia).catch(() => {});
-  }, [posts, sample]);
+    listPostMediaUrls(ids).then(setOwn).catch(() => {});
+  }, [posts, sample, given]);
 
+  // `only`: show just these posts (the destination picked in the highlights). The rail and the pictures above keep working on
+  // all of `posts`, so picking a destination, and going back to all, asks the network for nothing. The viewer pages through what is shown.
+  const shown = useMemo(() => (only ? posts.filter((p) => only.has(p.id)) : posts), [posts, only]);
   // Even rows of two tiles. The only space between tiles is `gap` (2 px, sideways and downwards); the page background shows through it.
-  const rows = useMemo(() => gridRows(posts.length), [posts.length]);
+  const rows = useMemo(() => gridRows(shown.length), [shown.length]);
 
   return (
     <>
@@ -109,7 +114,7 @@ export function JourneyGrid({ posts, margin = layout.screenMargin, sample }: { p
         {rows.map((row, r) => (
           <View key={r} style={{ flexDirection: 'row', gap }}>
             {row.map((i) => {
-              const p = posts[i];
+              const p = shown[i];
               const first = media[p.id]?.[0];
               const count = Math.max(media[p.id]?.length ?? 0, p.media_count);
               return (
@@ -129,7 +134,7 @@ export function JourneyGrid({ posts, margin = layout.screenMargin, sample }: { p
           </View>
         ))}
       </View>
-      {openAt !== null && <Viewer posts={posts} media={media} start={openAt} rail={rail} sampleLabel={sample ? SAMPLE_VIEWER_LABEL : undefined} onClose={() => setOpenAt(null)} />}
+      {openAt !== null && <Viewer posts={shown} media={media} start={openAt} rail={rail} sampleLabel={sample ? SAMPLE_VIEWER_LABEL : undefined} onClose={() => setOpenAt(null)} />}
     </>
   );
 }
