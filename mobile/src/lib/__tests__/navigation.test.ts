@@ -167,8 +167,9 @@ check('Library has no title and no diary card: its first row is the search field
   assert.doesNotMatch(screen, /DiaryCard/, 'the diary card is back');
   assert.ok(!exists(join('src', 'features', 'diary', 'DiaryCard.tsx')), 'the DiaryCard component is meant to be gone');
   assert.deepEqual(files.filter((f) => /DiaryCard/.test(read(f))), [], 'something still refers to the DiaryCard');
-  // a screen reader still gets the heading of the screen: hidden (1 x 1, clipped, see-through) and first in the screen
-  assert.match(screen, /const VISUALLY_HIDDEN = \{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', opacity: 0 \} as const;/);
+  // a screen reader still gets the heading of the screen: hidden (1 x 1, clipped, see-through letters: not opacity 0 or hidden, which a
+  // screen reader leaves out) and first in the screen
+  assert.match(screen, /const VISUALLY_HIDDEN = \{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', color: 'transparent' \} as const;/);
   const hidden = screen.indexOf('<AppText accessibilityRole="header" style={VISUALLY_HIDDEN}>Library</AppText>');
   const header = screen.indexOf('<LibraryHeader ');
   assert.ok(hidden > 0 && header > hidden, 'the hidden heading comes first, then the header row');
@@ -216,7 +217,9 @@ check('the search field: placeholder and label, the "search" key, no autocorrect
   const src = read(join('src', 'features', 'library', 'SearchBar.tsx'));
   assert.match(src, /SEARCH_PLACEHOLDER = 'Search the Library'/);
   assert.match(src, /SEARCH_LABEL = 'Search the library'/);
-  assert.match(src, /placeholder=\{SEARCH_PLACEHOLDER\}/);
+  assert.match(src, /placeholder=\{narrow \? SEARCH_PLACEHOLDER_NARROW : SEARCH_PLACEHOLDER\}/, 'the whole sentence, or "Search" on a phone under 352 wide where it would be cut in the middle of a word');
+  assert.match(src, /SEARCH_PLACEHOLDER_NARROW = 'Search'/);
+  assert.match(src, /NARROW_UNDER = 352/);
   assert.match(src, /accessibilityLabel=\{SEARCH_LABEL\}/);
   assert.match(src, /returnKeyType="search"/);
   assert.match(src, /autoCorrect=\{false\}/);

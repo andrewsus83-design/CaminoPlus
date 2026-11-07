@@ -21,8 +21,10 @@ import { useLibraryBookmarks } from '@/features/library/useLibraryBookmarks';
 // The tabs hold example content until we have chosen what we may include (see features/library/sample.ts); each tab and the search
 // say so. The diary is real: it is written and kept on this phone (features/diary), and its card is gone from here, the button leads to it.
 
-// Read by a screen reader (the heading of the screen, "Library") and not drawn: there is no title on the screen, the search field is the first thing.
-const VISUALLY_HIDDEN = { position: 'absolute', width: 1, height: 1, overflow: 'hidden', opacity: 0 } as const;
+// Read by a screen reader (the heading of the screen, "Library") and not drawn: there is no title on the screen, the search field is the
+// first thing. 1 x 1 and clipped, with see-through letters, and not opacity 0 or hidden: VoiceOver and TalkBack leave a view that is
+// not visible out, and then there would be no heading to jump to.
+const VISUALLY_HIDDEN = { position: 'absolute', width: 1, height: 1, overflow: 'hidden', color: 'transparent' } as const;
 
 export default function Library() {
   const router = useRouter();

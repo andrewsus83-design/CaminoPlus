@@ -1,5 +1,5 @@
 import { type ComponentRef, useRef, useState } from 'react';
-import { Platform, Pressable, TextInput, View } from 'react-native';
+import { Platform, Pressable, TextInput, View, useWindowDimensions } from 'react-native';
 import { Icon } from '@/components/Icon';
 import { c, fonts, radius, role } from '@/theme';
 
@@ -7,6 +7,9 @@ import { c, fonts, radius, role } from '@/theme';
 const noOutline = (Platform.OS === 'web' ? { outlineStyle: 'none' } : null) as object | null;
 
 export const SEARCH_PLACEHOLDER = 'Search the Library';
+/** On a phone under 352 wide the pill is too narrow for the whole sentence (it would be cut in the middle of a word): the short one fits down to 320. */
+export const SEARCH_PLACEHOLDER_NARROW = 'Search';
+export const NARROW_UNDER = 352;
 export const SEARCH_LABEL = 'Search the library';
 export const CLEAR_LABEL = 'Clear search';
 
@@ -23,6 +26,7 @@ export const CLEAR_LABEL = 'Clear search';
 export function SearchBar({ value, onChangeText }: { value: string; onChangeText: (text: string) => void }) {
   const [focus, setFocus] = useState(false);
   const input = useRef<ComponentRef<typeof TextInput>>(null);
+  const narrow = useWindowDimensions().width < NARROW_UNDER;
   const edge = focus ? 2 : 1;
   return (
     <View
@@ -38,7 +42,7 @@ export function SearchBar({ value, onChangeText }: { value: string; onChangeText
         onChangeText={onChangeText}
         onFocus={() => setFocus(true)}
         onBlur={() => setFocus(false)}
-        placeholder={SEARCH_PLACEHOLDER}
+        placeholder={narrow ? SEARCH_PLACEHOLDER_NARROW : SEARCH_PLACEHOLDER}
         placeholderTextColor={role.muted}
         accessibilityLabel={SEARCH_LABEL}
         returnKeyType="search"

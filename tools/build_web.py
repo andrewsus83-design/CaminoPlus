@@ -282,11 +282,13 @@ TABS = [
    "Photos of you: buy shots other pilgrims took of you on the way <span class=\"tag gold\">Coming later</span>"],
   [("discover", "Discover full-screen stories"), ("discover-photos", "Photos of you marketplace")]),
  ("library", "book", "Library", "Scripture, books and music for the road.",
-  "A banner, your private diary and three tabs: Bible, Books and Music. We are still choosing which Bible translation, which books and which music we are allowed to include, so those tabs show examples today and say so.",
+  "A search field, your bookmarks and your private diary along the top, then a banner and three tabs: Bible, Books and Music. We are still choosing which Bible translation, which books and which music we are allowed to include, so those tabs show examples today and say so.",
   [f"Bible, Books and Music, one tab each {COMING}",
-   "A private diary: tap the gold button, write, and the page is saved on your phone. It is not uploaded or shared, so it is not backed up either",
+   f"Search all three tabs at once and bookmark what you find. Today the search looks through the examples {COMING}",
+   "Bookmarks also keep the posts you bookmark on your journey",
+   "A private diary: tap the diary button, or the gold button to write, and the page is saved on your phone. It is not uploaded or shared, so it is not backed up either",
    "The diary works without a signal and stays on your phone when you log out"],
-  [("library", "Library tab with the banner, the diary and the Bible tab")]),
+  [("library", "Library tab with a search field and the bookmarks and diary buttons on top, then the banner and the Bible tab")]),
 ]
 
 # The routes of the route picker, in the order of the database (supabase/migrations/..._more_caminos.sql).

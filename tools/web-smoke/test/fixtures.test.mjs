@@ -25,7 +25,7 @@ test('the account: a profile for the signed-in pilgrim, a journey only for the p
 test('an empty account has the account and the journey and nothing else: no days, stamps, posts, friends, chats, stays, Caminos', () => {
   const ask = (path, data) => respond({ method: 'GET', url: `${URL_}${path}`, persona: 'in', data }).body;
   const rpc = (fn, data) => respond({ method: 'POST', url: `${URL_}/rest/v1/rpc/${fn}`, persona: 'in', data, body: {} }).body;
-  for (const t of ['journey_days', 'user_stamps', 'posts', 'notifications', 'messages', 'routes', 'stages']) {
+  for (const t of ['journey_days', 'user_stamps', 'posts', 'post_saves', 'notifications', 'messages', 'routes', 'stages']) {
     assert.ok(ask(`/rest/v1/${t}`, 'full').length > 0, `${t}: full`);
     assert.deepEqual(ask(`/rest/v1/${t}`, 'empty'), [], `${t}: empty`);
   }
