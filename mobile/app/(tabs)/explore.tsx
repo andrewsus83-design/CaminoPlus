@@ -91,8 +91,8 @@ export default function Discover() {
             </Pressable>
           ))}
         </ScrollView>
-        <View accessibilityLabel="Sample stories" style={{ alignSelf: 'center', marginTop: 8, paddingHorizontal: 14, height: 30, borderRadius: 15, backgroundColor: FIXED.pill, justifyContent: 'center' }}>
-          <AppText variant="caption" color={FIXED.goldInk}>Sample stories · real ones from pilgrims are coming</AppText>
+        <View accessibilityLabel="Sample stories" style={{ alignSelf: 'center', marginTop: 8, marginHorizontal: layout.screenMargin, paddingHorizontal: 14, paddingVertical: 5, minHeight: 30, borderRadius: 15, backgroundColor: FIXED.pill, justifyContent: 'center' }}>
+          <AppText variant="caption" color={FIXED.goldInk} style={{ textAlign: 'center' }}>Sample stories · real ones from pilgrims are coming</AppText>
         </View>
       </View>
       <CommentsSheet
