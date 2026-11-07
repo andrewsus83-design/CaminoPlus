@@ -94,7 +94,7 @@ paywall. The pack stays on the runner.
 ## Publish jobs
 
 Same build, with `route-fallback: deny` and `publishing: 'true'` (route must come from OSM, OSM data must be
-fresh, size and tile count inside the band and close to the live pack), then `publish_pack.mjs` uploads and
+fresh, size and tile count inside the band and close to the live pack, and the stage exists in the database), then `publish_pack.mjs` uploads and
 registers the pack in one database transaction. Without the Supabase secrets the step runs the quality gates
 as a dry run and uploads nothing.
 
@@ -182,7 +182,7 @@ One red leg never hides the others (`fail-fast: false`). Re-run only the failed 
 | | Quality gates | The pack is outside the band of its stage file (size, tiles, layers). Either the build lost data or the band needs recalibrating | `check_pack.mjs` message and the manifest in `offline-pack-reports-<slug>` |
 | | Render test | A view is below its floor, a console or map error, or a request tried to leave the device | `dist/render/<pack>.report.json` in the artifact (screenshots stay on the runner, like the pack) |
 | `publish <slug>` | Build steps | Same as above, with stricter gates: the route must come from OSM and the OSM data must be fresh | The same logs |
-| | Publish | Size or tile count jumped against the live pack, Storage upload or read-back failed, or `register_offline_pack` is missing | `publish_pack.mjs` output; nothing was registered |
+| | Publish | The stage is not in the database (nothing is uploaded), size or tile count jumped against the live pack, Storage upload or read-back failed, or `register_offline_pack` is missing | `publish_pack.mjs` output; nothing was registered |
 
 Warnings, not failures: `list_stages: pr: capped at 40 ...` means the PR changed more stages than it built, and
 `publish: N stage(s) have no quality band ...` lists the stages waiting for calibration.

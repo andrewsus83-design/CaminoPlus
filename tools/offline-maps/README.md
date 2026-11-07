@@ -207,7 +207,7 @@ later. `offline_packs.url` says where each file is, so the move needs no app cha
 `publish_pack.mjs [--target supabase|r2]` (and the monthly workflow) do:
 
 1. Check the file against its manifest (size + sha256) and run the quality gates above.
-2. Compare with the live pack (size), still before anything is uploaded.
+2. Check that the stage exists in the database (same route, same stage number; it may be unpublished) and compare with the live pack (size), still before anything is uploaded.
 3. Upload to `<route_slug>/stage-<NN>/tiles-v<YYYYMMDD>.pmtiles`.
    Version = date of the OSM data, so each monthly build gets a new immutable key
    (`Cache-Control: immutable`). Old versions can be deleted after 60 days, once no app
