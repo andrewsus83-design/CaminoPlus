@@ -84,7 +84,8 @@ function ActionBtn({ label, onPress, variant = 'primary', icon, disabled, loadin
   );
 }
 
-const card = { backgroundColor: role.surface, borderRadius: radius.md, borderWidth: 1, borderColor: role.border } as const;
+// Getters, so the colours follow the light/dark theme.
+const card = { get backgroundColor() { return role.surface; }, borderRadius: radius.md, borderWidth: 1, get borderColor() { return role.border; } };
 
 function PositionCard({ h, placeText }: { h: Help; placeText?: string | null }) {
   const p = h.position;

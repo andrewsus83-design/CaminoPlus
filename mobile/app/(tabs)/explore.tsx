@@ -23,6 +23,10 @@ type Favs = { loved: string[]; saved: string[] };
 // (For you, Friends, ...). The swipe tutorial shows on first open only.
 let tutorialSeen = false;
 
+// Fixed light colours: Discover is always photos under dark overlays, in light and dark mode.
+const WHITE = '#FFFDF8';
+const PARCH = '#F6EFE2';
+
 export default function Discover() {
   const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
@@ -78,7 +82,7 @@ export default function Discover() {
             data={itemsFor(t)}
             getItemLayout={(_, index) => ({ length: height, offset: height * index, index })}
             onScrollBeginDrag={dismiss}
-            ListEmptyComponent={<View style={{ width, height, alignItems: 'center', justifyContent: 'center', padding: 40, gap: 12 }}><Icon name="heart" color="rgba(255,255,255,0.8)" size={44} /><AppText variant="lead" color={c.white} style={{ textAlign: 'center' }}>Nothing saved yet. Tap the heart or bookmark on a story to keep it here.</AppText></View>}
+            ListEmptyComponent={<View style={{ width, height, alignItems: 'center', justifyContent: 'center', padding: 40, gap: 12 }}><Icon name="heart" color="rgba(255,255,255,0.8)" size={44} /><AppText variant="lead" color={WHITE} style={{ textAlign: 'center' }}>Nothing saved yet. Tap the heart or bookmark on a story to keep it here.</AppText></View>}
             keyExtractor={(i) => i.id}
             renderItem={({ item }) => (
           <View style={{ width, height, backgroundColor: item.tint, justifyContent: 'flex-end', paddingHorizontal: layout.screenMargin, paddingTop: 24, paddingBottom: insets.bottom + 120 }}>
@@ -109,8 +113,8 @@ export default function Discover() {
       <View style={{ position: 'absolute', top: insets.top + 12, left: 0, right: 0 }}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ minWidth: width, justifyContent: 'center', gap: 22, paddingHorizontal: layout.screenMargin }}>
           {TABS.map((t) => (
-            <Pressable key={t} accessibilityRole="tab" accessibilityState={{ selected: tab === t }} onPress={() => goTab(t)} hitSlop={10} style={{ paddingVertical: 8, borderBottomWidth: 3, borderBottomColor: tab === t ? c.white : 'transparent' }}>
-              <AppText variant="body" color={tab === t ? c.white : 'rgba(255,255,255,0.65)'} style={{ fontFamily: fonts.bodyBold, textShadowColor: 'rgba(0,0,0,0.35)', textShadowRadius: 6 }}>{t}</AppText>
+            <Pressable key={t} accessibilityRole="tab" accessibilityState={{ selected: tab === t }} onPress={() => goTab(t)} hitSlop={10} style={{ paddingVertical: 8, borderBottomWidth: 3, borderBottomColor: tab === t ? WHITE : 'transparent' }}>
+              <AppText variant="body" color={tab === t ? WHITE : 'rgba(255,255,255,0.65)'} style={{ fontFamily: fonts.bodyBold, textShadowColor: 'rgba(0,0,0,0.35)', textShadowRadius: 6 }}>{t}</AppText>
             </Pressable>
           ))}
         </ScrollView>
@@ -146,10 +150,10 @@ export default function Discover() {
       </Modal>
       {showTip && (
         <Pressable onPress={dismiss} style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(12,35,64,0.6)', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
-          <AppText variant="accent" color={c.parchment}>Swipe up or down</AppText>
-          <AppText variant="small" color={c.parchment}>for the next story</AppText>
-          <AppText variant="accent" color={c.parchment} style={{ marginTop: 12 }}>Swipe left or right</AppText>
-          <AppText variant="small" color={c.parchment}>for For you, Friends and more</AppText>
+          <AppText variant="accent" color={PARCH}>Swipe up or down</AppText>
+          <AppText variant="small" color={PARCH}>for the next story</AppText>
+          <AppText variant="accent" color={PARCH} style={{ marginTop: 12 }}>Swipe left or right</AppText>
+          <AppText variant="small" color={PARCH}>for For you, Friends and more</AppText>
           <AppText variant="small" color={c.goldSoft} style={{ marginTop: 16 }}>Tap anywhere to start</AppText>
         </Pressable>
       )}

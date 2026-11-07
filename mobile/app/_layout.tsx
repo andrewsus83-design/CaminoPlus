@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { ActivityIndicator, View } from 'react-native';
-import { Stack } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import { useFonts } from 'expo-font';
@@ -13,6 +13,7 @@ import { AuthProvider, useAuth } from '@/lib/auth';
 import { AccountUnavailable } from '@/components/AccountUnavailable';
 import { setMapSession } from '@/features/map';
 import { supabase } from '@/lib/supabase';
+import { ThemeProvider, consumeReturnToSettings, useTheme } from '@/lib/theme';
 import { role } from '@/theme';
 
 SplashScreen.preventAutoHideAsync();
@@ -25,11 +26,23 @@ export default function RootLayout() {
   if (!loaded && !error) return null;
   return (
     <SafeAreaProvider>
-      <AuthProvider>
-        <StatusBar style="dark" />
-        <RootStack />
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <Themed />
+        </AuthProvider>
+      </ThemeProvider>
     </SafeAreaProvider>
+  );
+}
+
+// Colours are read while rendering, so a theme change remounts the stack (key). Login state lives above and stays.
+function Themed() {
+  const { scheme } = useTheme();
+  return (
+    <>
+      <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
+      <RootStack key={scheme} />
+    </>
   );
 }
 
@@ -38,6 +51,9 @@ export default function RootLayout() {
 // A load error is NOT "no journey": see AccountUnavailable and lib/auth.tsx.
 function RootStack() {
   const { ready, status, session, journey, accountError, retry, signOut } = useAuth();
+  const router = useRouter();
+  // Right after a theme switch the stack was remounted: return to the Settings tab the person was on.
+  useEffect(() => { if (consumeReturnToSettings()) router.replace('/settings'); }, [router]);
   const splashHidden = useRef(false);
   useEffect(() => { if (ready) { splashHidden.current = true; SplashScreen.hideAsync(); } }, [ready]);
   if (!ready) {

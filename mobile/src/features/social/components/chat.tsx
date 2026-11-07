@@ -18,7 +18,7 @@ export type SenderInfo = { id: string; name: string; avatar_url: string | null }
 
 const BIG = 20;
 const SMALL = 6;
-const MINE_TIME = c.blue100;
+const mineTime = () => c.blue100; // function, so it follows the light/dark theme
 
 /* ------------------------------------------------------------ photos */
 
@@ -36,8 +36,8 @@ function ChatImage({ id, path, localUri, mine, bleed, corners, onOpen, onLongPre
   if (failed) {
     return (
       <Pressable accessibilityRole="button" accessibilityLabel="Photo could not load. Tap to try again" onPress={retry} style={[box, { alignItems: 'center', justifyContent: 'center', gap: 6, padding: 12 }]}>
-        <Icon name="image" color={mine ? MINE_TIME : role.muted} size={30} />
-        <AppText variant="caption" color={mine ? MINE_TIME : role.muted} style={{ textAlign: 'center', letterSpacing: 0 }}>Photo did not load. Tap to try again.</AppText>
+        <Icon name="image" color={mine ? mineTime() : role.muted} size={30} />
+        <AppText variant="caption" color={mine ? mineTime() : role.muted} style={{ textAlign: 'center', letterSpacing: 0 }}>Photo did not load. Tap to try again.</AppText>
       </Pressable>
     );
   }
@@ -56,7 +56,7 @@ export function ImageViewer({ uri, onClose }: { uri: string | null; onClose: () 
       <View accessibilityViewIsModal style={{ flex: 1, backgroundColor: 'rgba(8,20,36,0.96)', justifyContent: 'center' }}>
         {!!uri && <Image source={{ uri }} resizeMode="contain" accessibilityLabel="Photo" style={{ width: '100%', height: '80%' }} />}
         <Pressable accessibilityRole="button" accessibilityLabel="Close photo" onPress={onClose} style={{ position: 'absolute', top: insets.top + 10, right: 16, width: 56, height: 56, borderRadius: radius.pill, backgroundColor: 'rgba(255,253,248,0.16)', alignItems: 'center', justifyContent: 'center' }}>
-          <Icon name="close" color={c.white} size={30} strokeWidth={2.2} />
+          <Icon name="close" color="#FFFDF8" size={30} strokeWidth={2.2} />
         </Pressable>
       </View>
     </Modal>
@@ -80,8 +80,8 @@ type BubbleProps = {
 // onLight = on the pale red bubble of a help request (the light marks of the blue bubble would disappear there).
 function DeliveryMark({ entry, onLight }: { entry: MessageEntry; onLight?: boolean }) {
   switch (entry.delivery) {
-    case 'sending': return <Icon name="clock" color={onLight ? role.muted : MINE_TIME} size={14} strokeWidth={2} />;
-    case 'sent': return <Icon name="check" color={onLight ? role.muted : MINE_TIME} size={15} strokeWidth={2.2} />;
+    case 'sending': return <Icon name="clock" color={onLight ? role.muted : mineTime()} size={14} strokeWidth={2} />;
+    case 'sent': return <Icon name="check" color={onLight ? role.muted : mineTime()} size={15} strokeWidth={2.2} />;
     case 'seen': return <Icon name="check-double" color={onLight ? c.blue : c.gold} size={17} strokeWidth={2.2} />;
     case 'failed': return <Icon name="info" color={onLight ? c.red700 : '#FFB4A8'} size={15} strokeWidth={2.2} />;
     default: return null;
@@ -160,7 +160,7 @@ export const MessageBubble = memo(function MessageBubble({ entry, isGroup, sende
               </>
             )}
           <View style={{ flexDirection: 'row', alignSelf: 'flex-end', alignItems: 'center', gap: 5, marginTop: 2 }}>
-            <AppText variant="mono" color={mine && !unsent && !help ? MINE_TIME : role.muted} style={{ fontSize: 12, lineHeight: 16 }}>{time}</AppText>
+            <AppText variant="mono" color={mine && !unsent && !help ? mineTime() : role.muted} style={{ fontSize: 12, lineHeight: 16 }}>{time}</AppText>
             {mine && !unsent && <DeliveryMark entry={entry} onLight={help} />}
           </View>
         </Pressable>

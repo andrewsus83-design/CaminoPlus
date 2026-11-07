@@ -28,7 +28,8 @@ function Ring({ done, total = 5 }: { done: number; total?: number }) {
   );
 }
 
-const row = { flexDirection: 'row' as const, alignItems: 'center' as const, gap: 14, padding: 16, borderRadius: radius.lg, backgroundColor: role.surface, ...shadowStyle('sm') };
+// Getter for the colour, so it follows the light/dark theme.
+const row = { flexDirection: 'row' as const, alignItems: 'center' as const, gap: 14, padding: 16, borderRadius: radius.lg, get backgroundColor() { return role.surface; }, ...shadowStyle('sm') };
 
 // The "List your business" card. It changes with the owner's progress.
 export function BusinessCard({ state, name, stepsDone, onPress }: { state: OwnerState; name: string; stepsDone: number; onPress: () => void }) {
