@@ -662,6 +662,10 @@ class NavarraData:
     issues: Counter = field(default_factory=Counter)          # "albergues: PLAZAS: not a number ..." -> rows
     attributions: dict[str, Attribution] = field(default_factory=dict)
 
+    def __len__(self) -> int:
+        """Rows kept. audit.collect() prints len(result), so load() can be wrapped by it as it is."""
+        return len(self.lodgings) + len(self.fountains) + len(self.waymarks)
+
     def status(self) -> str:
         """One line for the Sources table of report.md."""
         text = f"{len(self.lodgings)} lodgings (no positions), {len(self.fountains)} fountains, {len(self.waymarks)} waymarks"

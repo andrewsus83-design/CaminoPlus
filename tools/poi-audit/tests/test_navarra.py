@@ -531,6 +531,7 @@ class Loading(unittest.TestCase):
             data = nav.load(seed(tmp))
         self.assertEqual((len(data.lodgings), len(data.fountains), len(data.waymarks), len(data.skipped)), (32, 32, 26, 0))
         self.assertEqual(data.status(), "ok (32 lodgings (no positions), 32 fountains, 26 waymarks; 0 rows skipped)")
+        self.assertEqual(len(data), 32 + 32 + 26, "audit.collect() prints len(result): without it a wrapped load() would count as FAILED")
         self.assertEqual(set(data.attributions), {"albergues", "fuentes", "senales"})
         self.assertEqual(data.issues, Counter())
 
