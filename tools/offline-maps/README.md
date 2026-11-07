@@ -304,7 +304,7 @@ The app checks `offline_packs` (version / `is_current`) when online and offers
 
 | Item | Where | Notes |
 |---|---|---|
-| GitHub Environment `pack-publish` | Settings, Environments | Limit "Deployment branches" to `main`. Required reviewers work, but every stage is its own deployment and asks for its own approval (33 clicks for a full run), see [ci-matrix.md](docs/ci-matrix.md#publish-jobs). Put the secrets below into this environment so no other workflow can read them |
+| GitHub Environment `pack-publish` | Settings, Environments | Limit "Deployment branches" to `main`. Required reviewers work, but every stage is its own deployment and asks for its own approval (one click per stage, 43 for a full run today), see [ci-matrix.md](docs/ci-matrix.md#publish-jobs). Put the secrets below into this environment so no other workflow can read them |
 | Supabase URL + service role key | secrets `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (environment `pack-publish`) | Lets the publish job upload packs and call `register_offline_pack`. Only the last step of the job sees their values; the first step only asks whether both are set and stops the job, red, when one is not |
 | Latest migrations applied | `supabase db push` | The migration that adds `public.register_offline_pack` (service role only) must be in the database before the first publish |
 | Later, for Cloudflare: R2 bucket `caminoplus-packs` (private) + tokens | secrets `R2_*`, Supabase function secrets `R2_*`, repo variable `PACK_TARGET=r2` | Read-only token for the function, read/write for the build |
@@ -321,8 +321,10 @@ yet and this path was never tested outside it, so start with one stage:
 2. Actions, offline-maps, Run workflow: branch `main`, tick `publish`, `stages` = `camino-frances-01`. Missing secrets stop the
    job in its first step, red, with the place to add them.
 3. Check that `offline_packs` has one current row for that stage and that the file is in the private bucket `offline-packs`.
-4. Run it again with `stages` = `all`: every stage with a `quality` band is published (the 33 stages of the Camino Francés,
-   about 131 MB). Stages without a band (the Portugués and Inglés stages not calibrated yet) are skipped.
+4. Run it again with `stages` = `all`: every stage with a `quality` band is published. On 2026-11-07 that is 43 stages (the 33 of
+   the Camino Francés, 8 of the Portugués and 2 of the Inglés, about 204 MB in all; Porto to Vilarinho alone is 23 MB), one job
+   each, two at a time. Stages without a band (the seven coastal Portugués and Inglés stages) are skipped. To publish only some,
+   list their slugs separated by commas.
 5. A pack is downloaded only with Pilgrim Plus (`get_my_entitlements().can_download_routes`, `private.has_plus`): a
    subscription with status `trial`, `active`, `grace`, `billing_issue` or `cancelled` that has not expired, in the
    `production` environment (sandbox purchases count only while the `app_config` flag `allow_sandbox_purchases` is true).
