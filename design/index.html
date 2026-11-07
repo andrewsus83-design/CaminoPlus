@@ -509,6 +509,19 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
 .cp-fab-write { display: inline-flex; align-items: center; justify-content: center; width: 60px; height: 60px; padding: 0; border-radius: var(--cp-radius-pill); background: var(--cp-color-gold); color: var(--cp-color-blue); border: 0; font: 700 16px/1 var(--cp-font-body); box-shadow: var(--cp-shadow-gold); cursor: pointer; }
 .cp-fab-write .cp-icon { width: 26px; height: 26px; stroke-width: 2.2px; }
 .phone .fab-slot { position: absolute; right: 20px; bottom: 116px; z-index: 6; }
+/* action rail: THE rail of Discover and of the full-screen journey viewer (mobile/src/components/ActionRail.tsx) */
+.cp-rail { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.cp-rail .b { width: 56px; height: 56px; padding: 0; border: 0; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(255, 253, 248, 0.85); color: var(--cp-color-blue); font-family: var(--cp-font-body); }
+.cp-rail .b .cp-icon { width: 26px; height: 26px; }
+.cp-rail .b.love .cp-icon, .cp-rail .b.save .cp-icon { width: 28px; height: 28px; }
+.cp-rail .b.love .cp-icon { color: var(--cp-color-red); }
+.cp-rail .b.on .cp-icon { fill: currentColor; }
+.cp-rail .b .n { font-size: 11px; line-height: 13px; font-weight: 500; letter-spacing: .4px; color: var(--cp-color-blue); }
+.cp-rail .b[disabled] { opacity: .45; }
+.rail-demo { display: flex; flex-wrap: wrap; justify-content: center; gap: 24px; }
+.rail-demo figure { margin: 0; width: 136px; }
+.rail-demo .rail-stage { height: 320px; display: flex; align-items: flex-end; justify-content: flex-end; padding: 0 12px 16px 0; }
+.rail-demo figcaption { margin-top: 10px; font-family: var(--cp-font-mono); font-size: 13px; line-height: 17px; color: var(--cp-text-muted); text-align: center; }
 /* lightbox */
 .cp-scrim { position: absolute; inset: 0; background: rgba(12,35,64,.66); backdrop-filter: blur(3px); z-index: 8; }
 .cp-lightbox { position: absolute; left: 16px; right: 16px; z-index: 9; background: var(--cp-surface); border-radius: var(--cp-radius-xl); overflow: hidden; box-shadow: var(--cp-shadow-xl); display: flex; flex-direction: column; }
@@ -942,7 +955,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     <div class="logo-ph"><span class="mark"><svg class="cp-icon"><use href="#i-shell"/></svg></span><span class="word">Camino<span>Plus</span></span><span class="tag">logo TBD</span></div>
     <nav class="doc-nav-links">
       <a href="#color">Color</a><a href="#type">Type</a><a href="#space">Spacing</a><a href="#radius">Radius</a><a href="#shadow">Shadow</a>
-      <a href="#buttons">Buttons</a><a href="#inputs">Inputs</a><a href="#chips">Chips</a><a href="#cards">Cards</a><a href="#waze">Map patterns</a><a href="#rpg">Quests & stories</a><a href="#patterns">Lightbox & detail</a>
+      <a href="#buttons">Buttons</a><a href="#inputs">Inputs</a><a href="#chips">Chips</a><a href="#cards">Cards</a><a href="#waze">Map patterns</a><a href="#rpg">Quests & stories</a><a href="#patterns">Lightbox & detail</a><a href="#actionrail">Action rail</a>
       <a href="#tabbar">Tab bar</a><a href="#business">Business</a><a href="#screens">Screens</a><a href="#icons">Icons</a><a href="#dark">Dark mode</a>
     </nav>
   </div>
@@ -1573,6 +1586,32 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
       <div class="cp-hours"><div class="today"><span>Today</span><span>08:00 – 21:00</span></div><div><span>Tomorrow</span><span>08:00 – 21:00</span></div></div>
       <div class="cp-bookbar" style="position:static;box-shadow:var(--cp-shadow-lg);border-radius:var(--cp-radius-xl);padding:14px 16px 14px 20px"><div class="pr"><b>€12</b> <small>/ bed</small><span class="d">Free cancellation</span></div><button class="cp-btn cp-btn-primary">Reserve</button></div>
       <p class="spec" style="margin:0">.cp-room (Agoda-style option) · .cp-hours · .cp-bookbar (replaces the tab bar on detail pages)</p>
+    </div>
+  </div>
+
+  <h3 id="actionrail">Action rail: love, bookmark, comments, share</h3>
+  <p class="note" style="max-width:720px;margin:0 0 20px">One rail for the whole app. Discover is the standard and the full-screen journey viewer (Me, Journey) draws the very same component, <code>components/ActionRail.tsx</code>, fed by <code>lib/actionRail.ts</code>. A screen never draws its own like, bookmark, comment or share buttons. The same comments sheet opens from both.</p>
+  <div class="grid g2" style="align-items:start">
+    <div class="panel">
+      <div class="rail-demo">
+        <figure><div class="rail-stage cp-img v5"><div class="cp-rail"><button class="b love" aria-label="Love"><svg class="cp-icon"><use href="#i-heart"/></svg></button><button class="b save" aria-label="Bookmark"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button><button class="b comments" aria-label="Comments, 1 comment"><svg class="cp-icon"><use href="#i-chat"/></svg><span class="n">1</span></button><button class="b share" aria-label="Share"><svg class="cp-icon"><use href="#i-share"/></svg></button></div></div><figcaption>Off. Discover: only the comments kept on the phone are counted</figcaption></figure>
+        <figure><div class="rail-stage cp-img v4"><div class="cp-rail"><button class="b love on" aria-label="Remove love, 12 likes"><svg class="cp-icon"><use href="#i-heart"/></svg><span class="n">12</span></button><button class="b save on" aria-label="Remove bookmark, 4 bookmarks"><svg class="cp-icon"><use href="#i-bookmark"/></svg><span class="n">4</span></button><button class="b comments" aria-label="Comments, 3 comments"><svg class="cp-icon"><use href="#i-chat"/></svg><span class="n">3</span></button><button class="b share" aria-label="Share, 1,234 shares"><svg class="cp-icon"><use href="#i-share"/></svg><span class="n">1.2K</span></button></div></div><figcaption>On is filled. Counts that were read, compact</figcaption></figure>
+        <figure><div class="rail-stage cp-img v2"><div class="cp-rail"><button class="b love" aria-label="Love, 0 likes"><svg class="cp-icon"><use href="#i-heart"/></svg><span class="n">0</span></button><button class="b save" aria-label="Bookmark"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button><button class="b comments" aria-label="Comments, not available yet" disabled><svg class="cp-icon"><use href="#i-chat"/></svg></button><button class="b share" aria-label="Share"><svg class="cp-icon"><use href="#i-share"/></svg></button></div></div><figcaption>A real 0 shows. A button that cannot work yet is dimmed</figcaption></figure>
+      </div>
+      <p class="spec" style="margin:20px 0 0">.cp-rail · 56 circles, 14 apart · right edge 16 (screen margin) · rgba(255,253,248,.85) · heart 28 red, bookmark 28 blue, chat 26, share 26 · count 11/13 under the icon</p>
+    </div>
+    <div class="panel">
+      <table class="contrast">
+        <tr><th>What</th><th>The standard</th></tr>
+        <tr><td><b>Order</b></td><td>Love, bookmark, comments, share, top to bottom. Never reordered, never hidden for a kind of content.</td></tr>
+        <tr><td><b>Circle</b></td><td>56 × 56, pill radius, paper white at 85 % so it reads on any photo. 14 apart, centred, the right edge on the 16 screen margin. Discover puts the lowest circle 120 above the safe area (above the tab bar); the viewer puts it 28 above it, with the caption kept clear.</td></tr>
+        <tr><td><b>Icons</b></td><td>Heart 28 in Cross Red, bookmark 28 in Atlantic Blue, chat 26 and share 26 in blue. Heart and bookmark are filled when on.</td></tr>
+        <tr><td><b>Counts</b></td><td>Under the icon, 11/13 blue. Compact (999, 1.2K, 12.3K, 1M), rounded down, never more than the real number. Shown only when the count was read: a real 0 shows 0, a count nobody read shows nothing. Screen readers hear the whole number: "Love, 1,234 likes".</td></tr>
+        <tr><td><b>States</b></td><td>Off, on, and "not available yet": dimmed to 45 %, disabled, and the label says so. The labels are Love / Remove love, Bookmark / Remove bookmark, Comments, Share.</td></tr>
+        <tr><td><b>Dark mode</b></td><td>The circles are cream and the photo behind never changes, so the circle and every icon on it keep their light token values in both modes (never the theme colours, which turn light blue and light red). Same rule for white text on a scrim.</td></tr>
+        <tr><td><b>Sample content</b></td><td>Discover's sample stories and the sample journey: love, bookmark and comments stay on the phone, and share sends the invitation to the app, never the sample itself.</td></tr>
+        <tr><td><b>Real posts</b></td><td>A tap shows its result at once and puts the old state back, with one short sentence, if it fails. These need the network: offline nothing changes and it says so.</td></tr>
+      </table>
     </div>
   </div>
 </section>

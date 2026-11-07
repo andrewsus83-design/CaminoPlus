@@ -1,6 +1,7 @@
 // Plain-node checks for the engagement stats of a journey post (no React Native). Run: npm run test:me
 import assert from 'node:assert/strict';
-import { countLabel, engagementItems, formatCount } from '../engagement';
+import { countLabel, formatCount } from '../../../lib/engagement';
+import { railCounts, railItems } from '../../../lib/actionRail';
 import { parseEngagementRows, withEngagement } from '../../../lib/postEngagement';
 import type { PostEngagement } from '../../../lib/postEngagement';
 
@@ -66,46 +67,6 @@ test('countLabel spells out big numbers in full, with thousands separators', () 
   assert.equal(countLabel('likes', 1000), '1,000 likes');
 });
 
-/* ---------------- engagementItems ---------------- */
-
-test('engagementItems: heart, comment bubble, share arrow, bookmark, in that order, with count, text and label', () => {
-  const items = engagementItems(post({ like_count: 1234, comment_count: 1, share_count: 0, save_count: 56 }));
-  assert.deepEqual(items.map((i) => i.kind), ['likes', 'comments', 'shares', 'bookmarks']);
-  assert.deepEqual(items.map((i) => i.icon), ['heart', 'chat', 'share', 'bookmark']);
-  assert.deepEqual(items.map((i) => i.count), [1234, 1, 0, 56]);
-  assert.deepEqual(items.map((i) => i.text), ['1.2K', '1', '0', '56']);
-  assert.deepEqual(items.map((i) => i.label), ['1,234 likes', '1 comment', '0 shares', '56 bookmarks']);
-});
-
-test('engagementItems: without the two newer counts only likes and comments show (nothing is invented)', () => {
-  const items = engagementItems(post());
-  assert.deepEqual(items.map((i) => i.kind), ['likes', 'comments']);
-  assert.deepEqual(items.map((i) => i.label), ['12 likes', '3 comments']);
-  // one of the two missing: only that one is hidden
-  assert.deepEqual(engagementItems(post({ share_count: 4 })).map((i) => i.kind), ['likes', 'comments', 'shares']);
-  assert.deepEqual(engagementItems(post({ save_count: 4 })).map((i) => i.kind), ['likes', 'comments', 'bookmarks']);
-});
-
-test('engagementItems: a real 0 is shown, because the database said so', () => {
-  const items = engagementItems(post({ like_count: 0, comment_count: 0, save_count: 0, share_count: 0 }));
-  assert.equal(items.length, 4);
-  assert.deepEqual(items.map((i) => i.text), ['0', '0', '0', '0']);
-  assert.deepEqual(items.map((i) => i.label), ['0 likes', '0 comments', '0 shares', '0 bookmarks']);
-});
-
-test('engagementItems: null, NaN, negative or text counts are left out, not turned into 0', () => {
-  const items = engagementItems(post({ comment_count: null, save_count: NaN, share_count: -2 }));
-  assert.deepEqual(items.map((i) => i.kind), ['likes']);
-  assert.deepEqual(engagementItems(post({ like_count: '12', comment_count: undefined })).map((i) => i.kind), []);
-  assert.deepEqual(engagementItems({}), []);
-});
-
-test('engagementItems does not change what it is given', () => {
-  const p = Object.freeze(post({ save_count: 5, share_count: 6 }));
-  assert.equal(engagementItems(p).length, 4);
-  assert.deepEqual(p, { id: 'p1', like_count: 12, comment_count: 3, save_count: 5, share_count: 6 });
-});
-
 /* ---------------- parseEngagementRows ---------------- */
 
 test('parseEngagementRows: rows of id, save_count and share_count become counts by post id', () => {
@@ -168,12 +129,12 @@ test('withEngagement does not change the posts it was given, and keeps their ord
   assert.deepEqual(out.map((p) => p.id), ['a', 'b']);
 });
 
-test('end to end: what the viewer shows with and without the counts', () => {
+test('end to end: what the rail shows under its icons with and without the two newer counts (the rail itself is tested in lib/__tests__/actionRail.test.ts)', () => {
   const posts = [post({ id: 'a' })];
-  const kinds = (p: object) => engagementItems(p).map((i) => i.kind);
-  assert.deepEqual(kinds(withEngagement(posts, null)[0]), ['likes', 'comments']);
-  assert.deepEqual(kinds(withEngagement(posts, counts(['a', 1, 0]))[0]), ['likes', 'comments', 'shares', 'bookmarks']);
-  assert.deepEqual(kinds(withEngagement(posts, parseEngagementRows([]))[0]), ['likes', 'comments']);
+  const texts = (p: object) => railItems({ counts: railCounts(p) }).map((i) => i.countText); // love, bookmark, comments, share
+  assert.deepEqual(texts(withEngagement(posts, null)[0]), ['12', undefined, '3', undefined]);
+  assert.deepEqual(texts(withEngagement(posts, counts(['a', 1, 0]))[0]), ['12', '1', '3', '0']);
+  assert.deepEqual(texts(withEngagement(posts, parseEngagementRows([]))[0]), ['12', undefined, '3', undefined]);
 });
 
 console.log(`\n${n} passed`);
