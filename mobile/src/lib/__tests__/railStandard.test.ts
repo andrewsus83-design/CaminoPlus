@@ -80,6 +80,7 @@ check('the rail is the standard: 56 px circles, 14 px apart, at the screen margi
   assert.match(src, /it\.tone === 'love' \? FIXED\.red : FIXED\.blue/);
   assert.match(src, /fontSize: 11, lineHeight: 13/, 'the count under the icon');
   assert.match(code(read(DISCOVER)), /bottom=\{insets\.bottom \+ 120\}/, 'Discover keeps the rail above the tab bar');
+  for (const f of [DISCOVER, VIEWER]) assert.match(code(read(f)), /paddingRight: layout\.screenMargin \+ RAIL_CIRCLE \+ 12/, `${f}: the caption keeps clear of the rail`);
 });
 
 check('on a surface that does not change in dark mode no colour changes: the rail and Discover use FIXED, never the flipping theme colours', () => {
