@@ -224,7 +224,8 @@ const plainOfBlock = (b: Block) => b.spans.map((s) => s.text).join('');
 
 /**
  * The words of the page without any mark, one line per line: what a list preview or a page name shows. With `maxChars` it stops
- * reading once that many characters are in hand (a preview of a page never needs the rest), so it costs the same on a long page.
+ * reading after the line that brings it to that many characters (a preview of a page never needs the rest), so it costs the same
+ * on a page of many lines. A line is read whole, so callers that must bound a single very long line cut the text first.
  */
 export function plainText(text: unknown, maxChars = Infinity): string {
   if (typeof text !== 'string' || text === '') return '';
@@ -290,7 +291,8 @@ function serialize(cells: Cell[]): { out: string; pos: number[] } {
   return { out, pos };
 }
 
-const sameCells = (a: Cell[], b: Cell[]) => a.length === b.length && a.every((c, k) => c.ch === b[k].ch && c.bold === b[k].bold && c.italic === b[k].italic);
+/** The same characters with the same marks. White space at the edge of a run is written outside its marks, so its own marks do not count. */
+const sameCells = (a: Cell[], b: Cell[]) => a.length === b.length && a.every((c, k) => c.ch === b[k].ch && (isSpaceCell(c) || (c.bold === b[k].bold && c.italic === b[k].italic)));
 
 /** The word (letters and digits) the caret touches, within one line's content, or null. */
 function wordAt(text: string, line: Line, pos: number): { a: number; b: number } | null {
@@ -402,6 +404,10 @@ export function toggleInline(text: string, selection: Sel, format: InlineFormat,
     if (!changed) continue;
     const ser = serialize(cells);
     if (!sameCells(cellsOf(ser.out), cells)) return null; // would not read back as intended: leave the words exactly as they are
+    const line = lines[w.idx];
+    const written = text.slice(line.start, w.cs) + ser.out;
+    const now = blockOf(written, 0, written.length);
+    if (now.kind !== line.kind || now.prefix !== line.prefix) return null; // the line would start to read as another block ("# " typed by hand)
     rewrites.set(w.idx, { out: ser.out, pos: ser.pos, cells, cs: w.cs });
   }
   if (rewrites.size === 0) return null;
@@ -425,7 +431,7 @@ export function toggleInline(text: string, selection: Sel, format: InlineFormat,
     const line = lines[k];
     const rw = rewrites.get(k);
     const shift = starts[k] - line.start;
-    if (!rw || old <= rw.cs) return old + shift;
+    if (!rw || old < rw.cs) return old + shift;
     const rel = old - rw.cs;
     if (old > line.end) return starts[k] + (rw.cs - line.start) + rw.out.length + (old - line.end);
     const base = starts[k] + (rw.cs - line.start);
@@ -470,7 +476,12 @@ export function toggleBlock(text: string, selection: Sel, format: BlockFormat, m
   const edits = new Map<number, { line: Line; old: string }>();
   for (const line of targets) {
     const old = text.slice(line.start, line.start + line.prefix);
-    if (old !== mark) edits.set(line.start, { line, old });
+    if (old === mark) continue;
+    // What is left of the line must read as what was meant: with the mark gone, the rest ("- a" after "- - a") may be a mark itself.
+    const written = mark + text.slice(line.start + old.length, line.end);
+    const now = blockOf(written, 0, written.length);
+    if (off ? now.kind === 'h' || now.kind === 'li' || now.kind === 'q' : now.kind !== want) return null;
+    edits.set(line.start, { line, old });
   }
   if (edits.size === 0) return null;
 

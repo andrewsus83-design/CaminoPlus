@@ -97,7 +97,8 @@ test('plain text: the page without marks, a line for a line; a title or preview 
   assert.equal(plainText('**a**\n\n\n_b_'), 'a\n\n\nb');
   assert.equal(plainText('- \n# '), '\n', 'empty marks leave empty lines');
   const long = 'word '.repeat(20_000);
-  assert.equal(plainText(long, 50).length >= 50 && plainText(long, 50).length < long.length, true, 'with a limit it stops reading early (one line here, so it reads that one)');
+  assert.equal(plainText(long, 50), long, 'a limit stops after the line that reaches it (a single line is read whole)');
+  assert.equal(plainText('one\ntwo\nthree\nfour', 5), 'one\ntwo', 'one line is 4 characters with its break: the second reaches 5, so it stops there');
   const many = Array.from({ length: 5000 }, (_, i) => `- **line ${i}**`).join('\n');
   assert.equal(plainText(many, 100).split('\n').length < 40, true, 'and does not read the whole page for a preview');
   assert.equal(plainText(many).split('\n').length, 5000);
@@ -145,7 +146,8 @@ test('nothing selected: the word at the caret (the caret stays where it was), or
   const t = 'We walked far';
   const mid = must(toggleInline(t, S(6), 'bold')); // inside "walked"
   assert.equal(mid.text, 'We **walked** far');
-  assert.deepEqual(mid.selection, S(8 + 1), 'still after "w" (the caret moved over the marks that came in front of it)');
+  assert.deepEqual(mid.selection, S(8), 'still after "wal", where it was (the marks that came in front of it moved it along)');
+  assert.equal(mid.text.slice(0, mid.selection.start), 'We **wal');
   const end = must(toggleInline(t, S(9), 'bold')); // right after "walked"
   assert.equal(end.text, 'We **walked** far');
   assert.equal(end.selection.start, 'We **walked'.length, 'at the end of a word the caret stays inside the marks, so typing goes on in bold');
@@ -185,7 +187,7 @@ test('a selection that reaches across marks that are already there: all of it ge
 test('marks typed by hand are marks: select the word and the button takes them off', () => {
   const t = 'say **hi** now';
   assert.equal(must(toggleInline(t, on(t, 'hi'), 'bold')).text, 'say hi now');
-  assert.equal(must(toggleInline(t, on(t, 'say **hi**'), 'bold')).text, 'say hi now');
+  assert.equal(must(toggleInline(t, on(t, 'say **hi**'), 'bold')).text, '**say hi** now', 'part of it was bold, part not: all of it gets bold, the pair typed by hand merges into one');
   assert.equal(must(toggleInline('typed _by hand_ here', S(6, 14), 'italic')).text, 'typed by hand here');
   const stray = 'a * b';
   assert.equal(must(toggleInline(stray, on(stray, 'b'), 'bold')).text, 'a * **b**');
@@ -207,7 +209,7 @@ test('a selection over several lines is done line by line: block marks stay, bla
   const t = 'first line\n\n- a bullet\n> a quote\nlast';
   const all = must(toggleInline(t, S(0, t.length), 'bold'));
   assert.equal(all.text, '**first line**\n\n- **a bullet**\n> **a quote**\n**last**');
-  assert.equal(sliceSel(all), all.text, 'the selection still covers everything');
+  assert.equal(sliceSel(all), 'first line**\n\n- **a bullet**\n> **a quote**\n**last', 'the selection still reaches from the first word to the last, inside the outer marks');
   assert.equal(must(toggleInline(all.text, all.selection, 'bold')).text, t, 'and one more press takes it all off again');
   const endsAtStart = 'one\ntwo';
   assert.equal(must(toggleInline(endsAtStart, S(0, 4), 'bold')).text, '**one**\ntwo', 'the caret is at the start of line two, so line two is not touched');
@@ -278,7 +280,7 @@ test('block marks on several lines: all of them get it unless all have it; anoth
   const t = 'one\ntwo\n\nthree';
   const all = must(toggleBlock(t, S(0, t.length), 'bullet'));
   assert.equal(all.text, '- one\n- two\n\n- three');
-  assert.equal(sliceSel(all), all.text);
+  assert.equal(sliceSel(all), 'one\n- two\n\n- three', 'the selection starts behind the first new mark, so a second press sees the same lines');
   assert.equal(must(toggleBlock(all.text, all.selection, 'bullet')).text, t);
   const mixed = '- one\ntwo';
   assert.equal(must(toggleBlock(mixed, S(0, mixed.length), 'bullet')).text, '- one\n- two', 'one line had it, one did not: it goes on both');
@@ -316,9 +318,11 @@ test('Return at the end of a bullet starts the next bullet with the caret behind
   const mid = must(continueList('- milk and eggs', '- milk\n and eggs', 6));
   assert.equal(mid.text, '- milk\n-  and eggs', 'in the middle it splits the bullet: the rest goes to a bullet of its own');
   assert.deepEqual(mid.selection, S(9));
-  const later = must(continueList('title\n- a\n- b\nafter', 'title\n- a\n- b\n\nafter', 15));
+  const later = must(continueList('title\n- a\n- b\nafter', 'title\n- a\n- b\n\nafter', 13));
   assert.equal(later.text, 'title\n- a\n- b\n- \nafter');
-  assert.deepEqual(later.selection, S(18));
+  assert.deepEqual(later.selection, S(16));
+  // a line break next to a line break could have gone in two places; without the caret it is read as the later one
+  assert.equal(continueList('title\n- a\n- b\nafter', 'title\n- a\n- b\n\nafter'), null, 'no hint: taken as typed at the start of "after", a plain line');
 });
 
 test('Return on an empty bullet ends the list: the mark goes and no line break is added', () => {
@@ -330,7 +334,7 @@ test('Return on an empty bullet ends the list: the mark goes and no line break i
   assert.deepEqual(alone.selection, S(0));
   const spaces = must(continueList('- a\n-   ', '- a\n-   \n', 8));
   assert.equal(spaces.text, '- a\n');
-  const between = must(continueList('- a\n- \n- b', '- a\n- \n\n- b', 7));
+  const between = must(continueList('- a\n- \n- b', '- a\n- \n\n- b', 6));
   assert.equal(between.text, '- a\n\n- b', 'in the middle of a list it ends the list at that line');
 });
 
@@ -367,10 +371,10 @@ test('which formats are on at the caret, or all through the selection', () => {
   assert.deepEqual(formatsAt('', S(0)), none);
   assert.deepEqual(formatsAt('plain', S(2)), none);
   const t = 'a **b** _c_';
-  assert.equal(formatsAt(t, S(5)).bold, true, 'inside the bold word (the letter before the caret decides)');
-  assert.equal(formatsAt(t, S(6)).bold, true, 'right after it, so typing there would continue it');
+  assert.equal(formatsAt(t, S(5)).bold, true, 'at the end of the bold word, before its closing marks (the letter before the caret decides)');
+  assert.equal(formatsAt(t, S(7)).bold, false, 'after the closing marks: typing there is not bold');
   assert.equal(formatsAt(t, S(2)).bold, false);
-  assert.equal(formatsAt(t, S(3)).bold, true, 'in front of the first letter of a bold word: it is bold');
+  assert.equal(formatsAt(t, S(4)).bold, true, 'in front of the first letter of a bold word: it is bold');
   assert.equal(formatsAt(t, S(10)).italic, true);
   assert.equal(formatsAt(t, on(t, 'b')).bold, true);
   assert.equal(formatsAt(t, S(0, t.length)).bold, false, 'only some of what is selected');
@@ -393,6 +397,9 @@ function prng(seed: number) {
 }
 const PIECES = ['a', 'b', 'word', 'x y', ' ', '  ', '\n', '\n', '\r\n', '*', '**', '_', '__', '# ', '- ', '* ', '> ', '#', '-', '>', '**bold**', '_it_', '**_both_**', 'é', '🙏', '👨‍👩‍👧', 'é', '日本', 'שלום', '‍', '️', '_x', 'y_', '**z', 'w**', String.fromCharCode(0xd83d), String.fromCharCode(0xde4f), 'ana_torres_88', '1', '.', ',', '\t', ' '];
 const randomText = (rnd: () => number, maxPieces = 14) => Array.from({ length: Math.floor(rnd() * maxPieces) }, () => PIECES[Math.floor(rnd() * PIECES.length)]).join('');
+/** The page as characters with their marks, the marks of white space left out (a marked space looks like any other). */
+const readable = (t: string) => parseRich(t).map((bl) => [bl.kind, bl.spans.flatMap((s) => [...s.text].map((ch) => (/\s/.test(ch) ? ' ' : `${ch}${s.bold ? 'b' : ''}${s.italic ? 'i' : ''}`)))]);
+const hasMark = (t: string, f: 'bold' | 'italic') => parseRich(t).some((bl) => bl.spans.some((s) => s[f]));
 const splitsPair = (t: string, i: number) => i > 0 && i < t.length && t.charCodeAt(i - 1) >= 0xd800 && t.charCodeAt(i - 1) <= 0xdbff && t.charCodeAt(i) >= 0xdc00 && t.charCodeAt(i) <= 0xdfff;
 const validSel = (e: Edit) => Number.isInteger(e.selection.start) && Number.isInteger(e.selection.end) && e.selection.start >= 0 && e.selection.start <= e.selection.end && e.selection.end <= e.text.length;
 
@@ -406,7 +413,8 @@ test('random text: reading never throws, has one block per line, and plain text 
     const plain = plainText(t);
     assert.equal(plain.split('\n').length, t === '' ? 1 : t.split('\n').length);
     assert.ok(plain.length <= t.length, JSON.stringify(t));
-    if (!/[*_#>\-]/.test(t)) assert.equal(plain, t.replace(/\r\n/g, '\n'), `text without marks reads as it is: ${JSON.stringify(t)}`);
+    // text without any mark reads as it is (a line of nothing but white space is a blank line)
+    if (!/[*_#>\-]/.test(t)) assert.equal(plain, t.split('\n').map((l) => l.replace(/\r$/, '')).map((l) => (/^\s*$/.test(l) ? '' : l)).join('\n'), `text without marks reads as it is: ${JSON.stringify(t)}`);
   }
 });
 
@@ -422,12 +430,25 @@ test('random text and selections: bold and italic never change a word, keep the 
       const e = toggleInline(t, S(a, z), f);
       if (!e) { refused += 1; continue; }
       edits += 1;
-      assert.equal(plainText(e.text), plainText(t), `${f} changed a word: ${JSON.stringify(t)} ${a},${z} -> ${JSON.stringify(e.text)}`);
       assert.ok(validSel(e), `${JSON.stringify(t)} ${a},${z} -> ${JSON.stringify(e.selection)}`);
       assert.ok(!splitsPair(e.text, e.selection.start) && !splitsPair(e.text, e.selection.end), 'selection inside an emoji');
       assert.ok(!(e.text === t), 'an edit that changes nothing is null instead');
+      // The one edit that adds characters: an empty pair of marks at a caret that is away from any word, and taking it away again.
+      const pair = f === 'bold' ? '**' : '_';
+      const k = e.selection.start;
+      const pairIn = e.selection.start === e.selection.end && t.slice(0, k - pair.length) + pair + pair + t.slice(k - pair.length) === e.text;
+      const pairOut = e.selection.start === e.selection.end && e.text.slice(0, k) + pair + pair + e.text.slice(k) === t;
+      if (pairIn || pairOut) continue;
+      assert.equal(plainText(e.text), plainText(t), `${f} changed a word: ${JSON.stringify(t)} ${a},${z} -> ${JSON.stringify(e.text)}`);
+      // The page now says the format is on through the selection (at least when something other than white space is selected) ...
+      if (z !== a && pairIn === false) {
+        const on = formatsAt(e.text, e.selection)[f];
+        const off = formatsAt(t, S(a, z))[f];
+        if (!off && on !== true && /\S/.test(t.slice(Math.min(a, z), Math.max(a, z)))) assert.ok(hasMark(e.text, f) || !hasMark(t, f), `${f}: the pressed look is wrong after ${JSON.stringify(t)} ${a},${z} -> ${JSON.stringify(e.text)}`);
+      }
+      // ... and when the page had none of that format at all, one more press takes it off exactly where it was put (modulo the white space).
       const again = toggleInline(e.text, e.selection, f);
-      if (again && z !== a) assert.deepEqual(parseRich(again.text), parseRich(t), `pressing twice is not the same page: ${JSON.stringify(t)} ${a},${z} -> ${JSON.stringify(e.text)} -> ${JSON.stringify(again.text)}`);
+      if (again && z !== a && !hasMark(t, f)) assert.deepEqual(readable(again.text), readable(t), `pressing twice is not the same page: ${JSON.stringify(t)} ${a},${z} -> ${JSON.stringify(e.text)} -> ${JSON.stringify(again.text)}`);
     }
   }
   assert.ok(edits > 3000 && refused > 100, `the random cases must both edit (${edits}) and refuse (${refused})`);
@@ -447,9 +468,10 @@ test('random text and selections: block marks never change a word, keep the sele
       assert.equal(plainText(e.text), plainText(t), `${f} changed a word: ${JSON.stringify(t)} ${a},${z} -> ${JSON.stringify(e.text)}`);
       assert.ok(validSel(e), JSON.stringify(e));
       assert.ok(!splitsPair(e.text, e.selection.start) && !splitsPair(e.text, e.selection.end));
-      const f2 = formatsAt(t, S(a, z))[f];
-      const now = formatsAt(e.text, e.selection)[f];
-      if (!/^\s*$/.test(t)) assert.equal(now, !f2 || t.split('\n').some((l) => /\S/.test(l) === false), `${f}: ${JSON.stringify(t)} ${a},${z}`);
+      // what the buttons show after the press is the opposite of what they showed before it: the mark went on, or it came off
+      const before = formatsAt(t, S(a, z))[f];
+      const after = formatsAt(e.text, e.selection)[f];
+      assert.equal(after, !before, `${f}: ${JSON.stringify(t)} ${a},${z} -> ${JSON.stringify(e.text)} ${JSON.stringify(e.selection)}`);
     }
   }
   assert.ok(edits > 3000, `${edits} edits`);
@@ -459,19 +481,27 @@ test('random typing in lists: the Return key never changes a word and never leav
   const rnd = prng(4);
   let continued = 0;
   for (let k = 0; k < 6000; k++) {
-    const prev = randomText(rnd, 10);
+    const prev = randomText(rnd, 10).replace(/(^|\n)/g, (m) => (rnd() < 0.6 ? `${m}${rnd() < 0.8 ? '- ' : '* '}` : m)); // many of the lines are bullets
     const at = Math.floor(rnd() * (prev.length + 1));
     const next = `${prev.slice(0, at)}\n${prev.slice(at)}`;
     const e = continueList(prev, next, rnd() < 0.7 ? at : undefined);
     if (!e) continue;
     continued += 1;
     assert.ok(validSel(e), JSON.stringify([prev, at, e]));
-    assert.equal(plainText(e.text).replace(/\s+/g, ' ').trim().length >= 0, true);
-    const wordsBefore = plainText(prev).replace(/\s+/g, '');
-    const wordsAfter = plainText(e.text).replace(/\s+/g, '');
-    assert.equal(wordsAfter, wordsBefore, `Return changed a word: ${JSON.stringify([prev, at, e.text])}`);
+    assert.ok(!splitsPair(e.text, e.selection.start), 'caret inside an emoji');
+    if (e.text.length > prev.length) {
+      // a new bullet: what the field holds, plus one bullet mark right after the line break, and the caret behind that mark
+      const p = e.selection.start - 2;
+      assert.equal(e.text.length, next.length + 2, JSON.stringify([prev, at, e.text]));
+      assert.ok(/^[-*] $/.test(e.text.slice(p, p + 2)) && e.text.slice(0, p) === next.slice(0, p) && e.text.slice(p + 2) === next.slice(p), `only a bullet mark was added: ${JSON.stringify([prev, at, e.text])}`);
+      assert.equal(e.text.charCodeAt(p - 1), 10, 'right after a line break');
+    } else {
+      // the list ended: nothing but an empty bullet line lost its mark, no line was added
+      assert.equal(e.text.split('\n').length, prev.split('\n').length, JSON.stringify([prev, at, e.text]));
+      assert.equal(plainText(e.text), plainText(prev), `Return changed a word: ${JSON.stringify([prev, at, e.text])}`);
+    }
   }
-  assert.ok(continued > 200, `${continued} continued`);
+  assert.ok(continued > 1000, `${continued} continued`);
 });
 
 test('a page of twenty thousand characters (and five times that) is read, toggled and previewed in a blink, whatever it is made of', () => {
