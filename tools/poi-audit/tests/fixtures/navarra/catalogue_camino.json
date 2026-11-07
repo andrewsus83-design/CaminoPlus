@@ -1,0 +1,659 @@
+{
+ "format": "linked-data-api",
+ "version": "0.2",
+ "result": {
+  "_about": "http://datos.gob.es/apidata/catalog/dataset/title/Camino%20de%20Santiago.json?_pageSize=50&_page=0",
+  "definition": {
+   "_about": "http://datos.gob.es/apidata/catalog/dataset/title/Camino%20de%20Santiago.json",
+   "definition": "http://datos.gob.es/apidata/catalog/dataset/title/Camino%20de%20Santiago.json",
+   "hasPart": "http://datos.gob.es/apidata/catalog/dataset/title/Camino%20de%20Santiago.json?_pageSize=50&_page=0",
+   "type": "http://purl.org/linked-data/api/vocab#ListEndpoint"
+  },
+  "extendedMetadataVersion": "http://datos.gob.es/apidata/catalog/dataset/title/Camino%20de%20Santiago.json?_pageSize=50&_page=0&_metadata=all",
+  "first": "http://datos.gob.es/apidata/catalog/dataset/title/Camino%20de%20Santiago.json?_page=0",
+  "isPartOf": "http://datos.gob.es/apidata/catalog/dataset/title/Camino%20de%20Santiago.json",
+  "items": [
+   {
+    "_about": "https://datos.gob.es/catalogo/a15002917-camino-de-santiago-trazado-oficial1",
+    "accrualPeriodicity": "http://publications.europa.eu/resource/authority/frequency/UNKNOWN",
+    "conformsTo": "https://eur-lex.europa.eu/LexUriServ/LexUriServ.do?uri=OJ:L:2008:326:0012:0030:ES:PDF",
+    "description": [
+     {
+      "_value": "Capa informativa mediante polilíneas de la localización del trazado oficial del Camino de Santiago en Navarra: el camino francés, que parte de Francia y pasa por Orreaga/Roncesvalles y el aragónés, que viniendo por Aragón y pasando por Sangüesa, se junta con el primero en Puente la Reina.",
+      "_lang": "es"
+     },
+     {
+      "_value": "Capa informativa mediante polilíneas de la localización del trazado oficial del Camino de Santiago en Navarra: el camino francés, que parte de Francia y pasa por Orreaga/Roncesvalles y el aragónés, que viniendo por Aragón y pasando por Sangüesa, se junta con el primero en Puente la Reina.",
+      "_lang": "eu"
+     }
+    ],
+    "distribution": {
+     "_about": "https://datos.gob.es/catalogo/a15002917-camino-de-santiago-trazado-oficial1/resource/48915ccf-5804-4839-8f33-71484b2914bf",
+     "accessURL": "https://idena.navarra.es/descargas/PATRIM_Lin_CaminoSant.zip",
+     "format": "http://publications.europa.eu/resource/authority/file-type/SHP",
+     "identifier": "https://idena.navarra.es/descargas/PATRIM_Lin_CaminoSant.zip",
+     "title": [
+      {
+       "_value": "Enlace a la descarga del Conjunto de Datos Espaciales",
+       "_lang": "eu"
+      },
+      {
+       "_value": "Enlace a la descarga del Conjunto de Datos Espaciales",
+       "_lang": "es"
+      }
+     ],
+     "type": "http://www.w3.org/ns/dcat#Distribution"
+    },
+    "identifier": "https://datosabiertos.navarra.es/dataset/spasitnapatrim_lin_caminosant-xml",
+    "issued": "mié, 15 abr 2026 11:21:16 GMT+0000",
+    "keyword": [
+     {
+      "_value": "Dataset público con descarga disponible",
+      "_lang": "es"
+     },
+     {
+      "_value": "Dataset público con descarga disponible",
+      "_lang": "eu"
+     },
+     {
+      "_value": "Geographical names",
+      "_lang": "eu"
+     },
+     {
+      "_value": "Geographical names",
+      "_lang": "es"
+     },
+     {
+      "_value": "Nombres geográficos",
+      "_lang": "eu"
+     },
+     {
+      "_value": "Nombres geográficos",
+      "_lang": "es"
+     }
+    ],
+    "language": [
+     "http://publications.europa.eu/resource/authority/language/EUS",
+     "http://publications.europa.eu/resource/authority/language/SPA"
+    ],
+    "license": "http://publications.europa.eu/resource/authority/licence/CC_BY_4_0",
+    "modified": "mié, 15 abr 2026 11:21:16 GMT+0000",
+    "publisher": "http://datos.gob.es/recurso/sector-publico/org/Organismo/A15002917",
+    "spatial": "http://datos.gob.es/recurso/sector-publico/territorio/Autonomia/Comunidad-Foral-Navarra",
+    "theme": [
+     "http://datos.gob.es/kos/sector-publico/sector/sociedad-bienestar",
+     "http://datos.gob.es/kos/sector-publico/sector/urbanismo-infraestructuras"
+    ],
+    "title": [
+     {
+      "_value": "Camino de Santiago. Trazado oficial",
+      "_lang": "es"
+     },
+     {
+      "_value": "Camino de Santiago. Trazado oficial",
+      "_lang": "eu"
+     }
+    ],
+    "type": "http://www.w3.org/ns/dcat#Dataset"
+   },
+   {
+    "_about": "https://datos.gob.es/catalogo/a15002917-fuentes-del-camino-de-santiago1",
+    "accrualPeriodicity": "http://publications.europa.eu/resource/authority/frequency/ANNUAL",
+    "description": [
+     {
+      "_value": "Archivo de datos con las coordenadas UTM (Sistema de Coordenadas Universal Transversal de Mercator) de todas las fuentes existentes en el trazado del Camino de Santiago a su paso por Navarra, tanto en el ramal francés como en el aragonés.\n\nSe hace constar que están incluidas todas las fuentes, tanto las que tienen garantías sanitarias, como las que no; estas últimas están señalizadas sobre el terreno mediante una placa que lo indica.",
+      "_lang": "es"
+     },
+     {
+      "_value": "Done Jakue Bidearen Nafarroako zatian (Frantziako nahiz Aragoiko adarrean) dauden iturri guztien UTM koordenatuak (Mercatorren Zeharkako Koordenatu Sistema Unibertsala) dituen datu-fitxategia.\n\nIturri guztiak jasota daudela argi dago, bai osasun-bermea dutenak, bai ez dutenak; azken horiek lekuan bertan hala adierazten duen plakarekin seinaleztatuta daude.",
+      "_lang": "eu"
+     }
+    ],
+    "distribution": [
+     {
+      "_about": "https://datos.gob.es/catalogo/a15002917-fuentes-del-camino-de-santiago1/resource/041626df-1a9c-4bab-8d07-6f2315416ca9",
+      "accessURL": "https://datosabiertos.navarra.es/datastore/dump/cf2cf3ca-e58b-4a93-9a46-eb4af9195190?format=ods&bom=True",
+      "format": "http://publications.europa.eu/resource/authority/file-type/ODS",
+      "identifier": "https://datosabiertos.navarra.es/datastore/dump/cf2cf3ca-e58b-4a93-9a46-eb4af9195190?format=ods&bom=True",
+      "title": [
+       {
+        "_value": "Donejakue bideko iturriak - ODS",
+        "_lang": "eu"
+       },
+       {
+        "_value": "Fuentes del Camino de Santiago - ODS",
+        "_lang": "es"
+       }
+      ],
+      "type": "http://www.w3.org/ns/dcat#Distribution"
+     },
+     {
+      "_about": "https://datos.gob.es/catalogo/a15002917-fuentes-del-camino-de-santiago1/resource/0a4d8a3e-ec15-43b0-abfd-a951ebed8bca",
+      "accessURL": "https://datosabiertos.navarra.es/dataset/5163f000-e25b-4469-9644-571db39beff5/resource/cf2cf3ca-e58b-4a93-9a46-eb4af9195190/download/inventario_fuentes_opendata.csv",
+      "format": "http://publications.europa.eu/resource/authority/file-type/CSV",
+      "identifier": "https://datosabiertos.navarra.es/dataset/5163f000-e25b-4469-9644-571db39beff5/resource/cf2cf3ca-e58b-4a93-9a46-eb4af9195190/download/inventario_fuentes_opendata.csv",
+      "title": [
+       {
+        "_value": "Donejakue bideko iturriak",
+        "_lang": "eu"
+       },
+       {
+        "_value": "Fuentes del Camino de Santiago",
+        "_lang": "es"
+       }
+      ],
+      "type": "http://www.w3.org/ns/dcat#Distribution"
+     },
+     {
+      "_about": "https://datos.gob.es/catalogo/a15002917-fuentes-del-camino-de-santiago1/resource/16301421-2e4d-42b4-b915-91773f8ab7f6",
+      "accessURL": "https://datosabiertos.navarra.es/datastore/dump/cf2cf3ca-e58b-4a93-9a46-eb4af9195190?format=xlsx&bom=True",
+      "format": "http://publications.europa.eu/resource/authority/file-type/XLSX",
+      "identifier": "https://datosabiertos.navarra.es/datastore/dump/cf2cf3ca-e58b-4a93-9a46-eb4af9195190?format=xlsx&bom=True",
+      "title": [
+       {
+        "_value": "Donejakue bideko iturriak - XLSX",
+        "_lang": "eu"
+       },
+       {
+        "_value": "Fuentes del Camino de Santiago - XLSX",
+        "_lang": "es"
+       }
+      ],
+      "type": "http://www.w3.org/ns/dcat#Distribution"
+     },
+     {
+      "_about": "https://datos.gob.es/catalogo/a15002917-fuentes-del-camino-de-santiago1/resource/42708727-1acc-4a7a-b7a3-2bc9fea41d9c",
+      "accessURL": "https://datosabiertos.navarra.es/datastore/dump/cf2cf3ca-e58b-4a93-9a46-eb4af9195190?format=xml&bom=True",
+      "format": "http://publications.europa.eu/resource/authority/file-type/XML",
+      "identifier": "https://datosabiertos.navarra.es/datastore/dump/cf2cf3ca-e58b-4a93-9a46-eb4af9195190?format=xml&bom=True",
+      "title": [
+       {
+        "_value": "Donejakue bideko iturriak - XML",
+        "_lang": "eu"
+       },
+       {
+        "_value": "Fuentes del Camino de Santiago - XML",
+        "_lang": "es"
+       }
+      ],
+      "type": "http://www.w3.org/ns/dcat#Distribution"
+     },
+     {
+      "_about": "https://datos.gob.es/catalogo/a15002917-fuentes-del-camino-de-santiago1/resource/6f9753ce-91db-4fa7-a4cf-5c5170f89ced",
+      "accessURL": "https://datosabiertos.navarra.es/datastore/dump/cf2cf3ca-e58b-4a93-9a46-eb4af9195190?format=csv&bom=True",
+      "format": "http://publications.europa.eu/resource/authority/file-type/CSV",
+      "identifier": "https://datosabiertos.navarra.es/datastore/dump/cf2cf3ca-e58b-4a93-9a46-eb4af9195190?format=csv&bom=True",
+      "title": [
+       {
+        "_value": "Donejakue bideko iturriak - CSV",
+        "_lang": "eu"
+       },
+       {
+        "_value": "Fuentes del Camino de Santiago - CSV",
+        "_lang": "es"
+       }
+      ],
+      "type": "http://www.w3.org/ns/dcat#Distribution"
+     },
+     {
+      "_about": "https://datos.gob.es/catalogo/a15002917-fuentes-del-camino-de-santiago1/resource/7b2e77d1-37b5-4c6b-9dc0-3bef6d6af118",
+      "accessURL": "https://datosabiertos.navarra.es/datastore/dump/cf2cf3ca-e58b-4a93-9a46-eb4af9195190?format=tsv&bom=True",
+      "format": "http://publications.europa.eu/resource/authority/file-type/TSV",
+      "identifier": "https://datosabiertos.navarra.es/datastore/dump/cf2cf3ca-e58b-4a93-9a46-eb4af9195190?format=tsv&bom=True",
+      "title": [
+       {
+        "_value": "Donejakue bideko iturriak - TSV",
+        "_lang": "eu"
+       },
+       {
+        "_value": "Fuentes del Camino de Santiago - TSV",
+        "_lang": "es"
+       }
+      ],
+      "type": "http://www.w3.org/ns/dcat#Distribution"
+     },
+     {
+      "_about": "https://datos.gob.es/catalogo/a15002917-fuentes-del-camino-de-santiago1/resource/7de7323a-571b-45a7-aab8-81bf58e69db1",
+      "accessURL": "https://datosabiertos.navarra.es/datastore/dump/cf2cf3ca-e58b-4a93-9a46-eb4af9195190?format=json&bom=True",
+      "format": "http://publications.europa.eu/resource/authority/file-type/JSON",
+      "identifier": "https://datosabiertos.navarra.es/datastore/dump/cf2cf3ca-e58b-4a93-9a46-eb4af9195190?format=json&bom=True",
+      "title": [
+       {
+        "_value": "Donejakue bideko iturriak - JSON",
+        "_lang": "eu"
+       },
+       {
+        "_value": "Fuentes del Camino de Santiago - JSON",
+        "_lang": "es"
+       }
+      ],
+      "type": "http://www.w3.org/ns/dcat#Distribution"
+     },
+     {
+      "_about": "https://datos.gob.es/catalogo/a15002917-fuentes-del-camino-de-santiago1/resource/bd868dbe-0365-4b91-9f37-f19ab13f79d4",
+      "accessURL": "https://datosabiertos.navarra.es/datastore/dump/cf2cf3ca-e58b-4a93-9a46-eb4af9195190?format=json&bom=True",
+      "format": "http://publications.europa.eu/resource/authority/file-type/JSON",
+      "identifier": "https://datosabiertos.navarra.es/datastore/dump/cf2cf3ca-e58b-4a93-9a46-eb4af9195190?format=json&bom=True",
+      "title": [
+       {
+        "_value": "Donejakue bideko iturriak - JSON - API",
+        "_lang": "eu"
+       },
+       {
+        "_value": "Fuentes del Camino de Santiago - JSON - API",
+        "_lang": "es"
+       }
+      ],
+      "type": "http://www.w3.org/ns/dcat#Distribution"
+     },
+     {
+      "_about": "https://datos.gob.es/catalogo/a15002917-fuentes-del-camino-de-santiago1/resource/f7c8dfc5-85c0-4e19-bc2b-48c450897665",
+      "accessURL": "https://datosabiertos.navarra.es/dataset/fuentes-del-camino-de-santiago-/resource/cf2cf3ca-e58b-4a93-9a46-eb4af9195190?view_id=b051c051-c15b-4cfc-a327-754e93a0ab5d",
+      "format": "http://publications.europa.eu/resource/authority/file-type/HTML",
+      "identifier": "https://datosabiertos.navarra.es/dataset/fuentes-del-camino-de-santiago-/resource/cf2cf3ca-e58b-4a93-9a46-eb4af9195190?view_id=b051c051-c15b-4cfc-a327-754e93a0ab5d",
+      "title": [
+       {
+        "_value": "Donejakue bideko iturriak - Tabla",
+        "_lang": "eu"
+       },
+       {
+        "_value": "Fuentes del Camino de Santiago - Tabla",
+        "_lang": "es"
+       }
+      ],
+      "type": "http://www.w3.org/ns/dcat#Distribution"
+     }
+    ],
+    "identifier": "https://datosabiertos.navarra.es/dataset/fuentes-del-camino-de-santiago-",
+    "issued": "mié, 23 jun 2021 12:36:59 GMT+0000",
+    "keyword": [
+     {
+      "_value": "Agua",
+      "_lang": "es"
+     },
+     {
+      "_value": "Camino de Santiago",
+      "_lang": "es"
+     },
+     {
+      "_value": "Done Jakue bidea",
+      "_lang": "eu"
+     },
+     {
+      "_value": "Fuentes",
+      "_lang": "es"
+     },
+     {
+      "_value": "Iturriak",
+      "_lang": "eu"
+     },
+     {
+      "_value": "Ura",
+      "_lang": "eu"
+     }
+    ],
+    "language": [
+     "http://publications.europa.eu/resource/authority/language/EUS",
+     "http://publications.europa.eu/resource/authority/language/SPA"
+    ],
+    "license": "http://publications.europa.eu/resource/authority/licence/CC_BY_4_0",
+    "modified": "vie, 09 oct 2026 09:14:39 GMT+0000",
+    "publisher": "http://datos.gob.es/recurso/sector-publico/org/Organismo/A15002917",
+    "spatial": "http://datos.gob.es/recurso/sector-publico/territorio/Autonomia/Comunidad-Foral-Navarra",
+    "temporal": "https://datosabiertos.navarra.es/federador.rdf/bnode/N33dbdc2015bc4f1c9cbd3ee370585045",
+    "theme": "http://datos.gob.es/kos/sector-publico/sector/turismo",
+    "title": [
+     {
+      "_value": "Donejakue bideko iturriak",
+      "_lang": "eu"
+     },
+     {
+      "_value": "Fuentes del Camino de Santiago",
+      "_lang": "es"
+     }
+    ],
+    "type": "http://www.w3.org/ns/dcat#Dataset",
+    "valid": "dom, 31 dic 2023 00:00:00 GMT+0000"
+   },
+   {
+    "_about": "https://datos.gob.es/catalogo/a16003011-camino-de-santiago-a-su-paso-por-la-comunidad-autonoma-del-pais-vasco",
+    "description": [
+     {
+      "_value": "Ibilbide erreal eta fisiko egingarria, erromesarentzat jarraitua eta segurua, bide historiko eta publikoetatik ibiltzea lehenetsiz, ez bakarrik mugarri edo lekuen segida, baizik eta bide historiko edo galtzada publikoetan barrena, ahal den neurrian, errepide eta bide arriskutsuak saihestuz, fisikoki elkartzen dena.",
+      "_lang": "eu"
+     },
+     {
+      "_value": "Ruta real y física practicable, continua para el peregrino y segura, primando su discurrir por caminos históricos y públicos, no siendo tan solo la sucesión de hitos o lugares, sino une de manera física en su mayoría a través de caminos históricos o calzadas públicas evitando, en la manera de lo posible, las carreteras y las vías peligrosas.",
+      "_lang": "es"
+     }
+    ],
+    "distribution": {
+     "_about": "https://datos.gob.es/catalogo/a16003011-camino-de-santiago-a-su-paso-por-la-comunidad-autonoma-del-pais-vasco/resource/cc635bc7-4129-4cf5-abba-3072d3bb4413",
+     "accessURL": "https://www.geo.euskadi.eus/WMS_KULTURA",
+     "format": {
+      "_about": "https://datos.gob.es/catalogo/a16003011-camino-de-santiago-a-su-paso-por-la-comunidad-autonoma-del-pais-vasco/resource/cc635bc7-4129-4cf5-abba-3072d3bb4413/format",
+      "type": "http://purl.org/dc/terms/IMT",
+      "value": "text/wms"
+     },
+     "title": [
+      {
+       "_value": "WMS Kultura",
+       "_lang": "es"
+      },
+      {
+       "_value": "WMS Kultura",
+       "_lang": "eu"
+      }
+     ],
+     "type": "http://www.w3.org/ns/dcat#Distribution"
+    },
+    "identifier": "https://opendata.euskadi.eus/catalogo/-/camino-santiago-su-paso-comunidad-autonoma-del-pais-vasco/",
+    "issued": "lun, 09 ene 2012 23:00:00 GMT+0000",
+    "keyword": [
+     {
+      "_value": "Cultura",
+      "_lang": "es"
+     },
+     {
+      "_value": "Gizartea",
+      "_lang": "eu"
+     },
+     {
+      "_value": "Historia- arte eta kultura ondarea",
+      "_lang": "eu"
+     },
+     {
+      "_value": "Kultura",
+      "_lang": "eu"
+     },
+     {
+      "_value": "Kultura ondarea",
+      "_lang": "eu"
+     },
+     {
+      "_value": "Leku babestuak",
+      "_lang": "eu"
+     },
+     {
+      "_value": "Lugares protegidos",
+      "_lang": "es"
+     },
+     {
+      "_value": "Patrimonio Cultural",
+      "_lang": "es"
+     },
+     {
+      "_value": "Patrimonio histórico artístico y cultural",
+      "_lang": "es"
+     },
+     {
+      "_value": "Sociedad",
+      "_lang": "es"
+     }
+    ],
+    "language": [
+     "http://publications.europa.eu/resource/authority/language/EUS",
+     "http://publications.europa.eu/resource/authority/language/SPA"
+    ],
+    "modified": "mié, 01 mar 2023 23:00:00 GMT+0000",
+    "publisher": "http://datos.gob.es/recurso/sector-publico/org/Organismo/A16003011",
+    "references": [
+     "https://opendata.euskadi.eus/catalogo/-/camino-santiago-su-paso-comunidad-autonoma-del-pais-vasco/",
+     "https://opendata.euskadi.eus/contenidos/ds_geograficos/md_ideeu_elcamino/es_def/data/md_ideeu_elcamino_es.xml",
+     "https://www.euskadi.eus/camino-de-santiago/patrimonio-mundial-euskadi/web01-a1donjak/es/",
+     "https://www.geo.euskadi.eus/geobisorea?lang=es&extent=-494723.6514,5193860.3471,-103366.0666,5392137.9985,102100&layers=KULTURA_CAS_3860_9&baselayer=MapaGris",
+     "https://www.legegunea.euskadi.eus/decreto/decreto-662022-24-mayo-modificacion-del-decreto-que-se-califica-como-bien-cultural-calificado-categoria-conjunto-monumental-camino-santiago-su-paso-comunidad-autonoma-del-pais-vasco/webleg00-contfich/es/",
+     "https://www.legegunea.euskadi.eus/es/eli/-/eli/es-pv/d/2012/01/10/2/dof/spa/html/"
+    ],
+    "spatial": "http://datos.gob.es/recurso/sector-publico/territorio/Autonomia/Pais-Vasco",
+    "temporal": "https://datos.gob.es/catalogo/a16003011-camino-de-santiago-a-su-paso-por-la-comunidad-autonoma-del-pais-vasco/PeriodOfTime-1",
+    "theme": "http://datos.gob.es/kos/sector-publico/sector/cultura-ocio",
+    "title": [
+     {
+      "_value": "Camino de Santiago a su paso por la Comunidad Autónoma del País Vasco.",
+      "_lang": "es"
+     },
+     {
+      "_value": "Done Jakue bidea Euskal Autonomia Erkidegoan.",
+      "_lang": "eu"
+     }
+    ],
+    "type": "http://www.w3.org/ns/dcat#Dataset"
+   },
+   {
+    "_about": "https://datos.gob.es/catalogo/a15002917-senales-del-camino-de-santiago",
+    "accrualPeriodicity": "http://publications.europa.eu/resource/authority/frequency/ANNUAL",
+    "description": [
+     {
+      "_value": "Archivo de datos con las coordenadas UTM (Sistema de Coordenadas Universal Transversal de Mercator) de las señales existentes en el trazado del Camino de Santiago a su paso por Navarra.",
+      "_lang": "es"
+     },
+     {
+      "_value": "Done Jakue Bideak Nafarroan egiten duen ibilbidean dauden seinaleen UTM (Mercatorreko Zeharkako Koordenatu Unibertsalaren Sistema) koordenatuak dituzten datuen fitxategia.",
+      "_lang": "eu"
+     }
+    ],
+    "distribution": [
+     {
+      "_about": "https://datos.gob.es/catalogo/a15002917-senales-del-camino-de-santiago/resource/196fcabf-f9f7-4b62-b7c1-cd76edaed72f",
+      "accessURL": "https://datosabiertos.navarra.es/datastore/dump/e0480e89-711a-4652-a960-4a37513546cd?format=xlsx&bom=True",
+      "format": "http://publications.europa.eu/resource/authority/file-type/XLSX",
+      "identifier": "https://datosabiertos.navarra.es/datastore/dump/e0480e89-711a-4652-a960-4a37513546cd?format=xlsx&bom=True",
+      "title": [
+       {
+        "_value": "Bidearen seinaleak - XLSX",
+        "_lang": "eu"
+       },
+       {
+        "_value": "Señales del camino - XLSX",
+        "_lang": "es"
+       }
+      ],
+      "type": "http://www.w3.org/ns/dcat#Distribution"
+     },
+     {
+      "_about": "https://datos.gob.es/catalogo/a15002917-senales-del-camino-de-santiago/resource/63ea2780-24e6-4b0a-96ae-881c08fbd9ad",
+      "accessURL": "https://datosabiertos.navarra.es/datastore/dump/e0480e89-711a-4652-a960-4a37513546cd?format=xml&bom=True",
+      "format": "http://publications.europa.eu/resource/authority/file-type/XML",
+      "identifier": "https://datosabiertos.navarra.es/datastore/dump/e0480e89-711a-4652-a960-4a37513546cd?format=xml&bom=True",
+      "title": [
+       {
+        "_value": "Bidearen seinaleak - XML",
+        "_lang": "eu"
+       },
+       {
+        "_value": "Señales del camino - XML",
+        "_lang": "es"
+       }
+      ],
+      "type": "http://www.w3.org/ns/dcat#Distribution"
+     },
+     {
+      "_about": "https://datos.gob.es/catalogo/a15002917-senales-del-camino-de-santiago/resource/6befeecb-1465-4573-a353-9a7d8527baf2",
+      "accessURL": "https://datosabiertos.navarra.es/dataset/senales-del-camino-de-santiago/resource/e0480e89-711a-4652-a960-4a37513546cd?view_id=e2641918-0e36-42db-bbd5-46098cf2d33a",
+      "format": "http://publications.europa.eu/resource/authority/file-type/HTML",
+      "identifier": "https://datosabiertos.navarra.es/dataset/senales-del-camino-de-santiago/resource/e0480e89-711a-4652-a960-4a37513546cd?view_id=e2641918-0e36-42db-bbd5-46098cf2d33a",
+      "title": [
+       {
+        "_value": "Bidearen seinaleak - Tabla",
+        "_lang": "eu"
+       },
+       {
+        "_value": "Señales del camino - Tabla",
+        "_lang": "es"
+       }
+      ],
+      "type": "http://www.w3.org/ns/dcat#Distribution"
+     },
+     {
+      "_about": "https://datos.gob.es/catalogo/a15002917-senales-del-camino-de-santiago/resource/9f6e7749-029f-40d1-a518-e647a25fde11",
+      "accessURL": "https://datosabiertos.navarra.es/dataset/bb9fe99f-3785-4c84-a47a-0a21ff3228a6/resource/e0480e89-711a-4652-a960-4a37513546cd/download/inventario_senales_opendata.csv",
+      "format": "http://publications.europa.eu/resource/authority/file-type/CSV",
+      "identifier": "https://datosabiertos.navarra.es/dataset/bb9fe99f-3785-4c84-a47a-0a21ff3228a6/resource/e0480e89-711a-4652-a960-4a37513546cd/download/inventario_senales_opendata.csv",
+      "title": [
+       {
+        "_value": "Bidearen seinaleak",
+        "_lang": "eu"
+       },
+       {
+        "_value": "Señales del camino",
+        "_lang": "es"
+       }
+      ],
+      "type": "http://www.w3.org/ns/dcat#Distribution"
+     },
+     {
+      "_about": "https://datos.gob.es/catalogo/a15002917-senales-del-camino-de-santiago/resource/b2ffb99a-e5c7-41c0-84cd-5bfd8545df6b",
+      "accessURL": "https://datosabiertos.navarra.es/datastore/dump/e0480e89-711a-4652-a960-4a37513546cd?format=tsv&bom=True",
+      "format": "http://publications.europa.eu/resource/authority/file-type/TSV",
+      "identifier": "https://datosabiertos.navarra.es/datastore/dump/e0480e89-711a-4652-a960-4a37513546cd?format=tsv&bom=True",
+      "title": [
+       {
+        "_value": "Bidearen seinaleak - TSV",
+        "_lang": "eu"
+       },
+       {
+        "_value": "Señales del camino - TSV",
+        "_lang": "es"
+       }
+      ],
+      "type": "http://www.w3.org/ns/dcat#Distribution"
+     },
+     {
+      "_about": "https://datos.gob.es/catalogo/a15002917-senales-del-camino-de-santiago/resource/c7482445-9c31-4aff-a0b6-ba42d2a5d2f4",
+      "accessURL": "https://datosabiertos.navarra.es/datastore/dump/e0480e89-711a-4652-a960-4a37513546cd?format=json&bom=True",
+      "format": "http://publications.europa.eu/resource/authority/file-type/JSON",
+      "identifier": "https://datosabiertos.navarra.es/datastore/dump/e0480e89-711a-4652-a960-4a37513546cd?format=json&bom=True",
+      "title": [
+       {
+        "_value": "Bidearen seinaleak - JSON - API",
+        "_lang": "eu"
+       },
+       {
+        "_value": "Señales del camino - JSON - API",
+        "_lang": "es"
+       }
+      ],
+      "type": "http://www.w3.org/ns/dcat#Distribution"
+     },
+     {
+      "_about": "https://datos.gob.es/catalogo/a15002917-senales-del-camino-de-santiago/resource/e2ffd293-02de-43c1-8fa4-cbc9756f01bb",
+      "accessURL": "https://datosabiertos.navarra.es/datastore/dump/e0480e89-711a-4652-a960-4a37513546cd?format=csv&bom=True",
+      "format": "http://publications.europa.eu/resource/authority/file-type/CSV",
+      "identifier": "https://datosabiertos.navarra.es/datastore/dump/e0480e89-711a-4652-a960-4a37513546cd?format=csv&bom=True",
+      "title": [
+       {
+        "_value": "Bidearen seinaleak - CSV",
+        "_lang": "eu"
+       },
+       {
+        "_value": "Señales del camino - CSV",
+        "_lang": "es"
+       }
+      ],
+      "type": "http://www.w3.org/ns/dcat#Distribution"
+     },
+     {
+      "_about": "https://datos.gob.es/catalogo/a15002917-senales-del-camino-de-santiago/resource/e36d8ed4-3e5a-44a3-b18b-3bad4e2ebd94",
+      "accessURL": "https://datosabiertos.navarra.es/datastore/dump/e0480e89-711a-4652-a960-4a37513546cd?format=ods&bom=True",
+      "format": "http://publications.europa.eu/resource/authority/file-type/ODS",
+      "identifier": "https://datosabiertos.navarra.es/datastore/dump/e0480e89-711a-4652-a960-4a37513546cd?format=ods&bom=True",
+      "title": [
+       {
+        "_value": "Bidearen seinaleak - ODS",
+        "_lang": "eu"
+       },
+       {
+        "_value": "Señales del camino - ODS",
+        "_lang": "es"
+       }
+      ],
+      "type": "http://www.w3.org/ns/dcat#Distribution"
+     },
+     {
+      "_about": "https://datos.gob.es/catalogo/a15002917-senales-del-camino-de-santiago/resource/f776a703-00a3-410b-9515-42b65da65e02",
+      "accessURL": "https://datosabiertos.navarra.es/datastore/dump/e0480e89-711a-4652-a960-4a37513546cd?format=json&bom=True",
+      "format": "http://publications.europa.eu/resource/authority/file-type/JSON",
+      "identifier": "https://datosabiertos.navarra.es/datastore/dump/e0480e89-711a-4652-a960-4a37513546cd?format=json&bom=True",
+      "title": [
+       {
+        "_value": "Bidearen seinaleak - JSON",
+        "_lang": "eu"
+       },
+       {
+        "_value": "Señales del camino - JSON",
+        "_lang": "es"
+       }
+      ],
+      "type": "http://www.w3.org/ns/dcat#Distribution"
+     }
+    ],
+    "identifier": "https://datosabiertos.navarra.es/dataset/senales-del-camino-de-santiago",
+    "issued": "vie, 03 oct 2025 08:46:34 GMT+0000",
+    "keyword": [
+     {
+      "_value": "Bide",
+      "_lang": "eu"
+     },
+     {
+      "_value": "Camino",
+      "_lang": "es"
+     },
+     {
+      "_value": "Donejakue",
+      "_lang": "eu"
+     },
+     {
+      "_value": "Marca",
+      "_lang": "es"
+     },
+     {
+      "_value": "Marka",
+      "_lang": "eu"
+     },
+     {
+      "_value": "Santiago",
+      "_lang": "es"
+     },
+     {
+      "_value": "Seinalea",
+      "_lang": "eu"
+     },
+     {
+      "_value": "Señal",
+      "_lang": "es"
+     }
+    ],
+    "language": [
+     "http://publications.europa.eu/resource/authority/language/EUS",
+     "http://publications.europa.eu/resource/authority/language/SPA"
+    ],
+    "license": "http://publications.europa.eu/resource/authority/licence/CC_BY_4_0",
+    "modified": "vie, 09 oct 2026 09:19:40 GMT+0000",
+    "publisher": "http://datos.gob.es/recurso/sector-publico/org/Organismo/A15002917",
+    "spatial": "http://datos.gob.es/recurso/sector-publico/territorio/Autonomia/Comunidad-Foral-Navarra",
+    "temporal": "https://datosabiertos.navarra.es/federador.rdf/bnode/Ncf6ca2d53b7047daaf776a5a4f8a64db",
+    "theme": [
+     "http://datos.gob.es/kos/sector-publico/sector/medio-ambiente",
+     "http://datos.gob.es/kos/sector-publico/sector/turismo"
+    ],
+    "title": [
+     {
+      "_value": "Donejakue bidearen seinaleak",
+      "_lang": "eu"
+     },
+     {
+      "_value": "Señales del camino de Santiago",
+      "_lang": "es"
+     }
+    ],
+    "type": "http://www.w3.org/ns/dcat#Dataset",
+    "valid": "dom, 31 dic 2023 00:00:00 GMT+0000"
+   }
+  ],
+  "itemsPerPage": 50,
+  "page": 0,
+  "startIndex": 1,
+  "type": "http://purl.org/linked-data/api/vocab#Page"
+ }
+}
