@@ -6,6 +6,7 @@ import { createLatestGate, friendlyError } from '../logic';
 import type { Conversation, Member, ReportReason } from '../types';
 import { useIsScreenFocused, useMeId } from './base';
 import { cachedConversation, rememberConversations } from './conversations';
+import { reportContent } from './safety';
 import { refreshUnreadTotals } from './unread';
 
 export type InfoPhase = 'loading' | 'ready' | 'error' | 'missing';
@@ -72,5 +73,4 @@ export function useChatInfo(conversationId: string) {
 }
 
 /** Report a single message (long-press menu in the chat). */
-export const reportMessage = (messageId: string, reason: ReportReason) =>
-  socialApi.report({ type: 'message', targetId: messageId, reason }).then(() => null, (e) => friendlyError(e, 'Could not send your report.'));
+export const reportMessage = (messageId: string, reason: ReportReason) => reportContent('message', messageId, reason);

@@ -160,3 +160,15 @@ export type StorageInfo = {
 };
 
 export type ReportReason = 'spam' | 'nudity' | 'harassment' | 'violence' | 'hate' | 'misinformation' | 'privacy' | 'other';
+
+/** What a report can be about (content_reports.target_type): a chat message, a person, a post or a comment. */
+export type ReportTarget = 'message' | 'profile' | 'post' | 'comment';
+
+/** One row of list_blocked_pilgrims(): somebody I blocked. Name and picture are null for a deleted account. */
+export type BlockedPilgrim = {
+  user_id: string;
+  username: string | null;
+  display_name: string | null;
+  avatar_url: string | null;
+  blocked_at: string;
+};

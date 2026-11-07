@@ -1,13 +1,14 @@
 // Plain-node checks for the pure social logic (no React Native). Run: npm run test:social
 import assert from 'node:assert/strict';
 import {
-  AVATAR_TINTS, CLUSTER_GAP_MS, NAME_COLORS, UUID_RE, avatarTint, badgeLabel, buildTimeline, canCreateGroup, classifySendError, clockTime,
+  AVATAR_TINTS, BLOCKED_LIST_ERROR, CLUSTER_GAP_MS, NAME_COLORS, REPORT_DETAILS_MAX, REPORT_PROMPT, REPORT_REASONS, REPORT_REASON_KEYS, REPORT_TARGETS,
+  REPORT_THANKS, UUID_RE, avatarTint, badgeLabel, blockMessage, blockedListError, buildReportRow, buildTimeline, canCreateGroup, classifySendError, clockTime,
   conversationName, countUnread, muteLabel, createDebouncer, createLatestGate, dayKey, dayLabel, daysBetween, deliveryLabel, filterConversations,
   filterPeople, firstName, friendAction, friendlyError, groupBlocker, initials, isMuted, isOutboxItem, isSearchable,
   mergeMessages, messageActions, nameColor, normalizeQuery, normalizeTotals, notificationAction, notificationHeadline,
-  notificationTime, outboxToMessage, parseOutbox, parseStorage, patchOutbox, pilgrimsLabel, previewLine, pruneOutbox, removeOutbox,
+  notificationTime, outboxToMessage, parseBlocked, parseOutbox, parseStorage, patchOutbox, pilgrimsLabel, previewLine, pruneOutbox, removeOutbox,
   requestState, retryDelayMs, sameTotals, smartTime, snippet, sortByName, splitNotifications, storageGate, timelineMessages, toInverted,
-  truncate, ts, uuidV4, upsertOutbox, validGroupTitle, withStatus, newId,
+  truncate, ts, unblockMessage, uuidV4, upsertOutbox, validGroupTitle, withStatus, newId,
 } from '../logic';
 import type { ChatMessage, Conversation, Friend, MessageEntry, Member, NotificationItem, OutboxItem, PilgrimResult, TimelineMessage } from '../types';
 import {
@@ -548,6 +549,102 @@ test('friendlyError shows the database\'s own sentences and turns technical or n
   assert.match(friendlyError({ message: 'you must be friends to chat' }), /be friends/);
   assert.equal(friendlyError({ message: 'boom' }, 'Fallback'), 'Fallback');
   assert.equal(friendlyError(undefined), 'Something went wrong. Please try again.');
+});
+
+/* ================================================================ reports and blocks ================================================================ */
+
+const REPORT_ID = '3f2b8c1e-9d4a-4b7e-8a21-5c6d7e8f9a0b';
+const reportRow = (details?: string | null) => buildReportRow({ type: 'post', targetId: REPORT_ID, reason: 'other', details });
+
+test('buildReportRow: a message names itself in message_id, a person, a post and a comment do not', () => {
+  assert.deepEqual(buildReportRow({ type: 'message', targetId: REPORT_ID, reason: 'spam' }),
+    { target_type: 'message', target_id: REPORT_ID, reason: 'spam', details: null, message_id: REPORT_ID });
+  for (const type of ['profile', 'post', 'comment'] as const) {
+    const row = buildReportRow({ type, targetId: REPORT_ID, reason: 'harassment' });
+    assert.deepEqual(row, { target_type: type, target_id: REPORT_ID, reason: 'harassment', details: null });
+    assert.ok(!('message_id' in row), `${type} report has no message_id (the server would clear it)`);
+  }
+});
+
+test('buildReportRow: details are trimmed, empty means null, long text is cut at 1000 whole characters', () => {
+  assert.equal(reportRow().details, null);
+  assert.equal(reportRow(null).details, null);
+  assert.equal(reportRow('   \n ').details, null);
+  assert.equal(reportRow('  selling things  ').details, 'selling things');
+  assert.equal(reportRow('x'.repeat(REPORT_DETAILS_MAX)).details, 'x'.repeat(REPORT_DETAILS_MAX));
+  assert.equal(reportRow('x'.repeat(1500)).details?.length, REPORT_DETAILS_MAX);
+  assert.equal(reportRow('x'.repeat(999) + '   y').details, 'x'.repeat(999), 'spaces left at the cut are trimmed too');
+  // an emoji is two UTF-16 units: cutting by units would leave half of one, which the server refuses
+  const long = reportRow('a' + '🙏'.repeat(1200)).details as string;
+  assert.equal(Array.from(long).length, REPORT_DETAILS_MAX);
+  assert.ok(!/[\ud800-\udbff](?![\udc00-\udfff])|(?<![\ud800-\udbff])[\udc00-\udfff]/.test(long), 'no lone surrogate');
+});
+
+test('buildReportRow refuses what the database would refuse, with a sentence a screen can show', () => {
+  const failure = (o: Parameters<typeof buildReportRow>[0]): unknown => {
+    try { buildReportRow(o); } catch (e) { return e; }
+    return null;
+  };
+  for (const bad of [
+    { type: 'conversation' as never, targetId: REPORT_ID, reason: 'spam' as const },
+    { type: 'post' as const, targetId: REPORT_ID, reason: 'because' as never },
+    { type: 'post' as const, targetId: 'not-a-uuid', reason: 'spam' as const },
+    { type: 'post' as const, targetId: '', reason: 'spam' as const },
+    { type: 'post' as const, targetId: undefined as never, reason: 'spam' as const },
+  ]) {
+    const err = failure(bad);
+    assert.ok(err instanceof Error, JSON.stringify(bad));
+    assert.equal(friendlyError(err), 'That cannot be reported.');
+  }
+  // the id is trimmed; any uuid shape passes (the database knows which ones exist)
+  assert.equal(buildReportRow({ type: 'profile', targetId: `  ${REPORT_ID}\n`, reason: 'spam' }).target_id, REPORT_ID);
+  assert.equal(buildReportRow({ type: 'profile', targetId: '00000000-0000-0000-0000-000000000000', reason: 'spam' }).target_id, '00000000-0000-0000-0000-000000000000');
+});
+
+test('report reasons and kinds: the sheet offers each reason once, all of them are ones the database accepts', () => {
+  const keys: string[] = REPORT_REASONS.map((r) => r.key);
+  assert.equal(new Set(keys).size, keys.length);
+  assert.equal(new Set(REPORT_REASON_KEYS).size, REPORT_REASON_KEYS.length);
+  for (const k of keys) assert.ok((REPORT_REASON_KEYS as readonly string[]).includes(k), k);
+  assert.deepEqual([...REPORT_TARGETS].sort(), ['comment', 'message', 'post', 'profile']);
+  for (const type of REPORT_TARGETS) for (const r of REPORT_REASONS) assert.doesNotThrow(() => buildReportRow({ type, targetId: REPORT_ID, reason: r.key }));
+});
+
+test('block, unblock and report wording is one set of sentences, in plain English without dashes', () => {
+  assert.equal(blockMessage('Ana Torres'), 'Ana Torres will not be able to message you or find you in search, and you will stop being friends. You can unblock them any time.');
+  assert.match(unblockMessage('Ana'), /^Ana will be able to find you in search and send you a friend request again\./);
+  assert.equal(REPORT_PROMPT, 'Tell us what is wrong. We review every report.');
+  assert.equal(REPORT_THANKS, 'Thank you. We will take a look.');
+  assert.ok(!/[–—]/.test([blockMessage('x'), unblockMessage('x'), REPORT_PROMPT, REPORT_THANKS, BLOCKED_LIST_ERROR].join(' ')), 'no en or em dash');
+});
+
+test('parseBlocked keeps the rows of the function, cleans them and drops what is not a row', () => {
+  const good = { user_id: 'u1', username: 'ana_t', display_name: 'Ana Torres', avatar_url: 'https://example.com/a.png', blocked_at: '2026-11-05T10:00:00.123456+00:00' };
+  assert.deepEqual(parseBlocked([good, { ...good, user_id: 'u2', username: null, display_name: '', avatar_url: 7 }]),
+    [good, { user_id: 'u2', username: null, display_name: null, avatar_url: null, blocked_at: good.blocked_at }]);
+  assert.deepEqual(parseBlocked(good), [good], 'one row instead of a list');
+  assert.deepEqual(parseBlocked(null), []);
+  assert.deepEqual(parseBlocked(undefined), []);
+  assert.deepEqual(parseBlocked('x'), []);
+  assert.deepEqual(parseBlocked([null, 'x', 5, {}, { user_id: '' }, { user_id: 5 }]), []);
+  assert.equal(parseBlocked([{ user_id: 'u3' }])[0].blocked_at, '');
+});
+
+test('blockedListError: offline says so; a server without the function never tells the pilgrim to update the app', () => {
+  const OFFLINE = 'You seem to be offline. Check your signal and try again.';
+  assert.equal(blockedListError({ network: true, message: 'x' }), OFFLINE);
+  assert.equal(blockedListError(new Error('Network request failed')), OFFLINE);
+  assert.equal(blockedListError({ message: 'You are offline.' }), OFFLINE);
+  // what PostgREST says for a function that is not there (yet): the generic helper would say "update the app"
+  const missing = { code: 'PGRST202', status: 404, message: 'Could not find the function public.list_blocked_pilgrims without parameters in the schema cache' };
+  assert.match(friendlyError(missing), /update the app/);
+  assert.equal(blockedListError(missing), BLOCKED_LIST_ERROR);
+  assert.equal(blockedListError({ status: 404 }), BLOCKED_LIST_ERROR);
+  assert.equal(blockedListError({ code: '42883', message: 'function public.list_blocked_pilgrims() does not exist' }), BLOCKED_LIST_ERROR);
+  assert.equal(blockedListError({ code: '42501', status: 403, message: 'permission denied for function list_blocked_pilgrims' }), BLOCKED_LIST_ERROR);
+  assert.equal(blockedListError({ status: 500, message: 'boom' }), BLOCKED_LIST_ERROR);
+  assert.equal(blockedListError(null), BLOCKED_LIST_ERROR);
+  assert.equal(BLOCKED_LIST_ERROR, 'Could not load your blocked list, try again later.');
 });
 
 /* ================================================================ help bell ================================================================ */
