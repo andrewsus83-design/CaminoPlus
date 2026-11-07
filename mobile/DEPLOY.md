@@ -20,8 +20,13 @@ other native settings). An update is published for the fingerprint of the code i
 updates with its own fingerprint. So a phone with an older build quietly does not get an update that needs newer native
 code, instead of crashing on it. If "This build" (Me > the gear at the top right > Settings) says `Update: none yet` while updates exist, that phone needs a new build.
 
-`fingerprint.config.js` tells Expo to ignore the build stamp (the commit and time that `app.config.js` writes into the
-app), because it changes on every build. `npm run test:config` fails if anything else starts changing the fingerprint.
+`fingerprint.config.js` tells Expo to ignore two things that change without touching native code: the build stamp (the
+commit and time that `app.config.js` writes into the app), which changes on every build, and the npm scripts of
+`package.json`, which Expo would otherwise hash, so that registering a test script in a pull request (most of them do)
+gave every phone a different fingerprint and no update would have fitted. `npm run test:config` fails if either starts
+counting again, and if `package.json` gets a script that runs on install or build (`postinstall`, `prebuild`,
+`eas-build-*`), because then ignoring scripts has to be decided again. **A build made before this change** worked out its
+fingerprint with the old rules: make a new build from `main` before switching updates on, or it will not match.
 
 ## One-time setup
 
