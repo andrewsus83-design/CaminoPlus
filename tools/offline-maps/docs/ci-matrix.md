@@ -91,9 +91,29 @@ Reports are uploaded as `offline-pack-reports-<slug>` (manifest and render repor
 upload `.pmtiles` files: the repository is public, so an artifact is downloadable by anyone and would bypass the
 paywall. The pack stays on the runner.
 
+## Coastal stages
+
+A coastal stage (`"coastal": true` in the stage file) needs the real ocean polygons from osmdata.openstreetmap.de, a
+server that often cannot be reached from GitHub's runners (the download times out). When that happens:
+
+- A **build job** (a pull request, or a manual run without "publish") carries on with Planetiler's tiny placeholder file,
+  prints the warning `no sea in this measurement build` and records `ocean_polygons: placeholder` in the manifest. The run
+  still proves that the stage builds, finds its route and renders offline. Its size and feature counts are not what the real
+  pack will be.
+- A **publish job** (`ocean-fallback: deny`) stops instead. `publish_pack.mjs` (through the quality gates) and
+  `calibrate_stage.mjs` also refuse a manifest that says `placeholder` for a coastal stage, so a pack without the sea is
+  never published and never becomes a baseline. An inland stage is not affected: it never needs the sea.
+
+So a coastal stage can only be calibrated and published from a build that really got the polygons: run the stage by hand
+when the server answers (Actions, offline-maps, Run workflow, "stages": the slug), or on a computer that can reach it, and
+read `ocean_polygons` in the manifest of the report. To stop depending on that server, keep a copy of the file where the
+runners can reach it and pin it by its SHA-256 like the other sources (not done yet; it is the owner's call, because the
+file is OpenStreetMap data under the ODbL and would be published with this repository).
+
 ## Publish jobs
 
-Same build, with `route-fallback: deny` and `publishing: 'true'` (route must come from OSM, OSM data must be
+Same build, with `route-fallback: deny`, `ocean-fallback: deny` and `publishing: 'true'` (route must come from OSM, the ocean
+polygons of a coastal stage must be the real ones, OSM data must be
 fresh, size and tile count inside the band and close to the live pack, and the stage exists in the database), then `publish_pack.mjs` uploads and
 registers the pack in one database transaction. Without the Supabase secrets the step runs the quality gates
 as a dry run and uploads nothing.

@@ -108,6 +108,13 @@ export function refusalReasons(manifest, report) {
       'fallback, so the corridor (and the pack) may cover the wrong area. Fix the route and rebuild.',
     );
   }
+  // A coastal pack built on the placeholder has no sea: its size and feature counts are not what the real pack will be.
+  if (m.coastal === true && m.ocean_polygons !== 'osmdata') {
+    why.push(
+      `ocean_polygons is ${m.ocean_polygons === undefined ? 'missing' : `'${m.ocean_polygons}'`} on a coastal stage: the sea is missing from this pack, ` +
+      'so its size and feature counts are not a baseline. Rebuild it where osmdata.openstreetmap.de can be reached (docs/ci-matrix.md, "Coastal stages").',
+    );
+  }
   if (r.ok !== true) {
     const failures = Array.isArray(r.failures) && r.failures.length ? ` (${r.failures.slice(0, 3).join(' | ')})` : '';
     why.push(`the render report says ok: ${String(r.ok)}${failures}.`);

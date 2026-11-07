@@ -27,6 +27,22 @@ test('the hand-drawn fallback route blocks publishing but not a measurement run'
   assert.deepEqual(run(m, { publishing: false }).errors, []);
 });
 
+test('a coastal stage built without the ocean polygons is a warning for a measurement run and an error for publishing', () => {
+  const m = { ...good(), coastal: true, ocean_polygons: 'placeholder' };
+  assert.match(run(m).errors.join('\n'), /this stage is coastal but its ocean polygons are 'placeholder', not 'osmdata'/);
+  const measured = run(m, { publishing: false });
+  assert.deepEqual(measured.errors, []);
+  assert.match(measured.warnings.join('\n'), /this stage is coastal but its ocean polygons are 'placeholder'/);
+  // the same judgement for a stage without a quality band (a measurement stage): it must not slip through the early return
+  const noBand = checkManifest(m, undefined, { publishing: false, now: NOW });
+  assert.match(noBand.warnings.join('\n'), /this stage is coastal but its ocean polygons are 'placeholder'/);
+  // fine: the real ocean polygons, an inland stage on the placeholder, and a manifest from before the keys existed
+  assert.deepEqual(run({ ...good(), coastal: true, ocean_polygons: 'osmdata' }).errors, []);
+  assert.deepEqual(run({ ...good(), coastal: false, ocean_polygons: 'placeholder' }).errors, []);
+  assert.deepEqual(run(good()).errors, []);
+  assert.deepEqual(run({ ...good(), coastal: true, ocean_polygons: 'osmdata' }, { publishing: false }).warnings, []);
+});
+
 test('tile count outside the band is an error, in both directions', () => {
   assert.match(run({ ...good(), tiles: 120 }).errors.join('\n'), /120 tiles, below the minimum of 900/);
   assert.match(run({ ...good(), tiles: 9000 }).errors.join('\n'), /9000 tiles, above the maximum of 2600/);

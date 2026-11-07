@@ -436,7 +436,12 @@ test('workflow: secrets live in one step of the publish job, which runs in the p
   assert.equal(withSecrets.length, 1);
   assert.match(withSecrets[0], /scripts\/publish_pack\.mjs/);
   assert.match(jobs.publish, /route-fallback: deny/);
+  assert.match(jobs.publish, /ocean-fallback: deny/);
   assert.match(jobs.publish, /publishing: 'true'/);
+  // the measurement build may fall back, for the route and for the sea of a coastal stage; the publish build never does
+  assert.match(jobs.build, /route-fallback: allow/);
+  assert.match(jobs.build, /ocean-fallback: allow/);
+  assert.doesNotMatch(jobs.build, /ocean-fallback: deny/);
 });
 
 test('workflow: the matrices are independent, capped, and skipped when there is nothing to run', () => {
