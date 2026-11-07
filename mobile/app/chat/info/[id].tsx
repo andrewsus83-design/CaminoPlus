@@ -10,7 +10,7 @@ import { FriendPickList } from '@/features/social/components/people';
 import { Btn, PilgrimAvatar, ScreenHeader } from '@/features/social/components/primitives';
 import { PersonRow } from '@/features/social/components/rows';
 import { EmptyState, ErrorState, Section } from '@/features/social/components/states';
-import { MAX_GROUP_TITLE, REPORT_REASONS, conversationName, firstName, friendlyError, isMuted, muteLabel, personName, pilgrimsLabel } from '@/features/social/logic';
+import { MAX_GROUP_TITLE, REPORT_PROMPT, REPORT_REASONS, REPORT_THANKS, blockMessage, conversationName, firstName, friendlyError, isMuted, muteLabel, personName, pilgrimsLabel } from '@/features/social/logic';
 import { goBack } from '@/features/social/nav';
 import type { Friend, Member, ReportReason } from '@/features/social/types';
 import { c, layout, radius, role } from '@/theme';
@@ -96,13 +96,13 @@ export default function ChatInfo() {
   };
 
   const block = async (userId: string, who: string) => {
-    const ok = await confirm({ title: `Block ${who}?`, message: `${who} will not be able to message you or find you in search, and you will stop being friends. You can unblock them any time.`, confirmLabel: 'Block', destructive: true, icon: 'block' });
+    const ok = await confirm({ title: `Block ${who}?`, message: blockMessage(who), confirmLabel: 'Block', destructive: true, icon: 'block' });
     if (ok) say(await info.block(userId), `${who} is blocked.`);
   };
 
   const report = async (userId: string, who: string) => {
-    const reason = await menu({ title: `Report ${who}`, message: 'Tell us what is wrong. We review every report.', options: REPORT_REASONS.map((r) => ({ key: r.key, label: r.label })) });
-    if (reason) say(await info.report(userId, reason as ReportReason), 'Thank you. We will take a look.');
+    const reason = await menu({ title: `Report ${who}`, message: REPORT_PROMPT, options: REPORT_REASONS.map((r) => ({ key: r.key, label: r.label })) });
+    if (reason) say(await info.report(userId, reason as ReportReason), REPORT_THANKS);
   };
 
   const memberMenu = async (m: Member) => {

@@ -102,6 +102,7 @@ function RootStack() {
         <Stack.Screen name="journey" />
         <Stack.Screen name="passport" />
         <Stack.Screen name="friends" />
+        <Stack.Screen name="blocked" />
         <Stack.Screen name="business/index" />
         <Stack.Screen name="business/register" />
         <Stack.Screen name="business/status" />

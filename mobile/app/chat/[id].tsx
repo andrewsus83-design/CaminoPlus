@@ -10,7 +10,7 @@ import { Composer, DateChip, ImageViewer, MessageBubble, ReplyInfo, SenderInfo, 
 import { useDialogs } from '@/features/social/components/dialogs';
 import { CountBadge, PilgrimAvatar } from '@/features/social/components/primitives';
 import { EmptyState, ErrorState, Notice, OFFLINE_TEXT } from '@/features/social/components/states';
-import { MessageAction, buildTimeline, conversationName, friendlyError, messageActions, pilgrimsLabel, REPORT_REASONS, snippet, storageGate, toInverted, ts } from '@/features/social/logic';
+import { MessageAction, buildTimeline, conversationName, friendlyError, messageActions, pilgrimsLabel, REPORT_PROMPT, REPORT_REASONS, REPORT_THANKS, snippet, storageGate, toInverted, ts } from '@/features/social/logic';
 import { goBack } from '@/features/social/nav';
 import { MAX_PHOTO_BYTES, PickerUnavailable, pickPhoto } from '@/features/social/pick';
 import type { ChatMessage, MessageEntry, ReportReason, TimelineEntry } from '@/features/social/types';
@@ -153,8 +153,8 @@ export default function ChatScreen() {
         if (err) toast(err);
       }
     } else if (action === 'report') {
-      const reason = await menu({ title: 'Report this message', message: 'Tell us what is wrong. We review every report.', options: REPORT_REASONS.map((r) => ({ key: r.key, label: r.label })) });
-      if (reason) toast((await reportMessage(m.id, reason as ReportReason)) ?? 'Thank you. We will take a look.');
+      const reason = await menu({ title: 'Report this message', message: REPORT_PROMPT, options: REPORT_REASONS.map((r) => ({ key: r.key, label: r.label })) });
+      if (reason) toast((await reportMessage(m.id, reason as ReportReason)) ?? REPORT_THANKS);
     }
   }, [chat, confirm, menu, toast]);
 

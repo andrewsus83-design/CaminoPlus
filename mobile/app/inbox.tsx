@@ -6,7 +6,7 @@ import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
 import { IconButton } from '@/components/ui';
 import {
-  socialApi, useConversations, useHasFriends, useMeId, useNotifications, useNow, useOnlineStatus, useUnreadTotals,
+  socialApi, useConversations, useHasFriends, useMeId, useNotifications, useNow, useOnlineStatus, useSafety, useUnreadTotals,
 } from '@/features/social';
 import { useDialogs } from '@/features/social/components/dialogs';
 import { Btn, CountBadge, ScreenHeader, SearchField, SegmentedTabs } from '@/features/social/components/primitives';
@@ -33,7 +33,10 @@ export default function Inbox() {
   const now = useNow();
   const convs = useConversations();
   const notifs = useNotifications();
-  const { toast, host } = useDialogs();
+  const dialogs = useDialogs();
+  const { menu, toast, host } = dialogs;
+  const safety = useSafety(dialogs);
+  const { refresh: refreshNotifications } = notifs;
   const [opening, setOpening] = useState(false);
 
   const openChatWith = useCallback(async (userId: string) => {
@@ -57,6 +60,25 @@ export default function Inbox() {
     else if (go.to === 'me') router.navigate('/(tabs)/me');
   }, [notifs, router, openChatWith]);
 
+  // Hold a notification: report or block the pilgrim behind it, and report the comment when it is about one.
+  const notificationMenu = useCallback(async (n: NotificationItem) => {
+    const actor = n.actor;
+    if (!actor) return;
+    const who = { id: actor.id, name: personName(actor) };
+    const commentId = n.kind === 'post_comment' && typeof n.data?.comment_id === 'string' ? n.data.comment_id : null;
+    const choice = await menu({
+      title: who.name,
+      options: [
+        ...(commentId ? [{ key: 'comment', label: 'Report this comment', icon: 'flag' as const, destructive: true }] : []),
+        { key: 'report', label: `Report ${who.name}`, icon: 'flag' as const, destructive: true },
+        { key: 'block', label: `Block ${who.name}`, icon: 'block' as const, destructive: true },
+      ],
+    });
+    if (choice === 'comment' && commentId) await safety.report({ type: 'comment', targetId: commentId, title: 'Report this comment' });
+    else if (choice === 'report') await safety.reportPerson(who);
+    else if (choice === 'block' && (await safety.block(who))) void refreshNotifications();
+  }, [menu, safety, refreshNotifications]);
+
   const answer = useCallback(async (n: NotificationItem, accept: boolean) => {
     const err = await notifs.answer(n, accept);
     toast(err ?? (accept ? `You and ${personName(n.actor, 'your new friend')} are now friends.` : 'Request declined.'));
@@ -79,7 +101,7 @@ export default function Inbox() {
 
       {tab === 'notifications' && (
         <NotificationsTab
-          notifs={notifs} now={now} bottom={bottom} onOpen={openNotification}
+          notifs={notifs} now={now} bottom={bottom} onOpen={openNotification} onMore={notificationMenu}
           onAccept={(n) => answer(n, true)} onDecline={(n) => answer(n, false)}
           onMessage={(n) => { const peer = notificationPeer(n); if (peer) void openChatWith(peer); }}
         />
@@ -103,9 +125,9 @@ export default function Inbox() {
 
 /* ------------------------------------------------------------ Notifications */
 
-function NotificationsTab({ notifs, now, bottom, onOpen, onAccept, onDecline, onMessage }: {
+function NotificationsTab({ notifs, now, bottom, onOpen, onMore, onAccept, onDecline, onMessage }: {
   notifs: ReturnType<typeof useNotifications>; now: number; bottom: number;
-  onOpen: (n: NotificationItem) => void; onAccept: (n: NotificationItem) => void; onDecline: (n: NotificationItem) => void; onMessage: (n: NotificationItem) => void;
+  onOpen: (n: NotificationItem) => void; onMore: (n: NotificationItem) => void; onAccept: (n: NotificationItem) => void; onDecline: (n: NotificationItem) => void; onMessage: (n: NotificationItem) => void;
 }) {
   const { sections, items, error, loading, refreshing, refresh, retry, markAllRead, stateOf, busy } = notifs;
   const hasUnread = (items ?? []).some((n) => !n.read_at);
@@ -139,6 +161,7 @@ function NotificationsTab({ notifs, now, bottom, onOpen, onAccept, onDecline, on
         <NotificationRow
           n={n} now={now} request={n.kind === 'friend_request' ? stateOf(n) : null} busy={busy.has(n.id)}
           onPress={() => onOpen(n)} onAccept={() => onAccept(n)} onDecline={() => onDecline(n)} onMessage={() => onMessage(n)}
+          onLongPress={n.actor ? () => onMore(n) : undefined}
         />
       )}
       ListEmptyComponent={<EmptyState icon="bell" title="All quiet on the Way" text="Friend requests, likes, comments and new badges will show up here." />}

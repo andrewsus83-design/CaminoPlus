@@ -114,6 +114,9 @@ export function usePilgrimSearch(query: string) {
 
   const setStatus = useCallback((id: string, status: FriendStatus) => setResults((list) => (list ? withStatus(list, id, status) : list)), []);
 
+  /** Take somebody out of the results at once (just blocked: the server leaves them out of the next search too). */
+  const hide = useCallback((id: string) => setResults((list) => (list ? list.filter((p) => p.id !== id) : list)), []);
+
   const act = useCallback(async (p: PilgrimResult, kind: 'add' | 'cancel' | 'accept'): Promise<string | null> => {
     const before = p.friend_status;
     setBusy((b) => new Set(b).add(p.id));
@@ -138,7 +141,7 @@ export function usePilgrimSearch(query: string) {
     }
   }, [setStatus]);
 
-  return { results, loading: loading || (isSearchable(clean) && clean !== settled), error, searchable: isSearchable(clean), busy, act, retry: () => search(settled) };
+  return { results, loading: loading || (isSearchable(clean) && clean !== settled), error, searchable: isSearchable(clean), busy, act, hide, retry: () => search(settled) };
 }
 
 /** Just the list of my friends (pickers for a new chat, a new group, adding people to a group). */

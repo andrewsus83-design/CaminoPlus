@@ -3,8 +3,8 @@
 // search helpers. No React Native imports on purpose: plain node tests cover all of it
 // (npm run test:social).
 import type {
-  ChatMessage, Conversation, Delivery, FriendStatus, MessageEntry, Member, NotificationItem,
-  OutboxItem, OutboxStatus, PilgrimResult, StorageInfo, TimelineEntry, TimelineMessage, UnreadTotals,
+  BlockedPilgrim, ChatMessage, Conversation, Delivery, FriendStatus, MessageEntry, Member, NotificationItem,
+  OutboxItem, OutboxStatus, PilgrimResult, ReportReason, ReportTarget, StorageInfo, TimelineEntry, TimelineMessage, UnreadTotals,
 } from './types';
 
 /* ------------------------------------------------------------------ ids */
@@ -544,6 +544,68 @@ export const REPORT_REASONS = [
   { key: 'privacy', label: 'Shares private information' },
   { key: 'other', label: 'Something else' },
 ] as const;
+
+/* ------------------------------------------------------------------ safety: reports and blocks */
+
+/** What the report sheet says, and what comes back (the same wherever a pilgrim reports something). */
+export const REPORT_PROMPT = 'Tell us what is wrong. We review every report.';
+export const REPORT_THANKS = 'Thank you. We will take a look.';
+
+/** The sentence under "Block Ana?" in the chat, the friends list and everywhere else a pilgrim can block. */
+export const blockMessage = (name: string) =>
+  `${name} will not be able to message you or find you in search, and you will stop being friends. You can unblock them any time.`;
+/** The sentence under "Unblock Ana?" in Blocked pilgrims. Unblocking does not bring a friendship back. */
+export const unblockMessage = (name: string) =>
+  `${name} will be able to find you in search and send you a friend request again. You will not be friends until you both agree.`;
+
+/** What can be reported: content_reports.target_type. */
+export const REPORT_TARGETS: readonly ReportTarget[] = ['message', 'profile', 'post', 'comment'];
+/** Every reason the database accepts (content_reports.reason). The sheet offers REPORT_REASONS, a subset of these. */
+export const REPORT_REASON_KEYS: readonly ReportReason[] = ['spam', 'nudity', 'harassment', 'violence', 'hate', 'misinformation', 'privacy', 'other'];
+/** content_reports.details holds at most 1000 characters. */
+export const REPORT_DETAILS_MAX = 1000;
+
+export type ReportRequest = { type: ReportTarget; targetId: string; reason: ReportReason; details?: string | null };
+/** The row sent to content_reports. Who reports and the status are the server's (default auth.uid(), trigger). */
+export type ReportRow = { target_type: ReportTarget; target_id: string; reason: ReportReason; details: string | null; message_id?: string };
+
+const ANY_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** The row for one report. The words of the pilgrim are trimmed, cut at 1000 characters (whole characters: an emoji is
+ *  never split) and null when empty. A message also names itself in message_id. Anything the database would refuse
+ *  (an unknown kind or reason, an id that is not a uuid) throws here, with a sentence the screen can show. */
+export function buildReportRow(o: ReportRequest): ReportRow {
+  const targetId = String(o.targetId ?? '').trim();
+  if (!REPORT_TARGETS.includes(o.type) || !REPORT_REASON_KEYS.includes(o.reason) || !ANY_UUID.test(targetId)) {
+    throw new Error('That cannot be reported.');
+  }
+  const details = Array.from(String(o.details ?? '').trim()).slice(0, REPORT_DETAILS_MAX).join('').trimEnd();
+  const row: ReportRow = { target_type: o.type, target_id: targetId, reason: o.reason, details: details || null };
+  if (o.type === 'message') row.message_id = targetId;
+  return row;
+}
+
+/** list_blocked_pilgrims() rows, cleaned: rows without a user id are dropped, text that is not text becomes null. */
+export function parseBlocked(raw: unknown): BlockedPilgrim[] {
+  const out: BlockedPilgrim[] = [];
+  for (const r of Array.isArray(raw) ? raw : raw ? [raw] : []) {
+    const x = r as Record<string, unknown> | null;
+    if (!x || typeof x !== 'object' || typeof x.user_id !== 'string' || !x.user_id) continue;
+    out.push({ user_id: x.user_id, username: str(x.username), display_name: str(x.display_name), avatar_url: str(x.avatar_url), blocked_at: typeof x.blocked_at === 'string' ? x.blocked_at : '' });
+  }
+  return out;
+}
+
+/** Shown on Blocked pilgrims when the list cannot be read, whatever the reason (also a server that does not have
+ *  the function yet, which must never read as "update the app"). */
+export const BLOCKED_LIST_ERROR = 'Could not load your blocked list, try again later.';
+
+/** Offline says so (the pilgrim can fix that); everything else is the one friendly sentence above. */
+export function blockedListError(e: unknown): string {
+  const err = (e ?? {}) as ErrLike;
+  const offline = !!err.network || /network request failed|failed to fetch|networkerror|load failed|you are offline/i.test(String(err.message ?? ''));
+  return offline ? friendlyError(e) : BLOCKED_LIST_ERROR;
+}
 
 /** Friendly text for an error from the data layer. */
 export type ErrLike = { message?: string; code?: string; status?: number; network?: boolean };

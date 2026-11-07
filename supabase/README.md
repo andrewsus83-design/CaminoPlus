@@ -27,6 +27,7 @@ supabase/
     ..._platform_hardening.sql  private-schema grants, account deletion, business fixes, indexes, pg_cron,
                                 start_journey and register_offline_pack RPCs (see "Platform notes")
     ..._friends_chat_notifications.sql  mutual friends, direct + group chat, notifications
+    ..._blocked_pilgrims.sql    list_blocked_pilgrims(): who you blocked (Settings > Privacy and safety)
   functions/               Deno edge functions: offline-pack-url (signed pack links), delete-account
   seed.sql                 reference data + a small Camino Frances sample
   dev/validate.sh          applies everything to a throwaway local Postgres, runs every dev/*smoke*.sql
@@ -432,6 +433,14 @@ erDiagram
   other person is not told and can ask again). Unfriending, declining and cancelling are idempotent.
 - A block deletes the friendship or pending request in both directions (and their request notifications) and stops new
   ones. Unknown, deleted and blocked pilgrims all answer `not_found`, so nobody learns who blocked whom.
+- `list_blocked_pilgrims()` (migration `20261108020000_blocked_pilgrims.sql`) returns the pilgrims **you** blocked, newest
+  first: `user_id`, `username`, `display_name`, `avatar_url`, `blocked_at` (name and picture are null for a deleted account).
+  It exists because the `profiles` policy hides a profile from both sides of a block, so the blocker cannot select the
+  profile of someone they blocked. It takes no argument and never answers the other direction. Unblocking is
+  `delete from blocks where blocked_id = ...` (policy "blocks owner only"). Tested by `dev/blocked_pilgrims_smoke.sql`.
+- A block does not take anyone out of a group you share: they can still write there, and the blocker still reads it (the
+  blocked person is masked as "Pilgrim"). Notifications the blocked person already sent you stay in your inbox (only their
+  friend request notification is removed).
 - `profiles.friends_count` is server maintained (guarded like the other counters).
 - `private.is_friend(a, b)` is true for accepted friends. `private.can_see` treats an accepted friend like an accepted
   follower, so the visibility value `followers` means **friends and followers** (the app labels it Friends). Journeys,
@@ -469,6 +478,10 @@ erDiagram
   capped at 99 each, plus unread notifications and incoming friend requests.
 - Reporting: `content_reports` accepts `target_type = 'message'` (`message_id` is filled from `target_id`) for messages
   the reporter can read. The report keeps a copy of what was said (`evidence`), so unsending afterwards does not erase it.
+  The app also reports a person (`profile`), a post (`post`) and a comment (`comment`), also right after blocking the
+  person: for these kinds the trigger only clears `message_id` and `evidence`, and the policy "report only messages you can
+  read" checks nothing, so any id is accepted, one report per reporter and target (`23505`, which the app counts as sent).
+  `dev/blocked_pilgrims_smoke.sql` proves what is accepted.
 - Chat photos are readable through the policy "read chat media" (members of the conversation, from their join time);
   the existing "read user media" policy is untouched.
 - Realtime publishes `messages`, `conversation_members`, `notifications`, `friendships`. `friendships` and

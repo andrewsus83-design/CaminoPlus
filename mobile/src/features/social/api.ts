@@ -3,9 +3,10 @@
 // hooks never write query strings, so the offline layer can wrap these functions later.
 import { OfflineError, assertOnline } from '@/lib/net';
 import { supabase } from '@/lib/supabase';
-import { normalizeTotals, parseStorage } from './logic';
+import { buildReportRow, normalizeTotals, parseBlocked, parseStorage } from './logic';
+import type { ReportRequest } from './logic';
 import type {
-  ChatMessage, Conversation, Friend, FriendRequest, Member, NotificationItem, OutboxItem, PilgrimResult, ReportReason, StorageInfo, UnreadTotals,
+  BlockedPilgrim, ChatMessage, Conversation, Friend, FriendRequest, Member, NotificationItem, OutboxItem, PilgrimResult, StorageInfo, UnreadTotals,
 } from './types';
 
 /** An error from the data layer. `network` = the request never got an answer (offline, timeout). */
@@ -177,11 +178,15 @@ const raw = {
     const list = rows<{ blocked_id: string }>(must(await supabase.from('blocks').select('blocked_id').eq('blocked_id', userId).limit(1)));
     return list.length > 0;
   },
-  /** Report a message, or a person. A second report of the same thing counts as sent. */
-  async report(o: { type: 'message' | 'profile'; targetId: string; reason: ReportReason; details?: string }): Promise<void> {
-    const row: Record<string, unknown> = { target_type: o.type, target_id: o.targetId, reason: o.reason, details: o.details?.trim() || null };
-    if (o.type === 'message') row.message_id = o.targetId;
-    const res = await supabase.from('content_reports').insert(row);
+  /** The pilgrims I blocked, newest first. Needs the function list_blocked_pilgrims (migration 20261108020000): until it
+   *  is applied this throws, and the one screen that asks (Blocked pilgrims) says so in plain words. */
+  async listBlocked(): Promise<BlockedPilgrim[]> {
+    return parseBlocked(must(await supabase.rpc('list_blocked_pilgrims')));
+  },
+  /** Report a message, a person, a post or a comment (what the row looks like: buildReportRow). A second report of the
+   *  same thing counts as sent. */
+  async report(o: ReportRequest): Promise<void> {
+    const res = await supabase.from('content_reports').insert(buildReportRow(o));
     if (res.error && res.error.code !== '23505') must(res);
   },
   /** Profiles of people whose name is not in the member list (someone who left a group). Best effort. */
