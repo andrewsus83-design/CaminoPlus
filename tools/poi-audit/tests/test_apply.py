@@ -249,6 +249,7 @@ class StageProblems(unittest.TestCase):
         self.assertTrue(any(f"stage camino-frances-29 ({STAGE_ID})" in p for p in report["problems"]), "it says WHICH stage")
         self.assertTrue(any(f"{len(self.plan.stage_stays)} stage_stays and {len(self.plan.stage_pois)} stage_pois" in p for p in report["problems"]))
         self.assertEqual(len(mock.places["stays"]), len(self.plan.stays), "the places themselves are still written")
+        self.assertIn("apply: counts read back match what was sent (the places only: no link rows were written)", log)
         return report
 
     def test_a_stage_that_is_not_in_the_database_gets_no_link_rows(self):

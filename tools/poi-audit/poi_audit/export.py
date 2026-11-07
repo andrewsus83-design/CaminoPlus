@@ -465,7 +465,9 @@ def check_plan(plan: Plan) -> list[str]:
 # files
 # ---------------------------------------------------------------------------
 def dumps(row: dict) -> str:
-    return json.dumps(row, ensure_ascii=False, separators=(",", ":"))
+    """One line of NDJSON. Non-ASCII stays readable; the two Unicode line separators are escaped, because line
+    based tools (and str.splitlines) would cut a line at them."""
+    return json.dumps(row, ensure_ascii=False, separators=(",", ":")).replace("\u2028", "\\u2028").replace("\u2029", "\\u2029")
 
 
 def write_plan(plan: Plan, out: Path) -> None:
@@ -488,7 +490,7 @@ def read_ndjson(path: Path) -> list[dict]:
         text = Path(path).read_text(encoding="utf-8")
     except OSError as e:
         raise PlanError([f"cannot read {path}: {e.strerror or e}"]) from None
-    for n, line in enumerate(text.splitlines(), 1):
+    for n, line in enumerate(text.split("\n"), 1):          # not splitlines(): U+2028 and friends are not line ends here
         if not line.strip():
             continue
         try:

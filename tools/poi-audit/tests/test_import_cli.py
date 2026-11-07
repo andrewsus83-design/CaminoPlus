@@ -141,9 +141,9 @@ class DryRun(Base):
 
 
 class Refusals(Base):
-    def cache_with(self, route=None, places=None) -> Path:
+    def cache_with(self, route=None, places=None, name="other-cache") -> Path:
         stage, _ = load_fixture_stage("29")
-        cache_dir = self.tmp / "other-cache"
+        cache_dir = self.tmp / name
         cache_dir.mkdir()
         cache = sources.Cache(cache_dir, offline=True)
         (cache.path("route", sources.overpass_route_query(stage["search_bbox"], stage["route_name_regex"]))).write_text(json.dumps(route), encoding="utf-8")
@@ -168,6 +168,29 @@ class Refusals(Base):
         self.assertEqual(code, 1)
         self.assertIn("no line for this stage", err)
         self.assertIn("do not connect the start and the end of the stage", err)
+        self.assertFalse((self.tmp / "out").exists())
+
+    def fixture_answer(self, name):
+        return json.loads((self.stage_dir / name).read_text(encoding="utf-8"))
+
+    def test_an_overpass_answer_with_a_runtime_error_is_not_imported_as_if_it_were_the_stage(self):
+        # Overpass answers 200 with a "remark" when the query ran out of time or memory, and sends what it had so far
+        remark = 'runtime error: Query timed out in "query" at line 5 after 181 seconds.'
+        for which in ("places", "route"):
+            places, route = self.fixture_answer("overpass-places.json"), self.fixture_answer("overpass-route.json")
+            (places if which == "places" else route)["remark"] = remark
+            self.cache = self.cache_with(route=route, places=places, name=f"cache-{which}")
+            code, out, err = run_main(self.argv(f"out-{which}"))
+            self.assertEqual(code, 1, which)
+            self.assertIn(f"Overpass answered the {which} request with a runtime error (runtime error: Query timed out", err)
+            self.assertIn("nothing was imported", err)
+            self.assertFalse((self.tmp / f"out-{which}").exists())
+
+    def test_an_answer_without_a_single_place_is_refused(self):
+        self.cache = self.cache_with(route=self.fixture_answer("overpass-route.json"), places={"version": 0.6, "elements": []})
+        code, out, err = run_main(self.argv())
+        self.assertEqual(code, 1)
+        self.assertIn("Overpass answered the places request with no places at all", err)
         self.assertFalse((self.tmp / "out").exists())
 
     def test_offline_without_a_cache_is_an_error_that_says_so(self):

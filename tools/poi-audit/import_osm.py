@@ -87,6 +87,18 @@ def load_stage(path: Path) -> dict:
     return stage
 
 
+def check_answer(raw, what: str, need_elements: bool) -> None:
+    """Overpass answers 200 even when the query ran out of time or memory: the body then holds a "remark" and
+    whatever was produced before (often nothing). Importing that would be importing a part of the stage."""
+    if not isinstance(raw, dict):
+        raise ImportFailed(f"the Overpass answer for the {what} is not what Overpass sends")
+    if raw.get("remark"):
+        raise ImportFailed(f"Overpass answered the {what} request with a runtime error ({str(raw['remark'])[:160]}): the answer may be "
+                           "partial, so nothing was imported. Run again later; with a cache folder, delete the stale answer first")
+    if need_elements and not raw.get("elements"):
+        raise ImportFailed(f"Overpass answered the {what} request with no places at all: nothing was imported")
+
+
 def generate(stage: dict, stage_path: Path, args) -> export.Plan:
     cache = sources.Cache(args.cache, offline=args.offline)
     bbox = stage["search_bbox"]
@@ -100,6 +112,8 @@ def generate(stage: dict, stage_path: Path, args) -> export.Plan:
     if problem:
         raise ImportFailed(f"no OSM route for this stage ({problem}). The hand-drawn fallback line is not good enough to say which "
                            "places belong to the stage, so nothing was imported")
+    # the answer is in the cache now: look at it again for the "remark" that load_route does not read
+    check_answer(sources.fetch_overpass(cache, route_query, "route"), "route", need_elements=True)
     try:
         start, end = route.stage_ends(stage, stage_path)
         line = route.build_stage_line(lines, start, end)
@@ -112,6 +126,7 @@ def generate(stage: dict, stage_path: Path, args) -> export.Plan:
         print(f"waiting {args.pause:g} s between the two Overpass requests")
         time.sleep(args.pause)
     raw = sources.fetch_overpass(cache, poi_query)
+    check_answer(raw, "places", need_elements=True)
     records = [r for r in map(from_osm, raw.get("elements") or []) if r]
     timestamp = (raw.get("osm3s") or {}).get("timestamp_osm_base")
     print(f"osm: {len(raw.get('elements') or [])} elements, {len(records)} places we know the category of; data of {timestamp or 'unknown date'}")

@@ -542,6 +542,20 @@ class Files(unittest.TestCase):
         for name in sorted(p.name for p in a.iterdir()):
             self.assertEqual((a / name).read_bytes(), (b / name).read_bytes(), name)
 
+    def test_unicode_line_separators_never_cut_a_line(self):
+        # str.splitlines() and line based tools treat U+2028 / U+2029 as line ends; clean_text turns them into spaces,
+        # and dumps escapes any that still arrive, so a file always has exactly one object per line
+        self.assertEqual(export.clean_text("Casa\u2028Sabina\u2029Roncesvalles"), "Casa Sabina Roncesvalles")
+        row = dict(self.plan.stays[0], name="Raw\u2028and\u2029raw")
+        line = export.dumps(row)
+        self.assertNotIn("\u2028", line)
+        self.assertNotIn("\u2029", line)
+        self.assertEqual(json.loads(line)["name"], "Raw\u2028and\u2029raw")
+        out = Path(tempfile.mkdtemp())
+        (out / "x.ndjson").write_text(line + "\n" + export.dumps(self.plan.stays[1]) + "\n", encoding="utf-8")
+        rows = export.read_ndjson(out / "x.ndjson")
+        self.assertEqual([r["name"] for r in rows], ["Raw\u2028and\u2029raw", self.plan.stays[1]["name"]])
+
     def test_rows_are_in_a_fixed_order(self):
         for rows in (self.plan.stays, self.plan.pois):
             ranks = [(export.OSM_TYPES.index(r["osm_type"]), r["osm_id"]) for r in rows]

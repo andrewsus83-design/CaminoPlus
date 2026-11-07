@@ -279,7 +279,10 @@ def apply_plan(client: Client, plan: Plan, log=print) -> dict:
     report["verified"] = not bad
     report["problems"].extend(bad)
     report["ok"] = report["ok"] and not bad
-    log("apply: counts read back match what was sent" if not bad else "apply: READ-BACK MISMATCH: " + "; ".join(bad))
+    if bad:
+        log("apply: READ-BACK MISMATCH: " + "; ".join(bad))
+    else:
+        log("apply: counts read back match what was sent" + ("" if problem is None else " (the places only: no link rows were written)"))
     return report
 
 
