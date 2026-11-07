@@ -117,7 +117,7 @@ export default function ChatScreen() {
         message: `Pilgrim Plus (${config.priceLabel}) includes cloud storage for your photos, so you can share them with friends right here.`,
         primary: { label: 'See Pilgrim Plus', value: 'plus' },
       });
-      if (go === 'plus') router.push('/(tabs)/settings');
+      if (go === 'plus') router.push('/settings');
       return;
     }
     if (gate === 'full') {

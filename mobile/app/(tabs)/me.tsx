@@ -7,6 +7,7 @@ import { AppText } from '@/components/AppText';
 import { Pill } from '@/components/Pill';
 import { ShellMark } from '@/components/auth/Wordmark';
 import { Icon } from '@/components/Icon';
+import { Fab } from '@/components/Fab';
 import { Avatar, Card, IconButton, Photo, SubTabs } from '@/components/ui';
 import { FormMessage } from '@/components/auth/Field';
 import { tints } from '@/data/mock';
@@ -183,7 +184,11 @@ export default function Me() {
               <Icon name={copied ? 'check' : 'copy'} color={copied ? c.success : role.muted} size={16} />
             </Pressable>
           )}
-          <View style={{ marginLeft: 'auto' }}><IconButton name="bell" label={unread.total ? `Inbox, ${unread.total} unread` : 'Inbox'} badge={Math.min(unread.total, 99)} onPress={() => router.push('/inbox')} size={52} /></View>
+          {/* Top right: the inbox, and Settings last, in the corner. Settings is a screen of its own, no longer a tab. */}
+          <View style={{ marginLeft: 'auto', flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <IconButton name="bell" label={unread.total ? `Inbox, ${unread.total} unread` : 'Inbox'} badge={Math.min(unread.total, 99)} onPress={() => router.push('/inbox')} size={52} />
+            <IconButton name="settings" label="Settings" onPress={() => router.push('/settings')} size={52} />
+          </View>
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 20 }}>
           <Pressable accessibilityRole="button" accessibilityLabel="Change profile picture" onPress={changePhoto} disabled={uploading}>
@@ -269,9 +274,7 @@ export default function Me() {
           </View>
         </KeyboardAvoidingView>
       </Modal>
-      <Pressable accessibilityRole="button" accessibilityLabel="Write a journey post" onPress={() => router.push('/write')} style={{ position: 'absolute', right: layout.screenMargin, bottom: Math.max(insets.bottom - 14, 10) + 88 + 8, width: 52, height: 52, borderRadius: radius.pill, backgroundColor: c.gold, alignItems: 'center', justifyContent: 'center', ...shadowStyle('gold') }}>
-        <Icon name="pen" color={role.onHighlight} size={22} />
-      </Pressable>
+      <Fab label="Write a journey post" onPress={() => router.push('/write')} />
     </View>
   );
 }

@@ -52,8 +52,8 @@ function Themed() {
 function RootStack() {
   const { ready, status, session, journey, accountError, retry, signOut } = useAuth();
   const router = useRouter();
-  // Right after a theme switch the stack was remounted: return to the Settings tab the person was on.
-  useEffect(() => { if (consumeReturnToSettings()) router.replace('/settings'); }, [router]);
+  // Right after a theme switch the stack was remounted: return to Settings, with Me underneath it so Back still works.
+  useEffect(() => { if (consumeReturnToSettings()) { router.replace('/me'); router.push('/settings'); } }, [router]);
   const splashHidden = useRef(false);
   useEffect(() => { if (ready) { splashHidden.current = true; SplashScreen.hideAsync(); } }, [ready]);
   if (!ready) {
@@ -87,6 +87,9 @@ function RootStack() {
       </Stack.Protected>
       <Stack.Protected guard={onboarded}>
         <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="settings" />
+        <Stack.Screen name="diary/index" />
+        <Stack.Screen name="diary/[id]" />
         <Stack.Screen name="stay/[id]" />
         <Stack.Screen name="write" options={{ presentation: 'fullScreenModal', animation: 'slide_from_bottom' }} />
         <Stack.Screen name="inbox" />
