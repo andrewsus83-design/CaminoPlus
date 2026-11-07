@@ -1,0 +1,268 @@
+﻿{
+ "fields": [
+  {
+   "id": "_id",
+   "type": "int"
+  },
+  {
+   "id": "CODIGO",
+   "type": "text"
+  },
+  {
+   "id": "CAMINO",
+   "type": "text"
+  },
+  {
+   "id": "ETAPA",
+   "type": "text"
+  },
+  {
+   "id": "COORD_X",
+   "type": "text"
+  },
+  {
+   "id": "COORD_Y",
+   "type": "text"
+  },
+  {
+   "id": "TIPO_SENAL",
+   "type": "text"
+  }
+ ],
+ "records": [
+  [
+   1,
+   "1",
+   "Francés",
+   "F1 (Francia-Orreaga/Roncesvalles)",
+   "640771",
+   "4775444",
+   "Flecha Direccional"
+  ],
+  [
+   2,
+   "2",
+   "Francés",
+   "F1 (Francia-Orreaga/Roncesvalles)",
+   "637741",
+   "4770519",
+   "Mojón"
+  ],
+  [
+   3,
+   "3",
+   "Francés",
+   "F1 (Francia-Orreaga/Roncesvalles)",
+   "637976",
+   "4769855",
+   "Flecha Direccional"
+  ],
+  [
+   4,
+   "4",
+   "Francés",
+   "F1 (Francia-Orreaga/Roncesvalles)",
+   "637943",
+   "4769205",
+   "Mojón"
+  ],
+  [
+   5,
+   "5",
+   "Francés",
+   "F1 (Francia-Orreaga/Roncesvalles)",
+   "636842",
+   "4767642",
+   "Mojón"
+  ],
+  [
+   6,
+   "6",
+   "Francés",
+   "F1 (Francia-Orreaga/Roncesvalles)",
+   "636656",
+   "4767089",
+   "Flecha Direccional"
+  ],
+  [
+   7,
+   "7",
+   "Francés",
+   "F1 (Francia-Orreaga/Roncesvalles)",
+   "636206",
+   "4766412",
+   "Mojón"
+  ],
+  [
+   8,
+   "8",
+   "Francés",
+   "F1 (Francia-Orreaga/Roncesvalles)",
+   "636197",
+   "4766423",
+   "Mojón"
+  ],
+  [
+   13,
+   "13",
+   "Francés",
+   "F1 (Francia-Orreaga/Roncesvalles)",
+   "635804",
+   "4765681",
+   "Señal Cruce Carretera"
+  ],
+  [
+   24,
+   "24",
+   "Lepoeder",
+   "F1 (Francia-Orreaga/Roncesvalles)",
+   "639585",
+   "4766628",
+   "Flecha Direccional"
+  ],
+  [
+   26,
+   "26",
+   "Lepoeder",
+   "F1 (Francia-Orreaga/Roncesvalles)",
+   "638898",
+   "4765371",
+   "Mojón"
+  ],
+  [
+   30,
+   "30",
+   "Francés",
+   "F2 (Orreaga/Roncesvalles-Zubiri)",
+   "637073",
+   "4763221",
+   "Panel Informativo"
+  ],
+  [
+   115,
+   "115",
+   "Aragonés",
+   "A3 (Monreal-Puente la Reina/Gares)",
+   "619245",
+   "4729922",
+   "Mojón"
+  ],
+  [
+   116,
+   "116",
+   "Aragonés",
+   "A3 (Monreal-Puente la Reina/Gares)",
+   "618891",
+   "4730025",
+   "Flecha Direccional"
+  ],
+  [
+   117,
+   "117",
+   "Aragonés",
+   "A3 (Monreal-Puente la Reina/Gares)",
+   "618601",
+   "4730097",
+   "Otros"
+  ],
+  [
+   134,
+   "134",
+   "Aragonés",
+   "A3 (Monreal-Puente la Reina/Gares)",
+   "611825",
+   "4728302",
+   "Señal Cruce Carretera"
+  ],
+  [
+   181,
+   "181",
+   "Aragonés",
+   "A3 (Monreal-Puente la Reina/Gares)",
+   "622166",
+   "4729518",
+   "Panel informativo"
+  ],
+  [
+   192,
+   "192",
+   "Francés",
+   "F3 (Zubiri-Pamplona/Iruña)",
+   "612488",
+   "4742220",
+   "Otros"
+  ],
+  [
+   343,
+   "343",
+   "Francés",
+   "F5 (Puente la Reina/Gares-Estella/Lizarra)",
+   "580306",
+   "4724777",
+   "Pinturas"
+  ],
+  [
+   385,
+   "385",
+   "Zaraputz",
+   "F6 (Estella/Lizarra-Los Arcos)",
+   "581997",
+   "4722695",
+   "Mojón"
+  ],
+  [
+   386,
+   "386",
+   "Zaraputz",
+   "F6 (Estella/Lizarra-Los Arcos)",
+   "581859",
+   "4722569",
+   "Otros"
+  ],
+  [
+   408,
+   "408",
+   "Zaraputz",
+   "F6 (Estella/Lizarra-Los Arcos)",
+   "578966",
+   "4722004",
+   "Flecha Direccional"
+  ],
+  [
+   492,
+   "492",
+   "Zaraputz",
+   "F6 (Estella/Lizarra-Los Arcos)",
+   "574147",
+   "4718370",
+   "Señal Cruce Carretera"
+  ],
+  [
+   576,
+   "576",
+   "Francés",
+   "F1 (Francia-Orreaga/Roncesvalles)",
+   "638247",
+   "4772646",
+   "Panel informativo"
+  ],
+  [
+   643,
+   "643",
+   "Lepoeder",
+   "F1 (Francia-Orreaga/Roncesvalles)",
+   "641358",
+   "4767836",
+   "Poste de Seguridad"
+  ],
+  [
+   720,
+   "720",
+   "Lepoeder",
+   "F1 (Francia-Orreaga/Roncesvalles)",
+   "638993",
+   "4765403",
+   "Señal Cruce Carretera"
+  ]
+ ]
+}

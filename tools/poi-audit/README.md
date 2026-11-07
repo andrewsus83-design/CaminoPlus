@@ -78,6 +78,95 @@ Dependabot proposes updates to the lock.
 
 No scraping of Google, TripAdvisor, Booking or social media.
 
+## Spanish open data (datos.gob.es): Navarra
+
+The Gobierno de Navarra publishes three tables about the Camino as open data. They are found through the
+datos.gob.es catalogue API and downloaded from the publisher's portal (datosabiertos.navarra.es).
+`poi_audit/opendata_navarra.py` reads them and `poi_audit/navarra_compare.py` measures them against OSM.
+**Not wired into `audit.py`, the importer or the database yet.**
+
+| Table (catalogue slug, `a15002917-...`) | Rows on 2026-11-07 | What is in it |
+|---|---|---|
+| Albergues turísticos en activo del Registro de Turismo de Navarra (`albergues-turisticos-en-activo-del-registro-de-turismo-de-navarra1`) | 115 | registry id (`UAB00062`), name, street, postcode, village, beds, "del Camino de Santiago" flag, owner contact only where the owner agreed |
+| Fuentes del Camino de Santiago (`fuentes-del-camino-de-santiago1`) | 32 (20 Francés, 12 Aragonés) | a UTM position, the stage (F1 to F7, A1 to A3) and the municipality; no name. Surveyed 2012 to 2023, updated yearly |
+| Señales del camino de Santiago (`senales-del-camino-de-santiago`) | 735 | waymarks (mojón, arrow, panel ...): position, type, stage. Not places |
+
+**Licence, exactly as published** (read on 2026-11-07): `http://publications.europa.eu/resource/authority/licence/CC_BY_4_0`,
+that is CC BY 4.0, for all three. Read in two places: the `license` field of the catalogue entry
+(`https://datos.gob.es/apidata/catalog/dataset/title/<title>`), and the publisher's own CKAN API
+(`https://datosabiertos.navarra.es/api/3/action/package_show?id=<name>`: `license_id` "CC-BY-4.0",
+`license_title` "Creative Commons Attribution 4.0", `license_url` the same URI, organisation "Gobierno de
+Navarra"). The datos.gob.es page of the fountains says "Condiciones de uso" with the same URI. The same value
+is on every Navarra dataset we looked at (7 in the catalogue, all 13 the portal lists for "albergue").
+`resolve_licence` refuses to run when the entry has no licence, an unknown one, or one that is not CC BY 4.0
+or CC0 (BY-NC, BY-SA and BY-ND are named in the refusal), and it does so before a data file is requested.
+`--licence CC-BY-4.0` fills a gap only; it never overrides a published value.
+
+```bash
+cd tools/poi-audit
+python -m poi_audit.opendata_navarra --cache cache              # 5 requests, 2 s apart, then everything is cached
+python -m poi_audit.opendata_navarra --cache cache --offline    # replay only; prints licence, credit and skipped rows
+python -m poi_audit.navarra_compare --stage ../offline-maps/stages/camino-frances-01.json \
+    --osm-cache cache --cache cache --offline                   # the measurement below, from caches (never asks Overpass)
+```
+
+In code: `data = opendata_navarra.load(sources.Cache(cache_dir))` gives `data.fountains` (`normalize.Record`,
+source `navarra`, category `fountain`), `data.lodgings` (`Lodging`: a registry row without a position,
+`.to_record(lat, lon)` once an OSM match gives one), `data.waymarks`, `data.skipped` (row and reason),
+`data.attributions` and `data.status()` for the Sources table. A server that answers 403, 429 or 5xx is asked
+twice more (30 s and 90 s later); after that `SourceBlocked` (403, 429) or `SourceError` is raised and nothing
+tries to get around it.
+
+**What it adds** (stage-1 OSM cache of 2026-11-06, tables of 2026-11-07). Less than hoped. The registry
+confirms that an albergue exists and how many beds it has (115 rows, 4,470 beds; 64 rows and 2,407 beds in the
+villages of stages 1 to 7). On stage 1, 4 of the 5 official albergues (Luzaide, Roncesvalles, Burguete, Espinal)
+are in OSM and 1 is not (Lorentx Aterpea, 42 beds); the bed counts agree in 1 of the 4 (Roncesvalles: 223
+official, 183 in OSM). It adds almost no contact data: owners refused publication for 108 of 115 rows (6 phones,
+9 emails and 5 websites in all), and OSM already has a phone and an email for the 4 matches. No prices, season or
+operator. The official fountain list is short (20 on the whole Camino Francés); of the 4 on stage 1, two are
+within 7 m of an OSM water point and two have none within 220 m, and OSM has 16 water points there. Drinkability
+is not stated. The waymarks are the most useful table: they can check a route line (the hand-drawn stage-1 line
+is 576 m from them at the median, and the stage-6 line keeps only 1 of 3 official fountains inside the 500 m
+corridor) and mark 86 safety posts and 102 road crossings. Their stage label is wrong for about 10 of the 735 rows.
+
+| Stage | Albergues | Beds | Flagged Camino | Official fountains | Waymarks |
+|---|---|---|---|---|---|
+| 1 Saint-Jean to Roncesvalles | 2 | 247 | 2 | 4 | 140 |
+| 2 Roncesvalles to Zubiri | 12 | 391 | 3 | 2 | 64 |
+| 3 Zubiri to Pamplona | 13 | 467 | 10 | 3 | 40 |
+| 4 Pamplona to Puente la Reina | 11 | 396 | 5 | 1 | 47 |
+| 5 Puente la Reina to Estella | 10 | 386 | 8 | 5 | 76 |
+| 6 Estella to Los Arcos | 9 | 244 | 8 | 3 | 124 |
+| 7 Los Arcos to Logroño (Navarra part) | 7 | 276 | 5 | 2 | 78 |
+
+Albergues are counted by village (the registry has no coordinates), from the stage names, approximately.
+Only stage 1 could be compared with OSM: there is no OSM cache for stages 2 to 7.
+
+**What it does not do.**
+- The registry has **no coordinates** (its XSD lists 15 columns, none a position), no prices, no season, no
+  operator. A row can be placed only through an OSM match (address, then name; `navarra_compare`).
+- Fountain and waymark coordinates say "UTM" and nothing else. They are **ED50 / UTM 30N** (EPSG:23030):
+  read as ETRS89 only 24 of the 140 stage-1 waymarks are within 30 m of the OSM route (median 104 m, against
+  2.6 m as ED50), and every point would be 235 m off. This is inferred, not published; `utm.py` converts
+  without pyproj (ED50 with the EPSG:1588 shift, about 1 to 3 m), `crs_evidence` repeats the check.
+- Hotels, hostals, casas rurales, campings and apartments are other registries of the same portal with the same 15
+  columns and the same refusal text (one table, "Alojamientos inscritos", has all 2,846 rows). Not read.
+- The official track (SHP from IDENA, `Camino de Santiago. Trazado oficial / real`) is not read: no
+  pure-Python shapefile reader is in the requirements. The waymarks stand in for it.
+- The pilgrim credentials of Orreaga/Roncesvalles (monthly counts since 2017 by age, gender, country, region,
+  motive and mode, CC BY 4.0) are statistics, not places. Not read; they could drive a "busy season" hint.
+- The catalogue API sits behind a firewall that answered 403 to 6 of 9 requests on 2026-11-07 (three in a row
+  to the adapter), while the publisher's portal never refused one. The cache makes a second run independent of
+  the catalogue; a fresh CI checkout is not.
+
+**Credit text.** Every record carries it (`tags["attribution"]["credit"]`, or `.attribution.credit` on a waymark):
+`Contains public sector information of Gobierno de Navarra, CC BY 4.0`. CC BY 4.0 also asks for the licence
+link and a note that the data was changed, which `Attribution.credit_full` adds: "... (https://creativecommons.org/licenses/by/4.0/).
+Dataset: Albergues turísticos en activo del Registro de Turismo de Navarra,
+https://datosabiertos.navarra.es/dataset/albergues-turisticos-en-activo-del-registro-de-turismo-de-navarra,
+retrieved 2026-11-07. Changed by CaminoPlus: names and contact fields normalised, categories mapped; the source
+has no coordinates." The "Sources and licences" table above does not list this source yet.
+
 ## Checks
 
 | Code | Severity | What it means |
