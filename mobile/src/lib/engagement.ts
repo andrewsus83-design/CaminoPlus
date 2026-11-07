@@ -27,7 +27,8 @@ export type EngagementItem = {
   label: string;
 };
 
-const isCount = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v) && v >= 0;
+/** true for a real count: a finite number that is not negative. Anything else (null, NaN, "12", -1) is "not known". */
+export const isCount = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v) && v >= 0;
 
 const UNITS = [
   { size: 1e9, suffix: 'B' },
