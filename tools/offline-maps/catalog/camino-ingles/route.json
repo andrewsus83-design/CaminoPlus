@@ -1,0 +1,11 @@
+{
+  "route_slug": "camino-ingles",
+  "route_index": 5,
+  "route_id": "20000000-0000-0000-0000-000000000006",
+  "route_name_regex": "camino ingl[eé]s|camiño ingl[eé]s|chemin anglais|english way|caminho ingl[eê]s|ingeles bidea",
+  "route_exclude_regex": "\\b(SL|PR)-[A-Z]{1,3} ?\\d",
+  "clip_km": 6,
+  "buffer_km": 3,
+  "maxzoom": 15,
+  "margin_km": 4
+}

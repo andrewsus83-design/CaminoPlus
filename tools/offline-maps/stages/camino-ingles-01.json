@@ -1,0 +1,85 @@
+{
+  "slug": "camino-ingles-01",
+  "name": "Ferrol to Neda",
+  "route_slug": "camino-ingles",
+  "stage_number": 1,
+  "route_id": "20000000-0000-0000-0000-000000000006",
+  "stage_id": "40000000-0000-0000-0005-000000000001",
+  "osm_extracts": [
+    "https://download.geofabrik.de/europe/spain/galicia-latest.osm.pbf"
+  ],
+  "search_bbox": [
+    -8.37,
+    43.39,
+    -8.03,
+    43.61
+  ],
+  "coastal": true,
+  "route_name_regex": "camino ingl[eé]s|camiño ingl[eé]s|chemin anglais|english way|caminho ingl[eê]s|ingeles bidea",
+  "route_exclude_regex": "\\b(SL|PR)-[A-Z]{1,3} ?\\d",
+  "fallback_route": "camino-ingles-01.route.geojson",
+  "clip_km": 6,
+  "min_route_km": 4.1,
+  "buffer_km": 3,
+  "maxzoom": 15,
+  "waypoints": [
+    {
+      "name": "Ferrol",
+      "at": [
+        -8.2428,
+        43.47899
+      ]
+    },
+    {
+      "name": "Caranza",
+      "at": [
+        -8.20436,
+        43.48074
+      ]
+    },
+    {
+      "name": "San Martiño de Xuvia",
+      "at": [
+        -8.17428,
+        43.49797
+      ]
+    },
+    {
+      "name": "Xuvia",
+      "at": [
+        -8.15812,
+        43.51615
+      ]
+    },
+    {
+      "name": "Neda",
+      "at": [
+        -8.15825,
+        43.50028
+      ]
+    }
+  ],
+  "render_checks": [
+    {
+      "name": "Ferrol z15",
+      "at": [
+        -8.2428,
+        43.47899,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    },
+    {
+      "name": "Neda z15",
+      "at": [
+        -8.15825,
+        43.50028,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    }
+  ],
+  "generated_from": "catalog/camino-ingles/01.json"
+}

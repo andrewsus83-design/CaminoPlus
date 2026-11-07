@@ -1,0 +1,43 @@
+{
+  "n": 3,
+  "name": "Pontedeume to Betanzos",
+  "from": {
+    "name": "Pontedeume",
+    "lat": 43.40726,
+    "lng": -8.17188,
+    "source": "nominatim node/136798686 place=town wikidata=Q12397882"
+  },
+  "to": {
+    "name": "Betanzos",
+    "lat": 43.27924,
+    "lng": -8.21058,
+    "source": "nominatim node/171484343 place=town wikidata=Q24002656"
+  },
+  "via": [
+    {
+      "name": "Miño",
+      "lat": 43.34685,
+      "lng": -8.20618,
+      "source": "nominatim node/13990222130 place=neighbourhood"
+    },
+    {
+      "name": "Montecelo",
+      "lat": 43.32846,
+      "lng": -8.19709,
+      "source": "nominatim node/6147317603 place=hamlet wikidata=Q20546264"
+    },
+    {
+      "name": "Tiobre",
+      "lat": 43.29349,
+      "lng": -8.20189,
+      "source": "nominatim way/84393139 amenity=place_of_worship wikidata=Q98108824 (Igrexa de San Martiño de Tiobre)"
+    }
+  ],
+  "extracts": [
+    "galicia"
+  ],
+  "coastal": true,
+  "distance_km": null,
+  "distance_source": null,
+  "notes": "Division as in 01.json (six stages). Sources for this stage: caminoingles.gal (site of the Asociación de Concellos do Camiño Inglés) 'Pontedeume - Betanzos' (19.9 km, read 2026-11-07); the Xunta portal caminodesantiago.gal, whose stage 'Miño - Bruma' starts with the section Miño-Betanzos 10.7 km and whose stage 'Neda - Miño' ends with Pontedeume-Miño 9.2 km (19.9 km together); Federación Española de Asociaciones de Amigos del Camino de Santiago (FEAACS), dossier 'Los Caminos de Santiago - Camiño Inglés', April 2024, stage 03 Pontedeume-Betanzos (19.93 km); the folleto 'De Ferrol a Santiago' (PDF on caminoingles.gal, 2021) splits the stage at Miño (9.75 + 10.175 km), and Miño is in via. The published lengths are not copied into distance_km, which stays null. Via: Miño (the only Miño node in the town, a place=neighbourhood; the municipality relation/341954 has its centroid 2.5 km away), Montecelo (the hamlet on the climb after the Ponte do Porco over the Lambre, named in the FEAACS text, 0.45 km from the route) and Tiobre (the Romanesque church of San Martiño, the 'obligatory stop' of caminoingles.gal; the point is the church). Ponte Baxoi, where the route comes down to sea level, is only a cafe node in Nominatim and was not used. Checked on 2026-11-07 against relation 1102966 from the OSM API: every point is within 0.45 km of the route, which is 20.1 km long between Pontedeume and Betanzos and never leaves the lines by more than 1.0 km. coastal is true: the route follows the Ría de Betanzos at the Baxoi marshes and through Miño (OSM coastline 0.08 km from it) and ends in Betanzos at the head of the ría."
+}

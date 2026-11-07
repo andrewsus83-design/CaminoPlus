@@ -1,0 +1,37 @@
+{
+  "n": 2,
+  "name": "Neda to Pontedeume",
+  "from": {
+    "name": "Neda",
+    "lat": 43.50028,
+    "lng": -8.15825,
+    "source": "nominatim node/136797204 place=village wikidata=Q12393870"
+  },
+  "to": {
+    "name": "Pontedeume",
+    "lat": 43.40726,
+    "lng": -8.17188,
+    "source": "nominatim node/136798686 place=town wikidata=Q12397882"
+  },
+  "via": [
+    {
+      "name": "Fene",
+      "lat": 43.47367,
+      "lng": -8.16256,
+      "source": "nominatim node/136794154 place=town wikidata=Q12388357"
+    },
+    {
+      "name": "Cabanas",
+      "lat": 43.41869,
+      "lng": -8.16092,
+      "source": "nominatim node/383984320 place=village wikidata=Q123615756"
+    }
+  ],
+  "extracts": [
+    "galicia"
+  ],
+  "coastal": true,
+  "distance_km": null,
+  "distance_source": null,
+  "notes": "Division as in 01.json (six stages). Sources for this stage: caminoingles.gal (site of the Asociación de Concellos do Camiño Inglés) 'Neda - Pontedeume' (12.9 km, read 2026-11-07; its page 'Ferrol - Neda' says 16 km from Neda to Pontedeume, so its own figures differ); the Xunta portal caminodesantiago.gal, whose stage 'Neda - Miño' (22.1 km) has the sections Neda-Fene 3.6, Fene-Cabanas 7.4, Cabanas-Pontedeume 1.9 and Pontedeume-Miño 9.2 km; Federación Española de Asociaciones de Amigos del Camino de Santiago (FEAACS), dossier 'Los Caminos de Santiago - Camiño Inglés', April 2024, stage 02 Neda-Pontedeume (13.21 km). The published lengths are not copied into distance_km, which stays null. Via: Fene and Cabanas, both stops of the Xunta portal (the FEAACS has the Ponte das Pías shortcut from Ferrol join the Camino at Fene; Cabanas is the village above the mouth of the Eume, 1.6 km before Pontedeume along the route). Fene: node/136794154 was found with Photon and read back with a Nominatim lookup, because a Nominatim search for 'Fene' lists only the municipality, whose centroid is 2.1 km from the town. Places the FEAACS text names that are not in via: Perlío, Mundín (washing place), Vilar do Colo. Checked on 2026-11-07 against relation 1102966 from the OSM API: every point is within 0.15 km of the route, which is 12.5 km long between Neda and Pontedeume and never leaves the lines by more than 0.6 km. coastal is true: the stage starts at the head of the Ría de Ferrol and ends at the mouth of the Eume, where the OSM coastline runs along the route."
+}
