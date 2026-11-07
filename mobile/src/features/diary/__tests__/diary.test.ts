@@ -361,6 +361,44 @@ const GOOD = page('g1', day(1), { title: 'Roncesvalles', body: 'Cold and clear.'
     assert.equal(await createDiaryStore(fake().storage).deleteEntry(UID, 'x'), true, 'nothing stored, nothing to delete');
   });
 
+  await test('a delete leaves no copy of the page on the phone: the slot that held the state before is written with the new state too', async () => {
+    const f = fake();
+    const store = createDiaryStore(f.storage);
+    await store.saveEntry(UID, page('keep', day(1), { body: 'Keep me' }));
+    await store.saveEntry(UID, page('gone', day(2), { body: 'Secret words' }));
+    assert.ok(f.files.get(A())?.includes('Keep me') && f.files.get(B())?.includes('Secret words'), 'the slot of the state before holds it, which is why a delete has to scrub it');
+    assert.equal(await store.deleteEntry(UID, 'gone'), true);
+    for (const key of [A(), B()]) assert.ok(!f.files.get(key)?.includes('Secret words'), `${key} still holds the deleted page`);
+    assert.deepEqual(f.writes.map((w) => [w.key === A() ? 'a' : 'b', w.seq]).slice(2), [['a', 3], ['b', 4]], 'the new state first, then the scrub, one seq later');
+    assert.deepEqual(ids(await store.loadEntries(UID)), ['keep']);
+    assert.equal(entriesOf(f.stored(A())).length, 1);
+    assert.equal(entriesOf(f.stored(B())).length, 1);
+  });
+
+  await test('a kill, or a refusal, during the scrub of a delete costs nothing: the page is gone from the state that was committed', async () => {
+    for (const opts of [{ crashSets: [4] }, { failSets: [4] }]) {
+      const f = fake(opts);
+      const store = createDiaryStore(f.storage);
+      await store.saveEntry(UID, page('keep', day(1)));
+      await store.saveEntry(UID, page('gone', day(2), { body: 'Secret words' }));
+      assert.equal(await store.deleteEntry(UID, 'gone'), true, 'the delete went through');
+      assert.ok(!f.files.get(A())?.includes('Secret words'), 'slot a, the new state, does not hold it');
+      const restarted = createDiaryStore(f.storage);
+      assert.deepEqual(ids(await restarted.loadEntries(UID)), ['keep'], 'and that is the state the next run reads');
+    }
+  });
+
+  await test('a delete in a diary that is new, or carried over from the first build, has no slot to scrub and writes once', async () => {
+    const f = fake();
+    f.seed(oldKey(UID), { v: 1, entries: [GOOD, page('g2', day(2))] });
+    const store = createDiaryStore(f.storage);
+    assert.equal(await store.deleteEntry(UID, 'g2'), true);
+    assert.deepEqual(f.writes.map((w) => [w.key === A() ? 'a' : 'b', w.seq]), [['a', 1]]);
+    assert.equal(f.files.has(B()), false, 'slot b is not created');
+    assert.equal(f.files.has(oldKey(UID)), false);
+    assert.deepEqual(ids(await store.loadEntries(UID)), ['g1']);
+  });
+
   await test('the order is by the moment a page was begun, not by how its date is written; equal moments keep a fixed order', () => {
     const a = page('a', '2026-11-04T23:00:00-05:00'); // 04:00 UTC on the 5th
     const b = page('b', '2026-11-05T01:00:00Z');

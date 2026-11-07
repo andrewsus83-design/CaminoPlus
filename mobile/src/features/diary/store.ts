@@ -98,9 +98,10 @@ type SlotRead =
   | { kind: 'foreign' }
   | { kind: 'unreadable' };
 
-// `target` is the slot the next write goes to and `seq` the number of the state it is based on (0 for a diary that is new).
+// `from` is the slot the pages were read from (null for a diary that is new, or one carried over from the key of the first build),
+// `target` the slot the next write goes to, and `seq` the number of the state it is based on (0 for a diary that is new).
 // `adopted` is true when the pages came from the key of the first build, which is removed once they are in a slot.
-type State = { kind: 'ok'; seq: number; entries: unknown[]; target: Slot; adopted: boolean } | { kind: 'blocked' };
+type State = { kind: 'ok'; seq: number; entries: unknown[]; from: Slot | null; target: Slot; adopted: boolean } | { kind: 'blocked' };
 
 /** The reasons a page is refused before anything is read. */
 function refusal(uid: string, e: DiaryEntry): SaveProblem | null {
@@ -145,11 +146,11 @@ export function createDiaryStore(storage: DiaryStorage) {
     if (a.kind === 'valid' || b.kind === 'valid') {
       const newestIsA = a.kind === 'valid' && (b.kind !== 'valid' || a.seq >= b.seq);
       const newest = (newestIsA ? a : b) as Extract<SlotRead, { kind: 'valid' }>;
-      return { kind: 'ok', seq: newest.seq, entries: newest.entries, target: newestIsA ? 'b' : 'a', adopted: false };
+      return { kind: 'ok', seq: newest.seq, entries: newest.entries, from: newestIsA ? 'a' : 'b', target: newestIsA ? 'b' : 'a', adopted: false };
     }
     if (a.kind === 'unreadable' && b.kind === 'unreadable') return { kind: 'blocked' };
     const old = await readOld(uid);
-    return { kind: 'ok', seq: 0, entries: old ?? [], target: 'a', adopted: old != null };
+    return { kind: 'ok', seq: 0, entries: old ?? [], from: null, target: 'a', adopted: old != null };
   };
 
   /** Writes `raw` as the next state, into the slot that is not the newest one. True when it is on the phone. */
@@ -161,6 +162,17 @@ export function createDiaryStore(storage: DiaryStorage) {
       try { await storage.remove(oldKey(uid)); } catch { /* only a stale copy now; clearDiary removes it as well */ }
     }
     return written;
+  };
+
+  /**
+   * After a delete the slot that was not written still holds the page, as the state before. "Deleted" has to mean gone, so the
+   * same state is written there too (one seq later, so it is still the newest) and no copy of the page is left on the phone. If
+   * this write dies half way it only damages the slot that is being scrubbed; the state that was just committed is intact.
+   */
+  const scrub = async (uid: string, state: Extract<State, { kind: 'ok' }>, raw: unknown[]): Promise<void> => {
+    if (!state.from) return;
+    const value: Stored = { v: 1, seq: state.seq + 2, entries: raw };
+    try { await storage.setJSON(slotKey(uid, state.from), value); } catch { /* the delete itself went through */ }
   };
 
   /** The pages of one person, newest first. An empty list when there is nothing, or nothing that can be read. */
@@ -195,14 +207,17 @@ export function createDiaryStore(storage: DiaryStorage) {
     }).catch((): SaveResult => ({ ok: false, reason: 'not-saved' }));
   };
 
-  /** True when the page is gone afterwards (also when it was never there); false when it could not be removed. */
+  /** True when the page is gone afterwards (also when it was never there), from both slots; false when it could not be removed. */
   const deleteEntry = (uid: string, id: string): Promise<boolean> => {
     if (!uid || !id) return Promise.resolve(true);
     return inTurn(async () => {
       const s = await readState(uid);
       if (s.kind === 'blocked') return false;
       const raw = s.entries.filter((item) => !(isEntry(item) && item.id === id));
-      return raw.length === s.entries.length ? true : commit(uid, s, raw);
+      if (raw.length === s.entries.length) return true;
+      if (!(await commit(uid, s, raw))) return false;
+      await scrub(uid, s, raw);
+      return true;
     }).catch(() => false);
   };
 
