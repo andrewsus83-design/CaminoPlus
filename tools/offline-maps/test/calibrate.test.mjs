@@ -200,6 +200,8 @@ test('every reason to refuse a baseline, one at a time', () => {
   const cases = [
     ['hand-drawn fallback route', m({ route_source: 'fallback' }), makeReport(), /route_source is 'fallback', not 'osm'/],
     ['no route_source at all', m({ route_source: undefined }), makeReport(), /route_source is missing/],
+    ['a coastal stage built on the placeholder sea', m({ coastal: true, ocean_polygons: 'placeholder' }), makeReport(), /ocean_polygons is 'placeholder' on a coastal stage: the sea is missing/],
+    ['a coastal stage that records no ocean_polygons', m({ coastal: true, ocean_polygons: undefined }), makeReport(), /ocean_polygons is missing on a coastal stage/],
     ['report not ok, with the failures that say why', m(), makeReport({ ok: false, failures: ['with the device offline, view "x": 3 rendered features in source layer "building", expected at least 30'] }), /says ok: false.*rendered features in source layer "building"/],
     ['report without ok', m(), makeReport({ ok: undefined }), /says ok: undefined/],
     ['console errors', m(), makeReport({ errors: ['console: boom'] }), /1 console, page or map error\(s\), the first: console: boom/],
@@ -226,6 +228,13 @@ test('every reason to refuse a baseline, one at a time', () => {
     assert.equal(typeof reason, 'string', `${what}: must be refused`);
     assert.match(reason, expected, what);
   }
+});
+
+test('the placeholder sea only matters for a coastal stage', () => {
+  // an inland stage never needs the sea, a coastal stage with the real polygons is fine, and a manifest from before the keys existed is not judged
+  assert.equal(refuseReason({ ...GOLDEN_MANIFEST, coastal: false, ocean_polygons: 'placeholder' }, makeReport()), null);
+  assert.equal(refuseReason({ ...GOLDEN_MANIFEST, coastal: true, ocean_polygons: 'osmdata' }, makeReport()), null);
+  assert.equal(refuseReason(GOLDEN_MANIFEST, makeReport()), null);
 });
 
 test('refuseReason lists every problem of a very broken build, one per line', () => {
@@ -697,6 +706,7 @@ test('cli: --dry-run prints the table and writes nothing', async () => {
 test('cli: a build that must not be a baseline is refused with a plain message and nothing is written', async () => {
   const refused = [
     ['hand-drawn route', { manifest: { ...GOLDEN_MANIFEST, route_source: 'fallback' } }, /route_source is 'fallback', not 'osm'/],
+    ['a coastal pack built on the placeholder sea', { manifest: { ...GOLDEN_MANIFEST, coastal: true, ocean_polygons: 'placeholder' } }, /ocean_polygons is 'placeholder' on a coastal stage/],
     ['request that left the device', { report: makeReport({ blocked_requests: ['https://tiles.example/0/0/0.pbf'] }) }, /1 request\(s\) tried to leave the device, the first: https:\/\/tiles\.example/],
     ['render report not ok', { report: makeReport({ ok: false, failures: ['1 request(s) tried to leave the device'] }) }, /render report says ok: false/],
     ['console errors', { report: makeReport({ errors: ['console: Failed to load glyphs'] }) }, /1 console, page or map error\(s\), the first: console: Failed to load glyphs/],

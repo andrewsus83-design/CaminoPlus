@@ -22,6 +22,12 @@
 #                   build that will be published must say deny (the workflow does). Only exit code 2
 #                   of route_from_osm.py means "too little route"; any other failure always stops
 #                   the build, because a crash is a bug, not a reason to ship a different route.
+#   OCEAN_FALLBACK  allow (default) | deny. Whether a coastal stage may be built with Planetiler's tiny
+#                   placeholder when the real ocean polygons cannot be downloaded (osmdata.openstreetmap.de
+#                   often cannot be reached from GitHub's runners). That pack has no sea. A measurement build
+#                   allows it (the manifest says ocean_polygons "placeholder"; check_pack.mjs --publishing and
+#                   calibrate_stage.mjs refuse such a pack); a build that will be published must say deny (the
+#                   workflow does). An inland stage never needs the sea and always falls back.
 #   DATA_DIR, OUT_DIR, PLANETILER_VERSION, PLANETILER_IMAGE, PYTHON, FETCH_RETRIES
 set -euo pipefail
 
@@ -34,6 +40,8 @@ PLANETILER_VERSION="${PLANETILER_VERSION:-0.10.2}"
 PY="${PYTHON:-python3}"
 ROUTE_FALLBACK="${ROUTE_FALLBACK:-allow}"
 case "$ROUTE_FALLBACK" in allow|deny) ;; *) echo "ROUTE_FALLBACK must be allow or deny" >&2; exit 2 ;; esac
+OCEAN_FALLBACK="${OCEAN_FALLBACK:-allow}"
+case "$OCEAN_FALLBACK" in allow|deny) ;; *) echo "OCEAN_FALLBACK must be allow or deny" >&2; exit 2 ;; esac
 
 # jqr "['slug']": one value (or a space separated list) out of the stage file.
 jqr() { "$PY" -c "import json,sys; v=json.load(open(sys.argv[1]))$1; print(' '.join(map(str,v)) if isinstance(v,list) else v)" "$STAGE_JSON"; }
@@ -125,18 +133,28 @@ fetch_source() { # <file> <url> [sha256]
   fi
 }
 zip_ok() { "$PY" -c "import sys,zipfile; sys.exit(0 if zipfile.ZipFile(sys.argv[1]).testzip() is None else 1)" "$1"; }
-# Ocean polygons only matter for stages that touch the sea. For inland stages, if
-# osmdata.openstreetmap.de is unreachable (it often is from GitHub runners), use
-# Planetiler's tiny test file (Monaco coast only), which adds nothing to the pack.
+# Ocean polygons only matter for stages that touch the sea. If osmdata.openstreetmap.de is
+# unreachable (it often is from GitHub runners), use Planetiler's tiny test file (Monaco coast
+# only), which adds nothing to the pack. For an inland stage that costs nothing. A coastal stage
+# built with it has no sea, so that is only for a measurement build (OCEAN_FALLBACK=allow): the
+# manifest records coastal and ocean_polygons "placeholder", and the publishing gate and the
+# calibration tool refuse such a pack. A build that will be published says OCEAN_FALLBACK=deny.
 # The real ocean file is rebuilt upstream every day, so it cannot be pinned by hash; it is
 # only checked to be a complete zip.
 OCEAN=osmdata
 if [[ -f "$DATA_DIR/tmp/water-placeholder.zip" ]] || \
    ! fetch_source water-polygons-split-3857.zip https://osmdata.openstreetmap.de/download/water-polygons-split-3857.zip; then
   if [[ "$(jqr ".get('coastal', False)")" == "True" ]]; then
-    echo "ocean polygons unavailable and this stage is coastal: stopping" >&2; exit 1
+    if [[ "$OCEAN_FALLBACK" != allow ]]; then
+      echo "ocean polygons unavailable and this stage is coastal: stopping (OCEAN_FALLBACK=$OCEAN_FALLBACK)" >&2; exit 1
+    fi
+    echo "ocean polygons unavailable and this stage is coastal: using the placeholder (OCEAN_FALLBACK=allow). The sea is missing from this pack: do not publish it or calibrate from it." >&2
+    if [[ -n "${GITHUB_ACTIONS:-}" ]]; then
+      echo "::warning title=no sea in this measurement build::${SLUG} is coastal, but osmdata.openstreetmap.de could not be reached, so it was built without the ocean polygons. It shows that the stage builds and renders; it cannot be published or calibrated."
+    fi
+  else
+    echo "ocean polygons unavailable; inland stage, using placeholder (no sea in this corridor)"
   fi
-  echo "ocean polygons unavailable; inland stage, using placeholder (no sea in this corridor)"
   if [[ ! -f "$DATA_DIR/tmp/water-placeholder.zip" ]]; then
     download "https://raw.githubusercontent.com/onthegomap/planetiler/v${PLANETILER_VERSION}/planetiler-core/src/test/resources/water-polygons-split-3857.zip" "$DATA_DIR/tmp/water-placeholder.zip"
   fi
@@ -211,6 +229,7 @@ manifest = {
   "bounds": [float(x) for x in bounds.split(",")],
   "route_source": route_source,
   "ocean_polygons": ocean,
+  "coastal": bool(stage.get("coastal", False)),
   "osm_timestamp": osm_ts,
   "planetiler": planetiler,
   "planetiler_image": image,

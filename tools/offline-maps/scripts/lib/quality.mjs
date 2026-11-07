@@ -31,6 +31,16 @@ export function checkManifest(m, q, { publishing = false, now = new Date() } = {
     );
   }
 
+  // A coastal stage built without the ocean polygons has no sea. build_stage.sh does that for a measurement build when
+  // osmdata.openstreetmap.de cannot be reached (OCEAN_FALLBACK=allow): fine to see that the stage builds and renders,
+  // never to publish. A manifest without the keys (an older build script) is not judged.
+  if (m.coastal === true && m.ocean_polygons !== 'osmdata') {
+    (publishing ? errors : warnings).push(
+      `${where}: this stage is coastal but its ocean polygons are '${m.ocean_polygons}', not 'osmdata', so the sea is missing from the pack. ` +
+      'Rebuild it where osmdata.openstreetmap.de can be reached (tools/offline-maps/docs/ci-matrix.md, "Coastal stages").',
+    );
+  }
+
   if (!q) {
     (publishing ? errors : warnings).push(`${where}: the stage file has no "quality" band, so size and tile count cannot be checked.`);
     return { errors, warnings };
