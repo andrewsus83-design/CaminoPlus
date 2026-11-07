@@ -126,7 +126,7 @@
 
   /* Layout: margins & paddings */
   --cp-screen-margin:      16px;  /* left/right edge of every mobile screen (the standard gutter) */
-  --cp-screen-top:         16px;  /* below status bar                          */
+  --cp-screen-top:         8px;   /* below the status bar / camera, on every screen (same as Whole route / Near me) */
   --cp-section-gap:        40px;  /* between sections on a screen             */
   --cp-stack-gap:          16px;  /* between items in a list                   */
   --cp-card-padding:       20px;

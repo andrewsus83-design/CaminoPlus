@@ -6,7 +6,7 @@ import { AccessibilityInfo, ActivityIndicator, Keyboard, KeyboardAvoidingView, M
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '@/components/AppText';
 import { Icon, IconName } from '@/components/Icon';
-import { c, fonts, radius, role, shadowStyle } from '@/theme';
+import { c, fonts, layout, radius, role, shadowStyle } from '@/theme';
 import { SelectMark } from '../components/people';
 import { Btn, PilgrimAvatar, SearchField } from '../components/primitives';
 import { Notice } from '../components/states';
@@ -433,7 +433,7 @@ export function HelpSheet({ visible, onClose, position, placeText }: HelpSheetPr
       <View style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: SCRIM }}>
         <Pressable accessibilityRole="button" accessibilityLabel="Close help" onPress={onClose} style={StyleSheet.absoluteFill} />
         <KeyboardAvoidingView behavior="padding">
-          <View accessibilityViewIsModal style={{ maxHeight: height - insets.top - 8, backgroundColor: role.bg, borderTopLeftRadius: radius.lg, borderTopRightRadius: radius.lg, overflow: 'hidden', ...shadowStyle('xl') }}>
+          <View accessibilityViewIsModal style={{ maxHeight: height - insets.top - layout.screenTop, backgroundColor: role.bg, borderTopLeftRadius: radius.lg, borderTopRightRadius: radius.lg, overflow: 'hidden', ...shadowStyle('xl') }}>
             <View style={{ paddingTop: 10, paddingHorizontal: PAD }}>
               <View style={{ alignSelf: 'center', width: 48, height: 5, borderRadius: radius.pill, backgroundColor: role.border }} />
               <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 6 }}>

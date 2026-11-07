@@ -110,7 +110,7 @@ export default function Discover() {
           />
         )}
       />
-      <View style={{ position: 'absolute', top: insets.top + 12, left: 0, right: 0 }}>
+      <View style={{ position: 'absolute', top: insets.top + layout.screenTop, left: 0, right: 0 }}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ minWidth: width, justifyContent: 'center', gap: 22, paddingHorizontal: layout.screenMargin }}>
           {TABS.map((t) => (
             <Pressable key={t} accessibilityRole="tab" accessibilityState={{ selected: tab === t }} onPress={() => goTab(t)} hitSlop={10} style={{ paddingVertical: 8, borderBottomWidth: 3, borderBottomColor: tab === t ? WHITE : 'transparent' }}>

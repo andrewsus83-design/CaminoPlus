@@ -168,7 +168,7 @@ function Viewer({ posts, media, start, onClose, sampleLabel }: { posts: Post[]; 
             );
           }}
         />
-        <Pressable accessibilityRole="button" accessibilityLabel="Close" onPress={onClose} hitSlop={12} style={{ position: 'absolute', top: insets.top + 10, left: 16, width: 52, height: 52, borderRadius: 26, backgroundColor: 'rgba(0,0,0,0.45)', alignItems: 'center', justifyContent: 'center' }}>
+        <Pressable accessibilityRole="button" accessibilityLabel="Close" onPress={onClose} hitSlop={12} style={{ position: 'absolute', top: insets.top + layout.screenTop, left: 16, width: 52, height: 52, borderRadius: 26, backgroundColor: 'rgba(0,0,0,0.45)', alignItems: 'center', justifyContent: 'center' }}>
           <Icon name="close" color="#FFFFFF" size={28} />
         </Pressable>
       </View>

@@ -9,6 +9,7 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { type NativeSyntheticEvent, useWindowDimensions } from 'react-native';
 import { Camera, GeoJSONSource, Images, Layer, Map, type CameraRef, type LayerProps, type MapRef, type ViewStateChangeEvent } from '@maplibre/maplibre-react-native';
+import { layout } from '@/theme';
 import { onlineTilesUrl } from './config';
 import { normDeg } from './nav';
 import { pois, routeBounds, towns } from './sampleRoute';
@@ -84,7 +85,7 @@ function LiveMapImpl(p: MapViewProps) {
 
   // Declared camera for entering a layer: frozen per layer so later renders never move it (follow moves are imperative).
   const stop = useMemo(() => {
-    if (heli) return { bounds: routeBounds, padding: { top: p.insets.top + 24, bottom: p.insets.bottom + 24, left: 32, right: 32 }, pitch: 0, bearing: 0, duration: 900, easing: 'fly' as const };
+    if (heli) return { bounds: routeBounds, padding: { top: p.insets.top + 24, bottom: p.insets.bottom + 24, left: 32, right: 32 }, pitch: 0, bearing: 0, duration: 900, easing: 'fly' as const }; // top-gap-ok: camera padding, not a screen margin
     const l = latest.current;
     return { center: l.at, zoom: l.walkZoom, pitch: WALK_PITCH, bearing: normDeg(l.bearing), padding: l.pad, duration: 1200, easing: 'fly' as const };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -207,7 +208,7 @@ function LiveMapImpl(p: MapViewProps) {
       attribution
       attributionPosition={heli ? { bottom: p.insets.bottom + 4, left: 8 } : { bottom: p.insets.bottom + 8, right: 12 }}
       compass={heli}
-      compassPosition={{ top: p.insets.top + 8, right: 12 }}
+      compassPosition={{ top: p.insets.top + layout.screenTop, right: 12 }}
       compassHiddenFacingNorth
       scaleBar={false}
       touchPitch={!heli}

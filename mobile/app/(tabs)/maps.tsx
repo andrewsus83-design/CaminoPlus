@@ -137,9 +137,9 @@ export default function Maps() {
   const lightLabel = `Map light: ${light === 'auto' ? `automatic, now ${night ? 'night' : 'day'}` : light}. Tap for ${NEXT_LIGHT[light]}.`;
 
   // What the camera keeps clear: banner and card in the Walk view, the chrome and tab bar otherwise.
-  const mapInsets = walk ? { top: insets.top + 8 + bannerH + 8, bottom: cardH } : { top: insets.top + 100, bottom: sheetBottom };
+  const mapInsets = walk ? { top: insets.top + layout.screenTop + bannerH + 8, bottom: cardH } : { top: insets.top + 100, bottom: sheetBottom }; // top-gap-ok: camera padding, not a screen margin
   // The Walk view's button stack takes the room between the banner and the card: 56, 52 or 48 dp buttons, scrolling only if even 48 does not fit.
-  const stackMax = Math.max(0, screenH - (insets.top + 8) - aboveH - 8 - cardH - 16);
+  const stackMax = Math.max(0, screenH - (insets.top + layout.screenTop) - aboveH - 8 - cardH - 16);
   const btn = [56, 52, 48].find((s) => 8 * s + 48 <= stackMax) ?? 48; // 8 = help bell, compass, near, GPS, light, route details and the zoom pair (2)
   const stackScrolls = 8 * btn + 48 > stackMax;
   const gpsColor = gpsMode === 'saver' ? (night ? '#7FD6A4' : c.success) : c.gold;
@@ -192,7 +192,7 @@ export default function Maps() {
         <Fragment key="walk">
           {/* Top: instruction banner and the "What is near" chips; below them notices on the left, round buttons on the right.
               The map keeps getting touches everywhere around them. */}
-          <View pointerEvents="box-none" style={{ position: 'absolute', top: insets.top + 8, left: layout.screenMargin, right: layout.screenMargin }}>
+          <View pointerEvents="box-none" style={{ position: 'absolute', top: insets.top + layout.screenTop, left: layout.screenMargin, right: layout.screenMargin }}>
             <View pointerEvents="box-none" style={{ gap: 8 }} onLayout={(e) => setAboveH(Math.round(e.nativeEvent.layout.height))}>
               <View onLayout={(e) => setBannerH(Math.round(e.nativeEvent.layout.height))}>
                 <WalkBanner banner={m.nav.banner} night={night} />
@@ -285,7 +285,7 @@ export default function Maps() {
       ) : (
         <Fragment key="heli">
           {/* Top: layer switch + pack status */}
-          <View pointerEvents="box-none" style={{ position: 'absolute', top: insets.top + 8, left: layout.screenMargin, right: layout.screenMargin, gap: 10 }}>
+          <View pointerEvents="box-none" style={{ position: 'absolute', top: insets.top + layout.screenTop, left: layout.screenMargin, right: layout.screenMargin, gap: 10 }}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
               <View style={{ flexDirection: 'row', padding: 4, borderRadius: radius.pill, backgroundColor: role.surface, ...shadowStyle('md') }}>
                 {LAYERS.map((l) => (
@@ -351,7 +351,7 @@ export default function Maps() {
         </Fragment>
       )}
 
-      {sheetShown && <ModalSheet half={SHEET_FULL} max={screenH - insets.top - 8} bottomInset={insets.bottom} onClose={() => setSheetOpen(false)}>
+      {sheetShown && <ModalSheet half={SHEET_FULL} max={screenH - insets.top - layout.screenTop} bottomInset={insets.bottom} onClose={() => setSheetOpen(false)}>
         {(
           <View style={{ gap: 6 }}>
             <AppText variant="h4">{ROUTE_NAME} · St-Jean → Santiago</AppText>
