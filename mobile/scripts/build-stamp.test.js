@@ -1,7 +1,7 @@
 // Plain-node checks of what goes into the app when it is built: the commit stamp, the switch-on of over-the-air
-// updates and, the one that matters most, that Expo's native fingerprint does NOT move when the stamp does.
-// (If it moved, every build and every update would get a different fingerprint and no phone would ever accept
-// an update.) Run: npm run test:config
+// updates and, the ones that matter most, that Expo's native fingerprint does NOT move when the stamp does or when an
+// npm script is added or changed. (If it moved, every build and every update would get a different fingerprint and no
+// phone would ever accept an update.) Run: npm run test:config
 const assert = require('node:assert/strict');
 const path = require('node:path');
 const { buildStamp } = require('./build-stamp');
@@ -82,6 +82,20 @@ check('Expo\'s native fingerprint does not move when the stamp does', async () =
   const b = await createFingerprintAsync(root);
   assert.equal(a.hash, b.hash, 'the fingerprint moved between two evaluations: something in the app config changes on every build and fingerprint.config.js does not skip it');
   assert.ok(!JSON.stringify(a.sources).includes('builtAt'), 'the build stamp is part of what the fingerprint hashes');
+});
+
+check('Expo\'s native fingerprint does not hash the npm scripts: registering a test script is not a native change', async () => {
+  const { createFingerprintAsync } = require('@expo/fingerprint');
+  const f = await createFingerprintAsync(path.resolve(__dirname, '..'));
+  assert.ok(
+    !f.sources.some((s) => s.id === 'packageJson:scripts'),
+    'the scripts of package.json are part of the fingerprint: every pull request that registers a test script gives every phone a different runtime version and no update would fit; fingerprint.config.js must skip them (SourceSkips.PackageJsonScriptsAll)',
+  );
+});
+
+check('package.json has no script that runs when the app is installed or built, which is why the fingerprint can ignore scripts', () => {
+  const hooks = Object.keys(require('../package.json').scripts).filter((name) => /^(preinstall|install|postinstall|prepare|prebuild|postbuild)$|^eas-build-/.test(name));
+  assert.deepEqual(hooks, [], `${hooks.join(', ')}: a script that runs on install or build can change what is built, so the fingerprint can no longer ignore scripts: decide that in fingerprint.config.js, not by accident`);
 });
 
 (async () => {
