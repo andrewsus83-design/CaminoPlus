@@ -62,6 +62,12 @@ check('the shared screens use the token', () => {
   assert.match(read('src/components/auth/AuthShell.tsx'), /paddingTop: insets\.top \+ layout\.screenTop/);
 });
 
+check('a form screen without a back button (onboarding, new password) starts at the same distance: no margin of its own', () => {
+  const shell = read('src/components/auth/AuthShell.tsx');
+  assert.match(shell, /marginTop: hero \? 90 : 0/); // only the hero title is pushed down, it sits below the photo
+  assert.doesNotMatch(shell, /back \? 0 : \d+/);
+});
+
 check('the Map\'s "Whole route / Near me" switch and the Walk view banner start at the token', () => {
   const maps = read('app/(tabs)/maps.tsx');
   assert.equal((maps.match(/top: insets\.top \+ layout\.screenTop,/g) ?? []).length, 2);
