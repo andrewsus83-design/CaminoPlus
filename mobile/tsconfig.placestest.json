@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node10",
+    "ignoreDeprecations": "6.0",
+    "target": "es2022",
+    "strict": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "types": ["node"],
+    "outDir": "node_modules/.cache/places-test",
+    "rootDir": "src"
+  },
+  "files": [
+    "src/features/places/__tests__/places.test.ts",
+    "src/features/places/__tests__/api.test.ts"
+  ]
+}
