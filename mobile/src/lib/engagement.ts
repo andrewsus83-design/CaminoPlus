@@ -1,11 +1,11 @@
-// The engagement stats of a journey post (likes, comments, shares, bookmarks): compact counts and the list
-// of stats the viewer shows. No React Native imports on purpose: plain node tests cover all of it
-// (npm run test:me).
+// How the engagement of a post (likes, comments, shares, bookmarks) is counted and written: compact counts ("1.2K") and
+// the words for screen readers. The one action rail of the app (lib/actionRail.ts) is built on these. No React Native
+// imports on purpose: plain node tests cover all of it (npm run test:me).
 
 /**
- * The numbers the stats are made of. A Post fits. Every count is optional because the viewer only shows
- * what it knows: save_count and share_count come from their own query (see lib/postEngagement.ts) and are
- * missing until the database has them. A missing count is left out, never shown as 0.
+ * The numbers the rail is made of. A Post fits. Every count is optional because the rail only shows what it knows:
+ * save_count and share_count come from their own query (see lib/postEngagement.ts) and are missing until the database
+ * has them. A missing count is left out, never shown as 0.
  */
 export type EngagementSource = {
   like_count?: number;
@@ -15,17 +15,6 @@ export type EngagementSource = {
 };
 
 export type EngagementKind = 'likes' | 'comments' | 'shares' | 'bookmarks';
-
-export type EngagementItem = {
-  kind: EngagementKind;
-  /** Name of the icon in components/Icon.tsx. */
-  icon: 'heart' | 'chat' | 'share' | 'bookmark';
-  count: number;
-  /** Compact, for under the icon: 1,234 -> "1.2K". */
-  text: string;
-  /** Whole number in words, for screen readers: "1,234 likes". */
-  label: string;
-};
 
 /** true for a real count: a finite number that is not negative. Anything else (null, NaN, "12", -1) is "not known". */
 export const isCount = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v) && v >= 0;
@@ -67,19 +56,4 @@ export function countLabel(kind: EngagementKind, n: number): string {
   const v = Math.floor(n);
   const [one, many] = NOUNS[kind];
   return `${String(v).replace(/\B(?=(\d{3})+(?!\d))/g, ',')} ${v === 1 ? one : many}`;
-}
-
-/** The stats to show, in rail order: heart, comment bubble, share arrow, bookmark. Counts that are not known are left out. */
-export function engagementItems(post: EngagementSource): EngagementItem[] {
-  const rows: [EngagementKind, EngagementItem['icon'], unknown][] = [
-    ['likes', 'heart', post.like_count],
-    ['comments', 'chat', post.comment_count],
-    ['shares', 'share', post.share_count],
-    ['bookmarks', 'bookmark', post.save_count],
-  ];
-  const items: EngagementItem[] = [];
-  for (const [kind, icon, v] of rows) {
-    if (isCount(v)) items.push({ kind, icon, count: Math.floor(v), text: formatCount(v), label: countLabel(kind, v) });
-  }
-  return items;
 }

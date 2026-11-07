@@ -209,7 +209,13 @@ erDiagram
   unsave with `delete`; an upsert that updates on conflict is refused.
   **The app reads `save_count` and `share_count` in a query of their own** (`listPostEngagement` in `mobile/src/lib/api.ts`),
   never in the main posts query: until the migration is applied to a database the columns do not exist, and naming a missing
-  column fails the whole query. When that query fails the viewer shows only the likes and comments it knows.
+  column fails the whole query. When that query fails the action rail shows only the counts it knows.
+  **The app's action rail** (love, bookmark, comments, share: the one rail of Discover and the journey viewer) writes through
+  `mobile/src/lib/api.ts`, under the policies above and with no migration of its own: `likePost` / `savePost` are
+  `upsert(..., { ignoreDuplicates: true })`, `unlikePost` / `unsavePost` delete the pilgrim's own row, `recordPostShare` is the rpc
+  after the native share sheet was used, `listPostComments` / `addPostComment` read and write `post_comments`. Every one stops at
+  `assertOnline`, so offline there is no request. Sample content (Discover's sample stories, the bundled sample journey) never
+  reaches these tables.
 - **Photo marketplace (phase 2)**: tables exist but nothing uses them yet. Face templates (biometric data)
   are deliberately not stored in this database; only consent records and match results are.
 
