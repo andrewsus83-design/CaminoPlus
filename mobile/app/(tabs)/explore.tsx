@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { FlatList, Pressable, ScrollView, Share, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ActionRail, RAIL_CIRCLE } from '@/components/ActionRail';
+import { ActionRail, RAIL_BOTTOM, RAIL_CIRCLE } from '@/components/ActionRail';
 import { AppText } from '@/components/AppText';
 import { CommentsSheet } from '@/components/CommentsSheet';
 import { FIXED } from '@/components/fixedColors';
@@ -70,11 +70,10 @@ export default function Discover() {
             ListEmptyComponent={<View style={{ width, height, alignItems: 'center', justifyContent: 'center', padding: 40, gap: 12 }}><Icon name="heart" color={FIXED.emptyIcon} size={44} /><AppText variant="lead" color={FIXED.white} style={{ textAlign: 'center' }}>Nothing saved yet. Tap the heart or bookmark on a story to keep it here.</AppText></View>}
             keyExtractor={(i) => i.id}
             renderItem={({ item }) => (
-          <View style={{ width, height, backgroundColor: item.tint, justifyContent: 'flex-end', paddingLeft: layout.screenMargin, paddingRight: layout.screenMargin + RAIL_CIRCLE + 12, paddingTop: 24, paddingBottom: insets.bottom + 120 }}>
+          <View style={{ width, height, backgroundColor: item.tint, justifyContent: 'flex-end', paddingLeft: layout.screenMargin, paddingRight: layout.screenMargin + RAIL_CIRCLE + 12, paddingTop: 24, paddingBottom: insets.bottom + RAIL_BOTTOM }}>
             <AppText variant="h3" color={FIXED.blue900}>{item.caption}</AppText>
             <AppText variant="mono" color={FIXED.blue900}>@{item.user}</AppText>
             <ActionRail
-              bottom={insets.bottom + 120}
               items={railItems({ loved: favs.loved.includes(item.id), saved: favs.saved.includes(item.id), counts: { comments: (comments[item.id] ?? []).length } })}
               onPress={(kind) => press(item.id, kind)}
             />

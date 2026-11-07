@@ -1,5 +1,7 @@
 // Choosing a photo for a chat message. expo-image-picker is a native module: when the running
 // build does not have it we say so instead of crashing (same approach as the journal composer).
+import { NativeName, hasNativeModule } from '@/lib/optionalNative';
+
 export class PickerUnavailable extends Error {}
 
 export type PickedPhoto = { uri: string; mimeType?: string | null; fileSize?: number | null };
@@ -9,6 +11,7 @@ export const MAX_PHOTO_BYTES = 15 * 1024 * 1024;
 export async function pickPhoto(): Promise<PickedPhoto | null> {
   let Picker: typeof import('expo-image-picker');
   try {
+    if (!hasNativeModule(NativeName.imagePicker)) throw new Error('missing');
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     Picker = require('expo-image-picker');
     if (!Picker.launchImageLibraryAsync) throw new Error('missing');

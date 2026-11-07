@@ -2,17 +2,20 @@ import { useMemo } from 'react';
 import { Platform } from 'react-native';
 import Constants from 'expo-constants';
 import { describeBuild, type BuildInput, type BuildStamp, type BuildText } from './buildInfo';
+import { NativeName, hasNativeModule } from './optionalNative';
 
 type UpdatesModule = typeof import('expo-updates');
 
 /**
  * expo-updates is optional at run time. An installed app or dev client that was made before it was added does not
- * contain its native part, and importing it there throws; so it is loaded only here, and a failure means "no updates".
+ * contain its native part, and importing it there throws (as a fatal error, a try/catch does not catch it, see
+ * optionalNative.ts); so the native part is asked for first, and no native part means "no updates".
  * Updates exist only in the installed iOS and Android apps. On the web, expo-updates ships a stand-in that claims to be
  * enabled and never finds anything, so the web counts as "no updates" too.
  */
 function loadUpdates(): UpdatesModule | null {
   if (Platform.OS !== 'ios' && Platform.OS !== 'android') return null;
+  if (!hasNativeModule(NativeName.updates)) return null;
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     return require('expo-updates') as UpdatesModule;

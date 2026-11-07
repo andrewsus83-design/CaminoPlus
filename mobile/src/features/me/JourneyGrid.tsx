@@ -9,13 +9,15 @@ import { Icon } from '@/components/Icon';
 import { Post, PostMediaUrl, listPostMediaUrls } from '@/lib/api';
 import { gridMetrics, gridRows } from '@/lib/gridLayout';
 import { SAMPLE_VIEWER_LABEL } from '@/lib/sampleJourney';
+import { NativeName, hasNativeModule } from '@/lib/optionalNative';
 import { c, fixed, fonts, radius, layout } from '@/theme';
 import { PostRail, usePostRail } from './usePostRail';
 
 // My journey: 9:16 tiles in an even two-column grid, square corners, 2 px between tiles (sideways and downwards) and
 // 2 px from the left and right screen edge (the TikTok / Reels profile grid; the maths is in lib/gridLayout.ts).
 // Tap a tile to open the full-screen viewer, which scrolls vertically one post at a time, like TikTok. The viewer has the
-// app's one action rail (love, bookmark, comments, share), the same component and comments sheet as Discover.
+// app's one action rail (love, bookmark, comments, share), the same component and comments sheet as Discover. The rail
+// places itself (components/ActionRail.tsx), so it sits exactly where Discover's does: the viewer never gives it numbers.
 // The colour of a text card belongs to the post, not to the mode the viewer is in: always the light palette.
 const CARD_COLORS = [
   { bg: fixed.blue, fg: fixed.parchment },
@@ -27,6 +29,7 @@ const CARD_COLORS = [
 
 let VideoModule: typeof import('expo-video') | null = null;
 try {
+  if (!hasNativeModule(NativeName.video)) throw new Error('missing');
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   VideoModule = require('expo-video');
   if (!VideoModule?.useVideoPlayer) VideoModule = null;
@@ -55,7 +58,7 @@ function PlayBadge() {
   );
 }
 
-/** Fills its parent: photo, video or colour card with the text of the post. */
+/** Fills its parent: photo, video or colour card with the text of the post. In the full-screen viewer the text of a colour card keeps clear of the action rail on the right, like the caption does. */
 function PostVisual({ post, media, index, active, small }: { post: Post; media?: Visual; index: number; active: boolean; small?: boolean }) {
   const col = CARD_COLORS[index % CARD_COLORS.length];
   if (media?.type === 'image') return <Image source={media.source ?? { uri: media.url }} resizeMode="cover" style={{ width: '100%', height: '100%' }} />;
@@ -78,7 +81,7 @@ function PostVisual({ post, media, index, active, small }: { post: Post; media?:
     );
   }
   return (
-    <View style={{ width: '100%', height: '100%', backgroundColor: col.bg, justifyContent: 'center', padding: small ? 12 : 32 }}>
+    <View style={{ width: '100%', height: '100%', backgroundColor: col.bg, justifyContent: 'center', padding: small ? 12 : 32, paddingRight: small ? 12 : layout.screenMargin + RAIL_CIRCLE + 12 }}>
       <AppText style={{ fontFamily: fonts.title, fontSize: small ? 16 : 30, lineHeight: small ? 22 : 40, color: col.fg, textAlign: 'center' }} numberOfLines={small ? 7 : 12}>{post.body || post.place_name || 'On the Camino'}</AppText>
     </View>
   );
@@ -178,7 +181,7 @@ function Viewer({ posts, media, start, rail, onClose, sampleLabel }: { posts: Po
                     {list.length > 1 && <AppText variant="caption" color={FIXED.onPhoto}>Swipe sideways for {list.length} slides</AppText>}
                   </View>
                 </View>
-                <ActionRail bottom={insets.bottom + 28} items={rail.itemsFor(item)} onPress={(kind) => rail.press(item, kind)} />
+                <ActionRail items={rail.itemsFor(item)} onPress={(kind) => rail.press(item, kind)} />
               </View>
             );
           }}
