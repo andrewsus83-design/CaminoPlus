@@ -1,0 +1,37 @@
+{
+  "n": 8,
+  "name": "Redondela to Pontevedra",
+  "from": {
+    "name": "Redondela",
+    "lat": 42.28422,
+    "lng": -8.6086,
+    "source": "photon.komoot.io node/84824093 place=town"
+  },
+  "to": {
+    "name": "Pontevedra",
+    "lat": 42.43189,
+    "lng": -8.64316,
+    "source": "photon.komoot.io node/764716504 place=city"
+  },
+  "via": [
+    {
+      "name": "Arcade",
+      "lat": 42.3366,
+      "lng": -8.60154,
+      "source": "nominatim relation/12685758 boundary=administrative place=civil_parish wikidata=Q3396148"
+    },
+    {
+      "name": "Bergunde",
+      "lat": 42.37047,
+      "lng": -8.6264,
+      "source": "nominatim node/8045252768 place=hamlet wikidata=Q20543083"
+    }
+  ],
+  "extracts": [
+    "galicia"
+  ],
+  "coastal": true,
+  "distance_km": null,
+  "distance_source": null,
+  "notes": "from is Redondela (end of stage 7). Xunta de Galicia stage Redondela to Pontevedra, with Arcade and Bergunde on the way. Arcade: civil parish relation/12685758 (Soutomaior), 0.42 km from the route (the railway station node/1692189268 and the village A Calle are in the same place). Bergunde: hamlet node (Vilaboa), 0.04 km from the route. Ponte Sampaio (the historic bridge, Vagamundos) was searched, but its only Nominatim hit is the civil parish point, 2.2 km from the route, so it is not in via. Pontevedra: place=city node from Photon (Nominatim returns only the municipality and civil parish relations). coastal is true: the stage passes the Ría de Vigo at Redondela and Arcade and ends at the Lérez estuary (an OSM API map call around Pontevedra finds natural=coastline ways, the nearest node 0.36 km from a point in the city). Checked against OSM relation 12786090 (Caminho Português de Santiago, ref CP), read through the OSM API on 2026-11-07: the 20.4 km between the two ends stay within 0.52 km of the straight lines through these points. Published figures seen, not copied into distance_km: Rother 18.8 km, Vagamundos 18 km."
+}

@@ -1,0 +1,61 @@
+{
+  "n": 3,
+  "name": "Barcelos to Ponte de Lima",
+  "from": {
+    "name": "Barcelos",
+    "lat": 41.53145,
+    "lng": -8.61923,
+    "source": "nominatim relation/3737586 boundary=administrative linked_place=city wikidata=Q213242"
+  },
+  "to": {
+    "name": "Ponte de Lima",
+    "lat": 41.7675,
+    "lng": -8.5831,
+    "source": "nominatim relation/20266180 place=town linked_place=town wikidata=Q490180"
+  },
+  "via": [
+    {
+      "name": "Lijó",
+      "lat": 41.56849,
+      "lng": -8.61351,
+      "source": "nominatim relation/4058003 boundary=administrative linked_place=village wikidata=Q1292163"
+    },
+    {
+      "name": "Aborim",
+      "lat": 41.60983,
+      "lng": -8.6366,
+      "source": "nominatim relation/4053128 boundary=administrative linked_place=village wikidata=Q322988"
+    },
+    {
+      "name": "Balugães",
+      "lat": 41.64321,
+      "lng": -8.63559,
+      "source": "nominatim relation/4048405 boundary=administrative linked_place=village wikidata=Q607244"
+    },
+    {
+      "name": "Vitorino dos Piães",
+      "lat": 41.68156,
+      "lng": -8.6233,
+      "source": "nominatim node/3873031356 place=village wikidata=Q1022572"
+    },
+    {
+      "name": "Facha",
+      "lat": 41.71389,
+      "lng": -8.61709,
+      "source": "nominatim relation/5713282 boundary=administrative linked_place=village wikidata=Q1022035"
+    },
+    {
+      "name": "Correlhã",
+      "lat": 41.74691,
+      "lng": -8.6115,
+      "source": "nominatim relation/5713280 boundary=administrative linked_place=village wikidata=Q1009452"
+    }
+  ],
+  "extracts": [
+    "portugal"
+  ],
+  "coastal": false,
+  "distance_km": null,
+  "distance_source": null,
+  "notes": "from is Barcelos (end of stage 2). via in walking order: Lijó, Aborim, Balugães, Vitorino dos Piães (node/3873031356; Casa da Fernanda, which Vagamundos names as the halfway stop; Rother also says the long day can be split in two), Facha, Correlhã; apart from Vitorino they are freguesia relations with linked_place=village. Ponte de Lima: relation/20266180 place=town, 0.15 km from the OSM route. Checked against OSM relation 12786090 (Caminho Português de Santiago, ref CP), read through the OSM API on 2026-11-07: the 34.0 km of the relation between the two ends stay within 0.89 km of the straight lines through these points. Published figures seen, not copied into distance_km: Rother 33.8 km, Vagamundos 35 km. Portela de Tamel (the pass with a pilgrim hostel, Rother) has no place object in Nominatim and is not in via."
+}

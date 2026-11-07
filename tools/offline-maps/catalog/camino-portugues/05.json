@@ -1,0 +1,50 @@
+{
+  "n": 5,
+  "name": "Rubiães to Tui",
+  "from": {
+    "name": "Rubiães",
+    "lat": 41.89778,
+    "lng": -8.62488,
+    "source": "nominatim relation/5627858 boundary=administrative linked_place=village wikidata=Q1313724"
+  },
+  "to": {
+    "name": "Tui",
+    "lat": 42.05013,
+    "lng": -8.64657,
+    "source": "nominatim node/544485787 place=town wikidata=Q23991307"
+  },
+  "via": [
+    {
+      "name": "Cossourado",
+      "lat": 41.91321,
+      "lng": -8.62327,
+      "source": "nominatim node/2654872048 place=village wikidata=Q1136271"
+    },
+    {
+      "name": "Fontoura",
+      "lat": 41.95614,
+      "lng": -8.63287,
+      "source": "nominatim relation/4640263 boundary=administrative linked_place=village wikidata=Q991077"
+    },
+    {
+      "name": "Arão",
+      "lat": 42.0132,
+      "lng": -8.64417,
+      "source": "nominatim node/3824150666 place=village wikidata=Q630434"
+    },
+    {
+      "name": "Valença",
+      "lat": 42.02731,
+      "lng": -8.64042,
+      "source": "nominatim relation/6592651 boundary=census linked_place=town wikidata=Q492475"
+    }
+  ],
+  "extracts": [
+    "portugal",
+    "galicia"
+  ],
+  "coastal": false,
+  "distance_km": null,
+  "distance_source": null,
+  "notes": "from is Rubiães (end of stage 4). This day ends in Tui, not in Valença: Rother and Vagamundos end it in Valença and start the next day there (Valença to O Porriño), but Santiagoways ends it in Tui and the Xunta de Galicia starts its six Galician stages there (stages 6 to 11 here); on the OSM route Valença is 3.9 km before Tui. via: Cossourado, Fontoura, Arão, Valença (relation/6592651, boundary=census 'Cidade de Valença', linked_place=town). Tui: node/544485787 place=town. Both the portugal and galicia extracts are needed (the Minho border lies between Valença and Tui). Checked against OSM relation 12786090 (Caminho Português de Santiago, ref CP), read through the OSM API on 2026-11-07: the 20.6 km between the two ends stay within 0.48 km of the straight lines through these points. Published figures seen, not copied into distance_km: Santiagoways 19.1 km (San Pedro de Rubiães to Tui); for the Valença cut, Rother 16.3 km and Vagamundos 17 km (Rubiães to Valença)."
+}

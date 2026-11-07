@@ -1,0 +1,49 @@
+{
+  "n": 11,
+  "name": "Padrón to Santiago de Compostela",
+  "from": {
+    "name": "Padrón",
+    "lat": 42.73902,
+    "lng": -8.66025,
+    "source": "photon.komoot.io node/614385011 place=town"
+  },
+  "to": {
+    "name": "Santiago de Compostela",
+    "lat": 42.88042,
+    "lng": -8.54586,
+    "source": "photon.komoot.io node/998649870 place=city"
+  },
+  "via": [
+    {
+      "name": "A Escravitude",
+      "lat": 42.78347,
+      "lng": -8.64997,
+      "source": "nominatim node/8941156875 place=hamlet wikidata=Q12380699"
+    },
+    {
+      "name": "O Faramello",
+      "lat": 42.80979,
+      "lng": -8.6273,
+      "source": "nominatim node/11774723609 place=hamlet (Teo)"
+    },
+    {
+      "name": "O Milladoiro",
+      "lat": 42.84495,
+      "lng": -8.57822,
+      "source": "nominatim node/911493143 place=town wikidata=Q1268124 (Ames)"
+    },
+    {
+      "name": "A Rocha Vella",
+      "lat": 42.85946,
+      "lng": -8.57723,
+      "source": "nominatim node/1271925268 place=hamlet wikidata=Q123221874"
+    }
+  ],
+  "extracts": [
+    "galicia"
+  ],
+  "coastal": false,
+  "distance_km": null,
+  "distance_source": null,
+  "notes": "from is Padrón (end of stage 10). Xunta de Galicia stage Padrón to Santiago de Compostela, with A Escravitude and Milladoiro on the way. A Escravitude: hamlet node (Padrón), 0.05 km from the route. O Faramello: hamlet in Teo (node/11774723609); a second hamlet node of the same name, tagged Rois, lies 0.1 km away. O Milladoiro: place=town node (Ames), 0.20 km from the route. A Rocha Vella: hamlet node near the Castelo da Rocha Forte, 0.03 km from the route, added to hold the line over the last 7 km. Agro dos Monteiros (the viewpoint where the cathedral first shows, Vagamundos) is node/1241770813 place=locality, 0.86 km from the route, and was not used. Santiago de Compostela: place=city node from Photon, the same point as the end of stage 33 of the Camino Francés. Santiagoways offers an optional night in Parada de Francos (not looked up). Not coastal. Checked against OSM relation 12786090 (Caminho Português de Santiago, ref CP), read through the OSM API on 2026-11-07: the 25.2 km between the two ends stay within 0.51 km of the straight lines through these points. Published figures seen, not copied into distance_km: Rother 25.0 km, Vagamundos 25 km."
+}

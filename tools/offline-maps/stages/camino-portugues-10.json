@@ -1,0 +1,92 @@
+{
+  "slug": "camino-portugues-10",
+  "name": "Caldas de Reis to Padrón",
+  "route_slug": "camino-portugues",
+  "stage_number": 10,
+  "route_id": "20000000-0000-0000-0000-000000000002",
+  "stage_id": "40000000-0000-0000-0001-000000000010",
+  "osm_extracts": [
+    "https://download.geofabrik.de/europe/spain/galicia-latest.osm.pbf"
+  ],
+  "search_bbox": [
+    -8.78,
+    42.51,
+    -8.51,
+    42.83
+  ],
+  "coastal": false,
+  "route_name_regex": "cami(nho|no|ño) portugu[eéê]s\\b",
+  "route_exclude_regex": "\\bCPC\\b|costa|espiritual|braga|interior|plata|ap[uú]lia",
+  "fallback_route": "camino-portugues-10.route.geojson",
+  "clip_km": 6,
+  "min_route_km": 6.3,
+  "buffer_km": 3,
+  "maxzoom": 15,
+  "waypoints": [
+    {
+      "name": "Caldas de Reis",
+      "at": [
+        -8.64217,
+        42.60411
+      ]
+    },
+    {
+      "name": "Carracedo",
+      "at": [
+        -8.65179,
+        42.65037
+      ]
+    },
+    {
+      "name": "As Cernadas",
+      "at": [
+        -8.63641,
+        42.666
+      ]
+    },
+    {
+      "name": "San Miguel de Valga",
+      "at": [
+        -8.63833,
+        42.69605
+      ]
+    },
+    {
+      "name": "Pontecesures",
+      "at": [
+        -8.64384,
+        42.71699
+      ]
+    },
+    {
+      "name": "Padrón",
+      "at": [
+        -8.66025,
+        42.73902
+      ]
+    }
+  ],
+  "render_checks": [
+    {
+      "name": "Caldas de Reis z15",
+      "at": [
+        -8.64217,
+        42.60411,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    },
+    {
+      "name": "Padrón z15",
+      "at": [
+        -8.66025,
+        42.73902,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    }
+  ],
+  "generated_from": "catalog/camino-portugues/10.json"
+}
