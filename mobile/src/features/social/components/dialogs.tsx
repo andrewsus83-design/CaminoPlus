@@ -8,7 +8,7 @@ import { KeyboardAvoidingView, Modal, Pressable, ScrollView, TextInput, View } f
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '@/components/AppText';
 import { Icon, IconName } from '@/components/Icon';
-import { c, fonts, radius, role, shadowStyle, layout } from '@/theme';
+import { c, fonts, radius, role, scrim, shadowStyle, layout } from '@/theme';
 import { Btn, noOutline } from './primitives';
 
 export type MenuOption<T extends string = string> = { key: T; label: string; icon?: IconName; destructive?: boolean; hint?: string };
@@ -57,7 +57,7 @@ function Sheet({ children, onClose, label }: { children: ReactNode; onClose: () 
   const insets = useSafeAreaInsets();
   return (
     <Modal visible transparent animationType="fade" onRequestClose={onClose} statusBarTranslucent>
-      <KeyboardAvoidingView behavior="padding" style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(20,54,93,0.45)' }}>
+      <KeyboardAvoidingView behavior="padding" style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: scrim }}>
         <Pressable accessibilityLabel={`Close ${label}`} accessibilityRole="button" onPress={onClose} style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 }} />
         <View accessibilityViewIsModal style={{ backgroundColor: role.bg, borderTopLeftRadius: radius.lg, borderTopRightRadius: radius.lg, paddingTop: 12, paddingHorizontal: layout.screenMargin, paddingBottom: Math.max(insets.bottom, 12) + 16, gap: 16, maxHeight: '88%', ...shadowStyle('xl') }}>
           <View style={{ alignSelf: 'center', width: 48, height: 5, borderRadius: radius.pill, backgroundColor: role.border }} />

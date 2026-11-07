@@ -12,7 +12,7 @@ import { BusinessFeedCard } from '@/features/business/BusinessCard';
 import { ownerStore, useOwner } from '@/features/business/store';
 import { Pill } from '@/components/Pill';
 import { SampleNotice, SampleTag } from '@/components/SampleNotice';
-import { c, layout, radius, role } from '@/theme';
+import { c, layout, radius, role, scrim } from '@/theme';
 // Sample content is never shared outside the app: share the invitation instead of an invented place or caption.
 const SHARE_APP = 'Walking the Camino? CaminoPlus has offline maps, stays and a pilgrim passport: https://camino.plus';
 
@@ -31,7 +31,7 @@ function FilterSheet({ open, value, onClose, onApply }: { open: boolean; value: 
   if (open !== shown) { setShown(open); if (open) setF(value); }
   return (
     <Modal visible={open} transparent animationType="slide" onRequestClose={onClose}>
-      <Pressable accessibilityLabel="Close filters" onPress={onClose} style={{ flex: 1, backgroundColor: 'rgba(20,54,93,0.45)' }} />
+      <Pressable accessibilityLabel="Close filters" onPress={onClose} style={{ flex: 1, backgroundColor: scrim }} />
       <View style={{ backgroundColor: role.bg, borderTopLeftRadius: radius.lg, borderTopRightRadius: radius.lg, paddingHorizontal: layout.screenMargin, paddingTop: 24, paddingBottom: 36, gap: 20 }}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
           <AppText variant="h4">Filters</AppText>

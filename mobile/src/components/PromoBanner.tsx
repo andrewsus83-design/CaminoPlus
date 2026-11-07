@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { NativeScrollEvent, NativeSyntheticEvent, Pressable, ScrollView, View, useWindowDimensions } from 'react-native';
 import { AppText } from './AppText';
 import { Icon, IconName } from './Icon';
-import { c, fonts, layout, radius } from '@/theme';
+import { c, fonts, layout, radius, role } from '@/theme';
 
 export type Promo = { id: string; eyebrow: string; title: string; cta: string; icon: IconName; onPress?: () => void };
 
@@ -16,14 +16,14 @@ export function PromoBanner({ promos }: { promos: Promo[] }) {
     <View style={{ gap: 12 }}>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} snapToInterval={w + 12} decelerationRate="fast" onMomentumScrollEnd={onEnd} contentContainerStyle={{ gap: 12 }} style={{ flexGrow: 0 }}>
         {promos.map((p) => (
-          <View key={p.id} style={{ width: w, minHeight: 190, borderRadius: radius.xl, backgroundColor: c.blue, padding: 24, overflow: 'hidden', justifyContent: 'space-between' }}>
+          <View key={p.id} style={{ width: w, minHeight: 190, borderRadius: radius.xl, backgroundColor: role.inverse, padding: 24, overflow: 'hidden', justifyContent: 'space-between' }}>
             <View style={{ position: 'absolute', right: -36, bottom: -44, opacity: 0.9 }}><Icon name={p.icon} color={c.gold} size={200} strokeWidth={1.2} /></View>
             <View style={{ gap: 8 }}>
-              <AppText variant="mono" color={c.goldSoft} style={{ textTransform: 'uppercase', letterSpacing: 1.5 }}>{p.eyebrow}</AppText>
-              <AppText style={{ fontFamily: fonts.title, fontSize: 28, lineHeight: 34, color: c.parchment, maxWidth: 230 }}>{p.title}</AppText>
+              <AppText variant="mono" color={role.onInverseAccent} style={{ textTransform: 'uppercase', letterSpacing: 1.5 }}>{p.eyebrow}</AppText>
+              <AppText style={{ fontFamily: fonts.title, fontSize: 28, lineHeight: 34, color: role.onInverse, maxWidth: 230 }}>{p.title}</AppText>
             </View>
             <Pressable accessibilityRole="button" onPress={p.onPress} style={{ alignSelf: 'flex-start', height: 48, paddingHorizontal: 24, borderRadius: radius.pill, backgroundColor: c.gold, alignItems: 'center', justifyContent: 'center', marginTop: 16 }}>
-              <AppText variant="label" color={c.blue}>{p.cta}</AppText>
+              <AppText variant="label" color={role.onHighlight}>{p.cta}</AppText>
             </Pressable>
           </View>
         ))}

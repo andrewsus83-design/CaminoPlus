@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from './AppText';
 import { Icon, IconName } from './Icon';
 import { useTabBarHidden } from '@/lib/tabBarVisibility';
-import { c, layout, radius, role, shadowStyle } from '@/theme';
+import { layout, radius, role, shadowStyle } from '@/theme';
 
 // Floating pill tab bar: gold pill behind the active icon.
 export function TabBar({ state, descriptors, navigateToTab }: BottomTabBarProps) {
@@ -16,7 +16,9 @@ export function TabBar({ state, descriptors, navigateToTab }: BottomTabBarProps)
       {state.routes.map((route, i) => {
         const focused = state.index === i;
         const label = descriptors[route.key].options.title ?? route.name;
-        const color = focused ? c.blue : 'rgba(20,54,93,0.42)';
+        // Roles, never a fixed navy: the bar is role.surface, so the inactive tab is role.muted (readable on it in
+        // both modes) and the active one role.action; the thicker stroke and the bold label say which is which.
+        const color = focused ? role.action : role.muted;
         return (
           <Pressable key={route.key} accessibilityRole="tab" accessibilityState={{ selected: focused }} onPress={() => navigateToTab(route.key)} style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 4 }}>
             <Icon name={route.name as IconName} color={color} size={28} strokeWidth={focused ? 2.6 : 1.6} />

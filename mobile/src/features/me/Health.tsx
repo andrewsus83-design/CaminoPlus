@@ -32,13 +32,13 @@ export function Health({ watchConnected = false }: { watchConnected?: boolean })
   return (
     <View style={{ gap: 16 }}>
       {!watchConnected && (
-        <Pressable accessibilityRole="button" onPress={() => router.push('/watches')} style={{ borderRadius: radius.lg, backgroundColor: c.blue, padding: 20, flexDirection: 'row', alignItems: 'center', gap: 16 }}>
+        <Pressable accessibilityRole="button" onPress={() => router.push('/watches')} style={{ borderRadius: radius.lg, backgroundColor: role.inverse, padding: 20, flexDirection: 'row', alignItems: 'center', gap: 16 }}>
           <View style={{ width: 56, height: 56, borderRadius: radius.pill, backgroundColor: 'rgba(246,239,226,0.14)', alignItems: 'center', justifyContent: 'center' }}>
-            <Icon name="watch" color={c.gold} size={30} />
+            <Icon name="watch" color={c.goldBright} size={30} />
           </View>
           <View style={{ flex: 1, gap: 2 }}>
-            <AppText variant="label" color={c.parchment}>Connect your smartwatch</AppText>
-            <AppText variant="small" color={c.parchment} style={{ opacity: 0.85 }}>See your steps, heart rate and sleep here.</AppText>
+            <AppText variant="label" color={role.onInverse}>Connect your smartwatch</AppText>
+            <AppText variant="small" color={role.onInverse} style={{ opacity: 0.85 }}>See your steps, heart rate and sleep here.</AppText>
           </View>
           <Icon name="chevron" color={c.gold} size={22} />
         </Pressable>

@@ -54,7 +54,7 @@ export default function NewChat() {
                 accessibilityRole="button" accessibilityLabel="New group" accessibilityHint="Chat with several friends at once" onPress={() => router.push('/chat/new-group')}
                 style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: layout.screenMargin, minHeight: 76, backgroundColor: pressed ? c.sand200 : 'transparent' })}
               >
-                <View style={{ width: 52, height: 52, borderRadius: radius.pill, backgroundColor: c.gold, alignItems: 'center', justifyContent: 'center' }}><Icon name="group" color={c.blue} size={26} /></View>
+                <View style={{ width: 52, height: 52, borderRadius: radius.pill, backgroundColor: c.gold, alignItems: 'center', justifyContent: 'center' }}><Icon name="group" color={role.onHighlight} size={26} /></View>
                 <View style={{ flex: 1 }}>
                   <AppText variant="label" style={{ fontSize: 18, lineHeight: 24 }}>New group</AppText>
                   <AppText variant="caption" muted style={{ letterSpacing: 0 }}>Chat with several friends at once</AppText>

@@ -74,7 +74,7 @@ export default function EditAccount() {
           <TextInput value={email} onChangeText={setEmail} editable={!isGoogle} autoCapitalize="none" keyboardType="email-address" style={[input, isGoogle && { opacity: 0.6 }]} />
           {isGoogle && <AppText variant="caption" muted>You signed in with Google, so your email is managed by Google.</AppText>}
         </View>
-        <Pressable accessibilityRole="button" onPress={save} disabled={busy} style={{ height: 68, borderRadius: 34, backgroundColor: c.blue, alignItems: 'center', justifyContent: 'center', opacity: busy ? 0.6 : 1 }}>
+        <Pressable accessibilityRole="button" onPress={save} disabled={busy} style={{ height: 68, borderRadius: 34, backgroundColor: role.action, alignItems: 'center', justifyContent: 'center', opacity: busy ? 0.6 : 1 }}>
           <AppText variant="label" color={c.parchment}>{busy ? 'Saving…' : 'Save changes'}</AppText>
         </Pressable>
         {!isGoogle && (

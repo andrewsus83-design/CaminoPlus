@@ -20,7 +20,7 @@ import { SampleJourney } from '@/features/me/SampleJourney';
 import { updateProfile } from '@/lib/api';
 import { copyText } from '@/lib/clipboard';
 import { PickerUnavailable, pickAndUploadAvatar } from '@/lib/avatar';
-import { c, fonts, layout, radius, role, shadowStyle } from '@/theme';
+import { c, fonts, layout, radius, role, scrim, shadowStyle } from '@/theme';
 
 const TABS = ['Journey', 'Plan', 'Health'] as const;
 
@@ -57,10 +57,10 @@ function PlanTracker({ days }: { days: DayT[] }) {
         </View>
       </Card>
       {next && (
-        <Card style={{ gap: 6, backgroundColor: c.blue }} onPress={() => router.push({ pathname: '/planner', params: { day: next.id } })}>
-          <AppText variant="mono" color={c.goldSoft} style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 1.2 }}>Up next · Day {next.day_number}</AppText>
-          <AppText variant="h4" color={c.parchment}>{title(next)}</AppText>
-          <AppText variant="small" color={c.parchment}>{next.planned_distance_km ? `${Number(next.planned_distance_km).toFixed(1)} km` : ''}{next.planned_date ? ` · ${shortDate(next.planned_date)}` : ''}</AppText>
+        <Card style={{ gap: 6, backgroundColor: role.inverse }} onPress={() => router.push({ pathname: '/planner', params: { day: next.id } })}>
+          <AppText variant="mono" color={role.onInverseAccent} style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 1.2 }}>Up next · Day {next.day_number}</AppText>
+          <AppText variant="h4" color={role.onInverse}>{title(next)}</AppText>
+          <AppText variant="small" color={role.onInverse}>{next.planned_distance_km ? `${Number(next.planned_distance_km).toFixed(1)} km` : ''}{next.planned_date ? ` · ${shortDate(next.planned_date)}` : ''}</AppText>
         </Card>
       )}
       <View>
@@ -191,7 +191,7 @@ export default function Me() {
               ? <Image source={{ uri: profile.avatar_url }} style={{ width: 92, height: 92, borderRadius: radius.pill, borderWidth: 3, borderColor: c.gold }} />
               : <Avatar size={92} ring />}
             <View style={{ position: 'absolute', right: -2, bottom: -2, width: 26, height: 26, borderRadius: 13, backgroundColor: c.gold, borderWidth: 2, borderColor: role.bg, alignItems: 'center', justifyContent: 'center' }}>
-              {uploading ? <ActivityIndicator size="small" color={c.blue} /> : <Icon name="camera" color={c.blue} size={13} />}
+              {uploading ? <ActivityIndicator size="small" color={role.onHighlight} /> : <Icon name="camera" color={role.onHighlight} size={13} />}
             </View>
           </Pressable>
           <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-around' }}>
@@ -228,18 +228,18 @@ export default function Me() {
             </Pressable>
           )}
           {journey?.route ? (
-            <Pressable accessibilityRole="button" accessibilityLabel="Change Camino" onPress={() => router.push('/change-camino')} style={{ marginTop: 8, flexDirection: 'row', alignItems: 'center', gap: 14, padding: 14, borderRadius: radius.lg, backgroundColor: c.blue, ...shadowStyle('md') }}>
+            <Pressable accessibilityRole="button" accessibilityLabel="Change Camino" onPress={() => router.push('/change-camino')} style={{ marginTop: 8, flexDirection: 'row', alignItems: 'center', gap: 14, padding: 14, borderRadius: radius.lg, backgroundColor: role.inverse, ...shadowStyle('md') }}>
               <View style={{ width: 52, height: 52, borderRadius: radius.pill, borderWidth: 1.5, borderColor: 'rgba(217,162,27,0.55)', alignItems: 'center', justifyContent: 'center' }}>
                 <ShellMark size={48} />
               </View>
               <View style={{ flex: 1, gap: 2 }}>
                 <AppText variant="accent" color={c.gold} style={{ fontSize: 24, lineHeight: 28 }}>Buen Camino!</AppText>
-                <AppText variant="caption" color={c.goldSoft} style={{ textTransform: 'uppercase', letterSpacing: 1.2 }}>My Camino</AppText>
-                <AppText variant="label" color={c.parchment} numberOfLines={1}>{journey.route.name}</AppText>
-                <AppText variant="caption" color={c.parchment} style={{ opacity: 0.85 }} numberOfLines={1}>{journey.start_stage ? `From stage ${journey.start_stage.stage_number} · ` : ''}{stagesDone} stages done</AppText>
+                <AppText variant="caption" color={role.onInverseAccent} style={{ textTransform: 'uppercase', letterSpacing: 1.2 }}>My Camino</AppText>
+                <AppText variant="label" color={role.onInverse} numberOfLines={1}>{journey.route.name}</AppText>
+                <AppText variant="caption" color={role.onInverse} style={{ opacity: 0.85 }} numberOfLines={1}>{journey.start_stage ? `From stage ${journey.start_stage.stage_number} · ` : ''}{stagesDone} stages done</AppText>
               </View>
               <View style={{ height: 40, paddingHorizontal: 16, borderRadius: radius.pill, backgroundColor: c.gold, justifyContent: 'center' }}>
-                <AppText variant="label" color={c.blue}>Change</AppText>
+                <AppText variant="label" color={role.onHighlight}>Change</AppText>
               </View>
             </Pressable>
           ) : <AppText variant="accent" color={role.accentText}>Buen Camino!</AppText>}
@@ -257,7 +257,7 @@ export default function Me() {
         {tab === 'Health' && <Health />}
       </Screen>
       <Modal visible={editBio} transparent animationType="slide" onRequestClose={() => setEditBio(false)}>
-        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(20,54,93,0.45)' }}>
+        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: scrim }}>
           <View style={{ backgroundColor: role.bg, borderTopLeftRadius: radius.lg, borderTopRightRadius: radius.lg, paddingHorizontal: layout.screenMargin, paddingTop: 24, paddingBottom: insets.bottom + 24, gap: 16 }}>
             <AppText variant="h4">Your description</AppText>
             <TextInput autoFocus multiline maxLength={160} value={bioDraft} onChangeText={setBioDraft} placeholder="Pilgrim from Jakarta, walking for my family…" placeholderTextColor={role.muted} style={{ minHeight: 110, textAlignVertical: 'top', fontFamily: fonts.body, fontSize: 19, lineHeight: 28, color: role.text, backgroundColor: role.surface, borderRadius: radius.lg, borderWidth: 1, borderColor: role.border, padding: 16 }} />
@@ -270,7 +270,7 @@ export default function Me() {
         </KeyboardAvoidingView>
       </Modal>
       <Pressable accessibilityRole="button" accessibilityLabel="Write a journey post" onPress={() => router.push('/write')} style={{ position: 'absolute', right: layout.screenMargin, bottom: Math.max(insets.bottom - 14, 10) + 88 + 8, width: 52, height: 52, borderRadius: radius.pill, backgroundColor: c.gold, alignItems: 'center', justifyContent: 'center', ...shadowStyle('gold') }}>
-        <Icon name="pen" color={c.blue} size={22} />
+        <Icon name="pen" color={role.onHighlight} size={22} />
       </Pressable>
     </View>
   );

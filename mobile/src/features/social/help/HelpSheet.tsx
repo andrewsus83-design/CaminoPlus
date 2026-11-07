@@ -6,7 +6,7 @@ import { AccessibilityInfo, ActivityIndicator, Keyboard, KeyboardAvoidingView, M
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '@/components/AppText';
 import { Icon, IconName } from '@/components/Icon';
-import { c, fonts, layout, radius, role, shadowStyle } from '@/theme';
+import { c, fonts, layout, radius, role, scrim, shadowStyle } from '@/theme';
 import { SelectMark } from '../components/people';
 import { Btn, PilgrimAvatar, SearchField } from '../components/primitives';
 import { Notice } from '../components/states';
@@ -29,7 +29,7 @@ export type HelpSheetProps = {
   placeText?: string | null;
 };
 
-const SCRIM = 'rgba(20,54,93,0.45)';
+const SCRIM = scrim;
 const PAD = 20;
 
 function useKeyboardOpen() {
@@ -301,18 +301,19 @@ function Confirm({ h }: { h: Help }) {
 
 /* ------------------------------------------------------------ after ringing */
 
-const STATE_STYLE = {
+// A function, not a constant: the colours follow the light/dark mode.
+const stateStyle = () => ({
   sent: { icon: 'check', color: c.success },
   sending: { icon: 'clock', color: role.muted },
   waiting: { icon: 'wifi-off', color: c.goldInk },
   failed: { icon: 'info', color: c.red700 },
   unknown: { icon: 'info', color: role.muted },
-} as const;
+} as const);
 
 const DeliveryItem = memo(function DeliveryItem({ row, onRetry }: { row: DeliveryRow; onRetry: (sendId: string) => void }) {
   const d = row.delivery;
   const r = row.recipient;
-  const look = STATE_STYLE[d?.state ?? 'unknown'];
+  const look = stateStyle()[d?.state ?? 'unknown'];
   const label = d ? `${row.send?.kind === 'ok' ? 'I am OK now: ' : ''}${d.label}` : 'Not sent';
   return (
     <View style={{ minHeight: 64, paddingHorizontal: 14, paddingVertical: 10, gap: 8 }}>

@@ -196,7 +196,7 @@ function MessagesTab({ list, convs, meId, now, bottom, requests, onOpen, onReque
               accessibilityRole="button" accessibilityLabel={`Friend requests, ${requests} waiting`} accessibilityHint="Opens your friend requests" onPress={onRequests}
               style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 12, marginHorizontal: layout.screenMargin, marginTop: 10, marginBottom: 4, minHeight: 64, paddingHorizontal: 16, borderRadius: radius.md, backgroundColor: pressed ? c.goldSoft : c.goldWash })}
             >
-              <View style={{ width: 40, height: 40, borderRadius: radius.pill, backgroundColor: c.blue, alignItems: 'center', justifyContent: 'center' }}><Icon name="user-plus" color={c.parchment} size={20} /></View>
+              <View style={{ width: 40, height: 40, borderRadius: radius.pill, backgroundColor: role.action, alignItems: 'center', justifyContent: 'center' }}><Icon name="user-plus" color={c.parchment} size={20} /></View>
               <AppText variant="label" style={{ flex: 1 }}>Friend requests</AppText>
               <CountBadge count={requests} />
               <Icon name="chevron" color={role.muted} size={20} />

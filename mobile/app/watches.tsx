@@ -32,7 +32,7 @@ export default function Watches() {
         </View>
         {WATCHES.map((w) => (
           <Card key={w.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 16 }}>
-            <View style={{ width: 60, height: 60, borderRadius: radius.pill, backgroundColor: c.blue, alignItems: 'center', justifyContent: 'center' }}>
+            <View style={{ width: 60, height: 60, borderRadius: radius.pill, backgroundColor: role.inverse, alignItems: 'center', justifyContent: 'center' }}>
               <Icon name="watch" color={c.gold} size={30} />
             </View>
             <View style={{ flex: 1, gap: 2 }}>
@@ -47,7 +47,7 @@ export default function Watches() {
               <AppText variant="label" color={c.success}>Connected</AppText>
             ) : (
               <Pressable accessibilityRole="button" accessibilityLabel={`Connect ${w.name}`} onPress={() => Alert.alert(w.name, 'Pairing arrives in the next app build.')} style={{ height: 44, paddingHorizontal: 18, borderRadius: radius.pill, backgroundColor: c.gold, justifyContent: 'center' }}>
-                <AppText variant="label" color={c.blue}>Connect</AppText>
+                <AppText variant="label" color={role.onHighlight}>Connect</AppText>
               </Pressable>
             )}
           </Card>

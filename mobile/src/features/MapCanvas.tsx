@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { PanResponder, View } from 'react-native';
 import Svg, { Circle, Defs, G, LinearGradient, Path, Polygon, Polyline, Rect, Stop, Text as SvgText } from 'react-native-svg';
-import { c } from '@/theme';
+import { fixed } from '@/theme';
 import type { MapViewProps } from './map/types';
 import { progressAlong } from './map/nav';
 import { pois, routeLine } from './map/sampleRoute';
@@ -30,18 +30,18 @@ export function MapCanvas(props: Props) {
 function Overview({ width, height, night }: Props) {
   const ground = night ? '#0C1626' : '#E7E0CB';
   const land = night ? '#10272F' : '#CFDCC8';
-  const route = night ? '#8CC8FF' : c.stone500;
-  const ink = night ? '#F6EFE2' : c.blue;
+  const route = night ? '#8CC8FF' : fixed.stone500;
+  const ink = night ? '#F6EFE2' : fixed.blue;
   return (
     <Svg width={width} height={height} viewBox="0 -80 390 844" preserveAspectRatio="xMidYMid slice">
       <Rect x="-200" y="-300" width="800" height="1400" fill={ground} />
       <Path d="M0 120 Q120 60 200 140 T390 100 V-300 H0Z" fill={land} />
       <Path d="M0 600 Q140 540 260 610 T390 560 V1000 H0Z" fill={land} />
       <Path d="M40 560 L120 470 L200 390 L250 300 L160 200 L60 90" stroke={route} strokeWidth="4" strokeDasharray="2 10" strokeLinecap="round" fill="none" />
-      <Path d="M40 560 L120 470 L200 390 L250 300" stroke={c.gold} strokeWidth="6" strokeLinecap="round" fill="none" />
+      <Path d="M40 560 L120 470 L200 390 L250 300" stroke={fixed.gold} strokeWidth="6" strokeLinecap="round" fill="none" />
       {heliTowns.map((t) => (
         <G key={t.name}>
-          <Circle cx={t.x} cy={t.y} r={t.done ? 9 : 7} fill={t.done ? c.gold : night ? '#0C2340' : c.white} stroke={night ? '#8CC8FF' : c.blue} strokeWidth="3" />
+          <Circle cx={t.x} cy={t.y} r={t.done ? 9 : 7} fill={t.done ? fixed.gold : night ? '#0C2340' : fixed.white} stroke={night ? '#8CC8FF' : fixed.blue} strokeWidth="3" />
           <SvgText x={t.x + 16} y={t.y + 5} fontSize="14" fontWeight="600" fill={ink}>{t.name}</SvgText>
         </G>
       ))}
@@ -49,9 +49,10 @@ function Overview({ width, height, night }: Props) {
   );
 }
 
-// Colours of the drawing in each light.
+// Colours of the drawing in each light. A map has its own day and night; it does not follow the app's light/dark mode,
+// so it uses the fixed (light) palette, never c.* (c.blue would be light blue on the day ground in dark mode).
 const LOOK = {
-  day: { ground: '#EFE5D2', road: '#FFFFFF', roadCase: '#D3C4A8', roof: '#EBDFC9', sideA: '#D4C5A8', sideB: '#BDAE90', edge: '#B3A483', route: c.blue, halo: '#FFFFFF', accuracy: c.blue, ink: c.blue, inkHalo: c.parchment, puck: '#1E4A7A', glow: 'none' },
+  day: { ground: '#EFE5D2', road: '#FFFFFF', roadCase: '#D3C4A8', roof: '#EBDFC9', sideA: '#D4C5A8', sideB: '#BDAE90', edge: '#B3A483', route: fixed.blue, halo: '#FFFFFF', accuracy: fixed.blue, ink: fixed.blue, inkHalo: fixed.parchment, puck: '#1E4A7A', glow: 'none' },
   night: { ground: '#0C1626', road: '#3B5780', roadCase: '#070E19', roof: '#5A86BE', sideA: '#3C6395', sideB: '#2B4B75', edge: '#1D3454', route: '#8CC8FF', halo: '#06101C', accuracy: '#4C9BFF', ink: '#F6EFE2', inkHalo: '#08111E', puck: '#3F8CF0', glow: '#4C9BFF' },
 } as const;
 
@@ -200,7 +201,7 @@ function WalkScene(p: Props) {
           })}
 
           {/* the way behind (thin gold) and ahead (bold dots with a halo) */}
-          {behindPts && <Polyline points={behindPts} fill="none" stroke={c.gold} strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />}
+          {behindPts && <Polyline points={behindPts} fill="none" stroke={fixed.gold} strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />}
           {dots.map((q, i) => {
             const s = proj(q);
             return s ? <Circle key={`h${i}`} cx={s.sx} cy={s.sy} r={Math.max(2.6, s.k * 1.8)} fill={look.halo} opacity={0.95} /> : null;
@@ -217,7 +218,7 @@ function WalkScene(p: Props) {
             const sel = p.selectedPoiId === poi.id;
             return (
               <G key={poi.id} onPress={() => p.onSelectPoi(poi.id)}>
-                <Circle cx={s.sx} cy={s.sy} r={sel ? 15 : 11} fill={hex[poi.kind]} stroke={sel ? c.gold : '#FFFFFF'} strokeWidth={sel ? 4 : 3} />
+                <Circle cx={s.sx} cy={s.sy} r={sel ? 15 : 11} fill={hex[poi.kind]} stroke={sel ? fixed.gold : '#FFFFFF'} strokeWidth={sel ? 4 : 3} />
                 <Circle cx={s.sx} cy={s.sy} r="3.5" fill="#FFFFFF" />
               </G>
             );
@@ -226,7 +227,7 @@ function WalkScene(p: Props) {
           {/* the red pin at the end of the stage */}
           {end && p.stageEnd && (
             <G transform={`translate(${end.sx - 24} ${end.sy - 61})`}>
-              <Path d="M24 61C24 61 5 39.5 5 22.5a19 19 0 0 1 38 0C43 39.5 24 61 24 61Z" fill={c.red} stroke="#FFFFFF" strokeWidth="3" strokeLinejoin="round" />
+              <Path d="M24 61C24 61 5 39.5 5 22.5a19 19 0 0 1 38 0C43 39.5 24 61 24 61Z" fill={fixed.red} stroke="#FFFFFF" strokeWidth="3" strokeLinejoin="round" />
               <Circle cx="24" cy="22.5" r="8" fill="#FFFFFF" />
               <Label x={54} y={20} size={15} fill={look.ink} halo={look.inkHalo}>{p.stageEnd.name}</Label>
             </G>
@@ -238,7 +239,7 @@ function WalkScene(p: Props) {
               {p.night && !sample && <Circle cx="32" cy="32" r="29" fill={look.glow} opacity={0.28} />}
               <Circle cx="32" cy="35" r="24" fill="#000000" opacity={0.22} />
               <Circle cx="32" cy="32" r="25" fill="#FFFFFF" />
-              <Circle cx="32" cy="32" r="20.5" fill={sample ? c.stone500 : look.puck} />
+              <Circle cx="32" cy="32" r="20.5" fill={sample ? fixed.stone500 : look.puck} />
               {sample ? (
                 <Circle cx="32" cy="32" r="7" fill="#FFFFFF" />
               ) : (

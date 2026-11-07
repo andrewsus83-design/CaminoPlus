@@ -1,44 +1,72 @@
 import tokens from './tokens.json';
 
-// Design tokens come from ../design/tokens.json (copied here; keep in sync).
+// Design tokens come from ../design/tokens.json (copied here; keep in sync). Both the light and the dark palette
+// are in that file ("color", "role" and the "dark" section); nothing about dark mode is defined in this file.
 // `c` and `role` are read while a screen renders (no StyleSheet.create anywhere), so dark mode swaps
 // their values in place with applyScheme() and remounts the screens (see lib/theme.tsx). Gold stays gold.
+//
+// Which one to use (the design page, section Dark mode, has the full rules):
+//   role.*   what a thing MEANS: page, card, text, muted text, link, button, error, hero card, text on gold.
+//            Use a role whenever one fits; roles keep their contrast in both modes.
+//   c.*      a palette color, only where its meaning is the same in both modes (a status wash, a progress bar).
+//            c.blue is NOT "the dark card": in dark mode it is light blue. A hero card is role.inverse.
+//   fixed.*  the light palette, never swapped. For a surface that does not change with the mode (a photo, a
+//            pastel story card, a cream round button on a photo): what is drawn on it must not change either.
 export type Scheme = 'light' | 'dark';
 
 const LIGHT = { ...tokens.color };
-const DARK: Partial<typeof LIGHT> = {
-  parchment: '#0F1A2B', white: '#17263B',
-  sand100: '#0F1A2B', sand200: '#1E3047', sand300: '#2B405C', sand400: '#44607F',
-  stone500: '#8D9BB0', stone600: '#A9B6C8',
-  ink: '#F6EFE2', inkStrong: '#FFFDF8',
-  blue: '#8FB3E0', blue900: '#C5D8EF', blue700: '#7FA6D8', blue100: '#22395A', blue50: '#16263D',
-  goldInk: '#E8B53A', goldWash: '#2A2413', goldSoft: '#5A4915',
-  red: '#D8695A', red700: '#E8978B', red100: '#3A1F1B',
-  success: '#6FBF98', successWash: '#173326',
-};
+type Palette = typeof LIGHT;
+const DARK: Partial<Palette> = tokens.dark.color;
+const DARK_ROLE: Record<string, string> = tokens.dark.role;
 
 export const c = { ...LIGHT };
 
-const roleFor = (k: typeof c) => ({
-  bg: k.parchment,
-  surface: k.white,
-  sunken: k.sand200,
-  border: k.sand300,
-  text: k.ink,
-  muted: k.stone600,
-  action: k.blue,
-  onAction: k.parchment,
-  highlight: k.gold,
-  accentText: k.goldInk,
-  danger: k.red,
+/** The light palette. It is never swapped, so it can be read at any time (also in module scope). */
+export const fixed: Readonly<Palette> = Object.freeze({ ...LIGHT });
+
+const ROLE: Record<string, string> = tokens.role;
+
+/** One role of tokens.json for a scheme: a literal of the dark section, or the color the role names. */
+const pick = (name: string, k: Palette, scheme: Scheme): string => {
+  const literal = scheme === 'dark' ? DARK_ROLE[name] : undefined;
+  if (literal) return literal.startsWith('#') ? literal : k[literal as keyof Palette];
+  return k[ROLE[name] as keyof Palette];
+};
+
+const roleFor = (k: Palette, scheme: Scheme) => ({
+  bg: pick('bg', k, scheme),
+  surface: pick('surface', k, scheme),
+  sunken: pick('surfaceSunken', k, scheme),
+  border: pick('border', k, scheme),
+  borderStrong: pick('borderStrong', k, scheme),
+  text: pick('text', k, scheme),
+  muted: pick('textMuted', k, scheme),
+  placeholder: pick('textPlaceholder', k, scheme),
+  action: pick('action', k, scheme),
+  onAction: pick('onAction', k, scheme),
+  highlight: pick('highlight', k, scheme),
+  /** Text and icons on gold (badges, the gold button): navy in both modes, because gold does not change. */
+  onHighlight: pick('onHighlight', k, scheme),
+  accentText: pick('textAccent', k, scheme),
+  danger: pick('danger', k, scheme),
+  onDanger: pick('onDanger', k, scheme),
+  /** The hero card (journey card, Connect your smartwatch, promo banners): dark blue in light mode, a lighter blue in dark mode. */
+  inverse: pick('surfaceInverse', k, scheme),
+  /** Text on a hero card: cream in both modes. */
+  onInverse: pick('textInverse', k, scheme),
+  /** Pale gold text on a hero card. */
+  onInverseAccent: pick('textInverseAccent', k, scheme),
 });
 
-export const role = roleFor(c);
+export const role = roleFor(c, 'light');
 
 export function applyScheme(scheme: Scheme) {
   Object.assign(c, LIGHT, scheme === 'dark' ? DARK : {});
-  Object.assign(role, roleFor(c));
+  Object.assign(role, roleFor(c, scheme));
 }
+
+/** The dimming behind a sheet or a dialog. Navy at 45% over either mode's screen; it does not change with the mode. */
+export const scrim = 'rgba(20,54,93,0.45)';
 
 export const space = tokens.space;
 export const radius = tokens.radius;

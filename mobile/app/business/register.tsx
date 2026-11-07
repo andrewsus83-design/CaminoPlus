@@ -184,7 +184,7 @@ export default function BusinessRegister() {
         <View style={{ flex: 1, opacity: ready ? 1 : 0.45 }}>
           {sending ? (
             <View style={{ height: 48, borderRadius: radius.pill, backgroundColor: c.gold, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
-              <ActivityIndicator color={c.blue} /><AppText variant="label" color={c.blue}>Sending…</AppText>
+              <ActivityIndicator color={role.onHighlight} /><AppText variant="label" color={role.onHighlight}>Sending…</AppText>
             </View>
           ) : (
             <Pill variant={step === STEPS.length ? 'gold' : 'primary'} label={step === STEPS.length ? 'Email my details' : 'Continue'} onPress={next} />
@@ -192,7 +192,7 @@ export default function BusinessRegister() {
         </View>
       </View>
     </Screen>
-    <Animated.View pointerEvents="none" style={{ position: 'absolute', top: 64, alignSelf: 'center', opacity: toast, transform: [{ translateY: toast.interpolate({ inputRange: [0, 1], outputRange: [-12, 0] }) }], flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, height: 40, borderRadius: radius.pill, backgroundColor: c.blue }}>
+    <Animated.View pointerEvents="none" style={{ position: 'absolute', top: 64, alignSelf: 'center', opacity: toast, transform: [{ translateY: toast.interpolate({ inputRange: [0, 1], outputRange: [-12, 0] }) }], flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, height: 40, borderRadius: radius.pill, backgroundColor: role.action }}>
       <Icon name="check" color={c.parchment} size={16} /><AppText variant="label" color={c.parchment}>Draft saved</AppText>
     </Animated.View>
     <Sheet visible={exitAsk} onClose={() => setExitAsk(false)}>
