@@ -29,6 +29,7 @@ supabase/
     ..._friends_chat_notifications.sql  mutual friends, direct + group chat, notifications
     ..._post_engagement_counters.sql    posts.save_count and share_count, post_shares, record_post_share()
     ..._blocked_pilgrims.sql    list_blocked_pilgrims(): who you blocked (Settings > Privacy and safety)
+    ..._post_saves_visibility.sql       bookmarks need a post you can see, and are never updated
   functions/               Deno edge functions: offline-pack-url (signed pack links), delete-account
   seed.sql                 reference data + a small Camino Frances sample
   dev/validate.sh          applies everything to a throwaway local Postgres, runs every dev/*smoke*.sql
@@ -201,6 +202,11 @@ erDiagram
   happens outside the app (a message, WhatsApp), so `share_count` is the number of distinct pilgrims who shared the post, not
   the number of times. `post_shares` has no client access at all. The recount takes a lock on the post row first, so two
   pilgrims acting at the same moment cannot leave the count one too low (the smoke test checks this with two sessions).
+  **Bookmarks** (migration `20261108030000_post_saves_visibility.sql`): a pilgrim reads, adds and removes their own `post_saves`
+  rows and nobody else's. Adding needs a post you can see, with the insert rule of a like (`exists` over `posts`, so the policy
+  "posts by visibility" decides); removing works also after you lost sight of the post. There is no update: UPDATE is revoked, a
+  bookmark is never moved. Save with `insert ... on conflict do nothing` (supabase-js `upsert(..., { ignoreDuplicates: true })`),
+  unsave with `delete`; an upsert that updates on conflict is refused.
   **The app reads `save_count` and `share_count` in a query of their own** (`listPostEngagement` in `mobile/src/lib/api.ts`),
   never in the main posts query: until the migration is applied to a database the columns do not exist, and naming a missing
   column fails the whole query. When that query fails the viewer shows only the likes and comments it knows.
