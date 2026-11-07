@@ -1,6 +1,8 @@
-// Plain-node checks of the highlights per destination on Me: which highlights there are, and which posts belong to which.
-// Run: npm run test:me
+// Plain-node checks of the highlights per destination on Me: which highlights there are, which posts belong to which, and
+// the guards that keep the My Camino card where it is. Run: npm run test:me
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import {
   MAX_HIGHLIGHTS, buildHighlights, coverUrl, destinationName, firstLetter, highlightLabel, nextHighlightIndex, parseSeen, placeMatch,
   type DayLike, type PostLike,
@@ -8,6 +10,9 @@ import {
 
 let n = 0;
 const check = (name: string, fn: () => void) => { fn(); n += 1; console.log(`ok   ${name}`); };
+const root = process.cwd(); // npm test runs from mobile/
+const read = (p: string) => readFileSync(join(root, p), 'utf8');
+const code = (src: string) => src.split('\n').filter((l) => !/^\s*(\/\/|\/?\*)/.test(l)).join('\n'); // without comment lines
 
 const day = (id: string, to: string | null, stage: string | null = null, status = 'planned'): DayLike => ({ id, to_name: to, stage: stage ? { name: stage } : null, status });
 const post = (id: string, place: string | null, at: string | null = null): PostLike => ({ id, place_name: place, published_at: at });
@@ -202,6 +207,102 @@ check('what was saved as seen: the keys of a saved copy, and nothing at all from
   assert.deepEqual(parseSeen({ v: 1, keys: ['a', 'b'] }), ['a', 'b']);
   assert.deepEqual(parseSeen({ v: 1, keys: ['a', 3, null, '', 'b'] }), ['a', 'b']);
   for (const junk of [null, undefined, 'text', 7, [], ['a'], {}, { v: 2, keys: ['a'] }, { v: 1 }, { v: 1, keys: 'a' }]) assert.deepEqual(parseSeen(junk), [], JSON.stringify(junk));
+});
+
+// ---- the screen: the My Camino card stays, the row sits right under it, and it stays what the owner asked for
+
+check('Me still has the My Camino card, as it was: shell mark in its ring, the title, the route, the gold Change button', () => {
+  const me = read('app/(tabs)/me.tsx');
+  const line = me.split('\n').find((l) => l.includes('accessibilityLabel="Change Camino"'));
+  assert.ok(line, 'the card (a button labelled "Change Camino") is gone: the owner asked for it to stay');
+  assert.match(line!, /onPress=\{\(\) => router\.push\('\/change-camino'\)\}/);
+  assert.match(line!, /marginTop: 8,.*padding: 14,.*backgroundColor: role\.inverse/, 'the card keeps its size and colour');
+  assert.match(me, /<ShellMark size=\{48\} \/>/, 'the shell logo stays');
+  assert.match(me, /width: 52, height: 52, borderRadius: radius\.pill, borderWidth: 1\.5/, 'in its 52 px ring');
+  assert.match(me, />Change<\/AppText>/, 'the gold Change button');
+  assert.match(me, />My Camino<\/AppText>/);
+  assert.match(me, />Buen Camino!<\/AppText>/);
+  assert.match(me, /\{journey\.start_stage \? `From stage \$\{journey\.start_stage\.stage_number\} · ` : ''\}\{stagesDone\} stages done/);
+});
+
+check('the highlights sit directly under the card: after it, before the Journey / Plan / Health tabs, once', () => {
+  const me = read('app/(tabs)/me.tsx');
+  const card = me.indexOf('accessibilityLabel="Change Camino"');
+  const row = me.indexOf('<Highlights');
+  const tabs = me.indexOf('<SubTabs');
+  assert.ok(card > 0 && row > 0 && tabs > 0, 'the card, the row and the tabs are all there');
+  assert.ok(card < row, '<Highlights comes after the My Camino card');
+  assert.ok(row < tabs, '<Highlights comes before <SubTabs');
+  assert.equal(me.split('<Highlights').length - 1, 1, 'one row');
+  // nothing between the card and the row but the "no route" text (that is the card\'s own else branch)
+  const between = me.slice(card, row);
+  assert.doesNotMatch(between, /<SubTabs|<JourneyGrid|<Fab\b/);
+});
+
+check('Me filters the Journey grid to the picked destination, with a bar that clears it, and shares one picture fetch', () => {
+  const me = read('app/(tabs)/me.tsx');
+  assert.match(me, /<Highlights key=\{session\?\.user\.id \?\? 'none'\} items=\{highlights\} days=\{days \?\? \[\]\} media=\{media\}/);
+  assert.match(me, /<JourneyGrid posts=\{posts\} media=\{media\} only=\{onlyIds\} \/>/, 'the grid gets the same pictures and the filter');
+  assert.match(me, /<ShowAllBar name=\{active\.name\} onPress=\{\(\) => setFilterKey\(null\)\} \/>/);
+  assert.match(me, /if \(tab !== 'Journey'\) \{ setTab\('Journey'\); setFilterKey\(h\.key\); return; \}/, 'from another tab it brings you to the grid');
+  assert.match(me, /setFilterKey\(\(k\) => \(k === h\.key \? null : h\.key\)\)/, 'the same highlight again clears the filter');
+  assert.match(me, /days && posts \? buildHighlights\(days, posts\) : \[\]/, 'nothing is drawn as "not visited" before the posts are known');
+  const grid = code(read('src/features/me/JourneyGrid.tsx'));
+  assert.match(grid, /usePostRail\(\{ posts, sample: !!sample \}\)/, 'the rail still works on all the posts, so a filter reads nothing from the network');
+  assert.match(grid, /if \(sample \|\| given\) return;/, 'the grid does not fetch the pictures when it was given them');
+  assert.match(grid, /<Viewer posts=\{shown\}/);
+});
+
+check('the row: 60 px pictures in a 66 px ring, 72 px wide items 16 apart, names at 12 px, the screen\'s margin as padding', () => {
+  const src = code(read('src/features/me/Highlights.tsx'));
+  assert.match(src, /const RING = 66;/);
+  assert.match(src, /const PICTURE = 60;/);
+  assert.match(src, /const ITEM_W = 72;/);
+  assert.match(src, /const GAP = 16;/);
+  assert.match(src, /fontSize: 12, lineHeight: 16/);
+  assert.match(src, /marginHorizontal: -layout\.screenMargin/, 'it reaches the screen edges');
+  assert.match(src, /paddingHorizontal: layout\.screenMargin/);
+  assert.match(src, /showsHorizontalScrollIndicator=\{false\}/);
+  assert.match(src, /if \(items\.length === 0\) return null;/, 'no destinations: nothing is drawn, not even the space');
+});
+
+check('the row\'s colours are theme roles: gold ring until it is opened, then the strong border; dashed circle and pin when ahead', () => {
+  const src = code(read('src/features/me/Highlights.tsx'));
+  assert.match(src, /backgroundColor: seen \? role\.borderStrong : c\.gold/);
+  assert.match(src, /borderStyle: 'dashed', borderColor: role\.borderStrong/);
+  assert.match(src, /<Icon name="pin" color=\{role\.muted\}/);
+  assert.match(src, /backgroundColor: role\.sunken/);
+  assert.match(src, /fontFamily: fonts\.title/, 'the letter of a destination without a picture');
+  assert.doesNotMatch(src, /#[0-9a-fA-F]{3,8}\b|rgba?\(/, 'no colour of its own');
+  assert.doesNotMatch(src, /\bc\.blue\b/);
+  assert.doesNotMatch(src, /StyleSheet\.create/);
+});
+
+check('every highlight is a button with a label, an ahead one opens that day in the planner, the bar is "Show all posts"', () => {
+  const src = code(read('src/features/me/Highlights.tsx'));
+  assert.match(src, /accessibilityRole="button" accessibilityLabel=\{highlightLabel\(h, active\)\}/);
+  assert.match(src, /router\.push\(\{ pathname: '\/planner', params: \{ day: h\.dayId \} \}\)/);
+  assert.match(src, /accessibilityRole="button" accessibilityLabel="Show all posts"/);
+  assert.match(src, /<AppText variant="label" numberOfLines=\{1\} style=\{\{ flexShrink: 1 \}\}>\{name\}<\/AppText>/, 'a long name gives way ...');
+  assert.match(src, /numberOfLines=\{1\} style=\{\{ flexShrink: 0 \}\}>· Show all<\/AppText>/, '... and "Show all" never wraps onto a second line');
+});
+
+check('what was opened is kept per person under u.<id>., so signing out clears it, and the row asks the network for nothing', () => {
+  const src = code(read('src/features/me/Highlights.tsx'));
+  assert.match(src, /const SEEN_NAME = 'highlights\.seen';/);
+  assert.match(src, /userKey\(userId, SEEN_NAME\)/);
+  assert.match(code(read('src/lib/localStore.ts')), /export const userKey = \(uid: string, name: string\) => `u\.\$\{uid\}\.\$\{name\}`/);
+  assert.doesNotMatch(src, /listPostMediaUrls|supabase|\bfetch\(|import \{[^}]*\} from '@\/lib\/api'/, 'it only draws what Me gives it');
+  assert.match(src, /import type \{ Post, PostMediaUrl \} from '@\/lib\/api'/, 'types only');
+});
+
+check('the logic files import nothing from React, React Native or the app: plain node can load them', () => {
+  for (const f of ['src/features/me/highlights.ts', 'src/features/me/text.ts']) {
+    const imports = [...read(f).matchAll(/^import .* from '([^']+)'/gm)].map((m) => m[1]);
+    for (const i of imports) assert.ok(i.startsWith('./'), `${f} imports ${i}`);
+  }
+  assert.match(read('src/features/me/shared.tsx'), /export \{ norm \} from '\.\/text';/, 'norm is still exported from shared for the passport');
+  assert.match(read('app/passport.tsx'), /import \{ Empty, ProgressBar, norm, shortDate \} from '@\/features\/me\/shared';/);
 });
 
 console.log(`${n} of ${n} passed`);
