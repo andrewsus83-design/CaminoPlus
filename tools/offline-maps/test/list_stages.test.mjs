@@ -426,15 +426,24 @@ test('workflow: no pack file is named anywhere, and every artifact path is a JSO
   }
 });
 
-test('workflow: secrets live in one step of the publish job, which runs in the pack-publish environment', () => {
+test('workflow: secret values live in one step of the publish job, which runs in the pack-publish environment', () => {
   const jobs = jobsOf(code);
   assert.deepEqual(Object.keys(jobs), ['plan', 'build', 'publish']);
   assert.doesNotMatch(code.slice(0, code.indexOf('\njobs:')), /secrets\./, 'no secret at workflow level');
   for (const name of ['plan', 'build']) assert.doesNotMatch(jobs[name], /secrets\./, `${name} must not see a secret`);
   assert.match(jobs.publish, /\n {4}environment: pack-publish\n/);
-  const withSecrets = stepsOf(jobs.publish).filter((s) => s.includes('secrets.'));
-  assert.equal(withSecrets.length, 1);
-  assert.match(withSecrets[0], /scripts\/publish_pack\.mjs/);
+  // Two steps name a secret. The first step of the job only asks whether the Supabase secrets are set (a boolean, so a
+  // missing secret stops the job in seconds, not after the build); the value goes to the publishing step and nowhere else.
+  const steps = stepsOf(jobs.publish);
+  const withSecrets = steps.filter((s) => s.includes('secrets.'));
+  assert.equal(withSecrets.length, 2);
+  const [check, publishStep] = withSecrets;
+  assert.equal(steps[0], check, 'the secret check is the first step of the job, before any download or build');
+  const asked = [...check.matchAll(/secrets\.[A-Z0-9_]+(.{0,6})/g)];
+  assert.ok(asked.length >= 2, 'the check asks about both Supabase secrets');
+  for (const m of asked) assert.match(m[1], /^ != ''/, `${m[0]} is only compared with '', never passed on`);
+  assert.doesNotMatch(check, /publish_pack|checkout|build-offline-pack/);
+  assert.match(publishStep, /scripts\/publish_pack\.mjs/);
   assert.match(jobs.publish, /route-fallback: deny/);
   assert.match(jobs.publish, /ocean-fallback: deny/);
   assert.match(jobs.publish, /publishing: 'true'/);
@@ -442,6 +451,46 @@ test('workflow: secrets live in one step of the publish job, which runs in the p
   assert.match(jobs.build, /route-fallback: allow/);
   assert.match(jobs.build, /ocean-fallback: allow/);
   assert.doesNotMatch(jobs.build, /ocean-fallback: deny/);
+});
+
+test('workflow: a publish job without its Supabase secrets stops at once, red, with the place to add them (never green with nothing uploaded)', async () => {
+  const jobs = jobsOf(code);
+  // Nothing in the publish job may turn "no secrets" into a dry run that ends green.
+  assert.doesNotMatch(jobs.publish, /--dry-run/);
+  assert.doesNotMatch(jobs.publish, /\bexit 0\b/);
+  // Run the real script of the check step, as GitHub does (bash -eo pipefail), for each way the secrets can be set.
+  const check = stepsOf(jobs.publish)[0];
+  assert.match(check, /HAVE_SUPABASE_URL: \$\{\{ secrets\.SUPABASE_URL != '' \}\}/);
+  assert.match(check, /HAVE_SUPABASE_SERVICE_ROLE_KEY: \$\{\{ secrets\.SUPABASE_SERVICE_ROLE_KEY != '' \}\}/);
+  const lines = check.split('\n');
+  const at = lines.findIndex((l) => /^\s*run: \|\s*$/.test(l));
+  assert.ok(at >= 0, 'the check has a run block');
+  const indent = indentOf(lines[at + 1]);
+  const script = lines.slice(at + 1).filter((l) => l.trim() === '' || indentOf(l) >= indent).map((l) => l.slice(indent)).join('\n');
+  const dir = await mkdtemp(join(tmpdir(), 'secret-check-'));
+  try {
+    const file = join(dir, 'check.sh');
+    const summary = join(dir, 'summary.md');
+    await writeFile(file, `${script}\n`);
+    const run = (url, key) => spawnSync('bash', ['--noprofile', '--norc', '-eo', 'pipefail', file], {
+      encoding: 'utf8',
+      env: { PATH: process.env.PATH, SLUG: 'camino-frances-01', GITHUB_STEP_SUMMARY: summary, HAVE_SUPABASE_URL: url, HAVE_SUPABASE_SERVICE_ROLE_KEY: key },
+    });
+    for (const [url, key] of [['false', 'false'], ['true', 'false'], ['false', 'true'], ['', '']]) {
+      const r = run(url, key);
+      const how = `url=${JSON.stringify(url)} key=${JSON.stringify(key)}`;
+      assert.equal(r.status, 1, `${how}: the job must stop (stderr: ${r.stderr})`);
+      assert.match(r.stdout, /^::error title=publish secrets missing::camino-frances-01: nothing can be published/m, how);
+      assert.match(r.stdout, /SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY/, how);
+      assert.match(r.stdout, /GitHub Environment pack-publish/, `${how}: says where to add the secrets`);
+    }
+    assert.match(readFileSync(summary, 'utf8'), /camino-frances-01: nothing can be published/, 'the run page says it too');
+    const ok = run('true', 'true');
+    assert.equal(ok.status, 0, `both secrets set: the job goes on (stdout: ${ok.stdout}, stderr: ${ok.stderr})`);
+    assert.equal(ok.stdout, '', 'and says nothing');
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
 });
 
 test('workflow: the matrices are independent, capped, and skipped when there is nothing to run', () => {
