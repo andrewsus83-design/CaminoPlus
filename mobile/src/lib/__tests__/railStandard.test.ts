@@ -104,6 +104,17 @@ check('the comments sheet sits on the theme background, so it keeps the theme co
   assert.doesNotMatch(src, /rgba?\(|#[0-9a-fA-F]{3,8}\b/, 'no colour of its own');
 });
 
+check('only other pilgrims\' comments on real posts can be reported, with the chat\'s reasons and the chat\'s report', () => {
+  const hook = code(read('src/features/me/usePostRail.ts'));
+  assert.match(hook, /report: sample \? undefined : \{/, 'a sample has nobody to report; a real post passes the report');
+  assert.match(hook, /reportContent\('comment', comment\.id, reason as ReportReason\)/, 'the report is the one the chat has, for a comment');
+  assert.match(hook, /reasons: REPORT_REASONS,[\s\S]*prompt: REPORT_PROMPT,[\s\S]*thanks: REPORT_THANKS/, 'the same words');
+  const sheet = code(read('src/components/CommentsSheet.tsx'));
+  assert.match(sheet, /!!report && !cm\.mine && !cm\.pending/, 'never on your own comment, never on one that is still being sent (it may not exist yet)');
+  assert.match(sheet, /accessibilityLabel=\{`Report comment by @\$\{cm\.user\}`\}/, 'a screen reader hears whose comment');
+  assert.equal(code(read(DISCOVER)).includes('report='), false, 'Discover shows sample comments: nothing to report');
+});
+
 check('the fixed colours are the LIGHT token values read straight from tokens.json (the cream circle is Discover\'s rgba(255,253,248,0.85))', () => {
   const tokens = JSON.parse(read('src/theme/tokens.json')) as { color: Record<string, string> };
   const js = ts.transpileModule(read('src/components/fixedColors.ts'), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, esModuleInterop: true } }).outputText;

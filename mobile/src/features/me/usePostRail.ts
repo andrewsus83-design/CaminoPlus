@@ -4,6 +4,7 @@ import {
   Post, addPostComment, likePost, listMyReactions, listPostComments, recordPostShare, savePost, unlikePost, unsavePost,
 } from '@/lib/api';
 import { railCounts, railItems, type RailItem, type RailKind } from '@/lib/actionRail';
+import { REPORT_PROMPT, REPORT_REASONS, REPORT_THANKS, reportContent, type ReportReason } from '@/features/social';
 import { assertOnline } from '@/lib/net';
 import { failureMessage, optimistic, optimisticToggle, type Reaction } from '@/lib/optimistic';
 import { commentText, toSheetComments, type SheetComment } from '@/lib/postComments';
@@ -192,6 +193,13 @@ export function usePostRail({ posts, sample }: { posts: Post[]; sample: boolean 
     comments: sample ? (sheetPost ? local.comments[sheetPost.id] ?? [] : []) : thread.items,
     status: sample ? ('ready' as const) : thread.status,
     message: sample ? null : thread.message,
+    // Other pilgrims' words are on this sheet only for real posts, so only there can a comment be reported (the chat's reasons and report).
+    report: sample ? undefined : {
+      reasons: REPORT_REASONS,
+      prompt: REPORT_PROMPT,
+      thanks: REPORT_THANKS,
+      send: (comment: SheetComment, reason: string) => reportContent('comment', comment.id, reason as ReportReason),
+    },
     onSend: (text: string): boolean | Promise<boolean> => {
       if (!sheetPost) return false;
       if (!sample) return sendReal(sheetPost, text);
