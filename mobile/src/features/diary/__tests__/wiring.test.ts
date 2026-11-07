@@ -276,6 +276,17 @@ check('the list says what is on each page, clean (never a mark), and asks before
   assert.match(present, /plainText\(body, READ_CHARS\)/, 'titles and previews read the page through the rich text reader');
 });
 
+check('the new test files run from diary.test.ts, and the test script of package.json is unchanged: its scripts are part of the app\'s native fingerprint, so editing them would make every installed app refuse the next update', () => {
+  const diary = read('src/features/diary/__tests__/diary.test.ts');
+  assert.match(diary, /import '\.\/richtext\.test';/);
+  assert.match(diary, /import \{ finished as mediaTests \} from '\.\/media\.test';/);
+  assert.match(diary, /await mediaTests;/);
+  const script = (JSON.parse(read('package.json')) as { scripts: Record<string, string> }).scripts['test:diary'];
+  assert.equal(script, 'tsc -p tsconfig.diarytest.json && node node_modules/.cache/diary-test/features/diary/__tests__/diary.test.js && node node_modules/.cache/diary-test/features/diary/__tests__/wiring.test.js');
+  const tsconfig = read('tsconfig.diarytest.json');
+  for (const f of ['diary', 'richtext', 'media', 'wiring']) assert.match(tsconfig, new RegExp(`${f}\\.test\\.ts`), `${f}.test.ts is compiled`);
+});
+
 check('every text that says what the diary keeps says it keeps photos, videos and the place too, and that deleting a page or the account removes them', () => {
   const present = read('src/features/diary/present.ts');
   assert.match(present, /Pages, photos, videos and places are not uploaded and not shared/);

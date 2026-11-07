@@ -109,7 +109,8 @@ function setup(storageOpts: StorageOpts = {}, filesOpts: FilesOpts = {}) {
   return { st, fs, store, log };
 }
 
-(async () => {
+// Run from diary.test.ts (the package's test script names only that file and wiring.test.ts, and its scripts are part of the app's native fingerprint).
+export const finished = (async () => {
   /* ---------------------------------------------------------------- what a page keeps */
 
   await test('a file name is one of ours or it is nothing: it can never leave the folder', () => {

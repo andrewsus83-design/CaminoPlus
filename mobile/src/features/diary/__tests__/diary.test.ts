@@ -5,6 +5,11 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { AUTOSAVE_MS, createPageSaver, type SaverDeps, type SaverView } from '../autosave';
+// The rich text, and the photos, videos and place, have their own files. They run from here, because the package's test script names
+// only this file and wiring.test.ts, and the scripts of package.json are part of the app's native fingerprint: editing them would
+// make every installed app refuse the next update.
+import './richtext.test';
+import { finished as mediaTests } from './media.test';
 import { EMPTY_CARD_LINE, PRIVACY_LINE, UNTITLED, clip, dateLine, firstLine, pagePreview, pageTitle, pagesLabel, problemMessage, thousands } from '../present';
 import { BODY_MAX, ENTRIES_MAX, TITLE_MAX, TOTAL_MAX, createDiaryStore, isEntry, newId, oldKey, pagesOf, slotKey, type DiaryEntry, type DiaryStorage, type SaveResult } from '../store';
 
@@ -103,6 +108,7 @@ const untouched = (f: Fake) => [f.files.get(A()), f.files.get(B()), f.files.get(
 const GOOD = page('g1', day(1), { title: 'Roncesvalles', body: 'Cold and clear.' });
 
 (async () => {
+  await mediaTests;
   /* ---------------------------------------------------------------- the keys */
 
   await test('the diary keys never start with u.: signing out wipes u.<id>.… and cannot touch them', () => {

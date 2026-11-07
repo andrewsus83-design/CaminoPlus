@@ -176,15 +176,15 @@ export function MediaViewer({ uid, items, start, onClose, onRemove }: { uid: str
           windowSize={3}
           renderItem={({ item, index: i }) => <ViewerPage uid={uid} m={item} active={i === at} width={width} height={height} />}
         />
-        <View pointerEvents="box-none" style={{ position: 'absolute', top: insets.top + 8, left: 12, right: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Pressable accessibilityRole="button" accessibilityLabel="Close" onPress={onClose} style={{ width: 48, height: 48, borderRadius: radius.pill, backgroundColor: FIXED.railCircle, alignItems: 'center', justifyContent: 'center' }}>
+        <View pointerEvents="box-none" style={{ position: 'absolute', top: insets.top + layout.screenTop, left: 12, right: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Pressable accessibilityRole="button" accessibilityLabel="Close" onPress={onClose} style={{ width: 48, height: 48, borderRadius: radius.pill, backgroundColor: FIXED.pill, alignItems: 'center', justifyContent: 'center' }}>
             <Icon name="close" color={FIXED.blue} />
           </Pressable>
-          <View style={{ backgroundColor: FIXED.railCircle, borderRadius: radius.pill, paddingHorizontal: 14, paddingVertical: 8 }}>
+          <View style={{ backgroundColor: FIXED.pill, borderRadius: radius.pill, paddingHorizontal: 14, paddingVertical: 8 }}>
             <AppText variant="label" color={FIXED.blue} accessibilityLiveRegion="polite">{`${at + 1} of ${items.length}`}</AppText>
           </View>
           {onRemove ? (
-            <Pressable accessibilityRole="button" accessibilityLabel={`Remove this ${kindWord(m)} from the page`} onPress={() => onRemove(m.id)} style={{ width: 48, height: 48, borderRadius: radius.pill, backgroundColor: FIXED.railCircle, alignItems: 'center', justifyContent: 'center' }}>
+            <Pressable accessibilityRole="button" accessibilityLabel={`Remove this ${kindWord(m)} from the page`} onPress={() => onRemove(m.id)} style={{ width: 48, height: 48, borderRadius: radius.pill, backgroundColor: FIXED.pill, alignItems: 'center', justifyContent: 'center' }}>
               <Icon name="trash" color={FIXED.blue} />
             </Pressable>
           ) : <View style={{ width: 48, height: 48 }} />}
