@@ -297,6 +297,9 @@ check('every text that says what the diary keeps says it keeps photos, videos an
   const present = read('src/features/diary/present.ts');
   assert.match(present, /Pages, photos, videos and places are not uploaded and not shared/);
   assert.match(read('app/help.tsx'), /Where are my diary pages kept\?'[^}]*photos, videos and places[^}]*Logging out keeps them[^}]*deleting your account deletes the whole diary/);
+  // the one thing that leaves the app's hands is said where the place is added and in the help: the phone's own map service may be asked for the name
+  assert.match(present, /your phone's own map service may be asked/);
+  assert.match(read('app/help.tsx'), /Can I add photos, videos and where I am to a diary page\?'[^}]*map service may be asked[^}]*you can type a name/);
   assert.match(read('app/delete-account.tsx'), /'The pages of your diary on this phone, with their photos, videos and places',/);
   assert.match(read('app/download-data.tsx'), /Your diary is not in the file: its pages, photos, videos and places are only on this phone, and we never receive them\./);
   const auth = read('AUTH.md');
