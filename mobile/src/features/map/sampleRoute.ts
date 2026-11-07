@@ -1,6 +1,8 @@
 // Sample route data for the map until routes/stages/pois are synced from Supabase into
 // the local SQLite store. Ids match supabase/seed.sql. Positions are APPROXIMATE
 // (hand-placed), good enough for UI work, not for navigation.
+// The pins below (`pois`) are the FALLBACK: the map draws the real stays and points of interest of the stage
+// (src/features/places) and uses these only while the database has none for it.
 import { LngLat, boundsOf, lineLengthM, pointAlong } from './geo';
 
 export const ROUTE_ID = '20000000-0000-0000-0000-000000000001';

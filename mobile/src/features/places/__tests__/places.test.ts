@@ -722,4 +722,16 @@ check('the Stays tab and the stay page read places through the hooks, never from
   assert.match(page, /<AppText[^>]*>\{OSM_CREDIT\}<\/AppText>/, 'the stay page draws the credit');
 });
 
+check('the Maps tab draws the pins of the model (real places, or the sample as the fallback), never the sample pins directly', () => {
+  const maps = read('app/(tabs)/maps.tsx');
+  assert.doesNotMatch(maps, /\bpois\b[^\n]*from '@\/features\/map'/, 'the Maps tab must not import the sample pins itself');
+  assert.match(maps, /pois=\{m\.pins\}/);
+  const model = read('src/features/map/useMapModel.ts');
+  assert.match(model, /useStagePois\(/);
+  assert.match(model, /useStageStays\(/);
+  for (const f of ['src/features/map/LiveMap.tsx', 'src/features/MapCanvas.tsx']) {
+    assert.doesNotMatch(read(f), /import \{[^}]*\bpois\b[^}]*\} from '\.\/(map\/)?sampleRoute'/, `${f} draws the pins it is given`);
+  }
+});
+
 console.log(`${n} of ${n} passed`);

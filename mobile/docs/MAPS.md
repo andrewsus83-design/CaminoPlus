@@ -55,6 +55,7 @@ npm run build:dev:ios         # needs an Apple Developer account ($99/yr) and yo
 | Walk view: banner, buttons, bottom card, Re-center pill | `src/features/map/WalkUi.tsx` |
 | Walk view settings (3D buildings, day/night) saved on the phone | `src/features/map/walkSettings.ts` |
 | Sample route, stages, POIs (approximate) | `src/features/map/sampleRoute.ts` |
+| Pins: real stays and points of interest of the stage (`rpc list_stage_stays` / `list_stage_pois`), a saved copy, the sample pins as the fallback | `src/features/places/` (`useStagePois`, `useStageStays`, `choosePins`) |
 
 **Online vs offline.** One style draws both. Online (internet + MapTiler key): MapTiler
 `v3` tiles. Offline, or no key: our own OSM `.pmtiles` packs for the current stage ±1.
