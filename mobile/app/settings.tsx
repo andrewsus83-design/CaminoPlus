@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Screen } from '@/components/Screen';
 import { AppText } from '@/components/AppText';
-import { Card, SectionLabel } from '@/components/ui';
+import { Card, IconButton, SectionLabel } from '@/components/ui';
 import { AccountSection, LogoutButton, ThemeToggle } from '@/components/AccountSection';
 import { BuildCard } from '@/components/BuildCard';
 import { BusinessCard, IntroSheet } from '@/features/business/BusinessCard';
@@ -31,14 +31,16 @@ export default function Settings() {
     else router.push('/business/dashboard');
   };
   return (
-    <Screen>
+    <Screen tabBar={false}>
+      {/* A screen of its own, opened from the gear at the top right of Me: back on the left, light/dark and log out on the right. */}
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-        <AppText variant="h2">Settings</AppText>
+        <IconButton name="back" label="Back" onPress={() => (router.canGoBack() ? router.back() : router.replace('/me'))} />
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
           <ThemeToggle />
           <LogoutButton />
         </View>
       </View>
+      <AppText variant="h2" accessibilityRole="header">Settings</AppText>
       <AccountSection />
       <Pressable accessibilityRole="button" accessibilityLabel="Connect smartwatch" onPress={() => router.push('/watches')} style={{ borderRadius: radius.lg, backgroundColor: role.inverse, padding: 20, flexDirection: 'row', alignItems: 'center', gap: 16, overflow: 'hidden' }}>
         <View style={{ width: 64, height: 64, borderRadius: radius.pill, backgroundColor: 'rgba(246,239,226,0.14)', alignItems: 'center', justifyContent: 'center' }}>

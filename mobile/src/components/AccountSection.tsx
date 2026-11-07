@@ -12,10 +12,10 @@ export function LogoutButton() {
   const { signOut } = useAuth();
   const confirm = () => {
     if (Platform.OS === 'web') {
-      if (typeof window !== 'undefined' && !window.confirm('Log out of CaminoPlus?')) return;
+      if (typeof window !== 'undefined' && !window.confirm('Log out of CaminoPlus? Your diary stays in this browser.')) return;
       return void signOut();
     }
-    Alert.alert('Log out?', 'Are you sure you want to log out? Downloaded stages stay on this phone.', [
+    Alert.alert('Log out?', 'Are you sure you want to log out? Downloaded stages and your diary stay on this phone.', [
       { text: 'Cancel', style: 'cancel' },
       { text: 'Log out', style: 'destructive', onPress: () => void signOut() },
     ]);

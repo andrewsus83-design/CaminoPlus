@@ -18,7 +18,7 @@ export default function BusinessStatus() {
   const router = useRouter();
   return (
     <Screen>
-      <IconButton name="close" label="Close" onPress={() => router.replace('/(tabs)/settings')} flat />
+      <IconButton name="close" label="Close" onPress={() => router.dismissTo('/settings')} flat />
       <View style={{ alignItems: 'center', gap: 10 }}>
         <View style={{ width: 84, height: 84, borderRadius: radius.pill, backgroundColor: c.goldWash, borderWidth: 2, borderColor: c.goldSoft, alignItems: 'center', justifyContent: 'center' }}>
           <Icon name="shell" color={c.goldInk} size={40} />

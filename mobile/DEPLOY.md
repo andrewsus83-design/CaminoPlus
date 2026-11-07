@@ -18,7 +18,7 @@ A merge never changes an app that is already installed on a phone. Only a new bu
 Every build carries the **fingerprint** of its native code (Expo computes it from the native modules, permissions and
 other native settings). An update is published for the fingerprint of the code it was made from, and a phone only takes
 updates with its own fingerprint. So a phone with an older build quietly does not get an update that needs newer native
-code, instead of crashing on it. If Settings says `Update: none yet` while updates exist, that phone needs a new build.
+code, instead of crashing on it. If "This build" (Me > the gear at the top right > Settings) says `Update: none yet` while updates exist, that phone needs a new build.
 
 `fingerprint.config.js` tells Expo to ignore the build stamp (the commit and time that `app.config.js` writes into the
 app), because it changes on every build. `npm run test:config` fails if anything else starts changing the fingerprint.
@@ -58,14 +58,14 @@ app), because it changes on every build. `npm run test:config` fails if anything
 1. Merge to `main`. The `ci` workflow runs.
 2. When `ci` is green, `eas-update` publishes to the `preview` channel.
 3. On the phone, open the app. An update downloads on launch and runs the next time the app starts. To take it at once:
-   **Settings > This build > Check for updates**.
+   **Me > the gear at the top right > This build > Check for updates**.
 
 To publish by hand, or to the store apps (`production`): **Actions > eas-update > Run workflow**, pick the channel.
 To undo a bad update, open the project on expo.dev > Updates and roll back or re-publish an earlier one.
 
 ## What is this phone running?
 
-**Settings > This build** shows the app version, the commit and its time, and the update (if any) on top of the installed
+**Me > the gear at the top right > Settings > This build** shows the app version, the commit and its time, and the update (if any) on top of the installed
 build. Tap it to copy the text for a bug report. In a development session it also says `+ local changes` when the code on
 the computer has changes that are not committed.
 

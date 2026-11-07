@@ -15,6 +15,10 @@ updates:
 
   # The Expo app. Expo, React Native and their companions move together with the Expo SDK
   # (pinned with ~ in package.json): bump the SDK on purpose, not through Dependabot majors.
+  # React, React DOM and React Native are not proposed at all: the SDK fixes their exact versions
+  # (react and react-dom 19.3.0, react-native 0.88.1), so they only change with the SDK, through
+  # `npx expo install`. TypeScript stays on 6: version 7 removed `moduleResolution: node10`, which
+  # every tsconfig of the app uses (PR #47 broke the mobile job on that).
   - package-ecosystem: npm
     directory: /mobile
     schedule:
@@ -28,14 +32,16 @@ updates:
       - dependency-name: 'expo-*'
         update-types: ['version-update:semver-major']
       - dependency-name: react
-        update-types: ['version-update:semver-major']
       - dependency-name: react-dom
-        update-types: ['version-update:semver-major']
       - dependency-name: react-native
-        update-types: ['version-update:semver-major']
       - dependency-name: 'react-native-*'
         update-types: ['version-update:semver-major']
+      - dependency-name: typescript
+        update-types: ['version-update:semver-major']
 
+  # playwright and maplibre-gl drive the map viewer of the offline-pack render test. A new version of
+  # either changes what the test sees (PR #45: the render test timed out after 60 s), so they are
+  # bumped on purpose, with the test looked at, and not proposed with the rest.
   - package-ecosystem: npm
     directory: /tools/offline-maps
     schedule:
@@ -43,6 +49,9 @@ updates:
     groups:
       offline-maps-node:
         patterns: ['*']
+    ignore:
+      - dependency-name: playwright
+      - dependency-name: maplibre-gl
 
   - package-ecosystem: pip
     directory: /tools/poi-audit

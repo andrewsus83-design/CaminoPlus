@@ -40,7 +40,7 @@ const SCREENS = {
   'Maps · Article popup': 'maps-article',
   'Discover': 'discover',
   'Discover · Photos of you': 'discover-photos',
-  'Settings': 'settings',
+  'Library': 'library',
 };
 
 const fonts = join(root, 'web', 'assets', 'fonts');
