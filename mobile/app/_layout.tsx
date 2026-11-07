@@ -53,7 +53,11 @@ function RootStack() {
   const { ready, status, session, journey, accountError, retry, signOut } = useAuth();
   const router = useRouter();
   // Right after a theme switch the stack was remounted: return to Settings, with Me underneath it so Back still works.
-  useEffect(() => { if (consumeReturnToSettings()) { router.replace('/me'); router.push('/settings'); } }, [router]);
+  // A moment later, once the new stack has mounted; if navigating still fails the person stays on Me, never a red screen.
+  useEffect(() => {
+    if (!consumeReturnToSettings()) return;
+    setTimeout(() => { try { router.replace('/me'); router.push('/settings'); } catch { /* stay on Me */ } }, 0);
+  }, [router]);
   const splashHidden = useRef(false);
   useEffect(() => { if (ready) { splashHidden.current = true; SplashScreen.hideAsync(); } }, [ready]);
   if (!ready) {

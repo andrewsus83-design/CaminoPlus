@@ -78,7 +78,8 @@ check('Me opens Settings from a gear at the top right: after the inbox bell, in 
 });
 
 check('after a light/dark switch the app returns to Settings with Me underneath, so Back still works', () => {
-  assert.match(read(join('app', '_layout.tsx')), /consumeReturnToSettings\(\)\) \{ router\.replace\('\/me'\); router\.push\('\/settings'\); \}/);
+  const layout = read(join('app', '_layout.tsx'));
+  assert.match(layout, /consumeReturnToSettings\(\)\) return;\n\s+setTimeout\(\(\) => \{ try \{ router\.replace\('\/me'\); router\.push\('\/settings'\); \} catch/);
 });
 
 check('one Fab for every floating gold button: Me writes a post, Library writes a diary page, both sit just above the tab bar', () => {
