@@ -14,7 +14,7 @@ import { Alert, Pressable } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
 import { useMyStorage } from '@/lib/billing';
 import { formatBytes } from '@/lib/format';
-import { c, radius } from '@/theme';
+import { c, radius, role } from '@/theme';
 
 export default function Settings() {
   const router = useRouter();
@@ -40,13 +40,13 @@ export default function Settings() {
         </View>
       </View>
       <AccountSection />
-      <Pressable accessibilityRole="button" accessibilityLabel="Connect smartwatch" onPress={() => router.push('/watches')} style={{ borderRadius: radius.lg, backgroundColor: c.blue, padding: 20, flexDirection: 'row', alignItems: 'center', gap: 16, overflow: 'hidden' }}>
+      <Pressable accessibilityRole="button" accessibilityLabel="Connect smartwatch" onPress={() => router.push('/watches')} style={{ borderRadius: radius.lg, backgroundColor: role.inverse, padding: 20, flexDirection: 'row', alignItems: 'center', gap: 16, overflow: 'hidden' }}>
         <View style={{ width: 64, height: 64, borderRadius: radius.pill, backgroundColor: 'rgba(246,239,226,0.14)', alignItems: 'center', justifyContent: 'center' }}>
-          <Icon name="watch" color={c.gold} size={34} />
+          <Icon name="watch" color={c.goldBright} size={34} />
         </View>
         <View style={{ flex: 1, gap: 2 }}>
-          <AppText variant="label" color={c.parchment}>Connect your smartwatch</AppText>
-          <AppText variant="small" color={c.parchment} style={{ opacity: 0.85 }}>Coming soon: Apple Watch, Garmin and more, with steps and heart rate on your journey.</AppText>
+          <AppText variant="label" color={role.onInverse}>Connect your smartwatch</AppText>
+          <AppText variant="small" color={role.onInverse} style={{ opacity: 0.85 }}>Coming soon: Apple Watch, Garmin and more, with steps and heart rate on your journey.</AppText>
         </View>
         <Icon name="chevron" color={c.gold} size={24} />
       </Pressable>

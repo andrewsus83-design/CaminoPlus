@@ -6,7 +6,7 @@ import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
 import { Pill } from '@/components/Pill';
 import { FormMessage } from '@/components/auth/Field';
-import { c, fonts, radius, role, layout } from '@/theme';
+import { c, fixed, fonts, radius, role, layout } from '@/theme';
 import { useAuth } from '@/lib/auth';
 import { PickedMedia, createJournalPost, uploadPostMedia } from '@/lib/api';
 
@@ -14,12 +14,13 @@ import { PickedMedia, createJournalPost, uploadPostMedia } from '@/lib/api';
 // colour card or a photo / video with text on top and an optional location sticker.
 // Step 1 builds the slides; step 2 is the share screen (caption, audience, Share).
 // Choosing photos and videos needs the image-picker native module (current dev build or later).
+// The background of a text slide belongs to the post, not to the mode the viewer is in: always the light palette.
 const BACKGROUNDS = [
-  { bg: c.blue, fg: c.parchment },
-  { bg: c.gold, fg: c.blue },
-  { bg: c.parchment, fg: c.blue },
-  { bg: c.red, fg: c.parchment },
-  { bg: '#2F5D50', fg: c.parchment },
+  { bg: fixed.blue, fg: fixed.parchment },
+  { bg: fixed.gold, fg: fixed.blue },
+  { bg: fixed.parchment, fg: fixed.blue },
+  { bg: fixed.red, fg: fixed.parchment },
+  { bg: '#2F5D50', fg: fixed.parchment },
   { bg: '#E9C987', fg: '#4A3A12' },
 ] as const;
 const STYLES = ['Classic', 'Bold', 'Handwritten'] as const;
@@ -160,8 +161,8 @@ export default function Write() {
         )}
         {!!s.place.trim() && (
           <View style={{ alignSelf: 'center', marginTop: 20 * scale, flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14 * scale, height: 40 * scale, borderRadius: radius.pill, backgroundColor: 'rgba(255,253,248,0.92)' }}>
-            <Icon name="pin" color={c.blue} size={18 * scale} />
-            {editable && <AppText variant="label" color={c.blue}>{s.place.trim()}</AppText>}
+            <Icon name="pin" color={fixed.blue} size={18 * scale} />
+            {editable && <AppText variant="label" color={fixed.blue}>{s.place.trim()}</AppText>}
           </View>
         )}
       </View>
@@ -219,18 +220,18 @@ export default function Write() {
         </Pressable>
         <View style={{ flexDirection: 'row', gap: 8 }}>
           <Pressable accessibilityRole="button" accessibilityLabel="Add location" onPress={() => setEditPlace((v) => !v)} style={{ height: 48, paddingHorizontal: 16, borderRadius: radius.pill, flexDirection: 'row', alignItems: 'center', gap: 6, ...glass }}>
-            <Icon name="pin" color={c.blue} size={20} />
-            <AppText variant="label" color={c.blue}>Location</AppText>
+            <Icon name="pin" color={fixed.blue} size={20} />
+            <AppText variant="label" color={fixed.blue}>Location</AppText>
           </Pressable>
           <Pressable accessibilityRole="button" accessibilityLabel="Change text style" onPress={() => patch({ style: STYLES[(STYLES.indexOf(slide.style) + 1) % STYLES.length] })} style={{ height: 48, paddingHorizontal: 18, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center', ...glass }}>
-            <AppText variant="label" color={c.blue} style={{ fontFamily: styleFont(slide.style) }}>Aa</AppText>
+            <AppText variant="label" color={fixed.blue} style={{ fontFamily: styleFont(slide.style) }}>Aa</AppText>
           </Pressable>
         </View>
       </View>
       {editPlace && (
         <View style={{ marginHorizontal: layout.screenMargin, marginTop: 8, height: 56, borderRadius: radius.pill, backgroundColor: 'rgba(255,253,248,0.95)', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 18, gap: 8 }}>
-          <Icon name="pin" color={c.blue} size={20} />
-          <TextInput autoFocus value={slide.place} onChangeText={(t) => patch({ place: t })} maxLength={60} placeholder="Where are you? (e.g. Burgos)" placeholderTextColor={role.muted} returnKeyType="done" onSubmitEditing={() => setEditPlace(false)} style={{ flex: 1, fontFamily: fonts.body, fontSize: 18, color: role.text }} />
+          <Icon name="pin" color={fixed.blue} size={20} />
+          <TextInput autoFocus value={slide.place} onChangeText={(t) => patch({ place: t })} maxLength={60} placeholder="Where are you? (e.g. Burgos)" placeholderTextColor={fixed.stone600} returnKeyType="done" onSubmitEditing={() => setEditPlace(false)} style={{ flex: 1, fontFamily: fonts.body, fontSize: 18, color: fixed.ink }} />
         </View>
       )}
       {slideBody(slide, true)}
@@ -245,22 +246,22 @@ export default function Write() {
             </Pressable>
           ))}
           <Pressable accessibilityRole="button" accessibilityLabel="Add slide" onPress={addSlide} style={{ width: 48, height: 72, borderRadius: 10, alignItems: 'center', justifyContent: 'center', ...glass }}>
-            <AppText variant="h4" color={c.blue}>+</AppText>
+            <AppText variant="h4" color={fixed.blue}>+</AppText>
           </Pressable>
           <Pressable accessibilityRole="button" accessibilityLabel="Add photos or videos" onPress={addMedia} style={{ height: 72, paddingHorizontal: 16, borderRadius: 10, flexDirection: 'row', alignItems: 'center', gap: 8, ...glass }}>
-            <Icon name="camera" color={c.blue} size={22} />
-            <AppText variant="label" color={c.blue}>Photo / video</AppText>
+            <Icon name="camera" color={fixed.blue} size={22} />
+            <AppText variant="label" color={fixed.blue}>Photo / video</AppText>
           </Pressable>
           {(slides.length > 1 || hasContent) && (
             <Pressable accessibilityRole="button" accessibilityLabel="Delete this slide" onPress={removeSlide} style={{ width: 48, height: 72, borderRadius: 10, alignItems: 'center', justifyContent: 'center', ...glass }}>
-              <Icon name="close" color={c.red} size={22} />
+              <Icon name="close" color={fixed.red} size={22} />
             </Pressable>
           )}
         </ScrollView>
         {!onMedia && (
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 12, paddingVertical: 4 }}>
             {BACKGROUNDS.map((b, i) => (
-              <Pressable key={b.bg} accessibilityRole="button" accessibilityLabel={`Background ${i + 1}`} onPress={() => patch({ bgIdx: i })} style={{ width: 44, height: 44, borderRadius: radius.pill, backgroundColor: b.bg, borderWidth: 3, borderColor: slide.bgIdx === i ? c.white : 'rgba(255,253,248,0.35)' }} />
+              <Pressable key={b.bg} accessibilityRole="button" accessibilityLabel={`Background ${i + 1}`} onPress={() => patch({ bgIdx: i })} style={{ width: 44, height: 44, borderRadius: radius.pill, backgroundColor: b.bg, borderWidth: 3, borderColor: slide.bgIdx === i ? fixed.white : 'rgba(255,253,248,0.35)' }} />
             ))}
           </ScrollView>
         )}

@@ -15,7 +15,7 @@ export function RouteGuideCard({ slug, stageCount }: { slug: string; stageCount?
         <SectionLabel>Areas and stages</SectionLabel>
         {g.areas.map((a, i) => (
           <View key={a.name} style={{ flexDirection: 'row', gap: 12 }}>
-            <View style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: c.blue, alignItems: 'center', justifyContent: 'center', marginTop: 2 }}>
+            <View style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: role.action, alignItems: 'center', justifyContent: 'center', marginTop: 2 }}>
               <AppText variant="caption" color={c.parchment}>{i + 1}</AppText>
             </View>
             <View style={{ flex: 1 }}>

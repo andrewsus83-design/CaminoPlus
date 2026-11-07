@@ -6,17 +6,18 @@ import { Icon } from '@/components/Icon';
 import { Post, PostMediaUrl, listPostMediaUrls } from '@/lib/api';
 import { gridMetrics, gridRows } from '@/lib/gridLayout';
 import { SAMPLE_VIEWER_LABEL } from '@/lib/sampleJourney';
-import { c, fonts, radius, layout } from '@/theme';
+import { c, fixed, fonts, radius, layout } from '@/theme';
 import { EngagementRail } from './EngagementRail';
 
 // My journey: 9:16 tiles in an even two-column grid, edge to edge, square corners, a 1 px line between tiles (the
 // TikTok / Reels profile grid; the maths is in lib/gridLayout.ts). Tap a tile to open the full-screen viewer, which
 // scrolls vertically one post at a time, like TikTok.
+// The colour of a text tile belongs to the post, not to the mode the viewer is in: always the light palette.
 const CARD_COLORS = [
-  { bg: c.blue, fg: c.parchment },
-  { bg: c.gold, fg: c.blue },
-  { bg: '#2F5D50', fg: c.parchment },
-  { bg: c.red, fg: c.parchment },
+  { bg: fixed.blue, fg: fixed.parchment },
+  { bg: fixed.gold, fg: fixed.blue },
+  { bg: '#2F5D50', fg: fixed.parchment },
+  { bg: fixed.red, fg: fixed.parchment },
   { bg: '#E9C987', fg: '#4A3A12' },
 ] as const;
 

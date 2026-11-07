@@ -5,7 +5,7 @@ import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
 import { Pill } from '@/components/Pill';
 import { Card, IconButton } from '@/components/ui';
-import { c, radius } from '@/theme';
+import { c, radius, role } from '@/theme';
 
 const steps = [
   { title: 'Details sent', note: 'In your email to the team', state: 'done' },
@@ -30,7 +30,7 @@ export default function BusinessStatus() {
         {steps.map((s, i) => (
           <View key={s.title} style={{ flexDirection: 'row', gap: 14, alignItems: 'center' }}>
             <View style={{ width: 28, height: 28, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center', backgroundColor: s.state === 'done' ? c.blue : s.state === 'now' ? c.gold : c.sand200 }}>
-              {s.state === 'done' ? <Icon name="check" color={c.parchment} size={16} /> : <AppText variant="caption" color={c.blue}>{i + 1}</AppText>}
+              {s.state === 'done' ? <Icon name="check" color={c.parchment} size={16} /> : <AppText variant="caption" color={s.state === 'now' ? role.onHighlight : role.action}>{i + 1}</AppText>}
             </View>
             <View style={{ flex: 1 }}>
               <AppText variant="label">{s.title}</AppText>

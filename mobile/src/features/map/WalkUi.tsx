@@ -6,7 +6,7 @@ import { AccessibilityInfo, Animated, PanResponder, Platform, Pressable, ScrollV
 import Svg, { Circle, G, Polygon } from 'react-native-svg';
 import { AppText } from '@/components/AppText';
 import { Icon, IconName } from '@/components/Icon';
-import { c, layout, radius, shadowStyle } from '@/theme';
+import { c, layout, radius, role, shadowStyle } from '@/theme';
 import type { Banner, Card, AheadItem } from './nav';
 import type { PoiKind } from './sampleRoute';
 import { POI_KINDS, kindHex } from './walkLayers';
@@ -138,7 +138,7 @@ export function LightIcon({ night, auto, size = 26, color }: { night: boolean; a
       <Icon name={night ? 'moon' : 'sun'} color={color ?? t.icon} size={size} strokeWidth={2} />
       {auto && (
         <View style={{ position: 'absolute', right: -6, bottom: -6, width: 20, height: 20, borderRadius: 10, backgroundColor: c.gold, alignItems: 'center', justifyContent: 'center' }}>
-          <AppText variant="caption" color={c.blue} style={{ fontSize: 11, lineHeight: 14, letterSpacing: 0, fontFamily: 'Inter_600SemiBold' }}>A</AppText>
+          <AppText variant="caption" color={role.onHighlight} style={{ fontSize: 11, lineHeight: 14, letterSpacing: 0, fontFamily: 'Inter_600SemiBold' }}>A</AppText>
         </View>
       )}
     </View>
@@ -320,7 +320,7 @@ export function WalkCard(p: CardProps) {
             onPress={p.onRouteDetails}
             style={({ pressed }) => ({ width: 60, height: 60, borderRadius: 30, backgroundColor: c.gold, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.85 : 1, ...shadowStyle('gold') })}
           >
-            <Icon name="flag" color={c.blue} size={28} strokeWidth={2.2} />
+            <Icon name="flag" color={role.onHighlight} size={28} strokeWidth={2.2} />
           </Pressable>
           <Pressable
             accessibilityRole="button"

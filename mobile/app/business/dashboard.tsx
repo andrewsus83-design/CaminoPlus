@@ -104,7 +104,7 @@ export default function BusinessDashboard() {
 
       <Card style={{ flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: c.goldWash }}>
         <View style={{ width: 44, height: 44, borderRadius: radius.pill, backgroundColor: c.gold, alignItems: 'center', justifyContent: 'center' }}>
-          <Icon name="star" color={c.blue} size={20} />
+          <Icon name="star" color={role.onHighlight} size={20} />
         </View>
         <View style={{ flex: 1 }}>
           <AppText variant="label">Boost your listing</AppText>

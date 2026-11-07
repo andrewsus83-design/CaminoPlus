@@ -27,7 +27,7 @@ export function PilgrimAvatar({ name, uri, seed, size = 56, group, ring }: Avata
           : <AppText variant="label" color={c.blue} style={{ fontSize: Math.round(size * 0.36), lineHeight: Math.round(size * 0.44), fontFamily: fonts.bodyBold }}>{initials(name)}</AppText>}
       </View>
       {group && (
-        <View style={{ position: 'absolute', right: -2, bottom: -2, width: Math.max(20, size * 0.38), height: Math.max(20, size * 0.38), borderRadius: radius.pill, backgroundColor: c.blue, borderWidth: 2, borderColor: role.bg, alignItems: 'center', justifyContent: 'center' }}>
+        <View style={{ position: 'absolute', right: -2, bottom: -2, width: Math.max(20, size * 0.38), height: Math.max(20, size * 0.38), borderRadius: radius.pill, backgroundColor: role.action, borderWidth: 2, borderColor: role.bg, alignItems: 'center', justifyContent: 'center' }}>
           <Icon name="group" color={c.parchment} size={Math.max(11, size * 0.22)} strokeWidth={2.2} />
         </View>
       )}
@@ -38,17 +38,18 @@ export function PilgrimAvatar({ name, uri, seed, size = 56, group, ring }: Avata
 /* ------------------------------------------------------------ badges and buttons */
 
 type Tone = 'red' | 'blue' | 'sand';
-const TONES: Record<Tone, { bg: string; fg: string }> = {
+// A function, not a constant: the colours follow the light/dark mode.
+const tones = (): Record<Tone, { bg: string; fg: string }> => ({
   red: { bg: c.red, fg: c.white },
-  blue: { bg: c.blue, fg: c.parchment },
+  blue: { bg: role.action, fg: role.onAction },
   sand: { bg: c.sand300, fg: c.blue },
-};
+});
 
 /** Round count: nothing for 0, "99+" above 99. */
 export function CountBadge({ count, tone = 'red', style }: { count: number; tone?: Tone; style?: ViewStyle }) {
   const label = badgeLabel(count);
   if (!label) return null;
-  const t = TONES[tone];
+  const t = tones()[tone];
   return (
     <View style={[{ minWidth: 22, height: 22, paddingHorizontal: 6, borderRadius: radius.pill, backgroundColor: t.bg, alignItems: 'center', justifyContent: 'center' }, style]}>
       <AppText variant="caption" color={t.fg} style={{ fontSize: 12, lineHeight: 16, fontFamily: fonts.bodyBold, letterSpacing: 0 }}>{label}</AppText>
@@ -65,7 +66,7 @@ type BtnProps = {
 export function Btn({ label, onPress, variant = 'primary', size = 'md', loading, disabled, icon, full, hint, accessibilityLabel, style }: BtnProps) {
   const palette = {
     primary: { bg: role.action, fg: role.onAction, border: role.action },
-    gold: { bg: role.highlight, fg: c.blue, border: role.highlight },
+    gold: { bg: role.highlight, fg: role.onHighlight, border: role.highlight },
     ghost: { bg: role.surface, fg: role.text, border: role.border },
     soft: { bg: c.blue50, fg: c.blue, border: c.blue50 },
     danger: { bg: c.red, fg: c.white, border: c.red },

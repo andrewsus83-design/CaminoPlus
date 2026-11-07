@@ -78,15 +78,16 @@ export function PersonRow({ name, username, uri, seed, detail, trailing, onPress
 
 /* ------------------------------------------------------------ notifications */
 
-const KINDS: Record<string, { icon: IconName; bg: string; fg: string }> = {
-  friend_request: { icon: 'user-plus', bg: c.blue, fg: c.parchment },
+// A function, not a constant: the colours follow the light/dark mode.
+const kinds = (): Record<string, { icon: IconName; bg: string; fg: string }> => ({
+  friend_request: { icon: 'user-plus', bg: role.action, fg: role.onAction },
   friend_accepted: { icon: 'check', bg: c.success, fg: c.white },
-  group_added: { icon: 'group', bg: c.gold, fg: c.blue },
+  group_added: { icon: 'group', bg: c.gold, fg: role.onHighlight },
   post_like: { icon: 'heart', bg: c.red, fg: c.white },
-  post_comment: { icon: 'chat', bg: c.blue, fg: c.parchment },
-  achievement: { icon: 'star', bg: c.gold, fg: c.blue },
+  post_comment: { icon: 'chat', bg: role.action, fg: role.onAction },
+  achievement: { icon: 'star', bg: c.gold, fg: role.onHighlight },
   system: { icon: 'bell', bg: c.blue100, fg: c.blue },
-};
+});
 
 type NotificationRowProps = {
   n: NotificationItem; now: number; request: RequestState | null; busy: boolean;
@@ -95,7 +96,8 @@ type NotificationRowProps = {
 };
 
 export function NotificationRow({ n, now, request, busy, onPress, onAccept, onDecline, onMessage, onLongPress }: NotificationRowProps) {
-  const kind = KINDS[n.kind] ?? KINDS.system;
+  const all = kinds();
+  const kind = all[n.kind] ?? all.system;
   const unread = !n.read_at;
   const { name, text, detail } = notificationHeadline(n);
   const when = notificationTime(n.created_at, now);
@@ -144,7 +146,7 @@ export function NotificationRow({ n, now, request, busy, onPress, onAccept, onDe
         {n.kind === 'friend_request' && request === 'declined' && <AppText variant="small" muted style={{ marginTop: 4 }}>Request declined</AppText>}
         {n.kind === 'friend_request' && request === 'gone' && <AppText variant="small" muted style={{ marginTop: 4 }}>This request is no longer open</AppText>}
       </View>
-      {unread && <View accessibilityElementsHidden style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: c.blue, marginTop: 8 }} />}
+      {unread && <View accessibilityElementsHidden style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: role.action, marginTop: 8 }} />}
     </Pressable>
   );
 }

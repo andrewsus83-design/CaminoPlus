@@ -75,14 +75,14 @@ export function BusinessCard({ state, name, stepsDone, onPress }: { state: Owner
   );
   // invite
   return (
-    <PressCard label="List your business" onPress={onPress} style={{ overflow: 'hidden', borderRadius: radius.xl, backgroundColor: c.blue, padding: 22, ...shadowStyle('md') }}>
+    <PressCard label="List your business" onPress={onPress} style={{ overflow: 'hidden', borderRadius: radius.xl, backgroundColor: role.inverse, padding: 22, ...shadowStyle('md') }}>
       <View style={{ position: 'absolute', right: -30, bottom: -36, opacity: 0.85 }}><Icon name="shell" color={c.gold} size={150} /></View>
       <AppText variant="mono" color={c.goldBright} style={{ fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase' }}>For business owners</AppText>
-      <AppText variant="h3" color={c.parchment} style={{ marginTop: 8, maxWidth: 240 }}>Run an albergue, café or shop on the Way?</AppText>
-      <AppText variant="small" color={c.parchment} style={{ opacity: 0.85, marginTop: 6, maxWidth: 230 }}>List it free. Pilgrims see you on the map tonight.</AppText>
+      <AppText variant="h3" color={role.onInverse} style={{ marginTop: 8, maxWidth: 240 }}>Run an albergue, café or shop on the Way?</AppText>
+      <AppText variant="small" color={role.onInverse} style={{ opacity: 0.85, marginTop: 6, maxWidth: 230 }}>List it free. Pilgrims see you on the map tonight.</AppText>
       <View style={{ flexDirection: 'row', alignSelf: 'flex-start', alignItems: 'center', gap: 8, marginTop: 16, height: 40, paddingHorizontal: 16, borderRadius: radius.pill, backgroundColor: c.gold }}>
-        <Icon name="briefcase" color={c.blue} size={18} />
-        <AppText variant="label" color={c.blue}>List your business</AppText>
+        <Icon name="briefcase" color={role.onHighlight} size={18} />
+        <AppText variant="label" color={role.onHighlight}>List your business</AppText>
       </View>
     </PressCard>
   );

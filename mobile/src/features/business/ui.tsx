@@ -4,16 +4,17 @@ import { AppText } from '@/components/AppText';
 import { Icon, IconName } from '@/components/Icon';
 import { c, radius, role } from '@/theme';
 
-const tones = {
-  gold: { bg: c.gold, fg: c.blue },
+// A function, not a constant: the colours follow the light/dark mode.
+const tones = () => ({
+  gold: { bg: c.gold, fg: role.onHighlight },
   green: { bg: c.successWash, fg: c.success },
   red: { bg: c.red100, fg: c.red700 },
   blue: { bg: c.blue100, fg: c.blue },
   neutral: { bg: c.sand200, fg: c.ink },
-} as const;
+});
 
-export function Badge({ label, tone = 'neutral', icon }: { label: string; tone?: keyof typeof tones; icon?: IconName }) {
-  const t = tones[tone];
+export function Badge({ label, tone = 'neutral', icon }: { label: string; tone?: keyof ReturnType<typeof tones>; icon?: IconName }) {
+  const t = tones()[tone];
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, alignSelf: 'flex-start', height: 28, paddingHorizontal: 12, borderRadius: radius.pill, backgroundColor: t.bg }}>
       {icon && <Icon name={icon} color={t.fg} size={14} />}
