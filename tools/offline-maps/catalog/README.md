@@ -13,6 +13,12 @@ stages/<route_slug>-<NN>.json             generated (calibration keys excepted, 
 stages/<route_slug>-<NN>.route.geojson    generated: straight lines through from, via..., to
 ```
 
+Every stage also needs a row in `public.stages` before its pack can be published (`publish_pack.mjs` refuses
+without one) or its places imported. The Camino Francés has them: stages 1 to 3 in `supabase/seed.sql`, stages 4 to 33
+in the migration `20261112000000_camino_frances_stages.sql`, which copies the ids, numbers and names from this catalog,
+leaves the stages hidden and has no distance (the catalog has none). `test/test_stage_rows.py` fails when a stage file
+has no row or a name differs. A new route adds its rows the same way, in a migration of its own.
+
 Stage 1 of the Camino Francés is hand-written and not managed by the generator; it needs no catalog entry.
 If `catalog/camino-frances/01.json` exists, it is checked (stage 2 must start where it ends) but nothing is
 written for it.

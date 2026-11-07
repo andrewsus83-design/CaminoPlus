@@ -10,6 +10,7 @@ import { Field, FormMessage } from '@/components/auth/Field';
 import { useAuth } from '@/lib/auth';
 import { listRoutes, listStages, Route, Stage, startJourney, updateProfile } from '@/lib/api';
 import { uuid } from '@/lib/uuid';
+import { stageMeta } from '@/features/me/plan';
 import { layout, role } from '@/theme';
 
 type Step = 'name' | 'route' | 'stage';
@@ -95,7 +96,7 @@ export default function Onboarding() {
       {step === 'stage' && (stages ? (
         stages.length ? stages.map((s) => (
           <Choice key={s.id} title={`Stage ${s.stage_number}`} selected={stageId === s.id} onPress={() => setStageId(s.id)}
-            meta={`${s.start?.name && s.end?.name ? `${s.start.name} to ${s.end.name}` : s.name} · ${Number(s.distance_km).toFixed(1)} km`} />
+            meta={stageMeta(s)} />
         )) : (
           <FormMessage tone="info">{`Stages for ${route?.name ?? 'this route'} are coming soon. We will start you at the beginning and fill in your plan when they are ready.`}</FormMessage>
         )

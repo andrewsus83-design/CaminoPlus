@@ -175,6 +175,14 @@ erDiagram
 
 - **Route-agnostic**: `route_networks` (Camino de Santiago now; Via Francigena or others later) >
   `routes` > `stages`, with `places` and `route_places` (km from start / km to destination for every town).
+- **Stages**: the Camino Francés has all 33. Stages 1 to 3 are in `seed.sql`; stages 4 to 33
+  (`20261112000000_camino_frances_stages.sql`) are hidden (`is_published = false`, so the "published stages are public"
+  policy keeps them from the app and `start_journey` plans no days for them) and have no `distance_km`, because there is
+  no sourced figure yet and an invented one is worse than none, so the column accepts null. To open them to pilgrims:
+  `update public.stages set is_published = true where route_id = '20000000-0000-0000-0000-000000000001' and stage_number
+  between 4 and 33;` (the app shows no kilometres for such a stage and the plan counts stages walked instead). A pack
+  or the OSM places for a stage need its row first; `tools/offline-maps/test/test_stage_rows.py` keeps the rows and the
+  stage files in step.
 - **POIs**: churches, cathedrals, iconic places, fountains, pharmacies... with `has_stamp`, `mass_times`, `story`.
   The app reads those of a stage with `rpc('list_stage_pois', { p_stage })` (same migration, same rules as
   `list_stage_stays` above): lat and lng as numbers, `km_from_stage_start`, `detour_m`, hours, `mass_times`, the source

@@ -7,13 +7,16 @@
     "strict": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
-    "types": ["node"],
+    "types": [
+      "node"
+    ],
     "outDir": "node_modules/.cache/me-test",
     "rootDir": "src"
   },
   "files": [
     "src/features/me/__tests__/engagement.test.ts",
     "src/features/me/__tests__/engagementQuery.test.ts",
-    "src/features/me/__tests__/postActionsApi.test.ts"
+    "src/features/me/__tests__/postActionsApi.test.ts",
+    "src/features/me/__tests__/plan.test.ts"
   ]
 }
