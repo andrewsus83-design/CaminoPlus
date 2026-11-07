@@ -61,6 +61,9 @@ function RootStack() {
       </Stack.Protected>
       <Stack.Protected guard={signedIn}>
         <Stack.Screen name="delete-account" />
+        <Stack.Screen name="feedback" />
+        <Stack.Screen name="help" />
+        <Stack.Screen name="rate" />
       </Stack.Protected>
       <Stack.Protected guard={signedIn && !onboarded}>
         <Stack.Screen name="onboarding" />

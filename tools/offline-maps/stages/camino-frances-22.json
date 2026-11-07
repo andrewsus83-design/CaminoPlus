@@ -22,6 +22,21 @@
   "min_route_km": 10.1,
   "buffer_km": 3,
   "maxzoom": 15,
+  "quality": {
+    "min_tiles": 810,
+    "max_tiles": 2180,
+    "min_size_mb": 1.6,
+    "max_size_mb": 4.6,
+    "required_layers": [
+      "building",
+      "place",
+      "poi",
+      "transportation",
+      "transportation_name"
+    ],
+    "max_change_ratio": 1.5,
+    "max_osm_age_days": 45
+  },
   "waypoints": [
     {
       "name": "Villadangos del Páramo",
@@ -74,8 +89,14 @@
         42.51729,
         15
       ],
-      "min_features": {},
-      "min_labels": {}
+      "min_features": {
+        "poi": 16,
+        "transportation": 52,
+        "building": 3
+      },
+      "min_labels": {
+        "place": 1
+      }
     },
     {
       "name": "Astorga z15",
@@ -84,8 +105,14 @@
         42.4554,
         15
       ],
-      "min_features": {},
-      "min_labels": {}
+      "min_features": {
+        "poi": 142,
+        "transportation": 175,
+        "building": 4
+      },
+      "min_labels": {
+        "place": 1
+      }
     }
   ],
   "generated_from": "catalog/camino-frances/22.json"

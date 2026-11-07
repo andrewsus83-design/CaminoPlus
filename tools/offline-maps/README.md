@@ -42,6 +42,20 @@ route taken from the OSM Camino relations (Napoleon + Valcarlos variants):
   features at z15 in Saint-Jean, 12 mountain peaks around Orisson at z13.
 <!-- /SIZES -->
 
+### All 33 stages of the Camino Francés
+
+Real builds of every stage (3 km corridor, z15), GitHub Actions run 42263170308 (2026-11-06), every route taken from
+OpenStreetMap: **1.2 to 11.0 MB, median 3.9 MB, mean 4.0 MB** (about 131 MB for all 33).
+
+| | stages (MB) |
+|---|---|
+| largest | 4 Pamplona to Puente la Reina 11.0, 3 Zubiri to Pamplona 9.0, 12 San Juan de Ortega to Burgos 8.5, 13 Burgos to Hornillos del Camino 6.7, 7 Los Arcos to Logroño 5.9 |
+| smallest | 16 Frómista to Carrión de los Condes 1.2, 15 Castrojeriz to Frómista 1.3, 17 Carrión de los Condes to Terradillos 1.3, 18 Terradillos to Bercianos 1.6, 14 Hornillos del Camino to Castrojeriz 1.7 |
+
+The big ones run through a city (Pamplona, Burgos, Logroño): buildings, roads and places add up there; the quiet Meseta
+stages are small. So the website says "about 4 MB for a typical stage, up to about 11 MB", not "2 to 5 MB" as it did
+before these builds. Each stage's quality band (0.6x to 1.6x of its own measurement) is in `stages/<slug>.json`.
+
 ## Why we build our own tiles (and not MapTiler for offline)
 
 Online maps can use MapTiler Cloud styles, but MapTiler's Cloud terms

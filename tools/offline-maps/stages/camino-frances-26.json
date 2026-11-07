@@ -23,6 +23,21 @@
   "min_route_km": 9.1,
   "buffer_km": 3,
   "maxzoom": 15,
+  "quality": {
+    "min_tiles": 730,
+    "max_tiles": 1950,
+    "min_size_mb": 1.9,
+    "max_size_mb": 5.2,
+    "required_layers": [
+      "building",
+      "place",
+      "poi",
+      "transportation",
+      "transportation_name"
+    ],
+    "max_change_ratio": 1.5,
+    "max_osm_age_days": 45
+  },
   "waypoints": [
     {
       "name": "Villafranca del Bierzo",
@@ -89,8 +104,14 @@
         42.60558,
         15
       ],
-      "min_features": {},
-      "min_labels": {}
+      "min_features": {
+        "poi": 87,
+        "transportation": 131,
+        "building": 13
+      },
+      "min_labels": {
+        "place": 1
+      }
     },
     {
       "name": "O Cebreiro z15",
@@ -99,8 +120,14 @@
         42.70784,
         15
       ],
-      "min_features": {},
-      "min_labels": {}
+      "min_features": {
+        "poi": 15,
+        "transportation": 18
+      },
+      "min_labels": {
+        "place": 1,
+        "peak": 1
+      }
     }
   ],
   "generated_from": "catalog/camino-frances/26.json"
