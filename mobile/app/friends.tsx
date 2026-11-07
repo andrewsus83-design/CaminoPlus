@@ -196,7 +196,7 @@ export default function FriendsScreen() {
                 <Btn label="Invite friends" icon="share" variant="gold" onPress={invite} />
               </Card>
             </View>
-            <View style={{ paddingHorizontal: 12 }}><SegmentedTabs tabs={tabs} value={tab} onChange={(k) => { setTab(k); router.setParams({ tab: k }); }} /></View>
+            <View style={{ paddingHorizontal: layout.screenMargin }}><SegmentedTabs tabs={tabs} value={tab} onChange={(k) => { setTab(k); router.setParams({ tab: k }); }} /></View>
             {data.error && !!data.friends && tab !== 'find' && <Notice icon="info" tone="warn" text="Could not refresh. Pull down to try again." />}
             {tab === 'find' && <View style={{ paddingHorizontal: layout.screenMargin }}><SearchField value={query} onChangeText={setQuery} placeholder="Search by name or @username" label="Search pilgrims" /></View>}
           </View>

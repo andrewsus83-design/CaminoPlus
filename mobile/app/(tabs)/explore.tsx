@@ -6,7 +6,7 @@ import { Icon } from '@/components/Icon';
 import { useAuth } from '@/lib/auth';
 import { localStore, userKey } from '@/lib/localStore';
 import { exploreItems } from '@/data/mock';
-import { c, fonts, radius, role } from '@/theme';
+import { c, fonts, layout, radius, role } from '@/theme';
 // Sample content is never shared outside the app: share the invitation instead of an invented place or caption.
 const SHARE_APP = 'Walking the Camino? CaminoPlus has offline maps, stays and a pilgrim passport: https://camino.plus';
 
@@ -81,10 +81,10 @@ export default function Discover() {
             ListEmptyComponent={<View style={{ width, height, alignItems: 'center', justifyContent: 'center', padding: 40, gap: 12 }}><Icon name="heart" color="rgba(255,255,255,0.8)" size={44} /><AppText variant="lead" color={c.white} style={{ textAlign: 'center' }}>Nothing saved yet. Tap the heart or bookmark on a story to keep it here.</AppText></View>}
             keyExtractor={(i) => i.id}
             renderItem={({ item }) => (
-          <View style={{ width, height, backgroundColor: item.tint, justifyContent: 'flex-end', padding: 24, paddingBottom: insets.bottom + 120 }}>
+          <View style={{ width, height, backgroundColor: item.tint, justifyContent: 'flex-end', paddingHorizontal: layout.screenMargin, paddingTop: 24, paddingBottom: insets.bottom + 120 }}>
             <AppText variant="h3" color={c.blue900}>{item.caption}</AppText>
             <AppText variant="mono" color={c.blue900}>@{item.user}</AppText>
-            <View style={{ position: 'absolute', right: 16, bottom: insets.bottom + 120, gap: 14, alignItems: 'center' }}>
+            <View style={{ position: 'absolute', right: layout.screenMargin, bottom: insets.bottom + 120, gap: 14, alignItems: 'center' }}>
               {(['loved', 'saved'] as const).map((k) => {
                 const on = favs[k].includes(item.id);
                 return (
@@ -107,7 +107,7 @@ export default function Discover() {
         )}
       />
       <View style={{ position: 'absolute', top: insets.top + 12, left: 0, right: 0 }}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ minWidth: width, justifyContent: 'center', gap: 22, paddingHorizontal: 16 }}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ minWidth: width, justifyContent: 'center', gap: 22, paddingHorizontal: layout.screenMargin }}>
           {TABS.map((t) => (
             <Pressable key={t} accessibilityRole="tab" accessibilityState={{ selected: tab === t }} onPress={() => goTab(t)} hitSlop={10} style={{ paddingVertical: 8, borderBottomWidth: 3, borderBottomColor: tab === t ? c.white : 'transparent' }}>
               <AppText variant="body" color={tab === t ? c.white : 'rgba(255,255,255,0.65)'} style={{ fontFamily: fonts.bodyBold, textShadowColor: 'rgba(0,0,0,0.35)', textShadowRadius: 6 }}>{t}</AppText>
@@ -121,7 +121,7 @@ export default function Discover() {
       <Modal visible={!!openId} transparent animationType="slide" onRequestClose={() => setOpenId(null)}>
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(12,35,64,0.5)' }}>
           <Pressable accessibilityLabel="Close comments" onPress={() => setOpenId(null)} style={{ flex: 1 }} />
-          <View style={{ maxHeight: height * 0.65, backgroundColor: role.bg, borderTopLeftRadius: radius.lg, borderTopRightRadius: radius.lg, padding: 20, paddingBottom: insets.bottom + 16, gap: 14 }}>
+          <View style={{ maxHeight: height * 0.65, backgroundColor: role.bg, borderTopLeftRadius: radius.lg, borderTopRightRadius: radius.lg, paddingHorizontal: layout.screenMargin, paddingTop: 20, paddingBottom: insets.bottom + 16, gap: 14 }}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
               <AppText variant="h4">Comments</AppText>
               <Pressable accessibilityLabel="Close" onPress={() => setOpenId(null)} hitSlop={12}><Icon name="close" color={role.text} size={26} /></Pressable>

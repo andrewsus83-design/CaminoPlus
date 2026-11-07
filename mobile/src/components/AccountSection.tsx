@@ -55,6 +55,11 @@ export function AccountSection() {
         <Icon name="pen" color={c.blue} size={22} />
         <AppText variant="label" color={c.blue}>Edit account</AppText>
       </Pressable>
+      <Pressable accessibilityRole="button" accessibilityLabel="Download my data" onPress={() => router.push('/download-data')}
+        style={({ pressed }) => ({ height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 8, backgroundColor: c.white, borderWidth: 1.5, borderColor: c.blue, opacity: pressed ? 0.8 : 1 })}>
+        <Icon name="share" color={c.blue} size={22} />
+        <AppText variant="label" color={c.blue}>Download my data</AppText>
+      </Pressable>
       <Pressable accessibilityRole="button" accessibilityLabel="Delete account" onPress={() => router.push('/delete-account')} hitSlop={8}
         style={{ minHeight: 48, alignItems: 'center', justifyContent: 'center' }}>
         <AppText variant="label" color={c.red}>Delete account</AppText>

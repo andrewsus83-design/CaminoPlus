@@ -194,7 +194,7 @@ export default function ChatInfo() {
                 : <InfoRow first icon="block" label={`Block ${name}`} danger onPress={() => block(peerId, name)} />}
               <InfoRow icon="flag" label={`Report ${name}`} danger onPress={() => report(peerId, name)} />
             </Card>
-            <AppText variant="caption" muted style={{ paddingHorizontal: 28, paddingTop: 6, letterSpacing: 0 }}>Chats are not end-to-end encrypted. Never share your location or money details here.</AppText>
+            <AppText variant="caption" muted style={{ paddingHorizontal: layout.screenMargin, paddingTop: 6, letterSpacing: 0 }}>Chats are not end-to-end encrypted. Never share your location or money details here.</AppText>
           </>
         )}
       </ScrollView>
