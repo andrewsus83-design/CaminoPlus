@@ -10,6 +10,7 @@ import { useAuth } from '@/lib/auth';
 import { listRoutes, listStages, Route, Stage, startJourney } from '@/lib/api';
 import { RouteGuideCard } from '@/components/auth/RouteGuideCard';
 import { uuid } from '@/lib/uuid';
+import { stageMeta } from '@/features/me/plan';
 import { layout, role } from '@/theme';
 
 /** Switch to another Camino from inside the app. Starts a new journey; the old one is kept. */
@@ -57,7 +58,7 @@ export default function ChangeCamino() {
               <AppText variant="label">Start at</AppText>
               {stages.map((s) => (
                 <Choice key={s.id} title={`Stage ${s.stage_number}`} selected={stageId === s.id} onPress={() => setStageId(s.id)}
-                  meta={`${s.start?.name && s.end?.name ? `${s.start.name} to ${s.end.name}` : s.name} · ${Number(s.distance_km).toFixed(1)} km`} />
+                  meta={stageMeta(s)} />
               ))}
             </View>
           )}

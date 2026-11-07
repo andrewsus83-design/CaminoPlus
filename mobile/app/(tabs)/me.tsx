@@ -15,6 +15,7 @@ import { useMeData } from '@/lib/useMeData';
 import { useUnreadTotals } from '@/features/social';
 import { Empty, ProgressBar, shortDate } from '@/features/me/shared';
 import { Health } from '@/features/me/Health';
+import { planProgress } from '@/features/me/plan';
 import { JourneyGrid } from '@/features/me/JourneyGrid';
 import { SampleJourney } from '@/features/me/SampleJourney';
 import { updateProfile } from '@/lib/api';
@@ -33,9 +34,9 @@ type DayT = NonNullable<ReturnType<typeof useMeData>['days']>[number];
 function PlanTracker({ days }: { days: DayT[] }) {
   const router = useRouter();
   if (days.length === 0) return <Empty text="Stages for your route are coming soon. Your day plan will appear here." />;
-  const total = days.reduce((a, d) => a + Number(d.planned_distance_km ?? 0), 0);
-  const doneKm = days.filter((d) => d.status === 'done').reduce((a, d) => a + Number(d.planned_distance_km ?? 0), 0);
-  const doneN = days.filter((d) => d.status === 'done').length;
+  // By kilometres when every day has a distance, otherwise by stages walked: some stages have no distance yet.
+  const progress = planProgress(days);
+  const doneN = progress.doneStages;
   const next = days.find((d) => d.status !== 'done');
   const last = days[days.length - 1];
   const title = (d: DayT) => (d.from_name && d.to_name ? `${d.from_name} → ${d.to_name}` : d.stage?.name ?? `Day ${d.day_number}`);
@@ -43,16 +44,16 @@ function PlanTracker({ days }: { days: DayT[] }) {
     <View style={{ gap: 16 }}>
       <Card style={{ gap: 14 }} onPress={() => router.push({ pathname: '/planner', params: next ? { day: next.id } : {} })}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
-          <AppText variant="h3">{Math.round(total ? (doneKm / total) * 100 : 0)}%</AppText>
+          <AppText variant="h3">{Math.round(progress.value * 100)}%</AppText>
           <AppText variant="label" muted>Day {Math.min(doneN + 1, days.length)} of {days.length}</AppText>
         </View>
-        <ProgressBar value={total ? doneKm / total : 0} />
+        <ProgressBar value={progress.value} />
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
           <AppText variant="label" color={role.accentText}>Open day planner</AppText>
           <Icon name="chevron" color={role.accentText} size={18} />
         </View>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-          <AppText variant="small" muted>{Math.round(doneKm)} of {Math.round(total)} km</AppText>
+          <AppText variant="small" muted>{progress.byKm ? `${Math.round(progress.doneKm)} of ${Math.round(progress.totalKm)} km` : `${doneN} of ${days.length} stages`}</AppText>
           <AppText variant="small" muted>{last.planned_date ? `Santiago ${shortDate(last.planned_date)}` : `${days.length - doneN} stages left`}</AppText>
         </View>
       </Card>
