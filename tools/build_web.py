@@ -284,9 +284,9 @@ TABS = [
  ("library", "book", "Library", "Scripture, books and music for the road.",
   "A banner, your private diary and three tabs: Bible, Books and Music. We are still choosing which Bible translation, which books and which music we are allowed to include, so those tabs show examples today and say so.",
   [f"Bible, Books and Music, one tab each {COMING}",
-   "A private diary: tap the gold button, write, and the page is saved on your phone. It is not uploaded or shared, so it is not backed up either",
-   "The diary works without a signal and stays on your phone when you log out"],
-  [("library", "Library tab with the banner, the diary and the Bible tab")]),
+   "A private diary: tap the gold button and write, and the page is saved on your phone as you type. Make words bold or italic, add headings and lists, and attach photos, videos and the place you are at",
+   "Nothing in the diary is uploaded or shared, so it is not backed up either. It works without a signal and stays on your phone when you log out"],
+  [("library", "Library tab with the banner, the diary and the Bible tab"), ("diary-read", "A diary page with a heading, bold and italic text, a list, a quote, photos, a video and the place")]),
 ]
 
 # The routes of the route picker, in the order of the database (supabase/migrations/..._more_caminos.sql).

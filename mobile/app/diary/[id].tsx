@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type ComponentRef } from 'react';
-import { Keyboard, KeyboardAvoidingView, Platform, Pressable, TextInput, View } from 'react-native';
+import { Keyboard, KeyboardAvoidingView, Platform, Pressable, ScrollView, TextInput, View } from 'react-native';
 import { useLocalSearchParams, usePreventRemove, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Screen } from '@/components/Screen';
@@ -13,9 +13,9 @@ import { device } from '@/features/diary/device';
 import { FormatBar, type FormatAction } from '@/features/diary/FormatBar';
 import { MediaGrid, MediaStrip, MediaViewer } from '@/features/diary/MediaTiles';
 import { MEDIA_PER_PAGE_MAX, mediaOf } from '@/features/diary/media';
-import { PlaceChip, PlaceNameField, PlacePanel } from '@/features/diary/PlaceParts';
+import { PlaceChip, PlaceEditRow, PlacePanel } from '@/features/diary/PlaceParts';
 import { normalizePlace, withName, type DiaryPlace } from '@/features/diary/place';
-import { MEDIA_NEEDS_NEW_APP, MEDIA_ON_WEB, attachMessage, dateLine, metaLine, pageTitle, placeProblemMessage, problemMessage, thousands } from '@/features/diary/present';
+import { FEATURES_NEED_NEW_APP, MEDIA_NEEDS_NEW_APP, MEDIA_ON_WEB, attachMessage, dateLine, metaLine, pageTitle, placeProblemMessage, problemMessage, thousands } from '@/features/diary/present';
 import { RichText } from '@/features/diary/RichText';
 import { continueList, formatsAt, toggleBlock, toggleInline, type Edit, type Sel } from '@/features/diary/richtext';
 import { BODY_MAX, TITLE_MAX, type DiaryEntry } from '@/features/diary/store';
@@ -195,7 +195,8 @@ function PageEditor({ uid, initial, goBack }: { uid: string; initial: DiaryEntry
   const canMedia = device.canPickMedia();
   const canPlace = device.canFindPlace();
   const hasAny = !!title.trim() || !!body.trim() || view.media.length > 0 || view.place !== null;
-  const lines = [Platform.OS === 'web' ? MEDIA_ON_WEB : '', Platform.OS !== 'web' && !canMedia ? MEDIA_NEEDS_NEW_APP : '', Platform.OS !== 'web' && !canPlace ? placeProblemMessage('unsupported') : ''].filter(Boolean);
+  // What this device cannot do, said once and honestly: the web preview has none of it, an older app lacks one or both.
+  const lines = !canMedia && !canPlace ? [Platform.OS === 'web' ? MEDIA_ON_WEB : FEATURES_NEED_NEW_APP] : [!canMedia ? MEDIA_NEEDS_NEW_APP : '', !canPlace ? placeProblemMessage('unsupported') : ''].filter(Boolean);
 
   const topBar = (
     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -274,7 +275,7 @@ function PageEditor({ uid, initial, goBack }: { uid: string; initial: DiaryEntry
               submitBehavior="submit"
               maxLength={TITLE_MAX}
               placeholder="Title (optional)"
-              placeholderTextColor={role.placeholder}
+              placeholderTextColor={role.muted}
               accessibilityLabel="Page title"
               style={[textStyle('h4'), { color: role.text, minHeight: 64, paddingHorizontal: 18, paddingTop: 14, paddingBottom: 10 }, noOutline]}
             />
@@ -295,7 +296,7 @@ function PageEditor({ uid, initial, goBack }: { uid: string; initial: DiaryEntry
               multiline
               maxLength={BODY_MAX}
               placeholder="Write about your day"
-              placeholderTextColor={role.placeholder}
+              placeholderTextColor={role.muted}
               accessibilityLabel="Page text"
               style={[textStyle('body'), { flex: 1, color: role.text, paddingHorizontal: 18, paddingTop: 14, paddingBottom: 18, textAlignVertical: 'top' }, noOutline]}
             />
@@ -308,18 +309,17 @@ function PageEditor({ uid, initial, goBack }: { uid: string; initial: DiaryEntry
             </Pressable>
           )}
           {!compact && (
-            <>
+            // Under the text: the files, the place, the steps of adding one. When the screen is short this part shrinks and scrolls,
+            // so the text keeps its room and the messages and the caption below it are never pushed off the screen.
+            <ScrollView style={{ flexGrow: 0, flexShrink: 1 }} contentContainerStyle={{ gap: 12 }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
               <MediaStrip uid={uid} items={view.media} adding={busy === 'copying'} onOpen={setViewing} onRemove={(mid) => saver.removeMedia(mid)} />
               {view.place !== null && (
-                <View style={{ gap: 8 }}>
-                  <PlaceChip place={view.place} onOpen={() => void openMaps(view.place as DiaryPlace)} onRemove={() => saver.setPlace(null)} />
-                  <PlaceNameField key={`${view.place.lat},${view.place.lon},${view.place.at}`} place={view.place} onFocusChange={setNameFocus} onName={(name) => saver.setPlace(withName(view.place as DiaryPlace, name), { soon: true })} />
-                </View>
+                <PlaceEditRow key={`${view.place.lat},${view.place.lon},${view.place.at}`} place={view.place} onOpen={() => void openMaps(view.place as DiaryPlace)} onRemove={() => saver.setPlace(null)} onFocusChange={setNameFocus} onName={(name) => saver.setPlace(withName(view.place as DiaryPlace, name), { soon: true })} />
               )}
               <PlacePanel flow={placeFlow.flow} onContinue={() => void placeFlow.confirm()} onClose={placeFlow.close} onSettings={() => void openSettings()} />
               {!hasAny && (canMedia || canPlace) && <AppText variant="small" muted>Tap the picture or the pin below to add photos, videos and where you are.</AppText>}
               {lines.map((l) => <AppText key={l} variant="small" muted>{l}</AppText>)}
-            </>
+            </ScrollView>
           )}
           {messages}
           {captionRow}

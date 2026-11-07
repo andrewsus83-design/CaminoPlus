@@ -160,6 +160,7 @@ export const PLACE_EXPLAIN_TITLE = 'Add where you are';
 export const PLACE_EXPLAIN = 'CaminoPlus reads your position once and keeps it in this page, only on this phone. It is never uploaded or shared.';
 export const PLACE_LOOKUP_NOTE = "To find the name of the place, your phone's own map service may be asked, which needs a signal. Without one you can type a name.";
 export const PLACE_FINDING = 'Finding where you are…';
+export const PLACE_PRIVATE = 'Only on this phone. It is not uploaded or shared.';
 
 /** The calm sentence for a place that could not be added. */
 export function placeProblemMessage(f: PlaceFailure): string {
@@ -176,4 +177,5 @@ export function placeProblemMessage(f: PlaceFailure): string {
 /** Said where photos, videos and places cannot be added: the web preview, or an app that is older than this feature. */
 export const MEDIA_ON_WEB = 'Photos, videos and places are added in the phone app.';
 export const MEDIA_NEEDS_NEW_APP = 'Adding photos and videos needs the newest version of the app.';
+export const FEATURES_NEED_NEW_APP = 'Adding photos, videos and places needs the newest version of the app.';
 export const MISSING_FILE = 'Not on this phone';
