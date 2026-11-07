@@ -1,12 +1,13 @@
--- Post engagement counters smoke test (migration 20261108010000_post_engagement_counters).
+-- Post engagement smoke test: the counters (migration 20261108010000_post_engagement_counters) and the
+-- rules for bookmarks (migration 20261108030000_post_saves_visibility).
 -- Self-contained: creates its own pilgrims (ids start with 1d) and removes them at the end, so it
 -- can run on any database that has the migrations (and be re-run). Every section is one transaction
 -- that is rolled back, so no section depends on another.
 -- Acts as signed-in people the way PostgREST does: request.jwt.claims + set local role.
 --
--- Section 9 applies the migration file a second time: the migration has to be re-runnable. The \ir
--- path is relative to this file, so run the test with psql -f (validate.sh does).
--- Section 8 needs a second database session (dblink, superuser) and is skipped without them.
+-- Sections 11 and 12 apply the migration files again: they have to be re-runnable. The \ir paths are
+-- relative to this file, so run the test with psql -f (validate.sh does).
+-- Section 10 needs a second database session (dblink, superuser) and is skipped without them.
 \set ON_ERROR_STOP 1
 
 -- ---------------------------------------------------------------- helpers
@@ -93,8 +94,9 @@ begin
   perform set_config('request.jwt.claims', '', true);
 end $$;
 
--- the statement must fail; optionally with this SQLSTATE and this hint
-create function engage_test.fails(p_sql text, p_state text default null, p_hint text default null)
+-- the statement must fail; optionally with this SQLSTATE, this hint and a message like this
+-- ('new row violates row-level security policy%' is a policy saying no, 'permission denied for table%' a missing privilege)
+create function engage_test.fails(p_sql text, p_state text default null, p_hint text default null, p_msg_like text default null)
 returns void language plpgsql as $$
 declare
   v_state text;
@@ -111,6 +113,9 @@ begin
     end if;
     if p_hint is not null and coalesce(v_hint, '') <> p_hint then
       raise exception 'expected hint % but got % (%) for: %', p_hint, coalesce(v_hint, ''), v_msg, p_sql;
+    end if;
+    if p_msg_like is not null and v_msg not like p_msg_like then
+      raise exception 'expected a message like "%" but got "%" for: %', p_msg_like, v_msg, p_sql;
     end if;
     return;
   end;
@@ -188,6 +193,52 @@ begin
           from pg_proc p where p.oid = 'public.record_post_share(uuid)'::regprocedure), 'record_post_share is open to PUBLIC';
   assert not has_function_privilege('anon', 'public.record_post_share(uuid)', 'execute'), 'record_post_share is open to anon';
   assert has_function_privilege('authenticated', 'public.record_post_share(uuid)', 'execute'), 'record_post_share is not granted to authenticated';
+end $$;
+
+-- What 20261108030000_post_saves_visibility promises about post_saves. It runs before and after the migration is
+-- applied again.
+create function engage_test.check_saves_structure() returns void language plpgsql as $$
+declare
+  r record;
+begin
+  -- three rules, one per command, for signed-in pilgrims; the old rule for everything is gone
+  assert not exists (select 1 from pg_policies where schemaname = 'public' and tablename = 'post_saves' and policyname = 'own saves'),
+         'the old rule for everything ("own saves") is gone';
+  assert (select count(*) from pg_policies where schemaname = 'public' and tablename = 'post_saves') = 3, 'post_saves has three policies';
+  assert (select string_agg(cmd, ',' order by cmd) from pg_policies where schemaname = 'public' and tablename = 'post_saves') = 'DELETE,INSERT,SELECT',
+         'one policy each for select, insert and delete: no update policy, no catch-all';
+  assert not exists (select 1 from pg_policies where schemaname = 'public' and tablename = 'post_saves' and roles <> array['authenticated']::name[]),
+         'every policy is for signed-in pilgrims only';
+  assert (select relrowsecurity from pg_class where oid = 'public.post_saves'::regclass), 'RLS on post_saves';
+
+  -- add: the rule of a like. The text is the same but for the table name, so whatever "visible" means for a like
+  -- is what it means for a bookmark (if the like rule changes, change this one with it)
+  assert replace((select with_check from pg_policies where schemaname = 'public' and tablename = 'post_saves' and cmd = 'INSERT'), 'post_saves', 'post_likes')
+         = (select with_check from pg_policies where schemaname = 'public' and tablename = 'post_likes' and cmd = 'INSERT'),
+         'the insert rule of a bookmark is the insert rule of a like';
+  -- read and remove: your own rows, the same words as "unlike"
+  assert (select qual from pg_policies where schemaname = 'public' and tablename = 'post_saves' and cmd = 'SELECT')
+         = (select qual from pg_policies where schemaname = 'public' and tablename = 'post_likes' and cmd = 'DELETE'), 'read: own rows';
+  assert (select qual from pg_policies where schemaname = 'public' and tablename = 'post_saves' and cmd = 'DELETE')
+         = (select qual from pg_policies where schemaname = 'public' and tablename = 'post_likes' and cmd = 'DELETE'), 'remove: own rows';
+
+  -- privileges: signed-in pilgrims read, add and remove, and cannot update (not even one column); anon has nothing
+  assert has_table_privilege('authenticated', 'public.post_saves', 'select')
+     and has_table_privilege('authenticated', 'public.post_saves', 'insert')
+     and has_table_privilege('authenticated', 'public.post_saves', 'delete'), 'signed-in pilgrims can read, add and remove';
+  assert not has_any_column_privilege('authenticated', 'public.post_saves', 'update'), 'signed-in pilgrims cannot update a bookmark, not even one column';
+  for r in select a.who, p.priv
+           from (values ('anon'), ('authenticated')) a(who)
+           cross join (values ('truncate'), ('references'), ('trigger')) p(priv) loop
+    assert not has_table_privilege(r.who, 'public.post_saves', r.priv), r.who || ' has ' || r.priv || ' on post_saves';
+  end loop;
+  for r in select p.priv from (values ('select'), ('insert'), ('update'), ('delete')) p(priv) loop
+    assert not has_table_privilege('anon', 'public.post_saves', r.priv), 'anon has ' || r.priv || ' on post_saves';
+  end loop;
+  for r in select p.priv from (values ('select'), ('insert'), ('update')) p(priv) loop
+    assert not has_any_column_privilege('anon', 'public.post_saves', r.priv), 'anon has ' || r.priv || ' on a column of post_saves';
+  end loop;
+  assert has_table_privilege('service_role', 'public.post_saves', 'update'), 'the server can still correct a row';
 end $$;
 
 grant execute on all functions in schema engage_test to anon, authenticated;
@@ -271,10 +322,11 @@ delete from public.post_saves where post_id = engage_test.pid('pub');
 select engage_test.login('erin');
 delete from public.post_saves where post_id = engage_test.pid('pub');
 do $$ begin assert engage_test.counts('pub') = '0/0', 'back to zero'; end $$;
--- moving a bookmark to another post moves the count (the policy lets a pilgrim update their own rows)
+-- moving a bookmark to another post moves the count. Only the server can move one (a pilgrim has no update, section 9)
 select engage_test.login('bob');
 insert into public.post_saves (post_id) values (engage_test.pid('pub'));
-update public.post_saves set post_id = engage_test.pid('story') where post_id = engage_test.pid('pub');
+select engage_test.logout();
+update public.post_saves set post_id = engage_test.pid('story') where user_id = engage_test.u('bob');
 do $$
 begin
   assert engage_test.counts('pub') = '0/0' and engage_test.counts('story') = '1/0', 'the count moved with the bookmark';
@@ -502,7 +554,201 @@ end $$;
 rollback;
 
 -- =============================================================================
-\echo '== 8. two pilgrims bookmark the same post at the same moment'
+\echo '== 8. bookmarks need a post you can see, the rule of a like'
+-- =============================================================================
+select engage_test.check_saves_structure();
+
+-- the attack that used to work: bookmark a post you cannot see
+begin;
+select engage_test.login('bob');
+do $$
+declare
+  p text;
+begin
+  foreach p in array array['private', 'followers', 'draft', 'deleted', 'hidden', 'story_old', 'gina_pub'] loop
+    perform engage_test.fails(format($q$insert into public.post_saves (post_id) values (%L)$q$, engage_test.pid(p)),
+                              '42501', null, 'new row violates row-level security policy%');
+    -- the form a client uses to save safely twice gets the same answer
+    perform engage_test.fails(format($q$insert into public.post_saves (post_id) values (%L) on conflict do nothing$q$, engage_test.pid(p)),
+                              '42501', null, 'new row violates row-level security policy%');
+  end loop;
+end $$;
+select engage_test.login('dave');   -- followed alice, then she blocked him
+do $$
+begin
+  perform engage_test.fails(format($q$insert into public.post_saves (post_id) values (%L)$q$, engage_test.pid('pub')),
+                            '42501', null, 'new row violates row-level security policy%');
+end $$;
+select engage_test.logout();
+do $$
+begin
+  assert (select count(*) from public.post_saves where user_id::text like '1d%') = 0, 'nothing was saved';
+  assert (select count(*) from public.posts where id::text like '1d2%' and (save_count <> 0 or share_count <> 0)) = 0, 'and no counter moved';
+end $$;
+rollback;
+
+-- the rule is the rule of a like, for every kind of post and viewer: both are allowed for the same pilgrims, and those are
+-- the pilgrims who can see the post (the hand-written list at the top)
+begin;
+do $$
+declare
+  v record;
+  p record;
+  expected boolean;
+  liked boolean;
+  saved boolean;
+  tried integer := 0;
+begin
+  for v in select name from engage_test.users where name not in ('zed', 'yan') order by name loop
+    perform engage_test.login(v.name);
+    for p in select label from engage_test.posts order by label loop
+      expected := exists (select 1 from engage_test.visible x where x.viewer = v.name and x.post = p.label);
+      begin
+        insert into public.post_likes (post_id) values (engage_test.pid(p.label));
+        liked := true;
+      exception when insufficient_privilege then
+        liked := false;
+      end;
+      begin
+        insert into public.post_saves (post_id) values (engage_test.pid(p.label));
+        saved := true;
+      exception when insufficient_privilege then
+        saved := false;
+      end;
+      assert liked = expected, format('a like: %s on the %s post, expected %s', v.name, p.label, expected);
+      assert saved = expected, format('a bookmark: %s on the %s post, expected %s (a like said %s)', v.name, p.label, expected, liked);
+      tried := tried + 1;
+    end loop;
+  end loop;
+  assert tried = 63, 'every viewer was tried on every post';   -- 7 viewers x 9 posts
+end $$;
+select engage_test.logout();
+do $$
+begin
+  assert (select count(*) from public.post_saves where post_id::text like '1d2%') = (select count(*) from engage_test.visible),
+         'one bookmark per pilgrim who could see the post, none for the others';
+  assert (select coalesce(sum(save_count), 0) from public.posts where id::text like '1d2%') = (select count(*) from engage_test.visible),
+         'and the counters add up to the same';
+  assert (select count(*) from public.post_likes where post_id::text like '1d2%') = (select count(*) from engage_test.visible), 'as many likes';
+end $$;
+rollback;
+
+-- a bookmark on a post you can see works, and is counted
+begin;
+select engage_test.login('bob');
+insert into public.post_saves (post_id) values (engage_test.pid('pub'));
+select engage_test.login('carol');
+insert into public.post_saves (post_id) values (engage_test.pid('followers'));
+select engage_test.login('erin');
+insert into public.post_saves (post_id) values (engage_test.pid('followers'));
+select engage_test.login('alice');
+insert into public.post_saves (post_id) values (engage_test.pid('private'));   -- her own private post is hers to see
+do $$
+begin
+  assert engage_test.counts('pub') = '1/0', 'bob''s bookmark of a public post is counted';
+  assert engage_test.counts('followers') = '2/0', 'a follower and a friend each bookmarked the followers post';
+  assert engage_test.counts('private') = '1/0', 'the author can bookmark her own private post';
+end $$;
+-- and never in somebody else's name
+select engage_test.login('bob');
+do $$
+begin
+  perform engage_test.fails(format($q$insert into public.post_saves (post_id, user_id) values (%L, %L)$q$, engage_test.pid('story'), engage_test.u('carol')),
+                            '42501', null, 'new row violates row-level security policy%');
+end $$;
+select engage_test.logout();
+do $$ begin assert not exists (select 1 from public.post_saves where post_id = engage_test.pid('story')), 'nothing was saved in carol''s name'; end $$;
+rollback;
+
+-- =============================================================================
+\echo '== 9. bookmarks are yours: read and remove your own, never update, nothing for anon'
+-- =============================================================================
+begin;
+select engage_test.login('bob');
+insert into public.post_saves (post_id) values (engage_test.pid('pub')), (engage_test.pid('story'));
+select engage_test.login('carol');
+insert into public.post_saves (post_id) values (engage_test.pid('pub'));
+select engage_test.login('alice');
+do $$
+begin
+  assert (select count(*) from public.post_saves) = 0, 'the author reads nobody''s bookmarks';
+  assert engage_test.counts('pub') = '2/0', 'but she reads the number';
+end $$;
+select engage_test.login('bob');
+do $$
+begin
+  assert (select count(*) from public.post_saves) = 2, 'bob reads his own two bookmarks';
+  assert (select count(*) from public.post_saves where user_id = engage_test.u('carol')) = 0, 'and not carol''s';
+  -- a delete with no filter at all removes his own rows and nothing else
+  assert engage_test.affected($q$delete from public.post_saves$q$) = 2, 'bob removes his own two';
+end $$;
+select engage_test.logout();
+do $$
+begin
+  assert (select count(*) from public.post_saves where user_id = engage_test.u('carol')) = 1, 'carol''s bookmark is still there';
+  assert engage_test.counts('pub') = '1/0' and engage_test.counts('story') = '0/0', 'the counts followed';
+end $$;
+-- you can always take a bookmark back, also when you can no longer see the post
+select engage_test.login('carol');
+insert into public.post_saves (post_id) values (engage_test.pid('followers'));
+delete from public.follows where follower_id = engage_test.u('carol');
+do $$
+begin
+  assert not exists (select 1 from public.posts where id = engage_test.pid('followers')), 'carol no longer sees the post';
+  assert (select count(*) from public.post_saves where post_id = engage_test.pid('followers')) = 1, 'she still reads her own bookmark of it';
+  assert engage_test.affected(format($q$delete from public.post_saves where post_id = %L$q$, engage_test.pid('followers'))) = 1, 'and can take it back';
+end $$;
+select engage_test.logout();
+do $$ begin assert engage_test.counts('followers') = '0/0', 'the count went down'; end $$;
+rollback;
+
+-- a bookmark is added or removed, never moved: an update is an error (not a quiet no-op), whatever it changes
+begin;
+select engage_test.login('bob');
+insert into public.post_saves (post_id) values (engage_test.pid('pub'));
+do $$
+begin
+  perform engage_test.fails(format($q$update public.post_saves set post_id = %L$q$, engage_test.pid('story')),   '42501', null, 'permission denied for table post_saves');
+  perform engage_test.fails(format($q$update public.post_saves set post_id = %L$q$, engage_test.pid('private')), '42501', null, 'permission denied for table post_saves');
+  perform engage_test.fails($q$update public.post_saves set created_at = now()$q$, '42501', null, 'permission denied for table post_saves');
+  -- an upsert that would update on conflict needs the same right, with or without a conflict
+  perform engage_test.fails(format($q$insert into public.post_saves (post_id) values (%L) on conflict (post_id, user_id) do update set created_at = now()$q$, engage_test.pid('pub')),
+                            '42501', null, 'permission denied for table post_saves');
+  perform engage_test.fails(format($q$insert into public.post_saves (post_id) values (%L) on conflict (post_id, user_id) do update set created_at = now()$q$, engage_test.pid('story')),
+                            '42501', null, 'permission denied for table post_saves');
+  -- saving twice safely is insert ... on conflict do nothing, and that still works
+  assert engage_test.affected(format($q$insert into public.post_saves (post_id) values (%L) on conflict do nothing$q$, engage_test.pid('pub'))) = 0,
+         'saving again with do nothing changes nothing';
+  assert engage_test.affected(format($q$insert into public.post_saves (post_id) values (%L) on conflict (post_id, user_id) do nothing$q$, engage_test.pid('pub'))) = 0,
+         'also with the conflict columns named, which is how PostgREST writes an ignore-duplicates upsert';
+  assert (select count(*) from public.post_saves) = 1 and (select post_id from public.post_saves) = engage_test.pid('pub'), 'the bookmark is where it was';
+end $$;
+-- anon can do nothing with bookmarks
+select engage_test.anon();
+do $$
+declare
+  s text;
+begin
+  foreach s in array array[
+    'select count(*) from public.post_saves',
+    format('insert into public.post_saves (post_id, user_id) values (%L, %L)', engage_test.pid('pub'), engage_test.u('bob')),
+    'update public.post_saves set created_at = now()',
+    'delete from public.post_saves'] loop
+    perform engage_test.fails(s, '42501', null, 'permission denied for table post_saves');
+  end loop;
+end $$;
+-- the server can still correct a row, and the counter follows it
+select engage_test.logout();
+do $$
+begin
+  assert (select count(*) from public.post_saves where post_id::text like '1d2%') = 1, 'anon changed nothing';
+  update public.post_saves set post_id = engage_test.pid('story') where user_id = engage_test.u('bob');
+  assert engage_test.counts('pub') = '0/0' and engage_test.counts('story') = '1/0', 'the server can still move a row, and the counter follows';
+end $$;
+rollback;
+
+-- =============================================================================
+\echo '== 10. two pilgrims bookmark the same post at the same moment'
 -- =============================================================================
 -- A recount that starts before the other pilgrim's row is committed does not see it and writes a count that is
 -- one too low (the way like_count and comment_count are kept). The trigger locks the post first to avoid that.
@@ -557,7 +803,7 @@ select exists (select 1 from pg_available_extensions where name = 'dblink')
 \endif
 
 -- =============================================================================
-\echo '== 9. the migration can run again'
+\echo '== 11. the counters migration can run again'
 -- =============================================================================
 begin;
 select engage_test.login('bob');
@@ -624,7 +870,73 @@ select engage_test.fails(format($q$select public.record_post_share(%L)$q$, engag
 rollback;
 
 -- =============================================================================
-\echo '== 10. invariants over everything, and clean up'
+\echo '== 12. the bookmark rules migration fixes the old rules, and can run again'
+-- =============================================================================
+begin;
+select engage_test.logout();
+-- 1. post_saves as it was before this migration (and as the live database still has it): one rule for everything, update allowed
+drop policy "read own saves" on public.post_saves;
+drop policy "save as yourself" on public.post_saves;
+drop policy "unsave" on public.post_saves;
+create policy "own saves" on public.post_saves for all to authenticated
+  using (user_id = (select auth.uid())) with check (user_id = (select auth.uid()));
+grant update on public.post_saves to authenticated;
+-- ... with the gap: bob bookmarks a post he cannot see, and moves a bookmark to another post
+select engage_test.login('bob');
+insert into public.post_saves (post_id) values (engage_test.pid('private')), (engage_test.pid('pub'));
+update public.post_saves set post_id = engage_test.pid('story') where post_id = engage_test.pid('pub');
+select engage_test.logout();
+do $$
+begin
+  assert engage_test.counts('private') = '1/0' and engage_test.counts('story') = '1/0', 'the old rules let a stranger bookmark a private post and move a bookmark';
+end $$;
+
+-- 2. the migration
+set local client_min_messages = warning;
+\ir ../migrations/20261108030000_post_saves_visibility.sql
+reset client_min_messages;
+select engage_test.check_saves_structure();
+create temp table engage_state as
+  select (select string_agg(policyname || '|' || cmd || '|' || roles::text || '|' || coalesce(qual, '') || '|' || coalesce(with_check, ''), E'\n' order by policyname)
+          from pg_policies where schemaname = 'public' and tablename = 'post_saves') as policies,
+         (select relacl::text from pg_class where oid = 'public.post_saves'::regclass) as acl,
+         (select count(*) from public.post_saves where user_id::text like '1d%') as saves;
+
+-- 3. twice more: nothing changes
+set local client_min_messages = warning;
+\ir ../migrations/20261108030000_post_saves_visibility.sql
+\ir ../migrations/20261108030000_post_saves_visibility.sql
+reset client_min_messages;
+do $$
+begin
+  assert (select policies from engage_state)
+         = (select string_agg(policyname || '|' || cmd || '|' || roles::text || '|' || coalesce(qual, '') || '|' || coalesce(with_check, ''), E'\n' order by policyname)
+            from pg_policies where schemaname = 'public' and tablename = 'post_saves'), 'the policies are exactly the same after two more runs';
+  assert (select acl from engage_state) is not distinct from (select relacl::text from pg_class where oid = 'public.post_saves'::regclass),
+         'and so are the privileges';
+  assert (select saves from engage_state) = 2 and (select count(*) from public.post_saves where user_id::text like '1d%') = 2,
+         'the two bookmarks are still there, also the one on a post its owner cannot see';
+  assert engage_test.counts('private') = '1/0' and engage_test.counts('story') = '1/0', 'and still counted';
+end $$;
+select engage_test.check_saves_structure();
+
+-- 4. the gap is closed, and what bob already had is still his
+select engage_test.login('bob');
+do $$
+begin
+  perform engage_test.fails(format($q$insert into public.post_saves (post_id) values (%L)$q$, engage_test.pid('followers')),
+                            '42501', null, 'new row violates row-level security policy%');
+  perform engage_test.fails(format($q$update public.post_saves set post_id = %L$q$, engage_test.pid('pub')), '42501', null, 'permission denied for table post_saves');
+  assert (select count(*) from public.post_saves) = 2, 'bob still reads both of his old bookmarks';
+  assert engage_test.affected(format($q$delete from public.post_saves where post_id = %L$q$, engage_test.pid('private'))) = 1,
+         'and can remove the one on the post he cannot see';
+end $$;
+select engage_test.logout();
+do $$ begin assert engage_test.counts('private') = '0/0', 'the count went down'; end $$;
+rollback;
+
+-- =============================================================================
+\echo '== 13. invariants over everything, and clean up'
 -- =============================================================================
 select engage_test.logout();
 do $$

@@ -56,8 +56,8 @@ grant all on public.post_shares to service_role;
 --    pilgrim's row was committed would not see it and could write a count that is one too low;
 --    waiting for the lock first means the recount below runs on a fresh snapshot. FOR NO KEY UPDATE
 --    is the lock the update itself takes, so this adds no new way to deadlock.
---    A save can be moved to another post by its owner (the policy "own saves" allows any update),
---    so an update of post_id recounts both posts, in a fixed order.
+--    A bookmark row can be moved to another post (its owner could, until 20261108030000_post_saves_visibility.sql
+--    took UPDATE away; the server still can), so an update of post_id recounts both posts, in a fixed order.
 -- -----------------------------------------------------------------------------
 create or replace function private.post_engagement_counters()
 returns trigger
