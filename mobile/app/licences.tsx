@@ -18,6 +18,7 @@ const DATA: Item[] = [
   { name: 'Natural Earth', what: 'Low-zoom world map data', licence: 'Public domain', url: 'https://www.naturalearthdata.com/about/terms-of-use/' },
   { name: 'OpenFreeMap and MapTiler', what: 'Online base map tiles (only while you are online)', licence: 'Their terms; data © OpenStreetMap contributors', url: 'https://openfreemap.org/' },
   { name: 'Overture Maps, Wikidata, Wikipedia, Wikimedia Commons', what: 'Cross-checking places and descriptions', licence: 'CDLA-Permissive 2.0, CC0, CC BY-SA, and per-file Commons licences', url: 'https://camino.plus/licences' },
+  { name: 'AI-generated sample pictures and clips', what: 'The sample journey shown before you have posts of your own', licence: 'Made by CaminoPlus with Google Nano Banana 2 and Veo 3.1 through OpenArt. AI-generated, not photographs of real places or people', url: 'https://openart.ai/' },
 ];
 
 const SOFTWARE: Item[] = [

@@ -5,6 +5,7 @@ import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
 import { Post, PostMediaUrl, listPostMediaUrls } from '@/lib/api';
 import { gridMetrics, gridRows } from '@/lib/gridLayout';
+import { SAMPLE_VIEWER_LABEL } from '@/lib/sampleJourney';
 import { c, fonts, radius, layout } from '@/theme';
 
 // My journey: 9:16 tiles in an even two-column grid, edge to edge, square corners, a 1 px line between tiles (the
@@ -26,23 +27,47 @@ try {
 } catch {
   VideoModule = null;
 }
-function LoopVideo({ uri, active }: { uri: string; active: boolean }) {
+/** `source` is a URL, or the asset id of a bundled clip (the sample journey). */
+function LoopVideo({ source, active }: { source: string | number; active: boolean }) {
   const { useVideoPlayer, VideoView } = VideoModule!;
-  const player = useVideoPlayer(uri, (p) => { p.loop = true; p.muted = true; });
+  const player = useVideoPlayer(source, (p) => { p.loop = true; p.muted = true; });
   useEffect(() => { if (active) player.play(); else player.pause(); }, [active, player]);
   return <VideoView player={player} nativeControls={false} contentFit="cover" style={{ width: '100%', height: '100%' }} />;
 }
 
 const dateOf = (iso: string | null) => (iso ? new Date(iso).toLocaleDateString([], { day: 'numeric', month: 'short', year: 'numeric' }) : '');
 
+/** A picture or clip of a post. A bundled sample has `source` (an asset id) and `poster` (its still picture) instead of a URL. */
+type Visual = PostMediaUrl & { source?: number; poster?: number };
+
+/** The small "this is a clip" mark on a grid tile. */
+function PlayBadge() {
+  return (
+    <View accessibilityLabel="Video" style={{ position: 'absolute', top: 8, left: 8, width: 26, height: 26, borderRadius: 13, backgroundColor: 'rgba(0,0,0,0.45)', alignItems: 'center', justifyContent: 'center' }}>
+      <View style={{ marginLeft: 2, width: 0, height: 0, borderTopWidth: 6, borderBottomWidth: 6, borderLeftWidth: 10, borderTopColor: 'transparent', borderBottomColor: 'transparent', borderLeftColor: '#FFFFFF' }} />
+    </View>
+  );
+}
+
 /** Fills its parent: photo, video or colour card with the text of the post. */
-function PostVisual({ post, media, index, active, small }: { post: Post; media?: PostMediaUrl; index: number; active: boolean; small?: boolean }) {
+function PostVisual({ post, media, index, active, small }: { post: Post; media?: Visual; index: number; active: boolean; small?: boolean }) {
   const col = CARD_COLORS[index % CARD_COLORS.length];
-  if (media?.type === 'image') return <Image source={{ uri: media.url }} resizeMode="cover" style={{ width: '100%', height: '100%' }} />;
+  if (media?.type === 'image') return <Image source={media.source ?? { uri: media.url }} resizeMode="cover" style={{ width: '100%', height: '100%' }} />;
   if (media?.type === 'video') {
+    // A clip that comes with a poster (the sample journey) shows the poster in the grid, and only the page that is on
+    // screen starts a player, so swiping through many clips never keeps many players alive at once.
+    if (media.poster !== undefined) {
+      const playing = !small && active && !!VideoModule;
+      return (
+        <View style={{ width: '100%', height: '100%', backgroundColor: '#000' }}>
+          {playing ? <LoopVideo source={media.source ?? media.url} active /> : <Image source={media.poster} resizeMode="cover" style={{ width: '100%', height: '100%' }} />}
+          {small && <PlayBadge />}
+        </View>
+      );
+    }
     return (
       <View style={{ width: '100%', height: '100%', backgroundColor: '#000', alignItems: 'center', justifyContent: 'center' }}>
-        {VideoModule && !small ? <LoopVideo uri={media.url} active={active} /> : <Icon name="steps" color="#FFFFFF" size={small ? 28 : 48} />}
+        {VideoModule && !small ? <LoopVideo source={media.url} active={active} /> : <Icon name="steps" color="#FFFFFF" size={small ? 28 : 48} />}
       </View>
     );
   }
@@ -53,8 +78,9 @@ function PostVisual({ post, media, index, active, small }: { post: Post; media?:
   );
 }
 
-export function JourneyGrid({ posts, bleed = true, margin = layout.screenMargin }: { posts: Post[]; bleed?: boolean; margin?: number }) {
-  const [media, setMedia] = useState<Record<string, PostMediaUrl[]>>({});
+export function JourneyGrid({ posts, bleed = true, margin = layout.screenMargin, sample }: { posts: Post[]; bleed?: boolean; margin?: number; sample?: Record<string, Visual[]> }) {
+  // `sample`: the bundled sample journey. Its pictures and clips come with the app, so nothing is fetched.
+  const [media, setMedia] = useState<Record<string, Visual[]>>(sample ?? {});
   const [openAt, setOpenAt] = useState<number | null>(null);
   const { width } = useWindowDimensions();
   // Edge to edge by default: `margin` is the screen's side padding, which the negative margin below cancels.
@@ -62,9 +88,10 @@ export function JourneyGrid({ posts, bleed = true, margin = layout.screenMargin 
   const { colW, tileH, line } = gridMetrics(width, { bleed, margin, pixelRatio: PixelRatio.get() });
 
   useEffect(() => {
+    if (sample) return;
     const ids = posts.filter((p) => p.media_count > 0).map((p) => p.id);
     listPostMediaUrls(ids).then(setMedia).catch(() => {});
-  }, [posts]);
+  }, [posts, sample]);
 
   // Even rows of two tiles. The only space between tiles is `line` (1 px); the page background shows through it.
   const rows = useMemo(() => gridRows(posts.length), [posts.length]);
@@ -95,12 +122,12 @@ export function JourneyGrid({ posts, bleed = true, margin = layout.screenMargin 
           </View>
         ))}
       </View>
-      {openAt !== null && <Viewer posts={posts} media={media} start={openAt} onClose={() => setOpenAt(null)} />}
+      {openAt !== null && <Viewer posts={posts} media={media} start={openAt} sampleLabel={sample ? SAMPLE_VIEWER_LABEL : undefined} onClose={() => setOpenAt(null)} />}
     </>
   );
 }
 
-function Viewer({ posts, media, start, onClose }: { posts: Post[]; media: Record<string, PostMediaUrl[]>; start: number; onClose: () => void }) {
+function Viewer({ posts, media, start, onClose, sampleLabel }: { posts: Post[]; media: Record<string, Visual[]>; start: number; onClose: () => void; sampleLabel?: string }) {
   const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const [cur, setCur] = useState(start);
@@ -128,13 +155,14 @@ function Viewer({ posts, media, start, onClose }: { posts: Post[]; media: Record
                   <PostVisual post={item} media={list[0]} index={index} active={index === cur} />
                 )}
                 <View pointerEvents="none" style={{ position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: layout.screenMargin, paddingTop: 60, paddingBottom: insets.bottom + 28, gap: 6, backgroundColor: 'rgba(0,0,0,0.35)' }}>
+                  {!!sampleLabel && <AppText variant="caption" color={c.goldSoft} style={{ textTransform: 'uppercase', letterSpacing: 1 }}>{sampleLabel}</AppText>}
                   <AppText variant="label" color="#FFFFFF">{[item.place_name, dateOf(item.published_at)].filter(Boolean).join(' · ') || 'On the Camino'}</AppText>
                   {!!item.body && list.length > 0 && <AppText variant="small" color="#FFFFFF" numberOfLines={4}>{item.body}</AppText>}
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                  {!sampleLabel && <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
                     <Icon name="heart" color={c.red} size={18} filled />
                     <AppText variant="caption" color="#FFFFFF">{item.like_count}</AppText>
                     {list.length > 1 && <AppText variant="caption" color="#FFFFFF" style={{ marginLeft: 12 }}>Swipe sideways for {list.length} slides</AppText>}
-                  </View>
+                  </View>}
                 </View>
               </View>
             );
