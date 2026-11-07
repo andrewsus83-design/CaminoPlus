@@ -22,6 +22,21 @@
   "min_route_km": 5.2,
   "buffer_km": 3,
   "maxzoom": 15,
+  "quality": {
+    "min_tiles": 440,
+    "max_tiles": 1190,
+    "min_size_mb": 3.2,
+    "max_size_mb": 8.8,
+    "required_layers": [
+      "building",
+      "place",
+      "poi",
+      "transportation",
+      "transportation_name"
+    ],
+    "max_change_ratio": 1.5,
+    "max_osm_age_days": 45
+  },
   "waypoints": [
     {
       "name": "Sigüeiro",
@@ -46,8 +61,15 @@
         42.96879,
         15
       ],
-      "min_features": {},
-      "min_labels": {}
+      "min_features": {
+        "poi": 66,
+        "transportation": 173,
+        "building": 4
+      },
+      "min_labels": {
+        "place": 1,
+        "peak": 1
+      }
     },
     {
       "name": "Santiago de Compostela z15",
@@ -56,8 +78,15 @@
         42.88042,
         15
       ],
-      "min_features": {},
-      "min_labels": {}
+      "min_features": {
+        "poi": 1352,
+        "transportation": 526,
+        "building": 73
+      },
+      "min_labels": {
+        "place": 1,
+        "peak": 1
+      }
     }
   ],
   "generated_from": "catalog/camino-ingles/06.json"

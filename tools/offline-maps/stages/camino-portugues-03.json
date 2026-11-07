@@ -22,6 +22,21 @@
   "min_route_km": 11.1,
   "buffer_km": 3,
   "maxzoom": 15,
+  "quality": {
+    "min_tiles": 540,
+    "max_tiles": 1440,
+    "min_size_mb": 3,
+    "max_size_mb": 8.1,
+    "required_layers": [
+      "building",
+      "place",
+      "poi",
+      "transportation",
+      "transportation_name"
+    ],
+    "max_change_ratio": 1.5,
+    "max_osm_age_days": 45
+  },
   "waypoints": [
     {
       "name": "Barcelos",
@@ -88,8 +103,14 @@
         41.53145,
         15
       ],
-      "min_features": {},
-      "min_labels": {}
+      "min_features": {
+        "poi": 319,
+        "transportation": 311,
+        "building": 12
+      },
+      "min_labels": {
+        "place": 1
+      }
     },
     {
       "name": "Ponte de Lima z15",
@@ -98,8 +119,14 @@
         41.7675,
         15
       ],
-      "min_features": {},
-      "min_labels": {}
+      "min_features": {
+        "poi": 230,
+        "transportation": 186,
+        "building": 6
+      },
+      "min_labels": {
+        "place": 1
+      }
     }
   ],
   "generated_from": "catalog/camino-portugues/03.json"

@@ -9,6 +9,7 @@ import { FormMessage } from '@/components/auth/Field';
 import { c, fixed, fonts, radius, role, layout } from '@/theme';
 import { useAuth } from '@/lib/auth';
 import { PickedMedia, createJournalPost, uploadPostMedia } from '@/lib/api';
+import { NativeName, hasNativeModule } from '@/lib/optionalNative';
 
 // Story composer, TikTok / Reels / Shorts style: a post is a row of slides. Each slide is a
 // colour card or a photo / video with text on top and an optional location sticker.
@@ -34,6 +35,7 @@ const newSlide = (over: Partial<Slide> = {}): Slide => ({ id: `s${Date.now()}${M
 // expo-video is native too: use it when the build has it, otherwise show a play tile.
 let VideoModule: typeof import('expo-video') | null = null;
 try {
+  if (!hasNativeModule(NativeName.video)) throw new Error('missing');
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   VideoModule = require('expo-video');
   if (!VideoModule?.useVideoPlayer) VideoModule = null;
@@ -64,6 +66,7 @@ function Backdrop({ slide }: { slide: Slide }) {
 async function pickMedia(): Promise<PickedMedia[] | null> {
   let Picker: typeof import('expo-image-picker');
   try {
+    if (!hasNativeModule(NativeName.imagePicker)) throw new Error('missing');
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     Picker = require('expo-image-picker');
     if (!Picker.launchImageLibraryAsync) throw new Error('missing');

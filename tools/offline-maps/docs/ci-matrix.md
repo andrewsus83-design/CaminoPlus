@@ -115,8 +115,11 @@ file is OpenStreetMap data under the ODbL and would be published with this repos
 Same build, with `route-fallback: deny`, `ocean-fallback: deny` and `publishing: 'true'` (route must come from OSM, the ocean
 polygons of a coastal stage must be the real ones, OSM data must be
 fresh, size and tile count inside the band and close to the live pack, and the stage exists in the database), then `publish_pack.mjs` uploads and
-registers the pack in one database transaction. Without the Supabase secrets the step runs the quality gates
-as a dry run and uploads nothing.
+registers the pack in one database transaction. The first step of the job checks that `SUPABASE_URL` and
+`SUPABASE_SERVICE_ROLE_KEY` are set and, when one is not, stops the job within seconds with a red error that says where to
+add them (Settings, Environments, `pack-publish`), before anything is downloaded or built. A publish job exists only because
+somebody asked to publish, so it never ends green with nothing uploaded (it used to run the gates as a dry run and exit
+green, which reads as "published"). That step sees two booleans, never a value: the values go to the last step only.
 
 Two at a time, and each stage on its own: one red stage does not stop the others, and a red stage keeps its
 previous pack as the current one. Concurrent runs queue per stage (`offline-maps-publish-<slug>`).

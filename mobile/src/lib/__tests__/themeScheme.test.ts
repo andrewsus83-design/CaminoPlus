@@ -53,6 +53,11 @@ check('light mode is the light palette of design/tokens.json, color by color and
   assert.equal(role.onInverse, light.parchment);
   assert.equal(role.onInverseAccent, light.goldSoft);
   assert.equal(role.onHighlight, light.blue);
+  // the tab bar has roles of its own now; in light mode they are exactly what it always drew (the action blue and the muted stone)
+  assert.equal(role.tabActive, light.blue);
+  assert.equal(role.tabInactive, light.stone600);
+  assert.equal(role.tabActive, role.action, 'light mode: the active tab is the blue it always was');
+  assert.equal(role.tabInactive, role.muted, 'light mode: the inactive tab is the stone it always was');
 });
 
 check('dark mode is the dark section of design/tokens.json: nothing about it is defined a second time in the app', () => {
@@ -66,6 +71,8 @@ check('dark mode is the dark section of design/tokens.json: nothing about it is 
   assert.equal(role.onInverse, darkRole.textInverse);
   assert.equal(role.onInverseAccent, darkRole.textInverseAccent);
   assert.equal(role.onHighlight, darkRole.onHighlight);
+  assert.equal(role.tabActive, darkRole.tabActive);
+  assert.equal(role.tabInactive, darkRole.tabInactive);
   applyScheme('light');
 });
 
@@ -93,9 +100,11 @@ check('the pairs a screen draws keep their contrast in the running theme, in bot
     ['text on bg', () => role.text, () => role.bg, 4.5],
     ['text on surface', () => role.text, () => role.surface, 4.5],
     ['muted on bg', () => role.muted, () => role.bg, 4.5],
-    ['muted on surface (the inactive tab)', () => role.muted, () => role.surface, 4.5],
+    ['muted on surface', () => role.muted, () => role.surface, 4.5],
     ['action on bg', () => role.action, () => role.bg, 4.5],
-    ['action on surface (the active tab)', () => role.action, () => role.surface, 4.5],
+    ['action on surface', () => role.action, () => role.surface, 4.5],
+    ['tabInactive on surface (the inactive tab, icon and label)', () => role.tabInactive, () => role.surface, 4.5],
+    ['tabActive on surface (the active tab, icon and label)', () => role.tabActive, () => role.surface, 4.5],
     ['onAction on action (a primary button)', () => role.onAction, () => role.action, 4.5],
     ['onHighlight on highlight (text and icons on gold)', () => role.onHighlight, () => role.highlight, 4.5],
     ['onInverse on inverse (text on a hero card)', () => role.onInverse, () => role.inverse, 4.5],
@@ -124,10 +133,34 @@ check('the scrim is one value and belongs to the theme', () => {
   assert.match(scrim, /^rgba\(\s*20\s*,\s*54\s*,\s*93\s*,\s*0\.\d+\)$/);
 });
 
-check('the tab bar draws the inactive tab in role.muted and the active one in role.action, never a fixed navy', () => {
+check('on the tab bar the active tab has at least 1.5 times the contrast of an inactive one, in both modes, and in dark mode the inactive ones are not darker than muted text', () => {
+  // In dark mode the active tab used to be the action blue (7.0:1) and the inactive ones muted text (7.4:1): the active
+  // tab was the quieter of the two. A lighter inactive tab must never bring that back.
+  for (const scheme of ['light', 'dark'] as const) {
+    applyScheme(scheme);
+    const active = ratio(role.tabActive, role.surface);
+    const inactive = ratio(role.tabInactive, role.surface);
+    assert.ok(active >= 1.5 * inactive, `${scheme}: the active tab is ${active.toFixed(2)}:1 and an inactive one ${inactive.toFixed(2)}:1 on the bar`);
+  }
+  applyScheme('dark');
+  assert.ok(ratio(role.tabInactive, role.surface) >= ratio(role.muted, role.surface), 'dark mode: the inactive tabs were lifted because they were hard to see');
+  applyScheme('light');
+});
+
+check('the tab bar draws the active tab in role.tabActive and the inactive ones in role.tabInactive: its own roles, never a fixed colour or a role other things share', () => {
   const src = read(join('src', 'components', 'TabBar.tsx'));
-  assert.match(src, /focused \? role\.action : role\.muted/);
+  assert.match(src, /focused \? role\.tabActive : role\.tabInactive/);
+  assert.doesNotMatch(src, /role\.(muted|action)\b/, 'muted and action are the colours of captions and links: changing them for the tab bar would change those too');
   assert.doesNotMatch(src, /rgba\(\s*20\s*,\s*54\s*,\s*93/);
+  assert.doesNotMatch(src, /#[0-9a-fA-F]{3,8}\b|rgba?\(/, 'no colour of its own in the tab bar: a role from design/tokens.json');
+});
+
+check('the tab bar roles exist in both modes of design/tokens.json: the dark section has its own value for each', () => {
+  const lightRole = tokens.role as Pal;
+  for (const name of ['tabActive', 'tabInactive']) {
+    assert.ok(lightRole[name] in light, `role.${name} names a light colour`);
+    assert.ok(darkRole[name], `dark.role.${name} is missing: dark mode would fall back to the light mapping`);
+  }
 });
 
 check('no screen draws the brand navy as a literal: use a role, fixed.*, or scrim', () => {
