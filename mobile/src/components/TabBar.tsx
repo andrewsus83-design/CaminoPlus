@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from './AppText';
 import { Icon, IconName } from './Icon';
 import { useTabBarHidden } from '@/lib/tabBarVisibility';
-import { c, radius, role, shadowStyle } from '@/theme';
+import { c, layout, radius, role, shadowStyle } from '@/theme';
 
 // Floating pill tab bar: gold pill behind the active icon.
 export function TabBar({ state, descriptors, navigateToTab }: BottomTabBarProps) {
@@ -12,7 +12,7 @@ export function TabBar({ state, descriptors, navigateToTab }: BottomTabBarProps)
   const hidden = useTabBarHidden();
   if (hidden) return null;
   return (
-    <View style={{ position: 'absolute', left: 12, right: 12, bottom: Math.max(insets.bottom - 14, 10), height: 88, borderRadius: radius.pill, backgroundColor: role.surface, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 6, ...shadowStyle('lg') }}>
+    <View style={{ position: 'absolute', left: layout.screenMargin, right: layout.screenMargin, bottom: Math.max(insets.bottom - 14, 10), height: 88, borderRadius: radius.pill, backgroundColor: role.surface, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 6, ...shadowStyle('lg') }}>
       {state.routes.map((route, i) => {
         const focused = state.index === i;
         const label = descriptors[route.key].options.title ?? route.name;

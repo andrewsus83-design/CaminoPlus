@@ -271,7 +271,7 @@ TABS = [
    f"Churches, fountains and points of interest from OpenStreetMap. History pop-ups and audio stories {COMING}",
    "Scavenger hunts, achievements and XP as you walk",
    "Crowd updates from other pilgrims, and the weather ahead",
-   "Offline map for every stage you download: route, towns, water, churches and albergues"],
+   "Offline map for every stage you download with Pilgrim Plus: route, towns, water, churches and albergues"],
   [("maps-helicopter", "Maps helicopter view of the whole route"), ("maps-city", "Maps city view at street level")]),
  ("discover", "play", "Discover", "Stories from the trail, full screen.",
   "Swipe through short, full-screen stories from pilgrims and places along the Way. Small tabs at the top switch topics, and a quick tutorial shows you how on your first visit.",
@@ -320,15 +320,16 @@ FAQ = [
   ("account", "Do I need an account?", "<p>Yes, a free account lets you save your plan, passport and journal. You can sign up with email or with Google.</p>"),
  ]),
  ("offline", "Offline &amp; maps", [
-  ("offline-works", "Does CaminoPlus work without signal?", "<p>The map does. CaminoPlus is offline-first: with Pilgrim Plus you download your route stage by stage, and the map and your GPS position keep working for a full walking day without signal. The map shows roads, paths, towns, water, churches and albergues as they are mapped in OpenStreetMap. Details of stays, audio stories and elevation lines still need a connection for now; offline versions are coming. Anything you post while offline waits in a queue and syncs when you are back online.</p>"),
-  ("offline-size", "How big are the offline downloads?", "<p>Each stage pack is roughly 2–5 MB. The first stage of the Camino Francés, Saint-Jean to Roncesvalles, is about 4.6 MB. You can download only the stages you need.</p>"),
+  ("offline-works", "Does CaminoPlus work without signal?", "<p>The map does, if you have Pilgrim Plus. Offline maps are only available to paying members. With Pilgrim Plus you download your route stage by stage, and the map and your GPS position keep working for a full walking day without signal. The map shows roads, paths, towns, water, churches and albergues as they are mapped in OpenStreetMap. Details of stays, audio stories and elevation lines still need a connection for now; offline versions are coming. Anything you post while offline waits in a queue and syncs when you are back online.</p>"),
+  ("offline-size", "How big are the offline downloads?", "<p>A typical stage pack is about 4 MB, and most are between 1 and 6 MB. Stages through big cities such as Pamplona and Burgos are larger, up to about 11 MB. The first stage of the Camino Francés, Saint-Jean to Roncesvalles, is about 4.6 MB. You can download only the stages you need.</p>"),
   ("battery", "Will GPS drain my battery?", "<p>GPS works without mobile data, and CaminoPlus uses a battery-saving location mode built for long days on foot. Our target is under 15% battery over a 7-hour walk. Real numbers depend on your phone, screen use and cold weather, so carrying a small power bank is still wise.</p>"),
   ("map-data", "Where does the map data come from?", "<p>Offline maps are built from <a href=\"https://www.openstreetmap.org/copyright\" rel=\"noopener\">OpenStreetMap</a>, the free map made by a worldwide community. Map data © OpenStreetMap contributors. See <a href=\"/licences\">Licences</a> for everything the app is built on.</p>"),
   ("fresh", "How fresh is information like crowds and opening hours?", "<p>Live information such as crowd updates is shown with a “updated X ago” label, so you always know how old it is. When you are offline you see the last version you downloaded.</p>"),
  ]),
  ("pricing", "Pricing &amp; billing", [
+  ("offline-plus", "Is offline mode only for paying members?", "<p>Yes. Offline maps are part of Pilgrim Plus (<b>$12 per year</b>) and are not available on the free plan. With Pilgrim Plus you download your stages over Wi-Fi, and the map and your GPS position keep working without signal. Without it the map needs a connection: your GPS dot still works without signal, but the base map under it only loads when you are online. See <a href=\"/pricing\">Pricing</a> for everything Pilgrim Plus includes.</p>"),
   ("cost", "How much does CaminoPlus cost?", "<p>The basic app is free. Pilgrim Plus costs <b>$12 per year</b> and adds offline route downloads and 5 GB of cloud storage. See <a href=\"/pricing\">Pricing</a> for details.</p>"),
-  ("free-plan", "What can I do on the free plan?", "<p>You can use the basic app with a connection: browse routes and stages, look up stays and cafés, watch stories in Discover and keep your passport and journal on your phone. The free plan has no offline route downloads and no cloud storage.</p>"),
+  ("free-plan", "What can I do on the free plan?", "<p>You can use the basic app with a connection: browse routes and stages, look up stays and cafés, watch stories in Discover and keep your passport and journal on your phone. The free plan has no offline maps (route downloads) and no cloud storage. Both come with Pilgrim Plus.</p>"),
   ("pay", "How do I pay?", "<p>Subscriptions are bought through the App Store or Google Play, using the payment method on your store account. Prices may be shown in your local currency.</p>"),
   ("renew", "Does the subscription renew automatically?", "<p>Yes, yearly, until you cancel. You can turn off auto-renew at any time in your App Store or Google Play subscription settings, and you keep access until the end of the paid year.</p>"),
   ("refund", "Can I get a refund?", "<p>Because payments go through Apple or Google, refunds follow their policies. On iPhone, request one at reportaproblem.apple.com. On Android, request one from your Google Play order history. If something went wrong, <a href=\"/contact\">tell us</a> and we will help.</p>"),
@@ -449,7 +450,7 @@ def home():
   </div>
   <div class="stat-row">
     <div class="stat"><b>6–8 h</b><span>walking days the offline map is built for</span></div>
-    <div class="stat"><b>2–5 MB</b><span>per downloaded stage</span></div>
+    <div class="stat"><b>~4 MB</b><span>for a typical stage</span></div>
     <div class="stat"><b>&lt;15%</b><span>battery target for a 7-hour day</span></div>
     <div class="stat"><b>$12</b><span>a year for offline downloads</span></div>
   </div>
@@ -514,7 +515,7 @@ def features():
       <ul class="ticks">{t}</ul>
     </div>
   </article>'''
-    extra = [("wifioff", "Offline-first", "Downloaded stages keep the map and your GPS position working for a full day without signal. Details of stays and audio stories need a connection for now."),
+    extra = [("wifioff", "Offline-first", "With Pilgrim Plus, downloaded stages keep the map and your GPS position working for a full day without signal. Details of stays and audio stories need a connection for now."),
              ("sync", "Syncs when you are back", "Posts and stamps go into an outbox and upload automatically when you reconnect."),
              ("battery", "Easy on battery", "A location mode tuned for long walking days. Target: under 15% over 7 hours."),
              ("users", "Crowd updates", "Pilgrims share how busy the trail, albergues and cafés are, with an “updated X ago” label."),
@@ -560,7 +561,7 @@ def routes():
 </div></section>
 <section class="section tight"><div class="wrap"><div class="grid c3">
   <article class="card"><span class="ic">{icon("pin")}</span><h4>Start anywhere</h4><p>Begin in Saint-Jean, Sarria, Porto or any town on the route. Your stages, distances and stays adjust to you.</p></article>
-  <article class="card"><span class="ic blue">{icon("download")}</span><h4>Download stage by stage</h4><p>Only take what you need. Each offline stage pack is about 2–5 MB.</p></article>
+  <article class="card"><span class="ic blue">{icon("download")}</span><h4>Download stage by stage</h4><p>Only take what you need. A typical offline stage pack is about 4 MB.</p></article>
   <article class="card"><span class="ic red">{icon("stamp")}</span><h4>The last 100 km</h4><p>For a Compostela you must walk at least the final 100 km, so plan your start town with that in mind.</p></article>
 </div></div></section>
 <section class="section"><div class="wrap" style="max-width:860px">
@@ -626,7 +627,7 @@ def pricing():
 
 def offline():
     steps = [("Pick your route", "Choose a Camino and the town you start from. CaminoPlus lists your stages."),
-             ("Download over Wi-Fi", "At home or at the albergue, download the next stages. Each pack is about 2–5 MB."),
+             ("Download over Wi-Fi", "At home or at the albergue, download the next stages. A typical pack is about 4 MB."),
              ("Walk without signal", "The map and your GPS position work offline: roads, paths, towns, water, churches and albergues."),
              ("Sync when you're back", "Posts and stamps you made offline upload on their own when you reconnect.")]
     st = "".join(f'<article class="card"><h4>{a}</h4><p>{b}</p></article>' for a, b in steps)
@@ -645,10 +646,10 @@ def offline():
   <div class="stack-lg">
     <p class="eyebrow">Small downloads</p>
     <h2>A whole stage in a few megabytes.</h2>
-    <p class="lead">Stage packs are compact vector maps, not heavy images, so they download quickly even on albergue Wi-Fi and barely touch your phone storage. Stage 1 of the Camino Francés, Saint-Jean-Pied-de-Port to Roncesvalles over the Pyrenees, is about 4.6 MB. More stages are being added.</p>
+    <p class="lead">Stage packs are compact vector maps, not heavy images, so they download quickly even on albergue Wi-Fi and barely touch your phone storage. Stage 1 of the Camino Francés, Saint-Jean-Pied-de-Port to Roncesvalles over the Pyrenees, is about 4.6 MB. Measured over the whole Camino Francés, a typical stage is about 4 MB and most are between 1 and 6 MB; stages through big cities such as Pamplona and Burgos are larger, up to about 11 MB. More stages are being added.</p>
   </div>
   <div class="stat-row">
-    <div class="stat"><b>2–5 MB</b><span>per stage pack</span></div>
+    <div class="stat"><b>~4 MB</b><span>typical stage pack</span></div>
     <div class="stat"><b>4.6 MB</b><span>Saint-Jean → Roncesvalles</span></div>
     <div class="stat"><b>6–8 h</b><span>walking days it is built for</span></div>
     <div class="stat"><b>&lt;15%</b><span>battery target over 7 hours</span></div>
@@ -670,7 +671,7 @@ def offline():
   <p class="muted">Offline downloads are part of <a href="/pricing">Pilgrim Plus</a> ($12 a year).</p>
 </div></div></section>
 {cta()}'''
-    page("offline-maps", "Offline maps", "How CaminoPlus offline maps work: download each Camino stage (about 2–5 MB) and keep the map and your GPS position working without signal.", body, "offline-maps")
+    page("offline-maps", "Offline maps", "How CaminoPlus offline maps work: download each Camino stage (about 4 MB) and keep the map and your GPS position working without signal.", body, "offline-maps")
 
 def faq():
     toc = "".join(f'<li><a href="#{k}">{t}</a></li>' for k, t, _ in FAQ)

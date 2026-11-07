@@ -463,6 +463,20 @@ test('the canonical measure-mode file becomes the golden file, byte for byte', (
   assert.ok(out.endsWith('}\n'));
 });
 
+test('on a generated stage file `quality` goes right after maxzoom, byte for byte where make_stages.py writes it (the committed stage 7)', async () => {
+  // CI runs `make_stages.py --check`, which compares text: a calibrated file must come out of this tool exactly as the generator
+  // would write it. (The tool used to insert quality before render_checks, i.e. after `waypoints`, and CI rejected the result.)
+  const original = await readFile(new URL('../stages/camino-frances-07.json', import.meta.url), 'utf8');
+  const { quality } = JSON.parse(original);
+  assert.ok(quality, 'stage 7 is calibrated in the repository');
+  const start = original.indexOf('  "quality": {');
+  const end = original.indexOf('\n  },\n', start) + '\n  },\n'.length;
+  assert.ok(start > 0 && end > start, 'found the quality member');
+  const stripped = original.slice(0, start) + original.slice(end);
+  assert.ok(!stripped.includes('"quality"'));
+  assert.equal(patchStageText(stripped, { quality, views: [] }), original);
+});
+
 test('nothing to write: the text is returned untouched', () => {
   const text = canonical(goldenCalibratedStage());
   assert.equal(patchStageText(text, { quality: undefined, views: [] }), text);

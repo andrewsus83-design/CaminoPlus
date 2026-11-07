@@ -22,6 +22,21 @@
   "min_route_km": 8.0,
   "buffer_km": 3,
   "maxzoom": 15,
+  "quality": {
+    "min_tiles": 620,
+    "max_tiles": 1680,
+    "min_size_mb": 1.5,
+    "max_size_mb": 4.2,
+    "required_layers": [
+      "building",
+      "place",
+      "poi",
+      "transportation",
+      "transportation_name"
+    ],
+    "max_change_ratio": 1.5,
+    "max_osm_age_days": 45
+  },
   "waypoints": [
     {
       "name": "Nájera",
@@ -67,8 +82,15 @@
         42.41674,
         15
       ],
-      "min_features": {},
-      "min_labels": {}
+      "min_features": {
+        "poi": 70,
+        "transportation": 91,
+        "building": 16
+      },
+      "min_labels": {
+        "place": 1,
+        "peak": 1
+      }
     },
     {
       "name": "Santo Domingo de la Calzada z15",
@@ -77,8 +99,14 @@
         42.44067,
         15
       ],
-      "min_features": {},
-      "min_labels": {}
+      "min_features": {
+        "poi": 136,
+        "transportation": 144,
+        "building": 8
+      },
+      "min_labels": {
+        "place": 1
+      }
     }
   ],
   "generated_from": "catalog/camino-frances/09.json"

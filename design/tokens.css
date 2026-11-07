@@ -121,7 +121,7 @@
   --cp-space-32:  128px;
 
   /* Layout: margins & paddings */
-  --cp-screen-margin:      8px;   /* left/right edge of every mobile screen   */
+  --cp-screen-margin:      16px;  /* left/right edge of every mobile screen (the standard gutter) */
   --cp-screen-top:         16px;  /* below status bar                          */
   --cp-section-gap:        40px;  /* between sections on a screen             */
   --cp-stack-gap:          16px;  /* between items in a list                   */

@@ -22,6 +22,21 @@
   "min_route_km": 8.2,
   "buffer_km": 3,
   "maxzoom": 15,
+  "quality": {
+    "min_tiles": 680,
+    "max_tiles": 1840,
+    "min_size_mb": 3,
+    "max_size_mb": 8.1,
+    "required_layers": [
+      "building",
+      "place",
+      "poi",
+      "transportation",
+      "transportation_name"
+    ],
+    "max_change_ratio": 1.5,
+    "max_osm_age_days": 45
+  },
   "waypoints": [
     {
       "name": "Ponferrada",
@@ -74,8 +89,14 @@
         42.54541,
         15
       ],
-      "min_features": {},
-      "min_labels": {}
+      "min_features": {
+        "poi": 391,
+        "transportation": 402,
+        "building": 14
+      },
+      "min_labels": {
+        "place": 1
+      }
     },
     {
       "name": "Villafranca del Bierzo z15",
@@ -84,8 +105,14 @@
         42.60558,
         15
       ],
-      "min_features": {},
-      "min_labels": {}
+      "min_features": {
+        "poi": 87,
+        "transportation": 131,
+        "building": 13
+      },
+      "min_labels": {
+        "place": 1
+      }
     }
   ],
   "generated_from": "catalog/camino-frances/25.json"

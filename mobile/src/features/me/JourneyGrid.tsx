@@ -1,13 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { FlatList, Image, Modal, Pressable, View, useWindowDimensions } from 'react-native';
+import { FlatList, Image, Modal, PixelRatio, Pressable, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
 import { Post, PostMediaUrl, listPostMediaUrls } from '@/lib/api';
+import { gridMetrics, gridRows } from '@/lib/gridLayout';
 import { c, fonts, radius, layout } from '@/theme';
 
-// My journey: 9:16 tiles in a two-column masonry grid. Tap a tile to open the full-screen
-// viewer, which scrolls vertically one post at a time, like TikTok.
+// My journey: 9:16 tiles in an even two-column grid, edge to edge, square corners, a 1 px line between tiles (the
+// TikTok / Reels profile grid; the maths is in lib/gridLayout.ts). Tap a tile to open the full-screen viewer, which
+// scrolls vertically one post at a time, like TikTok.
 const CARD_COLORS = [
   { bg: c.blue, fg: c.parchment },
   { bg: c.gold, fg: c.blue },
@@ -51,37 +53,33 @@ function PostVisual({ post, media, index, active, small }: { post: Post; media?:
   );
 }
 
-export function JourneyGrid({ posts, margin = layout.screenMargin }: { posts: Post[]; margin?: number }) {
+export function JourneyGrid({ posts, bleed = true, margin = layout.screenMargin }: { posts: Post[]; bleed?: boolean; margin?: number }) {
   const [media, setMedia] = useState<Record<string, PostMediaUrl[]>>({});
   const [openAt, setOpenAt] = useState<number | null>(null);
   const { width } = useWindowDimensions();
-  const gap = 10;
-  const colW = (width - margin * 2 - gap) / 2; // `margin` = the screen's side padding, so the grid fills the width exactly
-  const tileH = colW * (16 / 9);
+  // Edge to edge by default: `margin` is the screen's side padding, which the negative margin below cancels.
+  // Pass bleed={false} to keep the grid inside that padding.
+  const { colW, tileH, line } = gridMetrics(width, { bleed, margin, pixelRatio: PixelRatio.get() });
 
   useEffect(() => {
     const ids = posts.filter((p) => p.media_count > 0).map((p) => p.id);
     listPostMediaUrls(ids).then(setMedia).catch(() => {});
   }, [posts]);
 
-  // Masonry: right column starts half a tile lower so the two columns interlock.
-  const cols = useMemo(() => {
-    const left: number[] = [], right: number[] = [];
-    posts.forEach((_, i) => (i % 2 === 0 ? left : right).push(i));
-    return [left, right];
-  }, [posts]);
+  // Even rows of two tiles. The only space between tiles is `line` (1 px); the page background shows through it.
+  const rows = useMemo(() => gridRows(posts.length), [posts.length]);
 
   return (
     <>
-      <View style={{ flexDirection: 'row', gap }}>
-        {cols.map((col, ci) => (
-          <View key={ci} style={{ flex: 1, gap, marginTop: ci === 1 ? tileH * 0.22 : 0 }}>
-            {col.map((i) => {
+      <View style={{ marginHorizontal: bleed ? -margin : 0, gap: line }}>
+        {rows.map((row, r) => (
+          <View key={r} style={{ flexDirection: 'row', gap: line }}>
+            {row.map((i) => {
               const p = posts[i];
               const first = media[p.id]?.[0];
               const count = Math.max(media[p.id]?.length ?? 0, p.media_count);
               return (
-                <Pressable key={p.id} accessibilityRole="button" accessibilityLabel={`Open post from ${p.place_name ?? 'the Camino'}`} onPress={() => setOpenAt(i)} style={{ height: tileH, borderRadius: radius.lg, overflow: 'hidden', backgroundColor: c.sand200 }}>
+                <Pressable key={p.id} accessibilityRole="button" accessibilityLabel={`Open post from ${p.place_name ?? 'the Camino'}`} onPress={() => setOpenAt(i)} style={{ width: colW, height: tileH, overflow: 'hidden', backgroundColor: c.sand200 }}>
                   <PostVisual post={p} media={first} index={i} active={false} small />
                   {count > 1 && (
                     <View style={{ position: 'absolute', top: 8, right: 8, flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 8, height: 24, borderRadius: radius.pill, backgroundColor: 'rgba(0,0,0,0.45)' }}>
@@ -129,7 +127,7 @@ function Viewer({ posts, media, start, onClose }: { posts: Post[]; media: Record
                 ) : (
                   <PostVisual post={item} media={list[0]} index={index} active={index === cur} />
                 )}
-                <View pointerEvents="none" style={{ position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: 20, paddingTop: 60, paddingBottom: insets.bottom + 28, gap: 6, backgroundColor: 'rgba(0,0,0,0.35)' }}>
+                <View pointerEvents="none" style={{ position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: layout.screenMargin, paddingTop: 60, paddingBottom: insets.bottom + 28, gap: 6, backgroundColor: 'rgba(0,0,0,0.35)' }}>
                   <AppText variant="label" color="#FFFFFF">{[item.place_name, dateOf(item.published_at)].filter(Boolean).join(' · ') || 'On the Camino'}</AppText>
                   {!!item.body && list.length > 0 && <AppText variant="small" color="#FFFFFF" numberOfLines={4}>{item.body}</AppText>}
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>

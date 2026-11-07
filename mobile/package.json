@@ -52,7 +52,7 @@
     "build:dev:ios": "eas build --profile development --platform ios",
     "test:map": "tsc -p tsconfig.maptest.json && node node_modules/.cache/map-test/features/map/__tests__/map.test.js && node node_modules/.cache/map-test/features/map/__tests__/nav.test.js && node node_modules/.cache/map-test/features/map/__tests__/walkstyle.test.js",
     "test:social": "tsc -p tsconfig.socialtest.json && node node_modules/.cache/social-test/features/social/__tests__/social.test.js",
-    "test:lib": "tsc -p tsconfig.libtest.json && node node_modules/.cache/lib-test/lib/__tests__/cryptoPolyfill.test.js",
+    "test:lib": "tsc -p tsconfig.libtest.json && node node_modules/.cache/lib-test/lib/__tests__/cryptoPolyfill.test.js && node node_modules/.cache/lib-test/lib/__tests__/gridLayout.test.js",
     "test": "npm run test:map && npm run test:social && npm run test:lib"
   },
   "private": true

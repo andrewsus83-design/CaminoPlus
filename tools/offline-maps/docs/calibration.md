@@ -38,7 +38,9 @@ so CI failed. They are now 6 and 2, and every floor since comes from a real buil
    Read the table: every number is printed next to the value it came from. Check that no line says `NOT calibrated` and that
    the `warning:` lines make sense (for example a standard layer the pack lacks). Then run it again without `--dry-run`.
 4. **Commit.** `git diff stages/<slug>.json` shows only the `quality` block and the floors; every other byte of the file is
-   as it was. Commit it.
+   as it was. The tool puts `quality` right after `maxzoom`, exactly where `scripts/make_stages.py` writes it, so
+   `python3 scripts/make_stages.py --check` passes on the raw output (a test compares the patcher's output with the committed
+   stage 7 byte for byte). Commit it.
 5. **CI must be green.** The pull request run now enforces the numbers it just produced (band, floors, empty error lists).
    Only a green run on the committed stage file means the stage is calibrated, and only then can it be published.
 

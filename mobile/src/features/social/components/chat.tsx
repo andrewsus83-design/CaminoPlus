@@ -5,7 +5,7 @@ import { ActivityIndicator, Image, Keyboard, Modal, Platform, Pressable, TextInp
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
-import { c, fonts, radius, role } from '@/theme';
+import { c, fonts, layout, radius, role } from '@/theme';
 import { HelpBody, LinkedText, helpSpoken, linkTarget, openUrl } from '../help/bubble';
 import { isHelpMessage } from '../help/logic';
 import { MessageAction, clockTime, deliveryLabel, messageActions, nameColor } from '../logic';
@@ -195,7 +195,7 @@ export function DateChip({ label }: { label: string }) {
 
 export function SystemChip({ entry }: { entry: SystemEntry }) {
   return (
-    <View style={{ alignItems: 'center', marginVertical: 8, paddingHorizontal: 16 }}>
+    <View style={{ alignItems: 'center', marginVertical: 8, paddingHorizontal: layout.screenMargin }}>
       <View style={{ backgroundColor: role.surface, borderWidth: 1, borderColor: role.border, borderRadius: radius.md, paddingHorizontal: 16, paddingVertical: 8, maxWidth: '92%' }}>
         <AppText variant="caption" color={role.text} style={{ letterSpacing: 0, textAlign: 'center', fontSize: 15, lineHeight: 20 }}>{entry.message.body ?? ''}</AppText>
       </View>
@@ -266,7 +266,7 @@ export function Composer({ onSend, onPhoto, reply, onCancelReply, blockedName, o
 
   if (blockedName) {
     return (
-      <View style={{ borderTopWidth: 1, borderTopColor: role.border, backgroundColor: role.bg, paddingHorizontal: 16, paddingTop: 12, paddingBottom: bottom + 4, gap: 10 }}>
+      <View style={{ borderTopWidth: 1, borderTopColor: role.border, backgroundColor: role.bg, paddingHorizontal: layout.screenMargin, paddingTop: 12, paddingBottom: bottom + 4, gap: 10 }}>
         <AppText variant="small" muted style={{ textAlign: 'center' }}>You blocked {blockedName}. Unblock to send messages again.</AppText>
         <Btn label={`Unblock ${blockedName}`} variant="ghost" onPress={onUnblock} loading={unblocking} />
       </View>
@@ -274,7 +274,7 @@ export function Composer({ onSend, onPhoto, reply, onCancelReply, blockedName, o
   }
 
   return (
-    <View style={{ borderTopWidth: 1, borderTopColor: role.border, backgroundColor: role.bg, paddingHorizontal: 10, paddingTop: 8, paddingBottom: bottom }}>
+    <View style={{ borderTopWidth: 1, borderTopColor: role.border, backgroundColor: role.bg, paddingHorizontal: layout.screenMargin, paddingTop: 8, paddingBottom: bottom }}>
       {reply && (
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 8, marginHorizontal: 4, backgroundColor: role.surface, borderRadius: 14, borderWidth: 1, borderColor: role.border, overflow: 'hidden' }}>
           <View style={{ width: 4, alignSelf: 'stretch', backgroundColor: c.gold }} />

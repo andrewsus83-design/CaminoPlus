@@ -6,7 +6,7 @@ import { AccessibilityInfo, Animated, PanResponder, Platform, Pressable, ScrollV
 import Svg, { Circle, G, Polygon } from 'react-native-svg';
 import { AppText } from '@/components/AppText';
 import { Icon, IconName } from '@/components/Icon';
-import { c, radius, shadowStyle } from '@/theme';
+import { c, layout, radius, shadowStyle } from '@/theme';
 import type { Banner, Card, AheadItem } from './nav';
 import type { PoiKind } from './sampleRoute';
 import { POI_KINDS, kindHex } from './walkLayers';
@@ -307,13 +307,13 @@ export function WalkCard(p: CardProps) {
           </Pressable>
         </View>
 
-        <View style={{ paddingHorizontal: 20 }} accessible accessibilityLabel={`${p.card.time === '--' ? 'Time left unknown' : `${p.card.time} left`}. ${p.card.detail}. ${p.card.stage}`}>
+        <View style={{ paddingHorizontal: layout.screenMargin }} accessible accessibilityLabel={`${p.card.time === '--' ? 'Time left unknown' : `${p.card.time} left`}. ${p.card.detail}. ${p.card.stage}`}>
           <AppText variant="h2" color={t.cardText} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>{p.card.time}</AppText>
           <AppText variant="body" color={t.cardText} numberOfLines={1}>{glue(p.card.detail)}</AppText>
           <AppText variant="small" color={t.cardMuted} numberOfLines={2}>{glue(p.card.stage)}</AppText>
         </View>
 
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 20, paddingTop: 12, paddingBottom: p.bottomInset + 14 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: layout.screenMargin, paddingTop: 12, paddingBottom: p.bottomInset + 14 }}>
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Route details"
@@ -333,7 +333,7 @@ export function WalkCard(p: CardProps) {
         </View>
       </View>
 
-      <ScrollView scrollEnabled={p.expanded} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: p.bottomInset + 24, gap: 10 }}>
+      <ScrollView scrollEnabled={p.expanded} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: layout.screenMargin, paddingBottom: p.bottomInset + 24, gap: 10 }}>
         <AppText variant="mono" color={t.cardMuted} style={{ textTransform: 'uppercase', letterSpacing: 1.2, fontSize: 12 }}>Next on the way</AppText>
         {p.live ? (
           p.next.length ? (

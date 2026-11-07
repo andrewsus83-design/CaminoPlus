@@ -22,6 +22,21 @@
   "min_route_km": 7.2,
   "buffer_km": 3,
   "maxzoom": 15,
+  "quality": {
+    "min_tiles": 830,
+    "max_tiles": 2240,
+    "min_size_mb": 2.6,
+    "max_size_mb": 7.2,
+    "required_layers": [
+      "building",
+      "place",
+      "poi",
+      "transportation",
+      "transportation_name"
+    ],
+    "max_change_ratio": 1.5,
+    "max_osm_age_days": 45
+  },
   "waypoints": [
     {
       "name": "Roncesvalles",
@@ -88,8 +103,14 @@
         43.0094,
         15
       ],
-      "min_features": {},
-      "min_labels": {}
+      "min_features": {
+        "poi": 19,
+        "transportation": 23
+      },
+      "min_labels": {
+        "place": 1,
+        "peak": 1
+      }
     },
     {
       "name": "Zubiri z15",
@@ -98,8 +119,15 @@
         42.93,
         15
       ],
-      "min_features": {},
-      "min_labels": {}
+      "min_features": {
+        "poi": 33,
+        "transportation": 37,
+        "building": 2
+      },
+      "min_labels": {
+        "place": 1,
+        "peak": 1
+      }
     }
   ],
   "generated_from": "catalog/camino-frances/02.json"

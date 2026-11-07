@@ -3,7 +3,7 @@
 import { ReactNode, useEffect, useMemo, useRef } from 'react';
 import { Animated, PanResponder, Pressable, ScrollView, View } from 'react-native';
 import { Icon } from '@/components/Icon';
-import { radius, role, shadowStyle } from '@/theme';
+import { layout, radius, role, shadowStyle } from '@/theme';
 
 type Props = { open: boolean; onOpenChange: (open: boolean) => void; peek: number; full: number; bottom: number; children: ReactNode };
 
@@ -41,7 +41,7 @@ export function BottomSheet({ open, onOpenChange, peek, full, bottom, children }
   return (
     <Animated.View
       style={{
-        position: 'absolute', left: 12, right: 12, bottom, height: full,
+        position: 'absolute', left: layout.screenMargin, right: layout.screenMargin, bottom, height: full,
         borderRadius: radius.lg, backgroundColor: role.surface, ...shadowStyle('lg'),
         transform: [{ translateY: y }],
       }}
