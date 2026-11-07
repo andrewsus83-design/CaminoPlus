@@ -3,6 +3,7 @@
 import { supabase } from './supabase';
 import { assertOnline } from './net';
 import { uuid } from './uuid';
+import { parseEngagementRows, withEngagement, type PostEngagement } from './postEngagement';
 
 export type Profile = {
   id: string; username: string; display_name: string | null; bio: string | null; avatar_url: string | null;
@@ -14,7 +15,8 @@ export type Stage = { id: string; stage_number: number; name: string; distance_k
 export type Journey = { id: string; route_id: string; start_stage_id: string | null; status: string; walked_km: number; planned_start_date: string | null; route: { name: string; short_name: string | null; slug: string } | null; start_stage: { stage_number: number; name: string } | null };
 export type JourneyDay = { id: string; day_number: number; planned_date: string | null; from_name: string | null; to_name: string | null; planned_distance_km: number | null; actual_distance_km: number | null; started_at: string | null; finished_at: string | null; notes: string | null; status: string; stage: { name: string } | null };
 export type Stamp = { id: string; place_name: string | null; stamped_at: string; verified: boolean; method: string };
-export type Post = { id: string; body: string | null; place_name: string | null; published_at: string | null; like_count: number; comment_count: number; media_count: number; health_summary: { km?: number } | null };
+// save_count and share_count are optional: they are read by a separate query (listPostEngagement) and are missing until the database has them.
+export type Post = { id: string; body: string | null; place_name: string | null; published_at: string | null; like_count: number; comment_count: number; media_count: number; health_summary: { km?: number } | null; save_count?: number; share_count?: number };
 
 const PROFILE_COLS = 'id, username, display_name, bio, avatar_url, xp, level, followers_count, following_count, friends_count, posts_count, stamps_count, km_walked, is_private';
 
@@ -108,7 +110,7 @@ export async function listMyStamps(userId: string) {
 
 export async function listMyPosts(userId: string) {
   await assertOnline();
-  return must(
+  const posts = must(
     await supabase
       .from('posts')
       .select('id, body, place_name, published_at, like_count, comment_count, media_count, health_summary')
@@ -119,6 +121,24 @@ export async function listMyPosts(userId: string) {
       .order('published_at', { ascending: false })
       .limit(30),
   ) as Post[];
+  return withEngagement(posts, await listPostEngagement(posts.map((p) => p.id)));
+}
+
+/**
+ * Bookmark and share counts of posts (supabase/migrations/20261108010000_post_engagement_counters.sql).
+ * They are read here, in a query of their own, and NOT in the posts query above: until that migration is applied
+ * to the live database the two columns do not exist, and naming a missing column fails the whole query (that is how
+ * profiles.friends_count once broke sign-in). This never throws. It answers null when the counts cannot be read,
+ * and the posts then stay as they are: the viewer shows only the likes and comments it knows and hides the rest.
+ */
+export async function listPostEngagement(postIds: string[]): Promise<Map<string, PostEngagement> | null> {
+  if (postIds.length === 0) return new Map();
+  try {
+    const res = await supabase.from('posts').select('id, save_count, share_count').in('id', postIds);
+    return res.error ? null : parseEngagementRows(res.data);
+  } catch {
+    return null;
+  }
 }
 
 /** Text journal post (photos come with the media upload flow). Followers only by default. */
