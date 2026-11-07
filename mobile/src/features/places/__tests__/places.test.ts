@@ -704,4 +704,22 @@ check('the stage the Stays tab lists: the next day of the plan, then what is sav
   assert.deepEqual(chooseMyStage({ journeyId: null, fetched: PLAN, cached: PLAN, start: START }), { stage: null, cache: 'keep' });
 });
 
+/* ------------------------------------------------------------------ the screens use all of this */
+
+check('the licences screen credits OpenStreetMap and names the ODbL', () => {
+  const s = read('app/licences.tsx');
+  assert.match(s, /name: 'OpenStreetMap', what: '[^']*places[^']*', licence: 'ODbL 1\.0, © OpenStreetMap contributors', url: 'https:\/\/www\.openstreetmap\.org\/copyright'/, 'the entry says the places of the app come from OpenStreetMap too, under the ODbL');
+  assert.match(s, /Map data and places © OpenStreetMap contributors/, 'and so does the line at the bottom');
+});
+
+check('the Stays tab and the stay page read places through the hooks, never from the bundled samples directly', () => {
+  const stays = read('app/(tabs)/stays.tsx');
+  assert.match(stays, /useStageStays\(/);
+  assert.match(stays, /useMyStage\(/);
+  assert.doesNotMatch(stays, /from '@\/data\/mock'/, 'the Stays tab must not import the samples itself');
+  const page = read('app/stay/[id].tsx');
+  assert.match(page, /useStageStays\(/);
+  assert.match(page, /<AppText[^>]*>\{OSM_CREDIT\}<\/AppText>/, 'the stay page draws the credit');
+});
+
 console.log(`${n} of ${n} passed`);
