@@ -1,6 +1,8 @@
 // SAMPLE data behind the preview screens (Stays, stay detail, Discover, business tools). Those screens
 // say "Sample" on screen (components/SampleNotice) and never share this content outside the app.
-// Replaced by Supabase data (search_stays, posts) as each screen goes live.
+// The stays are now the FALLBACK: the Stays tab and the stay page read the real places of the stage from Supabase
+// (src/features/places, rpc list_stage_stays) and show these only while the database has none for it.
+// Replaced by Supabase data (posts) as the other screens go live.
 export const tints = ['#E9C987', '#9DB4CC', '#BFD0C4', '#D7C6E0', '#F2D8B6', '#C9A48A'];
 
 export type Stay = { id: string; name: string; kind: 'Albergue' | 'Hotel' | 'Café'; town: string; price: number | null; rating: number; reviews: number; distanceKm: number; label: string; tint: string; verifiedOwner?: boolean };

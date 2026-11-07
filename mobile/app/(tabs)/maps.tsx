@@ -7,8 +7,9 @@ import { Icon } from '@/components/Icon';
 import { Pill } from '@/components/Pill';
 import { ModalSheet } from '@/features/map/ModalSheet';
 import { setTabBarHidden } from '@/lib/tabBarVisibility';
-import { GpsMode, MapLayerMode, MapView, PRECISE_TIMEOUT_MS, ROUTE_NAME, nativeMapAvailable, pois, routeLengthKm } from '@/features/map';
+import { GpsMode, MapLayerMode, MapView, PRECISE_TIMEOUT_MS, ROUTE_NAME, nativeMapAvailable, routeLengthKm } from '@/features/map';
 import type { PoiKind } from '@/features/map';
+import { OSM_CREDIT, type PlacePin } from '@/features/places';
 import { HelpBellButton, HelpSheet } from '@/features/social';
 import { useAuth } from '@/lib/auth';
 import { MapIcon } from '@/features/map/MapIcon';
@@ -79,7 +80,8 @@ export default function Maps() {
     return () => clearTimeout(t);
   }, [gpsMode]);
 
-  const poi = pois.find((p) => p.id === selId);
+  // The pins come from the stage's real places, or are the bundled sample pins when the database has none for it.
+  const poi = m.pins.find((p) => p.id === selId);
   const onSelectPoi = useCallback((id: string | undefined) => {
     setSelId(id);
     if (id) setSheetOpen(false);
@@ -158,6 +160,7 @@ export default function Maps() {
           focus={m.walker.at}
           recenterKey={recenterKey}
           zoomCmd={zoomCmd}
+          pois={m.pins}
           selectedPoiId={selId}
           onSelectPoi={onSelectPoi}
           saver={gpsMode !== 'precise'}
@@ -359,6 +362,8 @@ export default function Maps() {
               {m.walkedKm} of {routeLengthKm} km walked · stage {m.stage.number} · {m.nextTownKm} km to {m.stage.name.split('→')[1]?.trim()}
             </AppText>
             <AppText variant="caption" muted>Preview data: the first three stages are hand-placed and the rest is drawn as straight lines between towns. Do not navigate with it yet.</AppText>
+            {m.pinSource === 'sample' && m.pins.length > 0 && <AppText variant="caption" muted>The pins on the map are examples.</AppText>}
+            {m.pinSource !== 'sample' && <AppText variant="caption" muted>{`The pins on the map are places from OpenStreetMap${m.pinSource === 'cache' ? ', saved on this phone' : ''}. Tap one to see how far it was checked. ${OSM_CREDIT}.`}</AppText>}
             <View style={{ marginTop: 12, gap: 10 }}>
               <AppText variant="label">This stage</AppText>
               <AppText variant="small" muted>{m.stage.name} · {m.stage.distanceKm} km</AppText>
@@ -371,7 +376,7 @@ export default function Maps() {
         )}
       </ModalSheet>}
 
-      {poi && <PoiPopup poi={poi} bottom={(walk ? insets.bottom : sheetBottom) + 12} onClose={() => onSelectPoi(undefined)} />}
+      {poi && <PoiPopup poi={poi} bottom={(walk ? insets.bottom : sheetBottom) + 12} onClose={() => onSelectPoi(undefined)} onOpenStay={(id) => router.push(`/stay/${id}?stage=${m.stage.id}`)} />}
 
       {/* Help bell: private alert to the friends and groups the pilgrim picks, plus a one-tap 112 call. Only a REAL fix is passed on, never the sample position. */}
       <HelpSheet
@@ -409,13 +414,13 @@ function StatusPill({ status, online, onPress }: { status: ReturnType<typeof use
   return null;
 }
 
-/** Pop-up card that appears over the map when a place is tapped. */
-function PoiPopup({ poi, bottom, onClose }: { poi: (typeof pois)[number]; bottom: number; onClose: () => void }) {
+/** Pop-up card that appears over the map when a place is tapped. A real place says where it came from; a sample pin says it is a preview. */
+function PoiPopup({ poi, bottom, onClose, onOpenStay }: { poi: PlacePin; bottom: number; onClose: () => void; onOpenStay: (stayId: string) => void }) {
   return (
     <View style={{ position: 'absolute', left: layout.screenMargin, right: layout.screenMargin, bottom, borderRadius: radius.lg, backgroundColor: role.surface, padding: 20, gap: 10, ...shadowStyle('lg') }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
         <View style={{ paddingHorizontal: 12, height: 30, borderRadius: radius.pill, backgroundColor: c.goldWash, justifyContent: 'center' }}>
-          <AppText variant="caption" color={c.goldInk}>{KIND_LABEL[poi.kind]}{poi.xp ? ` · +${poi.xp} XP` : ''}</AppText>
+          <AppText variant="caption" color={c.goldInk}>{poi.label ?? KIND_LABEL[poi.kind]}{poi.xp ? ` · +${poi.xp} XP` : ''}</AppText>
         </View>
         <Pressable accessibilityRole="button" accessibilityLabel="Close" onPress={onClose} hitSlop={14} style={{ width: 40, height: 40, alignItems: 'center', justifyContent: 'center' }}>
           <Icon name="close" color={role.muted} size={24} />
@@ -423,11 +428,14 @@ function PoiPopup({ poi, bottom, onClose }: { poi: (typeof pois)[number]; bottom
       </View>
       <AppText variant="h4">{poi.name}</AppText>
       <AppText variant="small" muted>{poi.blurb}</AppText>
-      <AppText variant="caption" muted>Preview pin. Opening hours, beds and water can change: check locally.</AppText>
+      <AppText variant="caption" muted>
+        {poi.sample ? 'Preview pin.' : `${poi.sourceLine}${poi.osmUrl ? ` · ${OSM_CREDIT}` : ''}.`} Opening hours, beds and water can change: check locally.
+      </AppText>
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 6 }}>
         {poi.audioMin ? <Pill label={`Play story · ${poi.audioMin} min`} onPress={() => Alert.alert('Audio stories', 'Coming in the next build.')} /> : null}
         {poi.kind === 'quest' ? <Pill variant="gold" label="Start quest" onPress={() => Alert.alert('Quests', 'Coming in the next build.')} /> : null}
-        <Pill variant="ghost" label="Save" onPress={() => Alert.alert('Saved', 'Saved to your plan (sample).')} />
+        {poi.sample ? <Pill variant="ghost" label="Save" onPress={() => Alert.alert('Saved', 'Saved to your plan (sample).')} /> : null}
+        {poi.stayId ? <Pill label="See the stay" onPress={() => onOpenStay(poi.stayId as string)} /> : null}
       </View>
     </View>
   );

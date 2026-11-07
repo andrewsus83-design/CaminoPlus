@@ -12,7 +12,7 @@ import { Camera, GeoJSONSource, Images, Layer, Map, type CameraRef, type LayerPr
 import { layout } from '@/theme';
 import { onlineTilesUrl } from './config';
 import { normDeg } from './nav';
-import { pois, routeBounds, towns } from './sampleRoute';
+import { routeBounds, towns } from './sampleRoute';
 import { buildStyle, firstLabelLayerId, type TileSource } from './style';
 import type { MapViewProps } from './types';
 import {
@@ -30,10 +30,6 @@ const IMAGES = {
   [IMAGE.sample]: require('../../../assets/map/puck-sample.png'),
 };
 
-const poiData: GeoJSON.FeatureCollection = {
-  type: 'FeatureCollection',
-  features: pois.map((p) => ({ type: 'Feature', id: p.id, properties: { id: p.id, kind: p.kind, name: p.name }, geometry: { type: 'Point', coordinates: p.at } })),
-};
 const townData: GeoJSON.FeatureCollection = {
   type: 'FeatureCollection',
   features: towns.map((t) => ({ type: 'Feature', properties: { name: t.name, major: !!t.major }, geometry: { type: 'Point', coordinates: t.at } })),
@@ -182,6 +178,13 @@ function LiveMapImpl(p: MapViewProps) {
   /* ---------------------------------------------------------------- overlay data and layers */
 
   const selected = p.selectedPoiId ?? '';
+  const poiData = useMemo<GeoJSON.FeatureCollection>(
+    () => ({
+      type: 'FeatureCollection',
+      features: p.pois.map((q) => ({ type: 'Feature', id: q.id, properties: { id: q.id, kind: q.kind, name: q.name }, geometry: { type: 'Point', coordinates: q.at } })),
+    }),
+    [p.pois],
+  );
   const remainingData = useMemo(() => lineFeature(p.remaining), [p.remaining]);
   const doneData = useMemo(() => lineFeature(p.done), [p.done]);
   const aheadData = useMemo(() => lineFeature(p.ahead ?? []), [p.ahead]);

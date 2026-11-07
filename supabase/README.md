@@ -32,6 +32,8 @@ supabase/
     ..._post_saves_visibility.sql       bookmarks need a post you can see, and are never updated
     ..._osm_import_keys.sql     a full unique key on (osm_type, osm_id) for pois and stays, for the OSM importer's upsert
                                 (a no-op where the first migrations already made it)
+    ..._stage_places.sql        list_stage_stays() / list_stage_pois(): the places of a stage, with lat and lng as numbers
+                                (Stays tab, stay page, map pins)
   functions/               Deno edge functions: offline-pack-url (signed pack links), delete-account
   seed.sql                 reference data + a small Camino Frances sample
   dev/validate.sh          applies everything to a throwaway local Postgres, runs every dev/*smoke*.sql
@@ -142,6 +144,16 @@ erDiagram
 - Filters map to columns: category, `rating_avg`, `price_from`, `labels` (GIN index), distance (PostGIS),
   favourites/bookmarks (`favorites.list`). One call does it all: `rpc('search_stays', {...})`.
 - Ratings, price range and favourite counts are kept up to date by triggers.
+- **The app reads the stays of a stage with `rpc('list_stage_stays', { p_stage })`** (migration `20261111000000_stage_places.sql`,
+  tested by `dev/stage_places_smoke.sql`). `location` is a PostGIS geography, which PostgREST sends as hex EWKB that the app
+  cannot read, so the function joins `stage_stays` and `stays` and answers `lat` and `lng` as numbers, in walking order
+  (`km_from_stage_start`, then the shorter `detour_m`), at most 500 rows: name, category, `kind`, the town, contact, hours,
+  address, description, beds, amenities, label slugs, `has_stamp`, `source`, `osm_type` and `osm_id`, `verification_level`
+  with its date and `data_confidence`. It does **not** answer prices, ratings or photos: they are not in OpenStreetMap and
+  the app never shows a made-up one (`stays.price_from` is the lowest of every price point, a coffee included, so it is no
+  price per night either). SECURITY INVOKER, so row level security still decides; anon may call it. It answers nothing for a
+  stage that is not published or was deleted, and skips soft-deleted stays and links. The app keeps a saved copy of each list
+  for when there is no signal, and shows the bundled sample, labelled as one, while the database has no places for the stage.
 
 ### Maps tab
 
@@ -164,6 +176,9 @@ erDiagram
 - **Route-agnostic**: `route_networks` (Camino de Santiago now; Via Francigena or others later) >
   `routes` > `stages`, with `places` and `route_places` (km from start / km to destination for every town).
 - **POIs**: churches, cathedrals, iconic places, fountains, pharmacies... with `has_stamp`, `mass_times`, `story`.
+  The app reads those of a stage with `rpc('list_stage_pois', { p_stage })` (same migration, same rules as
+  `list_stage_stays` above): lat and lng as numbers, `km_from_stage_start`, `detour_m`, hours, `mass_times`, the source
+  and the verification level. `nearby_pois` returns the whole `pois` row, geography included.
 - **Audio stories** per stage or POI with a trigger radius for auto-play. Files are on Cloudflare R2.
 - **Offline packs**: manifest of downloadable files per route or stage (`pmtiles`, `sqlite`, audio zip),
   with version, size and sha256 so the app can download in stages and update only what changed.

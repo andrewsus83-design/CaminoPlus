@@ -8,6 +8,9 @@ Postgres that already has the migrations applied:
     followed one level at a time: `route:routes(name)` or `stages!journeys_start_stage_id_fkey(name)`)
   - the keys of an `.insert({...})` / `.update({...})` / `.upsert({...})` object literal are columns
   - every `.rpc('name', {args})` and every `/rest/v1/rpc/name` call exists with those argument names
+  - every column the app reads from a function that returns a table is one the function returns: the app lists them in
+    a `RPC_COLUMNS = { function_name: ['column', ...] } as const` constant (mobile/src/features/places/api.ts), and
+    those lists are compared with the OUT / TABLE columns of the function in `public`
   - every `.storage.from('bucket')` bucket exists, every `functions/v1/<name>` / `functions.invoke('<name>')`
     function has a folder under supabase/functions
 
@@ -113,12 +116,17 @@ def main():
     for t, c, ref in psql(args, "select cl.relname, a.attname, rf.relname from pg_constraint k join pg_class cl on cl.oid=k.conrelid join pg_class rf on rf.oid=k.confrelid join pg_attribute a on a.attrelid=k.conrelid and a.attnum = any(k.conkey) where k.contype='f' and cl.relnamespace='public'::regnamespace"):
         fk_cols[(t, c)] = ref
     funcs = {}
-    for name, argnames in psql(args, "select p.proname, coalesce(array_to_string(p.proargnames, ','), '') from pg_proc p where p.pronamespace='public'::regnamespace"):
+    # only the arguments a caller can pass: not the OUT / TABLE columns of a function that returns a table (proargnames lists those too)
+    for name, argnames in psql(args, "select p.proname, coalesce((select string_agg(t.n, ',') from unnest(p.proargnames, p.proargmodes) as t(n, m) where t.m is null or t.m in ('i', 'b', 'v')), '') from pg_proc p where p.pronamespace='public'::regnamespace"):
         funcs.setdefault(name, []).append(set(a for a in argnames.split(",") if a))
+    # what a function returns, per overload: the columns of `returns table (...)` and the OUT parameters
+    rpc_out = {}
+    for name, outs in psql(args, "select p.proname, coalesce((select string_agg(t.n, ',') from unnest(p.proargnames, p.proargmodes) as t(n, m) where t.m in ('t', 'o')), '') from pg_proc p where p.pronamespace='public'::regnamespace"):
+        rpc_out.setdefault(name, []).append(set(c for c in outs.split(",") if c))
     buckets = {r[0] for r in psql(args, "select id from storage.buckets")}
     fn_dirs = {p.name for p in (ROOT / "supabase" / "functions").iterdir() if p.is_dir()}
 
-    problems, checked = [], {"tables": 0, "columns": 0, "rpcs": 0, "buckets": 0, "functions": 0}
+    problems, checked = [], {"tables": 0, "columns": 0, "rpcs": 0, "rpc columns": 0, "buckets": 0, "functions": 0}
 
     def check_select(table, sel, where, depth=0):
         if table not in cols:
@@ -178,6 +186,9 @@ def main():
             check_rpc(problems, checked, funcs, f"{rel}:{line_of(m.start())}", name, [k for k in re.findall(r"([A-Za-z_][A-Za-z0-9_]*)\s*:", body)])
         for m in re.finditer(r"""(?:rpc/)([a-z_]+)['"`]\s*,\s*\{([^}]*)\}""", text):
             check_rpc(problems, checked, funcs, f"{rel}:{line_of(m.start())}", m.group(1), re.findall(r"([A-Za-z_][A-Za-z0-9_]*)\s*:", m.group(2)))
+        for m in re.finditer(r"RPC_COLUMNS\s*=\s*\{(.*?)\}\s*as const", text, re.S):
+            for fn, body in re.findall(r"([a-z_]+)\s*:\s*\[(.*?)\]", m.group(1), re.S):
+                check_rpc_columns(problems, checked, rpc_out, f"{rel}:{line_of(m.start())}", fn, re.findall(r"'([a-z_]+)'", body))
         for m in re.finditer(r"storage\s*\.from\(\s*'([a-z-]+)'\s*\)", text):
             checked["buckets"] += 1
             if m.group(1) not in buckets:
@@ -204,6 +215,20 @@ def check_rpc(problems, checked, funcs, where, name, keys):
         return
     if keys and not any(set(keys) <= sig for sig in funcs[name]):
         problems.append(f"{where}: rpc '{name}' has no signature with arguments {sorted(keys)} (has {[sorted(s) for s in funcs[name]]})")
+
+
+def check_rpc_columns(problems, checked, rpc_out, where, name, columns):
+    if name not in rpc_out:
+        problems.append(f"{where}: RPC_COLUMNS names function '{name}' but it does not exist in schema public")
+        return
+    if not columns:
+        problems.append(f"{where}: RPC_COLUMNS lists no columns for '{name}'")
+        return
+    checked["rpc columns"] += len(columns)
+    if not any(set(columns) <= out for out in rpc_out[name]):
+        have = sorted(set().union(*rpc_out[name]))
+        missing = sorted(set(columns) - set().union(*rpc_out[name]))
+        problems.append(f"{where}: the app reads column(s) {missing} from rpc '{name}' but it returns only {have}")
 
 
 if __name__ == "__main__":
