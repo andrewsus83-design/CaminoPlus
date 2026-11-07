@@ -5,7 +5,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
 import { Card } from '@/components/ui';
-import { socialApi, useFriendsData, useNow, usePilgrimSearch, useUnreadTotals } from '@/features/social';
+import type { Who } from '@/features/social';
+import { refreshUnreadTotals, socialApi, useFriendsData, useNow, usePilgrimSearch, useSafety, useUnreadTotals } from '@/features/social';
 import { useDialogs } from '@/features/social/components/dialogs';
 import { Btn, RoundBtn, ScreenHeader, SearchField, SegmentedTabs } from '@/features/social/components/primitives';
 import { PersonRow } from '@/features/social/components/rows';
@@ -30,7 +31,9 @@ export default function FriendsScreen() {
   const now = useNow();
   const totals = useUnreadTotals();
   const data = useFriendsData();
-  const { confirm, menu, toast, host } = useDialogs();
+  const dialogs = useDialogs();
+  const { confirm, menu, toast, host } = dialogs;
+  const safety = useSafety(dialogs);
   const [tab, setTab] = useState<FriendsTab>(parseTab(params.tab));
   useEffect(() => { setTab(parseTab(params.tab)); }, [params.tab]);
   const [query, setQuery] = useState('');
@@ -55,24 +58,46 @@ export default function FriendsScreen() {
 
   const say = async (job: Promise<string | null>, ok: string) => { const err = await job; toast(err ?? ok); };
 
+  // Blocking ends a friendship or a request on the server, so the lists follow at once: the person leaves the friends,
+  // the requests (and the badge) and the search results.
+  const blockPerson = async (who: Who) => {
+    if (!(await safety.block(who))) return;
+    search.hide(who.id);
+    await data.reload();
+    void refreshUnreadTotals();
+  };
+
   const friendMenu = async (f: Friend) => {
     const name = personName(f);
     const choice = await menu({
       title: name,
       options: [
         { key: 'unfriend', label: `Unfriend ${name}`, icon: 'close', destructive: true },
+        { key: 'report', label: `Report ${name}`, icon: 'flag', destructive: true },
         { key: 'block', label: `Block ${name}`, icon: 'block', destructive: true },
       ],
     });
     if (choice === 'unfriend') {
       const ok = await confirm({ title: `Unfriend ${name}?`, message: 'You will stop seeing each other\'s friends-only posts and cannot chat until you are friends again.', confirmLabel: 'Unfriend', destructive: true, icon: 'close' });
       if (ok) await say(data.unfriend(f.id), `${name} is no longer your friend.`);
+    } else if (choice === 'report') {
+      await safety.reportPerson({ id: f.id, name });
     } else if (choice === 'block') {
-      const ok = await confirm({ title: `Block ${name}?`, message: `${name} will not be able to message you or find you in search, and you will stop being friends. You can unblock them any time.`, confirmLabel: 'Block', destructive: true, icon: 'block' });
-      if (ok) {
-        try { await socialApi.block(f.id); await data.reload(); toast(`${name} is blocked.`); } catch (e) { toast(friendlyError(e, 'Could not block this pilgrim.')); }
-      }
+      await blockPerson({ id: f.id, name });
     }
+  };
+
+  // Everybody who is not a friend yet (a request, a search result): report or block.
+  const personMenu = async (who: Who) => {
+    const choice = await menu({
+      title: who.name,
+      options: [
+        { key: 'report', label: `Report ${who.name}`, icon: 'flag', destructive: true },
+        { key: 'block', label: `Block ${who.name}`, icon: 'block', destructive: true },
+      ],
+    });
+    if (choice === 'report') await safety.reportPerson(who);
+    else if (choice === 'block') await blockPerson(who);
   };
 
   const sections: Sec[] = useMemo(() => {
@@ -97,9 +122,7 @@ export default function FriendsScreen() {
           trailing={
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
               <RoundBtn icon="chat" label={`Message ${name}`} onPress={() => openChat(f.id)} loading={opening === f.id} />
-              <Pressable accessibilityRole="button" accessibilityLabel={`More options for ${name}`} onPress={() => friendMenu(f)} style={{ width: 48, height: 48, alignItems: 'center', justifyContent: 'center' }}>
-                <Icon name="more" color={role.muted} size={24} />
-              </Pressable>
+              <MoreBtn name={name} onPress={() => friendMenu(f)} />
             </View>
           }
         />
@@ -112,6 +135,7 @@ export default function FriendsScreen() {
       return (
         <PersonRow
           name={name} username={r.username} uri={r.avatar_url} seed={r.id} detail={notificationTime(r.requested_at, now)}
+          trailing={<MoreBtn name={name} onPress={() => personMenu({ id: r.id, name })} />}
           below={
             <View style={{ flexDirection: 'row', gap: 10 }}>
               <View style={{ flex: 1 }}><Btn label="Accept" full loading={busy} onPress={() => say(data.accept(r.id), `You and ${name} are now friends.`)} accessibilityLabel={`Accept ${name}'s friend request`} /></View>
@@ -127,7 +151,12 @@ export default function FriendsScreen() {
       return (
         <PersonRow
           name={name} username={r.username} uri={r.avatar_url} seed={r.id} detail={`Sent ${notificationTime(r.requested_at, now).replace(/^Just now$/, 'just now')}`}
-          trailing={<Btn label="Cancel" size="sm" variant="ghost" loading={data.busy.has(r.id)} onPress={() => say(data.cancel(r.id), 'Request cancelled.')} accessibilityLabel={`Cancel your request to ${name}`} />}
+          trailing={
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
+              <Btn label="Cancel" size="sm" variant="ghost" style={{ paddingHorizontal: 12 }} loading={data.busy.has(r.id)} onPress={() => say(data.cancel(r.id), 'Request cancelled.')} accessibilityLabel={`Cancel your request to ${name}`} />
+              <MoreBtn name={name} onPress={() => personMenu({ id: r.id, name })} />
+            </View>
+          }
         />
       );
     }
@@ -140,10 +169,16 @@ export default function FriendsScreen() {
       return say(search.act(p, act.kind), act.kind === 'add' ? `Request sent to ${name}.` : act.kind === 'cancel' ? 'Request cancelled.' : `You and ${name} are now friends.`);
     };
     const label = { add: `Add ${name} as a friend`, cancel: `Cancel your request to ${name}`, accept: `Accept ${name}'s friend request`, message: `Message ${name}` }[act.kind];
+    // The row has to fit the button, the "more" button and a readable name: no icon in the button, less padding around its label.
     return (
       <PersonRow
         name={name} username={p.username} uri={p.avatar_url} seed={p.id} accessibilityLabel={`${name}${p.username ? `, @${p.username}` : ''}`}
-        trailing={<Btn label={act.label} size="sm" icon={act.kind === 'add' ? 'user-plus' : undefined} variant={act.kind === 'add' ? 'primary' : act.kind === 'accept' ? 'gold' : act.kind === 'message' ? 'soft' : 'ghost'} loading={busy || opening === p.id} onPress={press} accessibilityLabel={label} hint={act.kind === 'cancel' ? 'Tap to cancel the request' : undefined} />}
+        trailing={
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Btn label={act.label} size="sm" style={{ paddingHorizontal: 10 }} variant={act.kind === 'add' ? 'primary' : act.kind === 'accept' ? 'gold' : act.kind === 'message' ? 'soft' : 'ghost'} loading={busy || opening === p.id} onPress={press} accessibilityLabel={label} hint={act.kind === 'cancel' ? 'Tap to cancel the request' : undefined} />
+            <MoreBtn name={name} onPress={() => personMenu({ id: p.id, name })} />
+          </View>
+        }
       />
     );
   };
@@ -207,5 +242,14 @@ export default function FriendsScreen() {
       />
       {host}
     </View>
+  );
+}
+
+/** The three dots at the end of a person's row (48 dp, reads "More options for Ana"). */
+function MoreBtn({ name, onPress }: { name: string; onPress: () => void }) {
+  return (
+    <Pressable accessibilityRole="button" accessibilityLabel={`More options for ${name}`} onPress={onPress} style={{ width: 48, height: 48, alignItems: 'center', justifyContent: 'center' }}>
+      <Icon name="more" color={role.muted} size={24} />
+    </Pressable>
   );
 }

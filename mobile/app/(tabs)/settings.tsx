@@ -69,6 +69,16 @@ export default function Settings() {
         <BusinessCard state={owner.state} name={owner.draft.name} stepsDone={owner.stepsDone} onPress={openCard} />
       </View>
       <View style={{ gap: 8 }}>
+        <SectionLabel>Privacy and safety</SectionLabel>
+        <Card style={{ padding: 4 }}>
+          <Pressable accessibilityRole="button" accessibilityLabel="Blocked pilgrims" onPress={() => router.push('/blocked')} style={{ minHeight: 56, flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: 16 }}>
+            <Icon name="block" color={c.blue} size={22} />
+            <AppText variant="label" style={{ flex: 1 }}>Blocked pilgrims</AppText>
+            <Icon name="chevron" color={c.blue} size={20} />
+          </Pressable>
+        </Card>
+      </View>
+      <View style={{ gap: 8 }}>
         <SectionLabel>Support</SectionLabel>
         <Card style={{ padding: 4 }}>
           {[

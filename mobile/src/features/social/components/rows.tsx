@@ -91,9 +91,10 @@ const KINDS: Record<string, { icon: IconName; bg: string; fg: string }> = {
 type NotificationRowProps = {
   n: NotificationItem; now: number; request: RequestState | null; busy: boolean;
   onPress: () => void; onAccept: () => void; onDecline: () => void; onMessage: () => void;
+  onLongPress?: () => void; // hold the row: report or block the pilgrim behind it (and a comment, when it is about one)
 };
 
-export function NotificationRow({ n, now, request, busy, onPress, onAccept, onDecline, onMessage }: NotificationRowProps) {
+export function NotificationRow({ n, now, request, busy, onPress, onAccept, onDecline, onMessage, onLongPress }: NotificationRowProps) {
   const kind = KINDS[n.kind] ?? KINDS.system;
   const unread = !n.read_at;
   const { name, text, detail } = notificationHeadline(n);
@@ -101,7 +102,13 @@ export function NotificationRow({ n, now, request, busy, onPress, onAccept, onDe
   const actor = n.actor;
   const label = [`${name}${text}`, detail, when, unread ? 'unread' : null].filter(Boolean).join('. ');
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'flex-start', gap: 14, paddingHorizontal: layout.screenMargin, paddingVertical: 14, backgroundColor: pressed ? c.sand200 : unread ? c.goldWash : 'transparent' })}>
+    <Pressable
+      accessibilityRole="button" accessibilityLabel={label} accessibilityHint={onLongPress ? 'Hold for more options' : undefined}
+      accessibilityActions={onLongPress ? [{ name: 'more', label: 'Report or block' }] : undefined}
+      onAccessibilityAction={onLongPress ? (e) => { if (e.nativeEvent.actionName === 'more') onLongPress(); } : undefined}
+      onPress={onPress} onLongPress={onLongPress} delayLongPress={380}
+      style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'flex-start', gap: 14, paddingHorizontal: layout.screenMargin, paddingVertical: 14, backgroundColor: pressed ? c.sand200 : unread ? c.goldWash : 'transparent' })}
+    >
       <View style={{ width: 52, height: 52 }}>
         {actor
           ? <PilgrimAvatar name={personName(actor)} uri={actor.avatar_url} seed={actor.id} size={52} />
