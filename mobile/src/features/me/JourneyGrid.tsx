@@ -7,6 +7,7 @@ import { Post, PostMediaUrl, listPostMediaUrls } from '@/lib/api';
 import { gridMetrics, gridRows } from '@/lib/gridLayout';
 import { SAMPLE_VIEWER_LABEL } from '@/lib/sampleJourney';
 import { c, fonts, radius, layout } from '@/theme';
+import { EngagementRail } from './EngagementRail';
 
 // My journey: 9:16 tiles in an even two-column grid, edge to edge, square corners, a 1 px line between tiles (the
 // TikTok / Reels profile grid; the maths is in lib/gridLayout.ts). Tap a tile to open the full-screen viewer, which
@@ -154,15 +155,14 @@ function Viewer({ posts, media, start, onClose, sampleLabel }: { posts: Post[]; 
                 ) : (
                   <PostVisual post={item} media={list[0]} index={index} active={index === cur} />
                 )}
-                <View pointerEvents="none" style={{ position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: layout.screenMargin, paddingTop: 60, paddingBottom: insets.bottom + 28, gap: 6, backgroundColor: 'rgba(0,0,0,0.35)' }}>
-                  {!!sampleLabel && <AppText variant="caption" color={c.goldSoft} style={{ textTransform: 'uppercase', letterSpacing: 1 }}>{sampleLabel}</AppText>}
-                  <AppText variant="label" color="#FFFFFF">{[item.place_name, dateOf(item.published_at)].filter(Boolean).join(' · ') || 'On the Camino'}</AppText>
-                  {!!item.body && list.length > 0 && <AppText variant="small" color="#FFFFFF" numberOfLines={4}>{item.body}</AppText>}
-                  {!sampleLabel && <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                    <Icon name="heart" color={c.red} size={18} filled />
-                    <AppText variant="caption" color="#FFFFFF">{item.like_count}</AppText>
-                    {list.length > 1 && <AppText variant="caption" color="#FFFFFF" style={{ marginLeft: 12 }}>Swipe sideways for {list.length} slides</AppText>}
-                  </View>}
+                <View pointerEvents="none" style={{ position: 'absolute', left: 0, right: 0, bottom: 0 }}>
+                  {!sampleLabel && <EngagementRail post={item} />}
+                  <View style={{ paddingHorizontal: layout.screenMargin, paddingTop: 60, paddingBottom: insets.bottom + 28, gap: 6, backgroundColor: 'rgba(0,0,0,0.35)' }}>
+                    {!!sampleLabel && <AppText variant="caption" color={c.goldSoft} style={{ textTransform: 'uppercase', letterSpacing: 1 }}>{sampleLabel}</AppText>}
+                    <AppText variant="label" color="#FFFFFF">{[item.place_name, dateOf(item.published_at)].filter(Boolean).join(' · ') || 'On the Camino'}</AppText>
+                    {!!item.body && list.length > 0 && <AppText variant="small" color="#FFFFFF" numberOfLines={4}>{item.body}</AppText>}
+                    {list.length > 1 && <AppText variant="caption" color="#FFFFFF">Swipe sideways for {list.length} slides</AppText>}
+                  </View>
                 </View>
               </View>
             );
