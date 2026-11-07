@@ -1,0 +1,49 @@
+{
+  "n": 5,
+  "name": "Hospital de Bruma to Sigüeiro",
+  "from": {
+    "name": "Hospital de Bruma",
+    "lat": 43.15127,
+    "lng": -8.36423,
+    "source": "nominatim way/133668418 tourism=hostel (Albergue de peregrinos do Hospital de Bruma)"
+  },
+  "to": {
+    "name": "Sigüeiro",
+    "lat": 42.96879,
+    "lng": -8.44175,
+    "source": "nominatim node/836758500 place=town wikidata=Q20549795"
+  },
+  "via": [
+    {
+      "name": "Cabeza de Lobo",
+      "lat": 43.129,
+      "lng": -8.37773,
+      "source": "nominatim node/3692328788 place=hamlet wikidata=Q12384863"
+    },
+    {
+      "name": "San Paio de Buscás",
+      "lat": 43.09512,
+      "lng": -8.3823,
+      "source": "nominatim way/365835678 amenity=place_of_worship (Igrexa de San Paio de Buscás)"
+    },
+    {
+      "name": "A Calle",
+      "lat": 43.05932,
+      "lng": -8.3806,
+      "source": "nominatim node/3709638598 place=hamlet"
+    },
+    {
+      "name": "Fonte da Santiña",
+      "lat": 43.00847,
+      "lng": -8.41907,
+      "source": "nominatim node/3533427384 amenity=drinking_water"
+    }
+  ],
+  "extracts": [
+    "galicia"
+  ],
+  "coastal": false,
+  "distance_km": null,
+  "distance_source": null,
+  "notes": "Division as in 01.json (six stages). Sources for this stage: caminoingles.gal (site of the Asociación de Concellos do Camiño Inglés) 'Bruma - Sigüeiro' (24.2 km, read 2026-11-07); the Xunta portal caminodesantiago.gal 'Bruma - Sigüeiro' (24.2 km: Bruma-A Calle 11.7 + A Calle-Sigüeiro 12.5); Federación Española de Asociaciones de Amigos del Camino de Santiago (FEAACS), dossier 'Los Caminos de Santiago - Camiño Inglés', April 2024, stage 05 (Común) Bruma-Sigüeiro (25.12 km); the folleto 'De Ferrol a Santiago' (PDF on caminoingles.gal, 2021) splits the stage at the albergue of Poulo (9.881 + 15.238 km), which is not in via. The published lengths are not copied into distance_km, which stays null. The stage is common to the Ferrol and the A Coruña branches. Via: Cabeza de Lobo (the FEAACS names it and its church), San Paio de Buscás (the Romanesque church caminoingles.gal names; the point is the church), A Calle (a stop of the Xunta portal, 11.7 km along the route from the albergue as the portal says) and Fonte da Santiña (5.5 km before Sigüeiro per the FEAACS; an amenity=drinking_water node, not a place). Checked on 2026-11-07 against relation 1102966 from the OSM API: every point is within 0.05 km of the route, which is 24.5 km long between Hospital de Bruma and Sigüeiro and never leaves the lines by more than 0.4 km. coastal is false: the stage is inland (the nearest OSM coastline looked at, the head of the Ría de Betanzos, is 19 km from the start)."
+}

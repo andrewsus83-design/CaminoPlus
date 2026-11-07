@@ -17,6 +17,7 @@
     "src/features/me/__tests__/engagement.test.ts",
     "src/features/me/__tests__/engagementQuery.test.ts",
     "src/features/me/__tests__/postActionsApi.test.ts",
-    "src/features/me/__tests__/plan.test.ts"
+    "src/features/me/__tests__/plan.test.ts",
+    "src/features/me/__tests__/highlights.test.ts"
   ]
 }

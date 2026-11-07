@@ -1,0 +1,24 @@
+{
+  "n": 6,
+  "name": "Sigüeiro to Santiago de Compostela",
+  "from": {
+    "name": "Sigüeiro",
+    "lat": 42.96879,
+    "lng": -8.44175,
+    "source": "nominatim node/836758500 place=town wikidata=Q20549795"
+  },
+  "to": {
+    "name": "Santiago de Compostela",
+    "lat": 42.88042,
+    "lng": -8.54586,
+    "source": "nominatim node/998649870 place=city wikidata=Q23992507"
+  },
+  "via": [],
+  "extracts": [
+    "galicia"
+  ],
+  "coastal": false,
+  "distance_km": null,
+  "distance_source": null,
+  "notes": "Division as in 01.json (six stages). Sources for this stage: caminoingles.gal (site of the Asociación de Concellos do Camiño Inglés) 'Sigüeiro - Santiago de Compostela' (16.5 km, read 2026-11-07); the Xunta portal caminodesantiago.gal 'Sigüeiro - Santiago de Compostela' (16.1 km: Sigüeiro-A Barciela 0.7 + A Barciela-Santiago 15.4); Federación Española de Asociaciones de Amigos del Camino de Santiago (FEAACS), dossier 'Los Caminos de Santiago - Camiño Inglés', April 2024, stage 06 Sigüeiro-Santiago de Compostela (16 km); folleto 'De Ferrol a Santiago' (PDF on caminoingles.gal, 2021: 16.0 km). The published lengths are not copied into distance_km, which stays null. The stage is common to the Ferrol and the A Coruña branches. No via: the route stays within 0.7 km of the straight line. A Sionlla was tried (the bus stop 'A Sionlla (N-550)', node/1021091475, is on the route, but the hamlet node of that name is 3.8 km away, in another parish) and made the fit worse; A Barciela, the Xunta portal's stop 0.7 km after Sigüeiro, was not looked up. Santiago de Compostela is the place=city node in the old town, the same point as the end of Camino Francés stage 33 and 12 m from the end of OSM relation 1102966 at the Obradoiro. Checked on 2026-11-07 against relation 1102966 from the OSM API: from and to are within 0.03 km of the route, which is 16.1 km long between them. coastal is false: the stage is inland."
+}

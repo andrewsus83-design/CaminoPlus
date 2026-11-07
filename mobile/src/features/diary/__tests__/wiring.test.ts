@@ -31,18 +31,63 @@ check('the diary uses no network and no console, and the logic files import noth
   assert.doesNotMatch(read('src/features/diary/store.ts').split('\n').filter((l) => /^import /.test(l)).join('\n'), /localStore/, 'store.ts imports no phone store');
 });
 
-check('the editor saves when the person leaves: on Back, when the screen goes away, and when the app goes to the background', () => {
+check('the editor saves when the screen goes away and when the app goes to the background', () => {
   const hook = read('src/features/diary/useDiary.ts');
   assert.match(hook, /AppState\.addEventListener\('change'/);
   assert.match(hook, /state !== 'active'\) void saver\.flush\(\)/);
   assert.match(hook, /return \(\) => \{ alive\.current = false; void saver\.flush\(\); \}/, 'the saver is flushed when the screen goes away');
   const editor = read('app/diary/[id].tsx');
-  assert.match(editor, /await saver\.flush\(\)/, 'Back writes before it leaves');
   assert.match(editor, /autoFocus=\{!initial\}/, 'a new page opens ready to write');
   assert.match(editor, /router\.canGoBack\(\) \? router\.back\(\) : router\.replace\('\/library'\)/);
   assert.match(editor, /Saved on this phone/);
   assert.match(editor, /Saving…/);
   assert.match(editor, /This page is not here/);
+});
+
+check('every way of leaving the editor goes through one guard while something typed is not safely on the phone: the Back button, the system back, the swipe, the browser back', () => {
+  const src = read('app/diary/[id].tsx');
+  const editor = src.slice(src.indexOf('function PageEditor'));
+  assert.ok(editor.length > 200, 'PageEditor is there');
+  assert.match(src, /import \{[^}]*\busePreventRemove\b[^}]*\} from 'expo-router';/);
+  assert.match(editor, /const disablePrevention = usePreventRemove\(view\.status !== 'saved' && !leaving, \(\{ repeat \}\) => \{/, 'held while a write is pending or the last one failed, and only then');
+  assert.match(editor, /saver\.tryLeave\(\)/, 'it writes first, and says leave or stay');
+  assert.match(editor, /if \(answer !== 'leave' \|\| left\.current\) return;\s*left\.current = true;\s*setLeaving\(true\);\s*repeat\(\);/, 'on leave it lifts the hold and takes the way out that was held, once');
+  assert.match(editor, /<IconButton name="back" label="Back" onPress=\{goBack\} \/>/, 'the Back button is one of the ways out, not a path of its own');
+  assert.doesNotMatch(editor, /await saver\.flush\(\)/, 'no second, different way of leaving');
+  assert.match(editor, /if \(await saver\.discard\(\)\) \{ setLeaving\(true\); disablePrevention\(\); goBack\(\); \}/, 'a deleted page lifts the hold before it goes back');
+  // the hook this relies on comes with the installed expo-router, which blocks the pop of the stack, the Android back and (through
+  // react-native-screens' preventNativeDismiss) the iOS swipe, and hands the blocked action to the callback
+  const exported = read('node_modules/expo-router/build/exports.d.ts');
+  assert.match(exported, /usePreventRemove/);
+  assert.match(read('node_modules/expo-router/build/react-navigation/native-stack/views/NativeStackView.native.js'), /preventNativeDismiss: isRemovalPrevented/);
+});
+
+check('the editor is keyed by the person and the page, so an editor made for one account can never be reused by another', () => {
+  const src = read('app/diary/[id].tsx');
+  assert.match(src, /<PageEditor key=\{`\$\{page\.uid\}:\$\{page\.entry\?\.id \?\? NEW_PAGE\}`\} uid=\{page\.uid\}/);
+  assert.doesNotMatch(src, /<PageEditor key=\{page\.entry/);
+  assert.match(read('src/features/diary/useDiary.ts'), /usePageSaver\(uid: string, initial: DiaryEntry \| null\)/, 'the saver is made once for one uid, which is why the key matters');
+});
+
+check('storage.ts reads strictly, in the same places localStore writes: nothing there is null, anything that cannot be read throws', () => {
+  const storage = read('src/features/diary/storage.ts');
+  const local = read('src/lib/localStore.ts');
+  const get = /async getJSON<T>\(key: string\): Promise<T \| null> \{[\s\S]*?\n  \},/.exec(storage)?.[0] ?? '';
+  assert.ok(get.length > 100, 'the strict getJSON is there');
+  assert.doesNotMatch(get, /\bcatch\b|\.catch\(/, 'no error is swallowed on the way in');
+  assert.match(get, /text === null \? null : \(JSON\.parse\(text\) as T\)/, 'web: missing is null, damaged text throws');
+  assert.match(get, /file\.exists \? \(JSON\.parse\(await file\.text\(\)\) as T\) : null/, 'phone: missing is null, a read or parse error throws');
+  // the same places as localStore.ts: the layout is localStore's, the diary only reads it strictly
+  const safeRule = "const safe = (k: string) => k.replace(/[^A-Za-z0-9._-]/g, '_');";
+  assert.ok(local.includes(safeRule) && storage.includes(safeRule), 'the same file-name rule');
+  assert.ok(local.includes("new Directory(Paths.document, 'kv')") && storage.includes("new Directory(Paths.document, 'kv')"), 'the same folder');
+  assert.ok(local.includes('`${safe(k)}.json`') && storage.includes('`${safe(key)}.json`'), 'the same file name');
+  assert.ok(local.includes('`kv:${key}`') && storage.includes('`kv:${key}`'), 'the same web key');
+  // writes and removals are localStore's own, and the store is made over the strict reader, never over localStore itself
+  assert.match(storage, /setJSON: \(key, value\) => localStore\.setJSON\(key, value\)/);
+  assert.match(storage, /remove: \(key\) => localStore\.remove\(key\)/);
+  assert.match(storage, /createDiaryStore\(strictStorage\)/);
+  assert.doesNotMatch(storage, /createDiaryStore\(localStore\)/);
 });
 
 check('the list and the Library card read again when the screen comes back, so a page written a moment ago shows', () => {

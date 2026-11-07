@@ -1,0 +1,85 @@
+{
+  "slug": "camino-ingles-03",
+  "name": "Pontedeume to Betanzos",
+  "route_slug": "camino-ingles",
+  "stage_number": 3,
+  "route_id": "20000000-0000-0000-0000-000000000006",
+  "stage_id": "40000000-0000-0000-0005-000000000003",
+  "osm_extracts": [
+    "https://download.geofabrik.de/europe/spain/galicia-latest.osm.pbf"
+  ],
+  "search_bbox": [
+    -8.33,
+    43.19,
+    -8.05,
+    43.5
+  ],
+  "coastal": true,
+  "route_name_regex": "camino ingl[eé]s|camiño ingl[eé]s|chemin anglais|english way|caminho ingl[eê]s|ingeles bidea",
+  "route_exclude_regex": "\\b(SL|PR)-[A-Z]{1,3} ?\\d",
+  "fallback_route": "camino-ingles-03.route.geojson",
+  "clip_km": 6,
+  "min_route_km": 6.0,
+  "buffer_km": 3,
+  "maxzoom": 15,
+  "waypoints": [
+    {
+      "name": "Pontedeume",
+      "at": [
+        -8.17188,
+        43.40726
+      ]
+    },
+    {
+      "name": "Miño",
+      "at": [
+        -8.20618,
+        43.34685
+      ]
+    },
+    {
+      "name": "Montecelo",
+      "at": [
+        -8.19709,
+        43.32846
+      ]
+    },
+    {
+      "name": "Tiobre",
+      "at": [
+        -8.20189,
+        43.29349
+      ]
+    },
+    {
+      "name": "Betanzos",
+      "at": [
+        -8.21058,
+        43.27924
+      ]
+    }
+  ],
+  "render_checks": [
+    {
+      "name": "Pontedeume z15",
+      "at": [
+        -8.17188,
+        43.40726,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    },
+    {
+      "name": "Betanzos z15",
+      "at": [
+        -8.21058,
+        43.27924,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    }
+  ],
+  "generated_from": "catalog/camino-ingles/03.json"
+}

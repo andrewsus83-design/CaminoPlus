@@ -60,6 +60,7 @@ CI (`.github/workflows/ci.yml`) runs these on every pull request and every push 
 | Website in sync | `python3 tools/build_web.py /tmp/web-gen` and `diff -r` against `web/` (the generated files); `python3 tools/sync_tokens.py --check` |
 | Python tools | `python -m unittest discover -s tools/poi-audit/tests`, `python -m unittest discover -s tools/tests`, `python3 tools/check_docs_links.py` |
 | Offline map scripts | `cd tools/offline-maps && npm ci && npm test && npm run test:python && npm run test:render-fixture` |
+| Web smoke (every screen of the web export, light and dark, signed in and out, online and offline: nothing may throw) | `cd mobile && npx expo export --platform web --output-dir ../tools/web-smoke/dist/app`, then `cd tools/web-smoke && npm ci && npm test && npm run smoke` (needs Chromium: `npx playwright install chromium`); see `tools/web-smoke/README.md` |
 | Workflows | `pip install actionlint-py && actionlint` |
 
 The two pipelines run on their own schedule: `offline-maps` (monthly pack build and publish, publishing waits for approval in the

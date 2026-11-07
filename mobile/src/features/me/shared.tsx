@@ -4,7 +4,8 @@ import { Icon } from '@/components/Icon';
 import { Card } from '@/components/ui';
 import { c, radius } from '@/theme';
 
-export const norm = (t: string | null | undefined) => (t ?? '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+// norm lives in ./text (no React there, so tests can load it); this keeps `import { norm } from '@/features/me/shared'` working.
+export { norm } from './text';
 
 export function ProgressBar({ value }: { value: number }) {
   return (

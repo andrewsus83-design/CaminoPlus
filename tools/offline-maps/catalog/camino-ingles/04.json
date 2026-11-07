@@ -1,0 +1,49 @@
+{
+  "n": 4,
+  "name": "Betanzos to Hospital de Bruma",
+  "from": {
+    "name": "Betanzos",
+    "lat": 43.27924,
+    "lng": -8.21058,
+    "source": "nominatim node/171484343 place=town wikidata=Q24002656"
+  },
+  "to": {
+    "name": "Hospital de Bruma",
+    "lat": 43.15127,
+    "lng": -8.36423,
+    "source": "nominatim way/133668418 tourism=hostel (Albergue de peregrinos do Hospital de Bruma)"
+  },
+  "via": [
+    {
+      "name": "Cos",
+      "lat": 43.23416,
+      "lng": -8.24488,
+      "source": "nominatim node/13522088525 place=hamlet"
+    },
+    {
+      "name": "Presedo",
+      "lat": 43.20588,
+      "lng": -8.26493,
+      "source": "nominatim way/241983685 amenity=place_of_worship (Igrexa de Santa María de Presedo)"
+    },
+    {
+      "name": "Leiro",
+      "lat": 43.19067,
+      "lng": -8.26692,
+      "source": "nominatim node/3720557221 place=hamlet"
+    },
+    {
+      "name": "As Travesas",
+      "lat": 43.16966,
+      "lng": -8.3508,
+      "source": "nominatim node/3719246004 place=hamlet wikidata=Q61384479"
+    }
+  ],
+  "extracts": [
+    "galicia"
+  ],
+  "coastal": true,
+  "distance_km": null,
+  "distance_source": null,
+  "notes": "Division as in 01.json (six stages). Sources for this stage: caminoingles.gal (site of the Asociación de Concellos do Camiño Inglés) 'Betanzos - Bruma' (24.1 km, read 2026-11-07; it calls the stage end Bruma, and the albergue and the old pilgrims' hospital are at Hospital de Bruma); the Xunta portal caminodesantiago.gal, whose stage 'Miño - Bruma' has the sections Betanzos-Leiro 13.5 and Leiro-Bruma 10.5 km; Federación Española de Asociaciones de Amigos del Camino de Santiago (FEAACS), dossier 'Los Caminos de Santiago - Camiño Inglés', April 2024, stage 04 Betanzos-Bruma (23.51 km); the folleto 'De Ferrol a Santiago' (PDF on caminoingles.gal, 2021) splits the stage at Presedo (12.009 + 11.496 km), and Presedo is in via. The published lengths are not copied into distance_km, which stays null. Hospital de Bruma is the pilgrims' albergue (way/133668418), 0.13 km from the hamlet node OSM calls 'O Hospital' (node/3507681590). Via: Cos, Presedo (the parish church of Santa María; caminoingles.gal puts the Saleta sanctuary 100 m from the route), Leiro (a stop of the Xunta portal; the hamlet node is 0.6 km from the route) and As Travesas, where the A Coruña branch joins. The A Coruña branch is a variant and is not in this catalog, but OSM relation 1102966 holds both branches, so clip_km keeps about 7 km of it north of As Travesas. Checked on 2026-11-07 against relation 1102966 from the OSM API: every point is within 0.6 km of the route, which is 23.95 km long between Betanzos and Hospital de Bruma and never leaves the lines by more than 0.9 km. coastal is true: Betanzos is at the tidal head of the Ría de Betanzos and its OSM coastline is 0.65 km from the first kilometre of the route, so the corridor holds sea."
+}

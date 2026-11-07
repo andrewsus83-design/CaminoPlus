@@ -1,0 +1,43 @@
+{
+  "n": 1,
+  "name": "Ferrol to Neda",
+  "from": {
+    "name": "Ferrol",
+    "lat": 43.47899,
+    "lng": -8.2428,
+    "source": "nominatim node/166114645 place=suburb wikidata=Q12388458 (Ferrol Vello, the old town where the Camino starts at the Curuxeiras dársena)"
+  },
+  "to": {
+    "name": "Neda",
+    "lat": 43.50028,
+    "lng": -8.15825,
+    "source": "nominatim node/136797204 place=village wikidata=Q12393870"
+  },
+  "via": [
+    {
+      "name": "Caranza",
+      "lat": 43.48074,
+      "lng": -8.20436,
+      "source": "nominatim node/166114675 place=suburb wikidata=Q12385215"
+    },
+    {
+      "name": "San Martiño de Xuvia",
+      "lat": 43.49797,
+      "lng": -8.17428,
+      "source": "nominatim way/34054843 amenity=place_of_worship wikidata=Q3394492 (Mosteiro de San Martiño de Xuvia, O Couto)"
+    },
+    {
+      "name": "Xuvia",
+      "lat": 43.51615,
+      "lng": -8.15812,
+      "source": "nominatim node/181290879 place=suburb wikidata=Q12402977"
+    }
+  ],
+  "extracts": [
+    "galicia"
+  ],
+  "coastal": true,
+  "distance_km": null,
+  "distance_source": null,
+  "notes": "Division: six stages, as on caminoingles.gal (the site of the Asociación de Concellos do Camiño Inglés, stage pages read 2026-11-07) and in the FEAACS dossier below. They are the five stages of the Xunta de Galicia portal caminodesantiago.gal (read 2026-11-07: Ferrol-Neda 15.4, Neda-Miño 22.1, Miño-Bruma 34.7, Bruma-Sigüeiro 24.2, Sigüeiro-Santiago 16.1 km) with its two long ones split at Pontedeume and Betanzos, which that portal lists as stops on the same legs. Some commercial guides (viajecaminodesantiago.com: five stages, Ferrol to Pontedeume 28.9 km in one) merge stages 1 and 2: not used. Sources for this stage: caminoingles.gal 'Ferrol - Neda' (15.4 km); the Xunta portal 'Ferrol - Neda' (15.4 km: Ferrol-Xubia 13.4 + Xubia-Neda 1.9); Federación Española de Asociaciones de Amigos del Camino de Santiago (FEAACS), dossier 'Los Caminos de Santiago - Camiño Inglés', April 2024, stage 01 Ferrol-Neda (15.47 km); folleto 'De Ferrol a Santiago' (PDF on caminoingles.gal, 2021: 113.4 km in nine albergue-to-albergue sections that group into these six days). The published lengths are not copied into distance_km, which stays null. Ferrol is the Ferrol Vello suburb node, the old town where the Camino starts at the Curuxeiras dársena, 0.1 km from the first node of OSM relation 1102966; the place=town node/91254710 is 1.0 km away and was not used. The route circles the head of the Ría de Ferrol, so the Ferrol - Neda line is 7 km for a 15 km walk; via: Caranza, San Martiño de Xuvia (the monastery caminoingles.gal names) and Xuvia (the Xunta portal's stop Xubia, at the head of the ría). A shortcut over the Ponte das Pías to Fene, which skips Xuvia and Neda, exists (FEAACS) and is not in via. Checked on 2026-11-07 against relation 1102966 from the OSM API: every point is within 0.25 km of the route, which is 15.4 km long between Ferrol and Neda and never leaves the lines by more than 0.6 km. coastal is true: the OSM coastline runs along the route (Caranza, the head of the ría) and caminoingles.gal says the sea is on the right almost all the way."
+}

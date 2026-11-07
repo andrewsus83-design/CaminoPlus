@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Alert, Image, KeyboardAvoidingView, Modal, Platform, Pressable, TextInput, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -19,6 +19,9 @@ import { Health } from '@/features/me/Health';
 import { planProgress } from '@/features/me/plan';
 import { JourneyGrid } from '@/features/me/JourneyGrid';
 import { SampleJourney } from '@/features/me/SampleJourney';
+import { Highlights, ShowAllBar } from '@/features/me/Highlights';
+import { buildHighlights } from '@/features/me/highlights';
+import { usePostMedia } from '@/features/me/usePostMedia';
 import { updateProfile } from '@/lib/api';
 import { copyText } from '@/lib/clipboard';
 import { PickerUnavailable, pickAndUploadAvatar } from '@/lib/avatar';
@@ -116,6 +119,19 @@ export default function Me() {
   const { posts, stamps, days, stages, error, offline } = useMeData();
   const name = profile?.display_name || profile?.username || 'Pilgrim';
   const stagesDone = days?.filter((d) => d.status === 'done').length ?? 0;
+  // Highlights per destination under the My Camino card. Drawn once both the plan and the posts are known: before that
+  // every place would look "not visited yet". The pictures are read once (usePostMedia) and shared by the row and the grid.
+  const media = usePostMedia(posts);
+  const highlights = useMemo(() => (days && posts ? buildHighlights(days, posts) : []), [days, posts]);
+  const [filterKey, setFilterKey] = useState<string | null>(null);
+  // The destination the Journey grid is showing. A key that is no longer a visited destination (the data was reloaded) is no filter.
+  const active = filterKey ? highlights.find((h) => h.key === filterKey && h.state === 'visited') ?? null : null;
+  const onlyIds = useMemo(() => (active ? new Set(active.posts.map((p) => p.id)) : null), [active]);
+  const pickHighlight = (h: { key: string }) => {
+    // From the Plan or Health tab it brings you to the Journey grid with that destination; on the grid the same one again clears it.
+    if (tab !== 'Journey') { setTab('Journey'); setFilterKey(h.key); return; }
+    setFilterKey((k) => (k === h.key ? null : h.key));
+  };
   const changePhoto = async () => {
     if (!session) return;
     setUploading(true);
@@ -249,14 +265,16 @@ export default function Me() {
               </View>
             </Pressable>
           ) : <AppText variant="accent" color={role.accentText}>Buen Camino!</AppText>}
+          <Highlights key={session?.user.id ?? 'none'} items={highlights} days={days ?? []} media={media} activeKey={active?.key ?? null} userId={session?.user.id} onPick={pickHighlight} />
         </View>
         <SubTabs tabs={TABS} value={tab} onChange={setTab} />
         {(offline || stale) && <FormMessage tone="info">You are offline. Showing what is saved on this phone.</FormMessage>}
         {!!error && <FormMessage>{`Could not load your data. ${error}`}</FormMessage>}
 
+        {tab === 'Journey' && !!active && <ShowAllBar name={active.name} onPress={() => setFilterKey(null)} />}
         {tab === 'Journey' && (!posts ? (offline ? <Empty text="You are offline. Your journey posts will show up when you are back online." /> : loading) : posts.length === 0
           ? <SampleJourney />
-          : <JourneyGrid posts={posts} />)}
+          : <JourneyGrid posts={posts} media={media} only={onlyIds} />)}
 
         {tab === 'Plan' && (!days ? (offline ? <Empty text="You are offline and your plan is not saved on this phone yet. Open it once with a connection." /> : loading) : <PlanTracker days={days} />)}
 
