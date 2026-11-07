@@ -22,6 +22,7 @@ export const NativeName = {
   clipboard: 'ExpoClipboard',
   video: 'ExpoVideo',
   imagePicker: 'ExponentImagePicker',
+  location: 'ExpoLocation',
 } as const;
 
 export function hasNativeModule(name: string): boolean {

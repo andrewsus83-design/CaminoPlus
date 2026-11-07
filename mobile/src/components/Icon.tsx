@@ -67,6 +67,14 @@ const PATHS = {
   library: ['M12 7.5C10.7 6.3 8.7 5.5 6.2 5.5H3.5v12h2.7c2.5 0 4.5.8 5.8 2 1.3-1.2 3.3-2 5.8-2h2.7v-12h-2.7c-2.5 0-4.5.8-5.8 2Z', 'M12 7.5v12'],
   book: ['M7 3.5h10.5A1.5 1.5 0 0 1 19 5v14.5a1 1 0 0 1-1 1H7.5A2 2 0 0 1 5.5 18.5V5A1.5 1.5 0 0 1 7 3.5Z', 'M5.5 18.5A2 2 0 0 1 7.5 16.5H19', 'M12.25 6.5v6.5M9.5 8.9h5.5'],
   music: ['M9 18V5.5l11-2V16', 'M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z', 'M20 16a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z'],
+  // The diary's writing tools (the formatting bar above the keyboard) and a video clip.
+  bold: ['M7 4v16', 'M7 4h5.5a4 4 0 0 1 0 8H7', 'M7 12h6.5a4 4 0 0 1 0 8H7'],
+  italic: ['M10 4h8', 'M6 20h8', 'M15 4 9 20'],
+  heading: ['M6 4v16', 'M18 4v16', 'M6 12h12'],
+  list: ['M9 6h11', 'M9 12h11', 'M9 18h11'],
+  quote: ['M5 5v14', 'M10 8h9', 'M10 12h9', 'M10 16h5'],
+  video: ['M4 7.5A2.5 2.5 0 0 1 6.5 5h7A2.5 2.5 0 0 1 16 7.5v9a2.5 2.5 0 0 1-2.5 2.5h-7A2.5 2.5 0 0 1 4 16.5v-9Z', 'm16 10.5 4.5-2.8v8.6L16 13.5'],
+  play: ['M8 5.5v13l11-6.5-11-6.5Z'],
   diary: ['M8.5 4h10A1.5 1.5 0 0 1 20 5.5v13a1.5 1.5 0 0 1-1.5 1.5h-10A1.5 1.5 0 0 1 7 18.5v-13A1.5 1.5 0 0 1 8.5 4Z', 'M4 8h4M4 12h4M4 16h4', 'M11.5 8.5h5.5M11.5 12h3.5'],
 } as const;
 
@@ -90,6 +98,7 @@ export function Icon({ name, color, size = 24, strokeWidth = 1.75, filled }: { n
       {(name === 'group' || name === 'user-plus') && <Circle cx="9" cy="8" r="3.5" {...p} />}
       {name === 'sun' && <Circle cx="12" cy="12" r="4.2" {...p} />}
       {name === 'more' && [5, 12, 19].map((cx) => <Circle key={cx} cx={cx} cy="12" r="1.9" {...p} fill={color} />)}
+      {name === 'list' && [6, 12, 18].map((cy) => <Circle key={cy} cx="4.5" cy={cy} r="1.2" {...p} fill={color} />)}
       {PATHS[name].map((d) => (<Path key={d} d={d} {...p} />))}
     </Svg>
     </View>

@@ -21,7 +21,7 @@ const WILL_GO = [
   'Your posts, photos and videos',
   'Your friends, chats and group memberships',
   'Everything saved for you in the cloud',
-  'The pages of your diary on this phone',
+  'The pages of your diary on this phone, with their photos, videos and places',
 ];
 
 export default function DeleteAccount() {

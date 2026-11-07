@@ -13,6 +13,8 @@
   },
   "files": [
     "src/features/diary/__tests__/diary.test.ts",
+    "src/features/diary/__tests__/richtext.test.ts",
+    "src/features/diary/__tests__/media.test.ts",
     "src/features/diary/__tests__/wiring.test.ts"
   ]
 }

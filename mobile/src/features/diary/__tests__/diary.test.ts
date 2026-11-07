@@ -5,6 +5,10 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { AUTOSAVE_MS, createPageSaver, type SaverDeps, type SaverView } from '../autosave';
+// The rich text, and the photos, videos and place, have their own files. They run from here, so the package's test script (which
+// names only this file and wiring.test.ts) runs them without being edited.
+import './richtext.test';
+import { finished as mediaTests } from './media.test';
 import { EMPTY_CARD_LINE, PRIVACY_LINE, UNTITLED, clip, dateLine, firstLine, pagePreview, pageTitle, pagesLabel, problemMessage, thousands } from '../present';
 import { BODY_MAX, ENTRIES_MAX, TITLE_MAX, TOTAL_MAX, createDiaryStore, isEntry, newId, oldKey, pagesOf, slotKey, type DiaryEntry, type DiaryStorage, type SaveResult } from '../store';
 
@@ -103,6 +107,7 @@ const untouched = (f: Fake) => [f.files.get(A()), f.files.get(B()), f.files.get(
 const GOOD = page('g1', day(1), { title: 'Roncesvalles', body: 'Cold and clear.' });
 
 (async () => {
+  await mediaTests;
   /* ---------------------------------------------------------------- the keys */
 
   await test('the diary keys never start with u.: signing out wipes u.<id>.… and cannot touch them', () => {
@@ -694,7 +699,7 @@ const GOOD = page('g1', day(1), { title: 'Roncesvalles', body: 'Cold and clear.'
   await test('the words: counts, thousands, the honest line, the empty card, and a gentle message for every problem', () => {
     assert.deepEqual([0, 1, 2, 3].map(pagesLabel), ['0 pages', '1 page', '2 pages', '3 pages']);
     assert.deepEqual([0, 999, 1000, 20000, 1234567].map(thousands), ['0', '999', '1,000', '20,000', '1,234,567']);
-    assert.equal(PRIVACY_LINE, 'Only on this phone. Not uploaded, not shared. If you delete the app or lose this phone, these pages are gone.');
+    assert.equal(PRIVACY_LINE, 'Only on this phone. Pages, photos, videos and places are not uploaded and not shared. If you delete the app or lose this phone, they are gone.');
     assert.equal(EMPTY_CARD_LINE, 'Your diary is empty. Tap the pen to write the first page.');
     for (const p of ['body-too-long', 'title-too-long', 'too-many-pages', 'diary-full', 'not-saved'] as const) {
       const text = problemMessage(p);

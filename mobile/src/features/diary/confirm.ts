@@ -3,10 +3,13 @@
 import { Alert, Platform } from 'react-native';
 import { clip } from './present';
 
-/** Asks first; `onConfirm` runs only when the person says yes. Without a way to ask, nothing is deleted. */
-export function confirmDelete(pageName: string, onConfirm: () => void) {
+/**
+ * Asks first; `onConfirm` runs only when the person says yes. Without a way to ask, nothing is deleted. `attached` says the page
+ * has photos, videos or a place, which go with it: the question says so, so nobody is surprised.
+ */
+export function confirmDelete(pageName: string, onConfirm: () => void, attached = false) {
   const title = 'Delete this page?';
-  const message = `"${clip(pageName, 60)}" is only on this phone. Once it is deleted it cannot be brought back.`;
+  const message = `"${clip(pageName, 60)}" is only on this phone. Once it is deleted it cannot be brought back.${attached ? ' Its photos, videos and place are deleted with it.' : ''}`;
   if (Platform.OS === 'web') {
     if (typeof window === 'undefined' || typeof window.confirm !== 'function' || !window.confirm(`${title}\n\n${message}`)) return;
     return void onConfirm();
