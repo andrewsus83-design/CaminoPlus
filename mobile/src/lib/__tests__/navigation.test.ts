@@ -77,6 +77,19 @@ check('Me opens Settings from a gear at the top right: after the inbox bell, in 
   assert.match(src.slice(gear, gear + 200), /label="Settings"/);
 });
 
+check('the My Camino card stays on Me, with its Change button, in the app and in the design page', () => {
+  const me = read(join('app', '(tabs)', 'me.tsx'));
+  assert.match(me, /accessibilityLabel="Change Camino"/);
+  assert.match(me, /My Camino/);
+  assert.match(me, /<AppText variant="label" color=\{role\.onHighlight\}>Change<\/AppText>/);
+  assert.match(me, /router\.push\('\/change-camino'\)/);
+  const design = readFileSync(join(root, '..', 'design', 'index.html'), 'utf8');
+  const phone = design.slice(design.indexOf('<b>Me · Journey</b>'), design.indexOf('<b>Me · Write · Pick photos</b>'));
+  assert.ok(phone.length > 1000, 'the Me · Journey phone was not found in design/index.html');
+  assert.match(phone, />My Camino</, 'the design page lost the My Camino card');
+  assert.match(phone, />Change</, 'the design page lost the Change button');
+});
+
 check('after a light/dark switch the app returns to Settings with Me underneath, so Back still works', () => {
   const layout = read(join('app', '_layout.tsx'));
   assert.match(layout, /consumeReturnToSettings\(\)\) return;\n\s+setTimeout\(\(\) => \{ try \{ router\.replace\('\/me'\); router\.push\('\/settings'\); \} catch/);
