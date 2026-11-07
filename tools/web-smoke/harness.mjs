@@ -138,11 +138,29 @@ export function domQuiet(page, ms = 250, max = 3000) {
   }), { ms, max });
 }
 
-/** The page has loaded, drawn something, stopped asking for files, and stopped changing. */
-export async function settle(page, { timeout }) {
+/**
+ * Waits for the page to draw some text. Returns false when it never does: that is not an error HERE, the screen check that follows
+ * reports a blank page with the right name. When something has already been reported (an exception, say) and the page is still blank
+ * after `grace` ms, it will stay blank: stop waiting, so a build that crashes everywhere does not spend the full timeout on every check.
+ */
+async function waitForText(page, timeout, collector, grace = 1500) {
+  const drawn = page.waitForFunction(() => document.body.innerText.trim().length > 0, null, { timeout }).then(() => true, () => false);
+  let poll;
+  const givenUp = new Promise((resolve) => {
+    let since = null;
+    poll = setInterval(() => {
+      if (!collector || collector.errors.length === 0) return;
+      since ??= Date.now();
+      if (Date.now() - since > grace) resolve(false);
+    }, 100);
+  });
+  try { return await Promise.race([drawn, givenUp]); } finally { clearInterval(poll); }
+}
+
+/** The page has loaded, drawn something, stopped asking for files, and stopped changing. `collector` (optional) lets a blank, already failed page end the wait early. */
+export async function settle(page, { timeout }, collector = null) {
   await page.waitForLoadState('load', { timeout });
-  // a page that never draws any text is not an error HERE: the screen check that follows reports it as blank, with the right name
-  await page.waitForFunction(() => document.body.innerText.trim().length > 0, null, { timeout }).catch(() => {});
+  await waitForText(page, timeout, collector);
   await page.waitForLoadState('networkidle', { timeout });
   await domQuiet(page);
 }
@@ -160,7 +178,7 @@ export async function sweepRoute(browser, env, task) {
   let errors = null;
   try {
     await s.page.goto(env.origin + task.route.url, { waitUntil: 'load', timeout: env.timeout });
-    await settle(s.page, env);
+    await settle(s.page, env, s.collector);
     await s.page.waitForTimeout(150); // a last moment for errors thrown by effects that run after the first draw (the one short sleep of the test)
     if (task.offline) {
       const online = await s.page.evaluate(() => navigator.onLine);
@@ -195,11 +213,11 @@ export async function runScenario(browser, env, task) {
     page: s.page, env, task, collector: s.collector,
     step: (name) => { stepName = name; },
     /** open a path of the app and wait for it to be drawn and still */
-    go: async (path) => { await s.page.goto(env.origin + path, { waitUntil: 'load', timeout: env.timeout }); await settle(s.page, env); },
+    go: async (path) => { await s.page.goto(env.origin + path, { waitUntil: 'load', timeout: env.timeout }); await settle(s.page, env, s.collector); },
   };
   try {
     await task.scenario.run(api);
-    await settle(s.page, env); // the screen the scenario ended on may still be loading its code
+    await settle(s.page, env, s.collector); // the screen the scenario ended on may still be loading its code
     await s.page.waitForTimeout(150);
     s.collector.screen(await s.page.evaluate(readScreen)); // the screen the scenario ended on must not be blank or an error screen
   } catch (e) {

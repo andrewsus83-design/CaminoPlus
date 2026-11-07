@@ -62,6 +62,13 @@ test('a blank page and an error screen are reported', async () => {
   assert.deepEqual(kinds(e), ['error-screen']);
 });
 
+test('a page that crashed before drawing anything is reported at once, not after the whole timeout', async () => {
+  const t0 = Date.now();
+  const r = await sweep('/crash-before-drawing', {}, 30_000);
+  assert.deepEqual(kinds(r), ['blank', 'pageerror']);
+  assert.ok(Date.now() - t0 < 10_000, `took ${Date.now() - t0} ms: it waited for the timeout of a page that had already thrown`);
+});
+
 test('a request to a host nobody mocked is refused, recorded and reported (http and websocket)', async () => {
   const http = await sweep('/third-party');
   const stranger = http.errors.find((e) => e.kind === 'unexpected-host'); // the browser also logs the refused request as a console error

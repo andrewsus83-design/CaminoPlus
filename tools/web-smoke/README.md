@@ -69,7 +69,9 @@ npm test                           # the self-test: the harness against an app b
 npm run smoke                      # about 2.5 minutes: 336 checks at the time of writing, 4 pages at a time
 ```
 
-`npm run build:app` runs the export command for you. Options (`node smoke.mjs --help` is this list):
+`npm run build:app` runs the export command for you. Use the normal (production) export, as CI does: a development export (`--dev`)
+opens Metro's hot-reload sockets to its own server, which the test refuses like any other unexpected call, and never goes idle.
+Options (`node smoke.mjs --help` is this list):
 
 | Option | |
 |---|---|

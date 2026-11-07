@@ -20,6 +20,7 @@ const INDEX = `<!doctype html>
   else if (path === '/console-error') { say('logging an error'); console.error('something is wrong in this screen'); }
   else if (path === '/console-warn') { say('only a warning'); console.warn('just a warning'); console.log('and a log'); }
   else if (path === '/blank') { /* draws nothing */ }
+  else if (path === '/crash-before-drawing') { later(() => { throw new Error('crash before the first draw'); }); }
   else if (path === '/error-screen') say('Something went wrong\\nError: x is not a function');
   else if (path === '/third-party') { say('calls out'); fetch('https://tracker.example.test/collect').catch(() => {}); }
   else if (path === '/third-party-socket') { say('opens a socket'); try { new WebSocket('wss://socket.example.test/live'); } catch (e) {} }
