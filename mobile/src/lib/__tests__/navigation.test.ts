@@ -90,6 +90,22 @@ check('the My Camino card stays on Me, with its Change button, in the app and in
   assert.match(phone, />Change</, 'the design page lost the Change button');
 });
 
+check('Buen Camino! is Caveat Bold, as the brand design system says: the accent variant in the app, the accent font at 700 in the design page, and one Caveat note on the Me phone', () => {
+  // app: every display "Buen Camino!" is an AppText with variant="accent" (Caveat_700Bold in src/theme), never a font of its own
+  for (const f of files) {
+    read(f).split('\n').forEach((line) => {
+      if (/>Buen Camino!</.test(line) && /<AppText\b/.test(line)) assert.match(line, /variant="accent"/, `${f}: Buen Camino! is not drawn in the accent font`);
+    });
+  }
+  assert.match(read(join('src', 'theme', 'index.ts')), /accent: 'Caveat_700Bold'/);
+  // design page: the card uses the accent font at weight 700, and the phone has no second Caveat (brand: max one per design)
+  const design = readFileSync(join(root, '..', 'design', 'index.html'), 'utf8');
+  const phone = design.slice(design.indexOf('<b>Me · Journey</b>'), design.indexOf('<b>Me · Write · Pick photos</b>'));
+  assert.match(phone, /font-family:var\(--cp-font-accent\);font-weight:700;[^"]*">Buen Camino!</, 'the design card is not Caveat Bold');
+  assert.equal((phone.match(/--cp-font-accent/g) ?? []).length, 1, 'more than one Caveat note on the Me phone');
+  assert.match(design, /--cp-font-accent|tokens\.css/);
+});
+
 check('after a light/dark switch the app returns to Settings with Me underneath, so Back still works', () => {
   const layout = read(join('app', '_layout.tsx'));
   assert.match(layout, /consumeReturnToSettings\(\)\) return;\n\s+setTimeout\(\(\) => \{ try \{ router\.replace\('\/me'\); router\.push\('\/settings'\); \} catch/);
