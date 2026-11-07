@@ -38,3 +38,17 @@ export const SAMPLE_PLAYLISTS = [
   { id: 'chants', title: 'Chants for the road', note: 'Slow, simple chants for the road' },
   { id: 'sing', title: 'Songs to sing together', note: 'For when the group is tired' },
 ] as const;
+
+/** One example row of each tab, as the screens and the search read them. */
+export type Shelf = (typeof SAMPLE_SHELVES)[number];
+export type Book = (typeof SAMPLE_BOOKS)[number];
+export type Playlist = (typeof SAMPLE_PLAYLISTS)[number];
+
+/**
+ * The one Preview notice of a search: the results are these examples, so it says what they are, like each tab does.
+ * Searching is also an honest "looking through the examples": it never finds, opens or plays anything real.
+ */
+export const SEARCH_NOTICE = 'Search looks through the examples in this preview. The Bible text, books and music are not in the app yet, so nothing here can be opened or played.';
+
+/** The same, for the Bookmarks screen: the Library rows kept there are these examples. */
+export const BOOKMARKS_NOTICE = 'These are examples from the Library preview. They are kept only on this phone, and logging out clears them.';
