@@ -1,15 +1,20 @@
 // The private diary: what is stored on the phone and the few things that can be done to it.
 //
 // Pure logic, no React and no React Native, so plain node can import it (npm run test:diary). The phone's key-value store
-// comes in as a parameter (`DiaryStorage`): lib/localStore.ts has exactly this shape and storage.ts plugs it in, which is
-// what the app imports.
+// comes in as a parameter (`DiaryStorage`); storage.ts plugs the real one in, which is what the app imports.
 //
-// One object per person, under the key `diary.<userId>`: { v: 1, entries: [...] }.
+// One diary per person, kept in two keys, `diary.<userId>.a` and `diary.<userId>.b`, each { v: 1, seq, entries: [...] }.
 //
-// The key deliberately does NOT start with `u.`. Signing out wipes every `u.<userId>.…` key (lib/auth.tsx, clearUserData):
-// that is a cache of what the server knows. A diary is the person's own writing and exists nowhere else, so it must be
-// there when the same person signs in again. Another account on the same phone has another id, so another key, and never
-// sees it. Only deleting the account removes it (clearDiary, called by app/delete-account.tsx).
+// Why two slots and not one file: the diary is the person's only copy of their writing, and a write on a phone is not atomic.
+// A kill or a full disk in the middle of it leaves a cut-off file, and with one file that is the whole diary gone (it reads
+// as damaged, and the next save would replace what is left of it). So a read takes the readable slot with the higher seq and
+// a write goes to the OTHER slot with seq + 1: a write that dies half way can only damage the older slot, the newest
+// complete state is still in the other one, and the next write replaces the damaged slot.
+//
+// Neither key starts with `u.`. Signing out wipes every `u.<userId>.…` key (lib/auth.tsx, clearUserData): that is a cache of
+// what the server knows. A diary is the person's own writing and exists nowhere else, so it must be there when the same
+// person signs in again. Another account on the same phone has another id, so other keys, and never sees it. Only deleting
+// the account removes it (clearDiary, called by app/delete-account.tsx).
 import { uuid } from '../../lib/uuid';
 
 export type DiaryEntry = { id: string; createdAt: string; updatedAt: string; title: string; body: string };
@@ -19,19 +24,32 @@ export const BODY_MAX = 20_000;
 export const TITLE_MAX = 120;
 /** Pages one person can keep. */
 export const ENTRIES_MAX = 2_000;
+/**
+ * Characters of titles and text over all pages. Every save writes the whole diary, so this is what bounds the cost of a save
+ * (and of reading it): a person who writes 2 KB a day for three months has 180 KB, far below it. A save that would take the
+ * diary past it is refused, unless it makes the diary no bigger (a page that is shortened can always be saved).
+ */
+export const TOTAL_MAX = 2_000_000;
 
 /** Why a page was not written. Never thrown: it is an answer, and the screen words it gently (present.ts). */
-export type SaveProblem = 'body-too-long' | 'title-too-long' | 'too-many-pages' | 'not-saved';
+export type SaveProblem = 'body-too-long' | 'title-too-long' | 'too-many-pages' | 'diary-full' | 'not-saved';
 export type SaveResult = { ok: true } | { ok: false; reason: SaveProblem };
 
-/** The part of lib/localStore.ts the diary needs. Every call there resolves to null / false instead of throwing. */
+/**
+ * The part of the phone's key-value store the diary needs, and the way it must read: getJSON answers null only when there is
+ * nothing under the key, and THROWS when there is something it cannot read (the disk said no, or the text is cut off or
+ * damaged). lib/localStore.ts cannot tell the two apart (it answers null for both), so storage.ts reads strictly.
+ */
 export type DiaryStorage = {
   getJSON<T>(key: string): Promise<T | null>;
   setJSON(key: string, value: unknown): Promise<boolean>;
   remove(key: string): Promise<void>;
 };
 
-export const diaryKey = (uid: string) => `diary.${uid}`;
+export type Slot = 'a' | 'b';
+export const slotKey = (uid: string, slot: Slot) => `diary.${uid}.${slot}`;
+/** The first build kept the whole diary in this one key. It is read when no slot is valid, and removed once its pages are carried over. */
+export const oldKey = (uid: string) => `diary.${uid}`;
 
 /** A new page id: the app's usual client-side id (lib/uuid.ts), so nothing here needs a server or a counter. */
 export const newId = (): string => uuid();
@@ -45,8 +63,10 @@ export function isEntry(v: unknown): v is DiaryEntry {
   return typeof e.id === 'string' && e.id.length > 0 && typeof e.title === 'string' && typeof e.body === 'string' && validDate(e.createdAt) && validDate(e.updatedAt);
 }
 
-type Stored = { v: 1; entries: unknown[] };
-const isStored = (v: unknown): v is Stored => !!v && typeof v === 'object' && !Array.isArray(v) && (v as Stored).v === 1 && Array.isArray((v as Stored).entries);
+type Stored = { v: 1; seq: number; entries: unknown[] };
+const isSeq = (v: unknown): v is number => typeof v === 'number' && Number.isSafeInteger(v) && v >= 0 && v < Number.MAX_SAFE_INTEGER;
+const isSlot = (v: unknown): v is Stored => !!v && typeof v === 'object' && !Array.isArray(v) && (v as Stored).v === 1 && Array.isArray((v as Stored).entries) && isSeq((v as Stored).seq);
+const isOldDiary = (v: unknown): v is { v: 1; entries: unknown[] } => !!v && typeof v === 'object' && !Array.isArray(v) && (v as Stored).v === 1 && Array.isArray((v as Stored).entries);
 
 /** The pages in a stored list, newest first (by the day they were begun), once each. Anything that is not a page is left out. */
 export function pagesOf(raw: unknown[]): DiaryEntry[] {
@@ -58,20 +78,30 @@ export function pagesOf(raw: unknown[]): DiaryEntry[] {
   return pages.sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt) || (a.id < b.id ? 1 : a.id > b.id ? -1 : 0));
 }
 
-// What is read from the key, and what is done with it. This is the whole behaviour, in one place:
-//   - A v1 diary is read page by page. Items inside it that do not read as pages are not shown, but they stay in the stored
-//     list when other pages are saved, so nothing that a newer app wrote there is lost by an older one.
-//   - Anything else (nothing, text, a list, a number, `{ v: 2, … }` from a newer app, `entries` that is not a list) reads as an
-//     empty diary. Reading never writes, and neither does a delete: an older app cannot damage what a newer one stored just
-//     by opening the screen. The first page the person writes replaces such a value, because there is nothing to merge it
-//     with. (lib/localStore.ts answers null for a missing key and for a file it cannot read alike; the first case is an
-//     empty diary, the second can only be told apart when a storage throws, and then nothing is written at all.)
-//   - A storage that throws is "failed": a read shows nothing, a save or a delete says it did not happen. It never overwrites.
-type Read =
-  | { kind: 'ok'; raw: unknown[] }
-  | { kind: 'none' }
-  | { kind: 'unreadable' }
-  | { kind: 'failed' };
+const sizeOf = (e: DiaryEntry) => e.title.length + e.body.length;
+const totalOf = (raw: unknown[]) => raw.reduce<number>((sum, item) => sum + (isEntry(item) ? sizeOf(item) : 0), 0);
+
+// What is read, and what is done with it. A slot is
+//   valid       { v: 1, seq, entries } with a whole number seq;
+//   missing     nothing under the key;
+//   foreign     something readable that is not a v1 slot (a newer version, another shape): never read as pages;
+//   unreadable  the storage threw: a read error, or text that is cut off or damaged.
+// The diary is the valid slot with the higher seq. Reading never writes. A save or a delete writes the OTHER slot with seq + 1,
+// so it also replaces a slot that was damaged or foreign, and if that write dies half way the newest complete state is still in
+// the slot it did not touch. With no valid slot, and no slot unreadable (a new diary), the first write is seq 1 in slot a and
+// slot b is left alone. When neither slot can be read at all nothing is known about what is stored: reads show an empty
+// diary, saves and deletes refuse (the editor says so and keeps the words), and nothing is ever written over it.
+// Items inside a valid slot that do not read as pages are not shown, but stay in the list when other pages are saved.
+type SlotRead =
+  | { kind: 'valid'; seq: number; entries: unknown[] }
+  | { kind: 'missing' }
+  | { kind: 'foreign' }
+  | { kind: 'unreadable' };
+
+// `from` is the slot the pages were read from (null for a diary that is new, or one carried over from the key of the first build),
+// `target` the slot the next write goes to, and `seq` the number of the state it is based on (0 for a diary that is new).
+// `adopted` is true when the pages came from the key of the first build, which is removed once they are in a slot.
+type State = { kind: 'ok'; seq: number; entries: unknown[]; from: Slot | null; target: Slot; adopted: boolean } | { kind: 'blocked' };
 
 /** The reasons a page is refused before anything is read. */
 function refusal(uid: string, e: DiaryEntry): SaveProblem | null {
@@ -94,62 +124,110 @@ export function createDiaryStore(storage: DiaryStorage) {
     return run;
   };
 
-  const read = async (key: string): Promise<Read> => {
+  const readSlot = async (key: string): Promise<SlotRead> => {
     let value: unknown;
-    try { value = await storage.getJSON<unknown>(key); } catch { return { kind: 'failed' }; }
-    if (value == null) return { kind: 'none' };
-    return isStored(value) ? { kind: 'ok', raw: value.entries } : { kind: 'unreadable' };
-  };
-  const write = async (key: string, raw: unknown[]): Promise<boolean> => {
-    const value: Stored = { v: 1, entries: raw };
-    try { return (await storage.setJSON(key, value)) === true; } catch { return false; }
+    try { value = await storage.getJSON<unknown>(key); } catch { return { kind: 'unreadable' }; }
+    if (value == null) return { kind: 'missing' };
+    return isSlot(value) ? { kind: 'valid', seq: value.seq, entries: value.entries } : { kind: 'foreign' };
   };
 
-  /** The pages of one person, newest first. An empty list when there is nothing, or nothing that reads. */
+  /** The pages of the first build's single key, or null when there is none or it cannot be read (then it is left alone). */
+  const readOld = async (uid: string): Promise<unknown[] | null> => {
+    try {
+      const value = await storage.getJSON<unknown>(oldKey(uid));
+      return isOldDiary(value) ? value.entries : null;
+    } catch {
+      return null;
+    }
+  };
+
+  const readState = async (uid: string): Promise<State> => {
+    const [a, b] = await Promise.all([readSlot(slotKey(uid, 'a')), readSlot(slotKey(uid, 'b'))]);
+    if (a.kind === 'valid' || b.kind === 'valid') {
+      const newestIsA = a.kind === 'valid' && (b.kind !== 'valid' || a.seq >= b.seq);
+      const newest = (newestIsA ? a : b) as Extract<SlotRead, { kind: 'valid' }>;
+      return { kind: 'ok', seq: newest.seq, entries: newest.entries, from: newestIsA ? 'a' : 'b', target: newestIsA ? 'b' : 'a', adopted: false };
+    }
+    if (a.kind === 'unreadable' && b.kind === 'unreadable') return { kind: 'blocked' };
+    const old = await readOld(uid);
+    return { kind: 'ok', seq: 0, entries: old ?? [], from: null, target: 'a', adopted: old != null };
+  };
+
+  /** Writes `raw` as the next state, into the slot that is not the newest one. True when it is on the phone. */
+  const commit = async (uid: string, state: Extract<State, { kind: 'ok' }>, raw: unknown[]): Promise<boolean> => {
+    const value: Stored = { v: 1, seq: state.seq + 1, entries: raw };
+    let written = false;
+    try { written = (await storage.setJSON(slotKey(uid, state.target), value)) === true; } catch { written = false; }
+    if (written && state.adopted) {
+      try { await storage.remove(oldKey(uid)); } catch { /* only a stale copy now; clearDiary removes it as well */ }
+    }
+    return written;
+  };
+
+  /**
+   * After a delete the slot that was not written still holds the page, as the state before. "Deleted" has to mean gone, so the
+   * same state is written there too (one seq later, so it is still the newest) and no copy of the page is left on the phone. If
+   * this write dies half way it only damages the slot that is being scrubbed; the state that was just committed is intact.
+   */
+  const scrub = async (uid: string, state: Extract<State, { kind: 'ok' }>, raw: unknown[]): Promise<void> => {
+    if (!state.from) return;
+    const value: Stored = { v: 1, seq: state.seq + 2, entries: raw };
+    try { await storage.setJSON(slotKey(uid, state.from), value); } catch { /* the delete itself went through */ }
+  };
+
+  /** The pages of one person, newest first. An empty list when there is nothing, or nothing that can be read. */
   const loadEntries = (uid: string): Promise<DiaryEntry[]> => {
     if (!uid) return Promise.resolve([]);
     return inTurn(async () => {
-      const r = await read(diaryKey(uid));
-      return r.kind === 'ok' ? pagesOf(r.raw) : [];
+      const s = await readState(uid);
+      return s.kind === 'ok' ? pagesOf(s.entries) : [];
     }).catch((): DiaryEntry[] => []);
   };
 
-  /** Adds the page, or replaces the one with the same id. A new page is refused at ENTRIES_MAX; a page already there never is. */
+  /**
+   * Adds the page, or replaces the one with the same id. A new page is refused at ENTRIES_MAX pages, and a save that makes
+   * the diary bigger is refused past TOTAL_MAX characters; a page already there can always be saved if it is not bigger.
+   */
   const saveEntry = (uid: string, entry: DiaryEntry): Promise<SaveResult> => {
     const refused = refusal(uid, entry);
     if (refused) return Promise.resolve({ ok: false, reason: refused });
     const page: DiaryEntry = { id: entry.id, createdAt: entry.createdAt, updatedAt: entry.updatedAt, title: entry.title, body: entry.body };
     return inTurn(async (): Promise<SaveResult> => {
-      const key = diaryKey(uid);
-      const r = await read(key);
-      if (r.kind === 'failed') return { ok: false, reason: 'not-saved' };
-      const raw = r.kind === 'ok' ? r.raw.slice() : [];
+      const s = await readState(uid);
+      if (s.kind === 'blocked') return { ok: false, reason: 'not-saved' };
+      const raw = s.entries.slice();
+      const before = totalOf(raw);
       const at = raw.findIndex((item) => isEntry(item) && item.id === page.id);
       if (at >= 0) raw[at] = { ...(raw[at] as DiaryEntry), ...page };
       else if (raw.length >= ENTRIES_MAX) return { ok: false, reason: 'too-many-pages' };
       else raw.push(page);
-      return (await write(key, raw)) ? { ok: true } : { ok: false, reason: 'not-saved' };
+      const after = totalOf(raw);
+      if (after > TOTAL_MAX && after > before) return { ok: false, reason: 'diary-full' };
+      return (await commit(uid, s, raw)) ? { ok: true } : { ok: false, reason: 'not-saved' };
     }).catch((): SaveResult => ({ ok: false, reason: 'not-saved' }));
   };
 
-  /** True when the page is gone afterwards (also when it was never there); false when it could not be removed. */
+  /** True when the page is gone afterwards (also when it was never there), from both slots; false when it could not be removed. */
   const deleteEntry = (uid: string, id: string): Promise<boolean> => {
     if (!uid || !id) return Promise.resolve(true);
     return inTurn(async () => {
-      const key = diaryKey(uid);
-      const r = await read(key);
-      if (r.kind === 'failed') return false;
-      if (r.kind !== 'ok') return true;
-      const raw = r.raw.filter((item) => !(isEntry(item) && item.id === id));
-      return raw.length === r.raw.length ? true : write(key, raw);
+      const s = await readState(uid);
+      if (s.kind === 'blocked') return false;
+      const raw = s.entries.filter((item) => !(isEntry(item) && item.id === id));
+      if (raw.length === s.entries.length) return true;
+      if (!(await commit(uid, s, raw))) return false;
+      await scrub(uid, s, raw);
+      return true;
     }).catch(() => false);
   };
 
-  /** Removes the whole diary of one person, whatever is stored there. For deleting the account; never for signing out. */
+  /** Removes the whole diary of one person: both slots, and the key of the first build. For deleting the account; never for signing out. */
   const clearDiary = (uid: string): Promise<void> => {
     if (!uid) return Promise.resolve();
     return inTurn(async () => {
-      try { await storage.remove(diaryKey(uid)); } catch { /* nothing more can be done */ }
+      for (const key of [slotKey(uid, 'a'), slotKey(uid, 'b'), oldKey(uid)]) {
+        try { await storage.remove(key); } catch { /* the others are still removed */ }
+      }
     }).catch(() => undefined);
   };
 

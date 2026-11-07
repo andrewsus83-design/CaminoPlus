@@ -57,9 +57,10 @@ The app has to open on the trail, so it never waits for the network to decide wh
 - `src/lib/net.ts` fails fast when the phone is offline (instead of waiting for the refresh retries) and
   `startJourney` is one idempotent RPC with a client generated id, so a retry never creates a second journey.
 - Signing out also wipes everything saved for that user (`clearUserData`: every key that starts with `u.<userId>.`).
-  The one thing it keeps is the private diary (`diary.<userId>`, `src/features/diary/store.ts`): that is the
-  pilgrim's own writing and exists only on this phone, so it is there again when the same person signs in. The
-  key deliberately does not start with `u.`; `src/features/diary/__tests__/diary.test.ts` fails if that changes.
+  The one thing it keeps is the private diary (two keys, `diary.<userId>.a` and `diary.<userId>.b`, so that a write
+  cut off half way cannot take the whole diary with it; `src/features/diary/store.ts`): that is the pilgrim's own
+  writing and exists only on this phone, so it is there again when the same person signs in. The keys deliberately
+  do not start with `u.`; `src/features/diary/__tests__/diary.test.ts` fails if that changes.
 
 ## Deleting an account
 
