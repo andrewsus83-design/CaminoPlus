@@ -71,4 +71,40 @@ check('deleting a page asks first: the system alert on a phone, the browser conf
   for (const f of ['app/diary/index.tsx', 'app/diary/[id].tsx']) assert.match(read(f), /confirmDelete\(/, f);
 });
 
+check('deleting the account clears the diary: after the server said yes, never before, and nothing there can stop the sign-out', () => {
+  const src = read('app/delete-account.tsx');
+  assert.match(src, /import \{ clearDiary \} from '@\/features\/diary\/storage';/);
+  const uidAt = src.indexOf('session?.user.id');
+  const askAt = src.indexOf("supabase.functions.invoke('delete-account'");
+  const failAt = src.indexOf('if (e) throw e;');
+  const calls = [...src.matchAll(/clearDiary\(/g)].map((m) => m.index ?? -1);
+  assert.equal(calls.length, 1, 'one call, in one place');
+  const clearAt = src.indexOf('await clearDiary(uid)');
+  assert.equal(clearAt + 'await '.length, calls[0], 'and it is `await clearDiary(uid)`');
+  const signOutAt = src.indexOf('await signOut()');
+  assert.ok(uidAt > 0 && askAt > uidAt, 'the user id is read before the server is asked (signing out empties the session)');
+  assert.ok(failAt > askAt && clearAt > failAt, 'clearDiary comes after the server answered, and only when it did not fail');
+  assert.ok(signOutAt > clearAt, 'and before the sign-out');
+  assert.match(src, /try \{ await clearDiary\(uid\); \} catch \{/, 'a failure while clearing is swallowed');
+  assert.match(src, /if \(uid\) \{\s*try \{ await clearDiary\(uid\)/, 'no session, no call');
+});
+
+check('the delete screen tells the person the diary goes with the account, before they type DELETE', () => {
+  assert.match(read('app/delete-account.tsx'), /'The pages of your diary on this phone',/);
+});
+
+check('account deletion is the only place that clears a diary, and nothing in the app clears one on sign-out', () => {
+  const offenders: string[] = [];
+  const walk = (dir: string) => {
+    for (const name of fs.readdirSync(path.join(root, dir))) {
+      const rel = path.join(dir, name);
+      if (fs.statSync(path.join(root, rel)).isDirectory()) { if (name !== 'node_modules' && name !== '__tests__') walk(rel); continue; }
+      if (!/\.tsx?$/.test(name)) continue;
+      if (/\bclearDiary\b/.test(read(rel)) && !/delete-account\.tsx$|features\/diary\/(storage|store)\.ts$/.test(rel)) offenders.push(rel);
+    }
+  };
+  walk('app'); walk('src');
+  assert.deepEqual(offenders, []);
+});
+
 console.log(`${n} of ${n} passed`);

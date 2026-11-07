@@ -65,8 +65,9 @@ The app has to open on the trail, so it never waits for the network to decide wh
 
 Settings > Account > Delete account (also under Edit account; `app/delete-account.tsx`). The pilgrim types DELETE;
 the app calls the `delete-account` edge function (service role: removes the user's files, then the auth
-user; the database cascades the rest) and signs out. Subscriptions are billed by the stores and are not
-cancelled by deletion; the screen says so.
+user; the database cascades the rest), then deletes the diary pages on this phone (`clearDiary`, only after the
+server said yes) and signs out. Subscriptions are billed by the stores and are not cancelled by deletion; the
+screen says so.
 
 ## Owner setup (Supabase and Google), one time
 
