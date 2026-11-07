@@ -240,7 +240,7 @@ export default function Me() {
               </View>
               <View style={{ flex: 1, gap: 2 }}>
                 <AppText variant="accent" color={c.gold} style={{ fontSize: 24, lineHeight: 28 }}>Buen Camino!</AppText>
-                <AppText variant="caption" color={role.onInverseAccent} style={{ textTransform: 'uppercase', letterSpacing: 1.2 }}>My Camino</AppText>
+                <AppText variant="h4" color={role.onInverseAccent} style={{ fontSize: 17, lineHeight: 21 }}>My Camino</AppText>
                 <AppText variant="label" color={role.onInverse} numberOfLines={1}>{journey.route.name}</AppText>
                 <AppText variant="caption" color={role.onInverse} style={{ opacity: 0.85 }} numberOfLines={1}>{journey.start_stage ? `From stage ${journey.start_stage.stage_number} · ` : ''}{stagesDone} stages done</AppText>
               </View>

@@ -90,6 +90,17 @@ check('the My Camino card stays on Me, with its Change button, in the app and in
   assert.match(phone, />Change</, 'the design page lost the Change button');
 });
 
+check('"My Camino" on the card is set in Fraunces, the brand title font, in the app and in the design page', () => {
+  const me = read(join('app', '(tabs)', 'me.tsx'));
+  const line = me.split('\n').find((l) => />My Camino<\/AppText>/.test(l)) ?? '';
+  assert.match(line, /variant="h4"/, 'the My Camino label is not an h4 (Fraunces 600) AppText');
+  assert.doesNotMatch(line, /textTransform|fontFamily/, 'the My Camino label carries a font of its own');
+  assert.match(read(join('src', 'theme', 'index.ts')), /title: 'Fraunces_600SemiBold'/);
+  const design = readFileSync(join(root, '..', 'design', 'index.html'), 'utf8');
+  const phone = design.slice(design.indexOf('<b>Me · Journey</b>'), design.indexOf('<b>Me · Write · Pick photos</b>'));
+  assert.match(phone, /font-family:var\(--cp-font-title\);[^"]*">My Camino</, 'the design card label is not Fraunces');
+});
+
 check('Buen Camino! is Caveat Bold, as the brand design system says: the accent variant in the app, the accent font at 700 in the design page, and one Caveat note on the Me phone', () => {
   // app: every display "Buen Camino!" is an AppText with variant="accent" (Caveat_700Bold in src/theme), never a font of its own
   for (const f of files) {
