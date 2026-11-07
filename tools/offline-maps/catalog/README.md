@@ -48,7 +48,7 @@ This only shows the shape. The coordinates are illustrative and the `<id>` stand
 | `name` | Text, "<from town> to <to town>". |
 | `from`, `to` | A point (below). `from` is within 1.5 km of the previous stage's `to` when both are in the catalog. |
 | `via` | 0 to 6 points in walking order. See "Choosing via points". Optional, `[]` when none. |
-| `extracts` | One or more ids from `scripts/geofabrik_extracts.json`, every region the stage touches. Each id once. A region that is not in the allowlist is added to it (same pull request); only `https://download.geofabrik.de/` `.osm.pbf` URLs are accepted. |
+| `extracts` | One or more ids from `scripts/geofabrik_extracts.json`, every region the stage touches. Each id once. A region that is not in the allowlist is added to it (same pull request); only `https://download.geofabrik.de/` `.osm.pbf` URLs are accepted. The build merges them with [`scripts/merge_extracts.sh`](../scripts/merge_extracts.sh), also when the regions are in two countries (Portugal and Galicia); an object that is in both with two versions keeps the newer one. |
 | `coastal` | `true` when the stage reaches the sea (the build then refuses to use a placeholder for the ocean polygons). |
 | `distance_km` | A number only together with a cited `distance_source`; otherwise `null`. Above 0 and at most 80. |
 | `distance_source` | Where the number comes from; `null` when `distance_km` is `null`. |

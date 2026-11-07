@@ -85,6 +85,7 @@ offline style (same palette, same layers) so switching is not jarring.
 | `stages/camino-frances-01.json` | Stage config: ids from the `stages`/`routes` tables, OSM extracts, search bbox, corridor width, max zoom, and the **quality band** and **render checks** every build must meet |
 | `stages/camino-frances-01.route.geojson` | Hand-placed fallback route (Napoleon + Valcarlos). Measurement builds may use it; a build that gets published may not |
 | `scripts/build_stage.sh` | Whole build: download (checksummed), cut, route, corridor, Planetiler (image pinned by digest), manifest |
+| `scripts/merge_extracts.sh` | Joins the extracts of a stage that touches two regions. Each extract comes from its own snapshot, so an object near the border can have two versions; the newest one is kept (a plain `osmium merge` keeps both and `osmium extract` then refuses the file) |
 | `scripts/route_from_osm.py` | Takes the real route from OSM hiking relations (Camino de Santiago / GR 65). Optional stage keys `route_exclude_regex`, `clip_km`, `min_route_km` (see "Catalog and generator") |
 | `catalog/` | The human-checked list of stages per route (from, via, to, extract ids): the source the stage files are generated from. Schema and steps in [catalog/README.md](catalog/README.md) |
 | `scripts/make_stages.py`, `scripts/check_stages.py` | `npm run stages` generates `stages/<slug>.json` and its fallback route from the catalog (`-- --check` is the CI guard); `npm run check-stages` validates every stage file |
@@ -96,7 +97,7 @@ offline style (same palette, same layers) so switching is not jarring.
 | `scripts/planetiler_image.sh` | Prints the pinned Planetiler image reference |
 | `viewer/` | MapLibre GL JS page that opens a `.pmtiles` with no network; CaminoPlus palette |
 | `test/render_offline.mjs` | Playwright test: renders with all outside requests blocked, then with the device offline; checks feature counts, labels and console errors |
-| `test/*.test.mjs`, `test/test_*.py` | Unit tests: quality gates, publish against a mock Supabase, dev server, PMTiles header, the stage generator and checker, `route_from_osm.py` on a made-up OSM extract written at test time |
+| `test/*.test.mjs`, `test/test_*.py` | Unit tests: quality gates, publish against a mock Supabase, dev server, PMTiles header, the stage generator and checker, `route_from_osm.py` on a made-up OSM extract written at test time, `merge_extracts.sh` on two made-up extracts with different versions of one node (needs the `osmium` command) |
 | `test/fixtures/` | A tiny made-up pack (`mini.pmtiles`, 8 KB) + its stage file, so the render test runs in seconds without Planetiler; `catalog/` is a made-up catalog for the generator tests |
 | `../../supabase/functions/offline-pack-url/` | Edge function: signed download link only for Pilgrim Plus subscribers |
 | `../../supabase/migrations/20261104170000_offline_packs_bucket.sql` | Private Storage bucket `offline-packs` |

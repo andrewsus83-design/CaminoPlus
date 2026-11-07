@@ -72,7 +72,9 @@ if [[ ! -s "$STAGE_PBF" ]]; then
   # Geofabrik headers carry the replication timestamp (the data's "as of" date).
   osmium fileinfo -g header.option.osmosis_replication_timestamp "${parts[0]}" > "$WORK/osm_timestamp" || true
   [[ -s "$WORK/osm_timestamp" ]] || date -u +%Y-%m-%dT%H:%M:%SZ > "$WORK/osm_timestamp"
-  osmium merge --overwrite -o "$WORK/merged.osm.pbf" "${parts[@]}"
+  # Extracts of two regions come from two snapshots of OSM: merge_extracts.sh keeps the newest version of an object
+  # that is in both (a plain `osmium merge` keeps both versions, and osmium extract then refuses the file).
+  "$HERE/scripts/merge_extracts.sh" "$WORK/merged.osm.pbf" "${parts[@]}"
   osmium extract --overwrite --strategy=smart -b "$SEARCH_BBOX" -o "$STAGE_PBF" "$WORK/merged.osm.pbf"
   rm -f "$WORK/merged.osm.pbf"
 fi
