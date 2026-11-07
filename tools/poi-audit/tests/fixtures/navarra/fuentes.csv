@@ -1,0 +1,33 @@
+﻿_id,CAMINO,ETAPA,MUNICIPIO,COORD_X,COORD_Y
+1,Francés,F1 (Francia-Orreaga/Roncesvalles),Luzaide/Valcarlos,638220,4772411
+2,Francés,F1 (Francia-Orreaga/Roncesvalles),Luzaide/Valcarlos,635886,4765575
+3,Francés,F1 (Francia-Orreaga/Roncesvalles),Luzaide/Valcarlos,641441,4767692
+4,Francés,F1 (Francia-Orreaga/Roncesvalles),Roncesvalles/Orreaga,637061,4763565
+5,Francés,F2 (Orreaga/Roncesvalles-Zubiri),Aurizberri/Espinal,633548,4760736
+6,Francés,F2 (Orreaga/Roncesvalles-Zubiri),Aurizberri/Espinal,633199,4760197
+7,Francés,F3 (Zubiri-Pamplona/Iruña),Esteribar,617504,4749015
+8,Francés,F3 (Zubiri-Pamplona/Iruña),Esteribar,616472,4746364
+9,Francés,F3 (Zubiri-Pamplona/Iruña),Esteribar,615839,4745643
+10,Francés,F4 (Pamplona/Iruña-Puente la Reina/Gares),Cizur,603259,4732522
+11,Francés,F5 (Puente la Reina/Gares-Estella/Lizarra),Mañeru,593567,4724940
+12,Francés,F5 (Puente la Reina/Gares-Estella/Lizarra),Cirauqui,590571,4725809
+13,Francés,F5 (Puente la Reina/Gares-Estella/Lizarra),Cirauqui,590541,4725824
+14,Francés,F5 (Puente la Reina/Gares-Estella/Lizarra),Villatuerta,581882,4724337
+15,Francés,F5 (Puente la Reina/Gares-Estella/Lizarra),Villatuerta,581525,4723888
+16,Francés,F6 (Estella/Lizarra-Los Arcos),Villamayor de Monjardín,573882,4720402
+17,Francés,F6 (Estella/Lizarra-Los Arcos),Azqueta,575403,4719984
+18,Francés,F6 (Estella/Lizarra-Los Arcos),Urbiola,572808,4718584
+19,Francés,F7 (Los Arcos-Logroño),Torres del Río,560061,4711386
+20,Francés,F7 (Los Arcos-Logroño),Viana,550315,4705408
+21,Aragonés,A1 (Huesca-Sangüesa/Zangoza),Sangüesa,645107,4714328
+22,Aragonés,A2 (Sangüesa/Zangoza-Monreal),Izco,629026,4724109
+23,Aragonés,A2 (Sangüesa/Zangoza-Monreal),Salinas de Ibargoiti,624011,4727791
+24,Aragonés,A2 (Sangüesa/Zangoza-Monreal),Rocaforte,640088,4717427
+25,Aragonés,A2 (Sangüesa/Zangoza-Monreal),Rocaforte,638890,4717768
+26,Aragonés,A2 (Sangüesa/Zangoza-Monreal),Rocaforte,638351,4718180
+27,Aragonés,A2 (Sangüesa/Zangoza-Monreal),Aibar,636589,4719229
+28,Aragonés,A2 (Sangüesa/Zangoza-Monreal),Aibar,635682,4719795
+29,Aragonés,A3 (Monreal-Puente la Reina/Gares),Muruarte de Reta,610173,4725892
+30,Aragonés,A3 (Monreal-Puente la Reina/Gares),Muruarte de Reta,609515,4724940
+31,Aragonés,A3 (Monreal-Puente la Reina/Gares),Muruzabal,601366,4725396
+32,Aragonés,A3 (Monreal-Puente la Reina/Gares),Muruzabal,601549,4725369
