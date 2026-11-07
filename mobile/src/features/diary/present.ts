@@ -88,6 +88,14 @@ export function metaLine(e: Pick<DiaryEntry, 'media' | 'place'>): string {
   return parts.join(' · ');
 }
 
+/** "Photos and videos: 120 MB of 2 GB": what the files of the whole diary use, for the top of the list; empty when there are none. */
+export function mediaUsageLine(entries: Pick<DiaryEntry, 'media'>[]): string {
+  let bytes = 0;
+  let count = 0;
+  for (const e of entries) for (const m of mediaOf(e)) { bytes += m.bytes; count += 1; }
+  return count === 0 ? '' : `Photos and videos: ${formatBytes(bytes)} of ${formatBytes(DIARY_MEDIA_BYTES_MAX)}`;
+}
+
 /** 1536 -> "2 KB", 38 MB -> "38 MB", 1.5 GB -> "1.5 GB": a size in the words a phone uses. */
 export function formatBytes(n: number): string {
   if (!Number.isFinite(n) || n < 0) return '';

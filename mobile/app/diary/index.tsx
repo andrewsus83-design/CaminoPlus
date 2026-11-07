@@ -8,7 +8,7 @@ import { Pill } from '@/components/Pill';
 import { Card, IconButton } from '@/components/ui';
 import { FormMessage } from '@/components/auth/Field';
 import { confirmDelete } from '@/features/diary/confirm';
-import { PRIVACY_LINE, dateLine, pagePreview, pageTitle, pagesLabel } from '@/features/diary/present';
+import { PRIVACY_LINE, dateLine, mediaUsageLine, metaLine, pagePreview, pageTitle, pagesLabel } from '@/features/diary/present';
 import type { DiaryEntry } from '@/features/diary/store';
 import { useDiary } from '@/features/diary/useDiary';
 import { radius, role } from '@/theme';
@@ -20,7 +20,8 @@ export default function DiaryList() {
   const [deleteFailed, setDeleteFailed] = useState(false);
   const goBack = () => (router.canGoBack() ? router.back() : router.replace('/library'));
   const write = () => router.push('/diary/new');
-  const ask = (e: DiaryEntry) => confirmDelete(pageTitle(e), async () => setDeleteFailed(!(await remove(e.id))));
+  const ask = (e: DiaryEntry) => confirmDelete(pageTitle(e), async () => setDeleteFailed(!(await remove(e.id))), metaLine(e) !== '');
+  const usage = mediaUsageLine(entries);
 
   return (
     <Screen tabBar={false}>
@@ -28,6 +29,7 @@ export default function DiaryList() {
       <View style={{ gap: 8 }}>
         <AppText variant="h2" accessibilityRole="header">My diary</AppText>
         {entries.length > 0 && <AppText variant="label" muted>{pagesLabel(entries.length)}</AppText>}
+        {usage !== '' && <AppText variant="caption" muted>{usage}</AppText>}
         <AppText variant="small" muted>{PRIVACY_LINE}</AppText>
       </View>
 
@@ -54,17 +56,19 @@ export default function DiaryList() {
               const name = pageTitle(e);
               const preview = pagePreview(e);
               const date = dateLine(e.createdAt);
+              const attached = metaLine(e);
               return (
                 <Card key={e.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingRight: 8 }}>
                   <Pressable
                     accessibilityRole="button"
-                    accessibilityLabel={`${name}. ${date}`}
+                    accessibilityLabel={attached ? `${name}. ${date}. ${attached}` : `${name}. ${date}`}
                     accessibilityHint="Opens this page"
                     onPress={() => router.push(`/diary/${e.id}`)}
                     style={({ pressed }) => ({ flex: 1, gap: 4, minHeight: 56, justifyContent: 'center', opacity: pressed ? 0.8 : 1 })}
                   >
                     <AppText variant="label" numberOfLines={1}>{name}</AppText>
                     {!!preview && <AppText variant="small" muted numberOfLines={2}>{preview}</AppText>}
+                    {attached !== '' && <AppText variant="caption" color={role.accentText} numberOfLines={1}>{attached}</AppText>}
                     <AppText variant="caption" muted>{date}</AppText>
                   </Pressable>
                   <IconButton flat name="trash" label={`Delete page: ${name}`} onPress={() => ask(e)} />

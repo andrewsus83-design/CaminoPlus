@@ -10,6 +10,7 @@
 import { Platform } from 'react-native';
 import { Directory, File, Paths } from 'expo-file-system';
 import { localStore } from '../../lib/localStore';
+import { diaryFiles } from './files';
 import { createDiaryStore, type DiaryStorage } from './store';
 
 const safe = (k: string) => k.replace(/[^A-Za-z0-9._-]/g, '_');
@@ -27,5 +28,6 @@ const strictStorage: DiaryStorage = {
   remove: (key) => localStore.remove(key),
 };
 
+// The photos and videos of the pages are files in their own folder (files.ts), outside kv/: signing out never touches them.
 export { newId } from './store';
-export const { loadEntries, saveEntry, deleteEntry, clearDiary } = createDiaryStore(strictStorage);
+export const { loadEntries, saveEntry, attachMedia, deleteEntry, sweepMedia, clearDiary } = createDiaryStore(strictStorage, diaryFiles);
