@@ -1,0 +1,60 @@
+import { useMemo } from 'react';
+import { ActivityIndicator } from 'react-native';
+import { useRouter } from 'expo-router';
+import { Screen } from '@/components/Screen';
+import { AppText } from '@/components/AppText';
+import { SampleNotice } from '@/components/SampleNotice';
+import { Card, IconButton } from '@/components/ui';
+import { FormMessage } from '@/components/auth/Field';
+import { BOOKMARK_NOT_SAVED, LIBRARY_BOOKMARKS_EMPTY } from '@/features/library/bookmarks';
+import { LibraryGroups } from '@/features/library/LibraryTabs';
+import { SavedPostCard } from '@/features/library/SavedPostCard';
+import { BOOKMARKS_NOTICE } from '@/features/library/sample';
+import { SAVED_EMPTY, SAVED_FAILED, SAVED_LIMIT_NOTE, SAVED_OFFLINE_EMPTY, SAVED_OFFLINE_NOTE } from '@/features/library/savedPosts';
+import { hitCount, hitsForKeys } from '@/features/library/search';
+import { useLibraryBookmarks } from '@/features/library/useLibraryBookmarks';
+import { useSavedPosts } from '@/features/library/useSavedPosts';
+import { role } from '@/theme';
+
+// Library > Bookmarks: what the pilgrim kept, in two parts. Library: the rows bookmarked in the tabs, which are examples for now and
+// live only on this phone (features/library/bookmarks.ts). Posts: the posts bookmarked in the journey viewer, read from the account
+// (features/library/savedPosts.ts) with the copy of the last visit when there is no signal. A bookmark taken off here stays in its place,
+// with an empty bookmark, until the screen is left, so a slip is put back with one tap.
+export default function Bookmarks() {
+  const router = useRouter();
+  const goBack = () => (router.canGoBack() ? router.back() : router.replace('/library'));
+  const marks = useLibraryBookmarks();
+  const saved = useSavedPosts();
+  const hits = useMemo(() => hitsForKeys(marks.shown), [marks.shown]);
+
+  return (
+    <Screen tabBar={false}>
+      <IconButton name="back" label="Back" onPress={goBack} />
+      <AppText variant="h2" accessibilityRole="header">Bookmarks</AppText>
+
+      <AppText variant="h4" accessibilityRole="header">Library</AppText>
+      {marks.failed && <FormMessage>{BOOKMARK_NOT_SAVED}</FormMessage>}
+      {hitCount(hits) > 0 ? (
+        <>
+          <SampleNotice title="Preview">{BOOKMARKS_NOTICE}</SampleNotice>
+          <LibraryGroups hits={hits} marks={marks} />
+        </>
+      ) : marks.ready && (
+        <Card><AppText variant="small" muted>{LIBRARY_BOOKMARKS_EMPTY}</AppText></Card>
+      )}
+
+      <AppText variant="h4" accessibilityRole="header" style={{ marginTop: 8 }}>Posts</AppText>
+      {!!saved.notice && <FormMessage>{saved.notice}</FormMessage>}
+      {saved.offlineNote && <FormMessage tone="info">{SAVED_OFFLINE_NOTE}</FormMessage>}
+      {saved.failedNote && <FormMessage>{SAVED_FAILED}</FormMessage>}
+      {saved.view === 'loading' && <ActivityIndicator accessibilityLabel="Loading your bookmarked posts" color={role.action} style={{ marginTop: 8 }} />}
+      {saved.view === 'offline-empty' && <Card><AppText variant="small" muted>{SAVED_OFFLINE_EMPTY}</AppText></Card>}
+      {saved.view === 'failed-empty' && <FormMessage>{SAVED_FAILED}</FormMessage>}
+      {saved.view === 'empty' && <Card><AppText variant="small" muted>{SAVED_EMPTY}</AppText></Card>}
+      {saved.view === 'list' && saved.posts.map((p) => (
+        <SavedPostCard key={p.id} post={p} me={saved.uid} on={saved.isOn(p.id)} toggle={() => void saved.toggle(p)} />
+      ))}
+      {saved.view === 'list' && saved.capped && <AppText variant="caption" muted>{SAVED_LIMIT_NOTE}</AppText>}
+    </Screen>
+  );
+}

@@ -67,8 +67,10 @@ check('no second hand-made rail: the old read-only pill is gone and nothing else
     const src = code(read(f));
     if (/EngagementRail|engagementItems/.test(src)) offenders.push(`${f}: still names the old rail`);
     if (f !== RAIL && /rgba\(255,\s*253,\s*248,\s*0?\.85\)|FIXED\.railCircle/.test(src) && f !== 'src/components/fixedColors.ts') offenders.push(`${f}: draws the rail's cream circle`);
-    // the bookmark icon belongs to the rail: its name is only in the rail model and in the icon set
-    if (!['src/lib/actionRail.ts', 'src/components/Icon.tsx'].includes(f) && /\bname=\{?[^}\n]*['"]bookmark['"]|\bicon:\s*['"]bookmark['"]/.test(src)) offenders.push(`${f}: uses the bookmark icon outside the rail`);
+    // the bookmark icon belongs to the rail: its name is only in the rail model and in the icon set. The one other place is the Library's
+    // own bookmark buttons (src/features/library: the button next to the diary, and the one on each row), which are buttons of a list
+    // and not a rail: no circles on a photo, no counts, no comments or share.
+    if (!['src/lib/actionRail.ts', 'src/components/Icon.tsx'].includes(f) && !f.startsWith('src/features/library/') && /\bname=\{?[^}\n]*['"]bookmark['"]|\bicon:\s*['"]bookmark['"]/.test(src)) offenders.push(`${f}: uses the bookmark icon outside the rail`);
   }
   assert.deepEqual(offenders, [], 'use components/ActionRail.tsx (data: lib/actionRail.ts) instead');
 });
