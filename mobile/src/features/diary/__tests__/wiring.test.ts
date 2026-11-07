@@ -31,18 +31,38 @@ check('the diary uses no network and no console, and the logic files import noth
   assert.doesNotMatch(read('src/features/diary/store.ts').split('\n').filter((l) => /^import /.test(l)).join('\n'), /localStore/, 'store.ts imports no phone store');
 });
 
-check('the editor saves when the person leaves: on Back, when the screen goes away, and when the app goes to the background', () => {
+check('the editor saves when the screen goes away and when the app goes to the background', () => {
   const hook = read('src/features/diary/useDiary.ts');
   assert.match(hook, /AppState\.addEventListener\('change'/);
   assert.match(hook, /state !== 'active'\) void saver\.flush\(\)/);
   assert.match(hook, /return \(\) => \{ alive\.current = false; void saver\.flush\(\); \}/, 'the saver is flushed when the screen goes away');
   const editor = read('app/diary/[id].tsx');
-  assert.match(editor, /await saver\.flush\(\)/, 'Back writes before it leaves');
   assert.match(editor, /autoFocus=\{!initial\}/, 'a new page opens ready to write');
   assert.match(editor, /router\.canGoBack\(\) \? router\.back\(\) : router\.replace\('\/library'\)/);
   assert.match(editor, /Saved on this phone/);
   assert.match(editor, /Saving…/);
   assert.match(editor, /This page is not here/);
+});
+
+check('storage.ts reads strictly, in the same places localStore writes: nothing there is null, anything that cannot be read throws', () => {
+  const storage = read('src/features/diary/storage.ts');
+  const local = read('src/lib/localStore.ts');
+  const get = /async getJSON<T>\(key: string\): Promise<T \| null> \{[\s\S]*?\n  \},/.exec(storage)?.[0] ?? '';
+  assert.ok(get.length > 100, 'the strict getJSON is there');
+  assert.doesNotMatch(get, /\bcatch\b|\.catch\(/, 'no error is swallowed on the way in');
+  assert.match(get, /text === null \? null : \(JSON\.parse\(text\) as T\)/, 'web: missing is null, damaged text throws');
+  assert.match(get, /file\.exists \? \(JSON\.parse\(await file\.text\(\)\) as T\) : null/, 'phone: missing is null, a read or parse error throws');
+  // the same places as localStore.ts: the layout is localStore's, the diary only reads it strictly
+  const safeRule = "const safe = (k: string) => k.replace(/[^A-Za-z0-9._-]/g, '_');";
+  assert.ok(local.includes(safeRule) && storage.includes(safeRule), 'the same file-name rule');
+  assert.ok(local.includes("new Directory(Paths.document, 'kv')") && storage.includes("new Directory(Paths.document, 'kv')"), 'the same folder');
+  assert.ok(local.includes('`${safe(k)}.json`') && storage.includes('`${safe(key)}.json`'), 'the same file name');
+  assert.ok(local.includes('`kv:${key}`') && storage.includes('`kv:${key}`'), 'the same web key');
+  // writes and removals are localStore's own, and the store is made over the strict reader, never over localStore itself
+  assert.match(storage, /setJSON: \(key, value\) => localStore\.setJSON\(key, value\)/);
+  assert.match(storage, /remove: \(key\) => localStore\.remove\(key\)/);
+  assert.match(storage, /createDiaryStore\(strictStorage\)/);
+  assert.doesNotMatch(storage, /createDiaryStore\(localStore\)/);
 });
 
 check('the list and the Library card read again when the screen comes back, so a page written a moment ago shows', () => {

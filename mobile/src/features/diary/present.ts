@@ -1,6 +1,6 @@
 // The words of the diary and how a page is read for a list, as pure functions (no React): what a page is called, its
 // preview, its date, and the gentle messages. Plain node tests cover them (npm run test:diary).
-import { BODY_MAX, ENTRIES_MAX, TITLE_MAX, type DiaryEntry, type SaveProblem } from './store';
+import { BODY_MAX, ENTRIES_MAX, TITLE_MAX, TOTAL_MAX, type DiaryEntry, type SaveProblem } from './store';
 
 export const UNTITLED = 'Untitled page';
 /** Said on the list, honestly: where the pages are, and what that means. */
@@ -71,6 +71,7 @@ export function problemMessage(p: SaveProblem): string {
     case 'body-too-long': return `This page is full (${thousands(BODY_MAX)} characters). Start a new page to keep writing.`;
     case 'title-too-long': return `A title can have up to ${TITLE_MAX} characters.`;
     case 'too-many-pages': return `Your diary holds ${thousands(ENTRIES_MAX)} pages, the most it can keep. Delete an old page to save this one.`;
+    case 'diary-full': return `Your diary is full: it can hold ${thousands(TOTAL_MAX)} characters in all. Your words are still here, so copy them, delete an old page, then paste them into a new one.`;
     default: return 'This page could not be saved. Your phone may be full. Your words are still here, so copy them before you leave.';
   }
 }

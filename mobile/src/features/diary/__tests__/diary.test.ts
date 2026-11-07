@@ -1,12 +1,12 @@
-// Plain-node checks of the private diary: what is stored and how it is read (never a throw, never a guess), the limits, writes
-// that take turns, the key that survives signing out but not deleting the account, the autosave of the editor with a clock the
-// test controls, and the words. No React Native. Run: npm run test:diary
+// Plain-node checks of the private diary: what is stored and how it is read (two slots, strict reads, never a throw, never a
+// guess), the limits, writes that take turns, the keys that survive signing out but not deleting the account, the autosave of
+// the editor with a clock the test controls, and the words. No React Native. Run: npm run test:diary
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { AUTOSAVE_MS, createPageSaver, type SaverDeps, type SaverView } from '../autosave';
 import { EMPTY_CARD_LINE, PRIVACY_LINE, UNTITLED, clip, dateLine, firstLine, pagePreview, pageTitle, pagesLabel, problemMessage, thousands } from '../present';
-import { BODY_MAX, ENTRIES_MAX, TITLE_MAX, createDiaryStore, diaryKey, isEntry, newId, pagesOf, type DiaryEntry, type DiaryStorage, type SaveResult } from '../store';
+import { BODY_MAX, ENTRIES_MAX, TITLE_MAX, TOTAL_MAX, createDiaryStore, isEntry, newId, oldKey, pagesOf, slotKey, type DiaryEntry, type DiaryStorage, type SaveResult } from '../store';
 
 let n = 0;
 // A test that never finishes must fail, not end the process quietly (node exits when nothing is pending, with code 0).
@@ -29,18 +29,22 @@ type Op = 'get' | 'set' | 'remove';
 type FakeOpts = {
   /** Milliseconds one call takes, by operation and by how many calls of that kind there were (1-based). */
   latency?: (op: Op, call: number) => number;
-  /** Operations that throw (lib/localStore.ts never does; the diary must not depend on that). */
+  /** Operations that throw for every key (a disk that does not answer). */
   throwOn?: Op[];
-  /** setJSON calls (1-based) that fail by answering false, like a full disk. */
+  /** setJSON calls (1-based) that answer false, like a full disk. */
   failSets?: number[];
-  /** A file that does not parse throws, instead of answering null like lib/localStore.ts does. */
-  throwOnCorrupt?: boolean;
+  /** setJSON calls (1-based) that die half way: half of the text is left in the file and the call throws, as if the process was killed. */
+  crashSets?: number[];
 };
 
-// Values are kept as JSON text, as on the phone, so what is stored is what was serialized and nothing is shared by reference.
+// Values are kept as JSON text, as on the phone. getJSON reads the way storage.ts does, strictly: nothing there is null, a key
+// that cannot be read throws, and text that does not parse (cut off, damaged, empty) throws.
 function fake(opts: FakeOpts = {}) {
   const files = new Map<string, string>();
+  const unreadable = new Set<string>(); // keys the disk refuses to read
+  const unremovable = new Set<string>(); // keys the disk refuses to delete
   const calls = { get: 0, set: 0, remove: 0 };
+  const writes: { key: string; seq: number | null; cut: boolean }[] = [];
   const take = async (op: Op) => {
     calls[op] += 1;
     const call = calls[op];
@@ -52,143 +56,280 @@ function fake(opts: FakeOpts = {}) {
   const storage: DiaryStorage = {
     async getJSON<T>(key: string) {
       await take('get');
+      if (unreadable.has(key)) throw new Error(`${key} cannot be read`);
       const text = files.get(key);
       if (text === undefined) return null;
-      try { return JSON.parse(text) as T; } catch { if (opts.throwOnCorrupt) throw new Error('corrupt'); return null; }
+      return JSON.parse(text) as T;
     },
     async setJSON(key, value) {
       const call = await take('set');
+      const text = JSON.stringify(value);
+      const seq = (value as { seq?: number } | null)?.seq ?? null;
+      if (opts.crashSets?.includes(call)) {
+        files.set(key, text.slice(0, Math.floor(text.length / 2)));
+        writes.push({ key, seq, cut: true });
+        throw new Error('the process was killed');
+      }
       if (opts.failSets?.includes(call)) return false;
-      files.set(key, JSON.stringify(value));
+      files.set(key, text);
+      writes.push({ key, seq, cut: false });
       return true;
     },
     async remove(key) {
       await take('remove');
+      if (unremovable.has(key)) throw new Error(`${key} cannot be removed`);
       files.delete(key);
     },
   };
   return {
-    storage, files, calls,
+    storage, files, calls, writes, unreadable, unremovable,
     seed: (key: string, value: unknown) => { files.set(key, JSON.stringify(value)); },
     seedText: (key: string, text: string) => { files.set(key, text); },
     stored: (key: string): unknown => { const t = files.get(key); return t === undefined ? undefined : JSON.parse(t); },
   };
 }
+type Fake = ReturnType<typeof fake>;
 
 const page = (id: string, createdAt: string, over: Partial<DiaryEntry> = {}): DiaryEntry => ({ id, createdAt, updatedAt: createdAt, title: '', body: `text of ${id}`, ...over });
 const day = (d: number) => new Date(Date.UTC(2026, 10, d, 12, 0, 0)).toISOString();
+const slot = (seq: number, entries: unknown[]) => ({ v: 1, seq, entries });
+const A = (uid = UID) => slotKey(uid, 'a');
+const B = (uid = UID) => slotKey(uid, 'b');
+const ids = (list: DiaryEntry[]) => list.map((e) => e.id);
+const seqOf = (value: unknown) => (value as { seq?: number } | undefined)?.seq;
+const entriesOf = (value: unknown) => (value as { entries: unknown[] }).entries;
+const untouched = (f: Fake) => [f.files.get(A()), f.files.get(B()), f.files.get(oldKey(UID))];
 
 const GOOD = page('g1', day(1), { title: 'Roncesvalles', body: 'Cold and clear.' });
 
 (async () => {
-  /* ---------------------------------------------------------------- the key */
+  /* ---------------------------------------------------------------- the keys */
 
-  await test('the diary key never starts with u.: signing out wipes u.<id>.… and cannot touch it', () => {
+  await test('the diary keys never start with u.: signing out wipes u.<id>.… and cannot touch them', () => {
     for (const uid of [UID, OTHER, 'u', 'u.', 'u.abc', 'abc', '0']) {
-      const key = diaryKey(uid);
-      assert.ok(!key.startsWith('u.'), key);
-      assert.ok(key.startsWith('diary.') && key.endsWith(uid), key);
+      for (const key of [slotKey(uid, 'a'), slotKey(uid, 'b'), oldKey(uid)]) {
+        assert.ok(!key.startsWith('u.'), key);
+        assert.ok(key.startsWith('diary.') && key.includes(uid), key);
+      }
     }
-    assert.notEqual(diaryKey(UID), diaryKey(OTHER), 'each account has its own key');
+    const keys = [UID, OTHER].flatMap((uid) => [slotKey(uid, 'a'), slotKey(uid, 'b'), oldKey(uid)]);
+    assert.equal(new Set(keys).size, 6, 'each account has its own keys, and the two slots differ');
   });
 
   await test('a new page id is a fresh uuid every time', () => {
-    const ids = new Set(Array.from({ length: 200 }, () => newId()));
-    assert.equal(ids.size, 200);
-    for (const id of ids) assert.match(id, /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
+    const made = new Set(Array.from({ length: 200 }, () => newId()));
+    assert.equal(made.size, 200);
+    for (const id of made) assert.match(id, /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
   });
 
   /* ---------------------------------------------------------------- reading what is there */
 
-  await test('nothing stored, or something that is not a version 1 diary: an empty list, never an error, and nothing is written', async () => {
+  await test('nothing stored: an empty list, and a read writes nothing', async () => {
+    const f = fake();
+    assert.deepEqual(await createDiaryStore(f.storage).loadEntries(UID), []);
+    assert.equal(f.files.size, 0);
+    assert.equal(f.calls.set + f.calls.remove, 0);
+  });
+
+  await test('a slot that is not a version 1 slot is ignored, in either place: an empty list, never an error, and nothing is written', async () => {
     const odd: [string, unknown][] = [
       ['text', 'hello'], ['a number', 42], ['true', true], ['a list', []], ['a list of pages', [GOOD]], ['an empty object', {}],
-      ['no entries', { v: 1 }], ['entries that is not a list', { v: 1, entries: 'x' }], ['entries that is an object', { v: 1, entries: {} }],
-      ['a version that is text', { v: '1', entries: [GOOD] }], ['a newer version', { v: 2, entries: [GOOD] }], ['version 0', { v: 0, entries: [GOOD] }], ['no version', { entries: [GOOD] }],
+      ['no entries', { v: 1, seq: 1 }], ['entries that is not a list', { v: 1, seq: 1, entries: 'x' }], ['entries that is an object', { v: 1, seq: 1, entries: {} }],
+      ['a version that is text', { v: '1', seq: 1, entries: [GOOD] }], ['a newer version', { v: 2, seq: 1, entries: [GOOD] }], ['version 0', { v: 0, seq: 1, entries: [GOOD] }],
+      ['no version', { seq: 1, entries: [GOOD] }], ['no seq (the first build wrote none)', { v: 1, entries: [GOOD] }], ['a seq that is text', { v: 1, seq: '3', entries: [GOOD] }],
+      ['a negative seq', { v: 1, seq: -1, entries: [GOOD] }], ['a seq that is not whole', { v: 1, seq: 1.5, entries: [GOOD] }], ['a seq that is null', { v: 1, seq: null, entries: [GOOD] }],
     ];
-    for (const [what, value] of odd) {
-      const f = fake();
-      f.seed(diaryKey(UID), value);
-      const before = f.files.get(diaryKey(UID));
-      assert.deepEqual(await createDiaryStore(f.storage).loadEntries(UID), [], what);
-      assert.equal(f.files.get(diaryKey(UID)), before, `${what}: a read must not change what is stored`);
-      assert.equal(f.calls.set + f.calls.remove, 0, `${what}: a read must not write`);
+    for (const key of [A(), B()]) {
+      for (const [what, value] of odd) {
+        const f = fake();
+        f.seed(key, value);
+        const before = f.files.get(key);
+        assert.deepEqual(await createDiaryStore(f.storage).loadEntries(UID), [], what);
+        assert.equal(f.files.get(key), before, `${what}: a read must not change what is stored`);
+        assert.equal(f.calls.set + f.calls.remove, 0, `${what}: a read must not write`);
+      }
     }
-    const none = fake();
-    assert.deepEqual(await createDiaryStore(none.storage).loadEntries(UID), []);
-    assert.equal(none.files.size, 0);
   });
 
-  await test('corrupt JSON reads as an empty diary: with lib/localStore.ts (null) and with a storage that throws', async () => {
-    const corrupt = '{"v":1,"entries":[{"id":"a"';
-    const quiet = fake();
-    quiet.seedText(diaryKey(UID), corrupt);
-    assert.deepEqual(await createDiaryStore(quiet.storage).loadEntries(UID), []);
-    assert.equal(quiet.files.get(diaryKey(UID)), corrupt, 'the damaged file is still there');
-
-    const loud = fake({ throwOnCorrupt: true });
-    loud.seedText(diaryKey(UID), corrupt);
-    assert.deepEqual(await createDiaryStore(loud.storage).loadEntries(UID), []);
-    assert.equal(loud.files.get(diaryKey(UID)), corrupt);
+  await test('the diary is the readable slot with the higher seq; equal numbers take slot a', async () => {
+    const x = page('x', day(1)); const y = page('y', day(2));
+    const at = async (a: unknown, b: unknown) => { const f = fake(); f.seed(A(), a); f.seed(B(), b); return ids(await createDiaryStore(f.storage).loadEntries(UID)); };
+    assert.deepEqual(await at(slot(5, [x]), slot(6, [y])), ['y']);
+    assert.deepEqual(await at(slot(7, [x]), slot(6, [y])), ['x']);
+    assert.deepEqual(await at(slot(6, [x]), slot(6, [y])), ['x']);
+    assert.deepEqual(await at(slot(0, [x]), slot(1, [y])), ['y']);
   });
 
-  await test('a storage that throws: a read shows nothing, a save or a delete says it did not happen, and nothing is written', async () => {
-    const f = fake({ throwOn: ['get'] });
-    f.seed(diaryKey(UID), { v: 1, entries: [GOOD] });
-    const before = f.files.get(diaryKey(UID));
+  const damages: [string, (f: Fake, key: string) => void][] = [
+    ['missing', () => undefined],
+    ['damaged text', (f, key) => f.seedText(key, 'not json at all {{{')],
+    ['cut off in the middle', (f, key) => f.seedText(key, JSON.stringify(slot(9, [GOOD, page('g2', day(2))])).slice(0, 60))],
+    ['empty', (f, key) => f.seedText(key, '')],
+    ['of another version', (f, key) => f.seed(key, { v: 2, seq: 9, entries: [GOOD] })],
+    ['unreadable (the disk says no)', (f, key) => { f.seed(key, slot(9, [GOOD])); f.unreadable.add(key); }],
+  ];
+
+  for (const [which, other] of [['b', 'a'], ['a', 'b']] as const) {
+    await test(`slot ${which} missing, damaged, cut off, empty, of another version or unreadable: the pages of slot ${other} are shown, and a read writes nothing`, async () => {
+      for (const [what, damage] of damages) {
+        const f = fake();
+        const good = page('good', day(3));
+        f.seed(which === 'a' ? B() : A(), slot(4, [good]));
+        damage(f, which === 'a' ? A() : B());
+        assert.deepEqual(ids(await createDiaryStore(f.storage).loadEntries(UID)), ['good'], what);
+        assert.equal(f.calls.set + f.calls.remove, 0, `${what}: a read must not write`);
+      }
+    });
+  }
+
+  await test('the next save replaces a slot that was damaged, and the pages of the good one are carried over', async () => {
+    for (const [what, damage] of damages.filter(([w]) => !w.startsWith('unreadable'))) {
+      const f = fake();
+      f.seed(A(), slot(4, [page('old', day(1))]));
+      damage(f, B());
+      const store = createDiaryStore(f.storage);
+      assert.deepEqual(await store.saveEntry(UID, page('new', day(2))), { ok: true }, what);
+      assert.equal(seqOf(f.stored(B())), 5, `${what}: written to the damaged slot, one after the newest`);
+      assert.equal(seqOf(f.stored(A())), 4, `${what}: the good slot is not touched`);
+      assert.deepEqual(ids(await store.loadEntries(UID)), ['new', 'old'], what);
+    }
+  });
+
+  await test('the slots take turns: every write goes to the older slot with the next seq, and the other still holds the state before', async () => {
+    const f = fake();
     const store = createDiaryStore(f.storage);
+    for (let i = 1; i <= 5; i++) assert.deepEqual(await store.saveEntry(UID, page(`p${i}`, day(i))), { ok: true });
+    assert.deepEqual(f.writes.map((w) => [w.key === A() ? 'a' : 'b', w.seq]), [['a', 1], ['b', 2], ['a', 3], ['b', 4], ['a', 5]]);
+    assert.equal(entriesOf(f.stored(A())).length, 5);
+    assert.equal(entriesOf(f.stored(B())).length, 4, 'the slot that was not written still holds the previous state');
+    assert.deepEqual(ids(await store.loadEntries(UID)), ['p5', 'p4', 'p3', 'p2', 'p1']);
+  });
+
+  await test('a write that dies half way costs at most that write: after a restart the pages before it are there, and the next save replaces the cut-off slot', async () => {
+    const f = fake({ crashSets: [3] });
+    const first = createDiaryStore(f.storage);
+    assert.deepEqual(await first.saveEntry(UID, page('p1', day(1))), { ok: true });
+    assert.deepEqual(await first.saveEntry(UID, page('p2', day(2))), { ok: true });
+    assert.deepEqual(await first.saveEntry(UID, page('p3', day(3))), { ok: false, reason: 'not-saved' }, 'the third write was killed');
+    assert.throws(() => f.stored(A()), 'slot a is cut off');
+    assert.equal(seqOf(f.stored(B())), 2, 'slot b has the state before it');
+
+    const restarted = createDiaryStore(f.storage); // a new run of the app over the same files
+    assert.deepEqual(ids(await restarted.loadEntries(UID)), ['p2', 'p1']);
+    assert.deepEqual(await restarted.saveEntry(UID, page('p4', day(4))), { ok: true });
+    assert.deepEqual([seqOf(f.stored(A())), seqOf(f.stored(B()))], [3, 2], 'the cut-off slot is replaced');
+    assert.deepEqual(ids(await restarted.loadEntries(UID)), ['p4', 'p2', 'p1']);
+  });
+
+  await test('a kill during the very first write leaves a cut-off slot and nothing else: the diary is empty and can be written again, not stuck', async () => {
+    const f = fake({ crashSets: [1] });
+    assert.deepEqual(await createDiaryStore(f.storage).saveEntry(UID, page('p1', day(1))), { ok: false, reason: 'not-saved' });
+    assert.throws(() => f.stored(A()));
+    const restarted = createDiaryStore(f.storage);
+    assert.deepEqual(await restarted.loadEntries(UID), []);
+    assert.deepEqual(await restarted.saveEntry(UID, page('p2', day(2))), { ok: true });
+    assert.deepEqual(ids(await restarted.loadEntries(UID)), ['p2']);
+    assert.equal(seqOf(f.stored(A())), 1);
+  });
+
+  await test('a failed write (a full disk) leaves the state before it, and the next save carries on from there', async () => {
+    const f = fake({ failSets: [3] });
+    const store = createDiaryStore(f.storage);
+    await store.saveEntry(UID, page('p1', day(1)));
+    await store.saveEntry(UID, page('p2', day(2)));
+    assert.deepEqual(await store.saveEntry(UID, page('p3', day(3))), { ok: false, reason: 'not-saved' });
+    assert.deepEqual(ids(await store.loadEntries(UID)), ['p2', 'p1']);
+    assert.deepEqual(await store.saveEntry(UID, page('p3', day(3))), { ok: true });
+    assert.deepEqual(ids(await store.loadEntries(UID)), ['p3', 'p2', 'p1']);
+  });
+
+  await test('neither slot can be read: an empty list, saves and deletes say they did not happen, and nothing is ever written over what is there', async () => {
+    // a disk that does not answer, for every key
+    const mute = fake({ throwOn: ['get'] });
+    mute.seed(A(), slot(7, [GOOD])); mute.seed(B(), slot(6, [GOOD]));
+    const before = untouched(mute);
+    const store = createDiaryStore(mute.storage);
     assert.deepEqual(await store.loadEntries(UID), []);
     assert.deepEqual(await store.saveEntry(UID, page('p', day(2))), { ok: false, reason: 'not-saved' });
     assert.equal(await store.deleteEntry(UID, 'g1'), false);
-    assert.equal(f.files.get(diaryKey(UID)), before, 'what could not be read is not overwritten');
-    assert.equal(f.calls.set, 0);
+    assert.deepEqual(untouched(mute), before);
+    assert.equal(mute.calls.set, 0);
 
-    const w = fake({ throwOn: ['set'] });
-    assert.deepEqual(await createDiaryStore(w.storage).saveEntry(UID, page('p', day(2))), { ok: false, reason: 'not-saved' });
-    const r = fake({ throwOn: ['remove'] });
-    await createDiaryStore(r.storage).clearDiary(UID); // does not throw
+    // both slots refuse to be read now, and give the pages back when the disk recovers
+    const f = fake();
+    f.seed(A(), slot(7, [page('newest', day(3))])); f.seed(B(), slot(6, [page('older', day(2))]));
+    f.unreadable.add(A()); f.unreadable.add(B());
+    const s = createDiaryStore(f.storage);
+    assert.deepEqual(await s.loadEntries(UID), []);
+    assert.deepEqual(await s.saveEntry(UID, page('p', day(4))), { ok: false, reason: 'not-saved' });
+    assert.equal(await s.deleteEntry(UID, 'newest'), false);
+    assert.equal(f.calls.set + f.calls.remove, 0);
+    f.unreadable.clear();
+    assert.deepEqual(ids(await s.loadEntries(UID)), ['newest'], 'nothing was lost while it could not be read');
+
+    // both damaged
+    const g = fake();
+    g.seedText(A(), '{"v":1,"seq":7,"entries":[{"id"'); g.seedText(B(), 'garbage');
+    const before2 = untouched(g);
+    const t = createDiaryStore(g.storage);
+    assert.deepEqual(await t.loadEntries(UID), []);
+    assert.deepEqual(await t.saveEntry(UID, page('p', day(4))), { ok: false, reason: 'not-saved' });
+    assert.deepEqual(untouched(g), before2);
   });
 
-  await test('a value that cannot be read is not overwritten by a read, a delete or a refused page; the first page written replaces it', async () => {
+  await test('with no valid slot and none unreadable, a new diary starts at seq 1 in slot a and slot b is left alone', async () => {
     const f = fake();
-    f.seed(diaryKey(UID), { v: 2, entries: [{ id: 'later', body: { blocks: ['rich text of a newer app'] } }] });
-    const before = f.files.get(diaryKey(UID));
+    const newer = { v: 2, seq: 9, entries: [{ id: 'later', body: { blocks: ['rich text of a newer app'] } }] };
+    f.seed(B(), newer);
+    const before = f.files.get(B());
     const store = createDiaryStore(f.storage);
     assert.deepEqual(await store.loadEntries(UID), []);
-    assert.equal(await store.deleteEntry(UID, 'later'), true, 'there is nothing readable to delete');
-    assert.deepEqual(await store.saveEntry(UID, page('big', day(2), { body: 'x'.repeat(BODY_MAX + 1) })), { ok: false, reason: 'body-too-long' });
-    assert.equal(f.files.get(diaryKey(UID)), before, 'untouched until a page is really written');
     assert.deepEqual(await store.saveEntry(UID, page('first', day(3))), { ok: true });
-    assert.deepEqual(f.stored(diaryKey(UID)), { v: 1, entries: [page('first', day(3))] });
+    assert.deepEqual(f.stored(A()), slot(1, [page('first', day(3))]));
+    assert.equal(f.files.get(B()), before, 'what a newer app wrote is not touched');
+    assert.equal(await store.deleteEntry(UID, 'later'), true, 'there is nothing readable to delete');
+    assert.equal(f.files.get(B()), before);
   });
 
-  await test('items of a good diary that do not read as pages are not shown, and are kept when the others are saved or deleted', async () => {
+  await test('a refused page leaves both slots exactly as they were', async () => {
+    const f = fake();
+    const store = createDiaryStore(f.storage);
+    await store.saveEntry(UID, page('p1', day(1)));
+    await store.saveEntry(UID, page('p2', day(2)));
+    const before = untouched(f);
+    assert.deepEqual(await store.saveEntry(UID, page('big', day(3), { body: 'x'.repeat(BODY_MAX + 1) })), { ok: false, reason: 'body-too-long' });
+    assert.deepEqual(await store.saveEntry(UID, page('long', day(3), { title: 't'.repeat(TITLE_MAX + 1) })), { ok: false, reason: 'title-too-long' });
+    assert.deepEqual(untouched(f), before);
+  });
+
+  await test('items of a good slot that do not read as pages are not shown, and are kept when the others are saved or deleted', async () => {
     const f = fake();
     const junk = [null, 'x', 7, { id: 5 }, { id: 'no-text', createdAt: day(1), updatedAt: day(1) }, { ...GOOD, id: 'bad-date', createdAt: 'yesterday' }, { ...GOOD, id: '' }];
     const newer = { ...GOOD, id: 'g2', createdAt: day(2), updatedAt: day(2), mood: 'grateful' }; // a field of a newer app
-    f.seed(diaryKey(UID), { v: 1, entries: [GOOD, ...junk, newer] });
+    f.seed(A(), slot(3, [GOOD, ...junk, newer]));
     const store = createDiaryStore(f.storage);
-    assert.deepEqual((await store.loadEntries(UID)).map((e) => e.id), ['g2', 'g1']);
+    assert.deepEqual(ids(await store.loadEntries(UID)), ['g2', 'g1']);
 
     assert.deepEqual(await store.saveEntry(UID, page('g3', day(3))), { ok: true });
-    const raw = (f.stored(diaryKey(UID)) as { entries: unknown[] }).entries;
+    const raw = entriesOf(f.stored(B()));
+    assert.equal(seqOf(f.stored(B())), 4);
     assert.equal(raw.length, 1 + junk.length + 1 + 1, 'nothing was dropped');
     assert.deepEqual(raw.slice(1, 1 + junk.length), junk);
 
     // saving a page over one that a newer app wrote keeps that app's extra fields
     assert.deepEqual(await store.saveEntry(UID, { ...newer, body: 'edited' } as DiaryEntry), { ok: true });
-    const again = (f.stored(diaryKey(UID)) as { entries: Record<string, unknown>[] }).entries.find((e) => e && e.id === 'g2');
-    assert.equal(again?.mood, 'grateful');
-    assert.equal(again?.body, 'edited');
+    const again = entriesOf(f.stored(A())).find((e) => e && (e as { id?: string }).id === 'g2') as Record<string, unknown>;
+    assert.equal(again.mood, 'grateful');
+    assert.equal(again.body, 'edited');
 
     assert.equal(await store.deleteEntry(UID, 'g1'), true);
-    const left = (f.stored(diaryKey(UID)) as { entries: unknown[] }).entries;
+    const left = entriesOf(f.stored(B()));
     assert.deepEqual(left.slice(0, junk.length), junk, 'the unreadable items are still there after a delete');
   });
 
   await test('the same id twice in a stored list shows one page', async () => {
     const f = fake();
-    f.seed(diaryKey(UID), { v: 1, entries: [GOOD, { ...GOOD, body: 'copy' }] });
+    f.seed(A(), slot(1, [GOOD, { ...GOOD, body: 'copy' }]));
     const list = await createDiaryStore(f.storage).loadEntries(UID);
     assert.equal(list.length, 1);
     assert.equal(list[0].body, GOOD.body);
@@ -202,28 +343,30 @@ const GOOD = page('g1', day(1), { title: 'Roncesvalles', body: 'Cold and clear.'
     assert.deepEqual(await store.saveEntry(UID, page('b', day(2))), { ok: true });
     assert.deepEqual(await store.saveEntry(UID, page('c', day(3))), { ok: true });
     assert.deepEqual(await store.saveEntry(UID, page('a', day(1))), { ok: true });
-    assert.deepEqual((await store.loadEntries(UID)).map((e) => e.id), ['c', 'b', 'a']);
+    assert.deepEqual(ids(await store.loadEntries(UID)), ['c', 'b', 'a']);
 
     // an edit changes the text and updatedAt, not the place in the list (the day it was begun)
     assert.deepEqual(await store.saveEntry(UID, { ...page('a', day(1)), title: 'Day one', body: 'edited', updatedAt: day(9) }), { ok: true });
     const list = await store.loadEntries(UID);
-    assert.deepEqual(list.map((e) => e.id), ['c', 'b', 'a']);
+    assert.deepEqual(ids(list), ['c', 'b', 'a']);
     assert.deepEqual(list[2], { id: 'a', createdAt: day(1), updatedAt: day(9), title: 'Day one', body: 'edited' });
-    assert.equal((f.stored(diaryKey(UID)) as { entries: unknown[] }).entries.length, 3);
 
     assert.equal(await store.deleteEntry(UID, 'b'), true);
-    assert.deepEqual((await store.loadEntries(UID)).map((e) => e.id), ['c', 'a']);
+    assert.deepEqual(ids(await store.loadEntries(UID)), ['c', 'a']);
+    const writes = f.writes.length;
     assert.equal(await store.deleteEntry(UID, 'b'), true, 'deleting what is not there is not an error');
     assert.equal(await store.deleteEntry(UID, 'nope'), true);
-    assert.deepEqual((await store.loadEntries(UID)).map((e) => e.id), ['c', 'a']);
+    assert.equal(f.writes.length, writes, 'and writes nothing');
+    assert.deepEqual(ids(await store.loadEntries(UID)), ['c', 'a']);
+    assert.equal(await createDiaryStore(fake().storage).deleteEntry(UID, 'x'), true, 'nothing stored, nothing to delete');
   });
 
   await test('the order is by the moment a page was begun, not by how its date is written; equal moments keep a fixed order', () => {
     const a = page('a', '2026-11-04T23:00:00-05:00'); // 04:00 UTC on the 5th
     const b = page('b', '2026-11-05T01:00:00Z');
-    assert.deepEqual(pagesOf([b, a]).map((e) => e.id), ['a', 'b'], 'a later instant first, although its text sorts earlier');
-    const tie = pagesOf([page('x', day(1)), page('z', day(1)), page('y', day(1))]).map((e) => e.id);
-    assert.deepEqual(tie, pagesOf([page('z', day(1)), page('y', day(1)), page('x', day(1))]).map((e) => e.id));
+    assert.deepEqual(ids(pagesOf([b, a])), ['a', 'b'], 'a later instant first, although its text sorts earlier');
+    const tie = ids(pagesOf([page('x', day(1)), page('z', day(1)), page('y', day(1))]));
+    assert.deepEqual(tie, ids(pagesOf([page('z', day(1)), page('y', day(1)), page('x', day(1))])));
   });
 
   await test('a page that does not read as one is refused, not stored', async () => {
@@ -245,10 +388,10 @@ const GOOD = page('g1', day(1), { title: 'Roncesvalles', body: 'Cold and clear.'
     const full = 'é'.repeat(BODY_MAX);
     assert.deepEqual(await store.saveEntry(UID, page('full', day(1), { body: full })), { ok: true });
     assert.equal((await store.loadEntries(UID))[0].body.length, BODY_MAX);
-    const before = f.files.get(diaryKey(UID));
+    const before = untouched(f);
     assert.deepEqual(await store.saveEntry(UID, page('over', day(2), { body: `${full}x` })), { ok: false, reason: 'body-too-long' });
     assert.deepEqual(await store.saveEntry(UID, page('full', day(1), { body: `${full}x` })), { ok: false, reason: 'body-too-long' }, 'an update too');
-    assert.equal(f.files.get(diaryKey(UID)), before);
+    assert.deepEqual(untouched(f), before);
   });
 
   await test('a title holds up to 120 characters', async () => {
@@ -260,11 +403,12 @@ const GOOD = page('g1', day(1), { title: 'Roncesvalles', body: 'Cold and clear.'
   await test('a person keeps up to 2,000 pages: the next new page is refused, a page already there can still be edited, deleting makes room', async () => {
     const f = fake();
     const entries = Array.from({ length: ENTRIES_MAX }, (_, i) => page(`p${i}`, new Date(Date.UTC(2020, 0, 1) + i * 60_000).toISOString()));
-    f.seed(diaryKey(UID), { v: 1, entries });
+    f.seed(A(), slot(1, entries));
     const store = createDiaryStore(f.storage);
     assert.equal((await store.loadEntries(UID)).length, ENTRIES_MAX);
+    const before = untouched(f);
     assert.deepEqual(await store.saveEntry(UID, page('one-too-many', day(1))), { ok: false, reason: 'too-many-pages' });
-    assert.equal((f.stored(diaryKey(UID)) as { entries: unknown[] }).entries.length, ENTRIES_MAX);
+    assert.deepEqual(untouched(f), before);
     assert.deepEqual(await store.saveEntry(UID, { ...entries[7], body: 'still editable' }), { ok: true });
     assert.equal(await store.deleteEntry(UID, 'p0'), true);
     assert.deepEqual(await store.saveEntry(UID, page('now-there-is-room', day(1))), { ok: true });
@@ -272,14 +416,45 @@ const GOOD = page('g1', day(1), { title: 'Roncesvalles', body: 'Cold and clear.'
     assert.match(problemMessage('too-many-pages'), /2,000 pages/);
   });
 
+  await test('the whole diary holds up to 2,000,000 characters: a save that would pass it is refused gently and writes nothing, a save that is not bigger always goes through', async () => {
+    const big = (i: number, size = BODY_MAX, ch = 'x') => page(`big${i}`, new Date(Date.UTC(2024, 0, 1) + i * 3_600_000).toISOString(), { body: ch.repeat(size) });
+    const f = fake();
+    f.seed(A(), slot(1, Array.from({ length: 99 }, (_, i) => big(i)))); // 1,980,000 characters
+    const store = createDiaryStore(f.storage);
+    assert.deepEqual(await store.saveEntry(UID, big(99)), { ok: true }, 'exactly 2,000,000 is allowed');
+    const full = untouched(f);
+
+    assert.deepEqual(await store.saveEntry(UID, page('one-more', day(1), { body: 'y' })), { ok: false, reason: 'diary-full' }, 'one character more is not');
+    assert.deepEqual(await store.saveEntry(UID, { ...big(3), body: `${'x'.repeat(BODY_MAX - 1)}z`, title: 't' }), { ok: false, reason: 'diary-full' }, 'a page that grows is refused too');
+    assert.deepEqual(untouched(f), full, 'a refusal writes nothing');
+
+    assert.deepEqual(await store.saveEntry(UID, big(3, BODY_MAX, 'q')), { ok: true }, 'a page that is not bigger is saved, even in a full diary');
+    assert.deepEqual(await store.saveEntry(UID, big(3, 100)), { ok: true }, 'and one that gets shorter');
+    assert.deepEqual(await store.saveEntry(UID, page('one-more', day(1), { body: 'y'.repeat(100) })), { ok: true }, 'which makes room again');
+    assert.equal(await store.deleteEntry(UID, 'big4'), true, 'deleting is always possible');
+    assert.equal((await store.loadEntries(UID)).reduce((sum, e) => sum + e.title.length + e.body.length, 0) <= TOTAL_MAX, true);
+    assert.match(problemMessage('diary-full'), /^Your diary is full/);
+    assert.match(problemMessage('diary-full'), /2,000,000 characters/);
+    assert.ok(TOTAL_MAX === 2_000_000 && TOTAL_MAX < ENTRIES_MAX * BODY_MAX, 'the total, not the page count, is what bounds a save');
+
+    // a diary that is over the cap already (written by something else): shrinking is allowed, growing is not
+    const over = fake();
+    over.seed(A(), slot(1, Array.from({ length: 105 }, (_, i) => big(i)))); // 2,100,000 characters
+    const s = createDiaryStore(over.storage);
+    assert.deepEqual(await s.saveEntry(UID, page('new', day(1), { body: 'y' })), { ok: false, reason: 'diary-full' });
+    assert.deepEqual(await s.saveEntry(UID, big(1, 10)), { ok: true });
+    assert.deepEqual(await s.saveEntry(UID, big(2, BODY_MAX - 1)), { ok: true });
+  });
+
   /* ---------------------------------------------------------------- writes take turns */
 
   await test('two saves at once both survive, however slowly each one reads (a promise queue around read-modify-write)', async () => {
-    // The first read takes 25 ms and the second 1 ms: without taking turns the second page is written first and then lost.
-    const f = fake({ latency: (op, call) => (op === 'get' ? (call === 1 ? 25 : 1) : 0) });
+    // The first save reads its two slots in 25 ms and the second in 1 ms: without taking turns both start from an empty diary
+    // and the second page is lost.
+    const f = fake({ latency: (op, call) => (op === 'get' ? (call <= 2 ? 25 : 1) : 0) });
     const store = createDiaryStore(f.storage);
     await Promise.all([store.saveEntry(UID, page('a', day(1))), store.saveEntry(UID, page('b', day(2)))]);
-    assert.deepEqual((await store.loadEntries(UID)).map((e) => e.id), ['b', 'a']);
+    assert.deepEqual(ids(await store.loadEntries(UID)), ['b', 'a']);
   });
 
   await test('forty quick saves at mixed speeds lose nothing, and a save of one page twice ends with the later text', async () => {
@@ -288,6 +463,7 @@ const GOOD = page('g1', day(1), { title: 'Roncesvalles', body: 'Cold and clear.'
     const results = await Promise.all(Array.from({ length: 40 }, (_, i) => store.saveEntry(UID, page(`p${i}`, new Date(Date.UTC(2026, 0, 1) + i * 1000).toISOString()))));
     assert.ok(results.every((r) => r.ok));
     assert.equal((await store.loadEntries(UID)).length, 40);
+    assert.deepEqual(f.writes.map((w) => w.seq).slice(0, 40), Array.from({ length: 40 }, (_, i) => i + 1), 'one seq after the other, none twice');
     await Promise.all([store.saveEntry(UID, page('p3', day(1), { body: 'first' })), store.saveEntry(UID, page('p3', day(1), { body: 'second' }))]);
     assert.equal((await store.loadEntries(UID)).find((e) => e.id === 'p3')?.body, 'second');
   });
@@ -296,18 +472,18 @@ const GOOD = page('g1', day(1), { title: 'Roncesvalles', body: 'Cold and clear.'
     const f = fake({ latency: (op) => (op === 'set' ? 15 : 0) });
     const store = createDiaryStore(f.storage);
     void store.saveEntry(UID, page('a', day(1)));
-    assert.deepEqual((await store.loadEntries(UID)).map((e) => e.id), ['a'], 'the list opened right after Back shows the page written by Back');
+    assert.deepEqual(ids(await store.loadEntries(UID)), ['a'], 'the list opened right after Back shows the page written by Back');
 
     void store.saveEntry(UID, page('b', day(2)));
     void store.deleteEntry(UID, 'a');
-    assert.deepEqual((await store.loadEntries(UID)).map((e) => e.id), ['b']);
+    assert.deepEqual(ids(await store.loadEntries(UID)), ['b']);
 
     void store.saveEntry(UID, page('c', day(3)));
     await store.clearDiary(UID);
-    assert.equal(f.files.has(diaryKey(UID)), false, 'cleared after the pending save, not before it');
+    assert.deepEqual([f.files.has(A()), f.files.has(B())], [false, false], 'cleared after the pending save, not before it');
     void store.clearDiary(UID);
     await store.saveEntry(UID, page('d', day(4)));
-    assert.deepEqual((await store.loadEntries(UID)).map((e) => e.id), ['d']);
+    assert.deepEqual(ids(await store.loadEntries(UID)), ['d']);
   });
 
   await test('a write that fails does not stop the ones after it', async () => {
@@ -315,7 +491,7 @@ const GOOD = page('g1', day(1), { title: 'Roncesvalles', body: 'Cold and clear.'
     const store = createDiaryStore(f.storage);
     assert.deepEqual(await store.saveEntry(UID, page('a', day(1))), { ok: false, reason: 'not-saved' });
     assert.deepEqual(await store.saveEntry(UID, page('a', day(1))), { ok: true });
-    assert.deepEqual((await store.loadEntries(UID)).map((e) => e.id), ['a']);
+    assert.deepEqual(ids(await store.loadEntries(UID)), ['a']);
   });
 
   /* ---------------------------------------------------------------- one account, another account, signing out, deleting */
@@ -324,11 +500,12 @@ const GOOD = page('g1', day(1), { title: 'Roncesvalles', body: 'Cold and clear.'
     const f = fake();
     const store = createDiaryStore(f.storage);
     await store.saveEntry(UID, page('mine', day(1)));
+    await store.saveEntry(UID, page('mine2', day(2)));
     assert.deepEqual(await store.loadEntries(OTHER), []);
     await store.saveEntry(OTHER, page('theirs', day(2)));
     assert.equal(await store.deleteEntry(OTHER, 'mine'), true);
     await store.clearDiary(OTHER);
-    assert.deepEqual((await store.loadEntries(UID)).map((e) => e.id), ['mine']);
+    assert.deepEqual(ids(await store.loadEntries(UID)), ['mine2', 'mine']);
     assert.deepEqual(await store.loadEntries(OTHER), []);
   });
 
@@ -341,41 +518,85 @@ const GOOD = page('g1', day(1), { title: 'Roncesvalles', body: 'Cold and clear.'
   const wipePhone: Wipe = (files, prefix) => { for (const k of [...files.keys()]) if (`${safe(k)}.json`.startsWith(safe(prefix))) files.delete(k); };
 
   for (const [where, wipe] of [['on the web', wipeWeb], ['on a phone', wipePhone]] as [string, Wipe][]) {
-    await test(`signing out ${where} wipes the account's u.<id>.… keys and leaves the diary; signing in again shows it; deleting the account removes it`, async () => {
+    await test(`signing out ${where} wipes the account's u.<id>.… keys and leaves both slots of the diary; signing in again shows it; deleting the account removes them`, async () => {
       const f = fake();
       const store = createDiaryStore(f.storage);
       await store.saveEntry(UID, page('mine', day(1), { body: 'Hontanas' }));
+      await store.saveEntry(UID, page('mine2', day(2), { body: 'Burgos' })); // both slots hold a state now
       await store.saveEntry(OTHER, page('theirs', day(2)));
       for (const key of [`u.${UID}.account`, `u.${UID}.me`, `u.${UID}.places.stage`, `u.${OTHER}.account`, 'theme-scheme']) f.seed(key, { cached: true });
+      assert.ok(f.files.has(A()) && f.files.has(B()));
 
       // signOut for UID
       f.files.delete(`u.${UID}.account`);
       wipe(f.files, `u.${UID}.`);
       assert.deepEqual([...f.files.keys()].filter((k) => k.startsWith(`u.${UID}.`)), [], 'everything cached for the account is gone');
       assert.ok(f.files.has(`u.${OTHER}.account`) && f.files.has('theme-scheme'), 'other accounts and settings are not touched');
-      assert.deepEqual((await store.loadEntries(UID)).map((e) => e.body), ['Hontanas'], 'the diary survives signing out');
-      assert.deepEqual((await store.loadEntries(OTHER)).map((e) => e.id), ['theirs']);
-
-      // signed in again later: the same pages
-      assert.equal((await store.loadEntries(UID))[0].id, 'mine');
+      assert.ok(f.files.has(A()) && f.files.has(B()), 'both slots are still there');
+      assert.deepEqual((await store.loadEntries(UID)).map((e) => e.body), ['Burgos', 'Hontanas'], 'the diary survives signing out');
+      assert.deepEqual(ids(await store.loadEntries(OTHER)), ['theirs']);
 
       // deleting the account
       await store.clearDiary(UID);
       assert.deepEqual(await store.loadEntries(UID), []);
-      assert.equal(f.files.has(diaryKey(UID)), false);
-      assert.deepEqual((await store.loadEntries(OTHER)).map((e) => e.id), ['theirs'], "another account's diary stays");
+      assert.deepEqual([f.files.has(A()), f.files.has(B()), f.files.has(oldKey(UID))], [false, false, false]);
+      assert.deepEqual(ids(await store.loadEntries(OTHER)), ['theirs'], "another account's diary stays");
       assert.ok(f.files.has('theme-scheme'));
     });
   }
 
-  await test('clearDiary removes the diary whatever is stored there, also what cannot be read, and is quiet when there is none', async () => {
+  await test('clearDiary removes both slots and the old key whatever is stored there, also what cannot be read; one that cannot be removed does not stop the others', async () => {
     const f = fake();
-    f.seed(diaryKey(UID), { v: 9, entries: 'from the future' });
+    f.seed(A(), { v: 9, seq: 'from the future', entries: 'x' });
+    f.seedText(B(), 'cut o');
+    f.seed(oldKey(UID), { v: 1, entries: [GOOD] });
+    f.seed(A(OTHER), slot(1, [GOOD]));
     const store = createDiaryStore(f.storage);
     await store.clearDiary(UID);
-    assert.equal(f.files.has(diaryKey(UID)), false);
+    assert.deepEqual([f.files.has(A()), f.files.has(B()), f.files.has(oldKey(UID))], [false, false, false]);
+    assert.ok(f.files.has(A(OTHER)), "another account's diary stays");
     await store.clearDiary(UID);
     await store.clearDiary('');
+
+    const stubborn = fake();
+    stubborn.seed(A(), slot(2, [GOOD])); stubborn.seed(B(), slot(1, [GOOD])); stubborn.seed(oldKey(UID), { v: 1, entries: [GOOD] });
+    stubborn.unremovable.add(A());
+    await createDiaryStore(stubborn.storage).clearDiary(UID); // does not throw
+    assert.deepEqual([stubborn.files.has(A()), stubborn.files.has(B()), stubborn.files.has(oldKey(UID))], [true, false, false], 'the others are removed anyway');
+    await createDiaryStore(fake({ throwOn: ['remove'] }).storage).clearDiary(UID); // nor when the disk does not answer at all
+  });
+
+  await test('a diary the first build kept in one key is carried over by the first write and removed then; a stale copy is never read again; clearDiary removes it too', async () => {
+    const f = fake();
+    f.seed(oldKey(UID), { v: 1, entries: [GOOD] });
+    const store = createDiaryStore(f.storage);
+    assert.deepEqual(ids(await store.loadEntries(UID)), ['g1'], 'its pages show');
+    assert.equal(f.calls.set + f.calls.remove, 0, 'a read does not move or remove them');
+    assert.deepEqual(await store.saveEntry(UID, page('p2', day(2))), { ok: true });
+    assert.deepEqual(f.stored(A()), slot(1, [GOOD, page('p2', day(2))]), 'carried over into slot a');
+    assert.equal(f.files.has(oldKey(UID)), false, 'and the old key is gone, so a deleted page cannot come back from it');
+
+    f.seed(oldKey(UID), { v: 1, entries: [page('stale', day(5))] }); // a stale copy turns up
+    assert.deepEqual(ids(await store.loadEntries(UID)), ['p2', 'g1'], 'a slot that is valid wins');
+
+    const torn = fake({ crashSets: [1] });
+    torn.seed(oldKey(UID), { v: 1, entries: [GOOD] });
+    assert.deepEqual(await createDiaryStore(torn.storage).saveEntry(UID, page('p2', day(2))), { ok: false, reason: 'not-saved' });
+    assert.ok(torn.files.has(oldKey(UID)), 'the old key is only removed after the write went through');
+    assert.deepEqual(ids(await createDiaryStore(torn.storage).loadEntries(UID)), ['g1'], 'so after a kill the pages are still there');
+
+    const damaged = fake();
+    damaged.seedText(oldKey(UID), '{"v":1,"entries":[');
+    const before = damaged.files.get(oldKey(UID));
+    const d = createDiaryStore(damaged.storage);
+    assert.deepEqual(await d.loadEntries(UID), []);
+    assert.deepEqual(await d.saveEntry(UID, page('p', day(2))), { ok: true }, 'an old key that cannot be read does not stop a new diary');
+    assert.equal(damaged.files.get(oldKey(UID)), before, 'and is left alone');
+
+    await store.clearDiary(UID);
+    f.seed(oldKey(UID), { v: 1, entries: [GOOD] });
+    await store.clearDiary(UID);
+    assert.equal(f.files.has(oldKey(UID)), false);
   });
 
   await test('signing out leaves the diary alone (lib/auth.tsx) and the wipe only takes u.<id>.… keys (lib/localStore.ts)', () => {
@@ -437,7 +658,7 @@ const GOOD = page('g1', day(1), { title: 'Roncesvalles', body: 'Cold and clear.'
     assert.deepEqual([0, 999, 1000, 20000, 1234567].map(thousands), ['0', '999', '1,000', '20,000', '1,234,567']);
     assert.equal(PRIVACY_LINE, 'Only on this phone. Not uploaded, not shared. If you delete the app or lose this phone, these pages are gone.');
     assert.equal(EMPTY_CARD_LINE, 'Your diary is empty. Tap the pen to write the first page.');
-    for (const p of ['body-too-long', 'title-too-long', 'too-many-pages', 'not-saved'] as const) {
+    for (const p of ['body-too-long', 'title-too-long', 'too-many-pages', 'diary-full', 'not-saved'] as const) {
       const text = problemMessage(p);
       assert.ok(text.length > 20 && /\.$/.test(text) && !/error|fail|invalid|exception/i.test(text), text);
     }
