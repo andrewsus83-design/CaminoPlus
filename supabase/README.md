@@ -230,6 +230,12 @@ erDiagram
   happens outside the app (a message, WhatsApp), so `share_count` is the number of distinct pilgrims who shared the post, not
   the number of times. `post_shares` has no client access at all. The recount takes a lock on the post row first, so two
   pilgrims acting at the same moment cannot leave the count one too low (the smoke test checks this with two sessions).
+- **Bookmarked posts** (no migration of its own, tested by `dev/saved_posts_smoke.sql`). The Bookmarks screen of the app lists the
+  posts a pilgrim bookmarked with three plain selects: their `post_saves` (newest first, at most 50), the `posts` those rows name, and
+  the `profiles` of the authors who are not them. The policies that exist do all the work: "read own saves" shows nobody else's
+  bookmarks, "posts by visibility" leaves out a post that was deleted, hidden or made private since (a pilgrim still reads their own
+  deleted post, with `deleted_at` set, so the app drops those itself), and the read by `user_id` uses the index of the hardening
+  migration. If a policy of these tables changes, the smoke test says so, and the client contract check does the same for the columns.
   **Bookmarks** (migration `20261108030000_post_saves_visibility.sql`): a pilgrim reads, adds and removes their own `post_saves`
   rows and nobody else's. Adding needs a post you can see, with the insert rule of a like (`exists` over `posts`, so the policy
   "posts by visibility" decides); removing works also after you lost sight of the post. There is no update: UPDATE is revoked, a
