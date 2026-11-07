@@ -75,8 +75,14 @@ Dependabot proposes updates to the lock.
 | Overture Maps places | second opinion on location, name, category, open/closed, phone, website | CDLA-Permissive-2.0 | Read from the public S3 bucket; includes some closed places |
 | Wikidata | notable churches and sites, heritage status, photo, OSM ids, Wikipedia links | CC0 | Good for iconic places, thin for albergues |
 | Wikimedia Commons | photo licence, author, where the photo was taken | per file (CC0, CC BY, CC BY-SA ok) | NC / ND / unknown are rejected |
+| Gobierno de Navarra open data (datos.gob.es, datosabiertos.navarra.es) | the albergue registry, the Camino fountains, the waymarks | CC BY 4.0, attribution and a note of changes | Not wired yet: see the section below. The credit line is "Contains public sector information of Gobierno de Navarra, CC BY 4.0" |
 
-No scraping of Google, TripAdvisor, Booking or social media.
+Other datos.gob.es datasets are not used until their own licence has been read from their catalogue entry: the licence is
+per dataset, and the adapter refuses anything that is not CC BY 4.0 or CC0.
+
+No scraping of Google, TripAdvisor, Booking, Gronze.com or social media. Gronze.com in particular is not used: its content is
+copyrighted and its robots.txt blocks automated access, so it would need the owner's written permission first. Wikipedia and
+Wikivoyage text is CC BY-SA (a share-alike duty): the audit links to them and reads Wikidata facts, it does not copy their text.
 
 ## Spanish open data (datos.gob.es): Navarra
 
@@ -165,7 +171,7 @@ link and a note that the data was changed, which `Attribution.credit_full` adds:
 Dataset: Albergues turísticos en activo del Registro de Turismo de Navarra,
 https://datosabiertos.navarra.es/dataset/albergues-turisticos-en-activo-del-registro-de-turismo-de-navarra,
 retrieved 2026-11-07. Changed by CaminoPlus: names and contact fields normalised, categories mapped; the source
-has no coordinates." The "Sources and licences" table above does not list this source yet.
+has no coordinates." The "Sources and licences" table above lists this source.
 
 ## Checks
 
