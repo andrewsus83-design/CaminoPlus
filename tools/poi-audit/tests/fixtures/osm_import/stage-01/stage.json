@@ -1,0 +1,17 @@
+{
+ "slug": "camino-frances-01",
+ "name": "Saint-Jean-Pied-de-Port to Roncesvalles",
+ "route_slug": "camino-frances",
+ "stage_number": 1,
+ "route_id": "20000000-0000-0000-0000-000000000001",
+ "stage_id": "40000000-0000-0000-0000-000000000001",
+ "search_bbox": [
+  -1.42,
+  42.97,
+  -1.15,
+  43.2
+ ],
+ "route_name_regex": "camino|santiago|compostel|saint[- ]jacques|jacquaire|\\bgr ?65\\b|jakobsweg|done jakue",
+ "fallback_route": "stage.route.geojson",
+ "_note": "Frozen copy of the keys of tools/offline-maps/stages/camino-frances-01.json that the importer uses, so the tests do not move when the stage file is recalibrated."
+}

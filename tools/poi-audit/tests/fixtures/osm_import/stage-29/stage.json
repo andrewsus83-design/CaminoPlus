@@ -1,0 +1,17 @@
+{
+ "slug": "camino-frances-29",
+ "name": "Sarria to Portomarín",
+ "route_slug": "camino-frances",
+ "stage_number": 29,
+ "route_id": "20000000-0000-0000-0000-000000000001",
+ "stage_id": "40000000-0000-0000-0000-000000000029",
+ "search_bbox": [
+  -7.74,
+  42.69,
+  -7.29,
+  42.9
+ ],
+ "route_name_regex": "camino franc[eé]s|camiño franc[eé]s|chemin navarrais|nafar bidea",
+ "fallback_route": "stage.route.geojson",
+ "_note": "Frozen copy of the keys of tools/offline-maps/stages/camino-frances-29.json that the importer uses, so the tests do not move when the stage file is recalibrated."
+}

@@ -1,0 +1,34 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Napoleon route (main, closed in winter)",
+        "note": "Hand-placed approximate waypoints. Only used when the OSM route relation cannot be found. Replace with stages.geom from Supabase once real route data is imported."
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-1.2376, 43.1636], [-1.2310, 43.1480], [-1.2250, 43.1300], [-1.2190, 43.1100],
+          [-1.2300, 43.0920], [-1.2480, 43.0700], [-1.2620, 43.0500], [-1.2700, 43.0400],
+          [-1.2950, 43.0215], [-1.3195, 43.0094]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Valcarlos variant (winter / bad weather)",
+        "note": "Hand-placed approximate waypoints."
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-1.2376, 43.1636], [-1.2650, 43.1250], [-1.2820, 43.1090], [-1.3020, 43.0900],
+          [-1.3150, 43.0600], [-1.3222, 43.0198], [-1.3195, 43.0094]
+        ]
+      }
+    }
+  ]
+}
