@@ -156,20 +156,24 @@ export function usePostRail({ posts, sample }: { posts: Post[]; sample: boolean 
     if (!body || !uid) return false;
     const id = uuid();
     const s = store.current;
-    const was = s.over[post.id]?.comments ?? railCounts(post).comments;
     const mine: SheetComment = { id, user: 'you', text: body, pending: true, mine: true };
+    // One more comment, or one less when it fails: counted up and down (not set to a value) so two comments sent close together stay right.
+    const step = (by: 1 | -1) => {
+      const now = s.over[post.id]?.comments ?? railCounts(post).comments;
+      if (now !== undefined) (s.over[post.id] ??= {}).comments = Math.max(0, now + by);
+    };
     setThread((t) => ({ ...t, message: null }));
     const res = await optimistic({
       before: assertOnline,
       apply: () => {
         setThread((t) => ({ ...t, items: [...t.items, mine] }));
-        if (was !== undefined) (s.over[post.id] ??= {}).comments = was + 1;
+        step(1);
         bump();
       },
       commit: () => addPostComment({ id, userId: uid, postId: post.id, body }),
       revert: () => {
         setThread((t) => ({ ...t, items: t.items.filter((c) => c.id !== id) }));
-        if (was !== undefined) (s.over[post.id] ??= {}).comments = was;
+        step(-1);
         bump();
       },
     });
