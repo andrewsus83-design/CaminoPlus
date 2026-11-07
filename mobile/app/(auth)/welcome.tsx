@@ -34,7 +34,7 @@ export default function Welcome() {
           <Rect x="0" y="0" width="100%" height="100%" fill="url(#fade)" />
         </Svg>
       </View>
-      <View pointerEvents="none" style={{ position: 'absolute', top: insets.top + 14, left: 0, right: 0, alignItems: 'center' }}>
+      <View pointerEvents="none" style={{ position: 'absolute', top: insets.top + layout.screenTop, left: 0, right: 0, alignItems: 'center' }}>
         <Wordmark size={30} />
       </View>
       <ScrollView

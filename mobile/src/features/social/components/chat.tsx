@@ -55,7 +55,7 @@ export function ImageViewer({ uri, onClose }: { uri: string | null; onClose: () 
     <Modal visible={!!uri} transparent animationType="fade" onRequestClose={onClose} statusBarTranslucent>
       <View accessibilityViewIsModal style={{ flex: 1, backgroundColor: 'rgba(8,20,36,0.96)', justifyContent: 'center' }}>
         {!!uri && <Image source={{ uri }} resizeMode="contain" accessibilityLabel="Photo" style={{ width: '100%', height: '80%' }} />}
-        <Pressable accessibilityRole="button" accessibilityLabel="Close photo" onPress={onClose} style={{ position: 'absolute', top: insets.top + 10, right: 16, width: 56, height: 56, borderRadius: radius.pill, backgroundColor: 'rgba(255,253,248,0.16)', alignItems: 'center', justifyContent: 'center' }}>
+        <Pressable accessibilityRole="button" accessibilityLabel="Close photo" onPress={onClose} style={{ position: 'absolute', top: insets.top + layout.screenTop, right: 16, width: 56, height: 56, borderRadius: radius.pill, backgroundColor: 'rgba(255,253,248,0.16)', alignItems: 'center', justifyContent: 'center' }}>
           <Icon name="close" color="#FFFDF8" size={30} strokeWidth={2.2} />
         </Pressable>
       </View>

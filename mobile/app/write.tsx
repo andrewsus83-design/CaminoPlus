@@ -171,7 +171,7 @@ export default function Write() {
   if (step === 2) {
     return (
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1, backgroundColor: role.bg }}>
-        <ScrollView contentContainerStyle={{ paddingTop: insets.top + 12, paddingHorizontal: layout.screenMargin, paddingBottom: 160, gap: 20 }} keyboardShouldPersistTaps="handled">
+        <ScrollView contentContainerStyle={{ paddingTop: insets.top + layout.screenTop, paddingHorizontal: layout.screenMargin, paddingBottom: 160, gap: 20 }} keyboardShouldPersistTaps="handled">
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
             <Pressable accessibilityRole="button" accessibilityLabel="Back" onPress={() => setStep(1)} hitSlop={12}><Icon name="back" color={role.text} size={30} /></Pressable>
             <AppText variant="h4">New journey post</AppText>
@@ -213,7 +213,7 @@ export default function Write() {
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1, backgroundColor: onMedia ? '#000' : bg.bg }}>
       <Backdrop slide={slide} />
       {onMedia && <View pointerEvents="none" style={{ position: 'absolute', width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.18)' }} />}
-      <View style={{ paddingTop: insets.top + 8, paddingHorizontal: layout.screenMargin, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+      <View style={{ paddingTop: insets.top + layout.screenTop, paddingHorizontal: layout.screenMargin, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
         <Pressable accessibilityRole="button" accessibilityLabel="Close" onPress={() => router.back()} hitSlop={12} style={{ width: 48, height: 48, alignItems: 'center', justifyContent: 'center' }}>
           <Icon name="close" color={fg} size={30} />
         </Pressable>

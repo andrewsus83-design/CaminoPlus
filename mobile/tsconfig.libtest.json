@@ -11,5 +11,5 @@
     "outDir": "node_modules/.cache/lib-test",
     "rootDir": "src"
   },
-  "files": ["src/lib/__tests__/cryptoPolyfill.test.ts", "src/lib/__tests__/gridLayout.test.ts", "src/lib/__tests__/sampleJourney.test.ts"]
+  "files": ["src/lib/__tests__/cryptoPolyfill.test.ts", "src/lib/__tests__/gridLayout.test.ts", "src/lib/__tests__/sampleJourney.test.ts", "src/lib/__tests__/screenTop.test.ts"]
 }

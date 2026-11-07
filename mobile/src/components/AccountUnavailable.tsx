@@ -14,7 +14,7 @@ export function AccountUnavailable({ message, busy, onRetry, onSignOut }: { mess
   const insets = useSafeAreaInsets();
   const offline = !message || /offline/i.test(message);
   return (
-    <View style={{ flex: 1, backgroundColor: role.bg, justifyContent: 'center', paddingHorizontal: layout.screenMargin, paddingTop: insets.top, paddingBottom: insets.bottom + 24, gap: 20 }}>
+    <View style={{ flex: 1, backgroundColor: role.bg, justifyContent: 'center', paddingHorizontal: layout.screenMargin, paddingTop: insets.top + layout.screenTop, paddingBottom: insets.bottom + 24, gap: 20 }}>
       <View style={{ alignItems: 'center', gap: 16 }}>
         <View style={{ width: 84, height: 84, borderRadius: 42, backgroundColor: c.goldWash, alignItems: 'center', justifyContent: 'center' }}>
           <Icon name="shell" color={c.gold} size={42} />
