@@ -20,6 +20,10 @@
     "src/lib/__tests__/sampleJourney.test.ts",
     "src/lib/__tests__/screenTop.test.ts",
     "src/lib/__tests__/buildInfo.test.ts",
-    "src/lib/__tests__/themeScheme.test.ts"
+    "src/lib/__tests__/themeScheme.test.ts",
+    "src/lib/__tests__/actionRail.test.ts",
+    "src/lib/__tests__/optimistic.test.ts",
+    "src/lib/__tests__/postActions.test.ts",
+    "src/lib/__tests__/railStandard.test.ts"
   ]
 }

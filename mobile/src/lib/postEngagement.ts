@@ -31,6 +31,20 @@ export function parseEngagementRows(data: unknown): Map<string, PostEngagement> 
   return out;
 }
 
+/**
+ * Rows of `select post_id` (which of these posts this person liked, or bookmarked) -> the set of ids. null when the result
+ * is not a list of rows (the query failed): "unknown" is not the same as "none". A row without an id is skipped.
+ */
+export function parsePostIds(data: unknown): Set<string> | null {
+  if (!Array.isArray(data)) return null;
+  const out = new Set<string>();
+  for (const row of data) {
+    const id = (row as { post_id?: unknown } | null)?.post_id;
+    if (typeof id === 'string' && id.length > 0) out.add(id);
+  }
+  return out;
+}
+
 /** The posts with their counts. Without counts (null) it is the same list, untouched; a post without a row stays as it is. */
 export function withEngagement<T extends { id: string }>(posts: T[], counts: Map<string, PostEngagement> | null): T[] {
   if (!counts) return posts;

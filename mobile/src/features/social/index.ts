@@ -4,7 +4,7 @@
 export type {
   BlockedPilgrim, ChatMessage, Conversation, Friend, FriendRequest, FriendStatus, Member, NotificationItem, OutboxItem, PilgrimResult, ReportReason, ReportTarget, UnreadTotals,
 } from './types';
-export { NO_UNREAD } from './logic';
+export { NO_UNREAD, REPORT_PROMPT, REPORT_REASONS, REPORT_THANKS } from './logic';
 export { socialApi, SocialError } from './api';
 export { useUnreadTotals, refreshUnreadTotals } from './hooks/unread';
 export { useConversations } from './hooks/conversations';
