@@ -11,10 +11,11 @@ import { c, layout, role } from '@/theme';
 
 // Settings > Support > Help centre: short answers that work without signal, then ways to reach the team.
 const FAQ: { q: string; a: string }[] = [
-  { q: 'Do the maps work without signal?', a: 'Yes, once you download them. Open Maps, choose Offline maps and download the stages you will walk while you still have Wi-Fi. Your GPS dot works without signal. The online base map only loads when you are connected.' },
+  { q: 'Do the maps work without signal?', a: 'Yes, with Pilgrim Plus. Offline maps are only for paying members. Open Maps, choose Offline maps and download the stages you will walk while you still have Wi-Fi. Without Pilgrim Plus the map needs a connection. Your GPS dot works without signal either way, but the online base map only loads when you are connected.' },
+  { q: 'Is offline mode only for Pilgrim Plus members?', a: 'Yes. Offline maps and cloud storage for photos and videos are part of Pilgrim Plus, a paid yearly subscription. The free plan has no offline maps, so the map needs a connection.' },
   { q: 'How do I change the Camino I am walking?', a: 'Open Me and tap the My Camino card. You can pick another route or a different starting point at any time.' },
   { q: 'What does the help bell do?', a: 'It sends your last known position and a short message to the friends you choose. In an emergency call 112 first. CaminoPlus does not call anyone for you and cannot promise that a friend will see your message in time.' },
-  { q: 'Why can I not upload photos or videos?', a: 'Photos and videos in posts and chats are saved in the cloud, which is part of Pilgrim Plus. Everything else, including your plan and offline maps, is free.' },
+  { q: 'Why can I not upload photos or videos?', a: 'Photos and videos in posts and chats are saved in the cloud, which is part of Pilgrim Plus, together with offline maps. The rest of the basic app, including your plan, is free.' },
   { q: 'A place on the map is wrong or missing', a: 'Thank you for telling us. Choose Send feedback, pick "A problem" and write the name of the place and the stage. We cross-check it against the open map data before we change anything.' },
   { q: 'How do I delete my account?', a: 'Open Settings, then Edit account, then Delete account. Cancel Pilgrim Plus in the App Store or Google Play first, because deleting your account does not cancel the subscription.' },
 ];
