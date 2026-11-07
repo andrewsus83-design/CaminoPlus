@@ -1,0 +1,92 @@
+{
+  "slug": "camino-ingles-05",
+  "name": "Hospital de Bruma to Sigüeiro",
+  "route_slug": "camino-ingles",
+  "stage_number": 5,
+  "route_id": "20000000-0000-0000-0000-000000000006",
+  "stage_id": "40000000-0000-0000-0005-000000000005",
+  "osm_extracts": [
+    "https://download.geofabrik.de/europe/spain/galicia-latest.osm.pbf"
+  ],
+  "search_bbox": [
+    -8.57,
+    42.88,
+    -8.24,
+    43.24
+  ],
+  "coastal": false,
+  "route_name_regex": "camino ingl[eé]s|camiño ingl[eé]s|chemin anglais|english way|caminho ingl[eê]s|ingeles bidea",
+  "route_exclude_regex": "\\b(SL|PR)-[A-Z]{1,3} ?\\d",
+  "fallback_route": "camino-ingles-05.route.geojson",
+  "clip_km": 6,
+  "min_route_km": 8.7,
+  "buffer_km": 3,
+  "maxzoom": 15,
+  "waypoints": [
+    {
+      "name": "Hospital de Bruma",
+      "at": [
+        -8.36423,
+        43.15127
+      ]
+    },
+    {
+      "name": "Cabeza de Lobo",
+      "at": [
+        -8.37773,
+        43.129
+      ]
+    },
+    {
+      "name": "San Paio de Buscás",
+      "at": [
+        -8.3823,
+        43.09512
+      ]
+    },
+    {
+      "name": "A Calle",
+      "at": [
+        -8.3806,
+        43.05932
+      ]
+    },
+    {
+      "name": "Fonte da Santiña",
+      "at": [
+        -8.41907,
+        43.00847
+      ]
+    },
+    {
+      "name": "Sigüeiro",
+      "at": [
+        -8.44175,
+        42.96879
+      ]
+    }
+  ],
+  "render_checks": [
+    {
+      "name": "Hospital de Bruma z15",
+      "at": [
+        -8.36423,
+        43.15127,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    },
+    {
+      "name": "Sigüeiro z15",
+      "at": [
+        -8.44175,
+        42.96879,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    }
+  ],
+  "generated_from": "catalog/camino-ingles/05.json"
+}

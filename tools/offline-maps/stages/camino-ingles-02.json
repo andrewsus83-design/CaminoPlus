@@ -1,0 +1,78 @@
+{
+  "slug": "camino-ingles-02",
+  "name": "Neda to Pontedeume",
+  "route_slug": "camino-ingles",
+  "stage_number": 2,
+  "route_id": "20000000-0000-0000-0000-000000000006",
+  "stage_id": "40000000-0000-0000-0005-000000000002",
+  "osm_extracts": [
+    "https://download.geofabrik.de/europe/spain/galicia-latest.osm.pbf"
+  ],
+  "search_bbox": [
+    -8.3,
+    43.32,
+    -8.03,
+    43.59
+  ],
+  "coastal": true,
+  "route_name_regex": "camino ingl[eé]s|camiño ingl[eé]s|chemin anglais|english way|caminho ingl[eê]s|ingeles bidea",
+  "route_exclude_regex": "\\b(SL|PR)-[A-Z]{1,3} ?\\d",
+  "fallback_route": "camino-ingles-02.route.geojson",
+  "clip_km": 6,
+  "min_route_km": 4.3,
+  "buffer_km": 3,
+  "maxzoom": 15,
+  "waypoints": [
+    {
+      "name": "Neda",
+      "at": [
+        -8.15825,
+        43.50028
+      ]
+    },
+    {
+      "name": "Fene",
+      "at": [
+        -8.16256,
+        43.47367
+      ]
+    },
+    {
+      "name": "Cabanas",
+      "at": [
+        -8.16092,
+        43.41869
+      ]
+    },
+    {
+      "name": "Pontedeume",
+      "at": [
+        -8.17188,
+        43.40726
+      ]
+    }
+  ],
+  "render_checks": [
+    {
+      "name": "Neda z15",
+      "at": [
+        -8.15825,
+        43.50028,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    },
+    {
+      "name": "Pontedeume z15",
+      "at": [
+        -8.17188,
+        43.40726,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    }
+  ],
+  "generated_from": "catalog/camino-ingles/02.json"
+}
