@@ -1596,7 +1596,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
   </div>
 
   <h3 id="actionrail">Action rail: love, bookmark, comments, share</h3>
-  <p class="note" style="max-width:720px;margin:0 0 20px">One rail for the whole app. Discover is the standard and the full-screen journey viewer (Me, Journey) draws the very same component, <code>components/ActionRail.tsx</code>, fed by <code>lib/actionRail.ts</code>. A screen never draws its own like, bookmark, comment or share buttons. The same comments sheet opens from both.</p>
+  <p class="note" style="max-width:720px;margin:0 0 20px">One rail for the whole app. Discover is the standard and the full-screen journey viewer (Me, Journey) draws the very same component, <code>components/ActionRail.tsx</code>, fed by <code>lib/actionRail.ts</code>. A screen never draws its own like, bookmark, comment or share buttons, and never decides where the rail sits: the rail places itself, so the column is in the same spot of the screen in Discover and in the viewer. The same comments sheet opens from both.</p>
   <div class="grid g2" style="align-items:start">
     <div class="panel">
       <div class="rail-demo">
@@ -1604,13 +1604,13 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
         <figure><div class="rail-stage cp-img v4"><div class="cp-rail"><button class="b love on" aria-label="Remove love, 12 likes"><svg class="cp-icon"><use href="#i-heart"/></svg><span class="n">12</span></button><button class="b save on" aria-label="Remove bookmark, 4 bookmarks"><svg class="cp-icon"><use href="#i-bookmark"/></svg><span class="n">4</span></button><button class="b comments" aria-label="Comments, 3 comments"><svg class="cp-icon"><use href="#i-chat"/></svg><span class="n">3</span></button><button class="b share" aria-label="Share, 1,234 shares"><svg class="cp-icon"><use href="#i-share"/></svg><span class="n">1.2K</span></button></div></div><figcaption>On is filled. Counts that were read, compact</figcaption></figure>
         <figure><div class="rail-stage cp-img v2"><div class="cp-rail"><button class="b love" aria-label="Love, 0 likes"><svg class="cp-icon"><use href="#i-heart"/></svg><span class="n">0</span></button><button class="b save" aria-label="Bookmark"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button><button class="b comments" aria-label="Comments, not available yet" disabled><svg class="cp-icon"><use href="#i-chat"/></svg></button><button class="b share" aria-label="Share"><svg class="cp-icon"><use href="#i-share"/></svg></button></div></div><figcaption>A real 0 shows. A button that cannot work yet is dimmed</figcaption></figure>
       </div>
-      <p class="spec" style="margin:20px 0 0">.cp-rail · 56 circles, 14 apart · right edge 16 (screen margin) · rgba(255,253,248,.85) · heart 28 red, bookmark 28 blue, chat 26, share 26 · count 11/13 under the icon</p>
+      <p class="spec" style="margin:20px 0 0">.cp-rail · 56 circles, 14 apart · right edge 16 (screen margin) · lowest circle 120 above the safe area, on every screen · rgba(255,253,248,.85) · heart 28 red, bookmark 28 blue, chat 26, share 26 · count 11/13 under the icon</p>
     </div>
     <div class="panel">
       <table class="contrast">
         <tr><th>What</th><th>The standard</th></tr>
         <tr><td><b>Order</b></td><td>Love, bookmark, comments, share, top to bottom. Never reordered, never hidden for a kind of content.</td></tr>
-        <tr><td><b>Circle</b></td><td>56 × 56, pill radius, paper white at 85 % so it reads on any photo. 14 apart, centred, the right edge on the 16 screen margin. Discover puts the lowest circle 120 above the safe area (above the tab bar); the viewer puts it 28 above it, with the caption kept clear.</td></tr>
+        <tr><td><b>Circle</b></td><td>56 × 56, pill radius, paper white at 85 % so it reads on any photo. 14 apart, centred, the right edge on the 16 screen margin and the lowest circle 120 above the safe area, on every screen that has the rail. That height clears Discover's floating tab bar; the full-screen viewer has no tab bar and keeps the same 120, so the buttons are under the thumb in the same place on both. The caption keeps clear of the column.</td></tr>
         <tr><td><b>Icons</b></td><td>Heart 28 in Cross Red, bookmark 28 in Atlantic Blue, chat 26 and share 26 in blue. Heart and bookmark are filled when on.</td></tr>
         <tr><td><b>Counts</b></td><td>Under the icon, 11/13 blue. Compact (999, 1.2K, 12.3K, 1M), rounded down, never more than the real number. Shown only when the count was read: a real 0 shows 0, a count nobody read shows nothing. Screen readers hear the whole number: "Love, 1,234 likes".</td></tr>
         <tr><td><b>States</b></td><td>Off, on, and "not available yet": dimmed to 45 %, disabled, and the label says so. The labels are Love / Remove love, Bookmark / Remove bookmark, Comments, Share.</td></tr>
