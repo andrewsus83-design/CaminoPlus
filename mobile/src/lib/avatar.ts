@@ -1,5 +1,6 @@
 import { supabase } from './supabase';
 import { updateProfile } from './api';
+import { NativeName, hasNativeModule } from './optionalNative';
 
 export class PickerUnavailable extends Error {}
 
@@ -8,6 +9,7 @@ export class PickerUnavailable extends Error {}
 export async function pickAndUploadAvatar(userId: string): Promise<string | null> {
   let Picker: typeof import('expo-image-picker');
   try {
+    if (!hasNativeModule(NativeName.imagePicker)) throw new Error('missing');
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     Picker = require('expo-image-picker');
     if (!Picker.launchImageLibraryAsync) throw new Error('missing');

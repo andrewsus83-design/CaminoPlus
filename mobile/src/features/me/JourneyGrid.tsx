@@ -9,6 +9,7 @@ import { Icon } from '@/components/Icon';
 import { Post, PostMediaUrl, listPostMediaUrls } from '@/lib/api';
 import { gridMetrics, gridRows } from '@/lib/gridLayout';
 import { SAMPLE_VIEWER_LABEL } from '@/lib/sampleJourney';
+import { NativeName, hasNativeModule } from '@/lib/optionalNative';
 import { c, fixed, fonts, radius, layout } from '@/theme';
 import { PostRail, usePostRail } from './usePostRail';
 
@@ -27,6 +28,7 @@ const CARD_COLORS = [
 
 let VideoModule: typeof import('expo-video') | null = null;
 try {
+  if (!hasNativeModule(NativeName.video)) throw new Error('missing');
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   VideoModule = require('expo-video');
   if (!VideoModule?.useVideoPlayer) VideoModule = null;
