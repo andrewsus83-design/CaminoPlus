@@ -46,9 +46,9 @@ export type Playlist = (typeof SAMPLE_PLAYLISTS)[number];
 
 /**
  * The one Preview notice of a search: the results are these examples, so it says what they are, like each tab does.
- * Searching is also an honest "looking through the examples": it never finds, opens or plays anything real.
+ * A search never finds, opens or plays anything real.
  */
-export const SEARCH_NOTICE = 'Search looks through the examples in this preview. The Bible text, books and music are not in the app yet, so nothing here can be opened or played.';
+export const SEARCH_NOTICE = 'These results are examples. The Bible text, books and music are not in the app yet.';
 
 /** The same, for the Bookmarks screen: the Library rows kept there are these examples. */
 export const BOOKMARKS_NOTICE = 'These are examples from the Library preview. They are kept only on this phone, and logging out clears them.';

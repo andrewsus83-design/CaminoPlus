@@ -1,0 +1,64 @@
+import { type ComponentRef, useRef, useState } from 'react';
+import { Platform, Pressable, TextInput, View } from 'react-native';
+import { Icon } from '@/components/Icon';
+import { c, fonts, radius, role } from '@/theme';
+
+/** Browsers draw a focus outline on inputs; the border of the pill already shows focus. (Web only: native rejects the value.) */
+const noOutline = (Platform.OS === 'web' ? { outlineStyle: 'none' } : null) as object | null;
+
+export const SEARCH_PLACEHOLDER = 'Search the Library';
+export const SEARCH_LABEL = 'Search the library';
+export const CLEAR_LABEL = 'Clear search';
+
+/**
+ * The search field of the Library: a pill 52 high (as high as the two round buttons next to it), the search icon, the text, and
+ * a clear button (x) once something is typed. It takes the width it is given and shrinks with it (minWidth 0 on both the pill and
+ * the input: without it a web input keeps its own width and pushes the buttons out of the row).
+ *
+ * Colours are roles only: typed text role.text, placeholder and the x role.muted (both well over 4.5:1 on role.surface in light and
+ * dark), border role.border and gold while it has focus. Focus makes the border 2 instead of 1 thick and takes the same from the
+ * padding, so nothing in the row moves. The phone's own keyboard key says "search" and closes the keyboard; there is no
+ * autocorrect, no capital letter and no spell check, because what is typed is a few letters of a title.
+ */
+export function SearchBar({ value, onChangeText }: { value: string; onChangeText: (text: string) => void }) {
+  const [focus, setFocus] = useState(false);
+  const input = useRef<ComponentRef<typeof TextInput>>(null);
+  const edge = focus ? 2 : 1;
+  return (
+    <View
+      style={{
+        flex: 1, minWidth: 0, height: 52, borderRadius: radius.pill, backgroundColor: role.surface, borderWidth: edge, borderColor: focus ? c.gold : role.border,
+        flexDirection: 'row', alignItems: 'center', paddingLeft: 17 - edge, paddingRight: 5 - edge, gap: 8,
+      }}
+    >
+      <Icon name="search" color={role.text} size={22} />
+      <TextInput
+        ref={input}
+        value={value}
+        onChangeText={onChangeText}
+        onFocus={() => setFocus(true)}
+        onBlur={() => setFocus(false)}
+        placeholder={SEARCH_PLACEHOLDER}
+        placeholderTextColor={role.muted}
+        accessibilityLabel={SEARCH_LABEL}
+        returnKeyType="search"
+        autoCapitalize="none"
+        autoCorrect={false}
+        spellCheck={false}
+        clearButtonMode="never"
+        maxLength={60}
+        style={[{ flex: 1, minWidth: 0, height: 48, paddingVertical: 0, fontFamily: fonts.body, fontSize: 17, color: role.text }, noOutline]}
+      />
+      {value.length > 0 && (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={CLEAR_LABEL}
+          onPress={() => { onChangeText(''); input.current?.focus(); }}
+          style={{ width: 48, height: 48, alignItems: 'center', justifyContent: 'center' }}
+        >
+          <Icon name="close" color={role.muted} size={20} />
+        </Pressable>
+      )}
+    </View>
+  );
+}

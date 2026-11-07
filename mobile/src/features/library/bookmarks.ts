@@ -52,3 +52,9 @@ export function toggleBookmark(list: readonly Bookmark[], key: string, now: numb
 
 /** The keys, in the order of the list. */
 export const bookmarkKeys = (list: readonly Bookmark[]): string[] => list.map((b) => b.key);
+
+/** The Library part of the Bookmarks screen when nothing is bookmarked in the Library: it says how to. */
+export const LIBRARY_BOOKMARKS_EMPTY = 'Nothing bookmarked in the Library yet. Tap the bookmark on a row to keep it here.';
+
+/** The sentence for a change that could not be written to the phone (a full disk): what is shown goes back to what is saved. */
+export const BOOKMARK_NOT_SAVED = 'That bookmark could not be saved on this phone. Please try again.';

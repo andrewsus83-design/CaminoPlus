@@ -413,7 +413,7 @@ const happy: Script = (c) => ({ data: c.table === 'post_saves' ? SAVES : c.table
 
   /* ---------------- the source ---------------- */
 
-  check('savedPosts.ts reads and never writes, and the rest of the feature writes bookmarks of posts only through api.ts', () => {
+  check('savedPosts.ts reads and never writes, and the logic files are pure (wiring.test.ts checks who writes a bookmark of a post)', () => {
     const src = read('src/features/library/savedPosts.ts').split('\n').filter((l) => !/^\s*(\/\/|\*|\/\*)/.test(l)).join('\n');
     assert.doesNotMatch(src, /\.(insert|update|upsert|delete|rpc)\(/, 'savedPosts.ts only selects');
     assert.doesNotMatch(src, /from 'react|from 'expo|supabase-js|lib\/supabase|lib\/net'/, 'no React Native and no real client in the logic file');

@@ -193,6 +193,7 @@ textarea.cp-input { height: 120px; border-radius: var(--cp-radius-lg); padding: 
 .lib-notice > .cp-icon { width: 22px; height: 22px; color: var(--cp-color-gold-ink); }
 .lib-notice .h { font-weight: 600; font-size: 17px; line-height: 22px; color: var(--cp-color-gold-ink); }
 .lib-notice .p { font-size: 17px; line-height: 25px; }
+.lib-h { font-family: var(--cp-font-title); font-weight: 600; font-size: 24px; line-height: 30px; margin: 0; }
 .lib-label { font-family: var(--cp-font-mono); font-size: 12px; line-height: 22px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--cp-text-muted); margin-top: 8px; }
 .lib-covers { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .lib-cover { position: relative; aspect-ratio: 3 / 4; border-radius: var(--cp-radius-md); padding: 14px; display: flex; flex-direction: column; justify-content: space-between; color: var(--cp-color-blue); font-family: var(--cp-font-title); font-weight: 600; font-size: 24px; line-height: 30px; }
@@ -1671,7 +1672,8 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     <div class="panel" style="padding:12px 24px 0"><div class="cp-subtabs" style="margin:0"><span class="on"><svg class="cp-icon sm"><use href="#i-steps"/></svg>Journey</span><span class=""><svg class="cp-icon sm"><use href="#i-shell"/></svg>Passport</span><span class=""><svg class="cp-icon sm"><use href="#i-flag"/></svg>Plan</span></div><p class="spec" style="margin:16px 0 20px">.cp-subtabs · 15/600 · 3px blue underline</p></div>
   </div>
   <p class="spec" style="margin-top:16px">.cp-tabbar · height 72 · radius pill · shadow-lg · icon 24 in 52×32 pill · label 12/500 (active 700)</p>
-  <p class="note" style="margin-top:12px;max-width:760px"><b>Settings is not a tab.</b> It opens from the gear at the top right of Me, next to the inbox bell, as a screen of its own: a back button on the left, light/dark and log out on the right, and no tab bar under it. <b>Library</b> is the fifth tab: a banner, your private diary, and the tabs Bible, Books and Music. Until we have chosen what we may include, those three tabs show example content and say so. <b>The diary</b> (Library, My diary) keeps its pages only on the phone: the list says so, nothing is uploaded, logging out keeps the pages, deleting the account deletes them, and a page is saved as it is typed, so there is no Save button.</p>
+  <p class="note" style="margin-top:12px;max-width:760px"><b>Settings is not a tab.</b> It opens from the gear at the top right of Me, next to the inbox bell, as a screen of its own: a back button on the left, light/dark and log out on the right, and no tab bar under it. <b>Library</b> is the fifth tab. It has no title: the row on top is a search field, then the round Bookmarks button, then the round diary button in the corner (the same size as the bell and the gear on Me), and under it a banner and the tabs Bible, Books and Music. Until we have chosen what we may include, those three tabs show example content and say so. <b>The diary</b> (Library, My diary) keeps its pages only on the phone: the list says so, nothing is uploaded, logging out keeps the pages, deleting the account deletes them, and a page is saved as it is typed, so there is no Save button.</p>
+  <p class="note" style="margin-top:12px;max-width:760px"><b>Library search</b> looks through all three tabs at once, as you type, and lists what it finds grouped by tab (Bible, Books, Music) under one Preview notice. A word counts when it starts a word of a row (its title, the line under it, or the name of the tab), so "music" lists the music rows. With nothing found it says "Nothing found for ..." and offers Clear search; clearing the field brings the banner and the tabs back. <b>Bookmarks</b> is a screen of its own, opened from the round button next to the diary: a back button, no tab bar, then two parts. Library lists the rows bookmarked from the tabs; they stay only on the phone and logging out clears them, and each is still an example. Posts lists the posts bookmarked in the journey viewer; they stay with the account, and with no signal the list from the last visit is shown, with a line that says so. A row that is taken off stays in place, with an empty bookmark, until the screen is left, so a slip can be put back with one tap.</p>
 </section>
 
 <!-- =================================================================== BUSINESS -->
@@ -1895,7 +1897,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
 <section class="doc" id="screens">
   <p class="eyebrow">15 · Screens @ 390 × 844</p>
   <h2>The app, tab by tab</h2>
-  <p class="intro">Reference layouts at iPhone 15 size. Scroll sideways to see all of them. Me has the My Camino card with its Change button, a row of highlights (one round picture for each destination of the day plan: a gold ring when you posted there, a dashed circle while it is still ahead), three sub-tabs, an inbox, a two-step write flow, a share screen and a stamp pop-up. Maps has two layers: helicopter view and city view. Stays opens into Airbnb / Agoda-style detail pages for stays and cafes. Explore has a second screen for the photo marketplace. Library has a banner, the private diary and the tabs Bible, Books and Music, with a gold note button that writes a diary page; the diary has a list of pages and an editor. Settings is a screen opened from the gear at the top right of Me; it opens the business-owner flow: a welcome page, five registration steps, the review status and the owner dashboard.</p>
+  <p class="intro">Reference layouts at iPhone 15 size. Scroll sideways to see all of them. Me has the My Camino card with its Change button, a row of highlights (one round picture for each destination of the day plan: a gold ring when you posted there, a dashed circle while it is still ahead), three sub-tabs, an inbox, a two-step write flow, a share screen and a stamp pop-up. Maps has two layers: helicopter view and city view. Stays opens into Airbnb / Agoda-style detail pages for stays and cafes. Explore has a second screen for the photo marketplace. Library has a search field with a bookmarks button and a diary button on top, a banner and the tabs Bible, Books and Music, with a gold note button that writes a diary page; a search lists its results grouped by tab, Bookmarks lists what the pilgrim kept, and the diary has a list of pages and an editor. Settings is a screen opened from the gear at the top right of Me; it opens the business-owner flow: a welcome page, five registration steps, the review status and the owner dashboard.</p>
 
   <div class="phones">
 
@@ -2600,11 +2602,15 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     </div>
 
     <div class="phone-wrap">
-      <p class="phone-label"><b>Library</b>Banner · diary · Bible, Books, Music</p>
+      <p class="phone-label"><b>Library</b>Search · bookmarks · diary · Bible, Books, Music</p>
       <div class="phone">
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
         <div class="scroll">
-          <h1 class="scr-title">Library</h1>
+          <div class="lib-head">
+            <div class="lib-search"><svg class="cp-icon"><use href="#i-search"/></svg><span class="t">Search the Library</span></div>
+            <button class="cp-icon-btn flat" aria-label="Bookmarks"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button>
+            <button class="cp-icon-btn flat" aria-label="My diary"><svg class="cp-icon"><use href="#i-diary"/></svg></button>
+          </div>
           <div class="cp-banner" style="margin-top:16px">
             <span class="art"><svg class="cp-icon"><use href="#i-book"/></svg></span>
             <div class="ey">Preview · Bible</div>
@@ -2612,20 +2618,21 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
             <button class="cp-btn sm">See the Bible tab</button>
           </div>
           <div class="cp-dots"><i class="on"></i><i></i><i></i></div>
-          <div class="cp-card" style="margin-top:18px;display:flex;align-items:center;gap:16px;padding:18px 20px">
-            <span style="width:52px;height:52px;border-radius:50%;display:grid;place-items:center;flex:none;background:var(--cp-color-gold);color:var(--cp-color-blue)"><svg class="cp-icon"><use href="#i-compose"/></svg></span>
-            <div style="flex:1;min-width:0"><div style="font-family:var(--cp-font-title);font-weight:600;font-size:22px;line-height:28px">My diary</div><div class="note" style="margin:0">3 pages</div><div style="font-weight:600;font-size:16px;margin-top:6px">Hontanas</div><div class="note" style="margin:0;font-size:14px">Friday 6 November</div></div>
-            <svg class="cp-icon sm" style="color:var(--cp-text-muted)"><use href="#i-chev"/></svg>
+          <div class="cp-subtabs" style="margin:16px 0"><span class="on">Bible</span><span>Books</span><span>Music</span></div>
+          <div class="lib-notice">
+            <svg class="cp-icon"><use href="#i-flag"/></svg>
+            <div><div class="h">Preview</div><div class="p">The Bible text is not in the app yet. We are choosing a translation we are allowed to include. This tab shows how reading will look.</div></div>
           </div>
-          <div class="cp-subtabs" style="margin:20px 0 18px"><span class="on">Bible</span><span>Books</span><span>Music</span></div>
-          <div class="cp-card" style="padding:16px;background:var(--cp-color-gold-wash);box-shadow:inset 0 0 0 1.5px var(--cp-color-gold-soft)">
-            <div style="font-weight:600;color:var(--cp-color-gold-ink)">Preview</div>
-            <p class="note" style="margin:4px 0 0;color:var(--cp-text)">The Bible text is not in the app yet. We are choosing a translation we are allowed to include. This tab shows how reading will look.</p>
+          <div class="cp-card" style="margin-top:16px;padding:20px;display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;align-items:center;justify-content:space-between"><span class="lib-label" style="margin:0">Today's reading</span><span class="lib-chip sample">Sample</span></div>
+            <div style="font-family:var(--cp-font-title);font-weight:600;font-size:24px;line-height:30px">One short reading for today</div>
+            <div class="note">When the Bible is in the app, today's reading will be here, and it will work without a signal.</div>
           </div>
-          <div class="s-group" style="margin-top:16px">
-            <div class="s-row"><svg class="cp-icon"><use href="#i-book"/></svg><span class="lbl">Psalms for walking</span><span class="cp-badge neutral">Soon</span></div>
-            <div class="s-row"><svg class="cp-icon"><use href="#i-book"/></svg><span class="lbl">The Gospels</span><span class="cp-badge neutral">Soon</span></div>
-            <div class="s-row"><svg class="cp-icon"><use href="#i-book"/></svg><span class="lbl">Prayers for the road</span><span class="cp-badge neutral">Soon</span></div>
+          <div class="cp-card" style="margin-top:16px;padding:4px">
+            <div class="lib-row"><svg class="cp-icon"><use href="#i-book"/></svg><div style="flex:1;min-width:0;display:flex;flex-direction:column"><div class="t">Psalms for walking</div><div class="n">Short, for a rest by the road</div><span class="lib-chip soon" style="margin-top:6px">Soon</span></div><button class="lib-mark" aria-label="Bookmark: Psalms for walking"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+            <div class="lib-row"><svg class="cp-icon"><use href="#i-book"/></svg><div style="flex:1;min-width:0;display:flex;flex-direction:column"><div class="t">The Gospels</div><div class="n">One chapter a day</div><span class="lib-chip soon" style="margin-top:6px">Soon</span></div><button class="lib-mark on" aria-label="Remove bookmark: The Gospels"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+            <div class="lib-row"><svg class="cp-icon"><use href="#i-book"/></svg><div style="flex:1;min-width:0;display:flex;flex-direction:column"><div class="t">Prayers for the road</div><div class="n">Morning, evening and the pilgrim blessing</div><span class="lib-chip soon" style="margin-top:6px">Soon</span></div><button class="lib-mark" aria-label="Bookmark: Prayers for the road"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+            <div class="lib-row"><svg class="cp-icon"><use href="#i-book"/></svg><div style="flex:1;min-width:0;display:flex;flex-direction:column"><div class="t">Reading plans</div><div class="n">One reading for each stage of your Camino</div><span class="lib-chip soon" style="margin-top:6px">Soon</span></div><button class="lib-mark" aria-label="Bookmark: Reading plans"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
           </div>
         </div>
         <div class="fab-slot"><button class="cp-fab-write" aria-label="Write in your diary"><svg class="cp-icon "><use href="#i-compose"/></svg></button></div>
@@ -2636,6 +2643,130 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Discover</div>
           <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-library"/></svg></span>Library</div>
         </nav></div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Library · Search</b>All three tabs at once · grouped by tab</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll">
+          <div class="lib-head">
+            <div class="lib-search"><svg class="cp-icon"><use href="#i-search"/></svg><span class="t typed">pray</span><span class="x"><svg class="cp-icon"><use href="#i-x"/></svg></span></div>
+            <button class="cp-icon-btn flat" aria-label="Bookmarks"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button>
+            <button class="cp-icon-btn flat" aria-label="My diary"><svg class="cp-icon"><use href="#i-diary"/></svg></button>
+          </div>
+          <div class="lib-notice" style="margin-top:16px">
+            <svg class="cp-icon"><use href="#i-flag"/></svg>
+            <div><div class="h">Preview</div><div class="p">These results are examples. The Bible text, books and music are not in the app yet.</div></div>
+          </div>
+          <p class="note" style="margin:16px 0 0">2 results for “pray”</p>
+          <div class="lib-label" style="margin-top:24px">Bible · 1</div>
+          <div class="cp-card" style="margin-top:16px;padding:4px">
+            <div class="lib-row"><svg class="cp-icon"><use href="#i-book"/></svg><div style="flex:1;min-width:0;display:flex;flex-direction:column"><div class="t">Prayers for the road</div><div class="n">Morning, evening and the pilgrim blessing</div><span class="lib-chip soon" style="margin-top:6px">Soon</span></div><button class="lib-mark on" aria-label="Remove bookmark: Prayers for the road"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+          </div>
+          <div class="lib-label" style="margin-top:24px">Books · 1</div>
+          <div class="lib-covers" style="margin-top:16px">
+            <div>
+              <div class="lib-cover" style="background:var(--cp-success-wash)"><svg class="cp-icon"><use href="#i-book"/></svg>Prayers and blessings<button class="lib-mark" aria-label="Bookmark: Prayers and blessings"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+              <div class="lib-kind"><span>Prayer</span><span class="lib-chip sample">Sample</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="fab-slot"><button class="cp-fab-write" aria-label="Write in your diary"><svg class="cp-icon "><use href="#i-compose"/></svg></button></div>
+        <div class="tabdock"><nav class="cp-tabbar">
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Discover</div>
+          <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-library"/></svg></span>Library</div>
+        </nav></div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Library · Nothing found</b>A calm empty state · Clear search</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll">
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div class="lib-head">
+              <div class="lib-search"><svg class="cp-icon"><use href="#i-search"/></svg><span class="t typed">zzz</span><span class="x"><svg class="cp-icon"><use href="#i-x"/></svg></span></div>
+              <button class="cp-icon-btn flat" aria-label="Bookmarks"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button>
+              <button class="cp-icon-btn flat" aria-label="My diary"><svg class="cp-icon"><use href="#i-diary"/></svg></button>
+            </div>
+            <div class="lib-notice">
+              <svg class="cp-icon"><use href="#i-flag"/></svg>
+              <div><div class="h">Preview</div><div class="p">These results are examples. The Bible text, books and music are not in the app yet.</div></div>
+            </div>
+            <div class="cp-card" style="padding:32px 20px;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center">
+              <span style="width:64px;height:64px;border-radius:50%;background:var(--cp-surface-sunken);display:grid;place-items:center"><svg class="cp-icon" style="width:30px;height:30px;color:var(--cp-text-muted)"><use href="#i-search"/></svg></span>
+              <div class="lib-h">Nothing found for “zzz”</div>
+              <div class="note">Check the spelling, try a shorter word, or clear the search to browse the tabs.</div>
+              <button class="cp-btn md block" style="margin-top:8px;background:var(--cp-surface);color:var(--cp-text);box-shadow:inset 0 0 0 1px var(--cp-border)">Clear search</button>
+            </div>
+          </div>
+        </div>
+        <div class="fab-slot"><button class="cp-fab-write" aria-label="Write in your diary"><svg class="cp-icon "><use href="#i-compose"/></svg></button></div>
+        <div class="tabdock"><nav class="cp-tabbar">
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Discover</div>
+          <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-library"/></svg></span>Library</div>
+        </nav></div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Library · Bookmarks</b>Library rows on this phone · bookmarked posts</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll">
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div class="biz-top"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon "><use href="#i-back"/></svg></button></div>
+            <h1 class="scr-title" style="margin:0">Bookmarks</h1>
+            <h4 class="lib-h">Library</h4>
+            <div class="lib-notice">
+              <svg class="cp-icon"><use href="#i-flag"/></svg>
+              <div><div class="h">Preview</div><div class="p">These are examples from the Library preview. They are kept only on this phone, and logging out clears them.</div></div>
+            </div>
+            <div class="lib-label">Bible · 1</div>
+            <div class="cp-card" style="padding:4px">
+              <div class="lib-row"><svg class="cp-icon"><use href="#i-book"/></svg><div style="flex:1;min-width:0;display:flex;flex-direction:column"><div class="t">The Gospels</div><div class="n">One chapter a day</div><span class="lib-chip soon" style="margin-top:6px">Soon</span></div><button class="lib-mark on" aria-label="Remove bookmark: The Gospels"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+            </div>
+            <div class="lib-label">Music · 1</div>
+            <div class="cp-card" style="padding:4px">
+              <div class="lib-row"><span style="width:44px;height:44px;border-radius:50%;background:var(--cp-surface-sunken);display:grid;place-items:center;flex:none"><svg class="cp-icon" style="color:var(--cp-text-muted)"><use href="#i-music"/></svg></span><div style="flex:1;min-width:0;display:flex;flex-direction:column"><div class="t">Chants for the road</div><div class="n">Slow, simple chants for the road</div><span class="lib-chip soon" style="margin-top:6px">Soon</span></div><button class="lib-mark on" aria-label="Remove bookmark: Chants for the road"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+            </div>
+            <h4 class="lib-h" style="margin-top:8px">Posts</h4>
+            <div class="cp-card" style="padding:16px 6px 16px 20px;display:flex;align-items:center;gap:4px">
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px"><div style="font-weight:600;font-size:17px;line-height:22px">Hontanas · 6 Nov 2026</div><div class="note" style="display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">Sunrise over the meseta. Thirty kilometres and not one cloud.</div><div style="font-size:15px;line-height:21px;letter-spacing:.4px;font-weight:500;color:var(--cp-text-muted)">Your post · 2 photos or clips</div></div>
+              <button class="lib-mark on" aria-label="Remove bookmark: Hontanas · 6 Nov 2026"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button>
+            </div>
+          </div>
+        </div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Library · Bookmarks, empty</b>Nothing kept yet · says how to keep something</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll">
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div class="biz-top"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon "><use href="#i-back"/></svg></button></div>
+            <h1 class="scr-title" style="margin:0">Bookmarks</h1>
+            <h4 class="lib-h">Library</h4>
+            <div class="cp-card" style="padding:20px"><div class="note">Nothing bookmarked in the Library yet. Tap the bookmark on a row to keep it here.</div></div>
+            <h4 class="lib-h" style="margin-top:8px">Posts</h4>
+            <div class="cp-card" style="padding:20px"><div class="note">No bookmarked posts yet. Tap the bookmark on a post in your journey to keep it here.</div></div>
+          </div>
+        </div>
         <span class="home-ind"></span>
       </div>
     </div>
@@ -2952,7 +3083,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     <div class="icon-cell"><svg class="cp-icon"><use href="#i-chat"/></svg>whatsapp</div>
     <div class="icon-cell"><svg class="cp-icon"><use href="#i-msg"/></svg>message</div>
     <div class="icon-cell"><svg class="cp-icon"><use href="#i-bolt"/></svg>instant</div>
-    <div class="icon-cell"><svg class="cp-icon"><use href="#i-sos"/></svg>sos</div><div class="icon-cell"><svg class="cp-icon"><use href="#i-heli"/></svg>helicopter</div><div class="icon-cell"><svg class="cp-icon"><use href="#i-city"/></svg>city</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-pencil"/></svg>write</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-link"/></svg>link</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-wifi"/></svg>wifi</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-utensils"/></svg>food</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-wash"/></svg>laundry</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-bike"/></svg>bike</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-plug"/></svg>charging</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-clock"/></svg>hours</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-image"/></svg>photo</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-copy"/></svg>copy</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-book"/></svg>article</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-shield"/></svg>policy</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-phone"/></svg>call</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-tagpeople"/></svg>tag people</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-briefcase"/></svg>business</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-store"/></svg>shop</div>
+    <div class="icon-cell"><svg class="cp-icon"><use href="#i-sos"/></svg>sos</div><div class="icon-cell"><svg class="cp-icon"><use href="#i-heli"/></svg>helicopter</div><div class="icon-cell"><svg class="cp-icon"><use href="#i-city"/></svg>city</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-pencil"/></svg>write</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-link"/></svg>link</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-wifi"/></svg>wifi</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-utensils"/></svg>food</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-wash"/></svg>laundry</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-bike"/></svg>bike</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-plug"/></svg>charging</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-clock"/></svg>hours</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-image"/></svg>photo</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-copy"/></svg>copy</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-book"/></svg>article</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-shield"/></svg>policy</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-phone"/></svg>call</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-tagpeople"/></svg>tag people</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-briefcase"/></svg>business</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-store"/></svg>shop</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-diary"/></svg>diary</div>
   </div>
 </section>
 
