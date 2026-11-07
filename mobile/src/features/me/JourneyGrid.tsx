@@ -16,10 +16,12 @@ import { PostRail, usePostRail } from './usePostRail';
 // 2 px from the left and right screen edge (the TikTok / Reels profile grid; the maths is in lib/gridLayout.ts).
 // Tap a tile to open the full-screen viewer, which scrolls vertically one post at a time, like TikTok. The viewer has the
 // app's one action rail (love, bookmark, comments, share), the same component and comments sheet as Discover.
+// The cards of a post without a picture. A card whose colour flips in dark mode (blue, red) keeps the theme text colour, which
+// flips with it; a card whose colour does not flip (gold, the green, the sand) has text that does not flip either.
 const CARD_COLORS = [
   { bg: c.blue, fg: c.parchment },
-  { bg: c.gold, fg: c.blue },
-  { bg: '#2F5D50', fg: c.parchment },
+  { bg: c.gold, fg: FIXED.blue },
+  { bg: '#2F5D50', fg: FIXED.parchment },
   { bg: c.red, fg: c.parchment },
   { bg: '#E9C987', fg: '#4A3A12' },
 ] as const;
