@@ -27,7 +27,7 @@ function corruptLastByte(bytes) {
   return out;
 }
 
-function mockSupabase({ current = null, readBack = 'ok', rpcStatus = 200 } = {}) {
+function mockSupabase({ current = null, readBack = 'ok', rpcStatus = 200, stage = 'ok' } = {}) {
   const calls = [];
   const objects = new Map();
   const server = http.createServer(async (req, res) => {
@@ -36,6 +36,15 @@ function mockSupabase({ current = null, readBack = 'ok', rpcStatus = 200 } = {})
     const body = Buffer.concat(chunks);
     calls.push({ method: req.method, url: req.url, body, headers: req.headers });
     const json = (status, value) => { res.writeHead(status, { 'Content-Type': 'application/json' }).end(JSON.stringify(value)); };
+    if (req.method === 'GET' && req.url.startsWith('/rest/v1/stages?')) {
+      const row = { id: STAGE_ID, route_id: ROUTE_ID, stage_number: 1, deleted_at: null };
+      if (stage === 'missing') return json(200, []);
+      if (stage === 'deleted') return json(200, [{ ...row, deleted_at: '2026-11-01T00:00:00Z' }]);
+      if (stage === 'other_route') return json(200, [{ ...row, route_id: '20000000-0000-0000-0000-000000000002' }]);
+      if (stage === 'other_number') return json(200, [{ ...row, stage_number: 9 }]);
+      if (stage === 'error') return json(500, { message: 'boom' });
+      return json(200, [row]);
+    }
     if (req.method === 'GET' && req.url.startsWith('/rest/v1/offline_packs?')) return json(200, current ? [current] : []);
     if (req.method === 'POST' && req.url.startsWith('/storage/v1/object/offline-packs/')) {
       objects.set(req.url.replace('/storage/v1/object/', ''), body);
@@ -89,25 +98,26 @@ function publish(f, mock, extra = []) {
   return new Promise((resolve) => child.on('close', (code) => resolve({ code, out })));
 }
 
-test('happy path: gates, comparison, upload, read-back, then ONE register call', async () => {
+test('happy path: stage row, gates, comparison, upload, read-back, then ONE register call', async () => {
   const mock = await mockSupabase({ current: { version: 20261003, size_bytes: 3100, sha256: 'old' } });
   const f = await fixture();
   const r = await publish(f, mock);
   await mock.close();
   assert.equal(r.code, 0, r.out);
   assert.deepEqual(mock.calls.map((c) => `${c.method} ${c.url.split('?')[0]}`), [
+    'GET /rest/v1/stages',
     'GET /rest/v1/offline_packs',
     `POST /storage/v1/object/offline-packs/mini-test/stage-01/tiles-v${f.version}.pmtiles`,
     `GET /storage/v1/object/authenticated/offline-packs/mini-test/stage-01/tiles-v${f.version}.pmtiles`,
     'POST /rest/v1/rpc/register_offline_pack',
   ]);
-  const rpc = JSON.parse(mock.calls[3].body.toString());
+  const rpc = JSON.parse(mock.calls[4].body.toString());
   assert.deepEqual(rpc, {
     p_route_id: ROUTE_ID, p_stage_id: STAGE_ID, p_kind: 'tiles', p_format: 'pmtiles', p_version: f.version,
     p_url: `supabase://offline-packs/mini-test/stage-01/tiles-v${f.version}.pmtiles`,
     p_size_bytes: f.bytes.length, p_sha256: f.manifest.sha256,
   });
-  assert.equal(mock.calls[3].headers.authorization, 'Bearer test-service-key');
+  assert.equal(mock.calls[4].headers.authorization, 'Bearer test-service-key');
   assert.ok(!mock.calls.some((c) => c.method === 'PATCH' || c.method === 'DELETE'), 'must not retire rows by hand');
 });
 
@@ -146,7 +156,7 @@ test('a pack that jumped in size against the live one is refused before the uplo
   await mock.close();
   assert.equal(r.code, 1, r.out);
   assert.match(r.out, /Pack size changed 5\.00x against the published pack v20261003/);
-  assert.deepEqual(mock.calls.map((c) => c.method), ['GET']);
+  assert.deepEqual(mock.calls.map((c) => c.method), ['GET', 'GET'], 'the stage row and the live pack are read, nothing is written');
 });
 
 test('the damaged read-back differs from the stored bytes for every possible last byte', () => {
@@ -200,4 +210,34 @@ test('a manifest with a path in "file" or ids that are not uuids is refused', as
   const r2 = await publish(f2, null, ['--dry-run']);
   assert.equal(r2.code, 1);
   assert.match(r2.out, /must be uuids/);
+});
+
+// A pack for a stage that is not in the database can never be registered, so it must not be uploaded either (it would
+// be an orphan file in Storage). Only 3 of the 33 Camino Francés stages have a row today.
+for (const [stage, pattern] of [
+  ['missing', /is not in the database, so a pack cannot be registered for it/],
+  ['deleted', /is not in the database \(it is deleted\)/],
+  ['other_route', /belongs to route 20000000-0000-0000-0000-000000000002/],
+  ['other_number', /says this is stage number 9, the pack says 1/],
+]) {
+  test(`a stage row that is ${stage.replace('_', ' ')} is refused before anything is uploaded`, async () => {
+    const mock = await mockSupabase({ stage });
+    const f = await fixture();
+    const r = await publish(f, mock);
+    await mock.close();
+    assert.equal(r.code, 1, r.out);
+    assert.match(r.out, pattern);
+    assert.match(r.out, /Nothing was uploaded/);
+    assert.deepEqual(mock.calls.map((c) => `${c.method} ${c.url.split('?')[0]}`), ['GET /rest/v1/stages'], 'no pack lookup, no upload, no register');
+  });
+}
+
+test('a stage row that cannot be read stops the publish too', async () => {
+  const mock = await mockSupabase({ stage: 'error' });
+  const f = await fixture();
+  const r = await publish(f, mock);
+  await mock.close();
+  assert.equal(r.code, 1, r.out);
+  assert.match(r.out, /could not read the stage row: HTTP 500/);
+  assert.ok(!mock.calls.some((c) => c.method === 'POST'), 'nothing is uploaded or registered');
 });

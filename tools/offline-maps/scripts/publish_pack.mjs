@@ -17,7 +17,9 @@
 //   1. Integrity: recompute size + sha256 of the file against the manifest.
 //   2. Quality gates (scripts/lib/quality.mjs): route_source must be 'osm', size / tile count /
 //      layers / OSM age inside the band of the stage file. Nothing is uploaded if one fails.
-//   3. Compare with the pack that is live now (size must not jump); needs the service key.
+//   3. Check the stage exists in the database (same route, same number: a pack that can never be registered
+//      would be an orphan file in Storage), then compare with the pack that is live now (size must not jump);
+//      needs the service key.
 //   4. Upload, then download it again and compare sha256 (a truncated upload is caught here).
 //   5. Register with ONE call to public.register_offline_pack(...) (service_role only). The
 //      database does "insert the new row as current, retire the old ones" in a single
@@ -107,8 +109,20 @@ const rest = (path, init = {}) => fetch(`${supabaseUrl}/rest/v1/${path}`, {
   headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}`, 'Content-Type': 'application/json', ...(init.headers || {}) },
 });
 
-// 3. Compare with the live pack (service role bypasses RLS). Done BEFORE the upload.
+// 3. The stage must exist in the database, with this route and this number, and the pack is compared with the live
+// pack (service role bypasses RLS). Both are done BEFORE the upload: register_offline_pack needs the stage row, and an
+// upload that can never be registered is an orphan file in Storage.
 if (haveSupabase) {
+  const sr = await rest(`stages?id=eq.${m.stage_id}&select=id,route_id,stage_number,deleted_at`);
+  if (!sr.ok) fail(`could not read the stage row: HTTP ${sr.status} ${await sr.text()}`);
+  const [stageRow] = await sr.json();
+  const what = `${m.route_slug} stage ${m.stage_number} (${m.stage_id})`;
+  if (!stageRow || stageRow.deleted_at) {
+    fail(`${what} is not in the database${stageRow ? ' (it is deleted)' : ''}, so a pack cannot be registered for it. Nothing was uploaded. Add the stage row first; it can stay unpublished (is_published = false).`);
+  }
+  if (stageRow.route_id !== m.route_id) fail(`${what}: the database says this stage belongs to route ${stageRow.route_id}, the pack is for ${m.route_id}. Nothing was uploaded.`);
+  if (Number(stageRow.stage_number) !== Number(m.stage_number)) fail(`${what}: the database says this is stage number ${stageRow.stage_number}, the pack says ${m.stage_number}. Nothing was uploaded.`);
+  console.log(`stage row: ok (${what})`);
   const scope = `route_id=eq.${m.route_id}&stage_id=eq.${m.stage_id}&kind=eq.tiles&is_current=eq.true&deleted_at=is.null`;
   const r = await rest(`offline_packs?${scope}&select=version,size_bytes,sha256&order=version.desc&limit=1`);
   if (!r.ok) fail(`could not read the current pack: HTTP ${r.status} ${await r.text()}`);
