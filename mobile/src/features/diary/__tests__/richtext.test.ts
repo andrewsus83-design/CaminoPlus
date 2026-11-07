@@ -220,6 +220,14 @@ test('a selection over several lines is done line by line: block marks stay, bla
   assert.equal(crlf.text, '**one**\r\n**two**');
 });
 
+test('a line that has the format on every word already is left exactly as it was typed; white space at its edge is not a word to change', () => {
+  for (const line of [' **a****b**', '**a****b** ', '  **a****b**  ']) {
+    const t = `x\n${line}`;
+    const e = must(toggleInline(t, S(0, t.length), 'bold'));
+    assert.equal(e.text, `**x**\n${line}`, `"${line}" stays as typed while the line above gets the format`);
+  }
+});
+
 test('a toggle never changes a word and answers null (nothing changes) rather than a mark that would not read back', () => {
   for (const [t, s] of [['a_b_c', S(2, 3)], ['**x**y**z**', S(2, 9)], ['_a_b_', S(0, 5)], ['a__b__c', S(0, 7)], ['**', S(0, 2)], ['***', S(0, 3)]] as [string, Sel][]) {
     for (const f of ['bold', 'italic'] as const) {
