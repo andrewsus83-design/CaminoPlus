@@ -5,6 +5,7 @@ import { Screen } from '@/components/Screen';
 import { AppText } from '@/components/AppText';
 import { Card, SectionLabel } from '@/components/ui';
 import { AccountSection, LogoutButton, ThemeToggle } from '@/components/AccountSection';
+import { BuildCard } from '@/components/BuildCard';
 import { BusinessCard, IntroSheet } from '@/features/business/BusinessCard';
 import { useOwner } from '@/features/business/store';
 import { Icon } from '@/components/Icon';
@@ -108,6 +109,10 @@ export default function Settings() {
             </Pressable>
           ))}
         </Card>
+      </View>
+      <View style={{ gap: 8 }}>
+        <SectionLabel>This build</SectionLabel>
+        <BuildCard />
       </View>
       <IntroSheet visible={sheet} onClose={() => setSheet(false)}
         onStart={() => { setSheet(false); router.push('/business/register'); }}

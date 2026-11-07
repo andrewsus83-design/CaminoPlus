@@ -1,0 +1,69 @@
+# Over-the-air updates: after a green `ci` run on main, publish the app's JavaScript and assets to the phones that run a
+# build made for the same native code (the fingerprint decides that; mobile/DEPLOY.md explains it).
+#
+# - Off until you switch it on: repository variable EAS_UPDATE_ENABLED = true (and the secret EXPO_TOKEN). Until then this
+#   workflow is skipped, so a merge never shows a red cross for something that was not set up yet.
+# - workflow_dispatch: publish by hand, to `preview` (testers) or `production` (the store apps).
+# - Only a push to main of this repository, never a pull request, ever reaches the publish step.
+name: eas-update
+
+on:
+  workflow_run:
+    workflows: [ci]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      channel:
+        description: 'Which phones get it: preview (testers) or production (the store apps)'
+        type: choice
+        options: [preview, production]
+        default: preview
+
+permissions:
+  contents: read
+
+concurrency:
+  group: eas-update-${{ inputs.channel || 'preview' }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: >-
+      ${{ vars.EAS_UPDATE_ENABLED == 'true' && (
+        github.event_name == 'workflow_dispatch' ||
+        (github.event.workflow_run.conclusion == 'success' &&
+         github.event.workflow_run.event == 'push' &&
+         github.event.workflow_run.head_repository.full_name == github.repository)) }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: mobile
+    env:
+      # Inputs reach the scripts as environment variables only, never pasted into the script text.
+      CHANNEL: ${{ inputs.channel || 'preview' }}
+      COMMIT_MESSAGE: ${{ github.event.workflow_run.head_commit.message || 'manual run' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # the commit the green ci run was about, not whatever main is by now
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+      # The token is visible to the publish step only, never to npm ci.
+      - run: npm ci --no-audit --no-fund
+      - name: Publish the update
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          if [ -z "$EXPO_TOKEN" ]; then
+            echo "EXPO_TOKEN is not set. See mobile/DEPLOY.md, step 3." >&2
+            exit 1
+          fi
+          first_line="$(printf '%s' "$COMMIT_MESSAGE" | head -n 1 | cut -c1-100)"
+          npx --yes eas-cli@16 update --channel "$CHANNEL" --message "$first_line" --non-interactive
