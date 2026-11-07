@@ -2,7 +2,7 @@ import { View } from 'react-native';
 import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
 import { c, radius } from '@/theme';
-import { engagementItems, type EngagementSource } from './engagement';
+import { engagementItems, type EngagementSource } from '@/lib/engagement';
 
 /**
  * The stats rail of the full-screen journey viewer, in the style of TikTok and Reels: heart, comment bubble, share

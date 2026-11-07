@@ -1,6 +1,6 @@
 // Plain-node checks for the engagement stats of a journey post (no React Native). Run: npm run test:me
 import assert from 'node:assert/strict';
-import { countLabel, engagementItems, formatCount } from '../engagement';
+import { countLabel, engagementItems, formatCount } from '../../../lib/engagement';
 import { parseEngagementRows, withEngagement } from '../../../lib/postEngagement';
 import type { PostEngagement } from '../../../lib/postEngagement';
 
