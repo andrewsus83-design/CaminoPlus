@@ -1,6 +1,6 @@
 import { useRef, useState, type ComponentRef } from 'react';
 import { KeyboardAvoidingView, Platform, TextInput, View } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, usePreventRemove, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Screen } from '@/components/Screen';
 import { AppText } from '@/components/AppText';
@@ -28,7 +28,8 @@ export default function DiaryPage() {
 
   if (page.state === 'missing') return <NotHere goBack={goBack} />;
   if (page.state === 'loading') return <Screen tabBar={false}><IconButton name="back" label="Back" onPress={goBack} /></Screen>;
-  return <PageEditor key={page.entry?.id ?? NEW_PAGE} uid={page.uid} initial={page.entry} goBack={goBack} />;
+  // Keyed by the person and the page: the saver is made once, for one person, so another account can never reuse an editor.
+  return <PageEditor key={`${page.uid}:${page.entry?.id ?? NEW_PAGE}`} uid={page.uid} initial={page.entry} goBack={goBack} />;
 }
 
 /** A page that is not in this diary: deleted, or a link from another account. Friendly, and a way out. */
@@ -54,18 +55,24 @@ function PageEditor({ uid, initial, goBack }: { uid: string; initial: DiaryEntry
   const [deleteFailed, setDeleteFailed] = useState(false);
   const [date] = useState(() => dateLine(initial?.createdAt ?? new Date().toISOString()));
   const { saver, view } = usePageSaver(uid, initial);
-  const warned = useRef(false);
+  const [leaving, setLeaving] = useState(false);
+  const left = useRef(false);
 
-  // Back writes first and leaves when everything typed is on the phone. If it cannot be written the message is already on
-  // screen (and the words are still in the field): the first Back stays, a second one leaves anyway.
-  const leave = async () => {
-    const res = await saver.flush();
-    if (res.ok || warned.current) return goBack();
-    warned.current = true;
-  };
+  // Every way of leaving this screen (the Back button, the system's back, the swipe from the edge, the browser's back) is held
+  // here while what was typed is not safely on the phone (a write is pending, or the last one failed): it is written first,
+  // and then the way out is taken. If it cannot be written the first try stays (the reason is on screen and the words are
+  // still in the field) and the next one leaves. When everything is saved nothing is held and the way out is immediate.
+  const disablePrevention = usePreventRemove(view.status !== 'saved' && !leaving, ({ repeat }) => {
+    void saver.tryLeave().then((answer) => {
+      if (answer !== 'leave' || left.current) return;
+      left.current = true;
+      setLeaving(true);
+      repeat();
+    });
+  });
   const askDelete = () => confirmDelete(pageTitle({ title, body }), async () => {
     setDeleteFailed(false);
-    if (await saver.discard()) goBack();
+    if (await saver.discard()) { setLeaving(true); disablePrevention(); goBack(); }
     else setDeleteFailed(true);
   });
 
@@ -77,7 +84,7 @@ function PageEditor({ uid, initial, goBack }: { uid: string; initial: DiaryEntry
       <Screen tabBar={false} scroll={false}>
         <View style={{ flex: 1, gap: 12, paddingBottom: Math.max(insets.bottom, 12) }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-            <IconButton name="back" label="Back" onPress={() => void leave()} />
+            <IconButton name="back" label="Back" onPress={goBack} />
             {view.stored && <IconButton name="trash" label="Delete this page" onPress={askDelete} />}
           </View>
           <AppText variant="small" muted>{date}</AppText>

@@ -44,6 +44,31 @@ check('the editor saves when the screen goes away and when the app goes to the b
   assert.match(editor, /This page is not here/);
 });
 
+check('every way of leaving the editor goes through one guard while something typed is not safely on the phone: the Back button, the system back, the swipe, the browser back', () => {
+  const src = read('app/diary/[id].tsx');
+  const editor = src.slice(src.indexOf('function PageEditor'));
+  assert.ok(editor.length > 200, 'PageEditor is there');
+  assert.match(src, /import \{[^}]*\busePreventRemove\b[^}]*\} from 'expo-router';/);
+  assert.match(editor, /const disablePrevention = usePreventRemove\(view\.status !== 'saved' && !leaving, \(\{ repeat \}\) => \{/, 'held while a write is pending or the last one failed, and only then');
+  assert.match(editor, /saver\.tryLeave\(\)/, 'it writes first, and says leave or stay');
+  assert.match(editor, /if \(answer !== 'leave' \|\| left\.current\) return;\s*left\.current = true;\s*setLeaving\(true\);\s*repeat\(\);/, 'on leave it lifts the hold and takes the way out that was held, once');
+  assert.match(editor, /<IconButton name="back" label="Back" onPress=\{goBack\} \/>/, 'the Back button is one of the ways out, not a path of its own');
+  assert.doesNotMatch(editor, /await saver\.flush\(\)/, 'no second, different way of leaving');
+  assert.match(editor, /if \(await saver\.discard\(\)\) \{ setLeaving\(true\); disablePrevention\(\); goBack\(\); \}/, 'a deleted page lifts the hold before it goes back');
+  // the hook this relies on comes with the installed expo-router, which blocks the pop of the stack, the Android back and (through
+  // react-native-screens' preventNativeDismiss) the iOS swipe, and hands the blocked action to the callback
+  const exported = read('node_modules/expo-router/build/exports.d.ts');
+  assert.match(exported, /usePreventRemove/);
+  assert.match(read('node_modules/expo-router/build/react-navigation/native-stack/views/NativeStackView.native.js'), /preventNativeDismiss: isRemovalPrevented/);
+});
+
+check('the editor is keyed by the person and the page, so an editor made for one account can never be reused by another', () => {
+  const src = read('app/diary/[id].tsx');
+  assert.match(src, /<PageEditor key=\{`\$\{page\.uid\}:\$\{page\.entry\?\.id \?\? NEW_PAGE\}`\} uid=\{page\.uid\}/);
+  assert.doesNotMatch(src, /<PageEditor key=\{page\.entry/);
+  assert.match(read('src/features/diary/useDiary.ts'), /usePageSaver\(uid: string, initial: DiaryEntry \| null\)/, 'the saver is made once for one uid, which is why the key matters');
+});
+
 check('storage.ts reads strictly, in the same places localStore writes: nothing there is null, anything that cannot be read throws', () => {
   const storage = read('src/features/diary/storage.ts');
   const local = read('src/lib/localStore.ts');

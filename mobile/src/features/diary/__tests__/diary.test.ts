@@ -1017,6 +1017,62 @@ const GOOD = page('g1', day(1), { title: 'Roncesvalles', body: 'Cold and clear.'
     assert.equal(h.saved.length, 1);
   });
 
+  await test('leaving: when everything is on the phone the answer is "leave" at once, also for a page that is blank', async () => {
+    const h = harness();
+    assert.equal(await h.saver.tryLeave(), 'leave');
+    h.saver.edit({ body: 'Rain on the meseta' });
+    assert.equal(await h.saver.tryLeave(), 'leave');
+    assert.equal(h.saved.length, 1, 'it was written first');
+    assert.equal(h.clk.pending(), 0);
+    assert.equal(await h.saver.tryLeave(), 'leave');
+    assert.equal(h.saved.length, 1);
+  });
+
+  await test('leaving when the write fails stays once, so the reason on screen is seen, and leaves the next time; typing again starts the warning over', async () => {
+    const no: SaveResult = { ok: false, reason: 'not-saved' };
+    const h = harness({ answers: [no, no, no, no, no, no] });
+    h.saver.edit({ body: 'x' });
+    assert.equal(await h.saver.tryLeave(), 'stay');
+    assert.deepEqual([h.saver.view().status, h.saver.view().problem], ['failed', 'not-saved']);
+    assert.equal(await h.saver.tryLeave(), 'leave', 'the second try leaves anyway');
+    assert.equal(await h.saver.tryLeave(), 'leave');
+    h.saver.edit({ body: 'xy' });
+    assert.equal(await h.saver.tryLeave(), 'stay', 'something was typed since: the warning is given again');
+    assert.equal(await h.saver.tryLeave(), 'leave');
+  });
+
+  await test('a write that goes through after a warning ends it: a later failure warns again', async () => {
+    const no: SaveResult = { ok: false, reason: 'not-saved' };
+    const h = harness({ answers: [no, { ok: true }, no] });
+    h.saver.edit({ body: 'a' });
+    assert.equal(await h.saver.tryLeave(), 'stay');
+    assert.equal(await h.saver.tryLeave(), 'leave'); // the retry (second write) went through
+    assert.equal(h.saver.view().status, 'saved');
+    h.saver.edit({ body: 'ab' });
+    assert.equal(await h.saver.tryLeave(), 'stay', 'a new failure is a new warning');
+  });
+
+  await test('asking to leave twice at once (a double tap, the swipe and the button) is asking once', async () => {
+    const no: SaveResult = { ok: false, reason: 'not-saved' };
+    const h = harness({ answers: [no, no, no] });
+    h.saver.edit({ body: 'x' });
+    const [first, second] = await Promise.all([h.saver.tryLeave(), h.saver.tryLeave()]);
+    assert.deepEqual([first, second], ['stay', 'stay']);
+    assert.equal(h.saved.length, 1, 'written once');
+    assert.equal(await h.saver.tryLeave(), 'leave');
+  });
+
+  await test('a page that is deleted has nothing left to complain about, so leaving it is free', async () => {
+    const no: SaveResult = { ok: false, reason: 'not-saved' };
+    const h = harness({ initial: page('old', day(1), { body: 'Body' }), answers: [no] });
+    h.saver.edit({ body: 'Body, and more' });
+    await h.saver.flush();
+    assert.equal(h.saver.view().status, 'failed');
+    assert.equal(await h.saver.discard(), true);
+    assert.deepEqual([h.saver.view().status, h.saver.view().problem], ['saved', null]);
+    assert.equal(await h.saver.tryLeave(), 'leave');
+  });
+
   await test('typing, leaving and coming back through the real store: the page is there, and a blank page leaves no trace', async () => {
     const f = fake({ latency: (op) => (op === 'set' ? 5 : 0) });
     const store = createDiaryStore(f.storage);

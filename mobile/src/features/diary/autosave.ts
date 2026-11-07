@@ -4,6 +4,7 @@
 //   edit()     the person typed. The text is remembered at once and written AUTOSAVE_MS after the last keystroke.
 //   flush()    do it now, if there is anything to do, and answer when everything typed so far is on the phone. Called on
 //              Back, when the screen goes away and when the app goes to the background.
+//   tryLeave() the person wants to go (Back, the system's back, a swipe): flush first, and say 'leave' or 'stay'.
 //   discard()  the person deleted the page: nothing typed is written any more, and the stored page is removed.
 //
 // A page begun in this editor exists only while it has something in it besides spaces and line breaks: it is created with
@@ -44,6 +45,12 @@ export type SaverDeps = {
 export type PageSaver = {
   edit: (change: { title?: string; body?: string }) => void;
   flush: () => Promise<SaveResult>;
+  /**
+   * The person wants to leave, by whatever way: everything typed is written first. 'leave' when it is all on the phone. When it
+   * could not be written the answer is 'stay' once, so that the reason on screen is seen, and 'leave' on the next try (the person
+   * has seen it and chooses to go). Typing again starts the warning over. Asking twice at once is asking once (a double tap).
+   */
+  tryLeave: () => Promise<'leave' | 'stay'>;
   discard: () => Promise<boolean>;
   view: () => SaverView;
 };
@@ -69,6 +76,8 @@ export function createPageSaver(deps: SaverDeps, initial: DiaryEntry | null = nu
   let tail: Promise<SaveResult> = Promise.resolve({ ok: true });
   let problem: SaveProblem | null = null;
   let closed = false;
+  let warned = false; // the person has been told, by a leave that stayed, that what is typed could not be written
+  let asking: Promise<'leave' | 'stay'> | null = null;
 
   const view = (): SaverView => ({ status: timer != null || writing > 0 ? 'saving' : problem ? 'failed' : 'saved', stored, problem });
   const sig = (v: SaverView) => `${v.status}|${v.stored}|${v.problem}`;
@@ -110,7 +119,7 @@ export function createPageSaver(deps: SaverDeps, initial: DiaryEntry | null = nu
     const entry: DiaryEntry = { id, createdAt, updatedAt: stamp, title, body };
     sent = snap;
     run(() => deps.save(entry), (res) => {
-      if (res.ok) { stored = true; problem = null; }
+      if (res.ok) { stored = true; problem = null; warned = false; }
       else { problem = res.reason; if (sent === snap) sent = null; }
     });
   };
@@ -140,10 +149,23 @@ export function createPageSaver(deps: SaverDeps, initial: DiaryEntry | null = nu
     if (closed) return;
     if (change.title !== undefined) title = change.title;
     if (change.body !== undefined) body = change.body;
+    warned = false;
     stop();
     if (takeBack() || dirty()) timer = setTimer(() => { timer = null; void flush(); }, delay);
     else if (writing === 0) problem = null;
     notify();
+  };
+
+  const tryLeave = (): Promise<'leave' | 'stay'> => {
+    // After the flush has settled, what decides is the state: nothing pending and nothing failed (not the answer of some older write).
+    asking ??= flush()
+      .then((): 'leave' | 'stay' => {
+        if (view().status === 'saved' || warned) return 'leave';
+        warned = true;
+        return 'stay';
+      })
+      .finally(() => { asking = null; });
+    return asking;
   };
 
   const discard = async (): Promise<boolean> => {
@@ -153,11 +175,11 @@ export function createPageSaver(deps: SaverDeps, initial: DiaryEntry | null = nu
     await tail; // a write on its way finishes first, so the removal comes after it
     if (id == null) return true;
     const ok = await deps.remove(id);
-    if (ok) stored = false;
+    if (ok) { stored = false; problem = null; }
     else closed = false; // it is still there, and can be edited again
     notify();
     return ok;
   };
 
-  return { edit, flush, discard, view };
+  return { edit, flush, tryLeave, discard, view };
 }
