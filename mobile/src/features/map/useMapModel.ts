@@ -9,7 +9,8 @@ import {
   remainingToStageEnd, routeBearingAt, sliceAlong, stageEnds, updateTrack,
 } from './nav';
 import { loadInstalled, packSourceUrl, refreshCatalog, usePacks } from './packs/store';
-import { ROUTE_ID, pois, routeLine, samplePosition, stageForAlong, stages, towns } from './sampleRoute';
+import { choosePins, samplePins, useStagePois, useStageStays } from '@/features/places';
+import { ROUTE_ID, routeLine, samplePosition, stageForAlong, stages, towns } from './sampleRoute';
 import type { TileSource } from './style';
 import { timeAgo } from './timeAgo';
 import { useOnline } from './useConnectivity';
@@ -26,11 +27,8 @@ export type PackStatus =
   | { kind: 'missing'; stageNumber: number }
   | { kind: 'loading' };
 
-// Towns and pins the "Next on the way" list can name, and where the towns fall along the route.
-const landmarks: Landmark[] = [
-  ...towns.map((t) => ({ key: `t-${t.name}`, name: t.name, kind: 'town', at: t.at })),
-  ...pois.map((p) => ({ key: p.id, name: p.name, kind: p.kind, at: p.at })),
-];
+// Towns the "Next on the way" list can name (the pins of the stage are added in the hook), and where the towns fall along the route.
+const townLandmarks: Landmark[] = towns.map((t) => ({ key: `t-${t.name}`, name: t.name, kind: 'town', at: t.at }));
 const townAlong = towns.map((t) => ({ name: t.name, along: progressAlong(routeLine, t.at).alongM }));
 
 /** Ticks once a minute while `active`, for the arrival clock and the day/night switch. */
@@ -73,6 +71,13 @@ export function useMapModel({ gpsMode, visible }: { gpsMode: GpsMode; visible: b
 
   const alongNow = useMemo(() => progressAlong(routeLine, progressAt).alongM, [progressAt[0], progressAt[1]]); // eslint-disable-line react-hooks/exhaustive-deps
   const stage = stageForAlong(alongNow);
+  // The pins of this stage: its real stays and points of interest (from the database, or the copy saved on the phone),
+  // or the bundled sample pins when the database has none for it. Never a mix of the two.
+  const stageStays = useStageStays(stage.id);
+  const stagePois = useStagePois(stage.id);
+  const sample = useMemo(samplePins, []);
+  const { pins, source: pinSource } = useMemo(() => choosePins({ stays: stageStays, pois: stagePois, sample }), [stageStays, stagePois, sample]);
+  const landmarks = useMemo<Landmark[]>(() => [...townLandmarks, ...pins.map((p) => ({ key: p.id, name: p.name, kind: p.kind, at: p.at }))], [pins]);
   const stageEndAt = stage.line[stage.line.length - 1];
   // Where the walker (or the sample position) is on the route, and how far the end of the stage is along it.
   const { pos, endAlongM: stageEndAlong, remainingM } = useMemo(() => remainingToStageEnd(routeLine, progressAt, stageEndAt), [progressAt[0], progressAt[1], stage.id]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -130,7 +135,7 @@ export function useMapModel({ gpsMode, visible }: { gpsMode: GpsMode; visible: b
     () => cardFor({ live, remainingM: live ? remainingM : null, speedMps: track.speedMps, stageDistanceKm: stage.distanceKm, stageNumber: stage.number, stageName: stage.name, now }),
     [live, remainingM, track.speedMps, stage.distanceKm, stage.number, stage.name, now],
   );
-  const next = useMemo(() => (live ? nextOnTheWay(routeLine, pos.alongM, landmarks, 3) : []), [live, pos.alongM]);
+  const next = useMemo(() => (live ? nextOnTheWay(routeLine, pos.alongM, landmarks, 3) : []), [live, pos.alongM, landmarks]);
   const ahead = useMemo(() => sliceAlong(routeLine, pos.alongM, stageEndAlong), [pos.alongM, stageEndAlong]);
   const beyond = useMemo(() => sliceAlong(routeLine, stageEndAlong, lineTotalM(routeLine)), [stageEndAlong]);
   const stageEnd = useMemo(() => ({ at: stageEndAt, name: stageTo }), [stageEndAt, stageTo]);
@@ -151,6 +156,8 @@ export function useMapModel({ gpsMode, visible }: { gpsMode: GpsMode; visible: b
     remaining,
     walkedKm,
     stage,
+    pins,
+    pinSource,
     nextTownKm,
     now,
     autoNight,

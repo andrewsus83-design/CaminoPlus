@@ -2,6 +2,9 @@ import type { LngLat } from './geo';
 import type { PoiKind } from './sampleRoute';
 import type { TileSource } from './style';
 
+/** What the map needs to draw a pin. A PlacePin (features/places) has more, for the card that opens when it is tapped. */
+export type MapPin = { id: string; kind: PoiKind; name: string; at: LngLat };
+
 /** 'Helicopter' = the whole route. 'City' = the Walk view (tilted, heading-up, close to the walker). */
 export type MapLayerMode = 'Helicopter' | 'City';
 
@@ -21,6 +24,8 @@ export type MapViewProps = {
   recenterKey: number;
   /** Zoom buttons: bump n to zoom one level in (dir 1) or out (dir -1). */
   zoomCmd?: { dir: 1 | -1; n: number };
+  /** The pins to draw: real places of the stage, or the bundled sample pins when the stage has none. */
+  pois: MapPin[];
   selectedPoiId?: string;
   onSelectPoi: (id: string | undefined) => void;
   saver: boolean;

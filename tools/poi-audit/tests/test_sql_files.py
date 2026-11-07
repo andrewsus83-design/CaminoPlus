@@ -44,12 +44,13 @@ class SmokeTest(unittest.TestCase):
 
 
 class Migration(unittest.TestCase):
-    def test_the_version_is_the_next_free_one_and_unique(self):
+    def test_the_version_is_unique_and_after_the_migrations_it_follows(self):
+        # Not "the last one": later migrations (the places functions, 20261111000000) legitimately come after it.
         versions = [p.name.split("_", 1)[0] for p in sorted(MIGRATIONS.glob("*.sql"))]
         self.assertEqual(len(versions), len(set(versions)), "every migration has its own version")
         self.assertEqual(sorted(versions), versions)
-        self.assertEqual(versions[-1], MIGRATION.name.split("_", 1)[0], "it is the last one")
-        self.assertGreater(MIGRATION.name.split("_", 1)[0], "20261109000000")
+        self.assertIn(MIGRATION.name.split("_", 1)[0], versions)
+        self.assertGreater(MIGRATION.name.split("_", 1)[0], "20261109000000", "it comes after the last migration that existed when it was written")
 
     def test_it_only_adds_a_key_when_there_is_none_and_never_removes_anything(self):
         text = re.sub(r"--[^\n]*", "", MIGRATION.read_text(encoding="utf-8"))

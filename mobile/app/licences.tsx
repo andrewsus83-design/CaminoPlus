@@ -13,7 +13,7 @@ import { c, layout, role } from '@/theme';
 type Item = { name: string; what: string; licence: string; url: string };
 
 const DATA: Item[] = [
-  { name: 'OpenStreetMap', what: 'Map data: routes, towns, water, churches, albergues', licence: 'ODbL 1.0, © OpenStreetMap contributors', url: 'https://www.openstreetmap.org/copyright' },
+  { name: 'OpenStreetMap', what: 'Map data and the places in the app: routes, towns, water, churches, albergues, cafés', licence: 'ODbL 1.0, © OpenStreetMap contributors', url: 'https://www.openstreetmap.org/copyright' },
   { name: 'OpenMapTiles', what: 'Vector tile schema behind the offline maps', licence: 'CC BY 4.0, © OpenMapTiles', url: 'https://openmaptiles.org/' },
   { name: 'Natural Earth', what: 'Low-zoom world map data', licence: 'Public domain', url: 'https://www.naturalearthdata.com/about/terms-of-use/' },
   { name: 'OpenFreeMap and MapTiler', what: 'Online base map tiles (only while you are online)', licence: 'Their terms; data © OpenStreetMap contributors', url: 'https://openfreemap.org/' },
@@ -61,7 +61,7 @@ export default function Licences() {
         </View>
         <Group title="MAPS AND DATA" items={DATA} />
         <Group title="FONTS AND SOFTWARE" items={SOFTWARE} />
-        <AppText variant="caption" muted>Map data © OpenStreetMap contributors · © OpenMapTiles. Packs are rebuilt every month from fresh OpenStreetMap data.</AppText>
+        <AppText variant="caption" muted>Map data and places © OpenStreetMap contributors · © OpenMapTiles. Packs are rebuilt every month from fresh OpenStreetMap data. Places from OpenStreetMap are shown as they are, with where they came from and how far they were checked.</AppText>
       </ScrollView>
     </View>
   );

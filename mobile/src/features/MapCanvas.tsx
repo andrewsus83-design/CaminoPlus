@@ -2,9 +2,9 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { PanResponder, View } from 'react-native';
 import Svg, { Circle, Defs, G, LinearGradient, Path, Polygon, Polyline, Rect, Stop, Text as SvgText } from 'react-native-svg';
 import { fixed } from '@/theme';
-import type { MapViewProps } from './map/types';
+import type { MapPin, MapViewProps } from './map/types';
 import { progressAlong } from './map/nav';
-import { pois, routeLine } from './map/sampleRoute';
+import { routeLine } from './map/sampleRoute';
 import { kindHex, puckScreenY } from './map/walkLayers';
 import { buildScene, dotsAlong, localCumulative, makeCamera, ribbon, toLocal, type P2 } from './map/walkScene';
 
@@ -50,7 +50,7 @@ function Overview({ width, height, night }: Props) {
 }
 
 // Colours of the drawing in each light. A map has its own day and night; it does not follow the app's light/dark mode,
-// so it uses the fixed (light) palette, never c.* (c.blue would be light blue on the day ground in dark mode).
+// so it uses the fixed (light) palette, never c.* (fixed.blue would be light blue on the day ground in dark mode).
 const LOOK = {
   day: { ground: '#EFE5D2', road: '#FFFFFF', roadCase: '#D3C4A8', roof: '#EBDFC9', sideA: '#D4C5A8', sideB: '#BDAE90', edge: '#B3A483', route: fixed.blue, halo: '#FFFFFF', accuracy: fixed.blue, ink: fixed.blue, inkHalo: fixed.parchment, puck: '#1E4A7A', glow: 'none' },
   night: { ground: '#0C1626', road: '#3B5780', roadCase: '#070E19', roof: '#5A86BE', sideA: '#3C6395', sideB: '#2B4B75', edge: '#1D3454', route: '#8CC8FF', halo: '#06101C', accuracy: '#4C9BFF', ink: '#F6EFE2', inkHalo: '#08111E', puck: '#3F8CF0', glow: '#4C9BFF' },
@@ -142,10 +142,10 @@ function WalkScene(p: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scene, cam]);
 
-  const shownPois = pois
+  const shownPois = p.pois
     .filter((poi) => !p.poiKinds || p.poiKinds.includes(poi.kind))
     .map((poi) => ({ poi, s: proj(toLocal(scene.origin, poi.at)) }))
-    .filter((x): x is { poi: (typeof pois)[number]; s: NonNullable<ReturnType<typeof proj>> } => !!x.s && x.s.sx > -20 && x.s.sx < width + 20 && x.s.sy > 90 && x.s.sy < height - 20);
+    .filter((x): x is { poi: MapPin; s: NonNullable<ReturnType<typeof proj>> } => !!x.s && x.s.sx > -20 && x.s.sx < width + 20 && x.s.sy > 90 && x.s.sy < height - 20);
 
   const end = p.stageEnd ? proj(toLocal(scene.origin, p.stageEnd.at)) : null;
   const acc = Math.min(Math.max(p.walker?.accuracyM ?? 0, 0), 150);
