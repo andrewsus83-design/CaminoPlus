@@ -35,13 +35,14 @@ in light. Offline, the empty account has only the account saved, the Me tab neve
 Then the **scenarios** ([scenarios.mjs](scenarios.mjs)), each in light and dark, written the way a person would use the app:
 
 - the tab bar shows Me, Stays, Maps, Discover and Library, and each tab opens;
-- the gear on Me opens `/settings` (no tab bar there) and Back returns to `/me`;
+- the gear on Me opens `/settings` (no tab bar there) and Back returns to `/me`, also when Settings was opened from a link;
 - switching light/dark on Settings returns to Settings, and Back goes to Me;
 - Library shows a banner and the Bible, Books and Music tabs; the gold pen opens `/diary/new`;
 - Stays lists the stays of the stage and one opens with its details;
+- logging out from Settings lands on Welcome;
 - launching the app lands on Welcome (signed out), Onboarding (signed in, no journey) or Me;
-- offline, the account saved on the phone opens on Me and says it is offline; with an expired login, and with nothing saved
-  ("No signal right now"), it does not wait for the network.
+- with an expired login the session is renewed online; offline the account saved on the phone opens on Me and says it is offline,
+  and with an expired login (also with nothing saved: "No signal right now") the app does not wait for the network.
 
 The diary screens are placeholders while that feature is built: they are only swept (they must load without errors) and the pen
 only checks where it goes, never what those screens contain.
@@ -66,7 +67,7 @@ cd mobile && npm ci && npx expo export --platform web --output-dir ../tools/web-
 cd ../tools/web-smoke && npm ci
 npx playwright install chromium    # once; CI uses --with-deps
 npm test                           # the self-test: the harness against an app built to misbehave (about 25 s)
-npm run smoke                      # about 2.5 minutes: 336 checks at the time of writing, 4 pages at a time
+npm run smoke                      # about 3 minutes: about 340 checks at the time of writing, 4 pages at a time
 ```
 
 `npm run build:app` runs the export command for you. Use the normal (production) export, as CI does: a development export (`--dev`)

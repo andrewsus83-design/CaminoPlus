@@ -57,6 +57,18 @@ export const SCENARIOS = [
     },
   },
   {
+    name: 'Settings opened from a link (nothing behind it): Back still goes to Me',
+    persona: 'in',
+    async run(ctx) {
+      const { page, step, go } = ctx;
+      step('open /settings directly');
+      await go('/settings');
+      await page.getByRole('heading', { name: 'Settings', exact: true }).waitFor();
+      await back(ctx);
+      await waitPath(page, '/me', 'the address after Back');
+    },
+  },
+  {
     name: 'Settings: switching light and dark returns to Settings, and Back goes to Me',
     persona: 'in',
     async run(ctx) {
@@ -122,6 +134,19 @@ export const SCENARIOS = [
     },
   },
   {
+    name: 'Log out: Settings, the round log-out button, and the app is back on Welcome',
+    persona: 'in',
+    async run(ctx) {
+      const { page, step } = ctx;
+      await openSettings(ctx);
+      step('tap the log-out button and confirm');
+      page.once('dialog', (dialog) => dialog.accept()); // the web build asks with window.confirm
+      await page.getByRole('button', { name: 'Log out', exact: true }).click();
+      await waitPath(page, '/welcome', 'where the app lands after logging out');
+      await page.getByText(/Buen Camino/).first().waitFor();
+    },
+  },
+  {
     name: 'Launch: signed out lands on Welcome',
     persona: 'out',
     async run({ page, step, go }) {
@@ -157,6 +182,18 @@ export const SCENARIOS = [
       await go('/');
       await waitPath(page, '/me', 'where the app lands');
       await page.getByText(/You are offline/).first().waitFor();
+    },
+  },
+  {
+    name: 'Online with a login that has expired: it is renewed and the app opens on Me',
+    persona: 'in',
+    expiredLogin: true,
+    savedAccount: false,
+    schemes: ['light'],
+    async run({ page, step, go }) {
+      step('open the app with an expired login');
+      await go('/');
+      await eventually(() => pathOf(page), (p) => p === '/me', { what: 'where the app lands', timeout: 15_000 });
     },
   },
   {
