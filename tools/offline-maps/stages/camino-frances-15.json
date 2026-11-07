@@ -22,6 +22,21 @@
   "min_route_km": 9.3,
   "buffer_km": 3,
   "maxzoom": 15,
+  "quality": {
+    "min_tiles": 510,
+    "max_tiles": 1380,
+    "min_size_mb": 0.7,
+    "max_size_mb": 2.1,
+    "required_layers": [
+      "building",
+      "place",
+      "poi",
+      "transportation",
+      "transportation_name"
+    ],
+    "max_change_ratio": 1.5,
+    "max_osm_age_days": 45
+  },
   "waypoints": [
     {
       "name": "Castrojeriz",
@@ -67,8 +82,15 @@
         42.28837,
         15
       ],
-      "min_features": {},
-      "min_labels": {}
+      "min_features": {
+        "poi": 63,
+        "transportation": 50,
+        "building": 4
+      },
+      "min_labels": {
+        "place": 1,
+        "peak": 1
+      }
     },
     {
       "name": "Frómista z15",
@@ -77,8 +99,13 @@
         42.26769,
         15
       ],
-      "min_features": {},
-      "min_labels": {}
+      "min_features": {
+        "poi": 46,
+        "transportation": 59
+      },
+      "min_labels": {
+        "place": 1
+      }
     }
   ],
   "generated_from": "catalog/camino-frances/15.json"

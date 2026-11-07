@@ -22,6 +22,21 @@
   "min_route_km": 9.0,
   "buffer_km": 3,
   "maxzoom": 15,
+  "quality": {
+    "min_tiles": 700,
+    "max_tiles": 1870,
+    "min_size_mb": 2.1,
+    "max_size_mb": 5.8,
+    "required_layers": [
+      "building",
+      "place",
+      "poi",
+      "transportation",
+      "transportation_name"
+    ],
+    "max_change_ratio": 1.5,
+    "max_osm_age_days": 45
+  },
   "waypoints": [
     {
       "name": "Portomarín",
@@ -81,8 +96,14 @@
         42.80816,
         15
       ],
-      "min_features": {},
-      "min_labels": {}
+      "min_features": {
+        "poi": 72,
+        "transportation": 51,
+        "building": 2
+      },
+      "min_labels": {
+        "place": 1
+      }
     },
     {
       "name": "Palas de Rei z15",
@@ -91,8 +112,14 @@
         42.87391,
         15
       ],
-      "min_features": {},
-      "min_labels": {}
+      "min_features": {
+        "poi": 54,
+        "transportation": 40,
+        "building": 5
+      },
+      "min_labels": {
+        "place": 1
+      }
     }
   ],
   "generated_from": "catalog/camino-frances/30.json"

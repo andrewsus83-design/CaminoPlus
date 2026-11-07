@@ -22,6 +22,21 @@
   "min_route_km": 10.6,
   "buffer_km": 3,
   "maxzoom": 15,
+  "quality": {
+    "min_tiles": 760,
+    "max_tiles": 2040,
+    "min_size_mb": 3.2,
+    "max_size_mb": 8.7,
+    "required_layers": [
+      "building",
+      "place",
+      "poi",
+      "transportation",
+      "transportation_name"
+    ],
+    "max_change_ratio": 1.5,
+    "max_osm_age_days": 45
+  },
   "waypoints": [
     {
       "name": "Logroño",
@@ -67,8 +82,14 @@
         42.46612,
         15
       ],
-      "min_features": {},
-      "min_labels": {}
+      "min_features": {
+        "poi": 765,
+        "transportation": 419,
+        "building": 34
+      },
+      "min_labels": {
+        "place": 1
+      }
     },
     {
       "name": "Nájera z15",
@@ -77,8 +98,15 @@
         42.41674,
         15
       ],
-      "min_features": {},
-      "min_labels": {}
+      "min_features": {
+        "poi": 70,
+        "transportation": 91,
+        "building": 16
+      },
+      "min_labels": {
+        "place": 1,
+        "peak": 1
+      }
     }
   ],
   "generated_from": "catalog/camino-frances/08.json"

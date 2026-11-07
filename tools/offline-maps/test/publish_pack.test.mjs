@@ -18,6 +18,15 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const ROUTE_ID = '20000000-0000-0000-0000-0000000000ff';
 const STAGE_ID = '40000000-0000-0000-0000-0000000000ff';
 
+// The read-back the mock serves when it pretends the stored object was damaged. The last byte is flipped,
+// so the result differs from the original whatever that byte is. (It used to be replaced with 0x00, which left a
+// random pack that happens to end in 0x00 unchanged: the test failed about once in 256 runs.)
+function corruptLastByte(bytes) {
+  const out = Buffer.from(bytes);
+  out[out.length - 1] ^= 0xff;
+  return out;
+}
+
 function mockSupabase({ current = null, readBack = 'ok', rpcStatus = 200 } = {}) {
   const calls = [];
   const objects = new Map();
@@ -35,7 +44,7 @@ function mockSupabase({ current = null, readBack = 'ok', rpcStatus = 200 } = {})
     if (req.method === 'GET' && req.url.startsWith('/storage/v1/object/authenticated/')) {
       const stored = objects.get(req.url.replace('/storage/v1/object/authenticated/', ''));
       if (!stored) return json(404, { error: 'not found' });
-      res.writeHead(200).end(readBack === 'corrupt' ? Buffer.concat([stored.subarray(0, stored.length - 1), Buffer.from([0])]) : stored);
+      res.writeHead(200).end(readBack === 'corrupt' ? corruptLastByte(stored) : stored);
       return undefined;
     }
     if (req.method === 'POST' && req.url === '/rest/v1/rpc/register_offline_pack') {
@@ -138,6 +147,14 @@ test('a pack that jumped in size against the live one is refused before the uplo
   assert.equal(r.code, 1, r.out);
   assert.match(r.out, /Pack size changed 5\.00x against the published pack v20261003/);
   assert.deepEqual(mock.calls.map((c) => c.method), ['GET']);
+});
+
+test('the damaged read-back differs from the stored bytes for every possible last byte', () => {
+  for (let last = 0; last < 256; last += 1) {
+    const stored = Buffer.from([1, 2, 3, last]);
+    assert.notDeepEqual(corruptLastByte(stored), stored, `last byte ${last}`);
+    assert.deepEqual(stored, Buffer.from([1, 2, 3, last]), 'the stored buffer itself is not modified');
+  }
 });
 
 test('an upload that does not read back identical is never registered', async () => {

@@ -23,6 +23,21 @@
   "min_route_km": 9.5,
   "buffer_km": 3,
   "maxzoom": 15,
+  "quality": {
+    "min_tiles": 900,
+    "max_tiles": 2430,
+    "min_size_mb": 3.5,
+    "max_size_mb": 9.6,
+    "required_layers": [
+      "building",
+      "place",
+      "poi",
+      "transportation",
+      "transportation_name"
+    ],
+    "max_change_ratio": 1.5,
+    "max_osm_age_days": 45
+  },
   "waypoints": [
     {
       "name": "Los Arcos",
@@ -68,8 +83,14 @@
         42.56974,
         15
       ],
-      "min_features": {},
-      "min_labels": {}
+      "min_features": {
+        "poi": 25,
+        "transportation": 56,
+        "building": 3
+      },
+      "min_labels": {
+        "place": 1
+      }
     },
     {
       "name": "Logroño z15",
@@ -78,8 +99,14 @@
         42.46612,
         15
       ],
-      "min_features": {},
-      "min_labels": {}
+      "min_features": {
+        "poi": 765,
+        "transportation": 419,
+        "building": 34
+      },
+      "min_labels": {
+        "place": 1
+      }
     }
   ],
   "generated_from": "catalog/camino-frances/07.json"

@@ -22,6 +22,21 @@
   "min_route_km": 7.7,
   "buffer_km": 3,
   "maxzoom": 15,
+  "quality": {
+    "min_tiles": 450,
+    "max_tiles": 1220,
+    "min_size_mb": 1.4,
+    "max_size_mb": 4,
+    "required_layers": [
+      "building",
+      "place",
+      "poi",
+      "transportation",
+      "transportation_name"
+    ],
+    "max_change_ratio": 1.5,
+    "max_osm_age_days": 45
+  },
   "waypoints": [
     {
       "name": "Triacastela",
@@ -74,8 +89,13 @@
         42.75634,
         15
       ],
-      "min_features": {},
-      "min_labels": {}
+      "min_features": {
+        "poi": 31,
+        "transportation": 33
+      },
+      "min_labels": {
+        "place": 1
+      }
     },
     {
       "name": "Sarria z15",
@@ -84,8 +104,14 @@
         42.77842,
         15
       ],
-      "min_features": {},
-      "min_labels": {}
+      "min_features": {
+        "poi": 253,
+        "transportation": 136,
+        "building": 4
+      },
+      "min_labels": {
+        "place": 1
+      }
     }
   ],
   "generated_from": "catalog/camino-frances/28.json"

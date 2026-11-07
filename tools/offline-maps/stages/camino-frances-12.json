@@ -22,6 +22,21 @@
   "min_route_km": 9.0,
   "buffer_km": 3,
   "maxzoom": 15,
+  "quality": {
+    "min_tiles": 530,
+    "max_tiles": 1430,
+    "min_size_mb": 5,
+    "max_size_mb": 13.6,
+    "required_layers": [
+      "building",
+      "place",
+      "poi",
+      "transportation",
+      "transportation_name"
+    ],
+    "max_change_ratio": 1.5,
+    "max_osm_age_days": 45
+  },
   "waypoints": [
     {
       "name": "San Juan de Ortega",
@@ -81,8 +96,13 @@
         42.37527,
         15
       ],
-      "min_features": {},
-      "min_labels": {}
+      "min_features": {
+        "poi": 12,
+        "transportation": 12
+      },
+      "min_labels": {
+        "place": 1
+      }
     },
     {
       "name": "Burgos z15",
@@ -91,8 +111,15 @@
         42.34393,
         15
       ],
-      "min_features": {},
-      "min_labels": {}
+      "min_features": {
+        "poi": 1852,
+        "transportation": 732,
+        "building": 333
+      },
+      "min_labels": {
+        "place": 1,
+        "peak": 1
+      }
     }
   ],
   "generated_from": "catalog/camino-frances/12.json"

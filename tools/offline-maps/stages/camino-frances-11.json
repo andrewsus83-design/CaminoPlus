@@ -22,6 +22,21 @@
   "min_route_km": 8.5,
   "buffer_km": 3,
   "maxzoom": 15,
+  "quality": {
+    "min_tiles": 680,
+    "max_tiles": 1830,
+    "min_size_mb": 2.5,
+    "max_size_mb": 7,
+    "required_layers": [
+      "building",
+      "place",
+      "poi",
+      "transportation",
+      "transportation_name"
+    ],
+    "max_change_ratio": 1.5,
+    "max_osm_age_days": 45
+  },
   "waypoints": [
     {
       "name": "Belorado",
@@ -74,8 +89,14 @@
         42.4197,
         15
       ],
-      "min_features": {},
-      "min_labels": {}
+      "min_features": {
+        "poi": 88,
+        "transportation": 36,
+        "building": 10
+      },
+      "min_labels": {
+        "place": 1
+      }
     },
     {
       "name": "San Juan de Ortega z15",
@@ -84,8 +105,13 @@
         42.37527,
         15
       ],
-      "min_features": {},
-      "min_labels": {}
+      "min_features": {
+        "poi": 12,
+        "transportation": 12
+      },
+      "min_labels": {
+        "place": 1
+      }
     }
   ],
   "generated_from": "catalog/camino-frances/11.json"
