@@ -9,9 +9,9 @@ import { SAMPLE_VIEWER_LABEL } from '@/lib/sampleJourney';
 import { c, fonts, radius, layout } from '@/theme';
 import { EngagementRail } from './EngagementRail';
 
-// My journey: 9:16 tiles in an even two-column grid, edge to edge, square corners, a 1 px line between tiles (the
-// TikTok / Reels profile grid; the maths is in lib/gridLayout.ts). Tap a tile to open the full-screen viewer, which
-// scrolls vertically one post at a time, like TikTok.
+// My journey: 9:16 tiles in an even two-column grid, square corners, 2 px between tiles (sideways and downwards) and
+// 2 px from the left and right screen edge (the TikTok / Reels profile grid; the maths is in lib/gridLayout.ts).
+// Tap a tile to open the full-screen viewer, which scrolls vertically one post at a time, like TikTok.
 const CARD_COLORS = [
   { bg: c.blue, fg: c.parchment },
   { bg: c.gold, fg: c.blue },
@@ -79,14 +79,13 @@ function PostVisual({ post, media, index, active, small }: { post: Post; media?:
   );
 }
 
-export function JourneyGrid({ posts, bleed = true, margin = layout.screenMargin, sample }: { posts: Post[]; bleed?: boolean; margin?: number; sample?: Record<string, Visual[]> }) {
+export function JourneyGrid({ posts, margin = layout.screenMargin, sample }: { posts: Post[]; margin?: number; sample?: Record<string, Visual[]> }) {
   // `sample`: the bundled sample journey. Its pictures and clips come with the app, so nothing is fetched.
   const [media, setMedia] = useState<Record<string, Visual[]>>(sample ?? {});
   const [openAt, setOpenAt] = useState<number | null>(null);
   const { width } = useWindowDimensions();
-  // Edge to edge by default: `margin` is the screen's side padding, which the negative margin below cancels.
-  // Pass bleed={false} to keep the grid inside that padding.
-  const { colW, tileH, line } = gridMetrics(width, { bleed, margin, pixelRatio: PixelRatio.get() });
+  // `margin` is the screen's side padding. The grid reaches out of it, down to 2 px from the screen edge (marginHorizontal).
+  const { colW, tileH, gap, marginHorizontal } = gridMetrics(width, { margin, pixelRatio: PixelRatio.get() });
 
   useEffect(() => {
     if (sample) return;
@@ -94,14 +93,14 @@ export function JourneyGrid({ posts, bleed = true, margin = layout.screenMargin,
     listPostMediaUrls(ids).then(setMedia).catch(() => {});
   }, [posts, sample]);
 
-  // Even rows of two tiles. The only space between tiles is `line` (1 px); the page background shows through it.
+  // Even rows of two tiles. The only space between tiles is `gap` (2 px, sideways and downwards); the page background shows through it.
   const rows = useMemo(() => gridRows(posts.length), [posts.length]);
 
   return (
     <>
-      <View style={{ marginHorizontal: bleed ? -margin : 0, gap: line }}>
+      <View style={{ marginHorizontal, gap }}>
         {rows.map((row, r) => (
-          <View key={r} style={{ flexDirection: 'row', gap: line }}>
+          <View key={r} style={{ flexDirection: 'row', gap }}>
             {row.map((i) => {
               const p = posts[i];
               const first = media[p.id]?.[0];
