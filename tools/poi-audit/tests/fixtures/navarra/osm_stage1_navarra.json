@@ -1,0 +1,626 @@
+{
+"elements": [
+{
+"type": "node",
+"id": 535186143,
+"tags": {
+"addr:city": "Roncesvalles",
+"addr:postcode": "31650",
+"name": "La Posada de Roncesvalles",
+"tourism": "hostel"
+},
+"lat": 43.0083493,
+"lon": -1.3194285
+},
+{
+"type": "node",
+"id": 535186152,
+"tags": {
+"amenity": "drinking_water",
+"drinking_water": "yes"
+},
+"lat": 43.0080064,
+"lon": -1.3193049
+},
+{
+"type": "node",
+"id": 535186428,
+"tags": {
+"addr:city": "Roncesvalles",
+"addr:housenumber": "14",
+"addr:postcode": "31650",
+"addr:street": "Calle Nuestra Señora de Roncesvalles",
+"beds": "32",
+"name": "Hotel Roncesvalles",
+"operator:type": "private",
+"tourism": "hotel"
+},
+"lat": 43.0099837,
+"lon": -1.3199122
+},
+{
+"type": "node",
+"id": 535238492,
+"tags": {
+"amenity": "drinking_water",
+"drinking_water": "no"
+},
+"lat": 42.981004,
+"lon": -1.367632
+},
+{
+"type": "node",
+"id": 959121600,
+"tags": {
+"amenity": "drinking_water",
+"drinking_water": "yes",
+"name": "Andre Mariaren iturria"
+},
+"lat": 43.0084594,
+"lon": -1.3214401
+},
+{
+"type": "node",
+"id": 1393529901,
+"tags": {
+"addr:city": "Auritz/Burguete",
+"addr:housenumber": "25",
+"addr:postcode": "31640",
+"addr:street": "San Nicolas karrika",
+"beds": "5",
+"name": "Loperena",
+"operator:type": "private",
+"tourism": "guest_house"
+},
+"lat": 42.9883308,
+"lon": -1.3366592
+},
+{
+"type": "node",
+"id": 1627397126,
+"tags": {
+"amenity": "fountain",
+"drinking_water": "yes",
+"name": "Errolanen iturria"
+},
+"lat": 43.046881,
+"lon": -1.2646888
+},
+{
+"type": "node",
+"id": 1896340970,
+"tags": {
+"addr:city": "Roncesvalles",
+"addr:postcode": "31650",
+"addr:street": "Carretera Francia",
+"beds": "183",
+"name": "Erromesen aterpetxea",
+"operator": "Real Colegiata de Roncesvalles",
+"tourism": "hotel"
+},
+"lat": 43.0103845,
+"lon": -1.3192808
+},
+{
+"type": "node",
+"id": 2110543892,
+"tags": {
+"amenity": "drinking_water"
+},
+"lat": 42.9797239,
+"lon": -1.3719781
+},
+{
+"type": "node",
+"id": 2110543905,
+"tags": {
+"amenity": "drinking_water"
+},
+"lat": 42.979819,
+"lon": -1.3710138
+},
+{
+"type": "node",
+"id": 2214608019,
+"tags": {
+"addr:housenumber": "44",
+"addr:postcode": "31640",
+"addr:street": "San Nicolas karrika",
+"beds": "10",
+"name": "Bergara",
+"operator:type": "private",
+"tourism": "hostel"
+},
+"lat": 42.989529,
+"lon": -1.33553
+},
+{
+"type": "node",
+"id": 2214610375,
+"tags": {
+"addr:city": "Auritz/Burguete",
+"addr:housenumber": "32",
+"addr:postcode": "31640",
+"addr:street": "Calle San Nicolás",
+"beds": "16",
+"name": "Don Jauregui",
+"operator:type": "private",
+"tourism": "guest_house"
+},
+"lat": 42.9881596,
+"lon": -1.3364205
+},
+{
+"type": "node",
+"id": 2214610851,
+"tags": {
+"addr:city": "Auritz/Burguete",
+"addr:housenumber": "27",
+"addr:postcode": "31640",
+"addr:street": "San Nicolas karrika",
+"beds": "4",
+"name": "Loigorri",
+"operator:type": "private",
+"tourism": "guest_house"
+},
+"lat": 42.9885127,
+"lon": -1.33656
+},
+{
+"type": "node",
+"id": 2214612832,
+"tags": {
+"addr:city": "Auritz/Burguete",
+"addr:housenumber": "28",
+"addr:postcode": "31640",
+"addr:street": "Calle San Nicolás",
+"beds": "7",
+"name": "Hostal Juandeaburre",
+"operator:type": "private",
+"tourism": "hostel"
+},
+"lat": 42.9877017,
+"lon": -1.3367114
+},
+{
+"type": "node",
+"id": 2417877410,
+"tags": {
+"addr:city": "Luzaide/Valcarlos",
+"addr:housenumber": "52",
+"addr:postcode": "31660",
+"addr:street": "Calle Elizaldea",
+"beds": "24",
+"name": "Luzaideko aterpea",
+"operator": "Municipal",
+"tourism": "hostel"
+},
+"lat": 43.0929729,
+"lon": -1.3015794
+},
+{
+"type": "node",
+"id": 2418091631,
+"tags": {
+"addr:city": "Aurizberri/Espinal",
+"addr:postcode": "31694",
+"addr:street": "Ctra. Francia",
+"amenity": "restaurant",
+"beds": "57",
+"name": "Hostal Haizea",
+"operator:type": "private",
+"tourism": "hostel"
+},
+"lat": 42.9784524,
+"lon": -1.3661749
+},
+{
+"type": "node",
+"id": 2558370252,
+"tags": {
+"amenity": "drinking_water",
+"drinking_water": "yes"
+},
+"lat": 42.9929804,
+"lon": -1.3301017
+},
+{
+"type": "node",
+"id": 3370157817,
+"tags": {
+"addr:city": "Luzaide",
+"addr:postcode": "31660",
+"addr:street": "Calle Elizaldea",
+"beds": "13",
+"name": "Maitena",
+"operator:type": "private",
+"tourism": "hostel"
+},
+"lat": 43.0921559,
+"lon": -1.302284
+},
+{
+"type": "node",
+"id": 3649162459,
+"tags": {
+"amenity": "drinking_water"
+},
+"lat": 42.9890081,
+"lon": -1.3359365
+},
+{
+"type": "node",
+"id": 4289488213,
+"tags": {
+"addr:city": "Roncesvalles",
+"addr:housenumber": "14",
+"addr:postcode": "31650",
+"addr:street": "Calle Nuestra Señora de Roncesvalles",
+"beds": "52",
+"name": "Casa de los Beneficiados",
+"operator:type": "private",
+"tourism": "hotel"
+},
+"lat": 43.0099455,
+"lon": -1.3201628
+},
+{
+"type": "node",
+"id": 4984656415,
+"tags": {
+"amenity": "drinking_water",
+"man_made": "water_tap"
+},
+"lat": 43.028862,
+"lon": -1.3334337
+},
+{
+"type": "node",
+"id": 5002920741,
+"tags": {
+"amenity": "drinking_water",
+"name": "Apez Iturria",
+"operator": "Apezaren iturria"
+},
+"lat": 43.0125463,
+"lon": -1.3195722
+},
+{
+"type": "node",
+"id": 5037450453,
+"tags": {
+"amenity": "drinking_water"
+},
+"lat": 43.0347129,
+"lon": -1.2932941
+},
+{
+"type": "node",
+"id": 5963559833,
+"tags": {
+"amenity": "drinking_water"
+},
+"lat": 43.0672338,
+"lon": -1.3067667
+},
+{
+"type": "node",
+"id": 6749412223,
+"tags": {
+"amenity": "drinking_water"
+},
+"lat": 42.9929134,
+"lon": -1.3301272
+},
+{
+"type": "node",
+"id": 7122753032,
+"tags": {
+"name": "Irugoi Sl",
+"tourism": "guest_house"
+},
+"lat": 42.9768815,
+"lon": -1.3645759
+},
+{
+"type": "node",
+"id": 7725253918,
+"tags": {
+"amenity": "drinking_water"
+},
+"lat": 43.0468969,
+"lon": -1.2647259
+},
+{
+"type": "node",
+"id": 7818267722,
+"tags": {
+"name": "Roncesvalles",
+"tourism": "guest_house"
+},
+"lat": 42.9787909,
+"lon": -1.3695566
+},
+{
+"type": "node",
+"id": 8166247211,
+"tags": {
+"amenity": "drinking_water",
+"name": "Errolanen iturria"
+},
+"lat": 43.0056153,
+"lon": -1.3233193
+},
+{
+"type": "node",
+"id": 9695770786,
+"tags": {
+"amenity": "drinking_water",
+"name": "Harraska",
+"natural": "spring"
+},
+"lat": 43.0496237,
+"lon": -1.2728205
+},
+{
+"type": "node",
+"id": 10846158217,
+"tags": {
+"addr:city": "Luzaide/Valcarlos",
+"addr:housenumber": "113",
+"addr:postcode": "31660",
+"addr:street": "Elizaldea kalea",
+"name": "Apartamentos De Montaña Mendiola - Casa Ferran",
+"tourism": "hostel"
+},
+"lat": 43.0952682,
+"lon": -1.2985869
+},
+{
+"type": "node",
+"id": 13650863077,
+"tags": {
+"addr:city": "Espinal-Auzperri",
+"name": "Goizider",
+"tourism": "apartment"
+},
+"lat": 42.9810719,
+"lon": -1.3743843
+},
+{
+"type": "way",
+"id": 42798231,
+"tags": {
+"addr:city": "Orreaga / Roncesvalles",
+"addr:housenumber": "2",
+"addr:postcode": "31650",
+"addr:street": "Orreagako Gure Anderea karrika",
+"building": "yes",
+"name": "Orreagako ostatua",
+"operator": "private",
+"tourism": "hotel"
+},
+"center": {
+"lat": 43.0084442,
+"lon": -1.3194434
+}
+},
+{
+"type": "way",
+"id": 42798234,
+"tags": {
+"addr:city": "Roncesvalles",
+"addr:housenumber": "18",
+"addr:postcode": "31650",
+"addr:street": "Calle Nuestra Señora de Roncesvalles",
+"beds": "10",
+"building": "yes",
+"name": "Casa Sabina",
+"operator": "private",
+"tourism": "hostel"
+},
+"center": {
+"lat": 43.0093823,
+"lon": -1.3206928
+}
+},
+{
+"type": "way",
+"id": 82360346,
+"tags": {
+"addr:city": "Orreaga / Roncesvalles",
+"addr:housenumber": "20",
+"addr:postcode": "31650",
+"addr:street": "Orreagako Gure Anderea karrika",
+"beds": "116",
+"building": "yes",
+"name": "Refugio Itzandegia",
+"tourism": "hostel"
+},
+"center": {
+"lat": 43.0088617,
+"lon": -1.3204893
+}
+},
+{
+"type": "way",
+"id": 179292975,
+"tags": {
+"building": "yes",
+"name": "Izandorre",
+"operator": "Gobierno de Navarra",
+"tourism": "wilderness_hut"
+},
+"center": {
+"lat": 43.0373091,
+"lon": -1.2886213
+}
+},
+{
+"type": "way",
+"id": 216608590,
+"tags": {
+"addr:city": "Auritz/Burguete",
+"addr:housenumber": "71",
+"addr:postcode": "31640",
+"addr:street": "Calle San Nicolás",
+"beds": "40",
+"building": "yes",
+"name": "Hostal Burguete",
+"operator:type": "private",
+"tourism": "hotel"
+},
+"center": {
+"lat": 42.9907118,
+"lon": -1.3349648
+}
+},
+{
+"type": "way",
+"id": 216609899,
+"tags": {
+"addr:city": "Auritz / Burguete",
+"addr:housenumber": "6",
+"addr:postcode": "31640",
+"addr:street": "Calle Berexi",
+"beds": "12",
+"building": "yes",
+"name": "Casa Pedroarena",
+"tourism": "guest_house"
+},
+"center": {
+"lat": 42.9896744,
+"lon": -1.3344297
+}
+},
+{
+"type": "way",
+"id": 216610233,
+"tags": {
+"addr:city": "Auritz/Burguete",
+"addr:housenumber": "13",
+"addr:postcode": "31640",
+"addr:street": "San Nicolas karrika",
+"building": "yes",
+"name": "Hotel Loizu",
+"operator:type": "private",
+"tourism": "hotel"
+},
+"center": {
+"lat": 42.9876924,
+"lon": -1.3371115
+}
+},
+{
+"type": "way",
+"id": 383757908,
+"tags": {
+"addr:city": "Luzaide/Valcarlos",
+"addr:housenumber": "10",
+"addr:postcode": "31660",
+"addr:street": "Calle Elizaldea",
+"building": "yes",
+"name": "Hostal del Camino de Santiago",
+"tourism": "hostel"
+},
+"center": {
+"lat": 43.0915847,
+"lon": -1.3026498
+}
+},
+{
+"type": "way",
+"id": 383757927,
+"tags": {
+"addr:city": "Luzaide/Valcarlos",
+"addr:postcode": "31660",
+"beds": "24",
+"building": "house",
+"name": "Albergue de Peregrinos de Valcarlos",
+"tourism": "hostel"
+},
+"center": {
+"lat": 43.0918499,
+"lon": -1.3019186
+}
+},
+{
+"type": "way",
+"id": 383757946,
+"tags": {
+"building": "yes",
+"name": "Bidandaenea",
+"tourism": "chalet"
+},
+"center": {
+"lat": 43.0935795,
+"lon": -1.3004854
+}
+},
+{
+"type": "way",
+"id": 383757947,
+"tags": {
+"building": "yes",
+"name": "Etxezuria landetxea",
+"tourism": "chalet"
+},
+"center": {
+"lat": 43.0935542,
+"lon": -1.2999329
+}
+},
+{
+"type": "way",
+"id": 383789070,
+"tags": {
+"addr:city": "Aurizberri/Espinal",
+"addr:housenumber": "2",
+"addr:postcode": "31694",
+"addr:street": "Oianilun auzunea",
+"beds": "24",
+"building": "residential",
+"name": "Irugoienea",
+"tourism": "hostel"
+},
+"center": {
+"lat": 42.9772053,
+"lon": -1.3649434
+}
+},
+{
+"type": "way",
+"id": 596829122,
+"tags": {
+"addr:city": "Aurizberri/Espinal",
+"addr:postcode": "31694",
+"addr:street": "Martinputzu bidea",
+"beds": "10",
+"building": "yes",
+"name": "Gertxadako Basajauna",
+"tourism": "hostel"
+},
+"center": {
+"lat": 42.9815155,
+"lon": -1.3713793
+}
+},
+{
+"type": "way",
+"id": 761788063,
+"tags": {
+"addr:city": "Aurizberri/Espinal",
+"addr:housenumber": "80A",
+"addr:postcode": "31694",
+"addr:street": "San Bartolome karrika",
+"building": "yes",
+"name": "Apartamentos Irati",
+"tourism": "hotel"
+},
+"center": {
+"lat": 42.9785294,
+"lon": -1.3701611
+}
+}
+]
+}
