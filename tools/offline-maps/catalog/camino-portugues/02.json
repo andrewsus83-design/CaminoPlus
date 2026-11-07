@@ -1,0 +1,49 @@
+{
+  "n": 2,
+  "name": "Vilarinho to Barcelos",
+  "from": {
+    "name": "Vilarinho",
+    "lat": 41.33857,
+    "lng": -8.6819,
+    "source": "nominatim node/6230389149 place=hamlet (Macieira da Maia, Vila do Conde)"
+  },
+  "to": {
+    "name": "Barcelos",
+    "lat": 41.53145,
+    "lng": -8.61923,
+    "source": "nominatim relation/3737586 boundary=administrative linked_place=city wikidata=Q213242"
+  },
+  "via": [
+    {
+      "name": "Arcos",
+      "lat": 41.39517,
+      "lng": -8.66423,
+      "source": "nominatim relation/5989559 boundary=administrative linked_place=village wikidata=Q525254"
+    },
+    {
+      "name": "São Pedro de Rates",
+      "lat": 41.42807,
+      "lng": -8.67395,
+      "source": "nominatim relation/5937224 boundary=administrative linked_place=town wikidata=Q2118708 (OSM name 'Rates', alt_name and linked place name 'São Pedro de Rates')"
+    },
+    {
+      "name": "Pedra Furada",
+      "lat": 41.46836,
+      "lng": -8.6369,
+      "source": "nominatim relation/4056539 boundary=historic wikidata=Q2066348"
+    },
+    {
+      "name": "Carvalhal",
+      "lat": 41.5104,
+      "lng": -8.63505,
+      "source": "nominatim relation/4056465 boundary=administrative linked_place=village wikidata=Q1046068"
+    }
+  ],
+  "extracts": [
+    "portugal"
+  ],
+  "coastal": false,
+  "distance_km": null,
+  "distance_source": null,
+  "notes": "from is Vilarinho (end of stage 1). via in walking order: Arcos (freguesia, linked_place=village), São Pedro de Rates (relation/5937224: OSM name 'Rates', its linked place and alt_name are 'São Pedro de Rates'; the point is 0.65 km from the OSM route), Pedra Furada (relation/4056539, boundary=historic, on the Rother elevation profile), Carvalhal. Barcelos: relation/3737586 (linked_place=city); the OSM route passes through that point (Vagamundos: the day ends crossing the medieval bridge over the Cávado). Checked against OSM relation 12786090 (Caminho Português de Santiago, ref CP), read through the OSM API on 2026-11-07: the 27.0 km of the relation between the two ends stay within 0.69 km of the straight lines through these points. Published figures seen, not copied into distance_km: Rother 25.7 km, Vagamundos 27.5 km. Santiagoways (a tour operator) cuts this ground differently (Oporto to Fajozes, Fajozes to Arcos, Arcos to Barcelos) and counts 12 stages in all; the 11-stage division of the two guides above is used here."
+}

@@ -1,0 +1,49 @@
+{
+  "n": 10,
+  "name": "Caldas de Reis to Padrón",
+  "from": {
+    "name": "Caldas de Reis",
+    "lat": 42.60411,
+    "lng": -8.64217,
+    "source": "photon.komoot.io node/615606226 place=town"
+  },
+  "to": {
+    "name": "Padrón",
+    "lat": 42.73902,
+    "lng": -8.66025,
+    "source": "photon.komoot.io node/614385011 place=town"
+  },
+  "via": [
+    {
+      "name": "Carracedo",
+      "lat": 42.65037,
+      "lng": -8.65179,
+      "source": "nominatim relation/12656107 boundary=administrative place=civil_parish wikidata=Q12385419"
+    },
+    {
+      "name": "As Cernadas",
+      "lat": 42.666,
+      "lng": -8.63641,
+      "source": "nominatim node/6798047465 place=hamlet wikidata=Q123300776 (Valga)"
+    },
+    {
+      "name": "San Miguel de Valga",
+      "lat": 42.69605,
+      "lng": -8.63833,
+      "source": "nominatim node/10633049507 place=hamlet wikidata=Q123300701 (OSM name 'San Miguel', Valga)"
+    },
+    {
+      "name": "Pontecesures",
+      "lat": 42.71699,
+      "lng": -8.64384,
+      "source": "nominatim relation/345978 boundary=administrative place=municipality wikidata=Q1627584"
+    }
+  ],
+  "extracts": [
+    "galicia"
+  ],
+  "coastal": false,
+  "distance_km": null,
+  "distance_source": null,
+  "notes": "from is Caldas de Reis (end of stage 9). Xunta de Galicia stage Caldas de Reis to Padrón, with Carracedo and San Miguel de Valga on the way. Carracedo: civil parish relation (Caldas de Reis), 0.40 km from the route. As Cernadas: hamlet node (Valga) added to hold the line between Carracedo and Valga, 0.25 km from the route. San Miguel de Valga: hamlet node whose OSM name is 'San Miguel' (Valga), 0.02 km from the route; the Xunta calls the place San Miguel de Valga. Pontecesures: the municipality relation (place=municipality), 0.39 km from the route; the Camino crosses the Ulla there (from memory). Padrón: place=town node from Photon. Not coastal: OSM API map calls around the Pontecesures bridge and 3.7 km west of it (the Ulla estuary) find no natural=coastline. Checked against OSM relation 12786090 (Caminho Português de Santiago, ref CP), read through the OSM API on 2026-11-07: the 18.9 km between the two ends stay within 0.71 km of the straight lines through these points. Published figures seen, not copied into distance_km: Rother 18.5 km, Vagamundos 18.5 km."
+}

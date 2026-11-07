@@ -1,0 +1,43 @@
+{
+  "n": 1,
+  "name": "Porto to Vilarinho",
+  "from": {
+    "name": "Porto",
+    "lat": 41.1428,
+    "lng": -8.61121,
+    "source": "nominatim way/210461448 amenity=place_of_worship wikidata=Q1441255 (Sé do Porto, the cathedral where the Caminho starts)"
+  },
+  "to": {
+    "name": "Vilarinho",
+    "lat": 41.33857,
+    "lng": -8.6819,
+    "source": "nominatim node/6230389149 place=hamlet (Macieira da Maia, Vila do Conde)"
+  },
+  "via": [
+    {
+      "name": "Moreira da Maia",
+      "lat": 41.24742,
+      "lng": -8.64686,
+      "source": "nominatim relation/5923251 boundary=administrative linked_place=town wikidata=Q1947508 (OSM name 'Moreira', freguesia in Maia)"
+    },
+    {
+      "name": "Vilar de Pinheiro",
+      "lat": 41.26835,
+      "lng": -8.66551,
+      "source": "nominatim relation/5989557 boundary=administrative linked_place=village wikidata=Q615118"
+    },
+    {
+      "name": "Aldeia Nova",
+      "lat": 41.31828,
+      "lng": -8.67338,
+      "source": "nominatim node/7817687648 place=hamlet"
+    }
+  ],
+  "extracts": [
+    "portugal"
+  ],
+  "coastal": false,
+  "distance_km": null,
+  "distance_source": null,
+  "notes": "Division: Porto to Santiago in 11 stages, as in the Rother guide 'Chemin Portugais' (Cordula Rabe; table of contents on a Lehmanns sample page) and Vagamundos.pt; the Xunta de Galicia lists the six Galician stages (Tui to Santiago), which are stages 6 to 11 here. from is the Sé do Porto (way/210461448), where the Caminho is waymarked from (Vagamundos); the OSM route passes it 0.03 km away. The place=city point of Porto (relation/3372453, 41.15022,-8.61035) is 0.9 km further north and was not used. Moreira da Maia: OSM name 'Moreira', a freguesia of Maia, the usual halfway point (Vagamundos). Vilarinho: hamlet node/6230389149 (Macieira da Maia, Vila do Conde), 0.03 km from the OSM route; Portugal has many places of that name. Checked against OSM relation 12786090 (Caminho Português de Santiago, ref CP), read through the OSM API on 2026-11-07: between the Sé and Vilarinho (27.4 km along the relation) it stays within 0.97 km of the straight lines through these points, so clip_km 6 keeps all of it. Published figures seen, not copied into distance_km: Rother 25.7 km, Vagamundos 27 km. Not coastal: the Atlantic coast is more than 5 km west of the whole stage (the Costa route there is excluded in route.json). route.json: route_name_regex takes the relations named Caminho, Camino or Camiño Português/Portugués; route_exclude_regex drops the other ways that carry that name in OSM (the Costa, ref CPC; por Braga; Variante Espiritual; do Interior; de la Vía de la Plata; Apúlia to Viana do Castelo). Both were run over the 38 hiking and foot route relations read through the OSM API (13 map calls along the route and 21 relation reads, 2026-11-07): only 12786090, the Central route from the Coimbra area to Santiago, reaches a stage; 7684546 (Lisboa to Coimbra) and 10308998 (about 39.7 N) are kept too but lie south of Porto. The Costa (6100606) and the Braga route (8903414) are in the OSM data around the Sé as well, hence the exclusions."
+}

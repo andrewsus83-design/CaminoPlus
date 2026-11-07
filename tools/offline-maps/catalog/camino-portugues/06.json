@@ -1,0 +1,44 @@
+{
+  "n": 6,
+  "name": "Tui to O Porriño",
+  "from": {
+    "name": "Tui",
+    "lat": 42.05013,
+    "lng": -8.64657,
+    "source": "nominatim node/544485787 place=town wikidata=Q23991307"
+  },
+  "to": {
+    "name": "O Porriño",
+    "lat": 42.16188,
+    "lng": -8.62027,
+    "source": "photon.komoot.io node/299059474 place=town"
+  },
+  "via": [
+    {
+      "name": "Ponte das Febres",
+      "lat": 42.08625,
+      "lng": -8.63743,
+      "source": "nominatim way/256294259 highway=track (OSM name 'Ponte das Febres', Tui)"
+    },
+    {
+      "name": "Gándaras de Budiño",
+      "lat": 42.10003,
+      "lng": -8.62907,
+      "source": "nominatim way/793475815 leisure=nature_reserve (OSM name 'ZEC Gándaras de Budiño')"
+    },
+    {
+      "name": "Centeáns",
+      "lat": 42.12835,
+      "lng": -8.64326,
+      "source": "nominatim node/1242439623 place=hamlet"
+    }
+  ],
+  "extracts": [
+    "galicia",
+    "portugal"
+  ],
+  "coastal": false,
+  "distance_km": null,
+  "distance_source": null,
+  "notes": "from is Tui (end of stage 5). The Xunta de Galicia (caminodesantiago.gal, The Portuguese Way: Tui to Santiago, 118.8 km in six stages) lists this stage as Tui to O Porriño with Ponte das Febres and Gándaras de Budiño on the way; Centeáns is a hamlet on the route added to hold the line. Ponte das Febres: way/256294259, highway=track named 'Ponte das Febres' (the medieval bridge where St Telmo died, Vagamundos), 0.00 km from the OSM route. Gándaras de Budiño: leisure=nature_reserve (ZEC), so its point is the polygon centroid, 0.43 km from the route. O Porriño: place=town node from Photon (Nominatim returns only the municipality relation, whose point is 3 km south of the town). extracts: galicia, and portugal because the 3 km corridor around Tui reaches the Portuguese bank at Valença (2.6 km from the Tui point). Checked against OSM relation 12786090 (Caminho Português de Santiago, ref CP), read through the OSM API on 2026-11-07: the 17.3 km between the two ends stay within 0.85 km of the straight lines through these points. Published figures seen, not copied into distance_km: Santiagoways 16 km; Rother's Valença to O Porriño is 20.4 km."
+}

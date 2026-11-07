@@ -1,0 +1,11 @@
+{
+  "route_slug": "camino-portugues",
+  "route_index": 1,
+  "route_id": "20000000-0000-0000-0000-000000000002",
+  "route_name_regex": "cami(nho|no|ño) portugu[eéê]s\\b",
+  "route_exclude_regex": "\\bCPC\\b|costa|espiritual|braga|interior|plata|ap[uú]lia",
+  "clip_km": 6,
+  "buffer_km": 3,
+  "maxzoom": 15,
+  "margin_km": 4
+}

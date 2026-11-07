@@ -1,0 +1,78 @@
+{
+  "slug": "camino-portugues-07",
+  "name": "O Porriño to Redondela",
+  "route_slug": "camino-portugues",
+  "stage_number": 7,
+  "route_id": "20000000-0000-0000-0000-000000000002",
+  "stage_id": "40000000-0000-0000-0001-000000000007",
+  "osm_extracts": [
+    "https://download.geofabrik.de/europe/spain/galicia-latest.osm.pbf"
+  ],
+  "search_bbox": [
+    -8.74,
+    42.07,
+    -8.48,
+    42.37
+  ],
+  "coastal": true,
+  "route_name_regex": "cami(nho|no|ño) portugu[eéê]s\\b",
+  "route_exclude_regex": "\\bCPC\\b|costa|espiritual|braga|interior|plata|ap[uú]lia",
+  "fallback_route": "camino-portugues-07.route.geojson",
+  "clip_km": 6,
+  "min_route_km": 5.6,
+  "buffer_km": 3,
+  "maxzoom": 15,
+  "waypoints": [
+    {
+      "name": "O Porriño",
+      "at": [
+        -8.62027,
+        42.16188
+      ]
+    },
+    {
+      "name": "Mos",
+      "at": [
+        -8.59859,
+        42.19704
+      ]
+    },
+    {
+      "name": "O Souto",
+      "at": [
+        -8.60604,
+        42.25743
+      ]
+    },
+    {
+      "name": "Redondela",
+      "at": [
+        -8.6086,
+        42.28422
+      ]
+    }
+  ],
+  "render_checks": [
+    {
+      "name": "O Porriño z15",
+      "at": [
+        -8.62027,
+        42.16188,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    },
+    {
+      "name": "Redondela z15",
+      "at": [
+        -8.6086,
+        42.28422,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    }
+  ],
+  "generated_from": "catalog/camino-portugues/07.json"
+}

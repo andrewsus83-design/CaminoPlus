@@ -1,0 +1,37 @@
+{
+  "n": 4,
+  "name": "Ponte de Lima to Rubiães",
+  "from": {
+    "name": "Ponte de Lima",
+    "lat": 41.7675,
+    "lng": -8.5831,
+    "source": "nominatim relation/20266180 place=town linked_place=town wikidata=Q490180"
+  },
+  "to": {
+    "name": "Rubiães",
+    "lat": 41.89778,
+    "lng": -8.62488,
+    "source": "nominatim relation/5627858 boundary=administrative linked_place=village wikidata=Q1313724"
+  },
+  "via": [
+    {
+      "name": "Arcozelo",
+      "lat": 41.7949,
+      "lng": -8.59423,
+      "source": "nominatim relation/5713273 boundary=administrative wikidata=Q637942"
+    },
+    {
+      "name": "Labruja",
+      "lat": 41.8413,
+      "lng": -8.59513,
+      "source": "nominatim relation/5713289 boundary=administrative linked_place=village wikidata=Q1799550"
+    }
+  ],
+  "extracts": [
+    "portugal"
+  ],
+  "coastal": false,
+  "distance_km": null,
+  "distance_source": null,
+  "notes": "from is Ponte de Lima (end of stage 3). via: Arcozelo (a freguesia relation without a linked place, so its point is the polygon centroid, 0.14 km from the OSM route) and Labruja (linked village; the climb over the Serra da Labruja with the Cruz dos Franceses, Vagamundos). The Cruz dos Franceses and the Portela Grande were searched and have no Nominatim object, so they are not in via. Rubiães: relation/5627858 (freguesia, linked_place=village), 0.06 km from the OSM route; the pilgrim hostel (node/2261946536, 41.89949,-8.62445) is 0.2 km north of that point. Checked against OSM relation 12786090 (Caminho Português de Santiago, ref CP), read through the OSM API on 2026-11-07: the 17.9 km between the two ends stay within 0.51 km of the straight lines through these points. Published figures seen, not copied into distance_km: Rother 17.9 km, Vagamundos 18 km."
+}

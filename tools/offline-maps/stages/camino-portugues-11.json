@@ -1,0 +1,92 @@
+{
+  "slug": "camino-portugues-11",
+  "name": "Padrón to Santiago de Compostela",
+  "route_slug": "camino-portugues",
+  "stage_number": 11,
+  "route_id": "20000000-0000-0000-0000-000000000002",
+  "stage_id": "40000000-0000-0000-0001-000000000011",
+  "osm_extracts": [
+    "https://download.geofabrik.de/europe/spain/galicia-latest.osm.pbf"
+  ],
+  "search_bbox": [
+    -8.78,
+    42.65,
+    -8.42,
+    42.97
+  ],
+  "coastal": false,
+  "route_name_regex": "cami(nho|no|ño) portugu[eéê]s\\b",
+  "route_exclude_regex": "\\bCPC\\b|costa|espiritual|braga|interior|plata|ap[uú]lia",
+  "fallback_route": "camino-portugues-11.route.geojson",
+  "clip_km": 6,
+  "min_route_km": 7.7,
+  "buffer_km": 3,
+  "maxzoom": 15,
+  "waypoints": [
+    {
+      "name": "Padrón",
+      "at": [
+        -8.66025,
+        42.73902
+      ]
+    },
+    {
+      "name": "A Escravitude",
+      "at": [
+        -8.64997,
+        42.78347
+      ]
+    },
+    {
+      "name": "O Faramello",
+      "at": [
+        -8.6273,
+        42.80979
+      ]
+    },
+    {
+      "name": "O Milladoiro",
+      "at": [
+        -8.57822,
+        42.84495
+      ]
+    },
+    {
+      "name": "A Rocha Vella",
+      "at": [
+        -8.57723,
+        42.85946
+      ]
+    },
+    {
+      "name": "Santiago de Compostela",
+      "at": [
+        -8.54586,
+        42.88042
+      ]
+    }
+  ],
+  "render_checks": [
+    {
+      "name": "Padrón z15",
+      "at": [
+        -8.66025,
+        42.73902,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    },
+    {
+      "name": "Santiago de Compostela z15",
+      "at": [
+        -8.54586,
+        42.88042,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    }
+  ],
+  "generated_from": "catalog/camino-portugues/11.json"
+}

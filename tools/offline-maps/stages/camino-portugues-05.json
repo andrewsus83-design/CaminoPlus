@@ -1,0 +1,93 @@
+{
+  "slug": "camino-portugues-05",
+  "name": "Rubiães to Tui",
+  "route_slug": "camino-portugues",
+  "stage_number": 5,
+  "route_id": "20000000-0000-0000-0000-000000000002",
+  "stage_id": "40000000-0000-0000-0001-000000000005",
+  "osm_extracts": [
+    "https://download.geofabrik.de/europe/portugal-latest.osm.pbf",
+    "https://download.geofabrik.de/europe/spain/galicia-latest.osm.pbf"
+  ],
+  "search_bbox": [
+    -8.77,
+    41.81,
+    -8.5,
+    42.14
+  ],
+  "coastal": false,
+  "route_name_regex": "cami(nho|no|ño) portugu[eéê]s\\b",
+  "route_exclude_regex": "\\bCPC\\b|costa|espiritual|braga|interior|plata|ap[uú]lia",
+  "fallback_route": "camino-portugues-05.route.geojson",
+  "clip_km": 6,
+  "min_route_km": 6.9,
+  "buffer_km": 3,
+  "maxzoom": 15,
+  "waypoints": [
+    {
+      "name": "Rubiães",
+      "at": [
+        -8.62488,
+        41.89778
+      ]
+    },
+    {
+      "name": "Cossourado",
+      "at": [
+        -8.62327,
+        41.91321
+      ]
+    },
+    {
+      "name": "Fontoura",
+      "at": [
+        -8.63287,
+        41.95614
+      ]
+    },
+    {
+      "name": "Arão",
+      "at": [
+        -8.64417,
+        42.0132
+      ]
+    },
+    {
+      "name": "Valença",
+      "at": [
+        -8.64042,
+        42.02731
+      ]
+    },
+    {
+      "name": "Tui",
+      "at": [
+        -8.64657,
+        42.05013
+      ]
+    }
+  ],
+  "render_checks": [
+    {
+      "name": "Rubiães z15",
+      "at": [
+        -8.62488,
+        41.89778,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    },
+    {
+      "name": "Tui z15",
+      "at": [
+        -8.64657,
+        42.05013,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    }
+  ],
+  "generated_from": "catalog/camino-portugues/05.json"
+}

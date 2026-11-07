@@ -1,0 +1,78 @@
+{
+  "slug": "camino-portugues-04",
+  "name": "Ponte de Lima to Rubiães",
+  "route_slug": "camino-portugues",
+  "stage_number": 4,
+  "route_id": "20000000-0000-0000-0000-000000000002",
+  "stage_id": "40000000-0000-0000-0001-000000000004",
+  "osm_extracts": [
+    "https://download.geofabrik.de/europe/portugal-latest.osm.pbf"
+  ],
+  "search_bbox": [
+    -8.75,
+    41.68,
+    -8.46,
+    41.99
+  ],
+  "coastal": false,
+  "route_name_regex": "cami(nho|no|ño) portugu[eéê]s\\b",
+  "route_exclude_regex": "\\bCPC\\b|costa|espiritual|braga|interior|plata|ap[uú]lia",
+  "fallback_route": "camino-portugues-04.route.geojson",
+  "clip_km": 6,
+  "min_route_km": 6.0,
+  "buffer_km": 3,
+  "maxzoom": 15,
+  "waypoints": [
+    {
+      "name": "Ponte de Lima",
+      "at": [
+        -8.5831,
+        41.7675
+      ]
+    },
+    {
+      "name": "Arcozelo",
+      "at": [
+        -8.59423,
+        41.7949
+      ]
+    },
+    {
+      "name": "Labruja",
+      "at": [
+        -8.59513,
+        41.8413
+      ]
+    },
+    {
+      "name": "Rubiães",
+      "at": [
+        -8.62488,
+        41.89778
+      ]
+    }
+  ],
+  "render_checks": [
+    {
+      "name": "Ponte de Lima z15",
+      "at": [
+        -8.5831,
+        41.7675,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    },
+    {
+      "name": "Rubiães z15",
+      "at": [
+        -8.62488,
+        41.89778,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    }
+  ],
+  "generated_from": "catalog/camino-portugues/04.json"
+}
