@@ -30,6 +30,8 @@ supabase/
     ..._post_engagement_counters.sql    posts.save_count and share_count, post_shares, record_post_share()
     ..._blocked_pilgrims.sql    list_blocked_pilgrims(): who you blocked (Settings > Privacy and safety)
     ..._post_saves_visibility.sql       bookmarks need a post you can see, and are never updated
+    ..._osm_import_keys.sql     a full unique key on (osm_type, osm_id) for pois and stays, for the OSM importer's upsert
+                                (a no-op where the first migrations already made it)
   functions/               Deno edge functions: offline-pack-url (signed pack links), delete-account
   seed.sql                 reference data + a small Camino Frances sample
   dev/validate.sh          applies everything to a throwaway local Postgres, runs every dev/*smoke*.sql
@@ -133,6 +135,9 @@ erDiagram
 
 - `stays` holds both places to sleep and places to eat (`kind` = `stay` or `food`, derived from `category`).
 - Imported from OpenStreetMap first (`osm_type`, `osm_id`); other sources go in `source` and `external_ids`.
+  `tools/poi-audit/import_osm.py` writes them (and `pois`, `stage_stays`, `stage_pois`) through PostgREST, upserting on
+  `(osm_type, osm_id)`: see [its README section](../tools/poi-audit/README.md#import-to-supabase-osm-importer). Migration
+  `20261110000000_osm_import_keys.sql` makes sure that key is a full unique constraint; `dev/osm_import_smoke.sql` tests it.
 - `booking_method` is the per-stay label: walk-in, email, WhatsApp, phone, website, OTA, in-app (later).
 - Filters map to columns: category, `rating_avg`, `price_from`, `labels` (GIN index), distance (PostGIS),
   favourites/bookmarks (`favorites.list`). One call does it all: `rpc('search_stays', {...})`.
