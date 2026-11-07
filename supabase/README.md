@@ -1,7 +1,7 @@
 # CaminoPlus database (Supabase)
 
 Postgres schema, row level security, storage buckets and RPCs for the CaminoPlus app.
-70 tables in `public` (plus 4 server-only tables in `private`), split by app area.
+72 tables in `public` (plus 4 server-only tables in `private`), split by app area.
 
 ```
 supabase/
@@ -27,6 +27,7 @@ supabase/
     ..._platform_hardening.sql  private-schema grants, account deletion, business fixes, indexes, pg_cron,
                                 start_journey and register_offline_pack RPCs (see "Platform notes")
     ..._friends_chat_notifications.sql  mutual friends, direct + group chat, notifications
+    ..._post_engagement_counters.sql    posts.save_count and share_count, post_shares, record_post_share()
     ..._blocked_pilgrims.sql    list_blocked_pilgrims(): who you blocked (Settings > Privacy and safety)
   functions/               Deno edge functions: offline-pack-url (signed pack links), delete-account
   seed.sql                 reference data + a small Camino Frances sample
@@ -178,6 +179,7 @@ erDiagram
   posts ||--o{ post_likes : ""
   posts ||--o{ post_comments : ""
   posts ||--o{ post_saves : ""
+  posts ||--o{ post_shares : "shared out of the app"
   posts }o--o| stages : "tagged"
   posts }o--o| pois : "tagged"
   content_reports }o..o| posts : "flags"
@@ -190,6 +192,18 @@ erDiagram
 - Visibility: `private`, `followers`, `public`. A private account shows its public posts to followers only.
   Blocks hide everything both ways.
 - `content_reports` collects user flags; the moderation workflow is still an open decision.
+- **Engagement counters** (migration `20261108010000_post_engagement_counters.sql`, tested by `dev/post_engagement_smoke.sql`).
+  `posts` carries four server maintained counters: `like_count`, `comment_count`, `save_count` (bookmarks) and `share_count`.
+  Triggers keep them, the guard trigger ignores what a client sends, and whoever can read a post can read them. `post_saves` can
+  only be read by the pilgrim who saved, so an author gets the number of bookmarks from `save_count`. A share is recorded with
+  `rpc('record_post_share', { p_post_id })`: signed-in pilgrims who can see the post (the rule of the policy "posts by
+  visibility", checked every time), once per pilgrim, answers the new `share_count`; asking again changes nothing. A share
+  happens outside the app (a message, WhatsApp), so `share_count` is the number of distinct pilgrims who shared the post, not
+  the number of times. `post_shares` has no client access at all. The recount takes a lock on the post row first, so two
+  pilgrims acting at the same moment cannot leave the count one too low (the smoke test checks this with two sessions).
+  **The app reads `save_count` and `share_count` in a query of their own** (`listPostEngagement` in `mobile/src/lib/api.ts`),
+  never in the main posts query: until the migration is applied to a database the columns do not exist, and naming a missing
+  column fails the whole query. When that query fails the viewer shows only the likes and comments it knows.
 - **Photo marketplace (phase 2)**: tables exist but nothing uses them yet. Face templates (biometric data)
   are deliberately not stored in this database; only consent records and match results are.
 
