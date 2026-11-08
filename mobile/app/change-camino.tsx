@@ -11,7 +11,7 @@ import { listRoutes, listStages, Route, Stage, startJourney } from '@/lib/api';
 import { RouteGuideCard } from '@/components/auth/RouteGuideCard';
 import { uuid } from '@/lib/uuid';
 import { stageMeta } from '@/features/me/plan';
-import { layout, role } from '@/theme';
+import { layout, role, space } from '@/theme';
 
 /** Switch to another Camino from inside the app. Starts a new journey; the old one is kept. */
 export default function ChangeCamino() {
@@ -50,11 +50,11 @@ export default function ChangeCamino() {
       footer={<Pill large label={route ? `Switch to ${route.short_name ?? route.name}` : 'Pick a Camino'} onPress={start} loading={busy} disabled={!route || !stages} />}>
       {!!error && <FormMessage>{error}</FormMessage>}
       {routes ? routes.map((r) => (
-        <View key={r.id} style={{ gap: 12 }}>
+        <View key={r.id} style={{ gap: space[3] }}>
           <Choice title={r.name} accent={r.color} selected={route?.id === r.id} onPress={() => setRoute(r)} meta={routeMeta(r)} />
           {route?.id === r.id && <RouteGuideCard slug={r.slug} stageCount={r.stage_count} />}
           {route?.id === r.id && stages && stages.length > 0 && (
-            <View style={{ gap: 8, paddingLeft: 12 }}>
+            <View style={{ gap: space[2], paddingLeft: space[3] }}>
               <AppText variant="label">Start at</AppText>
               {stages.map((s) => (
                 <Choice key={s.id} title={`Stage ${s.stage_number}`} selected={stageId === s.id} onPress={() => setStageId(s.id)}

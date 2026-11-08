@@ -7,7 +7,7 @@ import { Pill } from '@/components/Pill';
 import { FormMessage } from '@/components/auth/Field';
 import { completeAuthFromUrl } from '@/lib/authLinks';
 import { supabase } from '@/lib/supabase';
-import { layout, role } from '@/theme';
+import { layout, role, space } from '@/theme';
 
 // Landing screen for caminoplus://auth-callback (email confirmation, password
 // reset, Google on Android). Exchanges the code for a session, then moves on.
@@ -33,7 +33,7 @@ export default function AuthCallback() {
   }, [url, router]);
 
   return (
-    <View style={{ flex: 1, backgroundColor: role.bg, justifyContent: 'center', padding: layout.screenMargin, gap: 20 }}>
+    <View style={{ flex: 1, backgroundColor: role.bg, justifyContent: 'center', padding: layout.screenMargin, gap: space[5] }}>
       {error ? (
         <>
           <AppText variant="h3">Link did not work</AppText>
@@ -42,7 +42,7 @@ export default function AuthCallback() {
           <Pill label="Back to start" onPress={() => router.replace('/')} />
         </>
       ) : (
-        <View style={{ alignItems: 'center', gap: 16 }}>
+        <View style={{ alignItems: 'center', gap: space[4] }}>
           <ActivityIndicator color={role.action} />
           <AppText variant="small" muted>Signing you in…</AppText>
         </View>

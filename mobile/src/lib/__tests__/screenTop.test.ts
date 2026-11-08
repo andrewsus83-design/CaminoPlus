@@ -64,7 +64,7 @@ check('the shared screens use the token', () => {
 
 check('a form screen without a back button (onboarding, new password) starts at the same distance: no margin of its own', () => {
   const shell = read('src/components/auth/AuthShell.tsx');
-  assert.match(shell, /marginTop: hero \? 90 : 0/); // only the hero title is pushed down, it sits below the photo
+  assert.match(shell, /marginTop: hero \? space\[24\] : 0/); // only the hero title is pushed down, it sits below the photo (space[24] is 96: it was 90, which is not a step of the space scale)
   assert.doesNotMatch(shell, /back \? 0 : \d+/);
 });
 

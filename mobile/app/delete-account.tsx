@@ -12,7 +12,7 @@ import { clearDiary } from '@/features/diary/storage';
 import { useAuth } from '@/lib/auth';
 import { supabase } from '@/lib/supabase';
 import { assertOnline, isOfflineError } from '@/lib/net';
-import { c, fonts, layout, radius, role } from '@/theme';
+import { c, layout, radius, role, space, textStyle } from '@/theme';
 
 // Settings > Account > Edit account > Delete account. Required by the App Store and Google Play for apps
 // that let people create an account. The work happens in the delete-account edge function (it needs the
@@ -61,29 +61,29 @@ export default function DeleteAccount() {
 
   return (
     <KeyboardAvoidingView style={{ flex: 1, backgroundColor: role.bg }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingTop: insets.top + layout.screenTop, paddingHorizontal: layout.screenMargin, paddingBottom: insets.bottom + 40, gap: 16 }}>
+      <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingTop: insets.top + layout.screenTop, paddingHorizontal: layout.screenMargin, paddingBottom: insets.bottom + space[10], gap: layout.stackGap }}>
         <BackButton fallback="/settings" />
-        <View style={{ gap: 8 }}>
+        <View style={{ gap: space[2] }}>
           <AppText variant="h2">Delete account</AppText>
           <AppText variant="lead" muted>This removes your CaminoPlus account and what is in it. It cannot be undone.</AppText>
         </View>
 
-        <Card style={{ gap: 12 }}>
+        <Card style={{ gap: space[3] }}>
           <AppText variant="label">What will be deleted</AppText>
           {WILL_GO.map((t) => (
-            <View key={t} style={{ flexDirection: 'row', gap: 10, alignItems: 'center' }}>
-              <Icon name="close" color={c.red} size={18} />
+            <View key={t} style={{ flexDirection: 'row', gap: space[3], alignItems: 'center' }}>
+              <Icon name="close" color={role.danger} size={18} />
               <AppText variant="small" style={{ flex: 1 }}>{t}</AppText>
             </View>
           ))}
         </Card>
 
-        <Card style={{ gap: 6, backgroundColor: c.goldWash }}>
+        <Card style={{ gap: space[2], backgroundColor: c.goldWash }}>
           <AppText variant="label">Before you go</AppText>
           <AppText variant="small">Pilgrim Plus is billed by the App Store or Google Play. Deleting your account does not cancel it, so please cancel the subscription there first to avoid another charge. Offline maps stay on this phone until you remove the app.</AppText>
         </Card>
 
-        <View style={{ gap: 8 }}>
+        <View style={{ gap: space[2] }}>
           <AppText variant="label">Type DELETE to confirm</AppText>
           <TextInput
             value={text}
@@ -93,13 +93,13 @@ export default function DeleteAccount() {
             placeholder="DELETE"
             placeholderTextColor={role.muted}
             accessibilityLabel="Type DELETE to confirm"
-            style={{ height: 56, fontFamily: fonts.body, fontSize: 19, color: role.text, backgroundColor: role.surface, borderRadius: radius.lg, borderWidth: 1, borderColor: confirmed ? c.red : role.border, paddingHorizontal: 16 }}
+            style={{ height: 56, ...textStyle('body'), color: role.text, backgroundColor: role.surface, borderRadius: radius.lg, borderWidth: 1, borderColor: confirmed ? role.danger : role.border, paddingHorizontal: space[4] }}
           />
         </View>
 
         {!!error && <FormMessage>{error}</FormMessage>}
 
-        <View style={{ gap: 12, marginTop: 8 }}>
+        <View style={{ gap: space[3], marginTop: space[2] }}>
           <Pill large label="Delete my account" onPress={run} disabled={!confirmed} loading={busy} />
           <Pill large variant="ghost" label="Keep my account" onPress={() => router.back()} disabled={busy} />
         </View>
