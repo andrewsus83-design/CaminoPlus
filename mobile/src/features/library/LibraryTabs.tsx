@@ -68,9 +68,9 @@ export function BibleBookRows({ items, marks, withPart = false, onOpen }: { item
 }
 
 /**
- * The rows of a list of results, group after group (the books of the Bible, the twelve books, the verses), each under its own label ("Bible · 2",
+ * The rows of a list of results, group after group (the books of the Bible, the books of the Library, the verses), each under its own label ("Bible · 2",
  * "Verses · 12"). What a search and the Bookmarks screen show; a group that has no row in it is not drawn. A tap on a book of the Bible opens its chapters
- * and a tap on a verse opens the reader at it: the screen says where (`onOpenBook`, `onOpenVerse`). A tap on one of the twelve books opens its page.
+ * and a tap on a verse opens the reader at it: the screen says where (`onOpenBook`, `onOpenVerse`). A tap on a book of the Library opens its page.
  */
 export function LibraryGroups({ hits, marks, onOpenBook, onOpenVerse, versesCapped = false }: { hits: Hits; marks: LibraryMarks; onOpenBook: (code: string) => void; onOpenVerse: (ref: Ref) => void; versesCapped?: boolean }) {
   return (
@@ -116,8 +116,8 @@ export function BibleTab({ testament, onTestament, onOpenBook }: { testament: Te
 }
 
 /**
- * The Books tab under its banner: the notice about what is still missing (none once every book has its text), and the twelve books as covers, two in a row,
- * each an A5 page that opens its book (books/BooksGrid.tsx). Whether a book has a text is asked of bookText.ts; nothing about it is kept here.
+ * The Books tab under its banner: the books of the Library as covers, two in a row, on a shelf for each kind of book, each an A5 page that opens its book (books/BooksGrid.tsx).
+ * Every book of the bundle has its text, so there is no notice here and nothing about a text is kept here.
  */
 export function BooksTab({ marks }: { marks?: LibraryMarks }) {
   return (

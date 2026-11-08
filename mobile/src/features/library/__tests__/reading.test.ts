@@ -400,7 +400,7 @@ check('a damaged place never throws: bad items are left out, a book twice is kep
 });
 
 check('the lists are bounded: at most 40 books and 1200 read marks, so a hostile file cannot grow them', () => {
-  assert.deepEqual([READING_MAX_BOOKS, READING_MAX_READ], [40, 1200], 'room for the twelve books and then some; the longest book has about 170 chapters');
+  assert.deepEqual([READING_MAX_BOOKS, READING_MAX_READ], [40, 1200], 'room for every book of the Library and then some; the longest book has 24 chapters');
   const items = Array.from({ length: READING_MAX_BOOKS + 20 }, (_, i) => ({ id: `book-${i}`, c: 'c1', y: 0, at: i, read: [] }));
   assert.equal(parseReading({ v: 1, items })!.items.length, READING_MAX_BOOKS);
   const read = Array.from({ length: READING_MAX_READ + 50 }, (_, i) => `c${i}`);

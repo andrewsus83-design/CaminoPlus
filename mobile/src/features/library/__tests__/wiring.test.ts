@@ -66,7 +66,7 @@ check('no new native module: the feature imports React, React Native, expo-route
   assert.deepEqual(offenders, []);
 });
 
-check('the rows of the twelve books (a search, Bookmarks) are books/BookRows.tsx, the covers of the tab are books/BooksGrid.tsx, and the Books files are checked in booksWiring.test.ts; a book of the Bible has no chip and no "Soon" anywhere', () => {
+check('the rows of the books of the Library (a search, Bookmarks) are books/BookRows.tsx, the covers of the tab are books/BooksGrid.tsx, and the Books files are checked in booksWiring.test.ts; a book of the Bible has no chip and no "Soon" anywhere', () => {
   const tabs = code(read(`${DIR}/LibraryTabs.tsx`));
   assert.match(tabs, /import \{ BookRows \} from '\.\/books\/BookRows';/);
   assert.doesNotMatch(tabs, /export function BookRows|const Soon =|const Free =/, 'the rows of the books, and their chips, are in books/');
@@ -278,7 +278,7 @@ check('there is no Music left: not a tab, not a notice, not a group of the searc
   assert.deepEqual(offenders, []);
 });
 
-check('the Bookmarks screen groups the Library rows with the same component as the search (the Bible, the twelve books, the verses), says where they are kept, and says how to bookmark when nothing current is kept', () => {
+check('the Bookmarks screen groups the Library rows with the same component as the search (the Bible, the books, the verses), says where they are kept, and says how to bookmark when nothing current is kept', () => {
   const src = code(read('app/library/bookmarks.tsx'));
   assert.match(src, /<LibraryGroups hits=\{hits\} marks=\{marks\} onOpenBook=\{\(code\) => router\.push\(bookHref\(code\)\)\} onOpenVerse=\{\(ref\) => router\.push\(readerHref\(ref\)\)\} \/>/, 'a book opens its chapters, a verse opens the reader at it');
   assert.match(src, /hitCount\(hits\) > 0 \|\| passages\.length > 0 \? \(/, 'the group of a book\'s passages counts too: nothing is "empty" while a passage is kept');

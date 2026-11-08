@@ -435,7 +435,7 @@ export function cleanBook(raw: unknown): BookContent | null {
 /** The name after `u.<userId>.`: where the places are kept (see the top of this file). */
 export const READING_NAME = 'library.reading';
 
-/** Books one person can have a place in: the twelve, and room. It only keeps a damaged file from growing a list. */
+/** Books one person can have a place in: every book of the Library, and room. It only keeps a damaged file from growing a list. */
 export const READING_MAX_BOOKS = 40;
 /** Chapters one book can have marked read: the longest book has about 170. */
 export const READING_MAX_READ = 1200;

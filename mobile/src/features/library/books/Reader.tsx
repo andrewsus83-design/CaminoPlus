@@ -243,7 +243,7 @@ function Chapter({ bookId, text, chapterId, passage }: { bookId: string; text: B
 }
 
 /**
- * The reader of a book at a chapter (`chapterId`, from the address) or where the person was. A book that is not one of the twelve, or has no text, or whose text
+ * The reader of a book at a chapter (`chapterId`, from the address) or where the person was. A book that is not in the Library, or has no text, or whose text
  * cannot be read, shows its page instead (which says so); a chapter the text does not have shows the page with a sentence that says so.
  */
 export function Reader({ id, chapterId, passage }: { id: string; chapterId?: string; passage?: number }) {
