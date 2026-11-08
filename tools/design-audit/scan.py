@@ -2203,7 +2203,10 @@ def check(res, base, limit=12):
             lines.append(fmt_violation(v))
         if len(shown) > limit:
             lines.append(f'      ... and {len(shown) - limit} more')
-        if not shown:
+        in_new_files = [rel for rel in sorted(cur_by) if rel not in bfiles and any(v['cat'] == cat for v in cur_by[rel])]
+        if not shown and in_new_files:
+            lines.append('      (in the file(s) with no baseline entry, listed below)')
+        elif not shown:
             grew = sorted((rel, sum(1 for v in vs if v['cat'] == cat), bfiles.get(rel, {}).get('counts', {}).get(cat, 0)) for rel, vs in cur_by.items() if rel in bfiles)
             for rel, n, b in grew:
                 if n > b:
