@@ -199,17 +199,24 @@ class TabWeight(unittest.TestCase):
                 off = stroke / stem - 1
                 self.assertLessEqual(abs(off), STROKE_OFF_STEM, f"{mode}: the icon is {stroke:.3f} px thick, the {what} stem of its label {stem:.3f} px ({off * 100:+.1f} percent)")
 
-    def test_the_inactive_tabs_stay_thin_and_light(self):
-        # the owner's wish: both thin and Light. A heavier label with a matching stroke would pass the test above and still be a different design.
+    def test_the_inactive_tabs_stay_thin_and_light_mode_is_one_step_heavier(self):
+        # the owner's wish: thin inactive tabs, Light in dark mode. Then (2026-11-08) the owner saw them in light mode as far too thin next to dark mode:
+        # the ink was the same in both modes (measured at 4x), the eye is not (dark on light looks thinner), so light mode is ONE step heavier, as the
+        # active tab is: Regular, and a stroke as thick as its stem. Not more: a Medium label would be a different design.
+        tab = TOKENS["tab"]
+        self.assertEqual(tab["inactiveLabelWeight"]["dark"], 300)
+        self.assertLess(tab["inactiveStroke"]["dark"], 1.0)
+        self.assertEqual(tab["inactiveLabelWeight"]["light"], 400, "light mode: Inter Regular, one step over the dark mode's Light")
+        self.assertGreater(tab["inactiveStroke"]["light"], tab["inactiveStroke"]["dark"], "light mode: a heavier stroke, to match its heavier label")
+        self.assertLess(tab["inactiveStroke"]["light"], 1.3, "still thinner than the 1.3 the owner found too thick")
         for mode in ("light", "dark"):
-            self.assertEqual(TOKENS["tab"]["inactiveLabelWeight"][mode], 300, mode)
-            self.assertLess(TOKENS["tab"]["inactiveStroke"][mode], 1.0, mode)
-            self.assertGreaterEqual(TOKENS["tab"]["activeStroke"][mode], 1.5 * TOKENS["tab"]["inactiveStroke"][mode], f"{mode}: the active icon is much heavier")
+            self.assertGreaterEqual(tab["activeStroke"][mode], 1.5 * tab["inactiveStroke"][mode], f"{mode}: the active icon is much heavier")
+            self.assertGreaterEqual(tab["activeLabelWeight"][mode], tab["inactiveLabelWeight"][mode] + 200, f"{mode}: the active label is at least two steps heavier")
 
     def test_the_old_stroke_would_fail(self):
-        # 1.3 was drawn until 2026-11-08: 1.517 px against a stem of 0.930 px
+        # 1.3 was drawn until 2026-11-08: 1.517 px against a Light stem of 0.930 px (dark mode is still Light)
         stroke = 1.3 * TAB_ICON_PX / ICON_BOX
-        self.assertGreater(stroke / self.drawn("light")[1][0], 1.5)
+        self.assertGreater(stroke / self.drawn("dark")[1][0], 1.5)
 
     def test_the_sizes_the_stroke_is_worked_out_for_are_the_sizes_that_are_drawn(self):
         app = (ROOT / "mobile" / "src" / "components" / "TabBar.tsx").read_text(encoding="utf-8")
