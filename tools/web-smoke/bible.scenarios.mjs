@@ -297,9 +297,12 @@ export const BIBLE_SCENARIOS = [
       const bar = page.getByRole('toolbar', { name: 'Actions for Psalm 121:3', exact: true });
       await bar.waitFor();
       await button(page, 'Bookmark: Psalm 121:3').waitFor();
+      await button(page, 'Write a note: Psalm 121:3').waitFor();
       await button(page, 'Copy: Psalm 121:3').waitFor();
       await button(page, 'Share: Psalm 121:3').waitFor();
-      for (const name of ['Bookmark: Psalm 121:3', 'Copy: Psalm 121:3', 'Share: Psalm 121:3']) { const b = await box(button(page, name), name); assert(b.height >= 68 - 1 && b.width >= 88 - 1, `${name} is at least 88 by 68 (${b.width} x ${b.height})`); }
+      // four actions (Bookmark, Note, Copy, Share) share the bar: a quarter of it each (82 on a 390 phone), 68 high
+      const quarter = ((await page.evaluate(() => window.innerWidth)) - 62) / 4 - 1;
+      for (const name of ['Bookmark: Psalm 121:3', 'Write a note: Psalm 121:3', 'Copy: Psalm 121:3', 'Share: Psalm 121:3']) { const b = await box(button(page, name), name); assert(b.height >= 68 - 1 && b.width >= quarter, `${name} is at least a quarter of the bar by 68 (${b.width} x ${b.height})`); }
       step('the chosen verse is shown by a ground and an underline, not by colour alone');
       const style = await page.getByText('He will not allow your foot to be', { exact: false }).first().evaluate((e) => { const s = getComputedStyle(e); return { line: s.textDecorationLine, bg: s.backgroundColor }; });
       assert(/underline/.test(style.line) && style.bg !== 'rgba(0, 0, 0, 0)', `a chosen verse is underlined and has a ground: ${JSON.stringify(style)}`);
@@ -332,7 +335,7 @@ export const BIBLE_SCENARIOS = [
     },
   },
   {
-    name: 'Bible: the actions are big (a glyph of 30, a word of 16 in Inter SemiBold, each at least 88 by 68, the reference 17) at 320, 390 and 430 wide, the bar clears the bottom edge, and a verse touched low on a short phone ends up above the bar',
+    name: 'Bible: the actions are big (a glyph of 30, a word in Inter SemiBold, each a quarter of the bar and 68 high, the reference 17) at 320, 390 and 430 wide, the bar clears the bottom edge, and a verse touched low on a short phone ends up above the bar',
     persona: 'in',
     async run({ page, step, go }) {
       for (const [width, height] of [[320, 568], [390, 844], [430, 932]]) {
@@ -362,12 +365,13 @@ export const BIBLE_SCENARIOS = [
         const bb = await box(bar, 'the bar');
         assert(bb.x >= 11 && bb.x + bb.width <= width - 11, `${width}: the bar is ${bb.x}..${bb.x + bb.width}`);
         assert(height - (bb.y + bb.height) >= 11 && height - (bb.y + bb.height) <= 14, `${width}: the bar is ${height - (bb.y + bb.height)} above the bottom edge`);
-        const actions = [`Bookmark: ${place}`, `Copy: ${place}`, `Share: ${place}`];
+        const actions = [`Bookmark: ${place}`, `Write a note: ${place}`, `Copy: ${place}`, `Share: ${place}`];
+        const quarter = (width - 62) / 4 - 1;
         const widths = [];
         for (const name of actions) {
           const b = await box(button(page, name), name);
           widths.push(b.width);
-          assert(b.height >= 67 && b.width >= 87.5, `${width}: ${name} is ${b.width} x ${b.height}, under 88 by 68`);
+          assert(b.height >= 67 && b.width >= quarter, `${width}: ${name} is ${b.width} x ${b.height}, under a quarter of the bar (${quarter.toFixed(1)}) by 68`);
           const parts = await button(page, name).evaluate((el) => {
             const svg = el.querySelector('svg');
             const word = [...el.querySelectorAll('div,span')].find((x) => x.children.length === 0 && x.textContent.trim().length > 0);
@@ -375,9 +379,9 @@ export const BIBLE_SCENARIOS = [
             return { glyph: svg ? svg.getBoundingClientRect().width : 0, size: parseFloat(cs.fontSize), family: cs.fontFamily, text: word.textContent };
           });
           assert(parts.glyph >= 28, `${width}: the glyph of ${name} is ${parts.glyph}`);
-          assert(parts.size >= 16 && /Inter_600SemiBold/.test(parts.family), `${width}: the word "${parts.text}" is ${parts.size} in ${parts.family}`);
+          assert(parts.size >= 12 && /Inter_600SemiBold/.test(parts.family), `${width}: the word "${parts.text}" is ${parts.size} in ${parts.family}`);
         }
-        assert(Math.abs(widths[0] - widths[1]) <= 1 && Math.abs(widths[1] - widths[2]) <= 1, `${width}: the three share the bar equally (${widths})`);
+        assert(widths.every((w) => Math.abs(w - widths[0]) <= 1), `${width}: the four share the bar equally (${widths})`);
         const ref = await bar.getByText(place, { exact: true }).evaluate((el) => { const cs = getComputedStyle(el); return { size: parseFloat(cs.fontSize), family: cs.fontFamily }; });
         assert(ref.size >= 16 && /JetBrainsMono/.test(ref.family), `${width}: the reference is ${ref.size} in ${ref.family}`);
         step(`the chosen verse is above the bar (the page scrolled it up if it was under it)`);
@@ -525,6 +529,37 @@ export const BIBLE_SCENARIOS = [
         await page.getByRole('radiogroup', { name: 'Part of the Bible' }).waitFor();
         await eventually(() => page.getByText('Continue reading', { exact: true }).count(), (n) => n === 0, { what: `the number of continue cards for ${JSON.stringify(bad)}` });
       }
+    },
+  },
+  {
+    name: 'Bible: Note on a chosen verse opens a new note of the diary that starts with the verse as a quotation (where it is, which translation), and the words written under it are in Notes',
+    persona: 'in',
+    async run({ page, step, go }) {
+      step('touch Psalm 121:3: the bar has Note after Bookmark and before Copy');
+      await go('/library/bible/PSA/121?v=3');
+      await page.getByRole('toolbar', { name: 'Actions for Psalm 121:3', exact: true }).waitFor();
+      const names = await page.getByRole('button').evaluateAll((els) => els.map((e) => e.getAttribute('aria-label') || ''));
+      const at = (n) => names.indexOf(n);
+      assert(at('Bookmark: Psalm 121:3') >= 0 && at('Write a note: Psalm 121:3') > at('Bookmark: Psalm 121:3') && at('Copy: Psalm 121:3') > at('Write a note: Psalm 121:3') && at('Share: Psalm 121:3') > at('Copy: Psalm 121:3'), 'Bookmark, Note, Copy, Share');
+      step('Note opens a new note of the diary: the verse as a quotation, where it is and which translation, and an empty line under it');
+      await button(page, 'Write a note: Psalm 121:3').click();
+      await waitPath(page, '/diary/new', 'the address of a new note');
+      const field = page.getByRole('textbox', { name: 'Page text' });
+      await field.waitFor();
+      const value = await field.inputValue();
+      assert(value.startsWith('> '), `the note starts with a quotation: ${JSON.stringify(value.slice(0, 40))}`);
+      assert(value.includes('He will not allow your foot to be moved'), 'the words of the verse are in the note');
+      assert(value.includes('— Psalm 121:3 (World English Bible)'), 'the note says where the verse is and which translation');
+      assert(value.endsWith('\n\n'), 'the note ends with an empty line to write on');
+      step('words written under the quotation make a note, and Notes shows it with the verse');
+      await field.fill(`${value}Under his shade today.`);
+      await page.getByRole('button', { name: 'Back', exact: true }).first().click();
+      await eventually(() => pathOf(page), (p) => p !== '/diary/new', { what: 'the address after Back from the note' });
+      await go('/me');
+      await shown(page, 'Notes').click();
+      await page.getByText('Notes stay on this phone.', { exact: true }).waitFor();
+      await page.getByText(/Under his shade today\./).filter({ visible: true }).first().waitFor();
+      await page.getByText(/He will not allow your foot/).filter({ visible: true }).first().waitFor();
     },
   },
 ];

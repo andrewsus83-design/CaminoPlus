@@ -193,4 +193,18 @@ check('the paper of a cover on the page is the catalog\'s six colours of the lig
   assert.equal(new Set(labels).size, labels.length, 'no two phones of the page have the same label (render_screens.mjs finds a picture by its label)');
 });
 
+check('the glyph of the Note action on the page is the app\'s pen: the sprite of the design page has it under i-pen, the same drawing as Icon.tsx, and the bars of a chosen verse and of a chosen passage use it', () => {
+  const icons = fs.readFileSync(path.join(root, 'src', 'components', 'Icon.tsx'), 'utf8');
+  const line = icons.split('\n').find((l) => /^ {2}pen: \[/.test(l));
+  assert.ok(line, 'Icon.tsx has a pen');
+  const app = [...line!.matchAll(/'([^']+)'/g)].map((m) => m[1]);
+  const sprite = /<symbol id="i-pen"[^>]*>(.*?)<\/symbol>/.exec(design);
+  assert.ok(sprite, 'the sprite of the design page has no i-pen');
+  assert.deepEqual([...sprite![1].matchAll(/ d="([^"]+)"/g)].map((m) => m[1]), app, 'the pen of the design page and of the app are the same drawing');
+  const bars = [...design.matchAll(/<div class="rd-act[^"]*"[^>]*>[^]*?<\/div>\s*<\/div>/g)].map((m) => m[0]);
+  assert.ok(bars.length >= 5, 'the bars of actions of the page (verses and passages)');
+  for (const bar of bars) assert.ok(bar.includes('<use href="#i-pen"/>') && bar.includes('<span>Note</span>'), 'every bar of actions has Note');
+  assert.equal(count(design, /<use href="#i-pen"\/>/g) >= bars.length, true);
+});
+
 console.log(`${n} of ${n} passed (design page, Books)`);

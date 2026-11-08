@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { AccessibilityInfo, Pressable, Share, View } from 'react-native';
+import { AccessibilityInfo, Pressable, Share, View, useWindowDimensions } from 'react-native';
 import { AppText } from '@/components/AppText';
 import { Icon, type IconName } from '@/components/Icon';
 import { copyText } from '@/lib/clipboard';
@@ -18,6 +18,9 @@ type ButtonProps = { icon: IconName; label: string; spoken: string; filled?: boo
  * actions (Copy is there) they share the bar and are as wide as 320 allows, a little under 88: the word shrinks to fit, never under 12.
  */
 function ActionButton({ icon, label, spoken, filled, disabled, compact, onPress }: ButtonProps) {
+  // four actions on a phone narrower than 360 each have about 64: the word is 13 there (a phone shrinks it itself, a browser does not), 16 everywhere else
+  const { width } = useWindowDimensions();
+  const size = compact && width < 360 ? 13 : ACTION_LABEL;
   return (
     <Pressable
       accessibilityRole="button"
@@ -28,7 +31,7 @@ function ActionButton({ icon, label, spoken, filled, disabled, compact, onPress 
       style={({ pressed }) => ({ flex: 1, minWidth: compact ? 0 : ACTION_MIN_WIDTH, minHeight: ACTION_MIN_HEIGHT, alignItems: 'center', justifyContent: 'center', gap: 4, borderRadius: radius.md, backgroundColor: pressed || filled ? role.sunken : 'transparent', opacity: disabled ? 0.5 : 1 })}
     >
       <Icon name={icon} color={role.action} size={ACTION_ICON} filled={filled} />
-      <AppText variant="label" maxFontSizeMultiplier={1.3} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.77} style={{ fontSize: ACTION_LABEL, lineHeight: ACTION_LABEL_LINE }}>{label}</AppText>
+      <AppText variant="label" maxFontSizeMultiplier={1.3} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.77} style={{ fontSize: size, lineHeight: ACTION_LABEL_LINE }}>{label}</AppText>
     </Pressable>
   );
 }

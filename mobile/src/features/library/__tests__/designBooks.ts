@@ -323,7 +323,7 @@ function readerPhone(o: ReaderOptions): string {
   const actions = o.chosen !== undefined
     ? `\n<div class="rd-act dock four" role="toolbar" aria-label="${esc(`Actions for ${label}`)}">
   <div class="top"><span class="pl">${esc(label)}</span><button class="x" aria-label="Close the passage actions">${svg('x')}</button></div>
-  <div class="btns"><button${o.bookmarked ? ' class="on"' : ''} aria-label="${esc(bookmarkWords(!!o.bookmarked, label))}">${svg('bookmark')}<span>Bookmark</span></button><button aria-label="${esc(`Write a note: ${label}`)}">${svg('pencil')}<span>Note</span></button><button aria-label="${esc(`Copy: ${label}`)}">${svg('copy')}<span>Copy</span></button><button aria-label="${esc(`Share: ${label}`)}">${svg('share')}<span>Share</span></button></div>
+  <div class="btns"><button${o.bookmarked ? ' class="on"' : ''} aria-label="${esc(bookmarkWords(!!o.bookmarked, label))}">${svg('bookmark')}<span>Bookmark</span></button><button aria-label="${esc(`Write a note: ${label}`)}">${svg('pen')}<span>Note</span></button><button aria-label="${esc(`Copy: ${label}`)}">${svg('copy')}<span>Copy</span></button><button aria-label="${esc(`Share: ${label}`)}">${svg('share')}<span>Share</span></button></div>
 </div>`
     : '';
   const progress = Math.round((o.progress ?? (o.end ? 0.97 : from > 0 ? 0.3 : 0.05)) * 100);
@@ -487,7 +487,9 @@ const STYLE = `<style>
   .rd-act.dock { bottom: 110px; }
   /* four actions (Copy is there) share the bar: as wide as the phone allows, the word shrinks to fit */
   .rd-act.four .btns button { min-width: 0; }
-  /* a bookmarked passage on the Bookmarks screen (books/PassageRows.tsx): the book, where it is, the first words; one button, and the bookmark beside it */
+  .rd-act.four .btns button { font-size: 16px; }
+  @media (max-width: 359px) { .rd-act.four .btns button { font-size: 13px; } }
+  /* a bookmarked passage on the Bookmarks screen: the book, where it is, the first words; one button, and the bookmark beside it (books/PassageRows.tsx) */
   .bk-prow { display: flex; align-items: flex-start; gap: 6px; padding: 10px 6px 10px 12px; }
   .bk-pt { flex: 1; min-width: 0; min-height: 44px; display: flex; flex-direction: column; gap: 4px; padding: 4px 0; }
   .bk-pt .bn { font-family: var(--cp-font-title); font-weight: 600; font-size: 19px; line-height: 24px; }
