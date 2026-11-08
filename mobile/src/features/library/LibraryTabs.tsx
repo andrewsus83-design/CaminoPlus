@@ -16,7 +16,7 @@ import { BIBLE_SOURCE_LINE, type RowTab } from './sample';
 import { hitGroups, itemKey, type Hits } from './search';
 import type { LibraryMarks } from './useLibraryBookmarks';
 
-// The two Library tabs that hold rows: Bible (the books of the Bible, one part at a time, as a grid of square tiles) and Books (the books of the Library, as a grid
+// The two Library tabs that hold rows: Bible (the books of the Bible, one part at a time, as a grid of compact tiles, two in a row) and Books (the books of the Library, as a grid
 // of A5 covers on one shelf for each kind of book, books/BooksGrid.tsx). The Bible is real: its text is in the app (see sample.ts), and so is the text of every book
 // (each book page says how the books were written, books/notices.ts). The diary is not a Library tab: it is the Notes sub-tab of Me (features/notes).
 // Colours are read while drawing, never at import.
@@ -91,7 +91,7 @@ export function LibraryGroups({ hits, marks, onOpenBook, onOpenVerse, versesCapp
 /**
  * The Bible tab under its banner: the choice of the part (Old Testament, Deuterocanon, New Testament, a segmented pill that scrolls with the page), then
  * "Books of the Bible" with how many the chosen part holds, the one quiet line that says which translation it is, and the books of that part as a grid of
- * square tiles, three in a row. Under the Deuterocanon, where a reader looks for Susanna, two lines: where the Greek additions of Esther and Daniel are, and the
+ * compact tiles, two in a row. Under the Deuterocanon, where a reader looks for Susanna, two lines: where the Greek additions of Esther and Daniel are, and the
  * one about the Orthodox Bibles. A tap on a tile opens the chapters of the book (the screen says where: `onOpenBook`). The count is a polite live region that says
  * the part with it: a screen reader answers a choice with "Old Testament, 39 books".
  */

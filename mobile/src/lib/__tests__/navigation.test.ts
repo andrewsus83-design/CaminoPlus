@@ -5,7 +5,7 @@
 // gear at the top right of Me. Library has no title: its top row is a search field and the round Bookmarks button in the corner
 // (the size of Me's bell and gear); directly under it the two tabs Bible and Books, then the banner of the tab (both have one). On Bible three
 // choices sit in the page under the compact banner (Old Testament, Deuterocanon, New Testament, a segmented pill) and the books of that part are
-// square tiles. The diary is not in the Library: it is the first sub-tab of Me (Notes, Journey, Plan, Health), and the one gold pen of Me follows
+// compact tiles, two in a row. The diary is not in the Library: it is the first sub-tab of Me (Notes, Journey, Plan, Health), and the one gold pen of Me follows
 // the sub-tab. These checks fail when someone brings a tab back without its icon (the tab bar would crash on it), when a route file and the tab
 // list disagree, when a link still points at the old Settings tab, or when the Library or Me drift from the design page.
 import assert from 'node:assert/strict';
