@@ -6,7 +6,7 @@ import { Icon } from '@/components/Icon';
 import { BackButton } from '@/components/BackButton';
 import { Card } from '@/components/ui';
 import { ORIGINAL_TEXT, READING_SOURCES, type ReadingSource } from '@/features/library/books/sources';
-import { c, layout, role } from '@/theme';
+import { layout, role, space } from '@/theme';
 
 // Credits and licences for the data and software CaminoPlus is built on. Several of these licences
 // (OpenStreetMap ODbL, OpenMapTiles CC BY, Wikipedia CC BY-SA, SIL OFL fonts) require this notice.
@@ -44,14 +44,14 @@ const BOOKS: Item[] = READING_SOURCES.map((s) => ({ name: s.work, what: `${credi
 
 function Group({ title, items }: { title: string; items: Item[] }) {
   return (
-    <View style={{ gap: 10 }}>
+    <View style={{ gap: space[3] }}>
       <AppText variant="label" color={role.accentText}>{title}</AppText>
       {items.map((i) => (
         <Pressable key={i.name} accessibilityRole="link" accessibilityLabel={`${i.name}: open licence details`} onPress={() => { void WebBrowser.openBrowserAsync(i.url); }}>
-          <Card style={{ gap: 4 }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          <Card style={{ gap: space[1] }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: space[2] }}>
               <AppText variant="label" style={{ flex: 1 }}>{i.name}</AppText>
-              <Icon name="chevron" color={c.blue} size={18} />
+              <Icon name="chevron" color={role.action} size={18} />
             </View>
             <AppText variant="small" muted>{i.what}</AppText>
             <AppText variant="caption" color={role.accentText}>{i.licence}</AppText>
@@ -65,7 +65,7 @@ function Group({ title, items }: { title: string; items: Item[] }) {
 /** The text of the books around the passages: only where it comes from, and no licence is claimed for it. */
 function OriginalText() {
   return (
-    <Card style={{ gap: 4 }}>
+    <Card style={{ gap: space[1] }}>
       <AppText variant="label">{ORIGINAL_TEXT.name}</AppText>
       <AppText variant="small" muted>{ORIGINAL_TEXT.what}</AppText>
     </Card>
@@ -76,9 +76,9 @@ export default function Licences() {
   const insets = useSafeAreaInsets();
   return (
     <View style={{ flex: 1, backgroundColor: role.bg }}>
-      <ScrollView contentContainerStyle={{ paddingTop: insets.top + layout.screenTop, paddingHorizontal: layout.screenMargin, paddingBottom: insets.bottom + 40, gap: 20 }}>
+      <ScrollView contentContainerStyle={{ paddingTop: insets.top + layout.screenTop, paddingHorizontal: layout.screenMargin, paddingBottom: insets.bottom + space[10], gap: space[5] }}>
         <BackButton />
-        <View style={{ gap: 8 }}>
+        <View style={{ gap: space[2] }}>
           <AppText variant="h2">Licences and credits</AppText>
           <AppText variant="lead" muted>CaminoPlus stands on the shoulders of many open projects. Thank you to everyone who maps the Way.</AppText>
         </View>

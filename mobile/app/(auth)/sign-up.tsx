@@ -56,7 +56,7 @@ export default function SignUp() {
       <Pill label="Create account" onPress={submit} loading={busy} />
       <AppText variant="caption" muted style={{ textAlign: 'center' }}>or</AppText>
       <GoogleButton onError={setError} />
-      <Pressable onPress={() => router.replace('/sign-in')} style={{ alignSelf: 'center', paddingVertical: 8 }}>
+      <Pressable onPress={() => router.replace('/sign-in')} style={{ alignSelf: 'center', minHeight: 48, justifyContent: 'center' }}>
         <AppText variant="small" muted>Have an account? <AppText variant="label" color={role.accentText}>Sign in</AppText></AppText>
       </Pressable>
     </AuthShell>

@@ -31,13 +31,13 @@ export default function SignIn() {
       {!!error && <FormMessage>{error}</FormMessage>}
       <Field label="Email" value={email} onChangeText={setEmail} autoCapitalize="none" autoComplete="email" keyboardType="email-address" textContentType="emailAddress" placeholder="you@example.com" />
       <Field label="Password" value={password} onChangeText={setPassword} secureTextEntry autoComplete="current-password" textContentType="password" placeholder="Your password" onSubmitEditing={submit} returnKeyType="go" />
-      <Pressable onPress={() => router.push('/forgot-password')} style={{ alignSelf: 'flex-end', paddingVertical: 4 }}>
+      <Pressable onPress={() => router.push('/forgot-password')} style={{ alignSelf: 'flex-end', minHeight: 48, justifyContent: 'center' }}>
         <AppText variant="label" color={role.accentText}>Forgot password?</AppText>
       </Pressable>
       <Pill label="Sign in" onPress={submit} loading={busy} />
       <AppText variant="caption" muted style={{ textAlign: 'center' }}>or</AppText>
       <GoogleButton onError={setError} />
-      <Pressable onPress={() => router.replace('/sign-up')} style={{ alignSelf: 'center', paddingVertical: 8 }}>
+      <Pressable onPress={() => router.replace('/sign-up')} style={{ alignSelf: 'center', minHeight: 48, justifyContent: 'center' }}>
         <AppText variant="small" muted>New here? <AppText variant="label" color={role.accentText}>Create an account</AppText></AppText>
       </Pressable>
     </AuthShell>

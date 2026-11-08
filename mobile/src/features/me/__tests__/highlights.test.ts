@@ -18,6 +18,7 @@ const check = (name: string, fn: () => void) => { fn(); n += 1; console.log(`ok 
 const root = process.cwd(); // npm test runs from mobile/
 const read = (p: string) => readFileSync(join(root, p), 'utf8');
 const code = (src: string) => src.split('\n').filter((l) => !/^\s*(\/\/|\/?\*)/.test(l)).join('\n'); // without comment lines
+const tokens = JSON.parse(read('src/theme/tokens.json')) as { text: Record<string, { size: number; lineHeight: number }> }; // the numbers of the type scale
 
 const day = (id: string, to: string | null, stage: string | null = null, status = 'planned'): DayLike => ({ id, to_name: to, stage: stage ? { name: stage } : null, status });
 const post = (id: string, place: string | null, at: string | null = null): PostLike => ({ id, place_name: place, published_at: at });
@@ -264,13 +265,18 @@ check('Me filters the Journey grid to the picked destination, with a bar that cl
   assert.match(grid, /<Viewer posts=\{shown\}/);
 });
 
-check('the row: 60 px pictures in a 66 px ring, 72 px wide items 16 apart, names at 12 px, the screen\'s margin as padding', () => {
+check('the row: 60 px pictures in a 66 px ring, 72 px wide items 16 apart, names in the caption variant (15 px, the smallest text there is), the screen\'s margin as padding', () => {
   const src = code(read('src/features/me/Highlights.tsx'));
   assert.match(src, /const RING = 66;/);
   assert.match(src, /const PICTURE = 60;/);
   assert.match(src, /const ITEM_W = 72;/);
-  assert.match(src, /const GAP = 16;/);
-  assert.match(src, /fontSize: 12, lineHeight: 16/);
+  assert.match(src, /const GAP = space\[4\];/, '16 apart: a step of the space scale');
+  // Updated on purpose with the standard (nothing under 15 px): the names were 12 px with a line height of 16 of their own; they are the caption variant now, which
+  // is 15 px on 21, so the row is a little taller (the label of an item was 16 high, it is 21) and a long name ends in "…" two letters sooner
+  assert.match(src, /<AppText variant="caption" numberOfLines=\{1\} style=\{\{ width: ITEM_W, textAlign: 'center', fontFamily: active \? fonts\.bodyBold : fonts\.bodyMedium \}\}>\{h\.name\}<\/AppText>/, 'the name of a destination: the caption variant, one line of the item\'s width');
+  assert.doesNotMatch(src, /fontSize|lineHeight|letterSpacing/, 'no size of its own anywhere in the row: every text is a variant of the type scale');
+  assert.ok(tokens.text.caption.size >= 15, 'and the caption variant is not under 15');
+  assert.doesNotMatch(src, /\b(?:padding|margin|gap|paddingHorizontal|paddingVertical)\w*: \d/, 'no padding, margin or gap written as a number: the steps of the space scale');
   assert.match(src, /marginHorizontal: -layout\.screenMargin/, 'it reaches the screen edges');
   // Updated on purpose with the All item: the margins are the screen's on both sides, but on the left they belong to the All item when it is there
   assert.match(src, /paddingLeft: pinned \? layout\.screenMargin : 0/, 'the All item has the margin on the left ...');
@@ -285,9 +291,9 @@ check('the All item: the first item of the row, pinned at its left (outside the 
   const scroller = src.indexOf('<ScrollView');
   assert.ok(all > 0 && scroller > all, 'the All item comes before the scrolling destinations and is not inside the ScrollView');
   assert.match(src, /const pinned = !!all && all\.total > 0;/, 'drawn whenever the route has places, with or without destinations');
-  assert.match(src, /<Icon name="shell" color=\{role\.action\} size=\{28\} \/>/);
+  assert.match(src, /<Icon name="shell" color=\{role\.action\} size=\{icon\.mdPlus\} \/>/, 'the shell is 28 px: a step of the icon scale');
   assert.match(src, /borderWidth: 1, borderColor: role\.border, backgroundColor: role\.surface/, 'a hairline ring and the surface fill');
-  assert.match(src, /padding: 3, backgroundColor: c\.gold/, 'the gold ring of an opened highlight while its view is on');
+  assert.match(src, /borderRadius: RING \/ 2, borderWidth: 3, borderColor: role\.highlight/, 'the gold ring of an opened highlight while its view is on: a 3 px border, a stroke and not a padding');
   assert.match(src, /fontFamily: on \? fonts\.bodyBold : fonts\.bodyMedium \}\}>All<\/AppText>/, 'the label is "All", bold while its view is on');
   assert.match(src, /accessibilityLabel=\{allLabel\(visited, total\)\} accessibilityHint=\{allHint\(on\)\} accessibilityState=\{\{ selected: on \}\} aria-selected=\{on\}/, '"All places, N of M with journeys", selected while its view is on (the state for the phone, aria-selected for the web)');
   const item = src.slice(src.indexOf('function AllItem'), src.indexOf('function Item('));
@@ -297,13 +303,13 @@ check('the All item: the first item of the row, pinned at its left (outside the 
 
 check('the row\'s colours are theme roles: gold ring until it is opened, then the strong border; dashed circle and pin when ahead', () => {
   const src = code(read('src/features/me/Highlights.tsx'));
-  assert.match(src, /backgroundColor: seen \? role\.borderStrong : c\.gold/);
+  assert.match(src, /borderWidth: 3, borderColor: seen \? role\.borderStrong : role\.highlight/);
   assert.match(src, /borderStyle: 'dashed', borderColor: role\.borderStrong/);
   assert.match(src, /<Icon name="pin" color=\{role\.muted\}/);
   assert.match(src, /backgroundColor: role\.sunken/);
-  assert.match(src, /fontFamily: fonts\.title/, 'the letter of a destination without a picture');
+  assert.match(src, /<AppText variant="h4" color=\{role\.muted\}>\{firstLetter\(h\.name\)\}<\/AppText>/, 'the letter of a destination without a picture: the h4 variant (Fraunces 24)');
   assert.doesNotMatch(src, /#[0-9a-fA-F]{3,8}\b|rgba?\(/, 'no colour of its own');
-  assert.doesNotMatch(src, /\bc\.blue\b/);
+  assert.doesNotMatch(src, /\bc\.\w+/, 'no palette colour either: roles only, which keep their contrast in dark mode (c.blue is light blue there)');
   assert.doesNotMatch(src, /StyleSheet\.create/);
 });
 
@@ -313,7 +319,7 @@ check('every highlight is a button with a label, an ahead one opens that day in 
   assert.match(src, /router\.push\(\{ pathname: '\/planner', params: \{ day: h\.dayId \} \}\)/);
   // Updated on purpose with the All view: the bar is for a destination of the row only; a place of the stamps has the Back button of the app (PlaceHeader, AllPlaces.tsx)
   assert.match(src, /accessibilityRole="button" accessibilityLabel="Show all posts"/);
-  assert.match(src, /minHeight: 48/, 'a touch target of 48');
+  assert.match(src, /minHeight: layout\.touchHard/, 'a touch target of 48 (layout.touchHard, the hard minimum)');
   assert.match(src, /<AppText variant="label" numberOfLines=\{1\} style=\{\{ flexShrink: 1 \}\}>\{name\}<\/AppText>/, 'a long name gives way ...');
   assert.match(src, /numberOfLines=\{1\} style=\{\{ flexShrink: 0 \}\}>· Show all<\/AppText>/, '... and "Show all" never wraps onto a second line');
   assert.doesNotMatch(src, /name="back"/, 'the row draws no Back chevron: the Back button of a screen is components/BackButton.tsx');

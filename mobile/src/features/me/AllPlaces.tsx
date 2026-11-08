@@ -4,7 +4,7 @@ import { BackButton } from '@/components/BackButton';
 import { Icon } from '@/components/Icon';
 import { Card } from '@/components/ui';
 import type { Post } from '@/lib/api';
-import { c, fonts, radius, role } from '@/theme';
+import { c, fonts, icon, radius, role, space } from '@/theme';
 import { ProgressBar } from './shared';
 import { placesLine, stampLabel, visitedCount, type RoutePoint } from './routePoints';
 
@@ -13,19 +13,22 @@ import { placesLine, stampLabel, visitedCount, type RoutePoint } from './routePo
 // how many. A tap on a stamp shows those posts in the Journey grid (the bar over the grid goes back to these stamps). Which post belongs to which place is routePoints.ts.
 // the round of a stamp is 78, as in the passport
 const SLOT = 78;
+// The count on a filled stamp is the caption variant (15 px, 21 high), so it keeps 8 px from the outline on every side: 8 + 21 + 8 = 37, and the round is 40. It sits on
+// the rim of the stamp (8 px out at the top right), not over the shell: a round this size at the corner would cover a part of the glyph.
+const BADGE = 40;
 
 function Stamp({ p, onPress }: { p: RoutePoint<Post>; onPress: () => void }) {
   const done = p.posts.length > 0;
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={stampLabel(p)} onPress={onPress} style={{ width: '33.33%', alignItems: 'center', gap: 8, paddingHorizontal: 4 }}>
+    <Pressable accessibilityRole="button" accessibilityLabel={stampLabel(p)} onPress={onPress} style={{ width: '33.33%', alignItems: 'center', gap: space[2], paddingHorizontal: space[1] }}>
       <View style={{ width: SLOT, height: SLOT }}>
         <View style={{ width: SLOT, height: SLOT, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center', backgroundColor: done ? c.goldSoft : 'transparent', borderWidth: done ? 0 : 2, borderStyle: 'dashed', borderColor: role.borderStrong, transform: [{ rotate: done ? '-8deg' : '0deg' }] }}>
-          <Icon name="shell" color={done ? c.blue : role.borderStrong} size={32} />
+          <Icon name="shell" color={done ? role.action : role.borderStrong} size={icon.lg} />
         </View>
         {done && (
           // the number of posts, upright (the stamp itself is turned a little), on its own ring of the page colour
-          <View style={{ position: 'absolute', top: -2, right: -2, minWidth: 28, height: 28, paddingHorizontal: 6, borderRadius: radius.pill, backgroundColor: role.highlight, borderWidth: 2, borderColor: role.bg, alignItems: 'center', justifyContent: 'center' }}>
-            <AppText variant="caption" color={role.onHighlight} style={{ fontSize: 12, lineHeight: 16, letterSpacing: 0, fontFamily: fonts.bodyBold }}>{p.posts.length}</AppText>
+          <View style={{ position: 'absolute', top: -8, right: -8, minWidth: BADGE, height: BADGE, paddingHorizontal: space[2], borderRadius: radius.pill, backgroundColor: role.highlight, borderWidth: 2, borderColor: role.bg, alignItems: 'center', justifyContent: 'center' }}>
+            <AppText variant="caption" color={role.onHighlight} style={{ fontFamily: fonts.bodyBold }}>{p.posts.length}</AppText>
           </View>
         )}
       </View>
@@ -38,16 +41,16 @@ function Stamp({ p, onPress }: { p: RoutePoint<Post>; onPress: () => void }) {
 export function AllPlaces({ places, onPick }: { places: readonly RoutePoint<Post>[]; onPick: (p: RoutePoint<Post>) => void }) {
   const visited = visitedCount(places);
   return (
-    <View style={{ gap: 16 }}>
-      <Card style={{ gap: 12 }}>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', gap: 12 }}>
+    <View style={{ gap: space[4] }}>
+      <Card style={{ gap: space[3] }}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', gap: space[3] }}>
           <AppText variant="h4">All places</AppText>
           <AppText variant="label" color={role.accentText}>{placesLine(visited, places.length)}</AppText>
         </View>
         <ProgressBar value={places.length ? visited / places.length : 0} />
         <AppText variant="small" muted>Tap a place to see your journeys there.</AppText>
       </Card>
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', rowGap: 20 }}>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', rowGap: space[5] }}>
         {places.map((p) => <Stamp key={p.key} p={p} onPress={() => onPick(p)} />)}
       </View>
     </View>
@@ -60,7 +63,7 @@ export function AllPlaces({ places, onPick }: { places: readonly RoutePoint<Post
  */
 export function PlaceHeader({ name, onBack }: { name: string; onBack: () => void }) {
   return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: space[3] }}>
       <BackButton onPress={onBack} hint="Back to all places" />
       <View style={{ flex: 1 }}>
         <AppText variant="h4" numberOfLines={1}>{name}</AppText>
