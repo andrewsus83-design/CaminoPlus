@@ -486,4 +486,24 @@ check('the files of the text are pure and fetch nothing: no React, no React Nati
   assert.ok(statSync(ASSETS).isDirectory());
 });
 
+// ----------------------------------------------------------------------------------------------------------------- the licences screen
+
+check('the licences screen has an entry for the translation: its name, "Public domain", the trademark sentence, the link, and what is not included; it says what the credit of the index says', () => {
+  const src = readFileSync(join(root, 'app/licences.tsx'), 'utf8');
+  const m = /const TEXT: Item\[\] = \[\s*\{ name: '([^']*)', what: '([^']*)', licence: '([^']*)', url: '([^']*)' \},\s*\];/.exec(src);
+  assert.ok(m, 'one entry in a group of its own');
+  const [, name, what, licence, url] = m!;
+  assert.equal(name, index.translation.name);
+  assert.equal(url, 'https://ebible.org/eng-web-c/');
+  assert.equal(url, index.translation.source);
+  assert.equal(licence, 'Public domain. The name “World English Bible” is a trademark of eBible.org.');
+  assert.ok(index.translation.credit.endsWith(licence.replace(/[“”]/g, '"')), 'the same sentences as TRANSLATION.credit (straight quotes there, curly ones on the screen)');
+  assert.ok(licence.startsWith(index.translation.licence));
+  assert.match(what, /^The text of the Bible in the Library: 73 books, kept in the app, so it reads without a signal\./);
+  assert.match(what, /Strong’s numbers, footnotes and cross references are not included\.$/);
+  assert.match(src, /<Group title="MAPS AND DATA" items=\{DATA\} \/>\s*<Group title="THE BIBLE TEXT" items=\{TEXT\} \/>\s*<Group title="FONTS AND SOFTWARE" items=\{SOFTWARE\} \/>/, 'its own group, between the data and the software');
+  assert.doesNotMatch(src, /^import .*(library\/bible|assets\/bible)|\brequire\(/m, 'the screen does not pull the text of the Bible into its own code: the entry is plain text');
+  assert.match(src, /Pressable key=\{i\.name\} accessibilityRole="link" accessibilityLabel=\{`\$\{i\.name\}: open licence details`\} onPress=\{\(\) => \{ void WebBrowser\.openBrowserAsync\(i\.url\); \}\}/, 'it opens the page of the translation like every other entry');
+});
+
 console.log(`${n} of ${n} passed (Bible text)`);
