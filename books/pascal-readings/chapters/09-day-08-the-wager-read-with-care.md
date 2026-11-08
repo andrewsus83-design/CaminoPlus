@@ -16,13 +16,13 @@ Picture a fork in the path with no sign. You cannot work out which branch is rig
 
 His question is the largest one: whether there is a God. The passage opens by granting that argument will not settle it. "Reason can determine nothing about it." Elsewhere he says outright that he does not mean to prove it by natural reasons: "Therefore I do not here undertake to prove by natural reasons either the existence of God". So the wager is not a proof. It is addressed to someone who has already concluded that reason is stuck and who would like to know what to do.
 
-The part we have left out is the argument that gives the page its name. In it, Pascal's reader objects that the right thing is not to wager at all, and Pascal replies that this is not an option: "you are embarked in the affair." Not choosing is a way of choosing. Then he reasons like a man at a gaming table. If you stake a little and the prize is everything, "if you gain, you gain all; if you lose, you lose nothing." The odds, he says, are in favour of backing the side that offers so much.
+The part we have left out is the argument that gives the page its name. In it, Pascal's reader objects that the right thing is not to wager at all, and Pascal replies that this is not an option: "you are embarked in the affair." Not choosing is a way of choosing. Then he reasons like a man at a gaming table. What you stake is finite, he says, and what you stand to win is endless: "if you gain, you gain all; if you lose, you lose nothing." On that count, he says, a sensible gambler backs the side that offers so much.
 
-The reader concedes the arithmetic and then says what is really wrong: "my hands are tied and my mouth is gagged: I am forced to wager and am not free, none can release me, but I am so made that I cannot believe." That is where today's passage resumes. Pascal does not tell him to look for more proofs. He tells him to labour at something else, "not by increase of the proofs of God, but by the diminution of your passions." He points to people who were once where the reader is and who have taken up a way of life. The way includes practices, and the reader is told to behave as they do before he believes as they do. The reader replies with a fear, "But that is just what I fear", and Pascal answers with a question: "what have you to lose?"
+The reader concedes the arithmetic and then says what he cannot get past: "my hands are tied and my mouth is gagged: I am forced to wager and am not free, none can release me, but I am so made that I cannot believe." That is where today's passage resumes. Pascal does not tell him to look for more proofs. He tells him to labour at something else, "not by increase of the proofs of God, but by the diminution of your passions." He points to people who were once where the reader is and who have taken up a way of life. The way includes practices, and the reader is told to behave as they do before he believes as they do. The reader replies with a fear, "But that is just what I fear", and Pascal answers with a question: "what have you to lose?"
 
 In the stretch we have left out, between the second and third parts of the passage, he adds that his words are those of someone who has "thrown himself on his knees" to pray that the reader would also give his whole self. So it is not a trick played from a safe seat. Then comes the last claim: that the life this leads to is one of a person who is "trustworthy, honourable, humble, grateful, generous, friendly, sincere, and true."
 
-Where it is hard, and it is hard in several places.
+It is hard in several places.
 
 The register is the first. A gaming table, for the deepest question there is. To some readers it is cold, and to others it turns faith into an investment. Pascal seems to know how it sounds, since his objector is so uncomfortable with it.
 
@@ -51,7 +51,7 @@ There is a quieter use of the passage that needs no belief at all. Its last line
 
 One more thing, about people. Fellow walkers answer this question every way there is: some with a settled faith, some with none, a great many in between, and quite a few who have never been asked. The man who wrote this page, by his own account, prayed for the reader on his knees. You might ask yourself how you would treat someone who answered differently from you, and how you did treat the people you met today.
 
-Tonight is not the night to settle anything this size, and nothing here needs deciding by morning. A wager has no deadline except the one life sets, and that is a long way off from a bunk in a hostel at nine o'clock. Tiredness makes big questions bigger. If you can, let this one be a question tonight, and sleep.
+Tonight is not the night to settle anything this size, and nothing here needs deciding by morning. Tiredness makes big questions bigger. If you can, let this one be a question tonight, and sleep.
 
 - What did I risk today on something I could not be sure of?
 - What would I honestly lose by looking at the largest question, and what by never looking?

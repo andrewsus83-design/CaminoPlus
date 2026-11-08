@@ -28,7 +28,7 @@ Then there is this: a habit can be a way of not being there. A walker can do a w
 
 One more thing is worth saying before it comes up. This is the quieter cousin of Day 8, where Pascal makes the same move with more force and more risk, and invites a reader to begin with practices before the belief arrives. If you are comfortable with today's passage and not with that one, it is worth noticing why.
 
-Which leaves what to do with it. Choose one small repeated act and give it your whole attention each time. The road offers plenty: putting the pack on, taking it off, stepping over the threshold of the place where you will sleep, the first drink of water in the morning. Pick one, and let it be the place where you wake up. The mind decided once. Now let the body practise, slowly enough that you are there for it.
+Which leaves the question of what to do with it. Choose one small repeated act and give it your whole attention each time. The road offers plenty: putting the pack on, taking it off, stepping over the threshold of the place where you will sleep, the first drink of water in the morning. Pick one, and let it be the place where you wake up. The mind decided once. Now let the body practise, slowly enough that you are there for it.
 
 ## For the walk
 
@@ -41,7 +41,7 @@ By evening, the habits are doing nearly all the work. Boots off, shoes on, wash,
 
 Now look at what else it carried today. Which habits served you? Perhaps a stretch before setting out, or a rest taken before you needed it, or a way of greeting people that makes the road friendlier. Which ones served you badly? A sharp remark that arrived before you chose it. A second look at the phone, and then a third. A grumble about the weather that had been practised for years before this road. The automaton does not discriminate. It takes whatever it has been given often enough.
 
-You will have noticed something in how Pascal puts it, too: custom works "without violence, without art, without argument". It does not win by force. It works by being there every day, and by not fighting. It is a reason to suspect, though Pascal does not draw the moral himself, that small and steady changes may last longer than large resolutions made at night.
+You will have noticed something in how Pascal puts it, too: custom works "without violence, without art, without argument". It does not win by force. It works by being there every day, and by not fighting. That is a reason to suspect, though Pascal does not draw the moral himself, that small and steady changes may last longer than large resolutions made at night.
 
 Pascal's picture has two halves, and tonight you might look for the gap between them. Is there something you have long been convinced of, that you should rest earlier, drink more, speak more gently, ring someone, that your habits have not yet caught up with? The mind has done its part. The gap is not a failure of belief. It is only that the automaton has not been taught.
 
@@ -49,7 +49,7 @@ Habits have bad days, too. A morning with a lost sock or a sore hip breaks the s
 
 Which brings us to tiredness. Tonight is a poor night to reform anything. A tired mind makes bold promises and a rested one has to keep them. So do not resolve to become a different person. Choose a single act for tomorrow, small enough to do even on a bad morning, and leave it at that. The automaton learns by repetition, not by speeches. The last habit of the day sets up the first of tomorrow: water within reach, the pack half-filled, the phone put where it will not be the first thing you touch.
 
-And if today's day went on autopilot from start to finish, and you cannot say what you saw, that is only information. It does not need a penance. Try tomorrow to be awake for one of its repeated moments.
+And if today went on autopilot from start to finish, and you cannot say what you saw, that is only information. It does not need a penance. Try tomorrow to be awake for one of its repeated moments.
 
 - What did my body do today without being asked, and was it good?
 - Which small act would I like to repeat until it comes without effort?
