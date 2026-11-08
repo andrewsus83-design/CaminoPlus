@@ -2,6 +2,7 @@
 import { ReactNode, useState } from 'react';
 import { ActivityIndicator, Image, Platform, Pressable, TextInput, View, ViewStyle } from 'react-native';
 import { AppText } from '@/components/AppText';
+import { FIXED } from '@/components/fixedColors';
 import { Icon, IconName } from '@/components/Icon';
 import { IconButton } from '@/components/ui';
 import { c, fonts, radius, role } from '@/theme';
@@ -14,7 +15,7 @@ export const noOutline = (Platform.OS === 'web' ? { outlineStyle: 'none' } : nul
 
 type AvatarProps = { name: string; uri?: string | null; seed?: string; size?: number; group?: boolean; ring?: boolean };
 
-/** Photo when there is one, else initials on a soft colour. Groups get a little "people" badge. */
+/** Photo when there is one, else initials on a soft colour. Groups get a little "people" badge. The soft colours are the same in dark mode, so the initials on them are the fixed navy, never c.blue (light blue in dark mode: 1.6 : 1 on them). */
 export function PilgrimAvatar({ name, uri, seed, size = 56, group, ring }: AvatarProps) {
   const [broken, setBroken] = useState(false);
   const tint = avatarTint(seed ?? name);
@@ -24,7 +25,7 @@ export function PilgrimAvatar({ name, uri, seed, size = 56, group, ring }: Avata
       <View style={{ width: size, height: size, borderRadius: radius.pill, backgroundColor: tint, alignItems: 'center', justifyContent: 'center', overflow: 'hidden', borderWidth: ring ? 2.5 : 0, borderColor: c.gold }}>
         {showPhoto
           ? <Image source={{ uri: uri! }} onError={() => setBroken(true)} style={{ width: size, height: size }} />
-          : <AppText variant="label" color={c.blue} style={{ fontSize: Math.round(size * 0.36), lineHeight: Math.round(size * 0.44), fontFamily: fonts.bodyBold }}>{initials(name)}</AppText>}
+          : <AppText variant="label" color={FIXED.blue} style={{ fontSize: Math.round(size * 0.36), lineHeight: Math.round(size * 0.44), fontFamily: fonts.bodyBold }}>{initials(name)}</AppText>}
       </View>
       {group && (
         <View style={{ position: 'absolute', right: -2, bottom: -2, width: Math.max(20, size * 0.38), height: Math.max(20, size * 0.38), borderRadius: radius.pill, backgroundColor: role.action, borderWidth: 2, borderColor: role.bg, alignItems: 'center', justifyContent: 'center' }}>

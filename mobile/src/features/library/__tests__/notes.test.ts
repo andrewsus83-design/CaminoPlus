@@ -568,6 +568,7 @@ check('the filter row is tabs: a tablist, each one a tab with its selected state
   assert.match(header, /accessibilityRole="tablist"/);
   assert.match(header, /accessibilityRole="tab"/);
   assert.match(header, /accessibilityState=\{\{ selected: on \}\}/);
+  assert.match(header, /aria-selected=\{on\}/, 'and the web says it too (the browser reads aria-selected, not accessibilityState)');
   assert.match(header, /accessibilityLabel=\{filterLabel\(f, counts\[f\]\)\}/);
   assert.match(header, /NOTE_FILTERS\.map\(/);
 });
@@ -667,6 +668,7 @@ check('the text of a note is the diary\'s RichText, clamped to eight lines by it
   assert.match(row, /needsMore\(/);
   assert.match(row, /accessibilityLabel=\{open \? 'Show less of this note' : 'Show more of this note'\}/);
   assert.match(row, /accessibilityState=\{\{ expanded: open \}\}/);
+  assert.match(row, /aria-expanded=\{open\}/);
 });
 
 check('the list leaves room under the last note for the gold pen and the floating tab bar, the same numbers the Fab and the tab bar use', () => {

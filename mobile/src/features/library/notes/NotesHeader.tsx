@@ -43,6 +43,7 @@ export function NotesHeader({ name, photo, seed, onWrite, filter, counts, onFilt
               key={f}
               accessibilityRole="tab"
               accessibilityState={{ selected: on }}
+              aria-selected={on}
               accessibilityLabel={filterLabel(f, counts[f])}
               onPress={() => onFilter(f)}
               style={{ flexGrow: 1, flexShrink: 1, alignItems: 'center', justifyContent: 'center', minHeight: TOUCH_MIN, paddingHorizontal: 12, paddingTop: 12, paddingBottom: 10, borderBottomWidth: 3, borderBottomColor: on ? role.action : 'transparent', marginBottom: -1 }}

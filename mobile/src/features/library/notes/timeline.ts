@@ -169,6 +169,10 @@ export const BODY_LINES = 8;
 export const BODY_LINE_PX = 28;
 export const BODY_CLAMP_PX = BODY_LINES * BODY_LINE_PX;
 
+/** The last pixels of a cut text fade out, in this many steps (a stack of thin bands of the background colour, each a little more opaque than the one above). */
+export const FADE_PX = 16;
+export const FADE_STEPS = 8;
+
 /** The text is taller than what a row shows: it is cut, and "Show more" says so. A pixel of slack, so rounding never invents a button. */
 export const needsMore = (naturalHeight: number): boolean => Number.isFinite(naturalHeight) && naturalHeight > BODY_CLAMP_PX + 1;
 
