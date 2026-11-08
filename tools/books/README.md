@@ -11,6 +11,7 @@ python3 tools/books/import_books.py --raw-dir DIR      # keep the downloads in D
 python3 tools/books/import_books.py --check            # write nothing; exit 1 if an asset is not what the recipes make
 python3 tools/books/import_books.py --list             # the twelve books, their verdicts and editions
 python3 -m unittest discover -s tools/tests -v         # the tests (test_books_import.py), no network
+python3 tools/books/breakage_check.py                  # 53 deliberate breakages of the guards: each must turn a test red (about 5 minutes)
 ```
 
 Files: `import_books.py` (the command), `books_recipes.py` (one recipe per book: source, sha256, how it is cut and structured, the facts the
