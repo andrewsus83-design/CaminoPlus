@@ -291,7 +291,7 @@ check('the All item: the first item of the row, pinned at its left (outside the 
   const scroller = src.indexOf('<ScrollView');
   assert.ok(all > 0 && scroller > all, 'the All item comes before the scrolling destinations and is not inside the ScrollView');
   assert.match(src, /const pinned = !!all && all\.total > 0;/, 'drawn whenever the route has places, with or without destinations');
-  assert.match(src, /<Icon name="shell" color=\{role\.action\} size=\{28\} \/>/);
+  assert.match(src, /<Icon name="shell" color=\{role\.action\} size=\{icon\.mdPlus\} \/>/, 'the shell is 28 px: a step of the icon scale');
   assert.match(src, /borderWidth: 1, borderColor: role\.border, backgroundColor: role\.surface/, 'a hairline ring and the surface fill');
   assert.match(src, /borderRadius: RING \/ 2, borderWidth: 3, borderColor: role\.highlight/, 'the gold ring of an opened highlight while its view is on: a 3 px border, a stroke and not a padding');
   assert.match(src, /fontFamily: on \? fonts\.bodyBold : fonts\.bodyMedium \}\}>All<\/AppText>/, 'the label is "All", bold while its view is on');
@@ -319,7 +319,7 @@ check('every highlight is a button with a label, an ahead one opens that day in 
   assert.match(src, /router\.push\(\{ pathname: '\/planner', params: \{ day: h\.dayId \} \}\)/);
   // Updated on purpose with the All view: the bar is for a destination of the row only; a place of the stamps has the Back button of the app (PlaceHeader, AllPlaces.tsx)
   assert.match(src, /accessibilityRole="button" accessibilityLabel="Show all posts"/);
-  assert.match(src, /minHeight: 48/, 'a touch target of 48');
+  assert.match(src, /minHeight: layout\.touchHard/, 'a touch target of 48 (layout.touchHard, the hard minimum)');
   assert.match(src, /<AppText variant="label" numberOfLines=\{1\} style=\{\{ flexShrink: 1 \}\}>\{name\}<\/AppText>/, 'a long name gives way ...');
   assert.match(src, /numberOfLines=\{1\} style=\{\{ flexShrink: 0 \}\}>· Show all<\/AppText>/, '... and "Show all" never wraps onto a second line');
   assert.doesNotMatch(src, /name="back"/, 'the row draws no Back chevron: the Back button of a screen is components/BackButton.tsx');

@@ -5,7 +5,7 @@ import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
 import type { Post, PostMediaUrl } from '@/lib/api';
 import { localStore, userKey } from '@/lib/localStore';
-import { fonts, layout, radius, role, space } from '@/theme';
+import { fonts, icon, layout, radius, role, space } from '@/theme';
 import { coverUrl, firstLetter, highlightLabel, nextHighlightIndex, parseSeen, rowStartOffset, type DayLike, type Highlight, type SeenSaved } from './highlights';
 import { allHint, allLabel } from './routePoints';
 
@@ -54,7 +54,7 @@ function useSeen(userId: string | null | undefined) {
 
 /** The first item of the row: every place of the Camino as stamps. The shell in a round of the card's surface with a hairline; gold ring and bold label while its view is on. */
 function AllItem({ visited, total, on, onPress }: { visited: number; total: number; on: boolean; onPress: () => void }) {
-  const glyph = <Icon name="shell" color={role.action} size={28} />;
+  const glyph = <Icon name="shell" color={role.action} size={icon.mdPlus} />;
   return (
     <Pressable accessibilityRole="button" accessibilityLabel={allLabel(visited, total)} accessibilityHint={allHint(on)} accessibilityState={{ selected: on }} aria-selected={on} onPress={onPress} style={{ width: ITEM_W, alignItems: 'center', gap: space[2] }}>
       {on ? (
@@ -88,7 +88,7 @@ function Item({ h, cover, seen, active, onPress }: { h: Highlight<Post>; cover: 
       ) : (
         // not visited yet: no ring, no picture, a dashed circle with a pin
         <View style={{ width: RING, height: RING, borderRadius: RING / 2, borderWidth: 2, borderStyle: 'dashed', borderColor: role.borderStrong, alignItems: 'center', justifyContent: 'center' }}>
-          <Icon name="pin" color={role.muted} size={24} />
+          <Icon name="pin" color={role.muted} size={icon.md} />
         </View>
       )}
       <AppText variant="caption" numberOfLines={1} style={{ width: ITEM_W, textAlign: 'center', fontFamily: active ? fonts.bodyBold : fonts.bodyMedium }}>{h.name}</AppText>
@@ -168,12 +168,12 @@ export function Highlights({ items, days, media, activeKey, userId, onPick, all 
 /** The slim bar above the Journey grid while it shows one destination of the row: "Hontanas · Show all", the cross clears the filter. One button, at least 48 high. */
 export function ShowAllBar({ name, onPress }: { name: string; onPress: () => void }) {
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel="Show all posts" accessibilityHint={`Now showing ${name}`} onPress={onPress} style={{ minHeight: 48, flexDirection: 'row', alignItems: 'center', gap: space[2], paddingHorizontal: space[4], borderRadius: radius.pill, backgroundColor: role.surface, borderWidth: 1, borderColor: role.border }}>
+    <Pressable accessibilityRole="button" accessibilityLabel="Show all posts" accessibilityHint={`Now showing ${name}`} onPress={onPress} style={{ minHeight: layout.touchHard, flexDirection: 'row', alignItems: 'center', gap: space[2], paddingHorizontal: space[4], borderRadius: radius.pill, backgroundColor: role.surface, borderWidth: 1, borderColor: role.border }}>
       {/* a long name gives way (…), never the words "Show all" */}
       <AppText variant="label" numberOfLines={1} style={{ flexShrink: 1 }}>{name}</AppText>
       <AppText variant="label" color={role.accentText} numberOfLines={1} style={{ flexShrink: 0 }}>· Show all</AppText>
       <View style={{ marginLeft: 'auto' }}>
-        <Icon name="close" color={role.muted} size={18} />
+        <Icon name="close" color={role.muted} size={icon.sm} />
       </View>
     </Pressable>
   );

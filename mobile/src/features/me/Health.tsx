@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import { AppText } from '@/components/AppText';
 import { Icon, IconName } from '@/components/Icon';
 import { Card } from '@/components/ui';
-import { c, layout, radius, role, space } from '@/theme';
+import { c, icon, layout, radius, role, space } from '@/theme';
 
 // Health tab: numbers from a connected smartwatch, then walking tips.
 // No watch pairing yet (needs the next native build), so metrics show a dash until then.
@@ -45,20 +45,20 @@ export function Health({ watchConnected = false }: { watchConnected?: boolean })
       {!watchConnected && (
         <Pressable accessibilityRole="button" onPress={() => router.push('/watches')} style={{ borderRadius: radius.lg, backgroundColor: role.inverse, padding: layout.cardPadding, flexDirection: 'row', alignItems: 'center', gap: space[4] }}>
           <WatchRound>
-            <Icon name="watch" color={c.goldBright} size={32} />
+            <Icon name="watch" color={c.goldBright} size={icon.lg} />
           </WatchRound>
           <View style={{ flex: 1, gap: space[1] }}>
             <AppText variant="label" color={role.onInverse}>Connect your smartwatch</AppText>
             <AppText variant="small" color={role.onInverse} style={{ opacity: 0.85 }}>See your steps, heart rate and sleep here.</AppText>
           </View>
-          <Icon name="chevron" color={role.highlight} size={24} />
+          <Icon name="chevron" color={role.highlight} size={icon.md} />
         </Pressable>
       )}
 
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space[3] }}>
         {METRICS.map((m) => (
           <Card key={m.id} style={{ width: '48%', flexGrow: 1, gap: space[2], padding: space[4] }}>
-            <Icon name={m.icon} color={m.id === 'hr' || m.id === 'rest' ? role.danger : role.action} size={24} />
+            <Icon name={m.icon} color={m.id === 'hr' || m.id === 'rest' ? role.danger : role.action} size={icon.md} />
             <AppText variant="h3">–</AppText>
             <AppText variant="caption" muted>{m.label} · {m.unit}</AppText>
           </Card>

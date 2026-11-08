@@ -255,7 +255,7 @@ check('the stamps are the passport\'s: three in a row, a 78 round, filled in gol
   assert.ok((40 - caption.lineHeight) / 2 >= 8, `the number has 8 px or more above and below it inside the round (it has ${(40 - caption.lineHeight) / 2})`);
   assert.match(src, /width: '33\.33%', alignItems: 'center', gap: space\[2\], paddingHorizontal: space\[1\]/, 'the room of a stamp is steps of the space scale');
   assert.doesNotMatch(src, /\b(?:padding|margin|gap|rowGap|paddingHorizontal|paddingVertical)\w*: \d/, 'no padding, margin or gap written as a number');
-  assert.match(src, /<Icon name="shell" color=\{done \? role\.action : role\.borderStrong\} size=\{32\} \/>/, 'the shell is the action colour (blue, light blue in dark mode) on a filled stamp');
+  assert.match(src, /<Icon name="shell" color=\{done \? role\.action : role\.borderStrong\} size=\{icon\.lg\} \/>/, 'the shell is the action colour (blue, light blue in dark mode) on a filled stamp, 32 px');
   assert.match(src, /accessibilityRole="button" accessibilityLabel=\{stampLabel\(p\)\} onPress=\{onPress\}/, 'a stamp is a button with its words');
   assert.match(src, /<ProgressBar value=\{places\.length \? visited \/ places\.length : 0\} \/>/, 'the progress bar of the passport');
   assert.match(src, /placesLine\(visited, places\.length\)/, '"5 of 33 places"');

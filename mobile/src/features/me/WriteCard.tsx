@@ -1,7 +1,7 @@
 import { Pressable, View } from 'react-native';
 import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
-import { radius, role, space } from '@/theme';
+import { icon, radius, role, space } from '@/theme';
 import { JOURNEY_WRITE } from './tabs';
 
 /**
@@ -21,7 +21,7 @@ export function WriteCard({ width, height, onPress }: { width: number; height: n
       style={({ pressed }) => ({ width, height, alignItems: 'center', justifyContent: 'center', gap: space[4], paddingHorizontal: space[3], backgroundColor: pressed ? role.sunken : role.surface, borderWidth: 1, borderColor: role.border })}
     >
       <View style={{ width: 64, height: 64, borderRadius: radius.pill, backgroundColor: role.highlight, alignItems: 'center', justifyContent: 'center' }}>
-        <Icon name="pen" color={role.onHighlight} size={32} strokeWidth={2.2} />
+        <Icon name="pen" color={role.onHighlight} size={icon.lg} strokeWidth={2.2} />
       </View>
       <AppText variant="label" style={{ textAlign: 'center' }}>{JOURNEY_WRITE.label}</AppText>
     </Pressable>

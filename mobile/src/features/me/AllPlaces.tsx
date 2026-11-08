@@ -4,7 +4,7 @@ import { BackButton } from '@/components/BackButton';
 import { Icon } from '@/components/Icon';
 import { Card } from '@/components/ui';
 import type { Post } from '@/lib/api';
-import { c, fonts, radius, role, space } from '@/theme';
+import { c, fonts, icon, radius, role, space } from '@/theme';
 import { ProgressBar } from './shared';
 import { placesLine, stampLabel, visitedCount, type RoutePoint } from './routePoints';
 
@@ -23,7 +23,7 @@ function Stamp({ p, onPress }: { p: RoutePoint<Post>; onPress: () => void }) {
     <Pressable accessibilityRole="button" accessibilityLabel={stampLabel(p)} onPress={onPress} style={{ width: '33.33%', alignItems: 'center', gap: space[2], paddingHorizontal: space[1] }}>
       <View style={{ width: SLOT, height: SLOT }}>
         <View style={{ width: SLOT, height: SLOT, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center', backgroundColor: done ? c.goldSoft : 'transparent', borderWidth: done ? 0 : 2, borderStyle: 'dashed', borderColor: role.borderStrong, transform: [{ rotate: done ? '-8deg' : '0deg' }] }}>
-          <Icon name="shell" color={done ? role.action : role.borderStrong} size={32} />
+          <Icon name="shell" color={done ? role.action : role.borderStrong} size={icon.lg} />
         </View>
         {done && (
           // the number of posts, upright (the stamp itself is turned a little), on its own ring of the page colour
