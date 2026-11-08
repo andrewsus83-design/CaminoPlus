@@ -106,6 +106,8 @@
   --cp-text-h2-size:      36px;  --cp-text-h2-lh:      42px;  --cp-text-h2-ls:      -0.5px;
   --cp-text-h3-size:      28px;  --cp-text-h3-lh:      34px;  --cp-text-h3-ls:      -0.25px;
   --cp-text-h4-size:      24px;  --cp-text-h4-lh:      30px;  --cp-text-h4-ls:      0;
+  --cp-text-h5-size:      17px;  --cp-text-h5-lh:      22px;  --cp-text-h5-ls:      0;   /* a small title in Fraunces (the name of a book on a Bible tile that is too long for h4) */
+  --cp-text-h6-size:      15px;  --cp-text-h6-lh:      21px;  --cp-text-h6-ls:      0;   /* the smallest title in Fraunces, as small as the scale goes (15) */
   --cp-text-lead-size:    22px;  --cp-text-lead-lh:    32px;
   --cp-text-body-size:    19px;  --cp-text-body-lh:    28px;
   --cp-text-small-size:   17px;  --cp-text-small-lh:   25px;

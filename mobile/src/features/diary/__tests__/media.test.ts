@@ -558,6 +558,18 @@ export const finished = (async () => {
     assert.equal((await store.loadEntries(UID))[0].body, 'before, and more words', 'with the text that went along');
   });
 
+  await test('a photo added to a draft keeps it a draft, and one added to a published note keeps it published: adding files never changes what a page is', async () => {
+    const { store } = setup();
+    const draft = page('d1', day(1), { body: 'a draft', status: 'draft' });
+    const first = await store.attachMedia(UID, draft, [asset('a.jpg')]);
+    assert.ok(first.ok && first.added.length === 1);
+    assert.deepEqual((await store.loadEntries(UID)).map((e) => [e.id, e.status, e.media?.length]), [['d1', 'draft', 1]]);
+    const note = page('n1', day(2), { body: 'a note', status: 'published' });
+    const second = await store.attachMedia(UID, note, [asset('b.jpg'), asset('c.mp4', 'video')]);
+    assert.ok(second.ok && second.added.length === 2);
+    assert.deepEqual((await store.loadEntries(UID)).map((e) => [e.id, e.status, e.media?.length]), [['n1', undefined, 2], ['d1', 'draft', 1]], 'a published note says nothing, a draft says draft');
+  });
+
   await test('adding files when neither slot can be read does nothing: no copy is made, nothing is written', async () => {
     const { st, store, fs } = setup();
     st.seed(A(), slotOf(7, [page('p1', day(1))])); st.seed(B(), slotOf(6, [page('p1', day(1))]));

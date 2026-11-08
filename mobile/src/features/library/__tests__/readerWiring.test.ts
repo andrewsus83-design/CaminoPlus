@@ -1,5 +1,5 @@
-// Source-level checks of the Bible screens: the grid of books on the Bible tab, the chapters of a book, the reader, the card that continues the chapter read
-// last, the actions on a verse, the search of verses. They read the files, nothing is run: what the pure parts do is checked in reader.test.ts and bible.test.ts;
+// Source-level checks of the Bible screens: the grid of books on the Bible tab, the chapters of a book, the reader, the place that is kept for the Continue reading bar
+// (the bar itself is checked in continueBarWiring.test.ts), the actions on a verse, the search of verses. They read the files, nothing is run: what the pure parts do is checked in reader.test.ts and bible.test.ts;
 // here it is that the screens use them the way they must (the routes are registered next to the other screens of the Library with the same guard, an address that
 // leads nowhere is a calm "not found", a tile is one button with a name, nothing in the reader needs the network or a new native module, Copy asks for the
 // clipboard before it shows, Previous and Next replace the screen and name where they go, the last place is kept only on the phone). Run from wiring.test.ts.
@@ -60,33 +60,38 @@ check('the chapter tiles: one button each ("Psalm 121", "Chapter 3"), square, at
   assert.match(code(read('src/features/library/bible/gridMath.ts')), /export const CHAPTER_TILE_MIN = 56;/);
 });
 
-check('the book tiles on the Bible tab: ONE button each named "Genesis, 50 chapters", square, the name in Fraunces (h4) fitted by tileFit.ts and the count in JetBrains Mono, no bookmark and no chip, three in a row between the side margins', () => {
+check('the book tiles on the Bible tab: ONE button each named "Genesis, 50 chapters", a compact card, two in a row between the side margins, the name in Fraunces at h4, h5 or h6 (fitted by tileFit.ts, never a size of its own) and the count in JetBrains Mono at the mono token, no bookmark and no chip, and the words never larger with the phone\'s text size', () => {
   const src = code(read(`${BIBLE}/BookGrid.tsx`));
   assert.match(src, /export const tileLabel = \(b: BibleBook\): string => `\$\{b\.name\}, \$\{chaptersLabel\(b\.chapters\)\.replace\(\/\\u00a0\/g, ' '\)\}`;/);
   assert.match(src, /accessibilityRole="button"\s+accessibilityLabel=\{tileLabel\(book\)\}\s+onPress=\{\(\) => onOpen\(book\.code\)\}/);
   assert.equal((src.match(/<Pressable\b/g) ?? []).length, 1, 'a tile is one Pressable, and nothing else in it can be pressed');
-  assert.match(src, /width: grid\.tile, height: grid\.tile, paddingHorizontal: grid\.padX, paddingVertical: grid\.padY/, 'the name is the hero: as little padding across as the round corners allow');
-  assert.match(src, /const name = fitName\(book\.name, grid\.innerWidth, fontScale\);/);
-  assert.match(src, /const count = fitCount\(chaptersLabel\(book\.chapters\), grid\.innerWidth, fontScale\);/);
-  assert.match(src, /<AppText\s+variant="h4"\s+maxFontSizeMultiplier=\{TEXT_SCALE_CAP\}\s+numberOfLines=\{name\.lines\.length\}\s+style=\{\{ fontSize: name\.size, lineHeight: name\.lineHeight, letterSpacing: name\.tracking \}\}\s+>\s+\{name\.lines\.join\('\\n'\)\}/);
-  assert.match(src, /<AppText\s+variant="mono"\s+muted\s+maxFontSizeMultiplier=\{TEXT_SCALE_CAP\}\s+numberOfLines=\{1\}\s+style=\{\{ fontSize: count\.size, lineHeight: count\.lineHeight \}\}\s+>\s+\{chaptersLabel\(book\.chapters\)\}/);
-  assert.match(src, /const \{ width, fontScale \} = useWindowDimensions\(\);\s+const grid = bookGrid\(width\);/);
+  assert.match(src, /width: grid\.tile, height: grid\.height, padding: grid\.pad, justifyContent: 'space-between', borderRadius: radius\.md/, 'a compact card as high as its words, the words one step of the space scale from the hairline on every side');
+  assert.match(src, /const name = fitName\(book\.name, grid\.innerWidth\);/);
+  assert.match(src, /<AppText variant=\{name\.variant\} maxFontSizeMultiplier=\{1\} numberOfLines=\{name\.lines\.length\}>\s+\{name\.lines\.join\('\\n'\)\}/, 'the name is the variant tileFit.ts chose (h4, h5 or h6), in the lines it worked out, never larger with the text size of the phone');
+  assert.match(src, /<AppText variant="mono" muted maxFontSizeMultiplier=\{1\} numberOfLines=\{1\}>\s+\{chaptersLabel\(book\.chapters\)\}/, 'the count is the mono token');
+  assert.match(src, /const \{ width \} = useWindowDimensions\(\);\s+const grid = useMemo\(\(\) => bookGrid\(width\), \[width\]\);/);
   assert.match(src, /flexDirection: 'row', flexWrap: 'wrap', gap: grid\.gap/);
-  assert.match(src, /backgroundColor: pressed \? role\.sunken : role\.surface, borderWidth: 1, borderColor: role\.border/);
-  assert.doesNotMatch(src, /BookmarkToggle|marks|Soon|Chip|#[0-9a-fA-F]{3,8}\b|\bfixed\.|\bc\.[a-z]|fontFamily|adjustsFontSizeToFit/, 'the 44 touch target of a bookmark does not fit a square of 90: the book is bookmarked on its own screen; no chip; no literal colour or font');
+  assert.match(src, /backgroundColor: pressed \? role\.sunken : role\.surface, borderWidth: grid\.border, borderColor: role\.border/);
+  assert.doesNotMatch(src, /BookmarkToggle|marks|Soon|Chip|#[0-9a-fA-F]{3,8}\b|\bfixed\.|\bc\.[a-z]|fontFamily|adjustsFontSizeToFit/, 'the 44 touch target of a bookmark does not fit a tile this small: the book is bookmarked on its own screen; no chip; no literal colour or font');
+  assert.doesNotMatch(src, /fontSize|lineHeight|letterSpacing|fontScale|TEXT_SCALE_CAP/, 'no size of its own: the variants are the type scale');
+  assert.doesNotMatch(src, /\b(?:padding|margin|gap|width|height|borderWidth|borderRadius)\w*: \d/, 'no number of space of its own: gridMath.ts has them, from the tokens');
   assert.match(src, /memo\(function BookTile/, 'a tile is drawn again only when its own props change');
   // where it is used: the Bible tab, for the books of the chosen part
   assert.match(code(read('src/features/library/LibraryTabs.tsx')), /<BibleBookGrid books=\{booksOf\(testament\)\} onOpen=\{onOpenBook\} \/>/);
+  // the sums are the tokens' and nothing else (reader.test.ts checks the values): the pure files read tokens.json and type none of the numbers again
+  for (const f of ['gridMath.ts', 'tileFit.ts']) assert.match(code(read(`${BIBLE}/${f}`)), /import tokens from '\.\.\/\.\.\/\.\.\/theme\/tokens\.json';/, `${f} reads the tokens`);
+  assert.match(code(read(`${BIBLE}/gridMath.ts`)), /export const SIDE: number = tokens\.layout\.screenMargin;/);
+  assert.match(code(read(`${BIBLE}/gridMath.ts`)), /const gap = narrow \? space\['2'\] : space\['3'\];\s+const pad = narrow \? space\['3'\] : space\['4'\];/);
+  assert.match(code(read(`${BIBLE}/tileFit.ts`)), /export const NAME_VARIANTS = \['h4', 'h5', 'h6'\] as const;/);
 });
 
-check('the Bible tab: the continue card (only when something was read), the compact banner, the three choices, the heading with the count and the quiet source line, then the tiles; the tab opens a book and the card opens the chapter', () => {
+check('the Bible tab: the compact banner, the three choices, the heading with the count and the quiet source line, then the tiles; the tab opens a book. There is no continue card in the page any more: the Continue reading bar floats above the tab bar instead (continueBarWiring.test.ts)', () => {
   const screen = code(read('app/(tabs)/library.tsx'));
-  const bible = screen.slice(screen.indexOf('<Screen keyboard>'));
-  const order = ["tab === 'Bible' && lastRead.place && <ContinueCard", "tab === 'Bible' && <DailyBanner", "tab === 'Bible' && <BibleTab"].map((needle) => bible.indexOf(needle));
-  assert.ok(order.every((i) => i > 0) && order.every((i, k) => k === 0 || i > order[k - 1]), `the card, the banner, the Bible tab (${order})`);
-  assert.match(bible, /<ContinueCard place=\{lastRead\.place\} onOpen=\{\(\) => router\.push\(readerHref\(\{ code: lastRead\.place!\.code, chapter: lastRead\.place!\.chapter \}\)\)\} \/>/);
+  const bible = screen.slice(screen.indexOf('<Screen keyboard'));
+  const order = ["tab === 'Bible' && <DailyBanner", "tab === 'Bible' && <BibleTab"].map((needle) => bible.indexOf(needle));
+  assert.ok(order.every((i) => i > 0) && order.every((i, k) => k === 0 || i > order[k - 1]), `the banner, the Bible tab (${order})`);
+  assert.doesNotMatch(screen, /ContinueCard|useLastRead/, 'the card is gone from the page: the place read last is continued from one bar above the tab bar, not from two things');
   assert.match(bible, /<BibleTab testament=\{testament\} onTestament=\{setTestament\} onOpenBook=\{\(code\) => router\.push\(bookHref\(code\)\)\} \/>/);
-  assert.match(screen, /const lastRead = useLastRead\(\);/);
   assert.match(screen, /useState<Testament>\('old'\)/, 'the Old Testament is on first');
   const tabs = code(read('src/features/library/LibraryTabs.tsx'));
   const tab = tabs.slice(tabs.indexOf('export function BibleTab'), tabs.indexOf('export function BooksTab'));
@@ -226,7 +231,7 @@ check('the actions on a verse: one at a time, Bookmark (under the place of the v
   assert.match(reader, /place=\{refLabel\(ref\)\}\s+words=\{verseText\(chosen\)\}/);
 });
 
-check('the card that continues the chapter read last is kept only on the phone under a per-person key, shows only a place that exists, and opens that chapter', () => {
+check('the chapter read last is kept only on the phone under a per-person key and is only a place that exists; the Continue reading bar (continueBarWiring.test.ts) is what continues it, and the card that did is gone', () => {
   const hook = code(read(`${BIBLE}/useLastRead.ts`));
   assert.match(hook, /const key = uid \? userKey\(uid, LAST_READ_NAME\) : null;/);
   assert.match(hook, /localStore\.getJSON<unknown>\(key\)/);
@@ -236,13 +241,7 @@ check('the card that continues the chapter read last is kept only on the phone u
   assert.match(hook, /useFocusEffect\(/, 'read again whenever the screen comes into view, because the reader changes it');
   assert.doesNotMatch(hook, /supabase|lib\/api|lib\/net|fetch\(/, 'the place never leaves the phone');
   assert.match(read(`${BIBLE}/lastRead.ts`), /export const LAST_READ_NAME = 'library\.lastRead';/);
-  const card = code(read(`${BIBLE}/ContinueCard.tsx`));
-  assert.match(card, /accessibilityRole="button"\s+accessibilityLabel=\{continueLabel\(place\)\}/);
-  assert.match(card, /minHeight: 64/);
-  assert.match(card, /<AppText variant="mono"[^>]*>\{placeLabel\(place\)\}<\/AppText>/, 'the chapter is a reference: JetBrains Mono');
-  assert.match(card, /<AppText variant="label" muted[^>]*>\{CONTINUE_TITLE\}<\/AppText>/);
-  assert.match(card, /backgroundColor: pressed \? role\.sunken : role\.surface, borderWidth: 1, borderColor: role\.border/);
-  assert.doesNotMatch(card, /#[0-9a-fA-F]{3,8}\b|\bfixed\.|\bc\.[a-z]|fontFamily/);
+  assert.ok(!fs.existsSync(path.join(root, `${BIBLE}/ContinueCard.tsx`)), 'the card is deleted: the bar above the tab bar replaced it, and nothing imports it');
   assert.match(read('src/lib/auth.tsx'), /await clearUserData\(uid\);/, 'logging out wipes it with every u.<userId>. key');
 });
 
@@ -291,7 +290,7 @@ check('the text of the Bible is imported only by the screens that read it and by
   const files = [...walk('app'), ...walk('src')];
   const resolve = (file: string, spec: string): string | null => (spec.startsWith('@/') ? `src/${spec.slice(2)}` : spec.startsWith('.') ? path.posix.normalize(path.posix.join(path.posix.dirname(file), spec)) : null);
   const importers = (target: string): string[] => files.filter((f) => [...read(f).matchAll(/from '([^']+)'/g)].some((m) => resolve(f, m[1]) === target)).sort();
-  assert.deepEqual(importers(`${BIBLE}/text`), [`${BIBLE}/Reader.tsx`, `${BIBLE}/searchText.ts`, 'app/library/bookmarks.tsx', 'src/features/library/noteStart.ts'].sort(), 'the reader, the search, Bookmarks (which shows the words of a verse) and the start of a note (which quotes a verse) read the text; nothing else does: not the Licences screen, not the tiles, not the Continue card');
+  assert.deepEqual(importers(`${BIBLE}/text`), [`${BIBLE}/Reader.tsx`, `${BIBLE}/searchText.ts`, 'app/library/bookmarks.tsx', 'src/features/library/noteStart.ts'].sort(), 'the reader, the search, Bookmarks (which shows the words of a verse) and the start of a note (which quotes a verse) read the text; nothing else does: not the Licences screen, not the tiles, not the Continue reading bar');
   assert.deepEqual(importers(`${BIBLE}/searchText`), [`${BIBLE}/useVerseSearch.ts`, 'app/(tabs)/library.tsx'].sort(), 'the search of verses, and the Library screen that makes it ready');
   assert.deepEqual(importers(`${BIBLE}/webc.generated`), [`${BIBLE}/text.ts`], 'the files of the text are reached through text.ts only');
   // the search is made ready when its field is touched, a beat before the first letter (the first search reads and folds the words of 35,408 verses: 100 to 135 ms on a laptop)

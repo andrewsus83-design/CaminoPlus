@@ -10,7 +10,7 @@ import {
 } from './nav';
 import { loadInstalled, packSourceUrl, refreshCatalog, usePacks } from './packs/store';
 import { choosePins, samplePins, useStagePois, useStageStays } from '@/features/places';
-import { ROUTE_ID, routeLine, samplePosition, stageForAlong, stages, towns } from './sampleRoute';
+import { ROUTE_ID, ROUTE_NOTICE, routeLine, samplePosition, stageForAlong, stages, towns } from './sampleRoute';
 import type { TileSource } from './style';
 import { timeAgo } from './timeAgo';
 import { useOnline } from './useConnectivity';
@@ -159,6 +159,7 @@ export function useMapModel({ gpsMode, visible }: { gpsMode: GpsMode; visible: b
     pins,
     pinSource,
     nextTownKm,
+    routeNotice: ROUTE_NOTICE, // what the route sheet says about the line: which stages are OpenStreetMap, which are placed by hand
     now,
     autoNight,
     nav: { live, state: bannerState, banner, card, next, headingDeg, ahead, beyond, stageEnd, remainingM, offM },

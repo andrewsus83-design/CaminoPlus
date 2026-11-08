@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import tokens from '../../theme/tokens.json';
-import { applyScheme, c, fixed, fonts, role, scrim, tabActiveWeight, tabInactiveWeight } from '../../theme';
+import { applyScheme, c, fixed, fonts, role, scrim, tabActiveWeight, tabInactiveWeight, textStyle, type TextVariant } from '../../theme';
 import { fontPath, readFont } from './fontFile';
 
 let n = 0;
@@ -63,6 +63,35 @@ check('light mode is the light palette of design/tokens.json, color by color and
   // light mode is as the owner liked it: the bar is the card white and has no visible edge (the shadow separates it)
   assert.equal(role.tabBar, role.surface, 'light mode: the tab bar is the card white it always was');
   assert.equal(role.tabBarBorder, role.tabBar, 'light mode: no visible edge');
+});
+
+check('the type scale is design/tokens.json "text": every token is a variant of AppText with exactly its size, line height, letter spacing and font; h5 and h6 are the two small titles (17 / 22 and 15 / 21, Fraunces 600); tokens.css has the same figures', () => {
+  type T = { size: number; lineHeight: number; letterSpacing?: number; font: string; weight: string };
+  const text = tokens.text as Record<string, T>;
+  const names = Object.keys(text);
+  assert.deepEqual(names, ['display', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'lead', 'body', 'small', 'label', 'caption', 'mono', 'accent'], 'the scale, in order');
+  const family = (t: T) => (t.font === 'title' ? fonts.title : t.font === 'mono' ? fonts.mono : t.font === 'accent' ? fonts.accent : t.weight === '600' ? fonts.bodyBold : t.weight === '500' ? fonts.bodyMedium : fonts.body);
+  for (const name of names) {
+    const t = text[name];
+    const style = textStyle(name as TextVariant);
+    assert.deepEqual(style, { fontSize: t.size, lineHeight: t.lineHeight, letterSpacing: t.letterSpacing ?? 0, fontFamily: family(t) }, `${name}: AppText draws the token`);
+  }
+  assert.deepEqual(textStyle('h5'), { fontSize: 17, lineHeight: 22, letterSpacing: 0, fontFamily: 'Fraunces_600SemiBold' });
+  assert.deepEqual(textStyle('h6'), { fontSize: 15, lineHeight: 21, letterSpacing: 0, fontFamily: 'Fraunces_600SemiBold' });
+  // the variants are the keys of the file: nothing to add in the theme when a token is added
+  assert.match(read(join('src', 'theme', 'index.ts')), /export type TextVariant = keyof typeof tokens\.text;/);
+  assert.match(read(join('src', 'components', 'AppText.tsx')), /variant\?: TextVariant/);
+  const css = readFileSync(join(root, '..', 'design', 'tokens.css'), 'utf8');
+  const vars = new Map([...css.matchAll(/(--cp-[a-z0-9-]+)\s*:\s*([^;]+);/g)].map((m) => [m[1], m[2].trim()] as const));
+  for (const name of names) {
+    const t = text[name];
+    assert.equal(vars.get(`--cp-text-${name}-size`), `${t.size}px`, `tokens.css ${name} size`);
+    assert.equal(vars.get(`--cp-text-${name}-lh`), `${t.lineHeight}px`, `tokens.css ${name} line height`);
+    if (t.letterSpacing !== undefined) assert.equal(parseFloat(vars.get(`--cp-text-${name}-ls`) ?? 'x'), t.letterSpacing, `tokens.css ${name} letter spacing`);
+  }
+  // and the table of the design page is checked against the same file by tools/tests/test_type_scale.py
+  const page = readFileSync(join(root, '..', 'design', 'index.html'), 'utf8');
+  for (const name of names) assert.ok(page.includes(`<div class="spec">${name}<br>${text[name].size} / ${text[name].lineHeight}`), `the type-scale table of the design page has the row ${name} at ${text[name].size} / ${text[name].lineHeight}`);
 });
 
 check('dark mode is the dark section of design/tokens.json: nothing about it is defined a second time in the app', () => {

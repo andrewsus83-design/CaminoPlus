@@ -129,52 +129,133 @@ export function classifyTurn(turnDeg: number): ManeuverKind {
 
 export type ManeuverOptions = { lookM?: number; thresholdDeg?: number; arriveM?: number };
 
+// What counts as a turn worth announcing. The OSM line of a stage has about 300 points and winds, and a bend every 350 to 460 m is not a
+// decision a walker wants to hear about, so only real turns are named, about one in 1 to 2 km on stages 1 and 2:
+//  * a turn is measured over a short window: the change of bearing between the route 30 m before a point and 30 m after it, so a winding
+//    path does not add up. A corner is the largest turn within 30 m of itself, and it must be at least 40 degrees;
+//  * corners that follow each other within 100 m are one maneuver, announced at the first of them with the net turn (the bearing before the
+//    first against the bearing after the last): a bend and its counter-bend cancel, two halves of one turn add up;
+//  * a junction-like change counts more than a gentle curve: the angle is discounted by the share of it that is not within 15 m of the
+//    corner (a curve spreads it out) and by the share that does not last (the heading 15 to 80 m after the corner against 15 to 80 m before:
+//    a wiggle goes back). The discounted angle must also reach 40 degrees. A vertex of 40 degrees and a hairpin pass, a tight smooth bend
+//    of 40 degrees does not;
+//  * a corner behind the walker is never announced again, and neither is a corner merged into one the walker has already passed.
+const ARM_M = 30;
+const SHORT_ARM_M = 15;
+const LEG_NEAR_M = 15;
+const LEG_FAR_M = 80;
+const GRID_M = 5;
+const PEAK_STEPS = 6; // 30 m on the 5 m grid
+const MERGE_M = 100;
+const CHAIN_MAX_M = 1500; // a chain of corners each within 100 m of the next is cut here, whatever the road does
+const TURN_DEG = 40;
+
+/** Signed change of bearing at `m` metres along the line between the route `arm` m before and `arm` m after (+ = right); null where the line is too short on a side to tell. */
+function turnAt(line: LngLat[], m: number, arm: number): number | null {
+  const p = pointAtAlong(line, m).point;
+  const a = pointAtAlong(line, m - arm).point;
+  const b = pointAtAlong(line, m + arm).point;
+  return distanceM(a, p) < arm * 0.6 || distanceM(p, b) < arm * 0.6 ? null : angleDiff(bearingDeg(a, p), bearingDeg(p, b));
+}
+
+// The turn every 5 m along a line, cached per array (like cumulative(): do not mutate a line after use): the next call, a few metres further on, reuses it.
+const gridCache = new WeakMap<LngLat[], Map<number, number | null>>();
+function gridTurn(line: LngLat[], i: number): number | null {
+  let cache = gridCache.get(line);
+  if (!cache) gridCache.set(line, (cache = new Map()));
+  let t = cache.get(i);
+  if (t === undefined) cache.set(i, (t = turnAt(line, i * GRID_M, ARM_M)));
+  return t;
+}
+
+type Corner = { m: number; t: number };
+
+/** The corner whose turn peaks near grid point i, or null: the largest turn within 30 m of itself (the first of equals), at least `thr`, placed to the metre. */
+function cornerAt(line: LngLat[], i: number, thr: number): Corner | null {
+  const t = gridTurn(line, i);
+  if (t == null || Math.abs(t) < thr) return null;
+  for (let j = i - PEAK_STEPS; j <= i + PEAK_STEPS; j++) {
+    const u = j === i || j < 0 ? null : gridTurn(line, j);
+    if (u != null && (Math.abs(u) > Math.abs(t) || (Math.abs(u) === Math.abs(t) && j < i))) return null;
+  }
+  let best: Corner = { m: i * GRID_M, t };
+  for (let d = -GRID_M + 1; d < GRID_M; d++) {
+    const u = d === 0 ? null : turnAt(line, i * GRID_M + d, ARM_M);
+    if (u != null && Math.abs(u) > Math.abs(best.t)) best = { m: i * GRID_M + d, t: u };
+  }
+  return best;
+}
+
+/** The first corner with `from` <= m <= `to` metres along the line, or null. */
+function nextCorner(line: LngLat[], from: number, to: number, thr: number): Corner | null {
+  const last = Math.floor(Math.min(to, lineTotalM(line)) / GRID_M) + 1;
+  for (let i = Math.max(0, Math.floor(from / GRID_M) - 1); i <= last; i++) {
+    const c = cornerAt(line, i, thr);
+    if (c && c.m >= from && c.m <= to) return c;
+  }
+  return null;
+}
+
+/** A corner and the corners that follow it, each within 100 m of the one before (the walker's maneuver, or the part of the route that one covers). */
+function chainFrom(line: LngLat[], first: Corner, limit: number, thr: number): Corner[] {
+  const chain = [first];
+  for (;;) {
+    const last = chain[chain.length - 1];
+    if (last.m - first.m > CHAIN_MAX_M) break;
+    const next = nextCorner(line, last.m + 1e-6, Math.min(last.m + MERGE_M - 1e-6, limit), thr);
+    if (!next) break;
+    chain.push(next);
+  }
+  return chain;
+}
+
+/** The turn of a chain of corners in degrees (+ = right) and the part of it that counts: the net turn, less what is curve and what does not last. */
+function judgeChain(line: LngLat[], chain: Corner[]): { net: number; score: number } {
+  const first = chain[0].m;
+  const last = chain[chain.length - 1].m;
+  const at = (m: number) => pointAtAlong(line, m).point;
+  const net = angleDiff(bearingDeg(at(first - ARM_M), at(first)), bearingDeg(at(last), at(last + ARM_M)));
+  if (Math.abs(net) < 1) return { net, score: 0 };
+  // does the new heading last? The route 15 to 80 m after the chain against 15 to 80 m before it (too short to tell: it counts as lasting)
+  const [b0, b1, a0, a1] = [at(first - LEG_FAR_M), at(first - LEG_NEAR_M), at(last + LEG_NEAR_M), at(last + LEG_FAR_M)];
+  const lasting = distanceM(b0, b1) < 8 || distanceM(a0, a1) < 8 ? 1 : Math.min(1, Math.abs(angleDiff(bearingDeg(b0, b1), bearingDeg(a0, a1))) / Math.abs(net));
+  // is it a corner and not a curve? How much of the turn of the strongest corner is already there within 15 m of it
+  const strongest = chain.reduce((x, y) => (Math.abs(y.t) > Math.abs(x.t) ? y : x));
+  const short = turnAt(line, strongest.m, SHORT_ARM_M);
+  const sharp = short == null ? 1 : Math.min(1, Math.abs(short) / Math.abs(strongest.t));
+  return { net, score: Math.abs(net) * lasting * sharp };
+}
+
 /**
- * The next turn on the route ahead of the walker. At every point along the next `lookM` (400 m), in 5 m steps, the turn is
- * the change of bearing between the 40 m of route before the point and the 40 m after it, so one noisy vertex does not
- * count as a turn and a corner is measured where it is, not where the walker stands. The first point where that change
- * reaches `thresholdDeg` (35) and is still growing is a corner; the corner is the top of that rise.
- * A corner the walker has already passed (the change is shrinking at the walker) is not announced.
- * `endAlongM` is the end of the stage: the scan never looks past it, and reaching it is 'arrive'.
+ * The next turn worth announcing on the route ahead of the walker, within `lookM` (400 m): see the rules above. `distanceM` is the distance
+ * to the place the turn starts (the first corner of a merged turn). A turn behind the walker is never returned, nor one merged into a turn the walker
+ * has passed. `endAlongM` is the end of the stage: a corner within 18 m of it, or beyond it, belongs to the next stage, and reaching it is 'arrive'.
  */
 export function nextManeuver(line: LngLat[], alongM: number, endAlongM = Infinity, o: ManeuverOptions = {}): Maneuver {
   const lookM = o.lookM ?? 400;
-  const threshold = o.thresholdDeg ?? 35;
+  const threshold = o.thresholdDeg ?? TURN_DEG;
   const arriveM = o.arriveM ?? 30;
   const total = lineTotalM(line);
   const end = Math.min(endAlongM, total);
   const remaining = Math.max(0, end - alongM);
   if (line.length < 2 || remaining <= arriveM) return { kind: 'arrive', distanceM: remaining, turnDeg: 0 };
 
-  const ARM = 40;
-  const STEP = 2;
-  const at = (m: number) => pointAtAlong(line, Math.max(0, Math.min(m, end))).point;
-  /** signed change of bearing at distance m along the route (+ = right), null where the route is too short to tell */
-  const turnAt = (m: number): number | null => {
-    const p = at(m);
-    const a = at(m - ARM);
-    const b = at(m + ARM);
-    // Both arms must be long enough to give a direction: not at the very start of the line or within the last metres of the stage.
-    return distanceM(a, p) < ARM * 0.6 || distanceM(p, b) < ARM * 0.6 ? null : angleDiff(bearingDeg(a, p), bearingDeg(p, b));
-  };
-
-  const scan = Math.min(lookM, remaining);
-  let prev = Math.abs(turnAt(alongM - STEP) ?? 0);
-  for (let s = 0; s <= scan; s += STEP) {
-    const t = turnAt(alongM + s);
-    const a = Math.abs(t ?? 0);
-    if (t != null && a >= threshold && a >= prev) {
-      let peak = t;
-      let peakS = s;
-      for (let u = s + STEP; u <= Math.min(remaining, s + 60); u += STEP) {
-        const tu = turnAt(alongM + u);
-        if (tu == null || Math.abs(tu) < Math.abs(peak)) break;
-        peak = tu;
-        peakS = u;
-      }
-      return { kind: classifyTurn(peak), distanceM: peakS, turnDeg: Math.round(peak) };
+  const limit = end - ARM_M * 0.6; // too close to the end of the stage to tell, and the turn after it is the next stage's
+  const startsBy = Math.min(alongM + lookM, limit);
+  let from = alongM;
+  for (;;) {
+    const first = nextCorner(line, from, startsBy, threshold);
+    if (!first) break;
+    const chain = chainFrom(line, first, limit, threshold);
+    const next = chain[chain.length - 1].m + 1e-6;
+    // A corner within 100 m after one that is behind the walker is part of that one's turn, which the walker is already making.
+    if (nextCorner(line, first.m - MERGE_M + 1e-6, first.m - 1e-6, threshold)) {
+      from = next;
+      continue;
     }
-    prev = a;
+    const { net, score } = judgeChain(line, chain);
+    if (score >= threshold) return { kind: classifyTurn(net), distanceM: Math.max(0, first.m - alongM), turnDeg: Math.round(net) };
+    from = next;
   }
   return remaining <= lookM ? { kind: 'arrive', distanceM: remaining, turnDeg: 0 } : { kind: 'straight', distanceM: lookM, turnDeg: 0 };
 }

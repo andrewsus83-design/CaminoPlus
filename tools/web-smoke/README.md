@@ -47,8 +47,9 @@ Then the **scenarios** ([scenarios.mjs](scenarios.mjs)), each in light and dark,
   two Bible rows that were taken out) or kept for a verse that is not in the text are ignored without an error;
 - Bible ([bible.scenarios.mjs](bible.scenarios.mjs), the same walks on the real text): the daily banner is compact (at most 120 high at 390
   wide, 140 at 320) and is one button; the three parts (Old Testament, Deuterocanon, New Testament) are a segmented control under the banner
-  that scrolls with the page, and each shows its books as three square tiles in a row; all 73 book names fit their tile at 320, 390 and 430, the
-  short ones at 22 or more on a phone of 390 and every one at 15 or more from 390 up (the two Thessalonians 14); a Chromium that hints the glyphs (CI's does)
+  that scrolls with the page, and each shows its books as compact tiles, two in a row (173 by 124 on a phone of 390, 140 by 116 on 320), the words 17 from the outline
+  (13 under 352 wide) and the first row clear of the tab bar; all 73 book names fit their tile at 320, 360, 390 and 430, each at a size of the type scale (24, 17 or 15, in Fraunces;
+  the 21 short ones the full 24; 17 or more from 390 up) with the count in JetBrains Mono at 15; a Chromium that hints the glyphs (CI's does)
   lays a name wider than one that does not, so the fit counts every letter rounded up to a pixel (tried with --font-render-hinting set to none, slight, medium and full);
   a tile opens the numbers of the chapters, a number opens the words, and Previous and Next name where they go, cross the books and the
   parts (Malachi 4 to Tobit 1) and are disabled at Genesis 1 and Revelation 22; prose is paragraphs, a psalm is stanzas, and the end of a
@@ -57,19 +58,29 @@ Then the **scenarios** ([scenarios.mjs](scenarios.mjs)), each in light and dark,
   SemiBold, each at least 88 by 68, the reference 17) at 320, 390 and 430 wide, the bar clears the bottom edge, and a verse touched low on a
   short phone (568 high) is brought above the bar; a link to a verse (`?v=105`) opens the chapter with that verse chosen,
   and an address that leads nowhere is a calm "Not found"; the search finds verses after the keystroke (typing is never blocked), marks the
-  match and offers "Go to" for a typed reference; "Continue reading" shows only when something was read, reopens that chapter and is ignored
-  when the place kept no longer exists;
+  match and offers "Go to" for a typed reference (going back to the chapter read last is the Continue reading bar, below);
 - Books ([books.scenarios.mjs](books.scenarios.mjs)): the Books tab is a compact banner and the covers, A5 (148 by 210) in two columns, 16 from the edge and 12 apart (173 by
   245 on a 390 phone, 138 by 196 on 320, 193 by 274 on 430, never wider than the screen), on a shelf for each kind of book (Pilgrim's guides, Readings for the Way) with its
   heading, each ONE button named "title, kind of book, time" with its own ribbon, a 44 by 44 button that bookmarks the book, in the four fonts of the brand (Fraunces,
-  Inter, JetBrains Mono, and at most one handwritten Caveat note on the screen); no cover says Soon or Free; a cover opens the book page (the cover, the title, the subtitle,
+  Inter, JetBrains Mono, and at most one handwritten Caveat note on the screen); a cover prints its title and its time (JetBrains Mono at 15, on one line, 12 clear of the
+  sides) and no kind of book (the label still says it); no cover says Soon or Free; a cover opens the book page (the cover, the title, the subtitle,
   the kind, the facts, THE NOTICE OF ITS KIND above the button, "Start reading", the contents with the minutes of each chapter, the credit) and Back returns to the tab; the
   first and the last book of each kind show the wording of `notices.ts`; the reader opens at chapter 1, Next and Previous (named by where they go, in the bar at the bottom)
   go through the chapters, are off at the first and at the last chapter, the browser's Back goes to the page and not through the chapters, and the Back button of the reader (the round 48 one of every screen, in a row with the two round 48 size buttons, 16 from the edge; there is no "Contents" pill) goes to the contents; the title of the book in the bar is one line of 19 px in Inter SemiBold (the longest titles whole on 390 and 430, cut with an ellipsis on 320, the bar as tall for every book); the reader keeps
-  where you stopped (Continue on the page and "Continue reading" on the tab, the same line, with the time) and the size of the text (five steps), and a damaged place opens
+  where you stopped (Continue on the page and the Continue reading bar above the tab bar, the same line, with the time) and the size of the text (five steps), and a damaged place opens
   the book at its start; a link with `?c=`, a chapter and a book that do not exist (and one of the twelve classics of an earlier plan); the ribbon, Bookmarks and the search
   (title, subtitle, chapters); and the same with no signal. The books are read from `mobile/assets/library/catalog.json` (the bundle of `tools/build_books.py`), so every
-  scenario works with however many there are;
+  scenario works with however many there are; the banner of the tab only ever says "Start reading";
+- Continue reading ([continue.scenarios.mjs](continue.scenarios.mjs)): one bar floats above the tab bar of the Library, on the Bible tab and on the Books tab, and only when
+  something was read: nothing read, no bar and no card in the page. It is 8 above the tab bar (never touching it), 64 high, the tab bar's width, with the X a button of its own,
+  at least 44 by 44, after it; scrolled to the end of the Bible tab the last tile ends above it; it is a hero card (Fraunces for the place, Inter over it, no handwriting, 4.5 : 1
+  for the words and 3 : 1 for the glyphs, in light and in dark); it is not on Me, not on a reader, and it steps aside while the search field has the focus or something is typed.
+  Tapping it opens the reader at the place (a chapter of the Bible, or the book where you stopped); the X hides it, keeps what was hidden on the phone, and it stays hidden
+  after a restart until another place is read (or the same one is saved later). The most recent place wins, the Bible or a book: a book is named by its title and the chapter
+  the reader will open; the book with the longest title of the Library has its title cut with an ellipsis and its chapter never cut, on one line with the X inside the bar, at 390
+  and at 320 wide, and the shortest title is drawn whole at 430. A stored mark that does not read (not JSON, another version, a wrong type, a time that is no time) hides
+  nothing; a place that no longer exists (a chapter past the last, a book that is not in the Library, a damaged store of the books) gives no bar and no error, and never
+  hides the Bible's place;
 - Me ([scenarios.mjs](scenarios.mjs) and [me.scenarios.mjs](me.scenarios.mjs)): the strip is Notes, Journey, Plan, Health, in that order, and Me opens on Journey, with the card of the
   journey and not the card of Notes; at 320 px wide the four labels are one row, each on one line, none clipped;
   - the header: the right half of the top row of Me has the gear and nothing else (no bell, no inbox button, no badge);
@@ -84,9 +95,20 @@ Then the **scenarios** ([scenarios.mjs](scenarios.mjs)), each in light and dark,
     and the card opens `/write`; a pilgrim with no post yet (the account with nothing in it) has the sample journey, whose banner says to tap the first card,
     with the card in front of the ten samples (the last sample is alone on its row);
   - Notes is the first sub-tab: its feed starts, right under the strip, with ONE card, "Write a note" (full width, at least 64 high, "Notes stay on this
-    phone." under its title); there is no filter row (no tab named All, Photos and videos or Places, none of those words, no tab list); the empty diary says
+    phone." under its title); there is no filter row (no tab named All, Photos and videos or Places, none of those words except the All item of the highlights row, no tab list); the empty diary says
     "No notes yet" with no button of its own; Plan and Health have no card; Journey has its own; the card opens `/diary/new`, and a note written there is
     in the feed after Back;
+  - All places ([allplaces.scenarios.mjs](allplaces.scenarios.mjs), on the 33 stages of the Camino Francés and six posts made up in the walk): the highlights row starts with "All" (the
+    shell, pinned at the left, the leftmost button of the row, 72 wide, selected only while its stamps are open), then the destinations of the plan; a tap opens one stamp for every place of
+    the route (33 stages are 34 places), three in a row, each a button of at least 48 named "<place>, N journeys" or "<place>, no journeys yet", a filled one with its number, and the line
+    "3 of 34 places"; a stamp shows exactly the posts at that place with the card that writes a post once, the app's one Back button over it goes back to the stamps (not to all the posts), and
+    All again closes the stamps; a place with no post says "No journeys at <place> yet" over the card alone; from Plan and Health All opens the stamps of Journey, and a destination of the row
+    still shows its posts (the same one again clears it); a plan with no destination still has the All item, alone in the row; an account whose route has no places has no All item;
+- Notes, a page is a draft until it is published: on a blank page Read and Publish are off and there is no Save draft; with words in it Save draft is at the
+  top right and the date says Draft; the marks (Bold, Italic, Heading, Bulleted list, Quote) sit inside the text box, under the text and above the bottom
+  row; Read is a third and Publish two thirds of one row at the bottom (margin to margin, at least 48 high); Read turns into Edit in the same place; Save draft
+  goes back to the feed with a Draft tag on the note; opened again the draft is read, with Edit and Publish; Publish takes the tag away; a published note that
+  is read has Edit alone across the row, and written it has Read and Done and no Save draft;
 - Stays lists the stays of the stage and one opens with its details;
 - logging out from Settings lands on Welcome;
 - launching the app lands on Welcome (signed out), Onboarding (signed in, no journey) or Me;
@@ -94,8 +116,8 @@ Then the **scenarios** ([scenarios.mjs](scenarios.mjs)), each in light and dark,
   and with an expired login (also with nothing saved: "No signal right now") the app does not wait for the network.
 
 The diary screens and the Notes feed (the first sub-tab of Me) belong to their own features: they are swept (they must load without errors),
-and the scenarios only check where the card leads, that Notes is the first sub-tab, that its feed has the one card and no filter tabs, and that a note written there
-shows up, never what those screens contain. The Bible screens are the Bible feature's own, and they run on the real text (Psalm 121, John 1, Psalm 119, Malachi 4, Tobit 1),
+and the scenarios only check where the card leads, that Notes is the first sub-tab, that its feed has the one card and no filter tabs, that a note written there
+shows up, and the draft/publish row of the editor (above), never what the notes themselves contain. The Bible screens are the Bible feature's own, and they run on the real text (Psalm 121, John 1, Psalm 119, Malachi 4, Tobit 1),
 so those walks fail when the text is missing or the import is wrong. The daily reading has scenarios of its own ([daily.scenarios.mjs](daily.scenarios.mjs)),
 which never name a date (the browser's clock is the phone's, and "today" is found as a person finds it, by the day that says "today"):
 
@@ -131,7 +153,7 @@ cd mobile && npm ci && npx expo export --platform web --output-dir ../tools/web-
 cd ../tools/web-smoke && npm ci
 npx playwright install chromium    # once; CI uses --with-deps
 npm test                           # the self-test: the harness against an app built to misbehave (about 25 s)
-npm run smoke                      # about 3 minutes: about 375 checks at the time of writing, 4 pages at a time
+npm run smoke                      # about 3 minutes: 460 checks at the time of writing (npm run smoke -- --list counts them), 4 pages at a time
 ```
 
 `npm run build:app` runs the export command for you. Use the normal (production) export, as CI does: a development export (`--dev`)
@@ -211,8 +233,10 @@ Chromium; a test checks they agree). Bump both on purpose, with the tests looked
 | [plan.mjs](plan.mjs) | which checks exist (route x state x scheme x mode, then the scenarios), the redirect list |
 | [scenarios.mjs](scenarios.mjs) | the walks a person does |
 | [me.scenarios.mjs](me.scenarios.mjs) | the walks of Me: the header with the gear alone, the chat button and where it opens, the card of Journey (also in the sample journey), the card of Notes |
+| [allplaces.scenarios.mjs](allplaces.scenarios.mjs) | the walks of the All item of Me: the row, the stamps of the route, the journeys at a place, the way back, Plan and Health, no destination, no places |
 | [bible.scenarios.mjs](bible.scenarios.mjs) | the walks of the Bible tab and the reader (kept apart so the other walks stay short) |
 | [books.scenarios.mjs](books.scenarios.mjs) | the walks of the Books tab: the covers, a book page, the reader, the place kept on the phone, the notice of each kind |
+| [continue.scenarios.mjs](continue.scenarios.mjs) | the walks of the Continue reading bar above the tab bar of the Library: where it sits, closing it, the most recent place, a mark that does not read |
 | [fixtures.mjs](fixtures.mjs) | the Supabase project, the saved state of the phone, the realtime socket |
 | [collector.mjs](collector.mjs) | what counts as a failure; the console allow-list |
 | [server.mjs](server.mjs) | a static server with single-page-app fallback, on a free port |
