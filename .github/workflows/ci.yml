@@ -253,5 +253,14 @@ jobs:
           python-version: '3.12'
       - name: actionlint (with shellcheck for the run scripts)
         run: |
-          pip install -q actionlint-py==1.7.12.25 shellcheck-py==0.11.0.1
+          # actionlint-py fetches the actionlint binary from GitHub while pip installs it; one failed download turned main red with nothing wrong in a workflow.
+          for attempt in 1 2 3; do
+            pip install -q actionlint-py==1.7.12.25 shellcheck-py==0.11.0.1 && break
+            if [ "$attempt" = 3 ]; then
+              echo "::error::pip could not install actionlint in 3 attempts"
+              exit 1
+            fi
+            echo "::warning::pip install attempt $attempt failed, trying again"
+            sleep $((attempt * 10))
+          done
           actionlint

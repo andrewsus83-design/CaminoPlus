@@ -1,6 +1,6 @@
 # Guidebook spec (`kind: guide`)
 
-One book per Camino route in the app's catalog. **9,000 to 12,000 words, never more than 12,000.** Chapters of 400 to 1,800
+One book per Camino route in the app's catalog. **Aim for 9,000 to 12,000 words; the checker warns below 7,000 and fails above 12,000.** Chapters of 400 to 1,800
 words, so that each is a comfortable read on a phone and a sensible unit in the app.
 
 ## What the reader needs

@@ -1,11 +1,11 @@
-# The CaminoPlus Library: 20 books
+# The CaminoPlus Library: 26 books
 
-Twenty books written for the app's **Library** and for sale as EPUB and PDF (neither is done yet: see "In the app" below): **eight route guidebooks** and **twelve reflection books**, each reflection book
+Twenty-six books written for the app's **Library** and for sale as EPUB and PDF (neither is done yet: see "In the app" below): **fourteen route guidebooks** (one for each route of the app's catalog) and **twelve reflection books**, each reflection book
 made from a famous book in the public domain and paired with one Camino. Written with the [`book-writer`](../.claude/skills/book-writer/SKILL.md) skill, built and
 packaged with the [`book-publisher`](../.claude/skills/book-publisher/SKILL.md) skill. Where the classics come from: [`sources/SOURCES.md`](sources/SOURCES.md).
 
 The same plan exists in machine-readable form in [`plan.json`](plan.json): `python3 tools/check_series.py` fails when a planned book is missing, an unplanned book appears, or a book disagrees with the plan.
-Six catalog routes (Aragonés, Salvador, Sanabrés, Madrid, Baztanes, Lisbon) have no guide yet; the plan lists them on purpose, and a second batch is writing them.
+Every one of the 14 catalog routes has a guide, and `routes_without_guide` in the plan is empty. The guides were written in two batches (books 1 to 8, then 9 to 14); `check_series.py` and the checker's rules for the two standard sentences (the welcome and the Compostela rule) are what keep the batches the same book.
 
 ## The guidebooks (up to 12,000 words each)
 
@@ -23,9 +23,16 @@ every fact in the book's fact ledger (`facts.md`).
 | 6 | `camino-ingles-guide` | The English Way | Camino Inglés, Ferrol to Santiago, ~120 km (`camino-ingles`) | 6 stages, **no cited distances** |
 | 7 | `camino-finisterre-muxia-guide` | To the End of the Earth | Santiago to Finisterre and Muxía, ~90 km (`camino-finisterre-muxia`) | route row only |
 | 8 | `camino-de-invierno-guide` | The Winter Way | Camino de Invierno, Ponferrada to Santiago, ~260 km (`camino-de-invierno`) | route row only |
+| 9 | `camino-aragones-guide` | The Aragonese Way | Camino Aragonés, Somport to Puente la Reina, ~160 km (`camino-aragones`) | route row only |
+| 10 | `camino-del-salvador-guide` | The Way of the Saviour | Camino del Salvador, León to Oviedo, ~120 km (`camino-del-salvador`) | route row only |
+| 11 | `camino-sanabres-guide` | The Sanabrian Way | Camino Sanabrés, Granja de Moreruela to Santiago, no length in the catalog (`camino-sanabres`) | route row only |
+| 12 | `camino-de-madrid-guide` | The Road from Madrid | Camino de Madrid, Madrid to Sahagún, ~320 km (`camino-de-madrid`) | route row only |
+| 13 | `camino-baztanes-guide` | The Baztán Way | Camino Baztanes, Bayonne to Pamplona, no length in the catalog (`camino-baztanes`) | route row only |
+| 14 | `camino-portugues-lisboa-guide` | The Long Portuguese Way | Camino Portugués from Lisbon, Lisbon to Santiago, ~620 km (`camino-portugues-lisboa`) | route row only |
 
-Why these eight: they are the best known and most walked of the 14 routes, from the Atlantic coast to the mountains. Six routes have no guide yet
-(Aragonés, Salvador, Sanabrés, Madrid, Baztanes, Lisbon): a second series.
+Why these eight first: they are the best known and most walked of the 14 routes, from the Atlantic coast to the mountains. Books 9 to 14 are the second batch and complete the catalog.
+Four of them describe a road that ends where it joins another (the Aragonés at Puente la Reina, the Salvador at Oviedo, the Madrid at Sahagún, the Baztanes at Arre, just before Pamplona): each says so, says what the
+Pilgrim's Office's pages do and do not say about it, and points to the guide of the road it joins. The Sanabrés and the Lisbon guide say where the road meets others and how far Santiago is from there.
 
 ## The reflection books: twelve famous books, each for a Camino
 
@@ -36,18 +43,18 @@ recommendation (`route_slug` in `book.json`, one line to change), chosen for the
 
 | # | Book id | Title | The famous book | Days | For the Camino | Why this pairing |
 |---|---|---|---|---|---|---|
-| 9 | `imitation-of-christ-readings` | The Quiet Road | *The Imitation of Christ*, Thomas à Kempis | 21 | Francés (`camino-frances`) | The great road and the great devotional classic; three weeks |
-| 10 | `confessions-readings` | The Restless Heart | *The Confessions*, Augustine of Hippo | 13 | Primitivo (`camino-primitivo`) | The hard mountain road; one day for each of the 13 books |
-| 11 | `pilgrims-progress-readings` | The Slough and the City | *The Pilgrim's Progress*, John Bunyan | 12 | Portugués Central (`camino-portugues`) | A road from Porto to Santiago, and the story of a pilgrim |
-| 12 | `purgatory-readings` | The Mountain of the Heart | *Purgatory* (*The Divine Comedy*), Dante, tr. Longfellow | 14 | Norte (`camino-del-norte`) | A long road of sea and hills; a climb in terraces |
-| 13 | `presence-of-god-readings` | Present at Every Step | *The Practice of the Presence of God*, Brother Lawrence | 6 | Inglés (`camino-ingles`) | A short, simple book for a short road of six stages |
-| 14 | `songs-of-ascents-readings` | Songs for the Climb | The Psalms of Ascent (Psalms 120 to 134) | 8 | Aragonés (`camino-aragones`) | The pilgrim psalms for the road that climbs over the Pyrenees: 15 psalms in 8 days |
-| 15 | `revelations-readings` | All Shall Be Well | *Revelations of Divine Love*, Julian of Norwich | 8 | Invierno (`camino-de-invierno`) | Quiet and consoling, for the quiet winter road |
-| 16 | `teresa-life-readings` | The Road to Ávila | *The Life of St. Teresa of Jesus*, Teresa of Ávila | 10 | Madrid (`camino-de-madrid`) | Spain's own saint, for the road across Spain's heartland |
-| 17 | `ignatius-pilgrim-readings` | The Pilgrim's Tale | *The Autobiography of St. Ignatius*, Ignatius of Loyola | 7 | Baztanes (`camino-baztanes`) | A conversion that began wounded at Pamplona, where this road ends |
-| 18 | `walking-readings` | Toward the Sunset | *Walking*, Henry David Thoreau | 5 | Finisterre and Muxía (`camino-finisterre-muxia`) | An essay about walking west, for the road to the end of the earth. Not a Christian book: it speaks in its own voice |
-| 19 | `francis-readings` | The Poor Man of the Road | *St. Francis of Assisi*, G. K. Chesterton | 9 | Portugués Costero (`camino-portugues-costero`) | Creation, joy and poverty, for the road beside the sea |
-| 20 | `pascal-readings` | The Silence of the Heart | *The Thoughts of Blaise Pascal* | 10 | Sanabrés (`camino-sanabres`) | A quiet inland road, and the book of a restless mind in silence |
+| 15 | `imitation-of-christ-readings` | The Quiet Road | *The Imitation of Christ*, Thomas à Kempis | 21 | Francés (`camino-frances`) | The great road and the great devotional classic; three weeks |
+| 16 | `confessions-readings` | The Restless Heart | *The Confessions*, Augustine of Hippo | 13 | Primitivo (`camino-primitivo`) | The hard mountain road; one day for each of the 13 books |
+| 17 | `pilgrims-progress-readings` | The Slough and the City | *The Pilgrim's Progress*, John Bunyan | 12 | Portugués Central (`camino-portugues`) | A road from Porto to Santiago, and the story of a pilgrim |
+| 18 | `purgatory-readings` | The Mountain of the Heart | *Purgatory* (*The Divine Comedy*), Dante, tr. Longfellow | 14 | Norte (`camino-del-norte`) | A long road of sea and hills; a climb in terraces |
+| 19 | `presence-of-god-readings` | Present at Every Step | *The Practice of the Presence of God*, Brother Lawrence | 6 | Inglés (`camino-ingles`) | A short, simple book for a short road of six stages |
+| 20 | `songs-of-ascents-readings` | Songs for the Climb | The Psalms of Ascent (Psalms 120 to 134) | 8 | Aragonés (`camino-aragones`) | The pilgrim psalms for the road that climbs over the Pyrenees: 15 psalms in 8 days |
+| 21 | `revelations-readings` | All Shall Be Well | *Revelations of Divine Love*, Julian of Norwich | 8 | Invierno (`camino-de-invierno`) | Quiet and consoling, for the quiet winter road |
+| 22 | `teresa-life-readings` | The Road to Ávila | *The Life of St. Teresa of Jesus*, Teresa of Ávila | 10 | Madrid (`camino-de-madrid`) | Spain's own saint, for the road across Spain's heartland |
+| 23 | `ignatius-pilgrim-readings` | The Pilgrim's Tale | *The Autobiography of St. Ignatius*, Ignatius of Loyola | 7 | Baztanes (`camino-baztanes`) | A conversion that began wounded at Pamplona, where this road ends |
+| 24 | `walking-readings` | Toward the Sunset | *Walking*, Henry David Thoreau | 5 | Finisterre and Muxía (`camino-finisterre-muxia`) | An essay about walking west, for the road to the end of the earth. Not a Christian book: it speaks in its own voice |
+| 25 | `francis-readings` | The Poor Man of the Road | *St. Francis of Assisi*, G. K. Chesterton | 9 | Portugués Costero (`camino-portugues-costero`) | Creation, joy and poverty, for the road beside the sea |
+| 26 | `pascal-readings` | The Silence of the Heart | *The Thoughts of Blaise Pascal* | 10 | Sanabrés (`camino-sanabres`) | A quiet inland road, and the book of a restless mind in silence |
 
 All twelve are free to publish: every edition was opened and its translator, editor and licence read before it was chosen
 ([`sources/SOURCES.md`](sources/SOURCES.md)). Two routes (Salvador, about three days, and Lisbon) have no reflection companion yet.
@@ -72,7 +79,7 @@ Notes tab) join the owner's Library is a decision for the owner. The design is i
 
 ## What is decided and what is yours to decide
 
-Decided here (and easy to change): the choice and order of the 20 books, the days and the Camino of each reflection book, the length targets, British spelling, the covers (navy for
+Decided here (and easy to change): the choice and order of the 26 books, the days and the Camino of each reflection book, the length targets, British spelling, the covers (navy for
 guides, parchment for reflection books), the format of a day.
 
 Yours to decide (the build leaves these open on purpose): who holds the rights to the original text and how it is licensed; the wording of the AI disclosure (it says today only that the books
@@ -83,12 +90,27 @@ app's Library is a product decision too (see "In the app: not yet").
 
 | | Written | Strict checker | EPUB, PDF, cover, store data | In the app |
 |---|---|---|---|---|
-| 8 route guidebooks | yes | passes, no warnings | built, structure checked | not yet |
+| 14 route guidebooks | yes | passes, no warnings | built, structure checked | not yet |
 | 12 reflection books | yes | passes, no warnings (every passage verified word for word) | built, structure checked | not yet |
 
-The checker prints the real numbers for each book (`python3 tools/check_books.py --strict --sources <folder>`). Together the books are about 311,000 words; the longest reflection book reads in about 2 h 29 min
-(the ceiling is 3 hours) and the longest guide has 11,648 words (the cap is 12,000).
+The checker prints the real numbers for each book (`python3 tools/check_books.py --strict --sources <folder>`). Together the books are about 373,000 words (the guides about 150,000, the reflection books about 224,000); the longest
+reflection book reads in about 2 h 29 min (the ceiling is 3 hours) and the longest guide has 11,658 words (the cap is 12,000).
 
-**What "passes" does and does not mean.** The checker verifies structure, length, the rules of the skills, and that every quoted passage is in its public-domain source. It cannot verify a fact. The facts of each guide are
-in its `facts.md` ledger with a named source, but **no person has reviewed them yet**, and the writers list in their reports the claims that rest on a single or a secondary source. The EPUBs have been checked for structure
-(zip, XML, manifest) but **not with the official EPUBCheck validator**. Nothing has been uploaded, priced or published.
+**What "passes" does and does not mean.** The checker verifies structure, length, the rules of the skills (among them the two standard sentences of a guide, word for word), and that every quoted passage is in its public-domain
+source. It cannot verify a fact. The facts of each guide are in its `facts.md` ledger with a named source, but **no person has reviewed them yet**, and the writers list in their reports the claims that rest on a single or a
+secondary source. The EPUBs have been checked for structure (zip, XML, manifest) but **not with the official EPUBCheck validator**. Nothing has been uploaded, priced or published.
+
+## For whoever checks the facts
+
+What the writers of the second batch (books 9 to 14) could not confirm, so that a person looks at it first. Each item is also in the book's ledger.
+
+- **All six**: the Pilgrim's Office's pages name no routes, so none of these guides says that its road counts for the Compostela; each says what the Office says and tells the reader to ask. Several pages (Wikipedia, some regional
+  boards) could be read only through a fetch tool's summary, and the ledgers mark those rows.
+- **Aragonés**: where the road joins the Francés (Puente la Reina, or Obanos, about 3 km before: the sources differ and the book gives both). Day lengths and "only place to eat" notes rest on one non-official stage guide of 2015 to 2017.
+- **Salvador**: the walkers' high point (~1,568 m) is not the road pass (~1,378 m); the association's safety statements about the road over the pass are its own and attributed. Its pages disagree on some distances.
+- **Sanabrés**: the Zamora stages rest on two sources of 2010 and 2011; the Xunta's first stage and the Junta's differ by ~3 km; the book never says a start "works" for the Compostela.
+- **Madrid**: the crossing of the Sierra is the Puerto de la Fuenfría, not Navacerrada (the app's route note says Navacerrada: see `mobile/src/data/routeGuide.ts`, not changed here). The main association's guide is from 2014.
+- **Baztanes**: the junction is the bridge of Arre, about 5 km before the centre of Pamplona. The stage descriptions are from one tourism site and a consumer website that follows it.
+- **Lisbon**: the first week (Lisbon to Tomar) rests on two commercial stage tables and a 2013 sheet; Golegã to Tomar is ~31 km in two sources and ~22 km in the older one.
+- **A fix made in the first batch while this one was audited**: the line "a passport in any app is a keepsake" appeared in seven guides, but the Office describes a digital credential of its own. It now says "in CaminoPlus, or in any app
+  other than the Office's own digital credential", and the checker refuses the old wording.

@@ -1,0 +1,26 @@
+{
+  "id": "camino-sanabres-guide",
+  "kind": "guide",
+  "order": 11,
+  "title": "The Sanabrian Way",
+  "subtitle": "A Pilgrim's Guide to the Camino Sanabrés",
+  "route_slug": "camino-sanabres",
+  "description_short": "An honest guide to the quiet Camino Sanabrés: sixteen walking days from Granja de Moreruela over the Sanabria mountains and through Ourense to Santiago, with the sources and what to check.",
+  "description_long": "The Camino Sanabrés leaves the Vía de la Plata at Granja de Moreruela, in the province of Zamora, and goes about ~370 km to the cathedral of Santiago de Compostela by another road: along the valley of the Tera, up through the Sanabria mountains to Puebla de Sanabria and the Padornelo pass, over the border into Galicia above A Gudiña, down to the thermal city of Ourense, and on by the Deza country to the Sar valley and the old gate of Mazarelos.\n\nThis guide is written for the Planner first and the Walker's evenings second. The road is quiet, with few services in places, and some of its days are 30 km or more. The book is plain about that, and about what the sources say and do not say: the Xunta de Galicia calls the road the Vía de la Plata and never uses the name Sanabrés, the Junta de Castilla y León says it was not a pilgrim road at first, and where the official pages, the provincial tourism board and the Confraternity of St James disagree on a length, it says so.\n\nYou will find the walk in sixteen days, by region: the Zamora plain and the valley of the Tera, the Sanabria mountains, Galicia from the pass to Ourense, and Ourense to Santiago; a chapter on the long days and the points where they can be split; chapters on when to go, on sleeping, eating and resting, on body, weather and safety, on the inner side of walking, and on arriving in Santiago and going home. It states the Pilgrim's Office rules for the Compostela as the Office writes them.\n\nEvery distance is marked approximate. The book names no hostels, cafes or prices, because they change; it sends you to the CaminoPlus app and to local information for the live answer. Its facts come from named public sources, which the book credits.",
+  "keywords": [
+    "Camino Sanabrés",
+    "Sanabrian Way",
+    "Camino de Santiago",
+    "Granja de Moreruela to Santiago",
+    "Vía de la Plata",
+    "pilgrim guidebook",
+    "Compostela"
+  ],
+  "categories": [
+    "Travel / Special Interest / Pilgrimages",
+    "Travel / Europe / Spain"
+  ],
+  "cover": { "colour": "red100", "icon": "library" },
+  "version": "1.0.0",
+  "date": "2026-11"
+}

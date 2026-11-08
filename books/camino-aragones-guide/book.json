@@ -1,0 +1,26 @@
+{
+  "id": "camino-aragones-guide",
+  "kind": "guide",
+  "order": 9,
+  "title": "The Aragonese Way",
+  "subtitle": "A Pilgrim's Guide to the Camino Aragonés",
+  "route_slug": "camino-aragones",
+  "description_short": "A calm, honest guide to the Camino Aragonés: six walking days from the Somport pass in the Pyrenees to Puente la Reina, where it joins the French Way. When to go, what to carry, how it ends.",
+  "description_long": "The Camino Aragonés is a quiet road. It runs about 160 km from the Somport pass on the French border, down the valley of the River Aragón to Jaca, across the open Canal de Berdún beside the Yesa reservoir and over the hills of Navarre, to the place where it meets the Camino Francés at Puente la Reina. It is the Spanish end of the old Via Tolosana, the road from Arles, and the Aragonese government's own pages call it the Camino Francés as it passes through Aragon.\n\nThis guide is written for the Planner first and the Walker's evenings second. It helps you decide whether a short, quiet road from mountain to farmland is your Camino, shape it into six or seven walking days, pack, and know what to check locally: snow at the pass, shade, water and food between villages, and the line of the path near the reservoir.\n\nYou will find the road day by day from Somport to Puente la Reina, with its Romanesque churches and monasteries, its abandoned villages and its long views; the other ways to cut it and the detours that deserve a day; chapters on when to go, on sleeping, eating and resting, on body, weather and safety, and on the inner side of walking; and an honest chapter on arriving. It says exactly what the Pilgrim's Office says about the Compostela, and that the walk from Somport to Puente la Reina is far from the last hundred kilometres: the Camino goes on along the French Way.\n\nEvery distance is marked approximate, and the book says where sources differ. It names no hostels, cafes or prices, because they change; it sends you to the CaminoPlus app and to local information for the live answer. Its facts come from named public sources, which the book credits.",
+  "keywords": [
+    "Camino Aragonés",
+    "Aragonese Way",
+    "Somport to Puente la Reina",
+    "Camino de Santiago",
+    "Via Tolosana",
+    "pilgrim guidebook",
+    "Pyrenees walking"
+  ],
+  "categories": [
+    "Travel / Special Interest / Pilgrimages",
+    "Travel / Europe / Spain"
+  ],
+  "cover": { "colour": "goldWash", "icon": "library" },
+  "version": "1.0.0",
+  "date": "2026-11"
+}

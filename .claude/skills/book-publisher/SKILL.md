@@ -107,5 +107,5 @@ The bundle is built so an app can attach a pilgrim's own writing to the books. T
 - `tools/book_kit.py`: the Markdown subset parser and the word and reading-time rules (220 words a minute).
 - `tools/check_books.py`: the quality gate. `tools/build_books.py`: the build. `tools/render_books.mjs`: the browser step.
 - `tools/tests/test_books.py`: the tests (`python3 -m unittest discover -s tools/tests -v`).
-- `books/series.json`: shared publisher facts. `books/series.md`: the plan for the 20 books. `books/sources/SOURCES.md`: where the
+- `books/series.json`: shared publisher facts. `books/series.md`: the plan for the 26 books. `books/sources/SOURCES.md`: where the
   classics come from.
