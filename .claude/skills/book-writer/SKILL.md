@@ -35,6 +35,7 @@ you do not know. That is also the best service to the person who will walk with 
 books/
   series.json               shared publisher facts (publisher, rights, AI disclosure)
   series.md                 the plan: all 20 books, order, days, Camino pairing, sources
+  shared-facts.md           facts several guides repeat (the Compostela rule), verified once; state them as this file does
   <book-id>/
     book.json               metadata (schema below)
     chapters/

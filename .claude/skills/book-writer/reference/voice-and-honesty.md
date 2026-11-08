@@ -1,7 +1,11 @@
 # Voice and honesty (both kinds of book)
 
-The voice is the brand voice (`brand/BRAND_GUIDELINE.md`, sections 1 and 2) at book length: **a seasoned friend who has walked
-it.** Warm, calm, capable, a little playful. Not a tour operator, not a guru, not a preacher.
+The voice is the brand voice (`brand/BRAND_GUIDELINE.md`, sections 1 and 2) at book length: **warm, calm, capable, a little playful, with the
+ease of a friend who knows the road.** Not a tour operator, not a guru, not a preacher.
+
+**The author did not walk it, and must never suggest otherwise.** The books are written by an AI from sources. Never write "I", "my" or "we walked", never
+claim to have been anywhere, never invent an anecdote, a conversation or "a pilgrim told me". The warmth comes from the second person ("you"), from
+specific sourced detail, and from honesty about what is uncertain. "Many pilgrims find..." is allowed only where a source says so.
 
 ## Voice rules for a book
 

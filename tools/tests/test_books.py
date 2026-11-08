@@ -140,6 +140,18 @@ class Guide(unittest.TestCase):
         self.assertIn("00-a.md: a web address outside the sources chapter", text)
         self.assertNotIn("01-sources", text)
 
+    def test_the_ledger_counts_facts_not_headers_and_notices_unchecked_ones(self):
+        two = ("| Fact | Value | Source | Checked |\n|---|---|---|---|\n" + "\n".join(f"| a{i} | v | s | yes |" for i in range(8)) + "\n\n"
+               "| Fact | Value | Source | Checked |\n|---|---|---|---|\n" + "\n".join(f"| b{i} | v | s | computed |" for i in range(7)) + "\n")
+        rep = self.check({"00-a.md": "# A\n\nx\n"}, facts=two)       # 15 facts in two tables, 17 table lines
+        self.assertNotIn("rows;", "\n".join(rep.warnings))
+        short = two.replace("| b6 | v | s | computed |\n", "")        # 14 facts: one short, though 16 lines would pass the old count
+        self.assertIn("only 14 rows", "\n".join(self.check({"00-a.md": "# A\n\nx\n"}, facts=short).warnings))
+        bad = two.replace("| a0 | v | s | yes |", "| a0 | v | s | no |").replace("| a1 | v | s | yes |", "| a1 | v | s |  |")
+        self.assertIn("2 row(s) are not marked checked", "\n".join(self.check({"00-a.md": "# A\n\nx\n"}, facts=bad).warnings))
+        removed = two.replace("| a0 | v | s | yes |", "| a0 | v | s | removed |")
+        self.assertNotIn("not marked checked", "\n".join(self.check({"00-a.md": "# A\n\nx\n"}, facts=removed).warnings))
+
     def test_metadata_is_checked(self):
         rep = self.check({"00-a.md": "# A\n\nx\n"}, meta=guide_meta(id="demo-guide", description_short="x" * 201, keywords=["k"] * 8,
                                                                      cover={"colour": "pink", "icon": "library"}))

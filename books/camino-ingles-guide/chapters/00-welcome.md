@@ -8,7 +8,7 @@ The English Way is the short Camino. Six walking days take you from the old nava
 
 If you are a month or more away, read the next four chapters in order: the Way in brief, whether it suits you, when to go, and what to do before you go. Then read the days, and the chapter on the A Coruña start, which explains a choice many people puzzle over.
 
-If you are on the road tonight, go straight to your stage. Each day says what the walking is like, what is worth a pause, and the one thing to be careful about.
+If you are on the road tonight, go straight to your stage. Each day says what the walking is like, what is worth a pause, and where to take care.
 
 If you are only dreaming, start with "Is this Camino for you?" and finish with "The inner Way". You can decide the rest later.
 

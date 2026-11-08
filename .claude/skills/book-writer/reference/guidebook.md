@@ -19,7 +19,7 @@ reader to the app for beds, cafes, closures and weather.
 | 02 | Is this Camino for you? | 500 to 800 | Difficulty, who it suits, who should choose another, how it compares with its neighbours in general terms. |
 | 03 | When to go | 500 to 800 | Seasons, weather patterns, daylight, crowds, heat, snow, what a month feels like. No forecasts, only patterns. |
 | 04 | Before you go | 1,000 to 1,500 | Credencial, getting there and back, training, packing, shoes and feet, money in general terms, language. |
-| 05 to NN | The stages | 4,500 to 6,000 together | The route in sections, see below. |
+| 05 to NN | The stages | 3,000 to 6,000 together: about 500 to 1,000 words a walking day. A short route spends the rest of the budget on the chapters around the stages (variants, ways to split the days, the Compostela rule), not on padding | The route in sections, see below. |
 | NN+1 | Sleeping, eating, resting | 700 to 1,000 | Albergue life and etiquette, hospitaleros, the pilgrim menu, rest days, sharing a room, noise, bedbugs. |
 | NN+2 | Body, weather and safety | 500 to 800 | Feet, heat, cold, rain, road and path safety, when to stop, 112. |
 | NN+3 | The inner Way | 400 to 700 | Why people walk, what the Way does to them, questions for the walk. For every reason to walk. |
@@ -50,6 +50,8 @@ The app's catalog is the source of truth for names and the order of towns. Do no
 public source, write `~`.
 
 - Catalog and route list: `supabase/migrations/20261106120000_more_caminos.sql` (route names, countries, start and end, `distance_km`).
+- **Cited distances and place notes per stage**: `tools/offline-maps/catalog/<route>/NN.json` (Francés, Portugués, Inglés). Each stage holds several named
+  sources for its distance and short notes on its places. It is the best ground truth for distances: read it before you search the web.
 - Camino Francés, 33 stages: `supabase/migrations/20261112000000_camino_frances_stages.sql` and `tools/offline-maps/stages/camino-frances-NN.json` (stage names, "A to B").
 - Camino Portugués Central, 11 to 12 stages: `supabase/migrations/20261113000000_camino_portugues_stages.sql`, `tools/offline-maps/stages/camino-portugues-NN.json`.
 - Camino Inglés, 6 stages: `supabase/migrations/20261113010000_camino_ingles_stages.sql`, `tools/offline-maps/stages/camino-ingles-NN.json`.
@@ -58,8 +60,8 @@ public source, write `~`.
 - Other routes (Norte, Primitivo, Costero, Finisterre and Muxía, Invierno, and so on): the catalog gives start, end and an overall
   distance only. For the stage towns, use the long-established traditional stage towns, say stage lengths vary, and ledger the source.
 
-If a stage of the app has a slug (`camino-frances-07`), you may add a closing line "In the app: stage 7". Nothing more specific
-about the app's contents.
+Add an "In the app: stage 7" line **only if that stage is published**: some stages are hidden (`is_published = false` in the migration, as the Camino Inglés
+stages are today), and then the pointer would be false. Read the comment of the migration. Nothing more specific about the app's contents.
 
 ## Required in every guide
 
@@ -68,6 +70,18 @@ about the app's contents.
 - A "check before you go" line for anything seasonal: closures, diversions, river levels, snow, fires, heat.
 - A short **Sources and thanks** section naming the public sources used (no URLs to businesses).
 - No table, no image, no emoji, no price, no phone number, no business name, no coordinates, no opening hour.
+
+## Numbers, rules and sources
+
+- **Exact rule figures are words, estimates are `~`.** Write a rule as the authority writes it: "the last hundred kilometres on foot", "seventy kilometres in Spain". Write an
+  estimate with a tilde on every number: "~20 to ~25 km", never "20 to 25 km". The checker warns on a bare "25 km".
+- **The Compostela rule is stated in one way in all eight guides**, as `books/shared-facts.md` has it (verified against the Pilgrim's Office). Never say that a start "works"
+  if it is near the limit: say what the Office says and send the reader to the Office.
+- **No list of which towns have a hostel, a cafe or a shop**, even without names: it changes. How hostels work is general and fine; where they are belongs to the app.
+- **Reaching sources.** WebFetch can fail on a site (503) that `curl -sL -A "Mozilla/5.0"` reads; Wikipedia's API rate-limits after a few quick calls (space the requests);
+  some official pages are rendered by script and show nothing to a plain fetch (then say the figure came from a secondary source, and name it). A fact from a single
+  source that is not official is attributed in the text ("Wikipedia says...").
+- **Say when the sources disagree.** Official pages often disagree with each other by a kilometre or two. Say so once per stage in a plain sentence, as a good guide does.
 
 ## Fact ledger format (`facts.md`, not published)
 

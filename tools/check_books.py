@@ -247,9 +247,15 @@ def _guide(book: bk.Book, rep: Report) -> None:
     if not facts.is_file():
         rep.error("facts.md: a guide needs its fact ledger (see reference/guidebook.md)")
     else:
-        rows = [ln for ln in facts.read_text(encoding="utf-8").splitlines() if ln.startswith("|") and not re.match(r"^\|\s*-", ln)]
-        if len(rows) - 1 < 15:
-            rep.warn(f"facts.md: only {max(len(rows) - 1, 0)} rows; a guide of this size states more facts than that")
+        lines = facts.read_text(encoding="utf-8").splitlines()
+        sep = re.compile(r"^\|\s*:?-")
+        rows = [ln for i, ln in enumerate(lines)
+                if ln.startswith("|") and not sep.match(ln) and not (i + 1 < len(lines) and sep.match(lines[i + 1]))]   # not separators, not each table's header
+        if len(rows) < 15:
+            rep.warn(f"facts.md: only {len(rows)} rows; a guide of this size states more facts than that")
+        unchecked = [ln for ln in rows if ln.strip().strip("|").split("|")[-1].strip().lower() in ("", "no", "unchecked")]
+        if unchecked:
+            rep.warn(f"facts.md: {len(unchecked)} row(s) are not marked checked (the last column): check the fact or take it out of the book")
     km_hits: list[str] = []
     for ch in book.chapters:
         in_sources = bool(SOURCES_CHAPTER.search(ch.title))

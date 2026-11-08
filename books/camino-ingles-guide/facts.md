@@ -22,7 +22,7 @@ Source short names (full addresses are given in each row):
 | Sum of the six CIG stage figures | 15.4 + 12.9 + 19.9 + 24.1 + 24.2 + 16.5 = 113.0 km | CIG stage pages (rows below) | yes (sum computed) |
 | Another figure for the same route: ~119 km | "approximate distance of 119 kilometres" | CIG, https://www.caminoingles.gal/en/compostela-camino-ingles | yes |
 | Another figure: ~110 km | 110 km (Wikipedia, citing the Confraternity of St James, 2018) | WP, https://en.wikipedia.org/wiki/English_Way | yes |
-| Ferrol to Neda | 15.4 km (CIG); Xunta stage 15.4 km; federation dossier 15.47 km; difficulty Low; estimate 4 h (CIG), 3 h (Xunta stage page) | CIG https://www.caminoingles.gal/en/etapa-ferrol-neda/ ; XUNTA https://www.caminodesantiago.gal/en/make-plans/the-ways/english-way/stage-ferrol-neda ; other sources as given in tools/offline-maps/catalog/camino-ingles/01.json (notes) | yes |
+| Ferrol to Neda | 15.4 km (CIG); Xunta stage 15.4 km (its body text says 14 km; read through a search summary of the Xunta page, not the page itself); federation dossier 15.47 km; difficulty Low; estimate 4 h (CIG), 3 h (Xunta stage page, same caveat) | CIG https://www.caminoingles.gal/en/etapa-ferrol-neda/ ; XUNTA https://www.caminodesantiago.gal/en/make-plans/the-ways/english-way/stage-ferrol-neda ; other sources as given in tools/offline-maps/catalog/camino-ingles/01.json (notes) | yes |
 | Neda to Pontedeume | 12.9 km (CIG); federation dossier 13.21 km; difficulty Low; estimate 4 h. CIG's page Ferrol to Neda says "16 km more to Pontedeume" (its own figures differ) | CIG https://www.caminoingles.gal/en/etapa-neda-pontedeume/ ; tools/offline-maps/catalog/camino-ingles/02.json (notes) | yes |
 | Xunta's Neda to Miño stage | 22.1 km, Medium, 5 h 35 min; Neda-Fene 3.6, Fene-Cabanas 7.4 (Cabanas-Pontedeume 1.9 and Pontedeume-Miño 9.2 from the catalog notes) | XUNTA https://www.caminodesantiago.gal/en/make-plans/the-ways/english-way/stage-neda-mino ; tools/offline-maps/catalog/camino-ingles/02.json | yes |
 | Pontedeume to Betanzos | 19.9 km (CIG, federation 19.93); difficulty Medium; estimate 6 h | CIG https://www.caminoingles.gal/en/etapa-pontedeume-betanzos/ ; catalog 03.json | yes |
@@ -35,7 +35,7 @@ Source short names (full addresses are given in each row):
 | Route starts at sea level and climbs inland without exceeding 500 metres; main thing to prepare for is rain | ~500 m | CIG https://www.caminoingles.gal/en/como-planificar-o-camino-ingles/ | yes |
 | Official leaflet splits the long days into nine sections: Pontedeume-Miño ~9.75 and Miño-Betanzos ~10.2; Betanzos-Presedo ~12.0 and Presedo-Bruma ~11.5; Bruma-Poulo ~9.9 and Poulo-Sigüeiro ~15.2 | km as stated, rounded | "De Ferrol a Santiago" leaflet (PDF on caminoingles.gal, 2021), as recorded in tools/offline-maps/catalog/camino-ingles/03.json, 04.json, 05.json (notes) | yes (repo; leaflet itself not re-read) |
 | Xunta's own five stages include Miño to Bruma at 34.7 km | ~35 km | tools/offline-maps/catalog/camino-ingles/01.json (notes: Xunta portal figures read 2026-11-07) | yes (repo; Xunta stage page not re-read) |
-| Public hostels listed by the official site (read November 2026): Ferrol, Neda, Pontedeume, Betanzos, Bruma (Mesía), Abegondo, Poulo (Ordes), Sergude (Carral) | towns only; no hostel named in the book | CIG https://www.caminoingles.gal/en/ and https://www.caminoingles.gal/en/como-planificar-o-camino-ingles/ | yes |
+| ~~Public hostels listed by town~~ REMOVED from the book: which towns have a public hostel changes, so the book lists none | n/a | n/a | removed |
 | Public hostels generally first come, first served, generally one night; private ones can be booked | as stated | CIG https://www.caminoingles.gal/en/faq/ | yes |
 | Public hostels generally do not allow pets to sleep inside | as stated | CIG https://www.caminoingles.gal/en/faq/ | yes |
 | Hostels without subsidies are kept up by pilgrims' contributions | as stated | OP https://oficinadelperegrino.com/en/pilgrimage/the-credencial/ | yes |
@@ -164,6 +164,24 @@ Source short names (full addresses are given in each row):
 ## I. Advice, not facts (no source needed, kept plain)
 
 Boots broken in before you go; two pairs of socks; start early on hot days and carry water; carry food for the long woodland days; keep to the path and not the main road; face traffic where you must walk on a road; tell someone your plan; earplugs and a head torch for dorms; check mattress seams and keep the pack off the bed; see a doctor for anything that worries you. Marked `advice`.
+
+## J. Added in the final pass (quotations and small facts used in the text)
+
+| Fact in the book | Value | Source (name + URL) | Checked |
+|---|---|---|---|
+| Ferrol, Pontedeume, Betanzos and Santiago de Compostela are all in the province of A Coruña ("every step is in Galicia, in the province of A Coruña") | province of A Coruña | WP https://en.wikipedia.org/wiki/Ferrol ; https://en.wikipedia.org/wiki/Pontedeume ; https://en.wikipedia.org/wiki/Betanzos ; OP footer "15705 Santiago de Compostela, A Coruña - ESPAÑA" https://oficinadelperegrino.com/en/pilgrimage/the-compostela/ | yes |
+| Quotation: the credencial "does not generate any rights" (full sentence: "The Credencial does not generate any rights to the pilgrim") | quote | OP https://oficinadelperegrino.com/en/pilgrimage/the-credencial/ | yes |
+| Quotation: first practical purpose "access to hostels offered by the Christian hospitality of the Way" | quote | OP https://oficinadelperegrino.com/en/pilgrimage/the-credencial/ | yes |
+| Quotation: Office's English translation of the Compostela text "with an attitude of devotion or because of a vow or promise" (Latin: devotionis affectu, voti vel pietatis) | quote | OP https://oficinadelperegrino.com/en/pilgrimage/the-compostela/ | yes |
+| The pilgrims' hospital in Neda (remains beside the Clock Tower and the Town Hall) is called "Sancti Spiritos" on the official page; the book says "dedicated to the Holy Spirit" (translation of Sancti Spiritus, the author's) | as stated | CIG https://www.caminoingles.gal/en/etapa-neda-pontedeume/ | yes (translation is the author's) |
+| Neda: bread of Neda and a visit to the town's wheat mills | as stated | CIG https://www.caminoingles.gal/en/a-gastronomia-no-camino-ingles/ | yes |
+| The cathedral is built over the reputed tomb of St James | as stated | WP https://en.wikipedia.org/wiki/Santiago_de_Compostela_Cathedral | yes |
+| The cathedral holds Pilgrims' Masses | as stated | WP https://en.wikipedia.org/wiki/Santiago_de_Compostela_Cathedral | yes (times not stated in the book) |
+| Wikipedia lists eight places with pilgrim hospitals with significant English support: Sigüeiro, San Paio, Pontedeume, Betanzos, Bruma, Neda, Miño, Paderne | 8 | WP https://en.wikipedia.org/wiki/English_Way | yes (Wikipedia) |
+| The Ferrol route and the Xunta page each give two figures: CIG's Neda to Pontedeume page 12.9 km and its Ferrol to Neda page "16 km more to Pontedeume" | ~13 km; ~16 km | CIG https://www.caminoingles.gal/en/etapa-neda-pontedeume/ ; https://www.caminoingles.gal/en/etapa-ferrol-neda/ | yes |
+| From Neda on the stage figures: 113.0 - 15.4 = 97.6 km left, "~98 km", just short of the hundred | ~98 km | computed from the CIG stage figures; Wikipedia says only Ferrol reaches the distance (https://en.wikipedia.org/wiki/English_Way) | computed (flag for the owner: depends on the figure chosen for the whole route; one official page says ~119 km) |
+| Official stage difficulty ratings: Ferrol-Neda Low; Neda-Pontedeume Low; Pontedeume-Betanzos Medium; Betanzos-Bruma Medium (most demanding); Bruma-Sigüeiro Low; Sigüeiro-Santiago Low | as stated | CIG stage pages (rows in section A) | yes |
+| About one pilgrim in eighteen who arrived in Santiago in 2024 walked the English Way | 5.6% = 1 in 17.9 | WP https://en.wikipedia.org/wiki/English_Way | yes (derived) |
 
 ## Not verified and left out
 
