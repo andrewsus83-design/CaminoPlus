@@ -3,8 +3,8 @@
 //
 // This file searches the ROWS: for a book of the Bible its name, its part (Old Testament, Deuterocanon, New Testament) and its line; for a book
 // its title, its subtitle, its description and the titles of its chapters; and the name of the tab itself, so "bible" lists all the Bible rows and "books" all the
-// books. It looks at both tabs at once and answers with the rows grouped by tab: one list, nothing to switch to. Notes (the diary) are not searched
-// here. The verses of the Bible are searched by searchText.ts, which is slower (the first search reads the books), so the screen asks it after the
+// books. It looks at both tabs at once and answers with the rows grouped by tab: one list, nothing to switch to. The diary is not searched here: it is not in the
+// Library (it is the Notes sub-tab of Me). The verses of the Bible are searched by searchText.ts, which is slower (the first search reads the books), so the screen asks it after the
 // keystroke (bible/useVerseSearch.ts) and adds its rows to the third group, Verses.
 //
 // How a row matches. Case, accents and punctuation do not matter ("Ávila" is "avila", "Kempis." is "kempis"). The query is
@@ -94,11 +94,12 @@ export function resultsLine(s: LibrarySearch): string {
 
 /**
  * The rows of these bookmark keys (newest first, as they are kept), grouped. A key that is no row of the Library any more is left out: it stays in
- * the saved list, it just shows nothing. That is what happens to a bookmark kept before the tabs were Bible, Books and Notes (a Music row such as
- * "music:morning", an example shelf such as "bible:psalms"), to one kept under the id of a row that was taken out of the list ("bible:bible-additions-to-esther":
- * the added passages are inside Esther and Daniel now), and to a verse that the text does not have ("bible:PSA.999.1", a chapter that is not there, a book that
- * cannot be read): nothing breaks, and nothing wrong shows. A Bookmarks screen with only such keys says "Nothing bookmarked in the Library yet",
- * which is true. The verses are looked up in `source` (text.ts); without one no verse is returned.
+ * the saved list, it just shows nothing. That is what happens to a bookmark kept before the tabs were Bible and Books (a Music row such as
+ * "music:morning", an example shelf such as "bible:psalms", a key of a tab that is not in the Library any more, such as "notes:..."), to one kept under the id of a row that
+ * was taken out of the list ("bible:bible-additions-to-esther": the added passages are inside Esther and Daniel now) or of a book that is not in the Library
+ * any more, and to a verse that the text does not have ("bible:PSA.999.1", a chapter that is not there, a book that cannot be read): nothing breaks, and nothing wrong
+ * shows. A Bookmarks screen with only such keys says "Nothing bookmarked in the Library yet", which is true. The verses are looked up in `source` (text.ts);
+ * without one no verse is returned.
  */
 export function hitsForKeys(keys: readonly string[], source?: TextSource): Hits {
   const rank = new Map<string, number>();

@@ -13,12 +13,12 @@ import type { DiaryEntry } from '@/features/diary/store';
 import { useDiary } from '@/features/diary/useDiary';
 import { radius, role } from '@/theme';
 
-// Library > My diary: the pages, newest first. They live only on this phone (src/features/diary/store.ts) and the screen says so.
+// Me > Notes > My diary: the pages, newest first. They live only on this phone (src/features/diary/store.ts) and the screen says so.
 export default function DiaryList() {
   const router = useRouter();
   const { ready, entries, remove } = useDiary();
   const [deleteFailed, setDeleteFailed] = useState(false);
-  const goBack = () => (router.canGoBack() ? router.back() : router.replace('/library'));
+  const goBack = () => (router.canGoBack() ? router.back() : router.replace('/me'));
   const write = () => router.push('/diary/new');
   const ask = (e: DiaryEntry) => confirmDelete(pageTitle(e), async () => setDeleteFailed(!(await remove(e.id))), metaLine(e) !== '');
   const usage = mediaUsageLine(entries);

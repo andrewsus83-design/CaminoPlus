@@ -3,10 +3,12 @@
 //
 // They wait for what the person would wait for (an address, a button, a line of text), never for a fixed time.
 //
-// The diary screens and the Notes tab (mobile/app/diary, mobile/src/features/diary, mobile/src/features/library/notes) belong to the diary: the
-// route sweep checks that they load without errors, and the Library scenarios below only check WHERE the pen goes and that Notes has no banner,
-// never what is in the notes. The daily reading (/library/daily) is the same: the scenarios check that the banner leads there, not what is on it.
-// The Bible side of the Library (the grid of books, the chapters, the reader, the search of verses, Continue reading) is in bible.scenarios.mjs.
+// The diary screens and the Notes feed (mobile/app/diary, mobile/src/features/diary, mobile/src/features/notes) belong to the diary: the route
+// sweep checks that they load without errors, and the Me scenarios below only check that Notes is the first sub-tab, WHERE its pen goes and that one
+// note written there shows up in the feed, never what the notes look like. The daily reading (/library/daily) is the same: the scenarios check that
+// the banner leads there, not what is on it.
+// The Bible side of the Library (the grid of books, the chapters, the reader, the search of verses, Continue reading) is in bible.scenarios.mjs,
+// and the Books side (the covers, the book page, the reader of a book) in books.scenarios.mjs.
 import assert from 'node:assert/strict';
 import { UID } from './fixtures.mjs';
 import { domQuiet, eventually, pathOf } from './harness.mjs';
@@ -95,7 +97,7 @@ export const SCENARIOS = [
     },
   },
   {
-    name: 'Library: the tabs Bible, Books and Notes sit directly under the search row, before the banner; Bible and Books each have a banner, Books has a notice and Bible none (its text is real), Notes has neither',
+    name: 'Library: the tabs Bible and Books sit directly under the search row, before the banner; each has a banner; neither has a notice (the Bible text is real, and so is every book); there is no Notes tab and no gold pen',
     persona: 'in',
     async run({ page, step, go }) {
       const strip = (label) => page.getByText(label, { exact: true }).filter({ visible: true }).first();
@@ -109,13 +111,16 @@ export const SCENARIOS = [
       assert(bookmarks.x > search.x + search.width - 2, 'the Bookmarks button is after the search field, in the corner');
       assert(Math.abs(bookmarks.y - search.y) < 12, 'the two are one row');
       await eventually(() => page.getByRole('button', { name: /diary/i }).count(), (n) => n === 0, { what: 'the number of diary buttons on Library' });
-      step('the tabs come directly under that row, in the order Bible, Books, Notes, and the banner comes after them');
-      const [bible, books, notes] = [await box(strip('Bible'), 'the Bible tab'), await box(strip('Books'), 'the Books tab'), await box(strip('Notes'), 'the Notes tab')];
-      assert(bible.x < books.x && books.x < notes.x, 'Bible, Books, Notes from left to right');
-      assert(Math.abs(bible.y - books.y) < 2 && Math.abs(books.y - notes.y) < 2, 'the three tabs are one row');
+      step('the tabs come directly under that row, in the order Bible, Books, and the banner comes after them');
+      const [bible, books] = [await box(strip('Bible'), 'the Bible tab'), await box(strip('Books'), 'the Books tab')];
+      assert(bible.x < books.x, 'Bible, Books from left to right');
+      assert(Math.abs(bible.y - books.y) < 2, 'the two tabs are one row');
       assert(bible.y > search.y + search.height, 'the tabs are under the search row');
       const title = await box(page.getByText('Daily reading', { exact: true }), 'the title of the Bible banner');
       assert(title.y > bible.y + bible.height, 'the banner is under the tabs, not above them');
+      step('there are exactly two tabs: no Notes tab, and no gold pen (writing is on Me)');
+      await eventually(() => page.getByText('Notes', { exact: true }).filter({ visible: true }).count(), (n) => n === 0, { what: 'the number of "Notes" labels on Library' });
+      await eventually(() => page.getByRole('button', { name: /^Write a (note|journey post)$/ }).count(), (n) => n === 0, { what: 'the number of gold pens on Library' });
       step('Bible: the banner (today\'s date, title, a handwritten note, a gold button), no Preview notice, and the one quiet line that says which translation it is');
       await page.getByText(/^(Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday) \d{1,2} (January|February|March|April|May|June|July|August|September|October|November|December)$/i).waitFor();
       await page.getByRole('button', { name: /^Read today/ }).waitFor();
@@ -131,37 +136,84 @@ export const SCENARIOS = [
       step('Books: what is only data (rights, links, the id of a source) is nowhere on the screen');
       const text = (await page.locator('body').innerText()).replace(/\s+/g, ' ');
       assert(!/gutenberg|ai_disclosure|route_slug/i.test(text), `the Books tab shows data that is not meant for the screen: ${text.slice(0, 200)}`);
-      step('Notes: the search row and the tabs stay exactly where they were, and there is no banner and no notice');
-      await strip('Notes').click();
-      await page.getByRole('button', { name: 'Write a note', exact: true }).waitFor();
-      const [search2, bible2, books2, notes2] = [await box(page.getByRole('textbox', { name: 'Search the library' }), 'the search field on Notes'), await box(strip('Bible'), 'the Bible tab on Notes'), await box(strip('Books'), 'the Books tab on Notes'), await box(strip('Notes'), 'the Notes tab on Notes')];
-      for (const [what, before, now] of [['the search field', search, search2], ['the Bible tab', bible, bible2], ['the Books tab', books, books2], ['the Notes tab', notes, notes2]]) {
-        assert(Math.abs(before.x - now.x) < 1.5 && Math.abs(before.y - now.y) < 1.5 && Math.abs(before.width - now.width) < 1.5, `${what} moved when Notes was chosen: ${JSON.stringify(before)} -> ${JSON.stringify(now)}`);
+      await eventually(() => page.getByRole('button', { name: /^Write a (note|journey post)$/ }).count(), (n) => n === 0, { what: 'the number of gold pens on Books' });
+    },
+  },
+  {
+    name: 'Me: the strip is Notes, Journey, Plan, Health in that order and Me opens on Journey with one gold pen, "Write a journey post"; at 320 px wide the four labels are one row, each on one line',
+    persona: 'in',
+    async run({ page, step, go }) {
+      const label = (t) => page.getByText(t, { exact: true }).filter({ visible: true }).first();
+      const box = async (locator, what) => { const b = await locator.boundingBox(); if (!b) throw new Error(`${what} has no box (it is not on the screen)`); return b; };
+      const NAMES = ['Notes', 'Journey', 'Plan', 'Health'];
+      const penNote = page.getByRole('button', { name: 'Write a note', exact: true });
+      const penPost = page.getByRole('button', { name: 'Write a journey post', exact: true });
+      step('open Me: it opens on Journey, with its pen and not the pen of Notes');
+      await go('/me');
+      await penPost.waitFor();
+      await eventually(() => penNote.count(), (n) => n === 0, { what: 'the number of "Write a note" pens on Journey' });
+      await eventually(() => page.getByText('Notes stay on this phone.', { exact: true }).count(), (n) => n === 0, { what: 'the number of Notes feeds while Journey is on' });
+      step('the four labels sit in one row, left to right: Notes, Journey, Plan, Health');
+      const row = [];
+      for (const t of NAMES) row.push(await box(label(t), `the ${t} label`));
+      for (let i = 1; i < row.length; i++) {
+        assert(row[i].x > row[i - 1].x + row[i - 1].width - 1, `${NAMES[i]} is to the right of ${NAMES[i - 1]}`);
+        assert(Math.abs(row[i].y - row[0].y) < 2, `${NAMES[i]} is on the row of ${NAMES[0]}`);
       }
-      for (const gone of ['Daily reading', 'Books for the road', 'Preview']) {
-        await eventually(() => page.getByText(gone, { exact: true }).filter({ visible: true }).count(), (n) => n === 0, { what: `the number of "${gone}" texts on Notes` });
+      step('at 320 px wide the four labels are still one row, each on one line, inside the screen and clear of each other');
+      await page.setViewportSize({ width: 320, height: 700 });
+      await domQuiet(page, 400);
+      const narrow = [];
+      for (const t of NAMES) narrow.push(await box(label(t), `the ${t} label at 320`));
+      narrow.forEach((b, i) => {
+        assert(b.height < 30, `${NAMES[i]} is one line at 320 (its box is ${Math.round(b.height)} high)`);
+        assert(b.x >= 0 && b.x + b.width <= 320, `${NAMES[i]} is inside the 320 px screen: ${JSON.stringify(b)}`);
+        if (i > 0) assert(b.x >= narrow[i - 1].x + narrow[i - 1].width - 1 && Math.abs(b.y - narrow[0].y) < 2, `${NAMES[i]} does not touch ${NAMES[i - 1]} and is on the same row`);
+      });
+      for (const t of NAMES) {
+        const clipped = await label(t).evaluate((el) => el.scrollWidth > el.clientWidth + 1);
+        assert(!clipped, `${t} is clipped at 320`);
       }
     },
   },
   {
-    name: 'Library: the gold pen shows only on Notes, is labelled "Write a note", and opens /diary/new',
+    name: 'Me: Notes is the first sub-tab and shows the feed with one gold pen, "Write a note", that opens /diary/new and writes a note that is in the feed after Back; Plan and Health have no pen; Journey has its own',
     persona: 'in',
-    async run({ page, step, go }) {
-      const pen = page.getByRole('button', { name: 'Write a note', exact: true });
-      const strip = (label) => page.getByText(label, { exact: true }).filter({ visible: true }).first();
-      step('open Library: Bible and Books have no pen');
-      await go('/library');
-      await page.getByText('Daily reading', { exact: true }).first().waitFor();
-      await eventually(() => pen.count(), (n) => n === 0, { what: 'the number of pens on Bible' });
-      await strip('Books').click();
-      await page.getByText('Books for the road', { exact: true }).waitFor();
-      await eventually(() => pen.count(), (n) => n === 0, { what: 'the number of pens on Books' });
-      step('Notes has it');
-      await strip('Notes').click();
-      await pen.waitFor();
-      step('tap the gold pen');
-      await pen.click();
+    async run(ctx) {
+      const { page, step, go } = ctx;
+      const label = (t) => page.getByText(t, { exact: true }).filter({ visible: true }).first();
+      const penNote = page.getByRole('button', { name: 'Write a note', exact: true });
+      const penPost = page.getByRole('button', { name: 'Write a journey post', exact: true });
+      const pens = async () => [await penNote.count(), await penPost.count()].join('+');
+      step('open Me and choose Notes');
+      await go('/me');
+      await penPost.waitFor();
+      await label('Notes').click();
+      step('the feed is there ("Notes stay on this phone."), with ONE pen: the note pen, and not the journey pen');
+      await page.getByText('Notes stay on this phone.', { exact: true }).waitFor();
+      await penNote.waitFor();
+      await eventually(pens, (v) => v === '1+0', { what: 'the pens on Notes (note + journey)' });
+      await page.getByText('No notes yet', { exact: true }).waitFor();
+      await eventually(() => page.getByText(/You are offline|Could not load your data/).count(), (n) => n === 0, { what: 'the messages about Me\'s data over the notes' });
+      step('Plan and Health have no pen at all');
+      await label('Plan').click();
+      await eventually(pens, (v) => v === '0+0', { what: 'the pens on Plan' });
+      await label('Health').click();
+      await eventually(pens, (v) => v === '0+0', { what: 'the pens on Health' });
+      step('Journey has its own pen again, and not the note pen');
+      await label('Journey').click();
+      await penPost.waitFor();
+      await eventually(pens, (v) => v === '0+1', { what: 'the pens on Journey' });
+      step('back on Notes, the pen opens a blank page, and what is written there is in the feed after Back');
+      await label('Notes').click();
+      await penNote.click();
       await waitPath(page, '/diary/new', 'the address after the pen');
+      await page.getByRole('textbox', { name: 'Page text' }).fill('Walked to Hontanas, wind in my face.');
+      await back(ctx);
+      await waitPath(page, '/me', 'the address after Back');
+      await page.getByText('Walked to Hontanas, wind in my face.').filter({ visible: true }).first().waitFor();
+      await eventually(() => page.getByText('No notes yet', { exact: true }).filter({ visible: true }).count(), (n) => n === 0, { what: 'the number of "No notes yet" once a note is written' });
+      await eventually(pens, (v) => v === '1+0', { what: 'the pens on Notes after the note' });
     },
   },
   {
@@ -181,7 +233,7 @@ export const SCENARIOS = [
     },
   },
   {
-    name: 'Library: the top row is a search field and the Bookmarks button, and no diary button or diary card; Help sends the diary to the Notes tab',
+    name: 'Library: the top row is a search field and the Bookmarks button, and no diary button or diary card; Help sends the diary to the Notes tab of Me',
     persona: 'in',
     async run(ctx) {
       const { page, step, go } = ctx;
@@ -195,7 +247,7 @@ export const SCENARIOS = [
       step('Help says where the diary is');
       await go('/help');
       await page.getByRole('button', { name: 'Where are my diary pages kept?', exact: true }).click();
-      await page.getByText(/Open Library and tap the Notes tab: your diary lives there\./).waitFor();
+      await page.getByText(/Open Me and tap the Notes tab: your diary lives there\./).waitFor();
     },
   },
   {
@@ -273,21 +325,21 @@ export const SCENARIOS = [
     },
   },
   {
-    name: 'Library: bookmarks kept before the tabs changed (a Music row, an old example row), under the two rows taken out of the Bible list, or for a verse that is not in the text are ignored without an error, and the rest still shows',
+    name: 'Library: bookmarks kept before the tabs changed (a Music row, an old example row, a Notes key), under the two rows taken out of the Bible list, or for a verse that is not in the text are ignored without an error, and the rest still shows',
     persona: 'in',
     async run({ page, step, go }) {
       const key = `kv:u.${UID}.library.bookmarks`;
       const save = (keys) => page.evaluate(([k, list]) => localStorage.setItem(k, JSON.stringify({ v: 1, items: list.map((name, i) => ({ key: name, at: 100 - i })) })), [key, keys]);
       step('open Library once, so that the app has made its own keys');
       await go('/library');
-      step('keep only old marks on the phone: a Music row, an example Bible shelf, an example cover, and open Bookmarks');
-      await save(['music:morning', 'music:sing', 'bible:psalms', 'books:guide', 'bible:bible-additions-to-esther', 'bible:bible-additions-to-daniel', 'bible:PSA.999.1', 'bible:PSA.121.99', 'bible:XXX.1.1', 'bible:SIR.11.15-16', 'bible:PSA.0.1']);
+      step('keep only old marks on the phone: a Music row, an example Bible shelf, an example cover, two Notes keys, the rows taken out of the Bible list, verses that are not in the text, and open Bookmarks');
+      await save(['music:morning', 'music:sing', 'bible:psalms', 'books:guide', 'notes:2f6c1a', 'notes:', 'bible:bible-additions-to-esther', 'bible:bible-additions-to-daniel', 'bible:PSA.999.1', 'bible:PSA.121.99', 'bible:XXX.1.1', 'bible:SIR.11.15-16', 'bible:PSA.0.1']);
       await go('/library/bookmarks');
       await page.getByRole('heading', { name: 'Bookmarks', exact: true }).waitFor();
       await page.getByText('Nothing bookmarked in the Library yet. Tap the bookmark on a row to keep it here.', { exact: true }).waitFor();
       for (const gone of ['Chants for the road', 'Morning walk', 'Psalms for walking', 'Guide to the Way']) await eventually(() => page.getByText(gone, { exact: true }).count(), (n) => n === 0, { what: `the number of "${gone}" rows` });
       step('add a current mark next to them: it shows, and the old ones still do not');
-      await save(['music:morning', 'bible:bible-additions-to-daniel', `books:${CATALOG[0].id}`, 'bible:psalms', 'bible:bible-job', 'bible:PSA.121.3', 'bible:PSA.999.1']);
+      await save(['music:morning', 'notes:2f6c1a', 'bible:bible-additions-to-daniel', `books:${CATALOG[0].id}`, 'bible:psalms', 'bible:bible-job', 'bible:PSA.121.3', 'bible:PSA.999.1']);
       await go('/library/bookmarks');
       await page.getByText('Bible · 1', { exact: true }).waitFor();
       await page.getByText('Books · 1', { exact: true }).waitFor();

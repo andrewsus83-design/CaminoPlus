@@ -38,7 +38,8 @@ check('the editor saves when the screen goes away and when the app goes to the b
   assert.match(hook, /return \(\) => \{ alive\.current = false; void saver\.flush\(\); \}/, 'the saver is flushed when the screen goes away');
   const editor = read('app/diary/[id].tsx');
   assert.match(editor, /autoFocus=\{!initial\}/, 'a new page opens ready to write');
-  assert.match(editor, /router\.canGoBack\(\) \? router\.back\(\) : router\.replace\('\/library'\)/);
+  assert.match(editor, /router\.canGoBack\(\) \? router\.back\(\) : router\.replace\('\/me'\)/, 'a page opened from a link, with nothing behind it, goes back to Me, where the diary is (its Notes sub-tab), not to the Library');
+  assert.doesNotMatch(read('app/diary/index.tsx'), /router\.replace\('\/library'\)/, 'the list of pages too');
   assert.match(editor, /Saved on this phone/);
   assert.match(editor, /Saving…/);
   assert.match(editor, /This page is not here/);
