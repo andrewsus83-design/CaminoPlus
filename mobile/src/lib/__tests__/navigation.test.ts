@@ -226,10 +226,12 @@ check('Library: directly under the search row the tabs Bible, Books, Notes, and 
   assert.match(screen, /\{tab === 'Books' && <BooksBanner \/>\}/);
   assert.equal((screen.match(/<DailyBanner/g) ?? []).length + (screen.match(/<BooksBanner/g) ?? []).length, 2, 'two banners, one for each tab that has one');
   // Notes, the third tab: no banner, no Screen (the feed owns its scroll), the top pinned above it, NotesTab filling the box under it
-  const notesHost = screen.slice(at("if (!searching && tab === 'Notes') {"), screenAt);
+  const notesHost = screen.slice(at("if (tab === 'Notes') {"), screenAt);
   assert.match(notesHost, /paddingTop: insets\.top \+ layout\.screenTop, paddingHorizontal: layout\.screenMargin, paddingBottom: 16, gap: 16 \}\}>\{top\}<\/View>/, 'the same top, in the same place and the same size as in the other host');
   assert.match(notesHost, /<View style=\{\{ flex: 1 \}\}><NotesTab \/><\/View>/, 'NotesTab fills the box under the tabs: a height of its own, as wide as the screen');
-  assert.doesNotMatch(notesHost, /<Screen\b|ScrollView|Banner|SubTabs/, 'no scroll view around the feed, no banner, and the strip comes from `top`');
+  assert.doesNotMatch(notesHost, /<Screen\b|Banner|SubTabs/, 'no banner, not in the scroll of the screen, and the strip comes from `top`');
+  assert.doesNotMatch(notesHost.slice(notesHost.indexOf(') : (')), /ScrollView/, 'no scroll view around the feed: it scrolls by itself');
+  assert.match(notesHost, /\{searching \? \(\s*<ScrollView\b[^>]*keyboardShouldPersistTaps="handled"[^>]*>\s*<SearchResults\b[\s\S]*?\/>\s*<\/ScrollView>\s*\) : \(/, 'a search on Notes keeps this host: the top, and the search field in it, is not made again when the first letter is typed (a field that is made again loses the keyboard); the results take the place of the feed');
   assert.ok(notesHost.indexOf('{top}') < notesHost.indexOf('<NotesTab'), 'the notes start right under the tabs');
   // the Books tab starts with its notice; the Bible tab has none (its text is in the app: one quiet source line instead)
   const tabsSrc = read(join('src', 'features', 'library', 'LibraryTabs.tsx'));
@@ -245,9 +247,9 @@ check('what floats at the bottom: only the gold pen on Notes; the three choices 
   const screen = read(join('app', '(tabs)', 'library.tsx'));
   assert.equal((screen.match(/<Fab\b/g) ?? []).length, 1);
   assert.equal((screen.match(/<TestamentBar\b/g) ?? []).length, 0, 'the screen draws no bar of its own: the Bible tab draws the choices in the page');
-  // the gold pen is in the Notes host, which is only used when nothing is typed and the tab is Notes
-  const notesHost = screen.slice(screen.indexOf("if (!searching && tab === 'Notes') {"), screen.indexOf('<Screen keyboard'));
-  assert.match(notesHost, /<Fab label="Write a note" icon="compose" onPress=\{\(\) => router\.push\('\/diary\/new'\)\} \/>/);
+  // the gold pen is in the Notes host, and it is not drawn over the search results that take the place of the feed there
+  const notesHost = screen.slice(screen.indexOf("if (tab === 'Notes') {"), screen.indexOf('<Screen keyboard'));
+  assert.match(notesHost, /\{!searching && <Fab label="Write a note" icon="compose" onPress=\{\(\) => router\.push\('\/diary\/new'\)\} \/>\}/);
   assert.ok(notesHost.includes('<Fab') && !screen.slice(screen.indexOf('<Screen keyboard')).includes('<Fab'), 'the pen is not in the other host');
   // no floating logic left: no room kept for a bar, no scroll back to the list, no offsets read
   assert.doesNotMatch(screen, /BAR_ROOM|scrollRef|onScroll|onListLayout|scroller|listTop|useRef|useEffect|TestamentBar/);

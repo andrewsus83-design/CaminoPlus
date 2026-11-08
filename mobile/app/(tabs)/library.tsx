@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Screen } from '@/components/Screen';
@@ -10,6 +10,7 @@ import { FormMessage } from '@/components/auth/Field';
 import { ContinueCard } from '@/features/library/bible/ContinueCard';
 import type { Testament } from '@/features/library/bible/books';
 import { bookHref, readerHref } from '@/features/library/bible/order';
+import type { Ref } from '@/features/library/bible/ref';
 import { useLastRead } from '@/features/library/bible/useLastRead';
 import { BooksBanner, DailyBanner } from '@/features/library/LibraryBanner';
 import { LibraryHeader } from '@/features/library/LibraryHeader';
@@ -51,6 +52,9 @@ export default function Library() {
   const marks = useLibraryBookmarks();
   const lastRead = useLastRead();
   const searching = isSearching(query);
+  // What a result of the Bible opens, the same in both hosts (the results are drawn on Notes too): a book its chapters, a verse the reader at it.
+  const openBook = (code: string) => router.push(bookHref(code));
+  const openVerse = (ref: Ref) => router.push(readerHref(ref));
   // The top of the screen, the same in both hosts: the heading for a screen reader, the search row, a message when a bookmark could not be kept, the tabs.
   const top = (
     <>
@@ -61,12 +65,21 @@ export default function Library() {
     </>
   );
 
-  if (!searching && tab === 'Notes') {
+  if (tab === 'Notes') {
+    // The pinned host is used for Notes also while something is typed, so the search field stays the same element: a field that moves to another
+    // parent when the first letter arrives is made again, and the keyboard goes away. The results take the place of the feed, in a scroll view of
+    // their own that is set up like Screen's (a tap on a button works while the keyboard is up, a scroll closes it), and the pen is not drawn over them.
     return (
       <View style={{ flex: 1, backgroundColor: role.bg }}>
         <View style={{ paddingTop: insets.top + layout.screenTop, paddingHorizontal: layout.screenMargin, paddingBottom: 16, gap: 16 }}>{top}</View>
-        <View style={{ flex: 1 }}><NotesTab /></View>
-        <Fab label="Write a note" icon="compose" onPress={() => router.push('/diary/new')} />
+        {searching ? (
+          <ScrollView keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag" contentContainerStyle={{ paddingHorizontal: layout.screenMargin, paddingBottom: layout.tabbarHeight + insets.bottom + 40, gap: 16 }}>
+            <SearchResults query={query} marks={marks} onClear={() => setQuery('')} onOpenBook={openBook} onOpenVerse={openVerse} />
+          </ScrollView>
+        ) : (
+          <View style={{ flex: 1 }}><NotesTab /></View>
+        )}
+        {!searching && <Fab label="Write a note" icon="compose" onPress={() => router.push('/diary/new')} />}
       </View>
     );
   }
@@ -74,13 +87,7 @@ export default function Library() {
     <Screen keyboard>
       {top}
       {searching ? (
-        <SearchResults
-          query={query}
-          marks={marks}
-          onClear={() => setQuery('')}
-          onOpenBook={(code) => router.push(bookHref(code))}
-          onOpenVerse={(ref) => router.push(readerHref(ref))}
-        />
+        <SearchResults query={query} marks={marks} onClear={() => setQuery('')} onOpenBook={openBook} onOpenVerse={openVerse} />
       ) : (
         <>
           {tab === 'Bible' && lastRead.place && <ContinueCard place={lastRead.place} onOpen={() => router.push(readerHref({ code: lastRead.place!.code, chapter: lastRead.place!.chapter }))} />}
