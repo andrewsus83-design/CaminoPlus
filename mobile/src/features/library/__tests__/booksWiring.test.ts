@@ -225,18 +225,18 @@ check('the Books tab: the notice, then the twelve books as covers in two columns
   assert.match(tabs, /\{group === 'Books' && <BookRows items=\{hits\.Books\} marks=\{marks\} \/>\}/, 'a search and Bookmarks still list the books as rows, which open the page');
   const screen = code(read('app/(tabs)/library.tsx'));
   assert.match(screen, /import \{ BooksBanner \} from '@\/features\/library\/books\/BooksBanner';/);
-  assert.match(screen, /const booksReading = useBooksReading\(\);/, 'read with the screen, so the banner says Continue from its first frame');
-  assert.match(screen, /\{tab === 'Books' && <BooksBanner reading=\{booksReading\} \/>\}/);
+  assert.doesNotMatch(screen, /useBooksReading|booksReading/, 'the screen no longer reads the places of the books for the banner: the Continue reading bar above the tab bar reads them itself (continueBarWiring.test.ts)');
+  assert.match(screen, /\{tab === 'Books' && <BooksBanner \/>\}/, 'the banner takes nothing: it never says "Continue reading" now');
   assert.doesNotMatch(screen, /BooksBanner\b[^;]*from '@\/features\/library\/LibraryBanner'/, 'the banner of the Books tab is not the old one of LibraryBanner.tsx');
 });
 
-check('the banner of the Books tab is the compact banner of the Bible tab with words of its own: nothing to press while no book has a text, "Start reading" opens the first book that has one, "Continue reading" opens the reader of the book read last', () => {
+check('the banner of the Books tab is the compact banner of the Bible tab with words of its own: nothing to press while no book has a text, "Start reading" opens the page of the first book that has one; it no longer continues a book: the Continue reading bar above the tab bar does, for the Bible and for the books', () => {
   const banner = src['BooksBanner.tsx'];
   assert.match(banner, /import \{ CompactBanner \} from '\.\.\/LibraryBanner';/, 'the same card, fonts and pill as the daily reading, not a second invention');
   assert.equal(count(banner, /<Pressable\b/g), 0, 'the card is the one button CompactBanner makes of it');
-  assert.match(banner, /const view = booksBanner\(BOOK_CATALOG, hasBookText, reading\.last\);/);
-  assert.match(banner, /router\.push\(view\.kind === 'continue' \? readerPath\(view\.bookId\) : bookPath\(view\.bookId\)\)/);
-  assert.match(banner, /note=\{view\.note\} cta=\{view\.cta\} onPress=\{open\} hint=\{view\.hint\}/);
+  assert.match(banner, /const view = booksBanner\(BOOK_CATALOG, hasBookText, null\);/, 'no place is passed, so the banner never says "Continue reading": that is the bar above the tab bar');
+  assert.doesNotMatch(banner, /useBooksReading|reading\.last|readerPath/, 'the banner reads no place and opens no reader');
+  assert.match(banner, /note=\{view\.note\} cta=\{view\.cta\} onPress=\{\(\) => router\.push\(bookPath\(view\.bookId\)\)\} hint=\{view\.hint\}/, 'the pill opens the page of the book');
   const compact = code(read('src/features/library/LibraryBanner.tsx'));
   assert.match(compact, /export function CompactBanner\(/);
   assert.match(compact, /height: 44, paddingHorizontal: 16, borderRadius: radius\.pill, backgroundColor: c\.gold/, 'the gold pill is 44 high');

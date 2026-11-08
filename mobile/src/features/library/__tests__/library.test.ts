@@ -12,6 +12,7 @@ import './books.test';
 import './bookText.test';
 import './reading.test'; // reading a book and drawing its cover: the neighbours of a chapter, the saved place, the text sizes, the A5 covers, the banner
 import './reader.test';
+import './continueBar.test'; // the Continue reading bar: the most recent place of the Bible and the books, closing it and bringing it back, where it sits above the tab bar
 import {
   BOOKMARKS_MAX, bookmarkKeys, hasBookmark, packBookmarks, parseBookmarks, toggleBookmark, type Bookmark,
 } from '../bookmarks';

@@ -18,6 +18,7 @@ const code = (src: string) => src.split('\n').filter((l) => !/^\s*(\/\/|\/?\*)/.
 import './notes.test'; // the Notes tab (src/features/library/notes): its logic and its wiring, run here so no script has to name it
 import './readerWiring.test'; // the Bible screens: the book grid, the chapters, the reader, the search of verses
 import './booksWiring.test'; // the Books screens: the covers, the banner, the book page, the reader and the places kept on the phone
+import './continueBarWiring.test'; // the Continue reading bar above the tab bar: one bar, one mount, its two buttons, its colours, its place, no card left in the pages
 
 const DIR = 'src/features/library';
 // The files of this feature: the folder itself, the Bible and Books folders, and the screens of app/library (the Bible screens too). Not notes/ and daily/,
@@ -38,7 +39,7 @@ check('the feature is the files this test expects, so a new one is looked at (an
     `${DIR}/BookmarkToggle.tsx`, `${DIR}/LibraryBanner.tsx`, `${DIR}/LibraryHeader.tsx`, `${DIR}/LibraryTabs.tsx`, `${DIR}/SavedPostCard.tsx`, `${DIR}/SearchBar.tsx`,
     `${DIR}/SearchResults.tsx`, `${DIR}/bookmarks.ts`, `${DIR}/client.ts`, `${DIR}/sample.ts`, `${DIR}/savedPosts.ts`, `${DIR}/search.ts`, `${DIR}/useLibraryBookmarks.ts`,
     `${DIR}/useSavedPosts.ts`,
-    `${DIR}/bible/BookGrid.tsx`, `${DIR}/bible/ChapterGrid.tsx`, `${DIR}/bible/ChapterNav.tsx`, `${DIR}/bible/ContinueCard.tsx`, `${DIR}/bible/PlaceMissing.tsx`,
+    `${DIR}/bible/BookGrid.tsx`, `${DIR}/bible/ChapterGrid.tsx`, `${DIR}/bible/ChapterNav.tsx`, `${DIR}/bible/PlaceMissing.tsx`,
     `${DIR}/bible/Reader.tsx`, `${DIR}/bible/ReaderText.tsx`, `${DIR}/bible/TestamentBar.tsx`, `${DIR}/bible/VerseActions.tsx`, `${DIR}/bible/VerseRows.tsx`,
     `${DIR}/bible/blocks.ts`, `${DIR}/bible/books.ts`, `${DIR}/bible/credit.ts`, `${DIR}/bible/gridMath.ts`, `${DIR}/bible/lastRead.ts`, `${DIR}/bible/order.ts`,
     `${DIR}/bible/ref.ts`, `${DIR}/bible/tileFit.ts`, `${DIR}/bible/today.ts`, `${DIR}/bible/useLastRead.ts`, `${DIR}/bible/useVerseSearch.ts`, `${DIR}/bible/verseActions.ts`,
@@ -74,7 +75,7 @@ check('the rows of the twelve books (a search, Bookmarks) are books/BookRows.tsx
   // the Bible is real: no "Soon" on a tile, a row of a book, a verse or in the Bible tab
   const bible = tabs.slice(tabs.indexOf('export function BibleBookRows'), tabs.indexOf('export function LibraryGroups')) + tabs.slice(tabs.indexOf('export function BibleTab'), tabs.indexOf('export function BooksTab'));
   assert.doesNotMatch(bible, /Soon|Free|Notice|SampleNotice|Preview/, 'a book of the Bible is not an example');
-  for (const f of ['BookGrid.tsx', 'ChapterGrid.tsx', 'VerseRows.tsx', 'ContinueCard.tsx', 'Reader.tsx', 'ReaderText.tsx']) assert.doesNotMatch(code(read(`${DIR}/bible/${f}`)), /Soon|SOON|Coming soon|SampleNotice|Preview/, `${f}: the Bible is in the app`);
+  for (const f of ['BookGrid.tsx', 'ChapterGrid.tsx', 'VerseRows.tsx', 'Reader.tsx', 'ReaderText.tsx']) assert.doesNotMatch(code(read(`${DIR}/bible/${f}`)), /Soon|SOON|Coming soon|SampleNotice|Preview/, `${f}: the Bible is in the app`);
   // the books of the Bible are marked in a row under the key of their own tab ("bible:"), whoever draws them
   assert.match(tabs, /<Mark marks=\{marks\} tab="Bible" id=\{b\.id\} title=\{b\.name\} \/>/);
   assert.match(tabs, /\{group === 'Bible' && <BibleBookRows items=\{hits\.Bible\} marks=\{marks\} withPart onOpen=\{onOpenBook\} \/>\}/);
@@ -98,10 +99,10 @@ check('a book of the Bible in a list of results or of Bookmarks is ONE button th
   assert.match(tabs, /import \{ Pressable, View \} from 'react-native';/);
 });
 
-check('what can be pressed in the feature: the bookmark button, the search field, the banner, the three choices, the tiles, the rows of books and verses, the continue card, the covers, the book page, the readers\' buttons, and nothing else', () => {
+check('what can be pressed in the feature: the bookmark button, the search field, the banner, the three choices, the tiles, the rows of books and verses, the covers, the book page, the readers\' buttons, and nothing else (the buttons of the Continue reading bar are in its own folder, checked in continueBarWiring.test.ts)', () => {
   const pressable = featureFiles.filter((f) => /<Pressable\b/.test(code(read(f)))).map((f) => path.basename(f)).sort();
   assert.deepEqual(pressable, [
-    'BookCover.tsx', 'BookGrid.tsx', 'BookPage.tsx', 'BookRows.tsx', 'BookUi.tsx', 'BookmarkToggle.tsx', 'ChapterFooter.tsx', 'ChapterGrid.tsx', 'ChapterNav.tsx', 'ContinueCard.tsx',
+    'BookCover.tsx', 'BookGrid.tsx', 'BookPage.tsx', 'BookRows.tsx', 'BookUi.tsx', 'BookmarkToggle.tsx', 'ChapterFooter.tsx', 'ChapterGrid.tsx', 'ChapterNav.tsx',
     'LibraryBanner.tsx', 'LibraryTabs.tsx', 'Reader.tsx', 'ReaderHeader.tsx', 'SearchBar.tsx', 'SearchResults.tsx', 'TestamentBar.tsx', 'VerseActions.tsx', 'VerseRows.tsx',
   ]);
   // the sample content never acts like real content: no data file has a handler either

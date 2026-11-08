@@ -7,14 +7,12 @@ import { AppText } from '@/components/AppText';
 import { Fab } from '@/components/Fab';
 import { SubTabs } from '@/components/ui';
 import { FormMessage } from '@/components/auth/Field';
-import { ContinueCard } from '@/features/library/bible/ContinueCard';
 import type { Testament } from '@/features/library/bible/books';
 import { bookHref, readerHref } from '@/features/library/bible/order';
 import type { Ref } from '@/features/library/bible/ref';
 import { prepareSearch } from '@/features/library/bible/searchText';
-import { useLastRead } from '@/features/library/bible/useLastRead';
 import { BooksBanner } from '@/features/library/books/BooksBanner';
-import { useBooksReading } from '@/features/library/books/useBooksReading';
+import { ContinueBar } from '@/features/library/continueBar/ContinueBar';
 import { DailyBanner } from '@/features/library/LibraryBanner';
 import { LibraryHeader } from '@/features/library/LibraryHeader';
 import { BibleTab, BooksTab } from '@/features/library/LibraryTabs';
@@ -35,11 +33,14 @@ import { layout, role } from '@/theme';
 // scroll away with them. Notes is a feed that owns its scroll (a virtualised list with pull to refresh, features/library/notes): the search
 // row and the tabs stay at the top, in the same place and the same size, and NotesTab fills the box under them, edge to edge.
 //
-// The Bible tab, top to bottom: the card that continues the chapter read last (only when something was read), the compact daily reading banner, the
-// choice of the part (Old Testament, Deuterocanon, New Testament: a segmented pill in the page, not a floating bar) and the books of that part as tiles.
-// A tile opens the chapters of the book (/library/bible/<code>), and a chapter opens the reader (/library/bible/<code>/<chapter>). The Bible is real; the
-// Books tab holds example rows until we have chosen what we may include (features/library/sample.ts) and says so. Notes is real too: written and kept
-// on this phone (features/diary). On Notes the gold pen writes a note; nothing else floats.
+// The Bible tab, top to bottom: the compact daily reading banner, the choice of the part (Old Testament, Deuterocanon, New Testament: a segmented pill in the
+// page, not a floating bar) and the books of that part as tiles. A tile opens the chapters of the book (/library/bible/<code>), and a chapter opens the reader
+// (/library/bible/<code>/<chapter>). The Bible is real; the Books tab holds example rows until we have chosen what we may include (features/library/sample.ts)
+// and says so. Notes is real too: written and kept on this phone (features/diary). On Notes the gold pen writes a note; nothing else floats.
+//
+// "Continue reading" is not in the page any more: the bar that goes back to the place read last, in the Bible or in a book, floats above the tab bar
+// (features/library/continueBar), on the Bible tab and on the Books tab, and has a close button. It is mounted by ONE line, the `overlay` of the Screen below, and brings
+// its own data, its own place and the room it takes at the end of the list; Notes is the other host, where the pen floats, and does not have it.
 
 // Read by a screen reader (the heading of the screen, "Library") and not drawn: there is no title on the screen, the search field is the
 // first thing. 1 x 1 and clipped, with see-through letters, and not opacity 0 or hidden: VoiceOver and TalkBack leave a view that is
@@ -53,9 +54,6 @@ export default function Library() {
   const [testament, setTestament] = useState<Testament>('old');
   const [query, setQuery] = useState('');
   const marks = useLibraryBookmarks();
-  const lastRead = useLastRead();
-  // Where the person has got to in the books: read here, with the screen, so that the banner of the Books tab says "Continue" from its first frame.
-  const booksReading = useBooksReading();
   const searching = isSearching(query);
   // What a result of the Bible opens, the same in both hosts (the results are drawn on Notes too): a book its chapters, a verse the reader at it.
   const openBook = (code: string) => router.push(bookHref(code));
@@ -89,16 +87,15 @@ export default function Library() {
     );
   }
   return (
-    <Screen keyboard>
+    <Screen keyboard overlay={<ContinueBar />}>
       {top}
       {searching ? (
         <SearchResults query={query} marks={marks} onClear={() => setQuery('')} onOpenBook={openBook} onOpenVerse={openVerse} />
       ) : (
         <>
-          {tab === 'Bible' && lastRead.place && <ContinueCard place={lastRead.place} onOpen={() => router.push(readerHref({ code: lastRead.place!.code, chapter: lastRead.place!.chapter }))} />}
           {tab === 'Bible' && <DailyBanner onOpen={() => router.push('/library/daily')} />}
           {tab === 'Bible' && <BibleTab testament={testament} onTestament={setTestament} onOpenBook={(code) => router.push(bookHref(code))} />}
-          {tab === 'Books' && <BooksBanner reading={booksReading} />}
+          {tab === 'Books' && <BooksBanner />}
           {tab === 'Books' && <BooksTab marks={marks} />}
         </>
       )}
