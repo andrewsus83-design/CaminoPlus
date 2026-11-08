@@ -7,7 +7,7 @@ import { bookGrid, type BookGrid } from './gridMath';
 import { TEXT_SCALE_CAP, fitCount, fitName } from './tileFit';
 
 /** What a screen reader says for a tile: "Genesis, 50 chapters". */
-export const tileLabel = (b: BibleBook): string => `${b.name}, ${chaptersLabel(b.chapters).replace(/ /g, ' ')}`;
+export const tileLabel = (b: BibleBook): string => `${b.name}, ${chaptersLabel(b.chapters).replace(/\u00a0/g, ' ')}`;
 
 type TileProps = { book: BibleBook; grid: BookGrid; fontScale: number; onOpen: (code: string) => void };
 

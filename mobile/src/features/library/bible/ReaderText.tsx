@@ -1,8 +1,10 @@
 import { memo, useMemo } from 'react';
-import { Text, View, type LayoutChangeEvent } from 'react-native';
+import { Text, View, useWindowDimensions, type LayoutChangeEvent } from 'react-native';
 import { AppText } from '@/components/AppText';
 import { c, role } from '@/theme';
 import { blocksOfVerse, superscript, type Block, type Gap, type PoemBlock, type ProseBlock } from './blocks';
+import { SIDE } from './gridMath';
+import { wrapPoem } from './wrap';
 
 /** The most the phone's own text size may enlarge the words of the Bible: a person who needs it large gets it large, up to this. */
 export const READER_MAX_FONT_SCALE = 1.6;
@@ -11,8 +13,11 @@ export const READER_MAX_FONT_SCALE = 1.6;
 export const BODY_SIZE = 19;
 export const BODY_LINE = 32;
 
+/** The number of a verse is drawn at this size: the raised digits of JetBrains Mono are 0.43 of it high (7.3 here), as small as a number can be and still be read. */
+export const NUMBER_SIZE = 17;
+
 /** A line of poetry goes in by an em space for each tab at its start (Inter has one: 19 wide at this size). */
-export const INDENT = ' ';
+export const INDENT = '\u2003';
 
 /** The space above a block of each kind of gap. A heading keeps 28 above it (none at the top of the chapter) and 6 under it. */
 export const GAP: Record<Gap, number> = { none: 0, paragraph: 16, stanza: 26 };
@@ -30,8 +35,8 @@ const chosen = () => ({ backgroundColor: c.goldSoft, textDecorationLine: 'underl
 function VerseNumber({ label, on }: { label: string; on: boolean }) {
   return (
     <>
-      <AppText variant="mono" maxFontSizeMultiplier={READER_MAX_FONT_SCALE} color={on ? role.text : role.muted} style={{ fontSize: 15, lineHeight: BODY_LINE }}>{superscript(label)}</AppText>
-      {' '}
+      <AppText variant="mono" maxFontSizeMultiplier={READER_MAX_FONT_SCALE} color={on ? role.text : role.muted} style={{ fontSize: NUMBER_SIZE, lineHeight: BODY_LINE }}>{superscript(label)}</AppText>
+      {'\u2009'}
     </>
   );
 }
@@ -61,15 +66,22 @@ function Prose({ block, selected, onSelect }: { block: ProseBlock; selected: str
   );
 }
 
-/** A stanza is ONE text, a line after the other: a screen reader reads it as it reads a paragraph, and a Psalm of 176 verses is 22 texts, not 350. */
+/**
+ * A stanza is ONE text, a line after the other: a screen reader reads it as it reads a paragraph, and a Psalm of 176 verses is 22 texts, not 350. A line that is
+ * too long for the phone is cut by the reader (wrap.ts) and its rest goes in one em further than the line itself: a hanging indent, which React Native does not
+ * have, so that a long line of a psalm never comes back to the margin looking like a line of its own.
+ */
 function Poem({ block, selected, onSelect }: { block: PoemBlock; selected: string | null; onSelect: Select }) {
+  const { width, fontScale } = useWindowDimensions();
+  const scale = Math.min(fontScale, READER_MAX_FONT_SCALE);
+  const lines = useMemo(() => wrapPoem(block.lines, { width: width - 2 * SIDE, size: BODY_SIZE, scale, numberSize: NUMBER_SIZE, numberOf: superscript }), [block, width, scale]);
   return (
     <AppText maxFontSizeMultiplier={READER_MAX_FONT_SCALE} style={{ fontSize: BODY_SIZE, lineHeight: BODY_LINE }}>
-      {block.lines.map((l, k) => (
+      {lines.map((l, k) => (
         <Text key={k}>
           {INDENT.repeat(l.indent)}
           <Words verse={l.verse} number={l.n} text={l.text} on={l.verse === selected} onSelect={onSelect} />
-          {k < block.lines.length - 1 ? '\n' : ''}
+          {k < lines.length - 1 ? '\n' : ''}
         </Text>
       ))}
     </AppText>

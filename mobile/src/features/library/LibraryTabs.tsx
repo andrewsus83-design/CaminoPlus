@@ -57,7 +57,7 @@ export function BibleBookRows({ items, marks, withPart = false, onOpen }: { item
     <Card style={{ padding: 4 }}>
       {items.map((b, i) => (
         <View key={b.id} style={{ ...rowStyle(i === 0, marks), minHeight: 64, flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 4 }}>
-          <Pressable accessibilityRole="button" accessibilityLabel={`${b.name}, ${bookLine(b, withPart).replace(/ /g, ' ')}`} accessibilityHint="Opens the chapters" onPress={() => onOpen(b.code)} style={{ flex: 1, minWidth: 0, gap: 2, paddingVertical: 6 }}>
+          <Pressable accessibilityRole="button" accessibilityLabel={`${b.name}, ${bookLine(b, withPart).replace(/\u00a0/g, ' ')}`} accessibilityHint="Opens the chapters" onPress={() => onOpen(b.code)} style={{ flex: 1, minWidth: 0, gap: 2, paddingVertical: 6 }}>
             <AppText variant="h4" style={{ fontSize: 20, lineHeight: 26 }}>{b.name}</AppText>
             <BibleBookLine book={b} withPart={withPart} />
           </Pressable>
@@ -106,7 +106,7 @@ export function BibleTab({ testament, onTestament, onOpenBook }: { testament: Te
             <AppText variant="h4" accessibilityRole="header">Books of the Bible</AppText>
             <AppText variant="mono" muted accessibilityLiveRegion="polite" accessibilityLabel={`${TESTAMENT_LABEL[testament]}, ${countLine(testament)}`} style={{ fontSize: 14, lineHeight: 20 }}>{countLine(testament)}</AppText>
           </View>
-          <AppText variant="caption" muted>{BIBLE_SOURCE_LINE}</AppText>
+          <AppText variant="caption" muted>{BIBLE_SOURCE_LINE.replace('public domain', 'public\u00a0domain')}</AppText>
         </View>
         <BibleBookGrid books={booksOf(testament)} onOpen={onOpenBook} />
         {testament === 'deutero' && <AppText variant="caption" muted>{ADDITIONS_NOTE}</AppText>}
