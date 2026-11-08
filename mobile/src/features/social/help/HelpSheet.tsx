@@ -6,7 +6,7 @@ import { AccessibilityInfo, ActivityIndicator, Keyboard, KeyboardAvoidingView, M
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '@/components/AppText';
 import { Icon, IconName } from '@/components/Icon';
-import { c, fonts, layout, radius, role, scrim, shadowStyle } from '@/theme';
+import { c, fonts, layout, radius, role, scrim, shadowStyle, space } from '@/theme';
 import { SelectMark } from '../components/people';
 import { Btn, PilgrimAvatar, SearchField } from '../components/primitives';
 import { Notice } from '../components/states';
@@ -30,7 +30,10 @@ export type HelpSheetProps = {
 };
 
 const SCRIM = scrim;
-const PAD = 20;
+const PAD = space[5];
+// The headings of the sheet are Inter SemiBold at sizes and line heights of the type scale (no variant is semibold at these sizes): 19 for the title of a card, 22 for a section.
+const CARD_TITLE = { fontSize: 19, lineHeight: 28 } as const;
+const SECTION_TITLE = { fontSize: 22, lineHeight: 32 } as const;
 
 function useKeyboardOpen() {
   const [open, setOpen] = useState(false);
@@ -55,14 +58,15 @@ function Call112({ onPress, compact }: { onPress: () => void; compact?: boolean 
   return (
     <Pressable
       accessibilityRole="button" accessibilityLabel="Call 112" accessibilityHint="The emergency number. Opens your phone to place the call." onPress={onPress}
-      style={({ pressed }) => ({ minHeight: compact ? 64 : 88, borderRadius: radius.lg, backgroundColor: pressed ? c.red700 : c.red, flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: 18, paddingVertical: 12, ...shadowStyle('md') })}
+      style={({ pressed }) => ({ minHeight: compact ? 64 : 88, borderRadius: radius.lg, backgroundColor: pressed ? c.red700 : role.danger, flexDirection: 'row', alignItems: 'center', gap: space[4], paddingHorizontal: space[5], paddingVertical: space[3], ...shadowStyle('md') })}
     >
+      {/* design-lint-ignore: color a 20 % light disc behind the handset on the red 112 button; no token is a translucent tint */}
       <View style={{ width: compact ? 40 : 56, height: compact ? 40 : 56, borderRadius: radius.pill, backgroundColor: 'rgba(255,253,248,0.2)', alignItems: 'center', justifyContent: 'center' }}>
-        <PhoneIcon color={c.white} size={compact ? 24 : 32} strokeWidth={2} />
+        <PhoneIcon color={role.onDanger} size={compact ? 24 : 32} strokeWidth={2} />
       </View>
       <View style={{ flex: 1 }}>
-        <AppText variant="label" color={c.white} style={{ fontSize: compact ? 22 : 30, lineHeight: compact ? 28 : 36, fontFamily: fonts.bodyBold }}>Call 112</AppText>
-        {!compact && <AppText variant="caption" color={c.white} style={{ letterSpacing: 0, fontSize: 15, lineHeight: 20 }}>Works in Spain, France and Portugal, from any phone</AppText>}
+        <AppText variant="label" color={role.onDanger} style={{ fontSize: compact ? 22 : 30, lineHeight: compact ? 28 : 34, fontFamily: fonts.bodyBold }}>Call 112</AppText>
+        {!compact && <AppText variant="caption" color={role.onDanger}>Works in Spain, France and Portugal, from any phone</AppText>}
       </View>
     </Pressable>
   );
@@ -70,12 +74,12 @@ function Call112({ onPress, compact }: { onPress: () => void; compact?: boolean 
 
 /** The big buttons of the sheet: like Btn, but a long label wraps instead of being cut off (small phones, large fonts). */
 function ActionBtn({ label, onPress, variant = 'primary', icon, disabled, loading, hint }: { label: string; onPress: () => void; variant?: 'primary' | 'ghost' | 'soft'; icon?: IconName; disabled?: boolean; loading?: boolean; hint?: string }) {
-  const palette = { primary: { bg: role.action, fg: role.onAction, border: role.action }, ghost: { bg: role.surface, fg: role.text, border: role.border }, soft: { bg: c.blue50, fg: c.blue, border: c.blue50 } }[variant];
+  const palette = { primary: { bg: role.action, fg: role.onAction, border: role.action }, ghost: { bg: role.surface, fg: role.text, border: role.border }, soft: { bg: c.blue50, fg: role.action, border: c.blue50 } }[variant];
   const off = !!(disabled || loading);
   return (
     <Pressable
       accessibilityRole="button" accessibilityLabel={label} accessibilityHint={hint} accessibilityState={{ disabled: off, busy: !!loading }} disabled={off} onPress={onPress}
-      style={({ pressed }) => ({ minHeight: 56, paddingHorizontal: 22, paddingVertical: 8, borderRadius: radius.pill, backgroundColor: palette.bg, borderWidth: 1, borderColor: palette.border, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, opacity: off && !loading ? 0.55 : pressed ? 0.85 : 1 })}
+      style={({ pressed }) => ({ minHeight: layout.touchMin, paddingHorizontal: space[6], paddingVertical: space[2], borderRadius: radius.pill, backgroundColor: palette.bg, borderWidth: 1, borderColor: palette.border, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: space[2], opacity: off && !loading ? 0.55 : pressed ? 0.85 : 1 })}
     >
       {loading
         ? <ActivityIndicator color={palette.fg} />
@@ -92,14 +96,14 @@ function PositionCard({ h, placeText }: { h: Help; placeText?: string | null }) 
   const place = cleanPlace(placeText);
   if (!p.fix && p.status === 'none') {
     return (
-      <View accessibilityRole="alert" style={[card, { padding: 16, gap: 10 }]}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+      <View accessibilityRole="alert" style={[card, { padding: space[4], gap: space[3] }]}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: space[3] }}>
           <View style={{ width: 44, height: 44, borderRadius: radius.pill, backgroundColor: c.red100, alignItems: 'center', justifyContent: 'center' }}><Icon name="info" color={c.red700} size={24} strokeWidth={1.9} /></View>
-          <AppText variant="label" style={{ flex: 1, fontSize: 19, lineHeight: 25 }}>We could not find your position</AppText>
+          <AppText variant="label" style={{ flex: 1, ...CARD_TITLE }}>We could not find your position</AppText>
         </View>
         <AppText variant="small" muted>{failureText(p.failure ?? 'unavailable')}</AppText>
         <AppText variant="small">You can still call 112.</AppText>
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space[3] }}>
           <Btn label="Try again" icon="refresh" size="sm" onPress={() => void p.locate()} />
           {(p.failure === 'blocked' || p.failure === 'denied') && <Btn label="Open settings" size="sm" variant="ghost" onPress={h.openSettings} />}
         </View>
@@ -108,11 +112,11 @@ function PositionCard({ h, placeText }: { h: Help; placeText?: string | null }) 
   }
   if (!p.fix) {
     return (
-      <View accessibilityLiveRegion="polite" style={[card, { padding: 16, flexDirection: 'row', alignItems: 'center', gap: 14 }]}>
+      <View accessibilityLiveRegion="polite" style={[card, { padding: space[4], flexDirection: 'row', alignItems: 'center', gap: space[4] }]}>
         <ActivityIndicator color={role.action} />
         <View style={{ flex: 1 }}>
           <AppText variant="label">Finding your position…</AppText>
-          <AppText variant="caption" muted style={{ letterSpacing: 0 }}>This can take up to 10 seconds. You can call 112 now.</AppText>
+          <AppText variant="caption" muted>This can take up to 10 seconds. You can call 112 now.</AppText>
         </View>
       </View>
     );
@@ -126,30 +130,30 @@ function PositionCard({ h, placeText }: { h: Help; placeText?: string | null }) 
   const title = old ? 'Last known position' : 'Your position';
   const spoken = [`${title}: ${coords}`, acc ? `Accurate to ${acc}` : 'Accuracy unknown', ageText(age), place, locating ? 'Checking for a more exact position' : null].filter(Boolean).join('. ');
   return (
-    <View style={[card, { padding: 16, gap: 8 }, old && { borderColor: c.goldSoft, backgroundColor: c.goldWash }]}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-        <Icon name="pin" color={old ? c.goldInk : c.blue} size={22} strokeWidth={2} />
+    <View style={[card, { padding: space[4], gap: space[2] }, old && { borderColor: c.goldSoft, backgroundColor: c.goldWash }]}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: space[2] }}>
+        <Icon name="pin" color={old ? role.accentText : role.action} size={24} strokeWidth={2} />
         <AppText variant="label" style={{ flex: 1 }}>{title}</AppText>
         <Pressable
           accessibilityRole="button" accessibilityLabel="Update my position" accessibilityState={{ busy: locating, disabled: locating }} disabled={locating} onPress={() => void p.locate()} hitSlop={4}
-          style={({ pressed }) => ({ minHeight: 48, paddingHorizontal: 12, flexDirection: 'row', alignItems: 'center', gap: 6, borderRadius: radius.pill, opacity: locating ? 0.6 : pressed ? 0.7 : 1 })}
+          style={({ pressed }) => ({ minHeight: 48, paddingHorizontal: space[3], flexDirection: 'row', alignItems: 'center', gap: space[2], borderRadius: radius.pill, opacity: locating ? 0.6 : pressed ? 0.7 : 1 })}
         >
           {locating ? <ActivityIndicator size="small" color={role.action} /> : <Icon name="refresh" color={role.action} size={20} strokeWidth={2} />}
-          <AppText variant="label" color={role.action} style={{ fontSize: 16 }}>{locating ? 'Updating' : 'Update'}</AppText>
+          <AppText variant="label" color={role.action}>{locating ? 'Updating' : 'Update'}</AppText>
         </Pressable>
       </View>
-      <View accessible accessibilityLabel={spoken} accessibilityLiveRegion="polite" style={{ gap: 4 }}>
-        <AppText variant="mono" style={{ fontSize: 20, lineHeight: 28, fontFamily: fonts.mono }}>{coords}</AppText>
+      <View accessible accessibilityLabel={spoken} accessibilityLiveRegion="polite" style={{ gap: space[1] }}>
+        <AppText variant="mono" style={{ fontSize: 19, lineHeight: 28 }}>{coords}</AppText>
         <AppText variant="small" muted>{acc ? `Accurate to ${acc}` : 'Accuracy unknown'} · {ageText(age)}</AppText>
-        {locating && <AppText variant="caption" muted style={{ letterSpacing: 0 }}>Checking for a more exact position…</AppText>}
+        {locating && <AppText variant="caption" muted>Checking for a more exact position…</AppText>}
         {old && !locating && (
-          <AppText variant="small" color={c.goldInk}>
+          <AppText variant="small" color={role.accentText}>
             {p.source === 'fresh' ? `This position is ${ageText(age).replace(' ago', '')} old. Tap Update to get a new one.` : 'Your phone could not get a fresh position, so this is the last one it knew. Tap Update to try again.'}
           </AppText>
         )}
         {!!place && (
-          <AppText variant="small" style={{ marginTop: 2 }}>
-            <AppText variant="label" style={{ fontSize: 17, lineHeight: 25 }}>Place: </AppText>
+          <AppText variant="small" style={{ marginTop: space[1] }}>
+            <AppText variant="label">Place: </AppText>
             {place}
           </AppText>
         )}
@@ -165,12 +169,12 @@ const RecipientRow = memo(function RecipientRow({ row, onToggle }: { row: Picker
     <Pressable
       accessibilityRole="checkbox" accessibilityState={{ checked: row.chosen }} accessibilityLabel={group ? `${r.name}, group${row.detail ? `, ${row.detail}` : ''}` : r.name}
       accessibilityHint={row.chosen ? 'Tap to take out of the list' : 'Tap to add to the list'} onPress={() => onToggle(r)}
-      style={({ pressed }) => ({ minHeight: 64, flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: 14, paddingVertical: 8, backgroundColor: pressed ? c.sand200 : row.chosen ? c.goldWash : 'transparent' })}
+      style={({ pressed }) => ({ minHeight: 64, flexDirection: 'row', alignItems: 'center', gap: space[4], paddingHorizontal: space[4], paddingVertical: space[2], backgroundColor: pressed ? role.sunken : row.chosen ? c.goldWash : 'transparent' })}
     >
       <PilgrimAvatar name={r.name} uri={row.avatarUrl} seed={r.id} size={44} group={group} />
       <View style={{ flex: 1, minWidth: 0 }}>
-        <AppText variant="label" numberOfLines={1} style={{ fontSize: 18, lineHeight: 24 }}>{r.name}</AppText>
-        {!!(row.detail || row.username) && <AppText variant="caption" muted numberOfLines={1} style={{ letterSpacing: 0 }}>{row.detail ?? `@${row.username}`}</AppText>}
+        <AppText variant="label" numberOfLines={1}>{r.name}</AppText>
+        {!!(row.detail || row.username) && <AppText variant="caption" muted numberOfLines={1}>{row.detail ?? `@${row.username}`}</AppText>}
       </View>
       <SelectMark on={row.chosen} />
     </Pressable>
@@ -178,8 +182,8 @@ const RecipientRow = memo(function RecipientRow({ row, onToggle }: { row: Picker
 });
 
 const Group = ({ title, rows, onToggle }: { title: string; rows: PickerRow[]; onToggle: (r: Recipient) => void }) => (rows.length === 0 ? null : (
-  <View style={{ gap: 6 }}>
-    <AppText variant="mono" muted style={{ textTransform: 'uppercase', letterSpacing: 1.2, fontSize: 12 }} accessibilityRole="header">{title}</AppText>
+  <View style={{ gap: space[2] }}>
+    <AppText variant="mono" muted style={{ textTransform: 'uppercase' }} accessibilityRole="header">{title}</AppText>
     <View style={[card, { overflow: 'hidden' }]}>
       {rows.map((row, i) => (
         <View key={row.recipient.kind + row.recipient.id} style={i === 0 ? undefined : { borderTopWidth: 1, borderTopColor: role.border }}>
@@ -197,30 +201,30 @@ function Recipients({ h }: { h: Help }) {
   const waiting = people.loading && people.rows.friends.length === 0 && people.rows.groups.length === 0;
   const shown = rows.friends.length + rows.groups.length;
   return (
-    <View style={{ gap: 12 }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
-        <AppText variant="label" accessibilityRole="header" style={{ fontSize: 21, lineHeight: 28 }}>Who should get it?</AppText>
-        <AppText variant="mono" muted accessibilityLiveRegion="polite" style={{ fontSize: 14 }}>{people.chosen.length === 0 ? 'None chosen' : `${people.chosen.length} chosen`}</AppText>
+    <View style={{ gap: space[3] }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: space[3] }}>
+        <AppText variant="label" accessibilityRole="header" style={SECTION_TITLE}>Who should get it?</AppText>
+        <AppText variant="mono" muted accessibilityLiveRegion="polite">{people.chosen.length === 0 ? 'None chosen' : `${people.chosen.length} chosen`}</AppText>
       </View>
       <AppText variant="small" muted>{URGENT_NOTE}</AppText>
 
       {waiting && (
-        <View accessibilityRole="progressbar" accessibilityLabel="Loading your friends" style={[card, { padding: 16, flexDirection: 'row', alignItems: 'center', gap: 12 }]}>
+        <View accessibilityRole="progressbar" accessibilityLabel="Loading your friends" style={[card, { padding: space[4], flexDirection: 'row', alignItems: 'center', gap: space[3] }]}>
           <ActivityIndicator color={role.action} />
           <AppText variant="small" muted>Loading your friends and groups…</AppText>
         </View>
       )}
       {!!people.error && (
-        <View accessibilityRole="alert" style={[card, { padding: 14, gap: 8, borderColor: c.red100 }]}>
+        <View accessibilityRole="alert" style={[card, { padding: space[4], gap: space[2], borderColor: c.red100 }]}>
           <AppText variant="small">{rows.remembered && shown > 0 ? `${people.error} These are the people you chose last time.` : people.error}</AppText>
           <View style={{ flexDirection: 'row' }}><Btn label="Try again" icon="refresh" size="sm" variant="ghost" onPress={() => void people.retry()} /></View>
         </View>
       )}
       {noPeople && (
-        <View style={[card, { padding: 16, gap: 8 }]}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-            <View style={{ width: 44, height: 44, borderRadius: radius.pill, backgroundColor: c.goldWash, alignItems: 'center', justifyContent: 'center' }}><Icon name="group" color={c.goldInk} size={24} /></View>
-            <AppText variant="label" style={{ flex: 1, fontSize: 19, lineHeight: 25 }}>No friends here yet</AppText>
+        <View style={[card, { padding: space[4], gap: space[2] }]}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: space[3] }}>
+            <View style={{ width: 44, height: 44, borderRadius: radius.pill, backgroundColor: c.goldWash, alignItems: 'center', justifyContent: 'center' }}><Icon name="group" color={role.accentText} size={24} /></View>
+            <AppText variant="label" style={{ flex: 1, ...CARD_TITLE }}>No friends here yet</AppText>
           </View>
           <AppText variant="small" muted>When a friend accepts your request, they show up here. Until then, use “Share by WhatsApp or SMS” below to send your position to anyone.</AppText>
         </View>
@@ -236,7 +240,7 @@ function Recipients({ h }: { h: Help }) {
             </View>
           )}
           <SearchField value={people.query} onChangeText={people.setQuery} placeholder="Search friends and groups" label="Search friends and groups" />
-          {!!people.limited && <AppText variant="small" color={c.goldInk} accessibilityLiveRegion="polite">{LIMIT_TEXT}</AppText>}
+          {!!people.limited && <AppText variant="small" color={role.accentText} accessibilityLiveRegion="polite">{LIMIT_TEXT}</AppText>}
           {shown === 0 && people.query.length > 0
             ? <AppText variant="small" muted style={{ textAlign: 'center' }}>{`No friend or group matches “${people.query.trim()}”.`}</AppText>
             : <><Group title="Friends" rows={rows.friends} onToggle={people.toggle} /><Group title="Groups" rows={rows.groups} onToggle={people.toggle} /></>}
@@ -251,12 +255,12 @@ function RingButton({ disabled, subtitle, spoken, onPress }: { disabled: boolean
     <Pressable
       accessibilityRole="button" accessibilityLabel={spoken} accessibilityHint="Shows what will be sent and to whom. Nothing is sent yet."
       accessibilityState={{ disabled }} disabled={disabled} onPress={onPress}
-      style={({ pressed }) => ({ minHeight: 64, borderRadius: radius.pill, backgroundColor: role.surface, borderWidth: 2, borderColor: c.red, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 12, paddingHorizontal: 20, opacity: disabled ? 0.5 : pressed ? 0.85 : 1 })}
+      style={({ pressed }) => ({ minHeight: 64, borderRadius: radius.pill, backgroundColor: role.surface, borderWidth: 2, borderColor: role.danger, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: space[3], paddingHorizontal: space[5], opacity: disabled ? 0.5 : pressed ? 0.85 : 1 })}
     >
-      <Icon name="bell" color={c.red} size={28} strokeWidth={2.1} />
+      <Icon name="bell" color={role.danger} size={28} strokeWidth={2.1} />
       <View style={{ flexShrink: 1 }}>
-        <AppText variant="label" style={{ fontSize: 20, lineHeight: 25 }}>Ring the bell</AppText>
-        {!!subtitle && <AppText variant="caption" muted numberOfLines={2} accessibilityLiveRegion="polite" style={{ letterSpacing: 0, fontSize: 14, lineHeight: 18 }}>{subtitle}</AppText>}
+        <AppText variant="label" style={CARD_TITLE}>Ring the bell</AppText>
+        {!!subtitle && <AppText variant="caption" muted numberOfLines={2} accessibilityLiveRegion="polite">{subtitle}</AppText>}
       </View>
     </Pressable>
   );
@@ -269,32 +273,32 @@ function Confirm({ h }: { h: Help }) {
   if (!p) return null;
   const old = fixAgeMs(p.fix, h.now) > FIX_OLD_MS;
   return (
-    <View style={{ gap: 14 }}>
-      <View style={{ gap: 4 }}>
+    <View style={{ gap: space[4] }}>
+      <View style={{ gap: space[1] }}>
         <AppText variant="h4" accessibilityRole="header">Send this message?</AppText>
         <AppText variant="small" muted>This is exactly what your friends will see in the chat.</AppText>
       </View>
-      <View accessibilityLabel={`The message: ${p.text.replace(/\n/g, '. ')}`} accessible style={{ backgroundColor: role.surface, borderRadius: radius.md, borderWidth: 1.5, borderColor: c.red, padding: 14 }}>
-        <AppText variant="mono" selectable style={{ fontSize: 15, lineHeight: 23 }}>{p.text}</AppText>
+      <View accessibilityLabel={`The message: ${p.text.replace(/\n/g, '. ')}`} accessible style={{ backgroundColor: role.surface, borderRadius: radius.md, borderWidth: 2, borderColor: role.danger, padding: space[4] }}>
+        <AppText variant="mono" selectable>{p.text}</AppText>
       </View>
-      <View style={{ gap: 6 }}>
-        <AppText variant="mono" muted style={{ textTransform: 'uppercase', letterSpacing: 1.2, fontSize: 12 }} accessibilityRole="header">To</AppText>
+      <View style={{ gap: space[2] }}>
+        <AppText variant="mono" muted style={{ textTransform: 'uppercase' }} accessibilityRole="header">To</AppText>
         <View style={[card, { overflow: 'hidden' }]}>
           {p.recipients.map((r, i) => (
-            <View key={r.kind + r.id} accessible accessibilityLabel={r.kind === 'group' ? `${r.name}, group. Everyone in it will see your position.` : r.name} style={[{ minHeight: 60, flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 14, paddingVertical: 8 }, i > 0 && { borderTopWidth: 1, borderTopColor: role.border }]}>
+            <View key={r.kind + r.id} accessible accessibilityLabel={r.kind === 'group' ? `${r.name}, group. Everyone in it will see your position.` : r.name} style={[{ minHeight: 60, flexDirection: 'row', alignItems: 'center', gap: space[3], paddingHorizontal: space[4], paddingVertical: space[2] }, i > 0 && { borderTopWidth: 1, borderTopColor: role.border }]}>
               <PilgrimAvatar name={r.name} seed={r.id} size={40} group={r.kind === 'group'} />
               <View style={{ flex: 1, minWidth: 0 }}>
                 <AppText variant="label" numberOfLines={1}>{r.name}</AppText>
-                <AppText variant="caption" muted style={{ letterSpacing: 0 }}>{r.kind === 'group' ? 'Group chat. Everyone in it sees your position.' : 'Friend'}</AppText>
+                <AppText variant="caption" muted>{r.kind === 'group' ? 'Group chat. Everyone in it sees your position.' : 'Friend'}</AppText>
               </View>
             </View>
           ))}
         </View>
       </View>
       <AppText variant="small" muted>{URGENT_NOTE}</AppText>
-      {p.skipped.length > 0 && <AppText variant="small" color={c.goldInk}>{`Not again yet, they got a help message less than a minute ago: ${namesText(p.skipped, 3)}.`}</AppText>}
-      {old && <AppText variant="small" color={c.goldInk}>{`This position is from ${ageText(fixAgeMs(p.fix, h.now))}. Go back and tap Update if you can.`}</AppText>}
-      {!h.online && <AppText variant="small" color={c.goldInk}>You are offline. The message waits in your phone and is sent when your signal returns.</AppText>}
+      {p.skipped.length > 0 && <AppText variant="small" color={role.accentText}>{`Not again yet, they got a help message less than a minute ago: ${namesText(p.skipped, 3)}.`}</AppText>}
+      {old && <AppText variant="small" color={role.accentText}>{`This position is from ${ageText(fixAgeMs(p.fix, h.now))}. Go back and tap Update if you can.`}</AppText>}
+      {!h.online && <AppText variant="small" color={role.accentText}>You are offline. The message waits in your phone and is sent when your signal returns.</AppText>}
     </View>
   );
 }
@@ -305,7 +309,7 @@ function Confirm({ h }: { h: Help }) {
 const stateStyle = () => ({
   sent: { icon: 'check', color: c.success },
   sending: { icon: 'clock', color: role.muted },
-  waiting: { icon: 'wifi-off', color: c.goldInk },
+  waiting: { icon: 'wifi-off', color: role.accentText },
   failed: { icon: 'info', color: c.red700 },
   unknown: { icon: 'info', color: role.muted },
 } as const);
@@ -316,19 +320,20 @@ const DeliveryItem = memo(function DeliveryItem({ row, onRetry }: { row: Deliver
   const look = stateStyle()[d?.state ?? 'unknown'];
   const label = d ? `${row.send?.kind === 'ok' ? 'I am OK now: ' : ''}${d.label}` : 'Not sent';
   return (
-    <View style={{ minHeight: 64, paddingHorizontal: 14, paddingVertical: 10, gap: 8 }}>
-      <View accessible accessibilityLabel={`${r.name}. ${label}.${d?.detail ? ` ${d.detail}` : ''}`} style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+    <View style={{ minHeight: 64, paddingHorizontal: space[4], paddingVertical: space[3], gap: space[2] }}>
+      <View accessible accessibilityLabel={`${r.name}. ${label}.${d?.detail ? ` ${d.detail}` : ''}`} style={{ flexDirection: 'row', alignItems: 'center', gap: space[3] }}>
         <PilgrimAvatar name={r.name} seed={r.id} size={40} group={r.kind === 'group'} />
         <View style={{ flex: 1, minWidth: 0 }}>
           <AppText variant="label" numberOfLines={1}>{r.name}</AppText>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-            {d?.state === 'sending' ? <ActivityIndicator size="small" color={look.color} /> : <Icon name={look.icon} color={look.color} size={16} strokeWidth={2.4} />}
-            <AppText variant="caption" color={look.color} style={{ letterSpacing: 0, fontFamily: fonts.bodyBold, flexShrink: 1 }}>{label}</AppText>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: space[2] }}>
+            {d?.state === 'sending' ? <ActivityIndicator size="small" color={look.color} /> : <Icon name={look.icon} color={look.color} size={18} strokeWidth={2.4} />}
+            <AppText variant="caption" color={look.color} style={{ fontFamily: fonts.bodyBold, flexShrink: 1 }}>{label}</AppText>
           </View>
-          {!!d?.detail && <AppText variant="caption" muted style={{ letterSpacing: 0, fontSize: 14, lineHeight: 19 }}>{d.detail}</AppText>}
+          {!!d?.detail && <AppText variant="caption" muted>{d.detail}</AppText>}
         </View>
       </View>
       {!!(d?.retry && row.send) && (
+        // design-lint-ignore: spacing lines the button up under the name: the avatar is 40 wide and the gap is 12
         <View style={{ paddingLeft: 52, flexDirection: 'row' }}>
           <Btn label="Try again" icon="refresh" size="sm" variant="ghost" onPress={() => onRetry(row.send!.id)} accessibilityLabel={`Try again for ${r.name}`} />
         </View>
@@ -342,14 +347,14 @@ function Sent({ h }: { h: Help }) {
   if (!a) return null;
   const lastHelp = a.sends.filter((s) => s.kind === 'help').reduce((m, s) => Math.max(m, s.at), a.startedAt);
   return (
-    <View style={{ gap: 14 }}>
-      <View style={{ gap: 4 }}>
+    <View style={{ gap: space[4] }}>
+      <View style={{ gap: space[1] }}>
         <AppText variant="h4" accessibilityRole="header">{h.closed ? 'You said you are OK' : `Bell rung at ${clockTime(a.startedAt)}`}</AppText>
         {h.closed
           ? <AppText variant="small" muted>{`At ${clockTime(a.okAt ?? lastHelp)}. The people you told got “I am OK now”.`}</AppText>
           : lastHelp - a.startedAt > 5000 && <AppText variant="small" muted>{`Your position was sent again at ${clockTime(lastHelp)}.`}</AppText>}
       </View>
-      <AppText variant="label" accessibilityLiveRegion="polite" style={{ fontSize: 18, lineHeight: 24 }}>{h.summary}</AppText>
+      <AppText variant="label" accessibilityLiveRegion="polite" style={CARD_TITLE}>{h.summary}</AppText>
       <View style={[card, { overflow: 'hidden' }]}>
         {h.rows.map((row, i) => (
           <View key={row.recipient.kind + row.recipient.id} style={i > 0 ? { borderTopWidth: 1, borderTopColor: role.border } : undefined}>
@@ -358,7 +363,7 @@ function Sent({ h }: { h: Help }) {
         ))}
       </View>
       <AppText variant="small" muted>{URGENT_NOTE}</AppText>
-      <View style={{ gap: 10 }}>
+      <View style={{ gap: space[3] }}>
         <ActionBtn label="Share by WhatsApp or SMS" icon="share" variant="ghost" onPress={() => void h.share()} hint="Opens your share sheet with your position and a map link" />
         {!h.closed && <ActionBtn label="Choose different people" icon="group" variant="soft" onPress={() => h.setView('compose')} />}
       </View>
@@ -409,7 +414,7 @@ export function HelpSheet({ visible, onClose, position, placeText }: HelpSheetPr
   } else {
     buttons = (
       <>
-        {h.resendBlocked && <AppText variant="caption" muted accessibilityLiveRegion="polite" style={{ textAlign: 'center', letterSpacing: 0 }}>{`You can send your position again in ${waitSeconds(h.resendWaitMs)} s.`}</AppText>}
+        {h.resendBlocked && <AppText variant="caption" muted accessibilityLiveRegion="polite" style={{ textAlign: 'center' }}>{`You can send your position again in ${waitSeconds(h.resendWaitMs)} s.`}</AppText>}
         <ActionBtn label="I am OK now" icon="check" loading={h.busy === 'ok'} disabled={busy} onPress={() => void h.sayOk()} hint="Tells the same chats: I am OK now" />
         <ActionBtn
           label="Send my position again" icon="refresh" variant="ghost" loading={h.busy === 'resend'} disabled={busy || h.resendBlocked} onPress={() => void h.resend()}
@@ -419,10 +424,10 @@ export function HelpSheet({ visible, onClose, position, placeText }: HelpSheetPr
     );
   }
   const footer = (
-    <View style={[{ gap: 10 }, sticky ? { paddingHorizontal: PAD, paddingTop: 10, paddingBottom: Math.max(insets.bottom, 12) + 6, borderTopWidth: 1, borderTopColor: role.border, backgroundColor: role.bg } : { marginTop: 4 }]}>
+    <View style={[{ gap: space[3] }, sticky ? { paddingHorizontal: PAD, paddingTop: space[3], paddingBottom: Math.max(insets.bottom, 12) + space[2], borderTopWidth: 1, borderTopColor: role.border, backgroundColor: role.bg } : { marginTop: space[1] }]}>
       {!!h.feedback && (
-        <View accessibilityRole="alert" accessibilityLiveRegion="polite" style={{ backgroundColor: c.goldWash, borderRadius: radius.md, paddingHorizontal: 14, paddingVertical: 10 }}>
-          <AppText variant="small" color={c.goldInk} style={{ textAlign: 'center' }}>{h.feedback}</AppText>
+        <View accessibilityRole="alert" accessibilityLiveRegion="polite" style={{ backgroundColor: c.goldWash, borderRadius: radius.md, paddingHorizontal: space[4], paddingVertical: space[3] }}>
+          <AppText variant="small" color={role.accentText} style={{ textAlign: 'center' }}>{h.feedback}</AppText>
         </View>
       )}
       {buttons}
@@ -435,16 +440,16 @@ export function HelpSheet({ visible, onClose, position, placeText }: HelpSheetPr
         <Pressable accessibilityRole="button" accessibilityLabel="Close help" onPress={onClose} style={StyleSheet.absoluteFill} />
         <KeyboardAvoidingView behavior="padding">
           <View accessibilityViewIsModal style={{ maxHeight: height - insets.top - layout.screenTop, backgroundColor: role.bg, borderTopLeftRadius: radius.lg, borderTopRightRadius: radius.lg, overflow: 'hidden', ...shadowStyle('xl') }}>
-            <View style={{ paddingTop: 10, paddingHorizontal: PAD }}>
+            <View style={{ paddingTop: space[3], paddingHorizontal: PAD }}>
               <View style={{ alignSelf: 'center', width: 48, height: 5, borderRadius: radius.pill, backgroundColor: role.border }} />
-              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 6 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: space[2] }}>
                 <AppText variant="h4" accessibilityRole="header">Need help?</AppText>
-                <Pressable accessibilityRole="button" accessibilityLabel="Close" onPress={onClose} hitSlop={4} style={({ pressed }) => ({ width: 48, height: 48, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center', backgroundColor: pressed ? c.sand200 : 'transparent' })}>
+                <Pressable accessibilityRole="button" accessibilityLabel="Close" onPress={onClose} hitSlop={4} style={({ pressed }) => ({ width: 48, height: 48, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center', backgroundColor: pressed ? role.sunken : 'transparent' })}>
                   <Icon name="close" color={role.text} size={24} strokeWidth={2} />
                 </Pressable>
               </View>
             </View>
-            <ScrollView ref={scroller} keyboardShouldPersistTaps="handled" style={{ flexShrink: 1 }} contentContainerStyle={{ paddingHorizontal: PAD, paddingTop: 4, paddingBottom: sticky ? 20 : Math.max(insets.bottom, 12) + 20, gap: 16 }}>
+            <ScrollView ref={scroller} keyboardShouldPersistTaps="handled" style={{ flexShrink: 1 }} contentContainerStyle={{ paddingHorizontal: PAD, paddingTop: space[1], paddingBottom: sticky ? 20 : Math.max(insets.bottom, 12) + 20, gap: space[4] }}>
               <Call112 compact={h.view === 'confirm'} onPress={() => void h.call112()} />
               <AppText variant="small">{EMERGENCY_NOTE}</AppText>
               {!h.online && <View style={{ borderRadius: radius.md, overflow: 'hidden' }}><Notice icon="wifi-off" text={OFFLINE_NOTE} /></View>}

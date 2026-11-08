@@ -6,7 +6,7 @@ import { Fragment } from 'react';
 import { Linking, Pressable, View } from 'react-native';
 import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
-import { c, fonts, radius, role } from '@/theme';
+import { c, layout, radius, role, space } from '@/theme';
 import { isHelpMessage, isSafeUrl, linkify, parseHelpMessage, urlsIn } from './logic';
 
 /** Opens an http(s) link. Anything else is refused. */
@@ -32,20 +32,20 @@ export function helpSpoken(body: string): string {
   return ['Help request', p.place ? `Place: ${p.place}` : null, p.position ? `Position: ${p.position}` : null, p.rest || null].filter(Boolean).join('. ');
 }
 
-/** Message text with tappable http(s) links. */
-export function LinkedText({ text, color, linkColor, fontSize = 18, lineHeight = 26 }: { text: string; color: string; linkColor: string; fontSize?: number; lineHeight?: number }) {
+/** Message text with tappable http(s) links: the body text of the type scale (19), or the small one (17) inside a help request. */
+export function LinkedText({ text, color, linkColor, variant = 'body' }: { text: string; color: string; linkColor: string; variant?: 'body' | 'small' }) {
   return (
-    <AppText variant="body" color={color} style={{ fontSize, lineHeight }}>
+    <AppText variant={variant} color={color}>
       {linkify(text).map((p, i) => (p.url
-        ? <AppText key={i} variant="body" accessibilityRole="link" onPress={() => void openUrl(p.url!)} color={linkColor} style={{ fontSize, lineHeight, textDecorationLine: 'underline' }}>{p.text}</AppText>
+        ? <AppText key={i} variant={variant} accessibilityRole="link" onPress={() => void openUrl(p.url!)} color={linkColor} style={{ textDecorationLine: 'underline' }}>{p.text}</AppText>
         : <Fragment key={i}>{p.text}</Fragment>))}
     </AppText>
   );
 }
 
 const Line = ({ label, value }: { label: string; value: string }) => (
-  <AppText variant="body" color={role.text} style={{ fontSize: 17, lineHeight: 24 }}>
-    <AppText variant="label" color={role.text} style={{ fontSize: 17, lineHeight: 24, fontFamily: fonts.bodyBold }}>{label} </AppText>
+  <AppText variant="small" color={role.text}>
+    <AppText variant="label" color={role.text}>{label} </AppText>
     {value}
   </AppText>
 );
@@ -54,18 +54,18 @@ const Line = ({ label, value }: { label: string; value: string }) => (
 export function HelpBody({ body }: { body: string }) {
   const p = parseHelpMessage(body);
   return (
-    <View style={{ gap: 6 }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-        <Icon name="bell" color={c.red700} size={22} strokeWidth={2.2} />
-        <AppText variant="label" color={c.red700} style={{ fontSize: 18, lineHeight: 24 }}>Help request</AppText>
+    <View style={{ gap: space[2] }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: space[2] }}>
+        <Icon name="bell" color={c.red700} size={24} strokeWidth={2.2} />
+        <AppText variant="label" color={c.red700}>Help request</AppText>
       </View>
       {!!p.place && <Line label="Place:" value={p.place} />}
       {!!p.position && <Line label="Position:" value={p.position} />}
-      {!!p.rest && <LinkedText text={p.rest} color={role.text} linkColor={c.blue700} fontSize={17} lineHeight={24} />}
+      {!!p.rest && <LinkedText text={p.rest} color={role.text} linkColor={c.blue700} variant="small" />}
       {!!p.mapUrl && (
         <Pressable
           accessibilityRole="button" accessibilityLabel="Open map" accessibilityHint="Opens this position in your maps app or browser" onPress={() => void openUrl(p.mapUrl!)}
-          style={({ pressed }) => ({ alignSelf: 'flex-start', minHeight: 48, marginTop: 4, paddingHorizontal: 20, borderRadius: radius.pill, backgroundColor: role.action, flexDirection: 'row', alignItems: 'center', gap: 8, opacity: pressed ? 0.85 : 1 })}
+          style={({ pressed }) => ({ alignSelf: 'flex-start', minHeight: layout.touchMin, marginTop: space[1], paddingHorizontal: space[5], borderRadius: radius.pill, backgroundColor: role.action, flexDirection: 'row', alignItems: 'center', gap: space[2], opacity: pressed ? 0.85 : 1 })}
         >
           <Icon name="pin" color={role.onAction} size={20} strokeWidth={2} />
           <AppText variant="label" color={role.onAction}>Open map</AppText>
