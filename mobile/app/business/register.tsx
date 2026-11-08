@@ -5,6 +5,7 @@ import { Screen } from '@/components/Screen';
 import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
 import { Pill } from '@/components/Pill';
+import { BackButton } from '@/components/BackButton';
 import { Card, Chip, IconButton } from '@/components/ui';
 import { Badge, Field, OptionCard, Row, StepBar } from '@/features/business/ui';
 import { Sheet } from '@/features/business/BusinessCard';
@@ -62,9 +63,9 @@ export default function BusinessRegister() {
     <View style={{ flex: 1, backgroundColor: role.bg }}>
     <Screen>
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-        <IconButton name="back" label="Back" onPress={back} flat />
+        <BackButton onPress={back} />
         <AppText variant="mono" muted style={{ marginLeft: 'auto', fontSize: 13 }}>Step {step} of {STEPS.length}</AppText>
-        <IconButton name="close" label="Close" onPress={() => setExitAsk(true)} flat />
+        <IconButton name="close" label="Close" onPress={() => setExitAsk(true)} />
       </View>
       <StepBar step={step} total={STEPS.length} />
 

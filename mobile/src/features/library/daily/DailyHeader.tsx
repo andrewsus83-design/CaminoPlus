@@ -1,16 +1,17 @@
 import { Pressable, View } from 'react-native';
 import { AppText } from '@/components/AppText';
+import { BackButton } from '@/components/BackButton';
 import { Icon, type IconName } from '@/components/Icon';
 import { radius, role } from '@/theme';
 import { BOOKMARK_DAY, UNBOOKMARK_DAY } from './bookmarks';
 
-// The top of the Daily reading screen, one row: the Back button, the title right next to it (the Fraunces title of the other screens, one step
-// smaller than their h2 so that it can sit beside three buttons), and at the right edge the calendar and the bookmark. The buttons look like the
-// round Back button of the other screens (components/ui.tsx IconButton) and are 44 by 44, the least a finger needs. The title wraps to a second
-// line on the narrowest phones and at the biggest text sizes (it stops growing at 1.2 times) and never runs under a button.
+// The top of the Daily reading screen, one row: the Back button of the app (components/BackButton.tsx), the title right next to it (the Fraunces title of the other
+// screens, one step smaller than their h2 so that it can sit beside three buttons), and at the right edge the calendar and the bookmark. The two buttons look like the
+// Back button (components/ui.tsx IconButton) and are as big, 48 by 48. The title wraps to a second line on the narrowest phones and at the biggest text sizes (it
+// stops growing at 1.2 times) and never runs under a button.
 // The bookmark exposes whether the day is bookmarked with aria-selected (a prop of React Native since 0.71, which the web draws as the attribute
 // of the same name: the older accessibilityState object is not drawn there).
-const SIZE = 44;
+const SIZE = 48;
 
 function HeaderButton({ name, label, onPress, selected }: { name: IconName; label: string; onPress: () => void; selected?: boolean }) {
   return (
@@ -26,10 +27,10 @@ function HeaderButton({ name, label, onPress, selected }: { name: IconName; labe
   );
 }
 
-export function DailyHeader({ onBack, onCalendar, bookmarked, onBookmark }: { onBack: () => void; onCalendar: () => void; bookmarked: boolean; onBookmark: () => void }) {
+export function DailyHeader({ onCalendar, bookmarked, onBookmark }: { onCalendar: () => void; bookmarked: boolean; onBookmark: () => void }) {
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: SIZE }}>
-      <HeaderButton name="back" label="Back" onPress={onBack} />
+      <BackButton fallback="/library" />
       <AppText variant="h3" accessibilityRole="header" numberOfLines={2} maxFontSizeMultiplier={1.2} style={{ flex: 1, minWidth: 0 }}>Daily reading</AppText>
       <HeaderButton name="calendar" label="Open calendar" onPress={onCalendar} />
       <HeaderButton name="bookmark" label={bookmarked ? UNBOOKMARK_DAY : BOOKMARK_DAY} selected={bookmarked} onPress={onBookmark} />

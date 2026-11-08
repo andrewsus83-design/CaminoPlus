@@ -261,8 +261,7 @@ textarea.cp-input { height: 120px; border-radius: var(--cp-radius-lg); padding: 
 .rd-kick { margin: 0; font-family: var(--cp-font-title); font-weight: 600; font-size: 24px; line-height: 30px; color: var(--cp-text-accent); }
 .rd-title { margin: 2px 0 0; font-family: var(--cp-font-title); font-weight: 600; font-size: 36px; line-height: 42px; letter-spacing: -0.5px; }
 .rd-sub { margin: 2px 0 0; font-family: var(--cp-font-title); font-weight: 600; font-size: 20px; line-height: 26px; color: var(--cp-text-muted); }
-.rd-all { min-height: 48px; display: inline-flex; align-items: center; gap: 6px; padding: 0 16px; border: 0; border-radius: var(--cp-radius-pill); background: var(--cp-surface); box-shadow: inset 0 0 0 1px var(--cp-border); color: var(--cp-text); font: 600 15px/20px var(--cp-font-body); }
-.rd-all .cp-icon { width: 18px; height: 18px; color: var(--cp-action); }
+.rd-all { min-height: 48px; display: inline-flex; align-items: center; padding: 0 20px; border: 0; border-radius: var(--cp-radius-pill); background: var(--cp-surface); box-shadow: inset 0 0 0 1px var(--cp-border); color: var(--cp-text); font: 600 17px/22px var(--cp-font-body); }
 .rd-nav { display: flex; flex-wrap: wrap; gap: 8px; }
 .rd-step { min-height: 48px; flex: 1 0 auto; display: flex; align-items: center; gap: 8px; padding: 0 14px; border: 0; border-radius: var(--cp-radius-pill); background: var(--cp-surface); box-shadow: inset 0 0 0 1px var(--cp-border), var(--cp-shadow-sm); color: var(--cp-text); font: 400 14px/20px var(--cp-font-mono); }
 .rd-step.next { justify-content: flex-end; }
@@ -402,10 +401,10 @@ textarea.cp-input { height: 120px; border-radius: var(--cp-radius-lg); padding: 
   height: 88px; padding: 0 8px; margin: 0 12px; border-radius: var(--cp-radius-pill);
   background: var(--cp-tab-bar); border: 1px solid var(--cp-tab-bar-border); box-shadow: var(--cp-shadow-lg);
 }
-.cp-tab { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 14px; font-weight: 600; color: var(--cp-tab-inactive); font-weight: 300; width: 72px; }
+.cp-tab { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 14px; color: var(--cp-tab-inactive); font-weight: var(--cp-tab-inactive-weight); width: 72px; }
 .cp-tab .ico { width: 64px; height: 38px; border-radius: var(--cp-radius-pill); display: grid; place-items: center; transition: background var(--cp-duration-base); }
 .cp-tab.on { color: var(--cp-text); font-weight: var(--cp-tab-active-weight); }
-.cp-tab .cp-icon { width: 28px; height: 28px; stroke-width: 1.3px; }
+.cp-tab .cp-icon { width: 28px; height: 28px; stroke-width: var(--cp-tab-inactive-stroke); }
 .cp-tab.on .ico { background: none; }
 .cp-tab.on .ico .cp-icon { stroke-width: var(--cp-tab-active-stroke); }
 
@@ -1471,12 +1470,24 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
       <button class="cp-btn cp-btn-primary md">Medium 48</button>
       <button class="cp-btn cp-btn-primary sm">Small 36</button>
       <span style="width:24px"></span>
-      <button class="cp-icon-btn" aria-label="Back"><svg class="cp-icon"><use href="#i-back"/></svg></button>
-      <button class="cp-icon-btn flat" aria-label="Save"><svg class="cp-icon"><use href="#i-heart"/></svg></button>
+      <button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon"><use href="#i-back"/></svg></button>
+      <button class="cp-icon-btn" aria-label="Save"><svg class="cp-icon"><use href="#i-heart"/></svg></button>
       <button class="cp-icon-btn blue" aria-label="Navigate"><svg class="cp-icon"><use href="#i-nav"/></svg></button>
       <button class="cp-report-fab" aria-label="Report"><svg class="cp-icon"><use href="#i-plus"/></svg></button>
     </div>
-    <p class="spec" style="margin:28px 0 0">.cp-btn-primary · .cp-btn-gold · .cp-btn-secondary · .cp-btn-ghost · .cp-btn-danger · sizes: (default lg) .md .sm · .cp-icon-btn 48 · .cp-report-fab 64 · press = scale(0.97)</p>
+    <p class="spec" style="margin:28px 0 0">.cp-btn-primary · .cp-btn-gold · .cp-btn-secondary · .cp-btn-ghost · .cp-btn-danger · sizes: (default lg) .md .sm · .cp-icon-btn 48 (.flat: a hairline, no shadow; the Back button) · .cp-report-fab 64 · press = scale(0.97)</p>
+  </div>
+  <h3 id="back-button">Back: one button for the whole app</h3>
+  <div class="panel" style="margin-top:16px">
+    <div class="row" style="gap:24px;align-items:flex-start">
+      <button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon"><use href="#i-back"/></svg></button>
+      <div style="max-width:700px">
+        <p style="margin:0 0 10px"><b>Back</b> is <code>.cp-icon-btn.flat</code> with the chevron <code>#i-back</code>: round, <b>48 by 48</b>, the surface colour and a hairline, named "Back", the first thing in the first row of a screen that was opened from another one, 16 from the edge. Every screen has this one and no other: not a pill that says "Contents", not a bare chevron of 30, not a button of 44 or 40, not one without its hairline.</p>
+        <p style="margin:0 0 10px">It goes to the screen before this one; when there is none (a link, a notification or a reload opened the screen) it goes to the home of the screen: the Library, Me, the first screen. In a form that has steps it goes back a step. Where it goes somewhere other than the screen before, it says so to a screen reader after its name: the reader of a book says "Back, Back to the contents of this book".</p>
+        <p style="margin:0">The other arrows are not Back and do not look like it: Previous and Next of a chapter, the arrows of the week and of the month of the calendar are named by where they go and are never alone in the corner. In the app it is one component, <code>mobile/src/components/BackButton.tsx</code> (the <code>IconButton</code> of the app with the back chevron), and a test fails when another file draws the chevron for a way back.</p>
+      </div>
+    </div>
+    <p class="spec" style="margin:20px 0 0">BackButton · IconButton name="back" label="Back" · 48 · role.surface + role.border · optional hint · fallback = the home of the screen (/library, /me, /)</p>
   </div>
 </section>
 
@@ -1882,7 +1893,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     </div>
     <div class="panel" style="padding:12px 24px 0"><div class="cp-subtabs" style="margin:0"><span>Notes</span><span class="on">Journey</span><span>Plan</span><span>Health</span></div><p class="spec" style="margin:16px 0 20px">.cp-subtabs · 17/600 · 3px blue underline · Me: Notes, Journey, Plan, Health, and it opens on Journey</p></div>
   </div>
-  <p class="spec" style="margin-top:16px">.cp-tabbar · height 72 · radius pill · shadow-lg · icon 24 in 52×32 pill · label 12/500 (active 700)</p>
+  <p class="spec" style="margin-top:16px">.cp-tabbar · height 88 · radius pill · shadow-lg · icon 28 · label 14 · inactive: stroke 0.8 (0.93 px) and Inter Light, the stem of the label · active: stroke 3 and Bold in light mode, 2.6 and SemiBold in dark mode (tokens.tab)</p>
   <p class="note" style="margin-top:12px;max-width:760px"><b>Settings is not a tab.</b> It opens from the gear at the top right of Me, the only button there, as a screen of its own: a back button on the left, light/dark and log out on the right, and no tab bar under it. <b>Library</b> is the fifth tab. It has no title: the row on top is a search field and the round Bookmarks button in the corner (the same size as the bell and the gear on Me), and directly under it the two tabs Bible and Books, then the banner of the tab. The Bible tab is real: the World English Bible, Catholic edition, all 73 books, in the app. It starts with a compact daily reading banner (one handwritten note and a gold pill), then a segmented pill that chooses the part (Old Testament, Deuterocanon, New Testament; it is in the page and scrolls with it), then the books of that part as square tiles, three in a row. A tile opens the numbers of the chapters of the book, a number opens the words, and Previous and Next name where they go and carry on across the books. The Books tab is real too: the books written for the app, with their text in it (Library · Books and the reader, below). There is no gold button on the Library. <b>Me</b> has four sub-tabs under the highlights, left to right Notes, Journey, Plan and Health, and it opens on Journey. One gold button floats over all four, the chat button at the bottom right: it opens the inbox (notifications, messages and groups) and carries the unread badge, so the header keeps only the gear. Writing is a card, not a button that floats: the first tile of Journey is the card Write a journey post, and the card at the top of Notes is Write a note. <b>The diary</b> (Me, Notes) keeps its pages only on the phone: the list says so, nothing is uploaded, logging out keeps the pages, deleting the account deletes them, and a page is saved as it is typed, so there is no Save button.</p>
   <p class="note" style="margin-top:12px;max-width:760px"><b>Library search</b> looks through the Bible and Books tabs at once, as you type (every book of the Bible and every book of the Library; the diary is not searched here, it is the Notes sub-tab of Me), and lists what it finds grouped by tab (Bible, Books) and then the verses. A word counts when it starts a word of a row (a name or title, the subtitle or the description of a book, a chapter title, the part of the Bible, the kind of book, or the name of the tab), so "new testament" lists the 27 books of the New Testament. With nothing found it says "Nothing found for ..." and offers Clear search; clearing the field brings the tabs and the banner back. <b>Bookmarks</b> is a screen of its own, opened from the round button in the corner: a back button, no tab bar, then two parts. Library lists the rows bookmarked from the tabs (books of the Bible, books of the Library, verses, and the passages of a book, which open the reader at them); they stay only on the phone and logging out clears them. Posts lists the posts bookmarked in the journey viewer; they stay with the account, and with no signal the list from the last visit is shown, with a line that says so. A row that is taken off stays in place, with an empty bookmark, until the screen is left, so a slip can be put back with one tap.</p>
 </section>
@@ -2408,9 +2419,9 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
         <div class="scroll" style="padding-bottom:130px">
           <div class="cp-inbox-top">
-            <button class="cp-icon-btn flat" style="width:44px;height:44px" aria-label="Back"><svg class="cp-icon "><use href="#i-back"/></svg></button>
+            <button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon "><use href="#i-back"/></svg></button>
             <h1>Inbox</h1>
-            <button class="cp-icon-btn flat" style="width:44px;height:44px" aria-label="Mark all as read"><svg class="cp-icon "><use href="#i-checks"/></svg></button>
+            <button class="cp-icon-btn flat" aria-label="Mark all as read"><svg class="cp-icon "><use href="#i-checks"/></svg></button>
           </div>
           <div class="cp-subtabs" style="margin:16px -24px 0;padding:0 12px"><span class="on">Notifications<span class="cp-badge red" style="height:20px;padding:0 7px;font-size:11px">3</span></span><span>Messages<span class="cp-badge neutral" style="height:20px;padding:0 7px;font-size:11px">2</span></span></div>
           <div class="hscroll" style="margin-top:14px">
@@ -2436,7 +2447,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
         <div class="scroll" style="padding-bottom:130px">
           <div class="cp-inbox-top">
-            <button class="cp-icon-btn flat" style="width:44px;height:44px" aria-label="Back"><svg class="cp-icon "><use href="#i-back"/></svg></button>
+            <button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon "><use href="#i-back"/></svg></button>
             <h1>Inbox</h1>
             <button class="cp-icon-btn flat" style="width:44px;height:44px" aria-label="New message"><svg class="cp-icon "><use href="#i-pencil"/></svg></button>
           </div>
@@ -3200,7 +3211,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
       <div class="phone">
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
         <div class="scroll">
-          <div class="biz-top" style="justify-content:space-between"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon"><use href="#i-back"/></svg></button><button class="rd-all" aria-label="All chapters of this book">All chapters<svg class="cp-icon sm"><use href="#i-chev"/></svg></button></div>
+          <div class="biz-top" style="justify-content:space-between"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon"><use href="#i-back"/></svg></button><button class="rd-all" aria-label="All chapters of this book">All chapters</button></div>
           <div style="margin-top:16px"><p class="rd-kick">Psalms</p><h1 class="rd-title">Psalm 121</h1><p class="rd-sub">A Song of Ascents.</p></div>
           <div class="rd-nav" style="margin:16px 0"><button class="rd-step previous" aria-label="Previous: Psalm 120"><svg class="cp-icon"><use href="#i-back"/></svg><span>Psalm 120</span></button><button class="rd-step next" aria-label="Next: Psalm 122"><span>Psalm 122</span><svg class="cp-icon"><use href="#i-chev"/></svg></button></div>
           <div class="rd-text"><p class="rd-p"> <span class="rd-v"><span class="rd-n">¹</span> I will lift up my eyes to the hills.</span>
@@ -3238,7 +3249,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
       <div class="phone">
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
         <div class="scroll">
-          <div class="biz-top" style="justify-content:space-between"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon"><use href="#i-back"/></svg></button><button class="rd-all" aria-label="All chapters of this book">All chapters<svg class="cp-icon sm"><use href="#i-chev"/></svg></button></div>
+          <div class="biz-top" style="justify-content:space-between"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon"><use href="#i-back"/></svg></button><button class="rd-all" aria-label="All chapters of this book">All chapters</button></div>
           <div style="margin-top:16px"><p class="rd-kick">Psalms</p><h1 class="rd-title">Psalm 121</h1><p class="rd-sub">A Song of Ascents.</p></div>
           <div class="rd-nav" style="margin:16px 0"><button class="rd-step previous" aria-label="Previous: Psalm 120"><svg class="cp-icon"><use href="#i-back"/></svg><span>Psalm 120</span></button><button class="rd-step next" aria-label="Next: Psalm 122"><span>Psalm 122</span><svg class="cp-icon"><use href="#i-chev"/></svg></button></div>
           <div class="rd-text"><p class="rd-p"> <span class="rd-v"><span class="rd-n">¹</span> I will lift up my eyes to the hills.</span>
@@ -3280,7 +3291,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
       <div class="phone">
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
         <div class="scroll">
-          <div class="biz-top" style="justify-content:space-between"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon"><use href="#i-back"/></svg></button><button class="rd-all" aria-label="All chapters of this book">All chapters<svg class="cp-icon sm"><use href="#i-chev"/></svg></button></div>
+          <div class="biz-top" style="justify-content:space-between"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon"><use href="#i-back"/></svg></button><button class="rd-all" aria-label="All chapters of this book">All chapters</button></div>
           <div style="margin-top:16px"><p class="rd-kick">Psalms</p><h1 class="rd-title">Psalm 121</h1><p class="rd-sub">A Song of Ascents.</p></div>
           <div class="rd-nav" style="margin:16px 0"><button class="rd-step previous" aria-label="Previous: Psalm 120"><svg class="cp-icon"><use href="#i-back"/></svg><span>Psalm 120</span></button><button class="rd-step next" aria-label="Next: Psalm 122"><span>Psalm 122</span><svg class="cp-icon"><use href="#i-chev"/></svg></button></div>
           <div class="rd-text"><p class="rd-p"> <span class="rd-v"><span class="rd-n">¹</span> I will lift up my eyes to the hills.</span>
@@ -3322,7 +3333,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
       <div class="phone">
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
         <div class="scroll">
-          <div class="biz-top" style="justify-content:space-between"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon"><use href="#i-back"/></svg></button><button class="rd-all" aria-label="All chapters of this book">All chapters<svg class="cp-icon sm"><use href="#i-chev"/></svg></button></div>
+          <div class="biz-top" style="justify-content:space-between"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon"><use href="#i-back"/></svg></button><button class="rd-all" aria-label="All chapters of this book">All chapters</button></div>
           <div style="margin-top:16px"><p class="rd-kick">John</p><h1 class="rd-title">Chapter 1</h1></div>
           <div class="rd-nav" style="margin:16px 0"><button class="rd-step previous" aria-label="Previous: Luke 24"><svg class="cp-icon"><use href="#i-back"/></svg><span>Luke 24</span></button><button class="rd-step next" aria-label="Next: John 2"><span>John 2</span><svg class="cp-icon"><use href="#i-chev"/></svg></button></div>
           <div class="rd-text"><p class="rd-p"><span class="rd-v"><span class="rd-n">¹</span> In the beginning was the Word, and the Word was with God, and the Word was God.</span> <span class="rd-v"><span class="rd-n">²</span> The same was in the beginning with God.</span> <span class="rd-v"><span class="rd-n">³</span> All things were made through him. Without him, nothing was made that has been made.</span> <span class="rd-v"><span class="rd-n">⁴</span> In him was life, and the life was the light of men.</span> <span class="rd-v"><span class="rd-n">⁵</span> The light shines in the darkness, and the darkness hasn’t overcome it.</span></p>
@@ -3365,7 +3376,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
       <div class="phone dk">
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
         <div class="scroll">
-          <div class="biz-top" style="justify-content:space-between"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon"><use href="#i-back"/></svg></button><button class="rd-all" aria-label="All chapters of this book">All chapters<svg class="cp-icon sm"><use href="#i-chev"/></svg></button></div>
+          <div class="biz-top" style="justify-content:space-between"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon"><use href="#i-back"/></svg></button><button class="rd-all" aria-label="All chapters of this book">All chapters</button></div>
           <div style="margin-top:16px"><p class="rd-kick">John</p><h1 class="rd-title">Chapter 1</h1></div>
           <div class="rd-nav" style="margin:16px 0"><button class="rd-step previous" aria-label="Previous: Luke 24"><svg class="cp-icon"><use href="#i-back"/></svg><span>Luke 24</span></button><button class="rd-step next" aria-label="Next: John 2"><span>John 2</span><svg class="cp-icon"><use href="#i-chev"/></svg></button></div>
           <div class="rd-text"><p class="rd-p"><span class="rd-v"><span class="rd-n">¹</span> In the beginning was the Word, and the Word was with God, and the Word was God.</span> <span class="rd-v"><span class="rd-n">²</span> The same was in the beginning with God.</span> <span class="rd-v"><span class="rd-n">³</span> All things were made through him. Without him, nothing was made that has been made.</span> <span class="rd-v"><span class="rd-n">⁴</span> In him was life, and the life was the light of men.</span> <span class="rd-v sel"><span class="rd-n">⁵</span> The light shines in the darkness, and the darkness hasn’t overcome it.</span></p>
@@ -3412,7 +3423,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
       <div class="phone">
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
         <div class="scroll">
-          <div class="biz-top" style="justify-content:space-between"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon"><use href="#i-back"/></svg></button><button class="rd-all" aria-label="All chapters of this book">All chapters<svg class="cp-icon sm"><use href="#i-chev"/></svg></button></div>
+          <div class="biz-top" style="justify-content:space-between"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon"><use href="#i-back"/></svg></button><button class="rd-all" aria-label="All chapters of this book">All chapters</button></div>
           <div style="margin-top:16px"><p class="rd-kick">Malachi</p><h1 class="rd-title">Chapter 4</h1></div>
           <div class="rd-nav" style="margin:16px 0"><button class="rd-step previous" aria-label="Previous: Malachi 3"><svg class="cp-icon"><use href="#i-back"/></svg><span>Malachi 3</span></button><button class="rd-step next" aria-label="Next: Tobit 1"><span>Tobit 1</span><svg class="cp-icon"><use href="#i-chev"/></svg></button></div>
           <div class="rd-text"><p class="rd-p"><span class="rd-v"><span class="rd-n">¹</span> “For behold, the day comes, burning like a furnace, when all the proud and all who work wickedness will be stubble. The day that comes will burn them up,” says the LORD of Armies, “so that it will leave them neither root nor branch.</span> <span class="rd-v"><span class="rd-n">²</span> But to you who fear my name shall the sun of righteousness arise with healing in its wings. You will go out and leap like calves of the stall.</span> <span class="rd-v"><span class="rd-n">³</span> You shall tread down the wicked; for they will be ashes under the soles of your feet in the day that I make,” says the LORD of Armies.</span></p>
@@ -4387,8 +4398,8 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
   The banner is the compact one of the Bible tab: a label (the first book, or the one read last), a title, one short handwritten note and a gold pill: <b>Start reading</b> or, once something was read, <b>Continue reading</b>, which goes on at the line where you stopped.
   A cover opens the <b>book page</b>: a larger cover, the title, the subtitle, the kind, the chapters, the words and the time, the description, <b>the notice of its kind</b> (what was written with AI assistance and what has not been checked: <code>notices.ts</code>) above the gold button
   (<b>Start reading</b> or <b>Continue: Is this Camino for you?</b>), the table of contents with the minutes of each chapter, the ones read ticked and the place where you stopped marked, and the credit.
-  The <b>reader</b> keeps a header at the top while the chapter scrolls under it, with one row as on a Kindle: the way back to the contents and two buttons for smaller and larger text (five steps, kept on the phone). At the bottom it keeps a bar: a thin line that shows how far down you are,
-  and under it Previous and Next named by where they go (off at the first and the last chapter) with the title of the book and "Chapter 3 of 17" between them. It sets paragraphs, headings, <b>lists</b> and <b>quotations</b> (the passage of a book of readings is one, with a rule at its left and a line that says whose words they are).
+  The <b>reader</b> keeps a header at the top while the chapter scrolls under it, with one row as on a Kindle: the <b>Back button</b> of every screen (round, 48, with the chevron: here it goes to the contents of the book) and two round buttons of the same size for smaller and larger text (five steps, kept on the phone). At the bottom it keeps a bar: a thin line that shows how far down you are,
+  and under it Previous and Next named by where they go (off at the first and the last chapter) with the title of the book (19 on 28, the body of the type scale, in SemiBold, on one line, cut with an ellipsis where it does not fit) and "Chapter 3 of 17" between them. It sets paragraphs, headings, <b>lists</b> and <b>quotations</b> (the passage of a book of readings is one, with a rule at its left and a line that says whose words they are).
   A touch on a paragraph, a list or a quotation <b>chooses that passage</b>, as a touch on a verse of the Bible does, and raises Bookmark, Copy and Share; a bookmarked passage is a row of Bookmarks that opens the reader at it.
   Where you stopped, the chapters you read and the size of the text stay on the phone and nothing is fetched: the books work with no signal.</p>
   <style>
@@ -4466,15 +4477,13 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
   .bk-row .rt .mn { font-family: var(--cp-font-mono); font-size: 13px; line-height: 20px; color: var(--cp-text-muted); }
   .bk-edition .k { font-family: var(--cp-font-mono); font-size: 12px; line-height: 16px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--cp-text-muted); }
   .bk-edition .v { font-size: 15px; line-height: 21px; letter-spacing: .4px; font-weight: 500; color: var(--cp-text-muted); }
-  /* the reader: a header at the top that stays (one row: the way back and the size of the text), the chapter under it, and a bar at the bottom that stays (the thin line, Previous, the title of the book with the place, Next) */
+  /* the reader: a header at the top that stays (one row: the Back button of the app, which goes to the contents, and the size of the text, three round buttons of 48, 16 from the edge like the Back button of every screen), the chapter under it, and a bar at the bottom that stays (the thin line, Previous, the title of the book with the place, Next) */
   .bk-rhead { position: absolute; top: 54px; left: 0; right: 0; z-index: 4; background: var(--cp-bg); padding-top: 8px; }
-  .bk-rhead .r1 { display: flex; align-items: center; justify-content: space-between; padding: 0 8px; }
+  .bk-rhead .r1 { display: flex; align-items: center; justify-content: space-between; padding: 0 16px; }
   .bk-rbar .r2 { display: flex; align-items: center; justify-content: space-between; padding: 4px 8px; }
   .bk-rbar { position: absolute; left: 0; right: 0; bottom: 0; z-index: 4; background: var(--cp-bg); padding-bottom: 34px; }
-  .bk-back { min-height: 44px; display: inline-flex; align-items: center; gap: 4px; padding: 0 14px 0 6px; font-weight: 600; font-size: 16px; line-height: 22px; }
-  .bk-back .cp-icon { width: 24px; height: 24px; }
   .bk-rhead .sz { display: flex; gap: 8px; }
-  .bk-rhead .a { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: var(--cp-surface); box-shadow: inset 0 0 0 1px var(--cp-border); font-family: var(--cp-font-title); font-weight: 600; }
+  .bk-rhead .a { width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; background: var(--cp-surface); box-shadow: inset 0 0 0 1px var(--cp-border); font-family: var(--cp-font-title); font-weight: 600; }
   .bk-rhead .a i { font-style: normal; }
   .bk-rhead .a.s i { font-size: 15px; line-height: 20px; }
   .bk-rhead .a.l i { font-size: 24px; line-height: 28px; }
@@ -4482,11 +4491,11 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
   .bk-ic { width: 56px; height: 56px; display: grid; place-items: center; border-radius: 50%; flex: none; }
   .bk-ic .cp-icon { width: 31px; height: 31px; }
   .bk-rbar .mid { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; padding: 0 4px; }
-  .bk-rbar .bt { max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; font-size: 18px; line-height: 24px; }
+  .bk-rbar .bt { max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; font-size: 19px; line-height: 28px; }
   .bk-rbar .ps { font-family: var(--cp-font-mono); font-size: 14px; line-height: 20px; color: var(--cp-text-muted); }
   .bk-prog { height: 4px; background: var(--cp-border); }
   .bk-prog i { display: block; height: 4px; background: var(--cp-action); }
-  .phone .scroll.bk-rscroll { top: 106px; bottom: 102px; padding: 20px 20px 48px; }
+  .phone .scroll.bk-rscroll { top: 110px; bottom: 102px; padding: 20px 20px 48px; }
   /* a passage that is chosen: the gold ground and underline of a verse; the bar of actions (the Bible's, 138 high) takes its own room above the bar at the bottom, and the chapter has that much less */
   .bk-rtx .on { background: var(--cp-color-gold-soft); text-decoration: underline; }
   .phone .scroll.bk-rscroll.pa { bottom: 248px; }
@@ -4608,7 +4617,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
         <div class="scroll" style="padding-bottom:40px">
           <div class="bk-pg">
-            <div class="biz-top"><button class="cp-icon-btn" aria-label="Back"><svg class="cp-icon"><use href="#i-back"/></svg></button></div>
+            <div class="biz-top"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon"><use href="#i-back"/></svg></button></div>
             <div class="bk-head"><div class="bk-cover" style="width:215px;height:305px;border-radius:4px;--paper:var(--bk-paper-goldSoft)"><div class="bk-body" role="button" aria-label="The French Way, Pilgrim's guide, 51 minutes" style="border-radius:4px"><span class="bk-spine" style="width:15px"></span><span class="bk-groove" style="left:15px"></span><span class="bk-hinge" style="left:17px"></span><span class="bk-edge" style="width:4px"></span><span class="bk-face" style="left:31px;right:20px;top:19px;bottom:15px"><span class="bk-ring" style="width:42px;height:42px"><svg class="cp-icon" style="width:30px;height:30px;stroke-width:1.5px"><use href="#i-library"/></svg></span><span class="bk-t"><span style="font-size:26px;line-height:30px">The French<br>Way</span></span><span class="bk-kind" style="font-size:11px;line-height:14px;letter-spacing:1px">PILGRIM'S GUIDE</span><span class="bk-time" style="font-size:12px;line-height:16px">51 min</span></span></div><button class="bk-ribbon on" aria-label="Remove bookmark: The French Way" style="right:7px;width:44px;height:44px"><span class="rb" style="width:30px;height:36px"><svg class="cp-icon" style="width:20px;height:20px"><use href="#i-bookmark"/></svg></span><span class="nt" style="width:30px;height:8px"></span></button></div>
               <h3>The French Way</h3><div class="su">A Pilgrim's Guide to the Camino Francés</div>
               <span class="kind" aria-label="Pilgrim's guide">PILGRIM'S GUIDE</span>
@@ -4633,7 +4642,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
         <div class="scroll" style="padding-bottom:40px">
           <div class="bk-pg">
-            <div class="biz-top"><button class="cp-icon-btn" aria-label="Back"><svg class="cp-icon"><use href="#i-back"/></svg></button></div>
+            <div class="biz-top"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon"><use href="#i-back"/></svg></button></div>
             <div class="bk-head"><div class="bk-cover" style="width:215px;height:305px;border-radius:4px;--paper:var(--bk-paper-successWash)"><div class="bk-body" role="button" aria-label="The Quiet Road, Readings for the Way, 2 hours 29 minutes" style="border-radius:4px"><span class="bk-spine" style="width:15px"></span><span class="bk-groove" style="left:15px"></span><span class="bk-hinge" style="left:17px"></span><span class="bk-edge" style="width:4px"></span><span class="bk-face" style="left:31px;right:20px;top:19px;bottom:15px"><span class="bk-ring" style="width:42px;height:42px"><svg class="cp-icon" style="width:30px;height:30px;stroke-width:1.5px"><use href="#i-book"/></svg></span><span class="bk-t"><span style="font-size:26px;line-height:30px">The Quiet<br>Road</span></span><span class="bk-kind" style="font-size:11px;line-height:14px;letter-spacing:1px">READINGS FOR THE WAY</span><span class="bk-time" style="font-size:12px;line-height:16px">2 h 29 min</span></span></div><button class="bk-ribbon" aria-label="Bookmark: The Quiet Road" style="right:7px;width:44px;height:44px"><span class="rb" style="width:30px;height:36px"><svg class="cp-icon" style="width:20px;height:20px"><use href="#i-bookmark"/></svg></span><span class="nt" style="width:30px;height:8px"></span></button></div>
               <h3>The Quiet Road</h3><div class="su">Twenty-One Days with The Imitation of Christ for the Pilgrim</div>
               <span class="kind" aria-label="Readings for the Way">READINGS FOR THE WAY</span>
@@ -4658,7 +4667,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
         <div class="scroll" style="padding-bottom:40px">
           <div class="bk-pg">
-            <div class="biz-top"><button class="cp-icon-btn" aria-label="Back"><svg class="cp-icon"><use href="#i-back"/></svg></button></div>
+            <div class="biz-top"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon"><use href="#i-back"/></svg></button></div>
             <div class="bk-head"><div class="bk-cover" style="width:215px;height:305px;border-radius:4px;--paper:var(--bk-paper-goldSoft)"><div class="bk-body" role="button" aria-label="The French Way, Pilgrim's guide, 51 minutes" style="border-radius:4px"><span class="bk-spine" style="width:15px"></span><span class="bk-groove" style="left:15px"></span><span class="bk-hinge" style="left:17px"></span><span class="bk-edge" style="width:4px"></span><span class="bk-face" style="left:31px;right:20px;top:19px;bottom:15px"><span class="bk-ring" style="width:42px;height:42px"><svg class="cp-icon" style="width:30px;height:30px;stroke-width:1.5px"><use href="#i-library"/></svg></span><span class="bk-t"><span style="font-size:26px;line-height:30px">The French<br>Way</span></span><span class="bk-kind" style="font-size:11px;line-height:14px;letter-spacing:1px">PILGRIM'S GUIDE</span><span class="bk-time" style="font-size:12px;line-height:16px">51 min</span></span></div><button class="bk-ribbon" aria-label="Bookmark: The French Way" style="right:7px;width:44px;height:44px"><span class="rb" style="width:30px;height:36px"><svg class="cp-icon" style="width:20px;height:20px"><use href="#i-bookmark"/></svg></span><span class="nt" style="width:30px;height:8px"></span></button></div>
               <h3>The French Way</h3><div class="su">A Pilgrim's Guide to the Camino Francés</div>
               <span class="kind" aria-label="Pilgrim's guide">PILGRIM'S GUIDE</span>
@@ -4683,7 +4692,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
         <div class="scroll" style="padding-bottom:40px">
           <div class="bk-pg">
-            <div class="biz-top"><button class="cp-icon-btn" aria-label="Back"><svg class="cp-icon"><use href="#i-back"/></svg></button></div>
+            <div class="biz-top"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon"><use href="#i-back"/></svg></button></div>
             <div class="bk-head"><div class="bk-cover" style="width:173px;height:245px;border-radius:4px;--paper:var(--bk-paper-goldSoft)"><div class="bk-body" role="button" aria-label="The French Way, Pilgrim's guide, 51 minutes" style="border-radius:4px"><span class="bk-spine" style="width:12px"></span><span class="bk-groove" style="left:12px"></span><span class="bk-hinge" style="left:14px"></span><span class="bk-edge" style="width:4px"></span><span class="bk-face" style="left:25px;right:17px;top:16px;bottom:12px"><span class="bk-ring" style="width:36px;height:36px"><svg class="cp-icon" style="width:24px;height:24px;stroke-width:1.5px"><use href="#i-library"/></svg></span><span class="bk-t"><span style="font-size:22px;line-height:26px">The French<br>Way</span></span><span class="bk-kind" style="font-size:10.5px;line-height:14px;letter-spacing:1px">PILGRIM'S GUIDE</span><span class="bk-time" style="font-size:11px;line-height:15px">51 min</span></span></div><button class="bk-ribbon" aria-label="Bookmark: The French Way" style="right:6px;width:44px;height:44px"><span class="rb" style="width:28px;height:36px"><svg class="cp-icon" style="width:19px;height:19px"><use href="#i-bookmark"/></svg></span><span class="nt" style="width:28px;height:8px"></span></button></div>
               <h3>The French Way</h3><div class="su">A Pilgrim's Guide to the Camino Francés</div>
               <span class="kind" aria-label="Pilgrim's guide">PILGRIM'S GUIDE</span>
@@ -4707,7 +4716,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
       <div class="phone">
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
         <div class="bk-rhead">
-          <div class="r1"><span class="bk-back" role="button" aria-label="Contents"><svg class="cp-icon"><use href="#i-back"/></svg><span>Contents</span></span><span class="sz"><span class="a s" role="button" aria-label="Smaller text"><i>A</i></span><span class="a l" role="button" aria-label="Larger text"><i>A</i></span></span></div>
+          <div class="r1"><button class="cp-icon-btn flat" aria-label="Back" title="Back to the contents of this book"><svg class="cp-icon"><use href="#i-back"/></svg></button><span class="sz"><span class="a s" role="button" aria-label="Smaller text"><i>A</i></span><span class="a l" role="button" aria-label="Larger text"><i>A</i></span></span></div>
         </div>
         <div class="scroll bk-rscroll">
           <div class="bk-rtx" style="max-width:684px">
@@ -4733,7 +4742,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
       <div class="phone">
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
         <div class="bk-rhead">
-          <div class="r1"><span class="bk-back" role="button" aria-label="Contents"><svg class="cp-icon"><use href="#i-back"/></svg><span>Contents</span></span><span class="sz"><span class="a s" role="button" aria-label="Smaller text"><i>A</i></span><span class="a l" role="button" aria-label="Larger text"><i>A</i></span></span></div>
+          <div class="r1"><button class="cp-icon-btn flat" aria-label="Back" title="Back to the contents of this book"><svg class="cp-icon"><use href="#i-back"/></svg></button><span class="sz"><span class="a s" role="button" aria-label="Smaller text"><i>A</i></span><span class="a l" role="button" aria-label="Larger text"><i>A</i></span></span></div>
         </div>
         <div class="scroll bk-rscroll">
           <div class="bk-rtx" style="max-width:684px">
@@ -4761,7 +4770,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
       <div class="phone dk">
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
         <div class="bk-rhead">
-          <div class="r1"><span class="bk-back" role="button" aria-label="Contents"><svg class="cp-icon"><use href="#i-back"/></svg><span>Contents</span></span><span class="sz"><span class="a s" role="button" aria-label="Smaller text"><i>A</i></span><span class="a l" role="button" aria-label="Larger text"><i>A</i></span></span></div>
+          <div class="r1"><button class="cp-icon-btn flat" aria-label="Back" title="Back to the contents of this book"><svg class="cp-icon"><use href="#i-back"/></svg></button><span class="sz"><span class="a s" role="button" aria-label="Smaller text"><i>A</i></span><span class="a l" role="button" aria-label="Larger text"><i>A</i></span></span></div>
         </div>
         <div class="scroll bk-rscroll">
           <div class="bk-rtx" style="max-width:684px">
@@ -4789,7 +4798,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
       <div class="phone">
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
         <div class="bk-rhead">
-          <div class="r1"><span class="bk-back" role="button" aria-label="Contents"><svg class="cp-icon"><use href="#i-back"/></svg><span>Contents</span></span><span class="sz"><span class="a s" role="button" aria-label="Smaller text"><i>A</i></span><span class="a l" role="button" aria-label="Larger text"><i>A</i></span></span></div>
+          <div class="r1"><button class="cp-icon-btn flat" aria-label="Back" title="Back to the contents of this book"><svg class="cp-icon"><use href="#i-back"/></svg></button><span class="sz"><span class="a s" role="button" aria-label="Smaller text"><i>A</i></span><span class="a l" role="button" aria-label="Larger text"><i>A</i></span></span></div>
         </div>
         <div class="scroll bk-rscroll">
           <div class="bk-rtx" style="max-width:1008px">
@@ -4815,7 +4824,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
       <div class="phone" style="width:320px">
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
         <div class="bk-rhead">
-          <div class="r1"><span class="bk-back" role="button" aria-label="Contents"><svg class="cp-icon"><use href="#i-back"/></svg><span>Contents</span></span><span class="sz"><span class="a s" role="button" aria-label="Smaller text"><i>A</i></span><span class="a l" role="button" aria-label="Larger text"><i>A</i></span></span></div>
+          <div class="r1"><button class="cp-icon-btn flat" aria-label="Back" title="Back to the contents of this book"><svg class="cp-icon"><use href="#i-back"/></svg></button><span class="sz"><span class="a s" role="button" aria-label="Smaller text"><i>A</i></span><span class="a l" role="button" aria-label="Larger text"><i>A</i></span></span></div>
         </div>
         <div class="scroll bk-rscroll">
           <div class="bk-rtx" style="max-width:684px">
@@ -4843,7 +4852,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
       <div class="phone">
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
         <div class="bk-rhead">
-          <div class="r1"><span class="bk-back" role="button" aria-label="Contents"><svg class="cp-icon"><use href="#i-back"/></svg><span>Contents</span></span><span class="sz"><span class="a s" role="button" aria-label="Smaller text"><i>A</i></span><span class="a l" role="button" aria-label="Larger text"><i>A</i></span></span></div>
+          <div class="r1"><button class="cp-icon-btn flat" aria-label="Back" title="Back to the contents of this book"><svg class="cp-icon"><use href="#i-back"/></svg></button><span class="sz"><span class="a s" role="button" aria-label="Smaller text"><i>A</i></span><span class="a l" role="button" aria-label="Larger text"><i>A</i></span></span></div>
         </div>
         <div class="scroll bk-rscroll" data-bk-end>
           <div class="bk-rtx" style="max-width:684px">
@@ -4879,7 +4888,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
       <div class="phone">
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
         <div class="bk-rhead">
-          <div class="r1"><span class="bk-back" role="button" aria-label="Contents"><svg class="cp-icon"><use href="#i-back"/></svg><span>Contents</span></span><span class="sz"><span class="a s" role="button" aria-label="Smaller text"><i>A</i></span><span class="a l" role="button" aria-label="Larger text"><i>A</i></span></span></div>
+          <div class="r1"><button class="cp-icon-btn flat" aria-label="Back" title="Back to the contents of this book"><svg class="cp-icon"><use href="#i-back"/></svg></button><span class="sz"><span class="a s" role="button" aria-label="Smaller text"><i>A</i></span><span class="a l" role="button" aria-label="Larger text"><i>A</i></span></span></div>
         </div>
         <div class="scroll bk-rscroll pa">
           <div class="bk-rtx" style="max-width:684px">
@@ -4910,7 +4919,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
       <div class="phone">
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
         <div class="bk-rhead">
-          <div class="r1"><span class="bk-back" role="button" aria-label="Contents"><svg class="cp-icon"><use href="#i-back"/></svg><span>Contents</span></span><span class="sz"><span class="a s" role="button" aria-label="Smaller text"><i>A</i></span><span class="a l" role="button" aria-label="Larger text"><i>A</i></span></span></div>
+          <div class="r1"><button class="cp-icon-btn flat" aria-label="Back" title="Back to the contents of this book"><svg class="cp-icon"><use href="#i-back"/></svg></button><span class="sz"><span class="a s" role="button" aria-label="Smaller text"><i>A</i></span><span class="a l" role="button" aria-label="Larger text"><i>A</i></span></span></div>
         </div>
         <div class="scroll bk-rscroll pa">
           <div class="bk-rtx" style="max-width:684px">
@@ -4973,9 +4982,9 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
   .dr-d.today .k { box-shadow: inset 0 0 0 2px var(--cp-action); font-weight: 600; line-height: 22px; }
   .dr-d.sel .k { background: var(--cp-action); color: var(--cp-on-action); font-weight: 600; line-height: 22px; }
   .dr-d.sel.today .k::after { content: ""; position: absolute; inset: 3px; border-radius: 50%; box-shadow: inset 0 0 0 2px var(--cp-on-action); }
-  /* The top row: Back, the title, the calendar and the bookmark, each button 44 round. */
-  .dr-hd { display: flex; align-items: center; gap: 8px; min-height: 44px; }
-  .dr-hb { width: 44px; height: 44px; flex: none; padding: 0; display: grid; place-items: center; border: 0; border-radius: 50%; background: var(--cp-surface); color: var(--cp-text); box-shadow: inset 0 0 0 1px var(--cp-border); }
+  /* The top row: Back, the title, the calendar and the bookmark, each button 48 round, like the Back button of every screen. */
+  .dr-hd { display: flex; align-items: center; gap: 8px; min-height: 48px; }
+  .dr-hb { width: 48px; height: 48px; flex: none; padding: 0; display: grid; place-items: center; border: 0; border-radius: 50%; background: var(--cp-surface); color: var(--cp-text); box-shadow: inset 0 0 0 1px var(--cp-border); }
   .dr-hb.on { color: var(--cp-action); }
   .dr-hb.on .cp-icon { fill: currentColor; }
   .dr-h1 { flex: 1; min-width: 0; margin: 0; font-family: var(--cp-font-title); font-weight: 600; font-size: 28px; line-height: 34px; letter-spacing: -.25px; }
@@ -5030,7 +5039,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
   .dr-sh2 .h { font-family: var(--cp-font-title); font-weight: 600; font-size: 24px; line-height: 30px; }
   .dr-close { height: 36px; margin: 4px 0; padding: 0 14px; border: 0; border-radius: var(--cp-radius-pill); background: none; box-shadow: inset 0 0 0 1px var(--cp-border); font: inherit; font-weight: 600; font-size: 17px; line-height: 22px; color: var(--cp-action); }
   /* The same screens in dark mode: the dark palette of tokens.json (the roles and the gold of the notice), nothing else changes. */
-  .phone.dk { --cp-bg:#0F1A2B;--cp-surface:#17263B;--cp-surface-sunken:#1E3047;--cp-surface-inverse:#1E4A7A;--cp-border:#2B405C;--cp-border-strong:#44607F;--cp-text:#F6EFE2;--cp-text-muted:#A9B6C8;--cp-text-placeholder:#8D9BB0;--cp-tab-inactive:#748092;--cp-tab-bar:#0A1220;--cp-tab-bar-border:#2B405C;--cp-tab-active-stroke:2.6px;--cp-tab-active-weight:600;--cp-text-inverse:#F6EFE2;--cp-text-accent:#E8B53A;--cp-action:#8FB3E0;--cp-on-action:#0F1A2B;--cp-highlight:#D9A21B;--cp-on-highlight:#14365D;--cp-danger:#E07868;--cp-on-danger:#17263B;--cp-color-gold-ink:#E8B53A;--cp-color-gold-soft:#5A4915;--cp-color-gold-wash:#2A2413; color: var(--cp-text); }
+  .phone.dk { --cp-bg:#0F1A2B;--cp-surface:#17263B;--cp-surface-sunken:#1E3047;--cp-surface-inverse:#1E4A7A;--cp-border:#2B405C;--cp-border-strong:#44607F;--cp-text:#F6EFE2;--cp-text-muted:#A9B6C8;--cp-text-placeholder:#8D9BB0;--cp-tab-inactive:#748092;--cp-tab-bar:#0A1220;--cp-tab-bar-border:#2B405C;--cp-tab-active-stroke:2.6px;--cp-tab-active-weight:600;--cp-tab-inactive-stroke:0.8px;--cp-tab-inactive-weight:300;--cp-text-inverse:#F6EFE2;--cp-text-accent:#E8B53A;--cp-action:#8FB3E0;--cp-on-action:#0F1A2B;--cp-highlight:#D9A21B;--cp-on-highlight:#14365D;--cp-danger:#E07868;--cp-on-danger:#17263B;--cp-color-gold-ink:#E8B53A;--cp-color-gold-soft:#5A4915;--cp-color-gold-wash:#2A2413; color: var(--cp-text); }
   /* The five colours of the liturgical year (mobile/src/theme/index.ts, liturgical): lighter in dark mode, so that the dot keeps 3 : 1. */
   .phone { --dr-green:#2F6B4F;--dr-violet:#6B3FA0;--dr-white:#FFFDF8;--dr-red:#A63D2F;--dr-rose:#C94F7C; }
   .phone.dk { --dr-green:#6FBF98;--dr-violet:#B79BE0;--dr-white:#FFFDF8;--dr-red:#E07868;--dr-rose:#F29BB9; }
@@ -5336,9 +5345,9 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
 
   <h3>Example: the tab bar</h3>
   <div class="grid g2">
-    <div class="swatch"><div style="padding:20px;background:#0F1A2B"><div style="display:flex;justify-content:space-around;padding:14px 10px;border-radius:30px;background:#0A1220;border:1px solid #2B405C"><span style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#748092;font-size:13px;font-weight:300"><svg class="cp-icon" style="stroke-width:1.3"><use href="#i-me"/></svg>Me</span><span style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#748092;font-size:13px;font-weight:300"><svg class="cp-icon" style="stroke-width:1.3"><use href="#i-stays"/></svg>Stays</span><span style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#FFFFFF;font-size:13px;font-weight:600"><svg class="cp-icon" style="stroke-width:2.6"><use href="#i-maps"/></svg>Maps</span><span style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#748092;font-size:13px;font-weight:300"><svg class="cp-icon" style="stroke-width:1.3"><use href="#i-compass"/></svg>Discover</span></div></div>
-      <div class="body"><p><b>Do</b> · inactive tab = <code>role.tabInactive</code> #748092 with a thin stroke (1.3) and a Light label (Inter 300), active = <code>role.tabActive</code> #FFFFFF with a thick stroke (2.6) and a SemiBold label (600), on the bar <code>role.tabBar</code> #0A1220 with its hairline <code>role.tabBarBorder</code> #2B405C.</p><p class="note">Inactive 4.7 : 1 on the bar, active 18.8 : 1: the active tab has at least 1.5 times the contrast of an inactive one, and the inactive ones recede (at most 5 : 1). In light mode the same roles are the card white, the blue (12.0 : 1) and a lighter stone, <code>stone550</code> #697584 (4.6 : 1). The active tab is drawn at stroke 2.6 and SemiBold in dark mode and a little heavier in light mode (stroke 3, Bold, <code>tokens.tab</code>): dark on light looks thinner than light on dark, although the ink is the same.</p></div></div>
-    <div class="swatch"><div style="padding:20px;background:#0F1A2B"><div style="display:flex;justify-content:space-around;padding:14px 10px;border-radius:30px;background:#0A1220;border:1px solid #2B405C"><span style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#0E213A;font-size:13px;font-weight:300"><svg class="cp-icon" style="stroke-width:1.3"><use href="#i-me"/></svg>Me</span><span style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#0E213A;font-size:13px;font-weight:300"><svg class="cp-icon" style="stroke-width:1.3"><use href="#i-stays"/></svg>Stays</span><span style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#FFFFFF;font-size:13px;font-weight:600"><svg class="cp-icon" style="stroke-width:2.6"><use href="#i-maps"/></svg>Maps</span><span style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#0E213A;font-size:13px;font-weight:300"><svg class="cp-icon" style="stroke-width:1.3"><use href="#i-compass"/></svg>Discover</span></div></div>
+    <div class="swatch"><div style="padding:20px;background:#0F1A2B"><div style="display:flex;justify-content:space-around;padding:14px 10px;border-radius:30px;background:#0A1220;border:1px solid #2B405C"><span style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#748092;font-size:14px;font-weight:var(--cp-tab-inactive-weight)"><svg class="cp-icon" style="width:28px;height:28px;stroke-width:var(--cp-tab-inactive-stroke)"><use href="#i-me"/></svg>Me</span><span style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#748092;font-size:14px;font-weight:var(--cp-tab-inactive-weight)"><svg class="cp-icon" style="width:28px;height:28px;stroke-width:var(--cp-tab-inactive-stroke)"><use href="#i-stays"/></svg>Stays</span><span style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#FFFFFF;font-size:14px;font-weight:600"><svg class="cp-icon" style="width:28px;height:28px;stroke-width:2.6"><use href="#i-maps"/></svg>Maps</span><span style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#748092;font-size:14px;font-weight:var(--cp-tab-inactive-weight)"><svg class="cp-icon" style="width:28px;height:28px;stroke-width:var(--cp-tab-inactive-stroke)"><use href="#i-compass"/></svg>Discover</span></div></div>
+      <div class="body"><p><b>Do</b> · inactive tab = <code>role.tabInactive</code> #748092 with a thin stroke (0.8) and a Light label (Inter 300), active = <code>role.tabActive</code> #FFFFFF with a thick stroke (2.6) and a SemiBold label (600), on the bar <code>role.tabBar</code> #0A1220 with its hairline <code>role.tabBarBorder</code> #2B405C.</p><p class="note">Inactive 4.7 : 1 on the bar, active 18.8 : 1: the active tab has at least 1.5 times the contrast of an inactive one, and the inactive ones recede (at most 5 : 1). In light mode the same roles are the card white, the blue (12.0 : 1) and a lighter stone, <code>stone550</code> #697584 (4.6 : 1). The active tab is drawn at stroke 2.6 and SemiBold in dark mode and a little heavier in light mode (stroke 3, Bold, <code>tokens.tab</code>): dark on light looks thinner than light on dark, although the ink is the same. The inactive tabs are as thin as each other: the stem of Inter Light is 136 of 2048 units, 0.93 px at 14 px, and an icon of 28 px with a stroke of 0.8 of its 24 units is 0.93 px (it was 1.3, which is 1.52 px, 1.56 times the label; measured on this page at 4x, see <code>tokens.tab</code>).</p></div></div>
+    <div class="swatch"><div style="padding:20px;background:#0F1A2B"><div style="display:flex;justify-content:space-around;padding:14px 10px;border-radius:30px;background:#0A1220;border:1px solid #2B405C"><span style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#0E213A;font-size:14px;font-weight:var(--cp-tab-inactive-weight)"><svg class="cp-icon" style="width:28px;height:28px;stroke-width:var(--cp-tab-inactive-stroke)"><use href="#i-me"/></svg>Me</span><span style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#0E213A;font-size:14px;font-weight:var(--cp-tab-inactive-weight)"><svg class="cp-icon" style="width:28px;height:28px;stroke-width:var(--cp-tab-inactive-stroke)"><use href="#i-stays"/></svg>Stays</span><span style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#FFFFFF;font-size:14px;font-weight:600"><svg class="cp-icon" style="width:28px;height:28px;stroke-width:2.6"><use href="#i-maps"/></svg>Maps</span><span style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#0E213A;font-size:14px;font-weight:var(--cp-tab-inactive-weight)"><svg class="cp-icon" style="width:28px;height:28px;stroke-width:var(--cp-tab-inactive-stroke)"><use href="#i-compass"/></svg>Discover</span></div></div>
       <div class="body"><p><b>Don't</b> · a fixed navy at 42% for the inactive tab (#0E213A): 1.2 : 1 on the dark bar, the icons vanish. It was 2.4 : 1 in light mode too.</p><p class="note">A person walking in bright sun needs the inactive tabs as much as anyone: low contrast hides them.</p></div></div>
   </div>
 

@@ -101,7 +101,7 @@ check('Settings is a screen of its own, not a tab, and the old tab route is gone
 check('Settings has Back, light/dark and log out, and keeps no room for a tab bar it does not have', () => {
   const src = read(join('app', 'settings.tsx'));
   assert.match(src, /<Screen tabBar=\{false\}>/);
-  assert.match(src, /name="back"/);
+  assert.match(src, /<BackButton fallback="\/me" \/>/);
   assert.match(src, /<ThemeToggle \/>/);
   assert.match(src, /<LogoutButton \/>/);
   assert.match(read(join('src', 'components', 'Screen.tsx')), /tabBar = true/);
@@ -650,8 +650,7 @@ check('Bookmarks is a screen of its own: the file exists, it is registered next 
   assert.ok(guard > 0 && at > guard && layout.indexOf('</Stack.Protected>', guard) > at, 'registered inside the block of screens for someone who has a journey');
   const src = read(join('app', 'library', 'bookmarks.tsx'));
   assert.match(src, /<Screen tabBar=\{false\}>/);
-  assert.match(src, /<IconButton name="back" label="Back" onPress=\{goBack\} \/>/);
-  assert.match(src, /router\.canGoBack\(\) \? router\.back\(\) : router\.replace\('\/library'\)/);
+  assert.match(src, /<BackButton fallback="\/library" \/>/);
   assert.match(src, /<AppText variant="h2" accessibilityRole="header">Bookmarks<\/AppText>/);
   assert.match(src, /<AppText variant="h4" accessibilityRole="header">Library<\/AppText>/);
   assert.match(src, /<AppText variant="h4" accessibilityRole="header" style=\{\{ marginTop: 8 \}\}>Posts<\/AppText>/);
@@ -762,6 +761,78 @@ check('every screen registered in the root layout is a file, so the stack never 
     const candidates = [`${name}.tsx`, join(name, 'index.tsx'), join(name, '_layout.tsx')];
     assert.ok(candidates.some((c) => exists(join('app', c))), `app/${name} does not exist`);
   }
+});
+
+// ---- ONE Back button. The owner saw a Back that was a pill ("Contents"), a bare chevron of 30, a button of 44 and a button without its hairline, on different screens
+// (2026-11-08): the Back button of the app is components/BackButton.tsx, the round 48 IconButton with the back chevron, and no other file draws the chevron as a way back.
+
+/** The files that draw the back chevron and are NOT a way back, each with the reason: a "Previous" arrow moves along a series (it replaces the screen or changes what it shows), it does not leave the screen. */
+const CHEVRON_THAT_IS_NOT_BACK: Record<string, string> = {
+  'src/features/library/bible/ChapterNav.tsx': 'the arrow of "Previous: Psalm 120", the chapter before in the Bible, which replaces the screen',
+  'src/features/library/books/ChapterFooter.tsx': 'the arrow of "Previous" at the end of a chapter of a book, which replaces the screen',
+  'src/features/library/books/ReaderBar.tsx': 'the Previous button of the bar at the bottom of the reader (named by the chapter it goes to), which replaces the screen',
+  'src/features/library/daily/WeekStrip.tsx': 'the arrow to the week before, which changes the strip',
+  'src/features/library/daily/MonthCalendar.tsx': 'the arrow to the month before, which changes the calendar',
+};
+/** The files with a text button that says "Back" in a form that has steps: Back next to Continue, the previous step of the form (the Back button of the app is at the top of the screen as well, where there is one). */
+const TEXT_BACK_OF_A_FORM: Record<string, string> = {
+  'app/business/register.tsx': 'the footer of the form of a business: Back and Continue, the previous step',
+  'app/onboarding.tsx': 'the footer of the first steps: Back and Continue, the previous step (there is no screen before the first step to go back to)',
+  'app/diary/[id].tsx': 'the page that says "This page is not here": its one big button is the way out, as well as the Back button of the app at its top',
+};
+const chevron = /\b(?:name|icon|direction)=(["'])back\1|\bname: ['"]back['"]/;
+const BACK_BUTTON = join('src', 'components', 'BackButton.tsx');
+
+check('ONE Back button: the round 48 IconButton of components/BackButton.tsx is the only file that draws the back chevron as a way back; the others that draw it are a "Previous" arrow, each on a list with its reason', () => {
+  const offenders = files.filter((f) => f !== BACK_BUTTON && chevron.test(read(f)) && !(f in CHEVRON_THAT_IS_NOT_BACK));
+  assert.deepEqual(offenders, [], `these files draw the back chevron: the Back button of a screen is <BackButton /> (components/BackButton.tsx); a "Previous" arrow goes on the list of this test with its reason`);
+  for (const f of Object.keys(CHEVRON_THAT_IS_NOT_BACK)) {
+    assert.ok(exists(f), `${f} is on the list of the chevrons that are not Back and it does not exist`);
+    assert.match(read(f), chevron, `${f} no longer draws the back chevron: take it off the list`);
+  }
+  // none of those draws it as a way back: each is named by where it goes (Previous, an arrow of a week or a month), never "Back"
+  for (const f of Object.keys(CHEVRON_THAT_IS_NOT_BACK)) assert.doesNotMatch(read(f), /(?:label|accessibilityLabel)=["']Back["']/, `${f}: an arrow that is not Back is not called Back`);
+  // and nobody makes a Back of their own out of other parts: no control labelled "Back" outside the one component, but the buttons of a form's footer, on their own list
+  const handMade = files.filter((f) => f !== BACK_BUTTON && /(?:\blabel|accessibilityLabel)=["']Back["']/.test(read(f)));
+  assert.deepEqual(handMade.filter((f) => !(f in TEXT_BACK_OF_A_FORM)), [], 'a control labelled "Back" that is not the BackButton of the app');
+  for (const [f, why] of Object.entries(TEXT_BACK_OF_A_FORM)) {
+    assert.ok(handMade.includes(f), `${f} (${why}) has no Back of a form any more: take it off the list`);
+    assert.match(read(f), /<Pill\b[^>]*label="Back"/, `${f}: its Back is a Pill with the word, a button of a form, not a copy of the round Back button`);
+    assert.doesNotMatch(read(f), /<(?:Pressable|IconButton)\b[^>]*(?:label|accessibilityLabel)="Back"/, `${f}`);
+  }
+});
+
+check('the Back button of the app is the IconButton of the app and nothing else: round, 48, labelled "Back", with a hint only when it goes somewhere other than the screen before; the same on every screen', () => {
+  const src = read(BACK_BUTTON);
+  const body = src.split('\n').filter((l) => !/^\s*\/\//.test(l)).join('\n');
+  assert.equal((body.match(/<IconButton\b/g) ?? []).length, 1, 'one IconButton');
+  assert.match(body, /<IconButton name="back" label="Back" hint=\{hint\} onPress=\{onPress \?\? \(\(\) => \(router\.canGoBack\(\) \? router\.back\(\) : router\.replace\(fallback\)\)\)\} \/>/, 'the IconButton of the app with the back chevron, and by default the screen before, or the home of the screen when there is none');
+  assert.doesNotMatch(body, /\bsize=|\bflat\b|\bbadge=|\bactive=/, 'no size, no flat: it is the same on every screen');
+  assert.match(body, /type Props = \{ onPress\?: \(\) => void; fallback\?: Href; hint\?: string \};/, 'three props: what it does, where to go when there is nothing behind, what a screen reader adds');
+  assert.match(read(join('src', 'components', 'ui.tsx')), /size = 48/, 'the IconButton is 48 unless it is asked for another size (the top rows of the tabs ask for 52: Back never does)');
+  // every use passes nothing but those three props
+  for (const f of files) {
+    for (const m of read(f).matchAll(/<BackButton\b([^>]*?)\/>/g)) {
+      const props = [...m[1].matchAll(/\b(\w+)=/g)].map((x) => x[1]);
+      for (const prop of props) assert.ok(['onPress', 'fallback', 'hint'].includes(prop), `${f}: <BackButton ${prop}=...>: the Back button has no ${prop}`);
+    }
+  }
+  const users = files.filter((f) => /<BackButton\b/.test(read(f)));
+  assert.ok(users.length >= 30, `${users.length} files draw the Back button`);
+  for (const f of users) assert.match(read(f), /import \{ BackButton \} from '(?:@\/components|\.\.?)\/BackButton';/, `${f} imports it from components/BackButton`);
+  // ScreenHeader (the headers of the inbox, the friends, the chats) draws it too, and so do the sign-in screens
+  assert.match(read(join('src', 'features', 'social', 'components', 'primitives.tsx')), /\{onBack && <BackButton onPress=\{onBack\} \/>\}/);
+  assert.match(read(join('src', 'components', 'auth', 'AuthShell.tsx')), /\{back && <BackButton \/>\}/);
+});
+
+check('the two readers: the Books reader has the Back button of the app at the top (it goes to the contents and says so), the Bible reader the Back button and "All chapters" as a ghost pill of the app; the title of a book in the bar is the type scale\'s body', () => {
+  const books = read(join('src', 'features', 'library', 'books', 'ReaderHeader.tsx'));
+  assert.match(books, /<BackButton onPress=\{onContents\} hint="Back to the contents of this book" \/>/);
+  const bible = read(join('src', 'features', 'library', 'bible', 'Reader.tsx'));
+  assert.match(bible, /<BackButton fallback=\{bookHref\(place\.code\)\} \/>/);
+  assert.match(bible, /<Pill variant="ghost" compact label="All chapters" accessibilityLabel="All chapters of this book"/);
+  assert.match(read(join('src', 'components', 'Pill.tsx')), /minHeight: large \? 68 : compact \? 48 : layout\.touchMin/, 'a compact pill is 48 high, like the Back button next to it');
+  assert.match(read(join('src', 'features', 'library', 'books', 'ReaderBar.tsx')), /const TITLE = \{ fontSize: textStyle\('body'\)\.fontSize, lineHeight: textStyle\('body'\)\.lineHeight \};/);
 });
 
 console.log(`${n} of ${n} passed`);

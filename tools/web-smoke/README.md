@@ -34,7 +34,7 @@ in light. Offline, the empty account has only the account saved, the Me tab neve
 
 Then the **scenarios** ([scenarios.mjs](scenarios.mjs)), each in light and dark, written the way a person would use the app:
 
-- the tab bar shows Me, Stays, Maps, Discover and Library, and each tab opens;
+- the tab bar shows Me, Stays, Maps, Discover and Library, and each tab opens; an inactive tab is thin and Light and its icon is drawn as thick as the stem of its label (0.8 of 24 units at 28 px, 0.93 px, within 10 percent of the 0.93 px of Inter Light at 14), the active tab heavier (the numbers of `tokens.tab`);
 - the gear on Me opens `/settings` (no tab bar there) and Back returns to `/me`, also when Settings was opened from a link;
 - switching light/dark on Settings returns to Settings, and Back goes to Me;
 - Library: its top row is a search field and the Bookmarks button (no title, no diary button); directly under it, before any banner, the two tabs
@@ -65,7 +65,7 @@ Then the **scenarios** ([scenarios.mjs](scenarios.mjs)), each in light and dark,
   Inter, JetBrains Mono, and at most one handwritten Caveat note on the screen); no cover says Soon or Free; a cover opens the book page (the cover, the title, the subtitle,
   the kind, the facts, THE NOTICE OF ITS KIND above the button, "Start reading", the contents with the minutes of each chapter, the credit) and Back returns to the tab; the
   first and the last book of each kind show the wording of `notices.ts`; the reader opens at chapter 1, Next and Previous (named by where they go, in the bar at the bottom)
-  go through the chapters, are off at the first and at the last chapter, Back goes to the page and not through the chapters, and Contents goes back to the page; the reader keeps
+  go through the chapters, are off at the first and at the last chapter, the browser's Back goes to the page and not through the chapters, and the Back button of the reader (the round 48 one of every screen, in a row with the two round 48 size buttons, 16 from the edge; there is no "Contents" pill) goes to the contents; the title of the book in the bar is one line of 19 px in Inter SemiBold (the longest titles whole on 390 and 430, cut with an ellipsis on 320, the bar as tall for every book); the reader keeps
   where you stopped (Continue on the page and "Continue reading" on the tab, the same line, with the time) and the size of the text (five steps), and a damaged place opens
   the book at its start; a link with `?c=`, a chapter and a book that do not exist (and one of the twelve classics of an earlier plan); the ribbon, Bookmarks and the search
   (title, subtitle, chapters); and the same with no signal. The books are read from `mobile/assets/library/catalog.json` (the bundle of `tools/build_books.py`), so every
@@ -99,7 +99,7 @@ shows up, never what those screens contain. The Bible screens are the Bible feat
 so those walks fail when the text is missing or the import is wrong. The daily reading has scenarios of its own ([daily.scenarios.mjs](daily.scenarios.mjs)),
 which never name a date (the browser's clock is the phone's, and "today" is found as a person finds it, by the day that says "today"):
 
-- the header is one row (Back, the title, the Calendar button, the Bookmark button), every button at least 44 by 44; the strip has exactly seven
+- the header is one row (Back, the title, the Calendar button, the Bookmark button), every button at least 44 by 44 (they are 48); the strip has exactly seven
   days, each at least 44 by 44; a tap on a day picks it and changes the liturgical title, Today brings it back, the arrows move a week; under it
   the card, the notice, and the readings and the reflection tagged as samples (the Psalm is the only citation, a reading opens and closes);
 - the Calendar button opens the sheet; Escape, Close and a tap outside close it; a day chosen in it closes it and moves the strip to its week; its

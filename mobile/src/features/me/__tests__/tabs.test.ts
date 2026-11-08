@@ -256,7 +256,7 @@ check('the words: Help says the diary is in the Notes tab of Me, and nothing in 
   assert.match(read('app/help.tsx'), /Open Me and tap the Notes tab: your diary lives there\./);
   assert.doesNotMatch(code(read('app/(tabs)/library.tsx')), /Notes/);
   assert.match(read('app/diary/[id].tsx'), /router\.replace\('\/me'\)/);
-  assert.match(read('app/diary/index.tsx'), /router\.replace\('\/me'\)/);
+  assert.match(read('app/diary/index.tsx'), /<BackButton fallback="\/me" \/>/);
 });
 
 function tokensText(group: string, name: string, key: string): number {
