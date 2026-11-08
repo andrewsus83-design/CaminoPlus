@@ -7,13 +7,14 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { BIBLE_BOOKS } from '../bible/books';
 import { CONTINUE_TITLE, LAST_READ_NAME, packLastRead } from '../bible/lastRead';
+import { placeLabel } from '../bible/order';
 import { bookById, BOOK_CATALOG } from '../books/catalog';
 import { READING_NAME, chapterNav, emptyReading, positionLine, savePlace, type ChapterRef } from '../books/reading';
 import { safeText } from '../books/safeText';
 import { BAR_GAP, BAR_HEIGHT, BAR_ROOM, CLOSE_SIZE, TAB_BAR_HEIGHT, barBottom, tabBarBottom } from '../continueBar/barLayout';
 import { HIDDEN_NAME, isHidden, markOf, packHidden, parseHidden } from '../continueBar/hidden';
 import {
-  HIDE_LABEL, OPEN_HINT, barVisible, bibleSpotOf, bookSpotOf, describeBible, describeBook, latestSpot, stampOf, type BibleSpot, type BookSpot, type Spot,
+  HIDE_LABEL, OPEN_HINT, barVisible, bibleSpotOf, bookSpotOf, describeBible, describeBook, latestSpot, stampOf, type BibleSpot, type BookSpot, type Spot, type SpotView,
 } from '../continueBar/spot';
 
 let n = 0;
@@ -91,19 +92,22 @@ check('a chapter of the Bible: the place as the Bible names it ("Genesis 3", "Ps
   assert.equal(CONTINUE_TITLE, 'Continue reading', 'the words over the place');
 });
 
-check('the name and the chapter of a place in the Bible are two parts of the label for every chapter of every book (a long name is cut, the chapter is not)', () => {
+check('the name and the chapter of a place in the Bible are two parts of the label for every chapter of every book (a long name is cut, the chapter is not): the Psalms are "Psalm", the rest are named by the list', () => {
   let places = 0;
   for (const b of BIBLE_BOOKS) {
     for (let chapter = 1; chapter <= b.chapters; chapter += 1) {
       const v = describeBible(bible(b.code, chapter, 1));
       assert.equal(v.tail, String(chapter), `${b.code} ${chapter}: the tail is the chapter`);
-      assert.equal(v.head, b.name, `${b.code} ${chapter}: the head is the name of the book`);
+      assert.equal(v.head, b.code === 'PSA' ? 'Psalm' : b.name, `${b.code} ${chapter}: the head is the name of the book as a place says it`);
       assert.equal(`${v.head} ${v.tail}`, v.label, `${b.code} ${chapter}: head, a space and tail are the label`);
+      assert.equal(v.label, placeLabel({ code: b.code, chapter }), `${b.code} ${chapter}: the label is the one the Bible uses on its buttons`);
       assert.equal(v.href, `/library/bible/${b.code}/${chapter}`);
       places += 1;
     }
   }
   assert.equal(places, 1328, 'every chapter of the 73 books');
+  assert.equal(describeBible(bible('PSA', 121, 1)).head, 'Psalm');
+  assert.equal(describeBible(bible('1CO', 13, 1)).head, '1 Corinthians');
 });
 
 check('a book: its title and the chapter the reader opens, counted as the reader counts it ("Chapter 2 of 24"), the open book, and the address of the reader of the book (which opens where the person stopped)', () => {
@@ -142,13 +146,14 @@ check('the same on the real texts of the app: for every one of the books of the 
   for (const entry of BOOK_CATALOG) {
     const text = safeText(entry.id);
     assert.ok(text && text.chapters.length > 0, `${entry.id}: its text reads`);
-    for (const at of [0, text!.chapters.length - 1]) {
-      const v = describeBook(book(entry.id, text!.chapters[at].id, 0.2, 1), text!.chapters)!;
-      assert.equal(v.label, `${entry.title} · Chapter ${at + 1}`, entry.id);
+    const own: ChapterRef[] = text.chapters;
+    for (const index of [0, own.length - 1]) {
+      const v: SpotView = describeBook(book(entry.id, own[index].id, 0.2, 1), own)!;
+      assert.equal(v.label, `${entry.title} · Chapter ${index + 1}`, entry.id);
       assert.equal(v.head, entry.title, `${entry.id}: the head is the title the Books tab shows`);
-      assert.equal(v.tail, `· Chapter ${at + 1}`, entry.id);
+      assert.equal(v.tail, `· Chapter ${index + 1}`, entry.id);
       assert.equal(`${v.head} ${v.tail}`, v.label, entry.id);
-      assert.equal(v.spoken, `Continue reading, ${entry.title}, Chapter ${at + 1}`, entry.id);
+      assert.equal(v.spoken, `Continue reading, ${entry.title}, Chapter ${index + 1}`, entry.id);
       assert.equal(v.href, `/library/book/${entry.id}/read`, entry.id);
     }
   }

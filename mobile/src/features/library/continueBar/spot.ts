@@ -13,6 +13,7 @@
 import { bookByCode } from '../bible/books';
 import { CONTINUE_TITLE, continueLabel, parseLastRead } from '../bible/lastRead';
 import { placeLabel, readerHref } from '../bible/order';
+import { refName } from '../bible/ref';
 import { bookById } from '../books/catalog';
 import { readerPath } from '../books/copy';
 import { lastRead, resumeAt, type ChapterRef, type StoredReading } from '../books/reading';
@@ -71,11 +72,11 @@ export type SpotView = {
 
 export function describeBible(spot: BibleSpot): SpotView {
   const place = { code: spot.code, chapter: spot.chapter };
-  const label = placeLabel(place);
-  // placeLabel is the name of the book, a space and the chapter: the head is what is left of it without the chapter, so the two parts can never disagree with the whole
+  // placeLabel is the name of the book as a place says it (refName: "Psalm", not "Psalms"), a space and the chapter; the two parts are made the same way, and a test
+  // (continueBar.test.ts) checks that they put together are placeLabel for every chapter of the Bible
+  const head = refName(spot.code, (code) => bookByCode(code)?.name);
   const tail = String(spot.chapter);
-  const head = label.endsWith(` ${tail}`) ? label.slice(0, label.length - tail.length - 1) : (bookByCode(spot.code)?.name ?? label);
-  return { icon: 'book', label, head, tail, spoken: continueLabel(place), href: readerHref(place) };
+  return { icon: 'book', label: placeLabel(place), head, tail, spoken: continueLabel(place), href: readerHref(place) };
 }
 
 /**
