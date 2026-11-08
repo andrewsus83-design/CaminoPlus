@@ -6,6 +6,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { BOOK_CATALOG } from '../books/catalog';
+import * as reading from '../books/reading';
 import {
   CONTINUE_CTA, CONTINUE_NOTE, NONE_LINE, START_CTA, START_NOTE, booksBanner, booksNotice, bookPath, readerPath,
 } from '../books/copy';
@@ -140,6 +141,8 @@ check('a long title is split in two: "Chapter XXXVI" and what the chapter is abo
   assert.deepEqual(splitTitle(sentence), { label: sentence, subtitle: '' });
   assert.deepEqual(splitTitle('Prelude for Making Election'), { label: 'Prelude for Making Election', subtitle: '' }, 'a short title is only a label');
   assert.deepEqual(splitTitle('A long title without any full stop in its first words, so it stays whole'), { label: 'A long title without any full stop in its first words, so it stays whole', subtitle: '' });
+  const wholeSentence = 'Concerning the great and wonderful mercy of God towards sinners. How it works in the soul';
+  assert.deepEqual(splitTitle(wholeSentence), { label: wholeSentence, subtitle: '' }, 'a first sentence that is itself long is not a name: the title stays whole');
   assert.ok(LONG_TITLE === 40 && LONG_LABEL === 44);
   assert.equal(partSubtitle('The First Book. Admonitions Profitable for the Spiritual Life'), 'Admonitions Profitable for the Spiritual Life');
   assert.equal(partSubtitle("Part I. Counsels and Practices Suitable for the Soul's Guidance."), "Counsels and Practices Suitable for the Soul's Guidance");
@@ -150,6 +153,7 @@ check('a long title is split in two: "Chapter XXXVI" and what the chapter is abo
   assert.equal(partName("St. Joseph's Mansion"), "St. Joseph's Mansion", 'a full stop after St is not the end of a sentence');
   assert.equal(partName('The Third Mansions. Chapter of St. Peter'), 'The Third Mansions');
   assert.equal(partName('  The  Fourth   Book.   Of the Altar '), 'The Fourth Book');
+  assert.equal(partName('The Life of St. Teresa. Of her childhood'), 'The Life of St. Teresa', 'a full stop after St is not the end of the name, wherever St stands');
   assert.equal(partName(''), '');
 });
 
@@ -175,6 +179,7 @@ check('the button of a book page: "Start reading" the first time, "Continue: Cha
   assert.equal(readButtonLabel(plain, { c: 'c3', y: 0.4 }).replace(/\xa0/g, ' '), 'Continue: Chapter 3');
   assert.equal(readButtonSpoken(imitation, { c: 'c4', y: 0.1 }), 'Continue: Book Two, Chapter I. Of inward things 0');
   assert.equal(readButtonSpoken(imitation, null), 'Start reading');
+  assert.equal(readButtonLabel(imitation, { c: 'c4', y: 0.1 }).replace(/\xa0/g, ' '), 'Continue: Chapter I', 'the button is short: the number of the chapter, and not its whole title (which is for a screen reader)');
   assert.equal(readButtonLabel(plain, { c: 'gone', y: 0.4 }), 'Start reading', 'a place in a chapter that is not there starts the book');
 });
 
@@ -218,6 +223,8 @@ check('words and reading time: runs of non-space, 200 a minute, minutes under an
   assert.equal(countWords(' Thou  art\ngreat, O Lord. '), 5);
   assert.equal(blockWords([{ k: 'p', t: 'a b c' }, { k: 'hr' }, { k: 'q', t: 'd\ne' }, { k: 'h', t: 'f' }, { k: 'li', t: '1. g' }]), 8);
   assert.equal(readingTime(10), '1 min');
+  assert.equal(readingTime(1099), '5 min', 'under half a minute more it rounds down');
+  assert.equal(readingTime(1300), '7 min', 'and from half a minute more it rounds up');
   assert.equal(readingTime(1200), '6 min');
   assert.equal(readingTime(11800), '59 min');
   assert.equal(readingTime(12000), '1 h');
@@ -247,6 +254,13 @@ check('a very long paragraph is cut into pieces that make the same text again, a
   const words = 'word '.repeat(2000).trim();
   assert.equal(pieces(words, 500).join(''), words);
   assert.ok(pieces(words, 500).every((p) => p.length <= 500));
+  // where a cut falls: at a full stop in the last fifth of a piece; without one, at the last space (a word is never cut); only a text with no space at all is cut anywhere
+  const early = `${'x'.repeat(48)}. ${'word '.repeat(60)}`.trim();
+  assert.ok(pieces(early, 100)[0].length > 80, 'a full stop in the first half of a piece is not where it is cut: the piece goes on to the last space');
+  const spaced = 'abcdefg '.repeat(40).trim();
+  const spacedParts = pieces(spaced, 100);
+  assert.ok(spacedParts.length > 2);
+  assert.ok(spacedParts.slice(1).every((p) => p.startsWith(' ')), 'a piece starts where the one before stopped, at a space, so no word is cut in two');
 });
 
 check('a numbered point keeps its marker apart from its text, and a text with no marker has none', () => {
@@ -335,6 +349,7 @@ check('a damaged place never throws: bad items are left out, a book twice is kep
 });
 
 check('the lists are bounded: at most 40 books and 1200 read marks, so a hostile file cannot grow them', () => {
+  assert.deepEqual([READING_MAX_BOOKS, READING_MAX_READ], [40, 1200], 'room for the twelve books and then some; the longest book has about 170 chapters');
   const items = Array.from({ length: READING_MAX_BOOKS + 20 }, (_, i) => ({ id: `book-${i}`, c: 'c1', y: 0, at: i, read: [] }));
   assert.equal(parseReading({ v: 1, items })!.items.length, READING_MAX_BOOKS);
   const read = Array.from({ length: READING_MAX_READ + 50 }, (_, i) => `c${i}`);
@@ -354,6 +369,33 @@ check('"Continue reading" is the book read last that still has a text: a place i
   assert.equal(lastRead(emptyReading(), () => true), null);
 });
 
+check('what other screens rely on stays (the floating Continue bar reads the places): every place that is saved carries the time it was saved, in milliseconds, the book read last comes with that time, and the names and shapes below do not change', () => {
+  const a = savePlace(emptyReading(), 'confessions', 'c3', 0.4, 1234);
+  assert.equal(placeOf(a, 'confessions')!.at, 1234, 'a place saved by savePlace carries its time');
+  const b = markRead(emptyReading(), 'devout-life', 'c1', 5678);
+  assert.equal(placeOf(b, 'devout-life')!.at, 5678, 'so does a place made by marking a chapter read');
+  const c = markRead(a, 'confessions', 'c1', 9999);
+  assert.equal(placeOf(c, 'confessions')!.at, 1234, 'marking a chapter read does not move the place in time: it is the time the person stopped');
+  const d = savePlace(a, 'imitation-of-christ', 'c1', 0, 2000);
+  assert.equal(lastRead(d, () => true)!.at, 2000, 'the book read last comes with its time');
+  assert.deepEqual(Object.keys(placeOf(d, 'confessions')!).sort(), ['at', 'c', 'id', 'read', 'y'], 'a place has these fields (more may be added, none taken away)');
+  // what was written is read back, and a later version may write more than this one reads
+  const stored = JSON.parse(JSON.stringify(packReading(d))) as { items: Array<Record<string, unknown>>; [k: string]: unknown };
+  stored.items[0].later = 'a field from a later version';
+  stored.later = 1;
+  assert.deepEqual(parseReading(stored), parseReading(packReading(d)), 'fields it does not know are left out, the rest loads as before');
+  assert.equal(reading.READING_NAME, 'library.reading');
+  const api = reading as unknown as Record<string, unknown>;
+  const arity: Record<string, number> = { savePlace: 5, markRead: 4, lastRead: 2, placeOf: 2, readSet: 2, parseReading: 1, packReading: 1, resumeAt: 2, startAt: 2, emptyReading: 0 };
+  for (const [name, n] of Object.entries(arity)) {
+    assert.equal(typeof api[name], 'function', `${name} is exported`);
+    assert.equal((api[name] as (...x: unknown[]) => unknown).length, n, `${name} takes ${n} arguments`);
+  }
+  for (const name of ['chapterIndex', 'chapterNav', 'positionLine', 'destination', 'previousLabel', 'nextLabel', 'tocGroups', 'hasParts', 'shortTitle', 'partName', 'splitTitle', 'partSubtitle', 'scrollProgress', 'offsetFor', 'isRead', 'countWords', 'blockWords', 'groupThousands', 'readingTime', 'bookFacts', 'pieces', 'layoutBlocks', 'splitMarker', 'readButtonLabel', 'readButtonSpoken']) {
+    assert.equal(typeof api[name], 'function', `${name} is exported`);
+  }
+});
+
 check('where a book opens: the saved chapter and how far down, or its start when there is no place, a place that does not read, or a chapter the text no longer has', () => {
   assert.deepEqual(resumeAt(plain, { c: 'c3', y: 0.4 }), { index: 2, y: 0.4, fresh: false });
   for (const bad of [null, undefined, { c: 'c99', y: 0.5 }, { c: '', y: 0.5 }]) assert.deepEqual(resumeAt(plain, bad), { index: 0, y: 0, fresh: true });
@@ -362,12 +404,17 @@ check('where a book opens: the saved chapter and how far down, or its start when
   assert.deepEqual(resumeAt(plain, { c: 'c2', y: 3 }), { index: 2, y: 0, fresh: false }, 'a chapter read to its end opens the next one from its top');
   assert.deepEqual(resumeAt(plain, { c: 'c4', y: 1 }), { index: 3, y: 0, fresh: false }, 'after the last chapter: that chapter, from its top');
   assert.deepEqual(resumeAt(plain, { c: 'c2', y: FINISHED_AT - 0.001 }), { index: 1, y: FINISHED_AT - 0.001, fresh: false });
+  assert.equal(FINISHED_AT, 0.97);
+  assert.deepEqual(resumeAt(plain, { c: 'c2', y: 0.97 }), { index: 2, y: 0, fresh: false }, 'from 97 % down a chapter counts as finished');
+  assert.deepEqual(resumeAt(plain, { c: 'c2', y: 0.96 }), { index: 1, y: 0.96, fresh: false }, 'and at 96 % it does not');
 });
 
 check('how far down to open a chapter: where the person was in it when it is the saved one and not finished, else the top', () => {
   assert.equal(startAt({ c: 'c3', y: 0.4 }, 'c3'), 0.4);
   assert.equal(startAt({ c: 'c3', y: 0.4 }, 'c4'), 0);
   assert.equal(startAt({ c: 'c3', y: 0.99 }, 'c3'), 0);
+  assert.equal(startAt({ c: 'c3', y: 0.97 }, 'c3'), 0, 'a chapter read to 97 % opens at its top');
+  assert.equal(startAt({ c: 'c3', y: 0.96 }, 'c3'), 0.96);
   assert.equal(startAt(null, 'c3'), 0);
   assert.equal(startAt({ c: 'c3', y: Number.NaN }, 'c3'), 0);
 });
@@ -497,6 +544,8 @@ check('every cover is a book: a spine, page edges, a small radius, a ribbon of a
 });
 
 check('every title of the twelve fits its cover as large as it can be, in at most four lines, with no word cut, from 320 to 430 wide and at the widest', () => {
+  assert.equal(TITLE_MAX_LINES, 4, 'a title is at most four lines');
+  assert.equal(coverMetrics(173).author.maxLines, 2, 'and an author at most two');
   const widths: number[] = [];
   for (let screen = 320; screen <= 430; screen += 1) widths.push(coverGrid(screen, 16).tile);
   widths.push(TILE_MAX);
