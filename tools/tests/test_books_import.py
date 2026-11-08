@@ -527,6 +527,157 @@ class Abandonment(unittest.TestCase):
             {"k": "hr"}, {"k": "p", "t": "More text of the chapter."}])
 
 
+# ---- the plain texts of CCEL: rules of underscores between sections, headings at the margin or centred, paragraphs indented by three ---------------
+RULE = "     " + "_" * 66
+
+EXERCISES = "\n".join([
+    "                                   CONTENTS", "", "   Approbation of the Latin Text", "", RULE, "",
+    "                                  GENERAL NOTE", "", "   In the reproduction of the text in English:", RULE, "",
+    "                                   ANNOTATIONS", "", "        TO GIVE SOME UNDERSTANDING OF THE SPIRITUAL EXERCISES WHICH FOLLOW", "",
+    "   First Annotation. The first Annotation is that by this name of Spiritual",
+    "   Exercises is meant every way of examining one's conscience. [1]", "",
+    "   Second Annotation. The second: He who gives the Exercises. [1]", RULE, "",
+    "   [1] The word Annotation does not occur in the original after the first time.", RULE, "",
+    "                                   FIRST WEEK", RULE, "",
+    "PRINCIPLE AND FOUNDATION", "", "   Man is created to praise, reverence, and serve God our Lord.", "",
+    "   G", "", "   G", RULE, "",
+    "FIRST EXERCISE", "", "  IT IS A MEDITATION ON THE FIRST SIN", "",
+    "   Prayer. The Preparatory Prayer is to ask grace of God our Lord.", "",
+    "  THE SECOND DAY", "", "   A paragraph under a heading that stands inside the chapter. [2]", RULE, "",
+    "   [2] A second note.", RULE, "",
+    "                                SECOND WEEK", RULE, "",
+    "THE CALL OF THE TEMPORAL KING", "", "  IT HELPS TO CONTEMPLATE THE LIFE OF THE KING ETERNAL", "", "   The text of the call.", RULE, "",
+    "                                 GENERAL INDEX", "", "   Index entries, left out.", ""])
+
+
+class ExercisesRecipe(unittest.TestCase):
+    def test_sections_are_chapters_the_weeks_are_parts_inner_headings_are_headings_and_the_notes_and_the_grid_are_dropped(self):
+        out = parse(R.parse_exercises, EXERCISES)
+        self.assertEqual([(c.part, c.title) for c in out.chapters], [
+            (None, "Annotations. To Give Some Understanding of the Spiritual Exercises Which Follow"),
+            ("First Week", "Principle and Foundation"),
+            ("First Week", "First Exercise. It Is a Meditation on the First Sin"),
+            ("Second Week", "The Call of the Temporal King. It Helps to Contemplate the Life of the King Eternal")])
+        self.assertEqual([b["k"] for b in blocks_of_chapter(out, 2)], ["p", "h", "p"])
+        self.assertEqual(blocks_of_chapter(out, 2)[1], {"k": "h", "t": "The Second Day"})
+        self.assertEqual(blocks_of_chapter(out, 0)[0]["t"], "First Annotation. The first Annotation is that by this name of Spiritual Exercises is meant every way of examining one's conscience.")
+        self.assertEqual((out.stats["footnotes"], out.stats["figure lines"], out.stats["footnote marks"]), (2, 2, 3))
+        self.assertNotIn("Approbation", json.dumps(out.chapters[0].blocks), "what comes before ANNOTATIONS is left out")
+        self.assertNotIn("Index entries", json.dumps([c.blocks for c in out.chapters]), "what comes after the GENERAL INDEX is left out")
+
+    def test_a_mark_without_its_note_or_a_note_without_its_mark_is_an_error(self):
+        with self.assertRaisesRegex(C.BookError, "do not match"):
+            parse(R.parse_exercises, EXERCISES.replace("   [2] A second note.", "   [3] A note for nothing."))
+        with self.assertRaisesRegex(C.BookError, "do not match"):
+            parse(R.parse_exercises, EXERCISES.replace("inside the chapter. [2]", "inside the chapter."))
+
+    def test_a_note_may_be_cited_twice_and_a_text_that_does_not_start_where_the_recipe_says_is_refused(self):
+        parse(R.parse_exercises, EXERCISES.replace("serve God our Lord.", "serve God our Lord. [1]"))
+        with self.assertRaisesRegex(C.BookError, "ANNOTATIONS"):
+            parse(R.parse_exercises, "just text\n")
+
+    def test_a_centred_title_cut_by_a_rule_is_one_title_and_a_chapter_that_repeats_its_heading_is_not_split(self):
+        text = EXERCISES.replace("                                 GENERAL INDEX", "\n".join([
+            "                                   RULES", RULE, "", "FOR PERCEIVING AND KNOWING THE MOVEMENTS", "", "  THE GOOD, TO RECEIVE THEM", "",
+            "   First Rule. The first Rule.", RULE, "", "                                 GENERAL INDEX"]))
+        out = parse(R.parse_exercises, text)
+        self.assertEqual((out.chapters[-1].part, out.chapters[-1].title), ("Rules", "Rules for Perceiving and Knowing the Movements. The Good, to Receive Them"))
+        repeated = EXERCISES.replace("                                 GENERAL INDEX", "\n".join([
+            "                           CONTEMPLATION TO GAIN LOVE", "", "   Note. First, it is well to remark two things.", "",
+            "CONTEMPLATION TO GAIN LOVE", "", "   Prayer. The usual Prayer.", RULE, "", "                                 GENERAL INDEX"]))
+        out = parse(R.parse_exercises, repeated)
+        self.assertEqual(out.chapters[-1].title, "Contemplation to Gain Love")
+        self.assertEqual(len(blocks_of_chapter(out, len(out.chapters) - 1)), 2)
+        self.assertEqual(out.stats["repeated headings"], 1)
+
+
+DEVOUT = "\n".join([
+    "Preface by the Author", "", "   DEAR reader, I request you to read this Preface for your own",
+    "   satisfaction as well as mine. [1]", RULE, "", "   [1] Pausias of Sicyon.", RULE, RULE, "",
+    "  CONTENTS.", "", "   Contents text that is skipped.", RULE, "",
+    " PART I. COUNSELS AND PRACTICES SUITABLE FOR THE SOUL'S", "    GUIDANCE FROM THE FIRST ASPIRATION", RULE, "",
+    "CHAPTER I. What true Devotion is.", "", "   YOU aim at a devout life, dear child, because as a Christian you",
+    "   know that it is a thing pleasing to God. [2]", "",
+    "CHAPTER IV. The Need of a Guide for those who would enter upon and advance in", "the Devout Life.", "",
+    "   1. PLACE yourself in the presence of God. 2. Ask Him to inspire your heart.", "", "   Preparation.", "",
+    "   3. A numbered paragraph stays a paragraph with its number.", "", "   Amen.", RULE, "",
+    "   [2] A footnote of the chapter.", "", "   A second paragraph of the same footnote.", RULE, "",
+    "                   PART II. CONTAINING SUNDRY COUNSELS AS TO UPLIFTING THE SOUL.", RULE, "",
+    "CHAPTER IX. FIRST MEDITATION.", "", "   BEGIN with an act of faith.", RULE, "",
+    "INDEX.", "", "   ABJECTION, 153", ""])
+
+
+class DevoutLifeRecipe(unittest.TestCase):
+    def test_preface_parts_chapters_points_headings_first_words_and_the_footnotes_dropped(self):
+        out = parse(R.parse_devout_life, DEVOUT)
+        self.assertEqual([(c.part, c.title) for c in out.chapters], [
+            (None, "Preface by the Author"),
+            ("Part I. Counsels and Practices Suitable for the Soul's Guidance from the First Aspiration", "Chapter I. What true Devotion is."),
+            ("Part I. Counsels and Practices Suitable for the Soul's Guidance from the First Aspiration",
+             "Chapter IV. The Need of a Guide for those who would enter upon and advance in the Devout Life."),
+            ("Part II. Containing Sundry Counsels as to Uplifting the Soul.", "Chapter IX. First Meditation.")])
+        self.assertEqual(blocks_of_chapter(out, 0), [{"k": "p", "t": "Dear reader, I request you to read this Preface for your own satisfaction as well as mine."}])
+        self.assertEqual(blocks_of_chapter(out, 1)[0]["t"], "You aim at a devout life, dear child, because as a Christian you know that it is a thing pleasing to God.")
+        self.assertEqual(blocks_of_chapter(out, 2), [
+            {"k": "li", "t": "1. Place yourself in the presence of God."}, {"k": "li", "t": "2. Ask Him to inspire your heart."}, {"k": "h", "t": "Preparation"},
+            {"k": "p", "t": "3. A numbered paragraph stays a paragraph with its number."}, {"k": "p", "t": "Amen."}])
+        self.assertEqual(blocks_of_chapter(out, 3)[0]["t"], "Begin with an act of faith.")
+        self.assertEqual((out.stats["footnotes"], out.stats["footnote marks"], out.stats["points split"], out.stats["first words set in lower case"], out.stats["footnote lines"]), (2, 2, 1, 4, 1))
+        self.assertNotIn("Contents text", json.dumps([c.blocks for c in out.chapters]))
+        self.assertNotIn("ABJECTION", json.dumps([c.blocks for c in out.chapters]))
+
+    def test_a_mark_without_its_note_is_an_error_and_so_is_a_text_with_no_preface(self):
+        with self.assertRaisesRegex(C.BookError, "do not match"):
+            parse(R.parse_devout_life, DEVOUT.replace("   [2] A footnote of the chapter.", "   [3] A footnote of the chapter."))
+        with self.assertRaisesRegex(C.BookError, "Preface by the Author"):
+            parse(R.parse_devout_life, "CHAPTER I. Nothing.\n")
+
+    def test_unshout_sets_a_first_word_in_capitals_as_a_word_and_leaves_the_rest(self):
+        self.assertEqual(R.unshout("YOU aim at a devout life"), "You aim at a devout life")
+        self.assertEqual(R.unshout("1. PRAYER opens the understanding"), "1. Prayer opens the understanding")
+        self.assertEqual(R.unshout("AMEN and amen"), "AMEN and amen")
+        self.assertEqual(R.unshout("GOD ALMIGHTY and the saints"), "GOD ALMIGHTY and the saints", "two words in capitals: not a first word, a name")
+        self.assertEqual(R.unshout("I am here"), "I am here")
+
+    def test_numbered_points_are_split_only_when_the_numbers_run_on(self):
+        self.assertEqual(R.split_points("1. One thing. 2. Another thing."), ["1. One thing.", "2. Another thing."])
+        self.assertEqual(R.split_points("1. One thing. 3. Another thing."), ["1. One thing. 3. Another thing."])
+        self.assertEqual(R.split_points("In 1876. 2. a date"), ["In 1876. 2. a date"])
+
+    def test_a_short_capitalised_line_with_a_full_stop_is_a_heading_and_a_sentence_is_not(self):
+        self.assertTrue(R.subheading("Affections and Resolutions."))
+        self.assertTrue(R.subheading("Of Creation."))
+        self.assertFalse(R.subheading("Amen."))
+        self.assertFalse(R.subheading("God is good and He is near."))
+        self.assertFalse(R.subheading("1. Consider."))
+
+
+DIALOGUE = "\n".join([
+    "   CONTENTS", "", "   A TREATISE OF DIVINE PROVIDENCE", "", "   A TREATISE OF OBEDIENCE", RULE, "",
+    "A TREATISE OF DIVINE PROVIDENCE", RULE, "",
+    "      How a soul, elevated by desire of the honor of God, and of the salvation", "      of her neighbors, asked of God four requests.", "",
+    "   The soul, who is lifted by a very great and yearning desire for the", "   honor of God, begins by exercising herself.", "",
+    "   A second paragraph.", RULE, "", "      How the desire of this soul grew.", "", "   This desire was great and continuous.", RULE, "",
+    "A TREATISE OF OBEDIENCE", RULE, "", "      Letter of Ser Barduccio.", "", "   Oh! had you seen with what humility.", RULE, "",
+    "            This document is from the Christian Classics Ethereal", "               Library at Calvin College, http://www.ccel.org", ""])
+
+
+class DialogueRecipe(unittest.TestCase):
+    def test_treatises_are_parts_each_heading_indented_by_six_is_a_chapter_and_the_front_and_back_are_left_out(self):
+        out = parse(R.parse_dialogue, DIALOGUE)
+        self.assertEqual([(c.part, c.title) for c in out.chapters], [
+            ("A Treatise of Divine Providence", "How a soul, elevated by desire of the honor of God, and of the salvation of her neighbors, asked of God four requests."),
+            ("A Treatise of Divine Providence", "How the desire of this soul grew."),
+            ("A Treatise of Obedience", "Letter of Ser Barduccio.")])
+        self.assertEqual([b["t"] for b in blocks_of_chapter(out, 0)], [
+            "The soul, who is lifted by a very great and yearning desire for the honor of God, begins by exercising herself.", "A second paragraph."])
+        self.assertNotIn("Christian Classics", json.dumps([c.blocks for c in out.chapters]))
+
+    def test_a_text_without_its_first_treatise_is_refused(self):
+        with self.assertRaisesRegex(C.BookError, "A TREATISE OF DIVINE PROVIDENCE"):
+            parse(R.parse_dialogue, "   A TREATISE OF DIVINE PROVIDENCE\n")
+
+
 # ---- the whole pipeline: hash, build, write, check --------------------------------------------------------------------
 def fake_recipe(text: str = gutenberg(CONFESSIONS), **kw) -> tuple[R.Recipe, bytes]:
     data = raw(text)
