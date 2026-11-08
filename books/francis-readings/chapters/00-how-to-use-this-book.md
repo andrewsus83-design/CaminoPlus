@@ -17,25 +17,25 @@ Every day has a morning reading of about five minutes and an evening reflection 
 
 ## Why this book for this road
 
-Three things in Francis's story seem to belong on a coast.
+Three things in Chesterton's Francis seem to belong on a coast.
 
-The first is creation. Francis called the sun, the moon, fire and water his brothers and sisters, and sang about them. The route guide in the app describes dunes, fishing villages and long boardwalks on this road, with wind and sun as its main challenge. It is a walk where the elements are never far away.
+The first is creation. He calls the sun, the moon, fire and water his brothers and sisters, and sings about them. The route guide in the app describes dunes, fishing villages and long boardwalks on this road, with wind and sun as its main challenge. It is a walk where the elements are never far away.
 
-The second is the sea itself. In Chesterton's telling, Francis twice set out across it, and the first time he went as a stowaway. A road that keeps company with the Atlantic suits a saint who liked to take a boat before anyone had made the arrangements.
+The second is the sea. Francis sets out across it twice in Chesterton's story, and the first time he goes as a stowaway, boarding a ship without waiting for arrangements. A road beside the Atlantic suits him.
 
-The third is joy and poverty, which Chesterton insists belong together. A pack, a bunk and a plain supper are a small, chosen version of the way Francis lived. They are not the same thing, and the book is honest about the difference. But a walker who has lived out of one pack for a week has a taste of what Chesterton means by travelling light.
+The third is joy and poverty, which Chesterton insists belong together. A pack, a bunk and a plain supper are a small, chosen version of the way Francis lived. They are not the same thing, and the book says so. But a walker who has lived out of one pack for a week has a taste of what Chesterton means by travelling light.
 
 ## A Christian saint and a Catholic writer
 
-Francis is a saint of the Catholic Church, and Chesterton wrote his book as a believer, in 1923, for readers who admired Francis but found much of him hard to understand. This is a Christian book, and we say so plainly so that nobody is surprised. People walk the Camino for many reasons: faith, sport, grief, curiosity, a rest from work. All of them are welcome here. You do not need to believe what Chesterton believed to notice what he noticed about gratitude, courtesy and travelling light.
+Francis is a saint of the Catholic Church, and Chesterton wrote as a believer, for readers who admired Francis but found much of him hard to follow. This is a Christian book, and we say so plainly. People walk the Camino for many reasons: faith, sport, grief, curiosity, a rest from work. All are welcome here. You do not need to believe what Chesterton believed to notice what he noticed about gratitude, courtesy and travelling light.
 
-It is also Chesterton's portrait, not Francis's own words, and a book of its time. The next chapter says what that means, and where we have chosen passages to avoid the places where it shows most. Where a day comes close to such a place, it says so, briefly.
+It is also his portrait, not Francis's own words, and a book of its time. The next chapter says what that means. Where a day comes close to a place where it shows, the day says so, briefly.
 
 ## The shape of the nine days
 
-The days follow Francis's life in the order Chesterton tells it, from the young man to his death. The first two chapters of his book, which set out his plan and sketch the world Francis was born into, are not drawn on.
+The days follow Francis's life in the order Chesterton tells it, from the young man to his death. The first two chapters of his book, which explain his approach and sketch the world Francis was born into, are not drawn on.
 
-- **Day 1, the boast and the turning back.** The young man of Assisi, his plans, and the road that turned him round.
+- **Day 1, the boast and the turning back.** The young man of Assisi, and the road that turned him round.
 - **Day 2, everything that can be called his.** The break with his father.
 - **Day 3, expecting nothing, enjoying everything.** Where his joy came from.
 - **Day 4, a stranger on the road.** The poor man as the people he met saw him.
@@ -45,12 +45,10 @@ The days follow Francis's life in the order Chesterton tells it, from the young 
 - **Day 8, the bare ground.** His death.
 - **Day 9, always going home.** What he left, and how to go on.
 
-The days are a shape, not a timetable. The book cannot know which day of your walk you are on, so read the day that fits the day you are having. If you are tired, read the passage and the prayer and leave the rest for the morning.
+The days are a shape, not a timetable. Read the one that fits the day you are having. If you are tired, read the passage and the prayer and leave the rest for the morning.
 
 ## On the road and at home
 
-Read the morning part on a bench, in a bunk in an *albergue* (the simple hostel where pilgrims sleep), at a café table while the soup arrives. Then put the phone away for an hour and take the question with you. Read the evening part last, when the boots are off. At home, the morning with your tea and the evening before bed work in the same way.
+Read the morning part on a bench, in a bunk in an *albergue* (the simple hostel where pilgrims sleep), at a café table while the soup arrives. Then take the question with you for an hour. Read the evening part last, when the boots are off. At home, do the same with your tea and before bed.
 
 *Buen Camino* is what walkers say to one another on the road, roughly *may your Way go well*. On the Portuguese side you may hear *Bom caminho*, which means the same.
-
-Read slowly. Chesterton wrote fast and brilliantly, and the passages are best taken a mouthful at a time.

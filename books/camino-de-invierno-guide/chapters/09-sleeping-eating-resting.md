@@ -18,7 +18,6 @@ Rooms are shared and the rules are simple.
 - **Keep your boots and pack off the beds.** Some hostels ask for boots to be left at the door, so ask.
 - **Check your bunk before you unpack.** If you find bites or bugs, tell the *hospitalero*, and if you can, wash and dry your clothes on a hot cycle.
 - **Earplugs and a sleep mask** are the usual answer to snoring and early lights.
-- **Carry a sleeping bag.** The Xunta's list for pilgrims includes one.
 
 ## Eating
 
@@ -26,7 +25,7 @@ A *menú del peregrino* is a set meal for pilgrims, offered in some places. This
 
 Lalín holds a famous annual fair of *cocido*, the Galician stew. The Valdeorras and Ribeira Sacra regions are wine country, and the wines have denominations of origin. The Castilla y León guide singles out, for the villages of the Bierzo, roasted chestnuts, *empanada*, cabbage broth, a sausage called *androlla*, country bread and almond sweets.
 
-The practical point is the long days. The Confraternity says some stretches are long and isolated, and the Xunta's advice is to eat energetic food on the way: nuts, figs, chocolate. Buy lunch before you set out, and do not trust a village on the map to have anything open when you arrive. The Xunta also says to drink at least two litres of water a day, and not to drink from streams, rivers, springs or fountains unless you are sure that the water is safe.
+The practical point is the long days. The Confraternity says some stretches are long and isolated, and the Xunta's advice is to eat energetic food on the way: nuts, figs, chocolate. Buy lunch before you set out, and do not trust a village on the map to have anything open when you arrive.
 
 ## Rest days
 

@@ -26,7 +26,7 @@ Add what the Confraternity of St James says about this road: expect mud, and col
 
 ## Shoes and feet
 
-The Xunta advises comfortable shoes that you have already worn, and says two pairs are a good idea. It advises well-fitting, breathable socks, clean and dry, and it says to wash your feet with soap and water at the end of the day and change your shoes. Mud is likely, and many walkers will want boots with a good grip. Break them in before you leave. Stop at the first hot spot and treat it.
+The Xunta advises comfortable shoes that you have already worn, and says two pairs are a good idea. It advises well-fitting, breathable socks, clean and dry, and it says to wash your feet with soap and water at the end of the day and change your shoes. Mud is likely, and many walkers will want boots with a good grip. Break them in before you leave.
 
 ## Money and language
 

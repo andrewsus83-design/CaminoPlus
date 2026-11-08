@@ -4,7 +4,7 @@ This chapter is plain on purpose. The Winter Way is a quiet road with long days 
 
 ## Feet and legs
 
-Your feet decide how the walk goes. The Xunta advises comfortable, worn-in shoes, clean and dry socks, and washing your feet at the end of each day. Stop at the first hot spot and dress it before it becomes a blister. Rest for a few minutes each hour, and eat and drink before you are hungry or thirsty.
+Your feet decide how the walk goes. Stop at the first hot spot and dress it before it becomes a blister. Rest for a few minutes each hour, and eat and drink before you are hungry or thirsty.
 
 Pace matters more than speed. The Xunta says not to walk too fast in the first days, and to keep the same rhythm. With stages of ~26 to ~36 km, the first day sets the tone for the rest.
 
@@ -39,7 +39,7 @@ Dogs on farms may bark as you pass. Walk on calmly, and do not stare at them or 
 
 ## Walking alone
 
-Many people on this road walk alone for hours. Tell someone where you will sleep each night and message them when you arrive. Keep your phone charged and your map saved on it, and know the name of the last village you passed. A phone signal can fail in the valleys, so do not rely on it. The Xunta advises carrying a small first-aid kit and a torch.
+Many people on this road walk alone for hours. Tell someone where you will sleep each night and message them when you arrive. Keep your phone charged and your map saved on it, and know the name of the last village you passed. A phone signal can fail in the valleys, so do not rely on it.
 
 ## When to stop
 
