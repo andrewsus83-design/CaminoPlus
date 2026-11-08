@@ -253,6 +253,8 @@ check('the rows of a search and of Bookmarks: ONE button that opens the book pag
   assert.match(rows, /const key = itemKey\('Books', b\.id\);/);
   assert.match(rows, /Free to read/);
   assert.match(rows, /Coming soon/);
+  assert.match(rows, /<Chip label="FREE" spoken="Free to read" bg=\{c\.successWash\} fg=\{c\.success\} \/>/, 'the mark of a row says FREE, as the cover does');
+  assert.match(rows, /<Chip label="SOON" spoken="Coming soon" bg=\{role\.sunken\} fg=\{role\.muted\} \/>/, 'and SOON, as the cover does');
   assert.match(code(read('src/features/library/SearchResults.tsx')), /found\.hits\.Books\.some\(\(b\) => !hasBookText\(b\.id\)\) && <SampleNotice title="Coming soon">\{SEARCH_NOTICE\}<\/SampleNotice>/);
   assert.match(code(read('app/library/bookmarks.tsx')), /hits\.Books\.some\(\(b\) => !hasBookText\(b\.id\)\)\s+\? <SampleNotice title="Coming soon">\{BOOKMARKS_NOTICE\}<\/SampleNotice>/);
 });
@@ -384,6 +386,8 @@ check('the words of a chapter: a heading is a heading for a screen reader, a quo
   const blocks = src['ReaderBlocks.tsx'];
   assert.match(blocks, /<AppText variant="h4" accessibilityRole="header" maxFontSizeMultiplier=\{t\.heading\.maxMultiplier\}/);
   assert.match(blocks, /borderLeftWidth: RULE, borderLeftColor: role\.borderStrong/);
+  assert.match(blocks, /const INDENT = 18;/);
+  assert.match(blocks, /paddingLeft: INDENT, borderLeftWidth: RULE/, 'a quotation or a poem is indented from the rule at its left');
   assert.match(blocks, /const \{ marker, rest \} = splitMarker\(item\.t\);/);
   assert.match(blocks, /width: Math\.round\(t\.body\.size \* 1\.9\)/);
   assert.match(blocks, /<View aria-hidden accessibilityElementsHidden importantForAccessibility="no-hide-descendants" style=\{\{ alignSelf: 'center', width: 48, height: 1/);
@@ -405,9 +409,11 @@ check('what is kept stays on the phone: the places under u.<userId>.library.read
   assert.match(writer, /AppState\.addEventListener\('change', \(s\) => \{ if \(s !== 'active'\) flush\(\); \}\);/, 'the place is written when the app goes to the background');
   assert.match(writer, /return \(\) => \{ sub\.remove\(\); flush\(\); \};/, 'and when the screen is left');
   assert.match(writer, /if \(!ready\) return;/, 'a save before the places were read could write over what is kept');
+  assert.match(writer, /const ready = !!loaded && loaded\.key === key;/, 'ready only when the places of this very person have been read');
   const store = src['readingStore.ts'];
   assert.match(store, /import \{ localStore \} from '@\/lib\/localStore';/);
   assert.match(store, /let queue: Promise<unknown> = Promise\.resolve\(\);/);
+  assert.equal(count(store, /const done = queue\.then\(\(\) => localStore\.setJSON\(/g), 2, 'a write (a place, the text size) waits for the write before it');
   assert.match(store, /await queue;\s+return parseReading\(await localStore\.getJSON<unknown>\(key\)\) \?\? emptyReading\(\);/, 'a read waits for the writes before it: the reader of one chapter is left while the next is opened');
   assert.match(store, /parseStep\(await localStore\.getJSON<unknown>\(SIZE_NAME\)\) \?\? DEFAULT_STEP/);
   assert.doesNotMatch(store, /userKey/, 'the text size belongs to the phone, not to a person: logging out does not wipe it');
@@ -423,6 +429,15 @@ check('what is kept stays on the phone: the places under u.<userId>.library.read
 });
 
 /* ================================================================ honest words, data only, touch */
+
+check('what other screens rely on stays: useBooksReading() gives { ready, last, placeOf, readSet } and the places are read from the one key, so a bar elsewhere can say where the person stopped', () => {
+  const hook = read(B('useBooksReading.ts'));
+  assert.match(hook, /export type BooksReading = \{[^}]*\bready: boolean;[^}]*\blast: BookPlace \| null;[^}]*\bplaceOf: \(bookId: string\) => BookPlace \| null;[^}]*\breadSet: \(bookId: string\) => ReadonlySet<string>;[^}]*\};/);
+  assert.match(hook, /export function useBooksReading\(\): BooksReading \{/);
+  assert.match(read(B('reading.ts')), /export type BookPlace = \{ id: string; c: string; y: number; at: number; read: string\[\] \};/, 'a place: the book, the chapter, how far down, when (milliseconds), the chapters read');
+  assert.match(read(B('readingStore.ts')), /export async function loadReading\(key: string\): Promise<StoredReading>/);
+  assert.match(code(read(B('useReadingWriter.ts'))), /current\.current = savePlace\(current\.current, bookId, chapterId, y, Date\.now\(\)\);/, 'every place that is saved is stamped with the time');
+});
 
 check('honest words: a book without a text says Soon and why, nothing says "verified", "official" or "certified", and whether a book has a text is asked of bookText.ts and never kept in the catalog', () => {
   for (const [f, s] of Object.entries(src)) assert.doesNotMatch(s, /verified|official|certified|approved|guaranteed/i, `${f}: an honest word`);
