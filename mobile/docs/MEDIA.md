@@ -43,7 +43,7 @@ The development build of 1.1.0 has no `expo-image-manipulator`. Nothing crashes:
 - Photos go up as the picker gives them (the picker's own JPEG quality 0.8 or 0.85, full size), if they are within the plan's file limit, with no thumbnail. The GPS block and XMP data are still removed on upload.
 - Videos behave as above.
 
-On the web the module works through the browser's canvas; there is no video compressor.
+On the web the module works through the browser's canvas; there is no video compressor. Checked in a web build: a 4,000 x 3,000 px JPEG of 2 MB with a GPS position went up on a Free account as a 1,280 x 960 px JPEG of 266 KB with no EXIF data, and a 480 x 360 px thumbnail of 51 KB.
 
 ## How to test on a phone (build 1.2.0)
 
