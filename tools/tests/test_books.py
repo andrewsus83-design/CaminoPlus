@@ -260,6 +260,12 @@ class Reflection(unittest.TestCase):
             f.write_text(txt.replace("A reflection that begins with a road", "As he says, *walketh not in darkness, saith the Lord*, and a reflection that begins with a road", 1), encoding="utf-8")
             self.assertNotIn("almost, but not exactly", "\n".join(cb.check_book(d, src).warnings))   # an exact quotation is fine
 
+    def test_straight_quotation_marks_are_paired_in_order(self):
+        self.assertEqual(cb._double_quoted('The word "saunter" is old, and "this is the longer quotation that matters" is his.'),
+                         ["this is the longer quotation that matters"])      # not the text between the two
+        self.assertEqual(cb._double_quoted("A “short” word and “a longer curly quotation here”."), ["a longer curly quotation here"])
+        self.assertEqual(cb._double_quoted('One stray " mark and nothing else'), [])                                       # an odd one out pairs with nothing
+
     def test_a_repeated_formula_is_noticed_and_a_prayer_in_italics_is_not_a_quotation(self):
         with tempfile.TemporaryDirectory() as t:
             d, src = self.book(t), self.sources(t)

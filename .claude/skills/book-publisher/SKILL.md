@@ -91,6 +91,7 @@ The bundle is built so the app can attach a pilgrim's own writing to the books. 
 - **Amazon KDP, ebook**: EPUB is accepted. The cover must be JPEG or TIFF, so convert the PNG for upload
   (`python3 -c "from PIL import Image; Image.open('x.cover.png').convert('RGB').save('x.cover.jpg', quality=92)"`).
   Title, subtitle, description and the seven keywords come from `store.json`; `description_long_html` is ready to paste.
+  The categories in `store.json` are the writer's suggestions: confirm each against the store's own category list before you choose.
 - **AI-generated content**: KDP asks, for every title, whether text, images or translations were generated with AI, and
   expects "yes" when the text was AI-generated. These books were written with AI assistance: answer truthfully, using the
   wording in `ai_disclosure`.

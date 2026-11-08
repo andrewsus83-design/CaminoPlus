@@ -37,7 +37,7 @@ Here is the practice. Each time an "if only" comes up, finish the sentence hones
 
 If you are lying awake with the questions, you are in good company. Doubt keeps late hours, and it is at its most persuasive between eleven and three. It is worth remembering that nothing you think in the dark has a vote in the morning. Let the thoughts come, and let them be heard, and then, if you can, put them down.
 
-Look back over the day with the story in mind. Where did "if only" visit you? Perhaps it was on a climb, or at the point where the path divided. Perhaps it came while you were waiting for something: a bed, an answer, a message. Perhaps it lived somewhere in the background all day like a radio in another room. Name the biggest "if" of the day. Say it plainly, once, in a whisper or in a single line on paper. A worry that has been named has edges, and a worry that is only carried has none.
+Walk back through the day with the story in mind. Where did "if only" visit you? Perhaps it was on a climb, or at the point where the path divided. Perhaps it came while you were waiting for something: a bed, an answer, a message. Perhaps it lived somewhere in the background all day like a radio in another room. Name the biggest "if" of the day. Say it plainly, once, in a whisper or in a single line on paper. A worry that has been named has edges, and a worry that is only carried has none.
 
 Then ask a second question: what did you do anyway? There is nearly always something. You walked the hill with the "if" in your head. You asked about the path. You drank water, ate bread, and stepped over the next stone. That, the passage says, is the whole business: you did, now, what you would have done then. It is more than it sounds.
 

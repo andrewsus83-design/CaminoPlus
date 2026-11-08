@@ -39,7 +39,7 @@ Once today, in the middle of something imperfect, look for the small peace that 
 
 The room is quiet, or quiet enough. Another day has gone, and this one was not perfect, and you are somehow at the start of the third week. Sit for a minute, and do nothing about it.
 
-Look back over the day for its moments of peace, and be careful how you look. The easy ones are obvious: the view, the shower, the meal. Those are real, and worth naming. But look for the harder kind too: a moment of quiet that came in the middle of something uncomfortable. A calm that arrived while your feet hurt. A moment of ease in a crowded room. A conversation in which you were tired and, to your own surprise, did not mind. Those are the ones the passage is talking about, and they are often easier to miss.
+Go back over the day for its moments of peace, and be careful how you look. The easy ones are obvious: the view, the shower, the meal. Those are real, and worth naming. But look for the harder kind too: a moment of quiet that came in the middle of something uncomfortable. A calm that arrived while your feet hurt. A moment of ease in a crowded room. A conversation in which you were tired and, to your own surprise, did not mind. Those are the ones the passage is talking about, and they are often easier to miss.
 
 Now ask what you were waiting for. Many of us hold a private list of conditions for peace: when the feet stop hurting, when the next stage is booked, when the weather turns, when that conversation is behind me. It is worth looking at the list. Some of the items may not be needed. Some may be keeping you from a peace that was on offer an hour ago.
 

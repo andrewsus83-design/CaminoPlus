@@ -294,7 +294,14 @@ def _section(ch: bk.Chapter, name: str) -> list[dict]:
     return out
 
 
-_DQUOTE = re.compile(r"[“\"]([^”\"]{12,}?)[”\"]")
+def _double_quoted(text: str) -> list[str]:
+    """Text in double quotation marks, 12 characters or longer. Curly marks pair themselves; straight marks are paired in order (an odd one out is ignored), so a
+    short quoted word followed by a longer quotation does not pair the text between them."""
+    out = [m.group(1) for m in re.finditer(r"“([^”]+)”", text)]
+    parts = text.split('"')
+    if len(parts) > 1 and len(parts) % 2 == 1:
+        out += parts[1::2]
+    return [o for o in out if len(o) >= 12]
 
 
 _INDEX: dict[int, tuple[list[str], dict]] = {}
@@ -346,7 +353,7 @@ def _quotation_candidates(ch: bk.Chapter) -> list[str]:
         groups = [b["spans"]] if b["t"] == "p" else b["items"]
         for spans in groups:
             text = bk.plain(spans)
-            out += [m.group(1) for m in _DQUOTE.finditer(text)]
+            out += _double_quoted(text)
             run = ""
             for sp in spans + [{"t": ""}]:
                 if sp.get("i"):

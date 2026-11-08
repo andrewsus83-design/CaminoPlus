@@ -35,7 +35,7 @@ There is an honest doubt left over, and it is better not to hide it. Can anyone 
 
 The pack is off at last. That first moment of setting it down is one of the small private pleasures of the road: your shoulders float, your back straightens, and for a few minutes you feel strangely light, almost as if you might lift off the floor. Sit with that. It is the nearest thing to a picture of what Thomas is describing.
 
-Look back over the day. What was heavy? There was the pack, certainly, and perhaps a stiff knee, or a hill that went on after it should have stopped. But heaviness comes in other forms, too. A phone call. A remark that is still turning over in your mind. A memory that walked beside you for an hour and would not go away. Name the heaviest thing. Was it the weight itself, or the argument you were having with it?
+Go back over the day. What was heavy? There was the pack, certainly, and perhaps a stiff knee, or a hill that went on after it should have stopped. But heaviness comes in other forms, too. A phone call. A remark that is still turning over in your mind. A memory that walked beside you for an hour and would not go away. Name the heaviest thing. Was it the weight itself, or the argument you were having with it?
 
 And what was light? Even a hard day has a few such moments: a downhill stretch, a bench in the shade, someone who offered to carry something, or simply a moment when the load and the walking were one thing and you forgot you were carrying anything at all.
 

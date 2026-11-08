@@ -43,7 +43,7 @@ Then ask a harder question, if you are able to. What did you carry today that ha
 
 If there is something you wish you could say to somebody, and have not, tonight is not too late to think about it, even if you cannot yet say it. Sometimes the first step is only to see that it is there.
 
-Two weeks is the middle of things, whatever the length of your road. The first rush of newness has gone, and the end is not yet near enough to hurry you. Something has probably shifted in these fourteen days: the pace of your feet, the people you know by sight, the things you notice and the things you have stopped noticing. You do not have to measure the change tonight. It is enough to see that you are not the person who set out. If you are among others tonight, notice how each of them carries their own silence. Some wear it lightly, and some like a coat. It is a good thing to respect when you pass someone sitting alone in the common room.
+Two weeks is the middle of things, whatever the length of your road. The first rush of newness has gone, and the end is not yet near enough to hurry you. Something has probably shifted in these fourteen days: the pace of your feet, the people you know by sight, the things you notice and the things you have stopped noticing. There is no need to measure the change tonight. It is enough to see that you are not the person who set out. If you are among others tonight, notice how each of them carries their own silence. Some wear it lightly, and some like a coat. It is a good thing to respect when you pass someone sitting alone in the common room.
 
 Three questions for tonight:
 
