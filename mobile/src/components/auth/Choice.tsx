@@ -2,19 +2,20 @@ import { View } from 'react-native';
 import { AppText } from '../AppText';
 import { Icon } from '../Icon';
 import { Card } from '../ui';
-import { c, radius, role } from '@/theme';
+import { c, radius, role, space } from '@/theme';
 
-/** Selectable row with a colour bar, title, meta line and a check. */
+/** Selectable row with a colour bar, title, meta line and a check. The Card's own padding (layout.cardPadding) is the room around the text. */
 export function Choice({ title, meta, selected, onPress, accent }: { title: string; meta?: string; selected: boolean; onPress: () => void; accent?: string | null }) {
   return (
-    <Card onPress={onPress} style={{ flexDirection: 'row', alignItems: 'center', gap: 14, padding: 18, borderWidth: 2, borderColor: selected ? c.gold : 'transparent' }}>
+    <Card onPress={onPress} style={{ flexDirection: 'row', alignItems: 'center', gap: space[4], borderWidth: 2, borderColor: selected ? role.highlight : 'transparent' }}>
       <View style={{ width: 12, alignSelf: 'stretch', borderRadius: radius.pill, backgroundColor: accent ?? c.goldSoft }} />
-      <View style={{ flex: 1, gap: 2 }}>
+      <View style={{ flex: 1, gap: space[1] }}>
         <AppText variant="label">{title}</AppText>
         {!!meta && <AppText variant="caption" muted>{meta}</AppText>}
       </View>
-      <View style={{ width: 28, height: 28, borderRadius: radius.pill, borderWidth: selected ? 0 : 1, borderColor: role.border, backgroundColor: selected ? c.gold : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
-        {selected && <Icon name="check" color={c.blue} size={18} />}
+      <View style={{ width: 28, height: 28, borderRadius: radius.pill, borderWidth: selected ? 0 : 1, borderColor: role.border, backgroundColor: selected ? role.highlight : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
+        {/* Navy on gold in both modes: c.blue is light blue in dark mode, and a light blue tick on gold is 1.06 : 1. */}
+        {selected && <Icon name="check" color={role.onHighlight} size={18} />}
       </View>
     </Card>
   );

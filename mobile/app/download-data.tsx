@@ -8,7 +8,7 @@ import { Card } from '@/components/ui';
 import { FormMessage } from '@/components/auth/Field';
 import { supabase } from '@/lib/supabase';
 import { assertOnline, isOfflineError } from '@/lib/net';
-import { c, layout, role } from '@/theme';
+import { c, layout, role, space } from '@/theme';
 
 // Settings > Account > Download my data. public.export_my_data() returns everything the person has put
 // into CaminoPlus as one JSON document; the share sheet lets them save it to Files, mail it to themselves
@@ -50,13 +50,13 @@ export default function DownloadData() {
   };
 
   return (
-    <ScrollView contentContainerStyle={{ paddingTop: insets.top + layout.screenTop, paddingHorizontal: layout.screenMargin, paddingBottom: insets.bottom + 40, gap: 16 }} style={{ backgroundColor: role.bg }}>
+    <ScrollView contentContainerStyle={{ paddingTop: insets.top + layout.screenTop, paddingHorizontal: layout.screenMargin, paddingBottom: insets.bottom + space[10], gap: layout.stackGap }} style={{ backgroundColor: role.bg }}>
       <BackButton />
-      <View style={{ gap: 8 }}>
+      <View style={{ gap: space[2] }}>
         <AppText variant="h2">Download my data</AppText>
         <AppText variant="lead" muted>Get a copy of what you have shared with CaminoPlus, as one file you can keep.</AppText>
       </View>
-      <Card style={{ gap: 8 }}>
+      <Card style={{ gap: space[2] }}>
         <AppText variant="label">What is in the file</AppText>
         {INCLUDED.map((t) => <AppText key={t} variant="small">• {t}</AppText>)}
         <AppText variant="caption" muted>Photos and videos are not inside the file. Other people appear only as ids. Your diary is not in the file: its pages, photos, videos and places are only on this phone, and we never receive them.</AppText>

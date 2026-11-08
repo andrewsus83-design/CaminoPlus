@@ -11,7 +11,7 @@ import { useAuth } from '@/lib/auth';
 import { listRoutes, listStages, Route, Stage, startJourney, updateProfile } from '@/lib/api';
 import { uuid } from '@/lib/uuid';
 import { stageMeta } from '@/features/me/plan';
-import { layout, role } from '@/theme';
+import { layout, role, space } from '@/theme';
 
 type Step = 'name' | 'route' | 'stage';
 
@@ -62,7 +62,7 @@ export default function Onboarding() {
 
   const stepNo = step === 'name' ? 1 : step === 'route' ? 2 : 3;
   const footer = (
-    <View style={{ gap: 12, paddingBottom: insets.bottom ? 0 : 8 }}>
+    <View style={{ gap: space[3], paddingBottom: insets.bottom ? 0 : space[2] }}>
       <Pill label={step === 'stage' ? 'Start my Camino' : 'Continue'} onPress={next} loading={busy} disabled={step === 'stage' && !stages} />
       {step === 'name' ? (
         <Pill variant="ghost" label="Sign out" onPress={signOut} />
@@ -76,7 +76,7 @@ export default function Onboarding() {
     <AuthShell back={false} footer={footer}
       title={step === 'name' ? 'Hola, pilgrim' : step === 'route' ? 'Which Camino?' : 'Where do you start?'}
       lead={step === 'name' ? 'What should other pilgrims call you?' : step === 'route' ? 'Pick the Camino you are starting with. You can switch to another Camino anytime inside the app (Settings, My Camino).' : 'Pick your first stage. Your day plan follows the official stages from there.'}>
-      <AppText variant="mono" muted style={{ fontSize: 12, marginTop: -8 }}>STEP {stepNo} OF 3</AppText>
+      <AppText variant="mono" muted style={{ marginTop: -space[2] }}>STEP {stepNo} OF 3</AppText>
       {!!error && <FormMessage>{error}</FormMessage>}
 
       {step === 'name' && (
@@ -85,7 +85,7 @@ export default function Onboarding() {
 
       {step === 'route' && (routes ? (
         routes.length ? routes.map((r) => (
-          <View key={r.id} style={{ gap: 12 }}>
+          <View key={r.id} style={{ gap: space[3] }}>
             <Choice title={r.name} accent={r.color} selected={route?.id === r.id} onPress={() => setRoute(r)}
               meta={routeMeta(r)} />
             {route?.id === r.id && <RouteGuideCard slug={r.slug} stageCount={r.stage_count} />}
