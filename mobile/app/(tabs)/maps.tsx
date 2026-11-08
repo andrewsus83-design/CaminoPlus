@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Fragment, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, BackHandler, Pressable, ScrollView, View, useWindowDimensions } from 'react-native';
 import { useRouter, useIsFocused } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -14,19 +14,31 @@ import { HelpBellButton, HelpSheet } from '@/features/social';
 import { useAuth } from '@/lib/auth';
 import { MapIcon } from '@/features/map/MapIcon';
 import { useMapModel } from '@/features/map/useMapModel';
-import { CompassIcon, LightIcon, NearChips, Notice, RecenterPill, RoundBtn, WalkBanner, WalkCard, ZoomPair, walkTheme } from '@/features/map/WalkUi';
+import { BTN, CONTROL_TEXT_MAX, EDGE, GAP, ICON, CompassIcon, LightIcon, NearChips, Notice, NoticeStack, RecenterPill, RoundBtn, WalkBanner, WalkCard, ZoomPair, walkTheme } from '@/features/map/WalkUi';
+import { fitControls, pillMaxWidth, routeRoom, walkRoom, type Slot } from '@/features/map/controlLayout';
 import { useWalkSettings } from '@/features/map/walkSettings';
 import { POI_KINDS } from '@/features/map/walkLayers';
-import { c, layout, radius, role, shadowStyle } from '@/theme';
+import { c, fixed, icon, layout, radius, role, shadowStyle, space } from '@/theme';
 
 // 'Helicopter' = whole route, 'City' = the Walk view (tilted, heading-up, close around you). Shown with plain names.
 const LAYERS: { mode: MapLayerMode; label: string }[] = [{ mode: 'Helicopter', label: 'Whole route' }, { mode: 'City', label: 'Near me' }];
 const KIND_LABEL = { church: 'Church', albergue: 'Albergue', water: 'Drinking water', cafe: 'Café', quest: 'Quest', stamp: 'Stamp point' } as const;
 const NEXT_LIGHT = { auto: 'day', day: 'night', night: 'automatic' } as const;
 
+// The round controls on the map, most important first (controlLayout.ts: a short phone shows the first ones that fit and folds the rest into "Map options" in the
+// route sheet, which the flag button opens). The zoom pair is a capsule of two buttons. In the Walk view the flag is the gold button of the bottom card, so the column
+// has none; on the whole route the flag is the last button of the column and is kept whenever something is folded.
+const one = (id: string): Slot => ({ id, h: BTN });
+// The chips of "What is near" take room under the banner, so the column gets shorter while they are open: then the button that closes them moves up and stays.
+const walkRank = (nearOpen: boolean): Slot[] => [{ id: 'zoom', h: 2 * BTN }, one('bell'), ...(nearOpen ? [one('near'), one('compass')] : [one('compass'), one('near')]), one('light'), one('gps')];
+const ROUTE_RANK: Slot[] = [{ id: 'zoom', h: 2 * BTN }, one('bell'), one('locate'), one('light'), one('gps'), one('details')];
+// ...and where they stand, top to bottom (the zoom pair last, nearest the thumb)
+const WALK_ORDER = ['bell', 'compass', 'near', 'light', 'gps', 'zoom'];
+const ROUTE_ORDER = ['bell', 'locate', 'light', 'gps', 'details', 'zoom'];
+
 export default function Maps() {
   const insets = useSafeAreaInsets();
-  const { height: screenH } = useWindowDimensions();
+  const { width: screenW, height: screenH } = useWindowDimensions();
   const SHEET_FULL = Math.min(Math.round(screenH * 0.6), 560);
   const CARD_MAX = Math.min(Math.round(screenH * 0.66), 580);
   const TAB_H = 88;
@@ -50,6 +62,7 @@ export default function Maps() {
   const [cardH, setCardH] = useState(250);
   const [bannerH, setBannerH] = useState(96);
   const [aboveH, setAboveH] = useState(96);
+  const [topH, setTopH] = useState(100);
   const { buildings3d, setBuildings3d } = useWalkSettings();
   const m = useMapModel({ gpsMode, visible: focused });
   const { journey } = useAuth();
@@ -140,11 +153,77 @@ export default function Maps() {
 
   // What the camera keeps clear: banner and card in the Walk view, the chrome and tab bar otherwise.
   const mapInsets = walk ? { top: insets.top + layout.screenTop + bannerH + 8, bottom: cardH } : { top: insets.top + 100, bottom: sheetBottom }; // top-gap-ok: camera padding, not a screen margin
-  // The Walk view's button stack takes the room between the banner and the card: 56, 52 or 48 dp buttons, scrolling only if even 48 does not fit.
-  const stackMax = Math.max(0, screenH - (insets.top + layout.screenTop) - aboveH - 8 - cardH - 16);
-  const btn = [56, 52, 48].find((s) => 8 * s + 48 <= stackMax) ?? 48; // 8 = help bell, compass, near, GPS, light, route details and the zoom pair (2)
-  const stackScrolls = 8 * btn + 48 > stackMax;
-  const gpsColor = gpsMode === 'saver' ? (night ? '#7FD6A4' : c.success) : c.gold;
+  // The column of round buttons at the right takes the room between the banner (and the chips) and the bottom card in the Walk view, between the top block and the
+  // tab bar on the whole route (the tab bar floats 88 high at max(inset - 14, 10), as components/TabBar.tsx draws it). It shows the buttons that fit, most important
+  // first, and folds the rest into "Map options" in the route sheet (controlLayout.ts). A short phone, a tall banner or a large text setting folds more.
+  const tabTop = Math.max(insets.bottom - 14, 10) + TAB_H;
+  const room = walk
+    ? walkRoom({ screenH, topInset: insets.top, screenTop: layout.screenTop, aboveH, cardH, gap: GAP, edge: GAP })
+    : routeRoom({ screenH, topInset: insets.top, screenTop: layout.screenTop, topH, tabBarH: tabTop, gap: GAP, edge: EDGE });
+  // The zoom pair never folds; on the whole route nor does the bell (in the Walk view a bell with no room in the column moves into the row of buttons of the card).
+  const fit = fitControls(walk ? walkRank(nearOpen && !poi) : ROUTE_RANK, room, { gap: GAP, pinned: walk ? undefined : 'details', must: walk ? ['zoom'] : ['zoom', 'bell'] });
+  // The notices under the banner (Walk view) may use what is left of the band between the banner and the card, above the Re-center pill when it is there.
+  const noticeRoom = Math.max(0, Math.floor(screenH - cardH - GAP - (follow ? 0 : BTN + GAP) - (insets.top + layout.screenTop + aboveH + space[2])));
+  // Not even one button fits (the largest text on a short phone): the column is not drawn, and every control, the zoom pair too, is a row of "Map options".
+  const columnHidden = fit.scroll && room < BTN;
+  const foldedIds = columnHidden ? [...(walk ? WALK_ORDER : ROUTE_ORDER).filter((id) => id !== 'zoom'), 'zoomIn', 'zoomOut'] : fit.folded;
+  const flagLabel = foldedIds.length ? 'Route details and map options' : 'Route details';
+  const gpsColor = gpsMode === 'saver' ? (night ? '#7FD6A4' : fixed.success) : fixed.gold;
+  const lightValue = light === 'auto' ? `Automatic, now ${night ? 'night' : 'day'}` : light === 'day' ? 'Day' : 'Night';
+
+  // Every control once: as a round button of the column, and (the ones that fold) as a row of "Map options".
+  const nodes: Record<string, ReactNode> = {
+    bell: <HelpBellButton key="bell" tone={night ? 'night' : 'day'} size={BTN} onPress={() => setHelpOpen(true)} />,
+    compass: (
+      <RoundBtn
+        key="compass" night={night}
+        label={headingUp ? 'Compass. The map turns as you walk. Tap to keep north at the top.' : 'Compass. North is at the top. Tap to turn the map as you walk.'}
+        onPress={() => setHeadingUp((h) => !h)}
+      >
+        <CompassIcon bearing={bearing} night={night} size={ICON} />
+      </RoundBtn>
+    ),
+    near: (
+      <RoundBtn key="near" night={night} label="What is near" expanded={nearOpen} active={nearOpen} onPress={() => setNearOpen((o) => !o)}>
+        <Icon name="search" color={theme.icon} size={ICON} strokeWidth={2} />
+      </RoundBtn>
+    ),
+    locate: (
+      <RoundBtn key="locate" night={night} label="Show my position" onPress={locate}>
+        <MapIcon name="locate" color={theme.icon} size={ICON} />
+      </RoundBtn>
+    ),
+    gps: (
+      <RoundBtn key="gps" night={night} label="Battery saver GPS" role="switch" checked={gpsMode === 'saver'} active={gpsMode === 'precise'} onPress={toggleGps}>
+        <MapIcon name={gpsMode === 'saver' ? 'battery' : 'target'} color={gpsColor} size={ICON} />
+      </RoundBtn>
+    ),
+    light: (
+      <RoundBtn key="light" night={night} label={lightLabel} onPress={cycleLight}>
+        <LightIcon night={night} auto={light === 'auto'} size={ICON} />
+      </RoundBtn>
+    ),
+    details: (
+      <RoundBtn key="details" night={night} label={flagLabel} onPress={() => setSheetOpen(true)}>
+        <Icon name="flag" color={theme.icon} size={ICON} strokeWidth={2} />
+      </RoundBtn>
+    ),
+    zoom: <ZoomPair key="zoom" night={night} onIn={() => setZoomCmd((z) => ({ dir: 1, n: z.n + 1 }))} onOut={() => setZoomCmd((z) => ({ dir: -1, n: z.n + 1 }))} />,
+  };
+  const optionRows: Record<string, { label: string; value: string; glyph: ReactNode; onPress: () => void; role?: 'button' | 'switch'; checked?: boolean }> = {
+    bell: { label: 'Need help', value: 'Call 112 or tell your friends where you are', glyph: <Icon name="bell" color={role.danger} size={ICON} strokeWidth={2} />, onPress: () => { setSheetOpen(false); setHelpOpen(true); } },
+    compass: { label: 'Map direction', value: headingUp ? 'The map turns as you walk' : 'North is at the top', glyph: <CompassIcon bearing={bearing} night={false} size={ICON} />, onPress: () => setHeadingUp((h) => !h) },
+    near: { label: 'What is near', value: nearOpen ? 'Pin types are shown' : 'Choose which pins to show', glyph: <Icon name="search" color={role.text} size={ICON} strokeWidth={2} />, onPress: () => { setSheetOpen(false); setNearOpen((o) => !o); } },
+    locate: { label: 'Show my position', value: 'Opens the Near me view', glyph: <MapIcon name="locate" color={role.text} size={ICON} />, onPress: () => { setSheetOpen(false); locate(); } },
+    light: { label: 'Map light', value: lightValue, glyph: <LightIcon night={night} auto={light === 'auto'} size={ICON} color={role.text} />, onPress: cycleLight },
+    gps: { label: 'GPS', value: gpsMode === 'saver' ? 'Battery saver' : 'Precise, for 10 minutes', glyph: <MapIcon name={gpsMode === 'saver' ? 'battery' : 'target'} color={gpsMode === 'saver' ? c.success : c.goldInk} size={ICON} />, onPress: toggleGps, role: 'switch', checked: gpsMode === 'saver' },
+    zoomIn: { label: 'Zoom in', value: 'Show the map closer', glyph: <MapIcon name="plus" color={role.text} size={ICON} />, onPress: () => setZoomCmd((z) => ({ dir: 1, n: z.n + 1 })) },
+    zoomOut: { label: 'Zoom out', value: 'Show more of the map', glyph: <MapIcon name="minus" color={role.text} size={ICON} />, onPress: () => setZoomCmd((z) => ({ dir: -1, n: z.n + 1 })) },
+  };
+  // The help bell is never two taps away: when the column has no room for it (or has to scroll), it sits in the row of buttons of the bottom card (a row of "Map options" has it too).
+  const bellInCard = walk && (fit.scroll || !fit.shown.includes('bell'));
+  // The controls of the column, top to bottom. When even the zoom pair does not fit the column scrolls, and then the zoom pair comes first, so it is what is in view.
+  const columnIds = (order: string[]) => (fit.scroll ? ['zoom', ...order.filter((id) => id !== 'zoom' && !(bellInCard && id === 'bell'))] : order.filter((id) => fit.shown.includes(id)));
 
   return (
     <View style={{ flex: 1, backgroundColor: night ? '#0C1626' : role.bg }}>
@@ -193,72 +272,47 @@ export default function Maps() {
       {/* Keyed so the Walk view and the overview are separate trees: react-native-web only watches a view's size if it had onLayout when it was created. */}
       {walk ? (
         <Fragment key="walk">
-          {/* Top: instruction banner and the "What is near" chips; below them notices on the left, round buttons on the right.
+          {/* Top: instruction banner and the "What is near" chips; under them the notices, on the left. The right is the column's: a gap stays between them.
               The map keeps getting touches everywhere around them. */}
-          <View pointerEvents="box-none" style={{ position: 'absolute', top: insets.top + layout.screenTop, left: layout.screenMargin, right: layout.screenMargin }}>
-            <View pointerEvents="box-none" style={{ gap: 8 }} onLayout={(e) => setAboveH(Math.round(e.nativeEvent.layout.height))}>
+          <View pointerEvents="box-none" style={{ position: 'absolute', top: insets.top + layout.screenTop, left: EDGE, right: EDGE }}>
+            <View pointerEvents="box-none" style={{ gap: space[2] }} onLayout={(e) => setAboveH(Math.round(e.nativeEvent.layout.height))}>
               <View onLayout={(e) => setBannerH(Math.round(e.nativeEvent.layout.height))}>
                 <WalkBanner banner={m.nav.banner} night={night} />
               </View>
               {nearOpen && !poi && <NearChips night={night} hidden={hiddenKinds} onToggle={toggleKind} />}
             </View>
 
-            <View pointerEvents="box-none" style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 8, marginTop: 8 }}>
-              <View pointerEvents="box-none" style={{ flex: 1, gap: 8 }}>
-                {m.walker.sample && <Notice tone="blue">{m.gpsOffRoute ? 'You are not on the Camino yet · showing a sample position' : 'Showing a sample position'}</Notice>}
-                {!!otherRoute && <Notice tone="gold">{`Maps for ${otherRoute} are coming. This is a preview of the Camino Francés.`}</Notice>}
+            <View pointerEvents="box-none" style={{ marginTop: space[2], marginRight: BTN + GAP }}>
+              <NoticeStack maxH={noticeRoom}>
+                {m.walker.sample && <Notice key="sample" tone="blue">{m.gpsOffRoute ? 'You are not on the Camino yet · showing a sample position' : 'Showing a sample position'}</Notice>}
+                {!!otherRoute && <Notice key="route" tone="gold">{`Maps for ${otherRoute} are coming. This is a preview of the Camino Francés.`}</Notice>}
                 {m.status.kind === 'missing' && (
-                  <Pressable accessibilityRole="button" hitSlop={8} onPress={() => router.push('/offline-maps')} style={{ alignSelf: 'flex-start', maxWidth: '100%' }}>
+                  <Pressable key="missing" accessibilityRole="button" hitSlop={space[2]} onPress={() => router.push('/offline-maps')} style={{ alignSelf: 'flex-start', maxWidth: '100%' }}>
                     <Notice tone="red">{`${m.online ? '' : 'Offline · '}No map pack for stage ${m.status.stageNumber} · Download`}</Notice>
                   </Pressable>
                 )}
                 {m.status.kind === 'ready' && m.status.stale && (
-                  <Pressable accessibilityRole="button" hitSlop={8} onPress={() => router.push('/offline-maps')} style={{ alignSelf: 'flex-start', maxWidth: '100%' }}>
+                  <Pressable key="stale" accessibilityRole="button" hitSlop={space[2]} onPress={() => router.push('/offline-maps')} style={{ alignSelf: 'flex-start', maxWidth: '100%' }}>
                     <Notice tone="gold">Offline map is out of date · Update</Notice>
                   </Pressable>
                 )}
-                {!nativeMapAvailable && <Notice tone="red">Preview map. The real map needs the dev build.</Notice>}
-              </View>
-
-              {/* Right: round buttons. They step aside while a place card or the opened bottom card needs the room. */}
-              {!poi && !cardOpen && (
-                <View pointerEvents="box-none">
-                  {(() => {
-                    const stack = (
-                      <View pointerEvents="box-none" style={{ alignItems: 'flex-end', gap: 8 }}>
-                        <HelpBellButton tone={night ? 'night' : 'day'} size={btn} onPress={() => setHelpOpen(true)} />
-                        <RoundBtn
-                          night={night} size={btn}
-                          label={headingUp ? 'Compass. The map turns as you walk. Tap to keep north at the top.' : 'Compass. North is at the top. Tap to turn the map as you walk.'}
-                          onPress={() => setHeadingUp((h) => !h)}
-                        >
-                          <CompassIcon bearing={bearing} night={night} size={btn - 20} />
-                        </RoundBtn>
-                        <RoundBtn night={night} size={btn} label="What is near" expanded={nearOpen} active={nearOpen} onPress={() => setNearOpen((o) => !o)}>
-                          <Icon name="search" color={theme.icon} size={28} strokeWidth={2} />
-                        </RoundBtn>
-                        <RoundBtn night={night} size={btn} label="Battery saver GPS" role="switch" checked={gpsMode === 'saver'} active={gpsMode === 'precise'} onPress={toggleGps}>
-                          <MapIcon name={gpsMode === 'saver' ? 'battery' : 'target'} color={gpsColor} size={28} />
-                        </RoundBtn>
-                        <RoundBtn night={night} size={btn} label={lightLabel} onPress={cycleLight}>
-                          <LightIcon night={night} auto={light === 'auto'} />
-                        </RoundBtn>
-                        <RoundBtn night={night} size={btn} label="Route details" onPress={() => setSheetOpen(true)}>
-                          <Icon name="flag" color={theme.icon} size={26} strokeWidth={2} />
-                        </RoundBtn>
-                        <ZoomPair night={night} size={btn} onIn={() => setZoomCmd((z) => ({ dir: 1, n: z.n + 1 }))} onOut={() => setZoomCmd((z) => ({ dir: -1, n: z.n + 1 }))} />
-                      </View>
-                    );
-                    return stackScrolls ? <ScrollView style={{ maxHeight: stackMax }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 4 }}>{stack}</ScrollView> : stack;
-                  })()}
-                </View>
-              )}
+                {!nativeMapAvailable && <Notice key="preview" tone="red">Preview map. The real map needs the dev build.</Notice>}
+              </NoticeStack>
             </View>
           </View>
 
+          {/* Right: the round buttons, in a column that ends one gap above the bottom card (the zoom pair, the one nearest the thumb, last). They step aside while a place
+              card or the opened bottom card needs the room. */}
+          {!poi && !cardOpen && (
+            <View pointerEvents="box-none" style={{ position: 'absolute', right: EDGE, bottom: cardH + GAP }}>
+              <ControlColumn ids={columnIds(WALK_ORDER)} nodes={nodes} room={room} scroll={fit.scroll} />
+            </View>
+          )}
+
+          {/* Left: the Re-center pill, on the same line as the bottom of the column, never wider than the room that the column leaves it. */}
           {!poi && !follow && (
-            <View pointerEvents="box-none" style={{ position: 'absolute', left: layout.screenMargin, bottom: cardH + 12 }}>
-              <RecenterPill night={night} onPress={recenter} />
+            <View pointerEvents="box-none" style={{ position: 'absolute', left: EDGE, bottom: cardH + GAP }}>
+              <RecenterPill night={night} onPress={recenter} maxWidth={pillMaxWidth(screenW, BTN, GAP, EDGE)} />
             </View>
           )}
 
@@ -280,6 +334,8 @@ export default function Maps() {
               expanded={cardOpen}
               onExpandedChange={setCardOpen}
               onRouteDetails={() => setSheetOpen(true)}
+              routeLabel={flagLabel}
+              extra={bellInCard ? nodes.bell : undefined}
               onExit={exitWalk}
               onHeight={setCardH}
             />
@@ -287,87 +343,56 @@ export default function Maps() {
         </Fragment>
       ) : (
         <Fragment key="heli">
-          {/* Top: layer switch + pack status */}
-          <View pointerEvents="box-none" style={{ position: 'absolute', top: insets.top + layout.screenTop, left: layout.screenMargin, right: layout.screenMargin, gap: 10 }}>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-              <View style={{ flexDirection: 'row', padding: 4, borderRadius: radius.pill, backgroundColor: role.surface, ...shadowStyle('md') }}>
-                {LAYERS.map((l) => (
-                  <Pressable key={l.mode} accessibilityRole="tab" accessibilityState={{ selected: layer === l.mode }} onPress={() => setLayer(l.mode)} style={{ height: 40, paddingHorizontal: 18, borderRadius: radius.pill, justifyContent: 'center', backgroundColor: layer === l.mode ? c.blue : 'transparent' }}>
-                    <AppText variant="label" color={layer === l.mode ? c.parchment : c.blue}>{l.label}</AppText>
-                  </Pressable>
-                ))}
+          {/* Top: layer switch and the offline maps button on one line (the button drops to the next line when the switch and the large text leave it no room), then the pack
+              status and the notices. */}
+          <View onLayout={(e) => setTopH(Math.round(e.nativeEvent.layout.height))} pointerEvents="box-none" style={{ position: 'absolute', top: insets.top + layout.screenTop, left: EDGE, right: EDGE, gap: GAP }}>
+            <View pointerEvents="box-none" style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: GAP }}>
+              <LayerSwitch layer={layer} night={night} compact={screenW < 350} onChange={setLayer} />
+              <View style={{ marginLeft: 'auto' }}>
+                <RoundBtn night={night} label="Offline maps" onPress={() => router.push('/offline-maps')}>
+                  <MapIcon name="download" color={theme.icon} size={ICON} />
+                </RoundBtn>
               </View>
-              <RoundButton label="Offline maps" onPress={() => router.push('/offline-maps')}>
-                <MapIcon name="download" color={c.blue} />
-              </RoundButton>
             </View>
             <StatusPill status={m.status} online={m.online} onPress={() => router.push('/offline-maps')} />
-            {!!otherRoute && (
-              <View style={{ alignSelf: 'flex-start', paddingHorizontal: 12, minHeight: 28, paddingVertical: 4, justifyContent: 'center', borderRadius: radius.pill, backgroundColor: c.goldWash }}>
-                <AppText variant="caption" color={c.goldInk}>{`Maps for ${otherRoute} are coming. This is a preview of the Camino Francés.`}</AppText>
-              </View>
-            )}
-            {m.gpsOffRoute && (
-              <View style={{ alignSelf: 'flex-start', paddingHorizontal: 12, height: 28, justifyContent: 'center', borderRadius: radius.pill, backgroundColor: c.blue50 }}>
-                <AppText variant="caption" color={c.blue}>You are not on the Camino yet · showing a sample position</AppText>
-              </View>
-            )}
-            {!nativeMapAvailable && (
-              <View style={{ alignSelf: 'flex-start', paddingHorizontal: 12, minHeight: 28, paddingVertical: 4, justifyContent: 'center', borderRadius: radius.pill, backgroundColor: c.red100 }}>
-                <AppText variant="caption" color={c.red700}>Preview map. The real map needs the dev build.</AppText>
-              </View>
-            )}
+            {!!otherRoute && <Notice tone="gold">{`Maps for ${otherRoute} are coming. This is a preview of the Camino Francés.`}</Notice>}
+            {m.gpsOffRoute && <Notice tone="blue">You are not on the Camino yet · showing a sample position</Notice>}
+            {!nativeMapAvailable && <Notice tone="red">Preview map. The real map needs the dev build.</Notice>}
           </View>
 
-          {/* Right: GPS mode + locate me */}
-          {!poi && <View pointerEvents="box-none" style={{ position: 'absolute', right: layout.screenMargin, bottom: sheetBottom + 16, gap: 10, alignItems: 'flex-end' }}>
-            <HelpBellButton tone="day" size={48} onPress={() => setHelpOpen(true)} />
-            <Pressable
-              accessibilityRole="switch"
-              accessibilityState={{ checked: gpsMode === 'saver' }}
-              accessibilityLabel="Battery saver GPS"
-              onPress={toggleGps}
-              style={{ flexDirection: 'row', alignItems: 'center', gap: 6, height: 40, paddingHorizontal: 14, borderRadius: radius.pill, backgroundColor: gpsMode === 'saver' ? c.successWash : c.goldSoft, ...shadowStyle('md') }}
-            >
-              <MapIcon name={gpsMode === 'saver' ? 'battery' : 'target'} color={gpsMode === 'saver' ? c.success : c.goldInk} size={18} />
-              <AppText variant="caption" color={gpsMode === 'saver' ? c.success : c.goldInk}>{gpsMode === 'saver' ? 'Battery saver' : 'Precise GPS · 10 min'}</AppText>
-            </Pressable>
-            <RoundButton label="Show my position" onPress={locate}>
-              <MapIcon name="locate" color={c.blue} />
-            </RoundButton>
-            <RoundButton label={lightLabel} onPress={cycleLight}>
-              <LightIcon night={night} auto={light === 'auto'} size={24} color={c.blue} />
-            </RoundButton>
-            <View style={{ borderRadius: radius.pill, backgroundColor: role.surface, ...shadowStyle('md'), overflow: 'hidden' }}>
-              <Pressable accessibilityRole="button" accessibilityLabel="Zoom in" onPress={() => setZoomCmd((z) => ({ dir: 1, n: z.n + 1 }))} style={{ width: 48, height: 52, alignItems: 'center', justifyContent: 'center' }}>
-                <MapIcon name="plus" color={c.blue} size={24} />
-              </Pressable>
-              <View style={{ height: 1, backgroundColor: c.sand300 }} />
-              <Pressable accessibilityRole="button" accessibilityLabel="Zoom out" onPress={() => setZoomCmd((z) => ({ dir: -1, n: z.n + 1 }))} style={{ width: 48, height: 52, alignItems: 'center', justifyContent: 'center' }}>
-                <MapIcon name="minus" color={c.blue} size={24} />
-              </Pressable>
+          {/* Right: the round buttons, in a column that ends one margin above the tab bar. */}
+          {!poi && (
+            <View pointerEvents="box-none" style={{ position: 'absolute', right: EDGE, bottom: tabTop + EDGE }}>
+              <ControlColumn ids={columnIds(ROUTE_ORDER)} nodes={nodes} room={room} scroll={fit.scroll} />
             </View>
-            <RoundButton label="Route details" onPress={() => setSheetOpen(true)}>
-              <Icon name="flag" color={c.blue} size={24} />
-            </RoundButton>
-          </View>}
+          )}
         </Fragment>
       )}
 
       {sheetShown && <ModalSheet half={SHEET_FULL} max={screenH - insets.top - layout.screenTop} bottomInset={insets.bottom} onClose={() => setSheetOpen(false)}>
         {(
-          <View style={{ gap: 6 }}>
+          <View style={{ gap: space[2] }}>
             <AppText variant="h4">{ROUTE_NAME} · St-Jean → Santiago</AppText>
             <AppText variant="small" muted>
               {m.walkedKm} of {routeLengthKm} km walked · stage {m.stage.number} · {m.nextTownKm} km to {m.stage.name.split('→')[1]?.trim()}
             </AppText>
+            {/* The controls that did not fit in the column of round buttons (a short phone, a tall banner, large text): the same buttons, as rows. */}
+            {foldedIds.some((id) => optionRows[id]) && (
+              <View style={{ marginTop: space[3], gap: space[1] }}>
+                <AppText variant="label">Map options</AppText>
+                {foldedIds.filter((id) => optionRows[id]).map((id) => {
+                  const r = optionRows[id];
+                  return <OptionRow key={id} label={r.label} value={r.value} onPress={r.onPress} role={r.role} checked={r.checked}>{r.glyph}</OptionRow>;
+                })}
+              </View>
+            )}
             <AppText variant="caption" muted>{m.routeNotice}</AppText>
             {m.pinSource === 'sample' && m.pins.length > 0 && <AppText variant="caption" muted>The pins on the map are examples.</AppText>}
             {m.pinSource !== 'sample' && <AppText variant="caption" muted>{`The pins on the map are places from OpenStreetMap${m.pinSource === 'cache' ? ', saved on this phone' : ''}. Tap one to see how far it was checked. ${OSM_CREDIT}.`}</AppText>}
-            <View style={{ marginTop: 12, gap: 10 }}>
+            <View style={{ marginTop: space[3], gap: space[3] }}>
               <AppText variant="label">This stage</AppText>
               <AppText variant="small" muted>{m.stage.name} · {m.stage.distanceKm} km</AppText>
-              <View style={{ flexDirection: 'row', gap: 10 }}>
+              <View style={{ flexDirection: 'row', gap: space[3] }}>
                 <Pill label="Offline maps" onPress={() => router.push('/offline-maps')} />
                 <Pill variant="ghost" label="Near me" onPress={() => setLayer('City')} />
               </View>
@@ -389,28 +414,69 @@ export default function Maps() {
   );
 }
 
-function RoundButton({ label, onPress, children }: { label: string; onPress: () => void; children: React.ReactNode }) {
+/** The column of round buttons: one above the other, GAP apart, on the right. When even the zoom pair does not fit the room it scrolls inside it (the last resort). */
+function ControlColumn({ ids, nodes, room, scroll }: { ids: string[]; nodes: Record<string, ReactNode>; room: number; scroll: boolean }) {
+  const stack = <View pointerEvents="box-none" style={{ alignItems: 'flex-end', gap: GAP }}>{ids.map((id) => nodes[id])}</View>;
+  if (!scroll) return stack;
+  if (room < BTN) return null; // not even one button fits: Map options (the flag of the card) has them all
+  return <ScrollView style={{ maxHeight: room }} showsVerticalScrollIndicator={false} contentContainerStyle={{ alignItems: 'flex-end' }}>{stack}</ScrollView>;
+}
+
+/** "Whole route / Near me": two tabs in one pill, as high as a round button (BTN) so that it lines up with the offline maps button next to it. */
+function LayerSwitch({ layer, night, compact, onChange }: { layer: MapLayerMode; night: boolean; compact: boolean; onChange: (l: MapLayerMode) => void }) {
+  const t = walkTheme(night);
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} style={{ width: 48, height: 48, borderRadius: radius.pill, backgroundColor: role.surface, alignItems: 'center', justifyContent: 'center', ...shadowStyle('md') }}>
-      {children}
+    <View accessibilityRole="tablist" style={{ flexShrink: 1, flexDirection: 'row', padding: space[1], borderRadius: radius.pill, backgroundColor: t.button, borderWidth: night ? 1.5 : 0, borderColor: t.buttonBorder, ...shadowStyle('md') }}>
+      {LAYERS.map((l) => {
+        const on = layer === l.mode;
+        return (
+          <Pressable
+            key={l.mode} accessibilityRole="tab" accessibilityState={{ selected: on }} onPress={() => onChange(l.mode)}
+            style={{ flexShrink: 1, height: layout.touchHard, paddingHorizontal: compact ? space[2] : space[4], borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center', backgroundColor: on ? (night ? t.buttonActive : fixed.blue) : 'transparent' }}
+          >
+            <AppText variant="label" numberOfLines={1} maxFontSizeMultiplier={CONTROL_TEXT_MAX} color={on ? fixed.parchment : t.icon}>{l.label}</AppText>
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+}
+
+/** One of the controls that were folded, as a row of "Map options": its icon, its name, and what it is now. At least BTN high. */
+function OptionRow({ label, value, onPress, role: kind = 'button', checked, children }: { label: string; value: string; onPress: () => void; role?: 'button' | 'switch'; checked?: boolean; children: ReactNode }) {
+  return (
+    <Pressable
+      accessibilityRole={kind}
+      accessibilityLabel={`${label}. ${value}`}
+      accessibilityState={checked != null ? { checked } : undefined}
+      aria-checked={checked}
+      onPress={onPress}
+      style={({ pressed }) => ({ minHeight: BTN, flexDirection: 'row', alignItems: 'center', gap: space[2], opacity: pressed ? 0.7 : 1 })}
+    >
+      <View style={{ width: ICON + space[3], alignItems: 'flex-start' }}>{children}</View>
+      <View style={{ flex: 1 }}>
+        <AppText variant="label">{label}</AppText>
+        <AppText variant="small" muted>{value}</AppText>
+      </View>
     </Pressable>
   );
 }
 
 function StatusPill({ status, online, onPress }: { status: ReturnType<typeof useMapModel>['status']; online: boolean | null; onPress: () => void }) {
-  const pill = (bg: string, fg: string, text: string, icon?: React.ReactNode) => (
-    <Pressable onPress={onPress} accessibilityRole="button" style={{ alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, height: 28, borderRadius: radius.pill, backgroundColor: bg }}>
-      {icon}
-      <AppText variant="caption" color={fg}>{text}</AppText>
+  // 8 px of room round the words; the tap area is at least 48 high with the hitSlop (the pill is 37 high).
+  const pill = (bg: string, fg: string, text: string, glyph?: ReactNode) => (
+    <Pressable onPress={onPress} accessibilityRole="button" hitSlop={space[2]} style={{ alignSelf: 'flex-start', maxWidth: '100%', flexDirection: 'row', alignItems: 'center', gap: space[2], paddingHorizontal: space[3], paddingVertical: space[2], borderRadius: radius.md, backgroundColor: bg }}>
+      {glyph}
+      <AppText variant="caption" color={fg} style={{ flexShrink: 1 }}>{text}</AppText>
     </Pressable>
   );
-  if (status.kind === 'online') return pill(c.blue50, c.blue, 'Online map', <MapIcon name="cloud" color={c.blue} size={14} />);
+  if (status.kind === 'online') return pill(c.blue50, c.blue, 'Online map', <MapIcon name="cloud" color={c.blue} size={icon.sm} />);
   if (status.kind === 'ready')
     return status.stale
-      ? pill(c.goldWash, c.goldInk, `${status.text} · check for update`, <Icon name="check" color={c.goldInk} size={14} />)
-      : pill(c.successWash, c.success, status.text, <Icon name="check" color={c.success} size={14} />);
+      ? pill(c.goldWash, c.goldInk, `${status.text} · check for update`, <Icon name="check" color={c.goldInk} size={icon.sm} />)
+      : pill(c.successWash, c.success, status.text, <Icon name="check" color={c.success} size={icon.sm} />);
   if (status.kind === 'missing')
-    return pill(c.red100, c.red700, `${online ? '' : 'Offline · '}No map pack for stage ${status.stageNumber} · Download`, online ? undefined : <MapIcon name="wifiOff" color={c.red700} size={14} />);
+    return pill(c.red100, c.red700, `${online ? '' : 'Offline · '}No map pack for stage ${status.stageNumber} · Download`, online ? undefined : <MapIcon name="wifiOff" color={c.red700} size={icon.sm} />);
   return null;
 }
 
