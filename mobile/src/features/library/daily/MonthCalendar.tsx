@@ -38,9 +38,10 @@ function Arrow({ direction, label, enabled, onPress }: { direction: 'back' | 'ch
       accessibilityState={{ disabled: !enabled }}
       disabled={!enabled}
       onPress={onPress}
-      style={({ pressed }) => ({ width: TOUCH, height: TOUCH, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center', opacity: !enabled ? 0.35 : pressed ? 0.6 : 1 })}
+      style={({ pressed }) => ({ width: TOUCH, height: TOUCH, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.6 : 1 })}
     >
-      <Icon name={direction} color={role.text} />
+      {/* An arrow that cannot go is quieter (the placeholder grey) but still 3 : 1, so that nobody loses sight of it; it is also marked disabled. */}
+      <Icon name={direction} color={enabled ? role.text : role.placeholder} />
     </Pressable>
   );
 }
