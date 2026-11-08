@@ -48,7 +48,8 @@ Then the **scenarios** ([scenarios.mjs](scenarios.mjs)), each in light and dark,
 - Bible ([bible.scenarios.mjs](bible.scenarios.mjs), the same walks on the real text): the daily banner is compact (at most 120 high at 390
   wide, 140 at 320) and is one button; the three parts (Old Testament, Deuterocanon, New Testament) are a segmented control under the banner
   that scrolls with the page, and each shows its books as three square tiles in a row; all 73 book names fit their tile at 320, 390 and 430, the
-  short ones at 22 or more on a phone of 390 and every one at 15 or more from 390 up;
+  short ones at 22 or more on a phone of 390 and every one at 15 or more from 390 up (the two Thessalonians 14); a Chromium that hints the glyphs (CI's does)
+  lays a name wider than one that does not, so the fit counts every letter rounded up to a pixel (tried with --font-render-hinting set to none, slight, medium and full);
   a tile opens the numbers of the chapters, a number opens the words, and Previous and Next name where they go, cross the books and the
   parts (Malachi 4 to Tobit 1) and are disabled at Genesis 1 and Revelation 22; prose is paragraphs, a psalm is stanzas, and the end of a
   chapter has the credit and says it is not the translation read at Mass; a touch chooses a verse and raises Bookmark, Copy and Share, a
@@ -81,8 +82,9 @@ Then the **scenarios** ([scenarios.mjs](scenarios.mjs)), each in light and dark,
 
 The diary screens and the Notes feed (the first sub-tab of Me) belong to their own features: they are swept (they must load without errors),
 and the scenarios only check where the pen leads, that Notes is the first sub-tab and that a note written there shows up, never what those
-screens contain. The daily reading has scenarios of its own ([daily.scenarios.mjs](daily.scenarios.mjs)), which never name a date (the browser's
-clock is the phone's, and "today" is found as a person finds it, by the day that says "today"):
+screens contain. The Bible screens are the Bible feature's own, and they run on the real text (Psalm 121, John 1, Psalm 119, Malachi 4, Tobit 1),
+so those walks fail when the text is missing or the import is wrong. The daily reading has scenarios of its own ([daily.scenarios.mjs](daily.scenarios.mjs)),
+which never name a date (the browser's clock is the phone's, and "today" is found as a person finds it, by the day that says "today"):
 
 - the header is one row (Back, the title, the Calendar button, the Bookmark button), every button at least 44 by 44; the strip has exactly seven
   days, each at least 44 by 44; a tap on a day picks it and changes the liturgical title, Today brings it back, the arrows move a week; under it
@@ -196,7 +198,7 @@ Chromium; a test checks they agree). Bump both on purpose, with the tests looked
 | [plan.mjs](plan.mjs) | which checks exist (route x state x scheme x mode, then the scenarios), the redirect list |
 | [scenarios.mjs](scenarios.mjs) | the walks a person does |
 | [bible.scenarios.mjs](bible.scenarios.mjs) | the walks of the Bible tab and the reader (kept apart so the other walks stay short) |
-| [books.scenarios.mjs](books.scenarios.mjs) | the walks of the Books tab: the covers, a book page, the reader, the place kept on the phone, a book with no text |
+| [books.scenarios.mjs](books.scenarios.mjs) | the walks of the Books tab: the covers, a book page, the reader, the place kept on the phone, the notice of each kind |
 | [fixtures.mjs](fixtures.mjs) | the Supabase project, the saved state of the phone, the realtime socket |
 | [collector.mjs](collector.mjs) | what counts as a failure; the console allow-list |
 | [server.mjs](server.mjs) | a static server with single-page-app fallback, on a free port |

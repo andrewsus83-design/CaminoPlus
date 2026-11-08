@@ -1,7 +1,7 @@
 // Source-level checks of how the Library (its tabs, search and Bookmarks) is wired into the app, in the style of the diary's wiring test:
 // they read the files, nothing is run. What the pure parts do is checked in library.test.ts, bible.test.ts, reader.test.ts and reading.test.ts; here it is
 // that the screens use them the way they must (a row keeps its key, a bookmark is cleared when the person logs out, a post is bookmarked
-// only through the calls the journey viewer makes, the rows cannot be pressed and the few things that can have a label and a state,
+// only through the calls the journey viewer makes, the rows of the example books cannot be pressed and the few things that can have a label and a state,
 // nothing needs a new native module). The daily reading (features/library/daily, app/library/daily.tsx) belongs to its own feature and its
 // own tests: only the way it is plugged in is checked here. The Bible screens (the grid of books, the chapters, the reader) are checked in readerWiring.test.ts,
 // which runs from here, and the Books screens in booksWiring.test.ts. The diary is not part of the Library any more: it is the Notes sub-tab of Me
@@ -113,7 +113,7 @@ check('what can be pressed in the feature: the bookmark button, the search field
 
 check('the compact banner of the Bible tab is ONE button for a screen reader (the gold pill is its look), it opens the daily reading, and the same component is the base of the banner of the Books tab', () => {
   const src = code(read(`${DIR}/LibraryBanner.tsx`));
-  const compact = src.slice(src.indexOf('export function CompactBanner'), src.indexOf('type BannerProps'));
+  const compact = src.slice(src.indexOf('export function CompactBanner'), src.indexOf('export function DailyBanner'));
   assert.equal((compact.match(/<Pressable\b/g) ?? []).length, 1, 'the card is the one Pressable; the gold pill inside it is a View');
   assert.match(compact, /if \(!cta \|\| !onPress\) return card;/, 'without a pill and something to do the card is only a card');
   assert.match(compact, /accessibilityRole="button"\s+accessibilityLabel=\{\[cta, title, label, line\]\.filter\(Boolean\)\.join\('\. '\)\}\s+accessibilityHint=\{hint\}\s+onPress=\{onPress\}/, 'the label is the pill\'s words, then the title and the date; the note is not said');
@@ -122,10 +122,8 @@ check('the compact banner of the Bible tab is ONE button for a screen reader (th
   assert.match(src, /export const DAILY_CTA = 'Read today';/);
   assert.match(src, /<CompactBanner label=\{todayLine\(now\)\} title=\{DAILY_TITLE\} note=\{DAILY_NOTE\} cta=\{DAILY_CTA\} onPress=\{onOpen\} hint="Opens today's reading and the calendar" \/>/);
   assert.match(src, /useFocusEffect\(useCallback\(\(\) => \{ setNow\(new Date\(\)\); \}, \[\]\)\);/, 'the date is read again whenever the Library comes into view');
-  assert.match(src, /export const BOOKS_KICKER = 'Preview · Books';/);
-  assert.match(src, /export const BOOKS_TITLE = 'Twelve free companions for the road';/);
-  assert.match(src, /export const BOOKS_LINE = 'Classics to read on the way\. Free to read\.';/);
-  assert.match(src, /<LibraryBanner kicker=\{BOOKS_KICKER\} title=\{BOOKS_TITLE\} line=\{BOOKS_LINE\} icon="library" \/>/, 'the Books tab banner is not changed here: it has no cta, no onOpen');
+  // the earlier tall banner and the words of the old preview of the Books tab are gone: the banner of the Books tab is books/BooksBanner.tsx, on CompactBanner
+  assert.doesNotMatch(src, /BOOKS_KICKER|BOOKS_TITLE|BOOKS_LINE|\bBannerProps\b|export function LibraryBanner|export function BooksBanner|Preview|Twelve free/, 'nothing of the earlier banner of the Books tab is left');
   // the props a base banner needs: the mono label, the title, an optional line, an optional single Caveat note, an optional gold pill and what it does
   assert.match(src, /export type CompactBannerProps = \{\s+label: string;\s+title: string;\s+line\?: string;\s+note\?: string;\s+cta\?: string;\s+onPress\?: \(\) => void;\s+hint\?: string;\s+\};/);
   // the four fonts, by variant, never a font of its own: JetBrains Mono for the label, Fraunces for the title, Inter for the line and the pill, Caveat for the note

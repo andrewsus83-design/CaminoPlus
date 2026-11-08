@@ -612,7 +612,7 @@ check('text sizes grow with the phone, up to a cap: the running text of the read
   assert.match(page, /numberOfLines=\{3\}/, 'except the line under a chapter in the contents, which is cut at three lines');
 });
 
-check('the design page: the group of the Books phones stands before the daily reading, once, and no phone has more than one handwritten note (the phones show the twelve books of the earlier plan, not the books of books/: they have to be drawn again before the design page can be said to show the Books tab as it is)', () => {
+check('the design page: the group of the Books phones stands before the daily reading, once, and no phone has more than one handwritten note (what the phones show is checked in designBooks.test.ts, which draws them again from the bundle)', () => {
   const design = fs.readFileSync(path.join(root, '..', 'design', 'index.html'), 'utf8');
   const at = (needle: string) => design.indexOf(needle);
   assert.ok(at('<h3 id="books-reader">') > 0 && at('<h3 id="books-reader">') < at('<h3 id="daily-reading">'), 'the Books group is before the Daily reading group');

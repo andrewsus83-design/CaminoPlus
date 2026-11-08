@@ -12,6 +12,7 @@ import './searchtext.test';
 import './reading.test'; // reading a book and drawing its cover: the neighbours of a chapter, the saved place, the text sizes, the A5 covers, the banner
 import './reader.test';
 import './passages.test'; // what a pilgrim can keep from a book: the key of a passage, its words, the rows of the Bookmarks screen
+import './designBooks.test'; // the Books phones of the design page are what the books make of them (designBooks.ts draws them from the bundle)
 import {
   BOOKMARKS_MAX, bookmarkKeys, hasBookmark, packBookmarks, parseBookmarks, toggleBookmark, type Bookmark,
 } from '../bookmarks';

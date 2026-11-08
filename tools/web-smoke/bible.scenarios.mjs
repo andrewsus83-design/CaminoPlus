@@ -135,10 +135,11 @@ export const BIBLE_SCENARIOS = [
       assert.equal(nt[0].name, 'Matthew');
       assert.equal(nt[26].name, 'Revelation');
       await eventually(() => shown(page, 'Orthodox Bibles include a few more books.').count(), (n) => n === 0, { what: 'the number of Orthodox notes on the New Testament' });
-      step('the choices belong to the Bible tab: gone on Books, back on Bible with the choice kept, and gone while something is typed in the search');
+      step('the choices belong to the Bible tab: gone on Books, back on Bible with the choice kept, and gone while something is typed in the search (the Library has no Notes tab: the diary is on Me)');
       await shown(page, 'Books').click();
       await shown(page, 'Books for the road').waitFor();
       await eventually(() => page.getByRole('radio').count(), (n) => n === 0, { what: 'the number of choices on Books' });
+      await eventually(() => page.getByText('Notes', { exact: true }).filter({ visible: true }).count(), (n) => n === 0, { what: 'the number of Notes tabs on the Library' });
       await shown(page, 'Bible').click();
       await group.waitFor();
       await eventually(() => checked('New Testament'), (v) => v === 'true', { what: 'the choice made before is still the choice' });
@@ -150,7 +151,7 @@ export const BIBLE_SCENARIOS = [
     },
   },
   {
-    name: 'Library: every one of the 73 book names fits its square tile without being cut, in 320, 390 and 430 wide, in the three parts: the name is the hero (24, the long words down to 15 from 390 up), the count small',
+    name: 'Library: every one of the 73 book names fits its square tile without being cut, in 320, 390 and 430 wide, in the three parts, as a browser lays them out whether it hints the glyphs or not: the name is the hero (24, the long words down to 15 and the two Thessalonians to 14 from 390 up), the count small',
     persona: 'in',
     async run({ page, step, go }) {
       step('open Library');
@@ -170,7 +171,7 @@ export const BIBLE_SCENARIOS = [
             assert.equal(t.countLines, 1, `${where}: the count is on one line`);
             assert(!t.countCut, `${where}: the count is cut`);
             assert(t.nameSize >= 11 && t.nameSize <= 24, `${where}: the name is drawn at ${t.nameSize}`);
-            if (width >= 390) assert(t.nameSize >= 15, `${where}: the name is drawn at ${t.nameSize}, under 15`);
+            if (width >= 390) assert(t.nameSize >= (/Thessalonians/.test(t.name) ? 14 : 15), `${where}: the name is drawn at ${t.nameSize}, under ${/Thessalonians/.test(t.name) ? 14 : 15}`);
             if (width >= 390 && SHORT_NAMES.includes(t.name)) assert(t.nameSize >= 22, `${where}: a short name is the hero of its tile and is drawn at ${t.nameSize}`);
             assert(t.countSize >= 10 && t.countSize <= 12, `${where}: the count is drawn at ${t.countSize}`);
             assert(Math.abs(t.w - t.h) <= 1 && t.w >= 44, `${where}: the tile is ${t.w} x ${t.h}`);
@@ -463,7 +464,7 @@ export const BIBLE_SCENARIOS = [
       await row.waitFor({ timeout: 15_000 });
       const marked = await row.evaluate((r) => [...r.querySelectorAll('*')].filter((e) => getComputedStyle(e).textDecorationLine.includes('underline') && getComputedStyle(e).backgroundColor !== 'rgba(0, 0, 0, 0)').map((e) => (e.textContent || '').toLowerCase()));
       assert(marked.some((m) => m.startsWith('lord')) && marked.some((m) => m.startsWith('keeper')), `the matched words are marked: ${JSON.stringify(marked)}`);
-      await eventually(() => page.getByText(/Books marked Soon are not in the app yet/).count(), (n) => n === 0, { what: 'the number of Soon notices when no book is among the results' });
+      await eventually(() => page.getByText(/Coming soon|Books marked Soon|books are examples/).count(), (n) => n === 0, { what: 'the number of notices about books when no book is among the results' });
       step('tap the verse: the reader opens at it, chosen');
       await row.click();
       await waitPath(page, '/library/bible/PSA/121', 'the address after tapping a verse of the results');
