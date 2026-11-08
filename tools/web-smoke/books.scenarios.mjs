@@ -32,6 +32,24 @@ const strip = (page, label) => page.getByText(label, { exact: true }).filter({ v
 const box = async (locator, what) => { const b = await locator.boundingBox(); if (!b) throw new Error(`${what} has no box (it is not on the screen)`); return b; };
 const near = (a, b, by, what) => assert(Math.abs(a - b) <= by, `${what}: ${a} is not within ${by} of ${b}`);
 
+/** What the page says about the reading time printed on every cover that is on it: its text, size, font and the room between it and the sides of its cover (read from the DOM, in the page). */
+const readTimes = (page) => page.evaluate(() => {
+  const time = /^(\d+ min|\d+ h( \d+ min)?)$/;
+  const out = [];
+  for (const b of document.querySelectorAll('[role="button"]')) {
+    if (!/, (Pilgrim's guide|Readings for the Way), /.test(b.getAttribute('aria-label') || '')) continue;
+    const cover = b.getBoundingClientRect();
+    if (cover.width === 0) continue;
+    const el = [...b.querySelectorAll('div')].find((d) => d.children.length === 0 && time.test(d.textContent.trim()));
+    if (!el) continue;
+    const r = document.createRange();
+    r.selectNodeContents(el);
+    const t = r.getBoundingClientRect();
+    out.push({ label: b.getAttribute('aria-label'), text: el.textContent, size: parseFloat(getComputedStyle(el).fontSize), font: getComputedStyle(el).fontFamily, left: t.left - cover.left, right: cover.right - t.right, bottom: cover.bottom - t.bottom, lines: new Set([...r.getClientRects()].map((q) => Math.round(q.top))).size });
+  }
+  return out;
+});
+
 /** Library, the Books tab, with the covers drawn. */
 async function openBooks({ page, go }) {
   await go('/library');
@@ -102,6 +120,17 @@ export const BOOKS_SCENARIOS = [
         const c = boxes[i];
         assert(r.x >= c.x && r.y >= c.y - 1 && r.x + r.width <= c.x + c.width + 0.5 && r.y + r.height <= c.y + c.height, `ribbon ${i + 1} is inside its cover`);
       }
+      step('a cover prints no kind of book (a screen reader still hears it in the label), and its time is JetBrains Mono at the mono token, 15, on one line, clear of the sides and the bottom of the cover');
+      for (const word of ["PILGRIM'S GUIDE", 'READINGS FOR THE WAY']) await eventually(() => page.getByText(word, { exact: true }).count(), (n) => n === 0, { what: `the number of "${word}" lines printed on the covers` });
+      const times = await readTimes(page);
+      assert(times.length >= 2, `the covers on the screen print their time (${times.length})`);
+      for (const t of times) {
+        assert.equal(t.size, 15, `${t.label}: the time is drawn at ${t.size}, not the mono token 15`);
+        assert(/JetBrains/.test(t.font), `${t.label}: the time is JetBrains Mono (${t.font})`);
+        assert.equal(t.lines, 1, `${t.label}: the time is on one line`);
+        assert(t.left >= 12 + 8 && t.right >= 12 + 3, `${t.label}: the time is ${t.left} from the left and ${t.right} from the right of its cover, the sides are 12 inside the spine and the page edges`);
+        assert(t.bottom >= 12, `${t.label}: the time is ${t.bottom} from the bottom of its cover, the bottom is 12`);
+      }
       step('the four fonts of the brand: Fraunces for the title of a cover, JetBrains Mono for its time, and at most one handwritten (Caveat) note on the screen');
       const fonts = await page.evaluate((time) => {
         const family = (text) => { const el = [...document.querySelectorAll('div')].find((d) => d.children.length === 0 && d.textContent === text && d.getBoundingClientRect().width > 0); return el ? getComputedStyle(el).fontFamily : null; };
@@ -122,6 +151,11 @@ export const BOOKS_SCENARIOS = [
         near(a.width / a.height, A5, 0.01, `width over height at ${width}`);
         assert(c.x > a.x + a.width && Math.abs(c.y - a.y) < 2, `two in a row at ${width}`);
         assert(c.x + c.width <= width - 16 + 1, `inside the right margin at ${width}`);
+        for (const t of await readTimes(page)) {
+          assert.equal(t.size, 15, `${t.label} at ${width}: the time is drawn at ${t.size}`);
+          assert.equal(t.lines, 1, `${t.label} at ${width}: the time is on one line`);
+          assert(t.left >= 12 && t.right >= 12, `${t.label} at ${width}: the time is ${t.left} from the left and ${t.right} from the right of its cover`);
+        }
       }
     },
   },
@@ -161,7 +195,7 @@ export const BOOKS_SCENARIOS = [
       await go(`/library/book/${readings.id}`);
       await page.getByRole('heading', { name: readings.title, exact: true }).first().waitFor();
       await page.getByText(NOTICE.reflection, { exact: true }).waitFor();
-      await page.getByText('READINGS FOR THE WAY', { exact: true }).first().waitFor(); // on the cover and in the mark under the title
+      await page.getByText('READINGS FOR THE WAY', { exact: true }).first().waitFor(); // in the mark under the title (the cover prints no kind)
       await page.getByText('A little each day', { exact: true }).waitFor();
       await eventually(() => page.getByText(NOTICE.guide, { exact: true }).count(), (n) => n === 0, { what: 'the number of guide notices on a book of readings' });
       await page.getByText(readBook(readings.id).credit.slice(0, 40), { exact: false }).first().waitFor();
