@@ -593,6 +593,14 @@ check('every control has a label for a screen reader, says it is a button, and i
   assert.match(cal, /minHeight: TOUCH, justifyContent: 'center'/, 'Today is 44 high');
   assert.match(cal, /accessibilityState=\{\{ disabled: !enabled \}\}\s+disabled=\{!enabled\}/, 'an arrow at the limit is off, and says so');
   assert.match(source(ROUTE), /<IconButton name="back" label="Back" onPress=\{goBack\} \/>/);
+  // and what each one does: a day selects itself, the arrows go back and forward (and look it), Today goes to today
+  assert.match(cal, /onPress=\{\(\) => onSelect\(day\)\}/, 'a day selects itself');
+  assert.match(cal, /<Arrow direction="back" label=\{previousMonthLabel\(shown, range\)\} enabled=\{canGoBack\} onPress=\{onPrevious\} \/>/, 'the left arrow goes to the month before');
+  assert.match(cal, /<Arrow direction="chevron" label=\{nextMonthLabel\(shown, range\)\} enabled=\{canGoForward\} onPress=\{onNext\} \/>/, 'the right arrow goes to the month after');
+  assert.match(cal, /accessibilityHint="Goes back to today"\s+onPress=\{onToday\}/, 'Today goes to today');
+  assert.match(cal, /<Icon name=\{direction\} color=/, 'the arrow draws the icon it was given: back (pointing left) before, chevron (pointing right) after');
+  assert.match(cal, />\{monthTitle\(shown\)\}<\/AppText>/, 'the title is the month on show');
+  assert.match(cal, />\{day\.d\}<\/AppText>/, 'a day shows its number');
   assert.match(read('src/components/ui.tsx'), /size = 48/, 'the shared round button is 48');
   assert.equal(TOUCH, 44);
   assert.match(read(`${DIR}/layout.ts`), /export const TOUCH = 44;/);
@@ -632,7 +640,7 @@ check('the screen is a stack screen like Bookmarks: Back, the title "Daily readi
   for (const shared of [/<Screen tabBar=\{false\}>/, /router\.canGoBack\(\) \? router\.back\(\) : router\.replace\('\/library'\)/, /<IconButton name="back" label="Back" onPress=\{goBack\} \/>/]) assert.match(bookmarks, shared, 'Bookmarks still has what this screen copies');
 });
 
-check('the route is registered once, in the block for someone with a journey, right after library/bookmarks and with the same (no) options', () => {
+check('the route is registered once, in the block for someone with a journey, next to library/bookmarks and with the same (no) options', () => {
   const layout = read('app/_layout.tsx');
   const daily = [...layout.matchAll(/<Stack\.Screen name="library\/daily"([^>]*)\/>/g)];
   const bookmarks = [...layout.matchAll(/<Stack\.Screen name="library\/bookmarks"([^>]*)\/>/g)];
@@ -640,7 +648,7 @@ check('the route is registered once, in the block for someone with a journey, ri
   assert.equal(bookmarks.length, 1);
   assert.equal(daily[0][1].trim(), bookmarks[0][1].trim(), 'the options of Bookmarks, which are none');
   assert.equal(daily[0][1].trim(), '');
-  assert.match(layout, /<Stack\.Screen name="library\/bookmarks" \/>\n\s+<Stack\.Screen name="library\/daily" \/>/);
+  assert.match(layout, /<Stack\.Screen name="library\/bookmarks" \/>\n(\s+<Stack\.Screen name="library\/[\w/\[\]-]+" \/>\n)*\s+<Stack\.Screen name="library\/daily" \/>/, 'next to Bookmarks (other Library screens may be between them)');
   const guard = layout.indexOf('<Stack.Protected guard={onboarded}>');
   const at = layout.indexOf('<Stack.Screen name="library/daily" />');
   const end = layout.indexOf('</Stack.Protected>', guard);
@@ -662,6 +670,7 @@ check('the reading under the calendar: heading of the day, the Preview notice, o
   assert.equal((src.match(/<ReadingCard /g) ?? []).length, 1, 'ONE sample reading');
   assert.equal((src.match(/<ReflectionCard /g) ?? []).length, 1);
   assert.match(src, /const \{ reading, reflection \} = readingFor\(day\);/);
+  assert.match(src, /const heading = readingHeading\(day, isToday\);/, 'the heading is the chosen day, and says Today when it is');
   assert.match(src, /<View accessible accessibilityRole="header" accessibilityLabel=\{heading\.label\} accessibilityLiveRegion="polite"/, 'one heading for a screen reader, said again when another day is picked');
   assert.ok(src.indexOf('accessibilityLabel={heading.label}') < src.indexOf('<SampleNotice') && src.indexOf('<SampleNotice') < src.indexOf('<ReadingCard reading') && src.indexOf('<ReadingCard reading') < src.indexOf('<ReflectionCard reflection'), 'order: heading, notice, reading, reflection');
   assert.match(src, /\{reading\.reference\}/);
@@ -688,6 +697,9 @@ check('the clock is handed in once and read in one place: the phone\'s own is th
   assert.match(hook, /Platform\.OS === 'ios'/, 'iOS says the new month and the picked day out loud; Android and the web have the live regions');
   assert.match(hook, /AccessibilityInfo\.announceForAccessibility\(text\)/);
   assert.match(hook, /dispatch\(\{ type: 'month', by \}\)/);
+  assert.match(hook, /previousMonth: \(\) => move\(-1\), nextMonth: \(\) => move\(1\)/, 'the left arrow goes back, the right one forward');
+  assert.match(hook, /canGoBack: flags\.back, canGoForward: flags\.forward/, 'the back arrow is off at the first month, the forward one at the last');
+  assert.match(hook, /dispatch\(\{ type: 'select', day \}\)/, 'a day that is tapped is selected');
   assert.doesNotMatch(hook, /setInterval|setTimeout/, 'no timer: nothing to clean up');
   assert.match(all(), /accessibilityLiveRegion="polite"/);
 });
@@ -698,10 +710,12 @@ check('the feature uses no console, no interval and no timer', () => {
   assert.deepEqual(offenders, []);
 });
 
-check('this test is run by npm test: its file is in tsconfig.librarytest.json, test:library runs it, and npm test runs test:library', () => {
+check('this test is run by npm test: its file is in tsconfig.librarytest.json, and test:library runs it (or an entry point of the library tests imports it), and npm test runs test:library', () => {
   assert.match(read('tsconfig.librarytest.json'), /"src\/features\/library\/__tests__\/daily\.test\.ts"/);
   const scripts = (JSON.parse(read('package.json')) as { scripts: Record<string, string> }).scripts;
-  assert.ok(scripts['test:library'].includes('library-test/features/library/__tests__/daily.test.js'), 'test:library does not run daily.test.js');
+  const named = scripts['test:library'].includes('library-test/features/library/__tests__/daily.test.js');
+  const imported = ['library.test.ts', 'wiring.test.ts'].some((f) => /^import '\.\/daily\.test';/m.test(read(`src/features/library/__tests__/${f}`)));
+  assert.ok(named || imported, 'nothing runs daily.test: name it in test:library or import it from library.test.ts or wiring.test.ts');
   assert.ok(/npm run test:library\b/.test(scripts.test), 'npm test does not run test:library');
 });
 
