@@ -696,7 +696,7 @@ const GOOD = page('g1', day(1), { title: 'Roncesvalles', body: 'Cold and clear.'
     assert.equal(dateLine(''), '');
   });
 
-  await test('the words: counts, thousands, the honest line, the empty card, and a gentle message for every problem', () => {
+  await test('the words: counts, thousands, the honest line, the line for an empty diary, and a gentle message for every problem', () => {
     assert.deepEqual([0, 1, 2, 3].map(pagesLabel), ['0 pages', '1 page', '2 pages', '3 pages']);
     assert.deepEqual([0, 999, 1000, 20000, 1234567].map(thousands), ['0', '999', '1,000', '20,000', '1,234,567']);
     assert.equal(PRIVACY_LINE, 'Only on this phone. Pages, photos, videos and places are not uploaded and not shared. If you delete the app or lose this phone, they are gone.');

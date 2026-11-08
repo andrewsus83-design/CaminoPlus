@@ -5,7 +5,7 @@ import { c, layout, radius, role, shadowStyle } from '@/theme';
 
 /**
  * The gold round button that floats at the bottom right, just above the tab bar: "Write a journey post" on Me,
- * "Write in your diary" on Library. One component so every FAB looks and sits the same.
+ * "Write a note" on the Notes tab of Library. One component so every FAB looks and sits the same.
  *
  * 60 px round with a 26 px icon, as the design page says (.cp-fab-write), above the 56 px touch minimum. It sits 8 px
  * above the floating tab bar. The two numbers (14 and 88) are the tab bar's own, see TabBar.tsx;
