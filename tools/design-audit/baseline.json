@@ -1,43 +1,43 @@
 {
  "$comment": "The design-lint baseline: how far the app code is from design/tokens.json today. Written by `python3 tools/design-audit/scan.py --update-baseline`, never by hand. `python3 tools/design-audit/scan.py --check` fails when a category total goes up, or when a file that has no entry here gets a violation (code that only moved to it is not one). `fp` is one short fingerprint per violation (its rule, value and source line, not its line number), so a failure can name the new violations and a move between files is told from a new violation. tools/design-audit/README.md has the rest.",
  "version": 1,
- "commit": "604c9fbbe97fd052e370b0a559ba7cbb6803d524",
+ "commit": "7cc65fc304ed061e1a95ec18cf10fdb9b3a7377f",
  "totals": {
   "color": 196,
-  "font": 214,
-  "spacing": 388,
-  "size": 135,
-  "inset": 36,
+  "font": 220,
+  "spacing": 389,
+  "size": 133,
+  "inset": 37,
   "ignore": 0
  },
  "kinds": {
   "color/raw": 196,
   "font/letter-spacing": 24,
-  "font/line-height": 89,
-  "font/size": 29,
-  "font/small": 72,
-  "inset/text-near-edge": 36,
-  "size/icon": 101,
+  "font/line-height": 91,
+  "font/size": 31,
+  "font/small": 74,
+  "inset/text-near-edge": 37,
+  "size/icon": 100,
   "size/radius": 12,
-  "size/touch": 22,
-  "spacing/gap": 180,
+  "size/touch": 21,
+  "spacing/gap": 181,
   "spacing/margin": 40,
   "spacing/padding": 168
  },
  "apart": {
-  "color/role-first": 365,
-  "spacing/offset": 55,
+  "color/role-first": 368,
+  "spacing/offset": 57,
   "spacing/negative": 12,
-  "size/touch-below-primary": 60
+  "size/touch-below-primary": 61
  },
  "duplicates": {
-  "pill": 25,
+  "pill": 27,
   "icon_button": 40,
   "card": 8,
   "notice": 1,
   "subtab": 2,
   "fab": 0,
-  "segment": 2
+  "segment": 4
  },
  "files": {
   "app/(auth)/welcome.tsx": {
@@ -477,13 +477,6 @@
    },
    "fp": "28f20c369f 46f5ecde73 4e004a2e47 4e597e9ef3 dee02ffd6e"
   },
-  "src/features/library/bible/BookGrid.tsx": {
-   "counts": {
-    "spacing": 2,
-    "inset": 1
-   },
-   "fp": "875f45da86 c165224b5e f897e19bb2"
-  },
   "src/features/library/bible/ChapterGrid.tsx": {
    "counts": {
     "font": 2
@@ -496,14 +489,6 @@
     "spacing": 1
    },
    "fp": "1f27781973 7b9addc9a1 b348391ba1"
-  },
-  "src/features/library/bible/ContinueCard.tsx": {
-   "counts": {
-    "font": 3,
-    "spacing": 2,
-    "size": 2
-   },
-   "fp": "01ba88b95e 0f29051fe9 46f5ecde73 67b8792b3f 88895b3b6a 96806a6da6 ce12c26938"
   },
   "src/features/library/bible/Reader.tsx": {
    "counts": {
@@ -622,9 +607,17 @@
   },
   "src/features/library/books/cover.ts": {
    "counts": {
-    "font": 2
+    "font": 1
    },
-   "fp": "67f49541ba fcc7ec9c79"
+   "fp": "fcc7ec9c79"
+  },
+  "src/features/library/continueBar/ContinueBar.tsx": {
+   "counts": {
+    "font": 6,
+    "spacing": 1,
+    "size": 1
+   },
+   "fp": "04ea933ae6 0f6abcbc2b 4d048aec36 54f595ef5b 7b1035c120 7bb9488159 9977853676 dc1ab241e4"
   },
   "src/features/library/daily/CalendarSheet.tsx": {
    "counts": {
@@ -697,6 +690,14 @@
    },
    "fp": "0911608954 0a2ff3a3f0 0a2ff3a3f0 1a7529721f 46ad095181 4cfb6a020d 51a887a523 51a887a523 77ec318fb0 783e80b9a3 8060be8832 9384330f20 d23753758e d23753758e d23753758e df96d10c5b e3484b631f e9952da0be e9952da0be"
   },
+  "src/features/me/AllPlaces.tsx": {
+   "counts": {
+    "font": 2,
+    "spacing": 1,
+    "inset": 1
+   },
+   "fp": "1e2c3f4442 37f658d6bf c11baa4146 dbf022a8b4"
+  },
   "src/features/me/Health.tsx": {
    "counts": {
     "color": 1,
@@ -708,11 +709,10 @@
   },
   "src/features/me/Highlights.tsx": {
    "counts": {
-    "font": 2,
-    "spacing": 4,
-    "size": 1
+    "font": 4,
+    "spacing": 6
    },
-   "fp": "3bb84bf75b 417a9edc56 599117db21 69a20cab91 71f0a6768c 9401880cf7 9a8a3c19b7"
+   "fp": "417a9edc56 58c203648f 599117db21 69a20cab91 9a8a3c19b7 b9c39a73de c53b0a1d2c c8a3196e3e d68f9b4c09 edd9c91118"
   },
   "src/features/me/JourneyGrid.tsx": {
    "counts": {
@@ -752,10 +752,11 @@
   "src/features/notes/NoteRow.tsx": {
    "counts": {
     "font": 2,
-    "spacing": 5,
-    "size": 6
+    "spacing": 6,
+    "size": 6,
+    "inset": 1
    },
-   "fp": "005da3ef02 005da3ef02 005da3ef02 005da3ef02 4fa3521e8f 5610b001dd 6e11d25c18 8f0f3709e2 9d7ae69782 a0ac1cf9a9 b850e6afd7 dbc3c98a52 f8f164e315"
+   "fp": "005da3ef02 005da3ef02 005da3ef02 005da3ef02 4fa3521e8f 5610b001dd 6e11d25c18 75e99bedd2 855db71d9a 8f0f3709e2 9d7ae69782 a0ac1cf9a9 b850e6afd7 dbc3c98a52 f8f164e315"
   },
   "src/features/notes/NotesHeader.tsx": {
    "counts": {
