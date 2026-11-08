@@ -8,7 +8,7 @@ There are no mountains. What makes the days demanding is length and exposure. Th
 
 ## Who it suits
 
-It suits a first-time walker who has trained a little and wants a Camino with a clear shape: a start at a cathedral, a long run beside the sea, a boat across a border river, an arrival at another cathedral. Twelve days with a rest day or two fit inside a fortnight, and the road passes through towns often enough that a day can be cut.
+It suits a first-time walker who has trained a little and wants a Camino with a clear shape: a start at a cathedral, a long run beside the sea, a boat across a border river, an arrival at another cathedral. Twelve days with a rest day or two fit inside a fortnight, and published plans cut the road at many different towns, so a day can be shortened.
 
 It suits people who love the sea and can live with weather. The wind, the sun and the rain all matter, and a wet, windy day on an open shore asks more than the kilometres suggest.
 

@@ -24,6 +24,8 @@ Source short names (full addresses are given in each row or here):
 - SF = books/shared-facts.md (the Compostela rule, the purpose sentence, the welcome sentence)
 - CAT = supabase/migrations/20261106120000_more_caminos.sql and 20261104150200_routes_maps.sql
 
+Compostela rule: shared-facts.md was re-read at the end of the work, after its Compostela section was corrected. The rule is stated in one place only, chapter 09, and the standard purpose sentence follows it word for word; chapter 13 points to chapter 09 without restating the rule; the price of the Certificate of Distance is not stated anywhere in the book.
+
 Not read: the Visit Portugal pages (visitportugal.com) sit behind an anti-bot check and could not be fetched; nothing in the book rests on them. The Visit Porto page on the Coastal Way showed only the home page to a plain fetch.
 
 ## A. The route, its length and its stages
@@ -163,7 +165,7 @@ Not read: the Visit Portugal pages (visitportugal.com) sit behind an anti-bot ch
 | The certified route ends at the border at Valença; Valença is the meeting point of the Central and Coastal routes | n/a | TP; TPN-PT | yes |
 | The Spiritual Variant: relatively newly established, begins in Pontevedra, leaves the Central route for Vilanova de Arousa, boat up the estuary to Pontecesures (the stone-boat route of the body of St James), then the Central to Santiago | description | CSJ | yes |
 | The Xunta's Mar de Arousa and Río Ulla Route: maritime-river itinerary commemorating the arrival of the apostle's body by sea; forty nautical miles to Iria Flavia then about 25 km on foot to Santiago (Spanish "cuarenta millas náuticas... unos 25 kilómetros a pie") | 40 nautical miles; ~25 km | XAR (English and Spanish) | yes |
-| The Xunta pages read for this book (route page, eight stage pages, Arousa page) contain no mention of the Spiritual Variant | 0 matches | grep of the saved pages (English and Spanish), 2026-11-08 | yes |
+| The Xunta pages read for this book (the coastal route page and its eight stage pages in English and Spanish, the four Central stage pages, the Central route page, the Arousa page in English and Spanish) contain no mention of the Spiritual Variant (the only hits for "spiritual" are the general word) | 0 matches | grep of the saved pages, 2026-11-08 | yes |
 | Pontevedra is the point where the variant leaves the road | place | CSJ | yes |
 | The Xunta has eight stages in Galicia; the official portal says an average of seven days for the Portuguese part | 8; 7 | XUNTA-C; CCP | yes |
 | Splits: A Guarda to Baiona ~35 km (16.7 + 18.6 = 35.3); the Xunta's sections on Day 7 end at A Ramallosa, Nigrán, Coruxo | 35.3 | XC-1; XC-2; XC-3 | computed |

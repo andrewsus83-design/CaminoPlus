@@ -35,7 +35,7 @@ One last thing, and it is the odd one. Francis goes out into the cold and sings.
 
 The straps come off, and for a few minutes you can feel exactly how heavy the pack was. There is a strange lightness in the shoulders, as if they had been lent to someone else all day and returned. It is the best moment to ask what else was carried today besides the pack.
 
-Some of it may have been very small: a message you were putting off, a conversation you kept replaying, a judgement about how you were doing compared with the people you met. Some of it may have been heavier. A family that is far away, or near, or gone. A job you will go back to. Nobody here is asking you to drop any of it. The only question is which of it you were carrying out of habit, as a man might hold a coat he has stopped wearing.
+Some of it may have been very small: a message you were putting off, a conversation you kept replaying, a judgement about how you were doing compared with the people you met. Some of it may have been heavier. A family that is far away, or near, or gone. A job you will go back to. None of it needs to be dropped tonight. The only question is which of it you were carrying out of habit, as a man might hold a coat he has stopped wearing.
 
 Not everything that was handed to you is a burden, and the passage should not be read as if it were. A pair of boots that someone chose for you, a blessing at the door, a recipe, a name: gifts are also things that were given. Francis gave back even the clothes his father had provided. Nobody is asking you to do the same. Keep what was given in love, and keep it with thanks. The question is only which things you are holding by habit, and which by love.
 
