@@ -33,7 +33,7 @@ export function PilgrimAvatar({ name, uri, seed, size = 56, group, ring }: Avata
           : <AppText variant="label" color={FIXED.blue} style={{ ...initialsText(size), fontFamily: fonts.bodyBold }}>{initials(name)}</AppText>}
       </View>
       {group && (
-        <View style={{ position: 'absolute', right: -2, bottom: -2, width: big ? 40 : 24, height: big ? 40 : 24, borderRadius: radius.pill, backgroundColor: role.action, borderWidth: 2, borderColor: role.bg, alignItems: 'center', justifyContent: 'center' }}>
+        <View style={{ position: 'absolute', right: big ? -4 : -6, bottom: big ? -4 : -6, width: big ? 40 : 24, height: big ? 40 : 24, borderRadius: radius.pill, backgroundColor: role.action, borderWidth: 2, borderColor: role.bg, alignItems: 'center', justifyContent: 'center' }}>
           <Icon name="group" color={role.onAction} size={big ? 24 : 18} strokeWidth={2.2} />
         </View>
       )}
