@@ -131,16 +131,34 @@ export function partName(part: string): string {
   return t;
 }
 
+/** A label longer than this is a whole sentence, not a name: the reader sets it in the size of a heading, which is smaller than a title. */
+export const LONG_LABEL = 44;
+
+/** A title longer than this that has no number is looked at for a short first sentence ("Annotations. To give some understanding of the exercises...") to make its label. */
+export const LONG_TITLE = 40;
+
 /**
  * A chapter title split in two, so that a long one does not become a wall of heading: "Chapter XXXVI. The Foundation of the Monastery of St. Joseph. Persecution
- * and Temptations." is the label "Chapter XXXVI" (Fraunces) and the rest, which says what the chapter is about (Inter, under it). A title that does not start
- * with a word and a number ("Prologue", "Book X") is only a label.
+ * and Temptations." is the label "Chapter XXXVI" (Fraunces) and the rest, which says what the chapter is about (Inter, under it). A long title with no number
+ * that starts with a short sentence ("Annotations. To give some understanding...") is split after that sentence; any other title ("Prologue", "Book X", "Of the
+ * excellence of the obedient, and of the misery of the disobedient") is only a label.
  */
 export function splitTitle(title: string): { label: string; subtitle: string } {
   const t = title.replace(/\s+/g, ' ').trim();
   const m = NUMBERED.exec(t);
-  if (!m) return { label: t, subtitle: '' };
-  return { label: m[0].replace(/ /g, NO_BREAK_SPACE), subtitle: t.slice(m[0].length).replace(/^[\s.:;,\-–—]+/, '').trim() };
+  if (m) return { label: m[0].replace(/ /g, NO_BREAK_SPACE), subtitle: t.slice(m[0].length).replace(/^[\s.:;,\-–—]+/, '').trim() };
+  if (t.length > LONG_TITLE) {
+    const first = /^(.{3,36}?)[.:?!]\s+(?=[A-Z0-9“"‘'(])/.exec(t);
+    if (first) return { label: first[1], subtitle: t.slice(first[0].length).trim() };
+  }
+  return { label: t, subtitle: '' };
+}
+
+/** The rest of a part after its name, for a line under it: "Counsels and Practices Suitable for the Soul's Guidance", from "Part I. Counsels and Practices Suitable for the Soul's Guidance." Empty when there is none. */
+export function partSubtitle(part: string): string {
+  const t = part.replace(/\s+/g, ' ').trim();
+  const name = partName(t);
+  return t.length > name.length ? t.slice(name.length).replace(/^[\s.:;,\-–—]+/, '').replace(/[.\s]+$/, '') : '';
 }
 
 /* ============================================================ progress */

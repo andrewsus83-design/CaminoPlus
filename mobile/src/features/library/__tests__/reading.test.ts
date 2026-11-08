@@ -17,7 +17,7 @@ import {
 } from '../books/readerType';
 import {
   FINISHED_AT, PIECE_MAX, READING_MAX_BOOKS, READING_MAX_READ, READ_AT, blockWords, bookFacts, chapterIndex, chapterNav, countWords, destination, emptyReading, groupThousands,
-  hasParts, isRead, lastRead, layoutBlocks, markRead, nextLabel, offsetFor, packReading, parseReading, partName, pieces, placeOf, positionLine, previousLabel, readButtonLabel,
+  hasParts, isRead, lastRead, layoutBlocks, LONG_LABEL, LONG_TITLE, markRead, nextLabel, offsetFor, packReading, parseReading, partName, partSubtitle, pieces, placeOf, positionLine, previousLabel, readButtonLabel,
   readButtonSpoken, readSet, readingTime, resumeAt, savePlace, scrollProgress, shortTitle, splitMarker, splitTitle, startAt, tocGroups, type ChapterRef,
 } from '../books/reading';
 import { textWidth, wrap } from '../books/typeMetrics';
@@ -132,6 +132,19 @@ check('a long title is split in two: "Chapter XXXVI" and what the chapter is abo
   assert.equal(nb(splitTitle('Chapter 7: A short one').label), 'Chapter 7');
   assert.equal(splitTitle('Chapter 7: A short one').subtitle, 'A short one');
   assert.deepEqual(splitTitle('  Book  Divine   Things '), { label: 'Book Divine Things', subtitle: '' }, 'a word that only starts like a numeral is not one');
+  // a long title with no number: a short first sentence is the label, the rest what it is about; with no short first sentence it is a label
+  const annotations = splitTitle('Annotations. To Give Some Understanding of the Spiritual Exercises Which Follow, and to Enable Him Who Is to Give and Him Who Is to Receive Them to Help Themselves');
+  assert.equal(annotations.label, 'Annotations');
+  assert.equal(annotations.subtitle, 'To Give Some Understanding of the Spiritual Exercises Which Follow, and to Enable Him Who Is to Give and Him Who Is to Receive Them to Help Themselves');
+  const sentence = 'Of the excellence, virtues, and holy works of virtuous and holy ministers; and how such are like the sun.';
+  assert.deepEqual(splitTitle(sentence), { label: sentence, subtitle: '' });
+  assert.deepEqual(splitTitle('Prelude for Making Election'), { label: 'Prelude for Making Election', subtitle: '' }, 'a short title is only a label');
+  assert.deepEqual(splitTitle('A long title without any full stop in its first words, so it stays whole'), { label: 'A long title without any full stop in its first words, so it stays whole', subtitle: '' });
+  assert.ok(LONG_TITLE === 40 && LONG_LABEL === 44);
+  assert.equal(partSubtitle('The First Book. Admonitions Profitable for the Spiritual Life'), 'Admonitions Profitable for the Spiritual Life');
+  assert.equal(partSubtitle("Part I. Counsels and Practices Suitable for the Soul's Guidance."), "Counsels and Practices Suitable for the Soul's Guidance");
+  assert.equal(partSubtitle('Book One'), '');
+  assert.equal(partSubtitle('A Treatise of Prayer'), '');
   assert.equal(partName('The First Book. Admonitions Profitable for the Spiritual Life'), 'The First Book');
   assert.equal(partName('Book One'), 'Book One');
   assert.equal(partName("St. Joseph's Mansion"), "St. Joseph's Mansion", 'a full stop after St is not the end of a sentence');
@@ -651,9 +664,14 @@ check('on every real text a title fits a button, a part has a name, every paragr
     for (const c of book.chapters) {
       assert.ok(shortTitle(c.title).length <= 28, `${e.id} ${c.id}: "${shortTitle(c.title)}"`);
       const { label, subtitle } = splitTitle(c.title);
-      assert.ok(label.length > 0 && label.length <= 28, `${e.id} ${c.id}: label "${label}"`);
-      assert.equal(`${label} ${subtitle}`.trim().replace(/[\s.:;,\-–—]+/g, ' ').length > 0, true);
-      if (c.part) assert.ok(partName(c.part).length > 0 && partName(c.part).length <= c.part.length);
+      const words = (t: string) => t.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+      assert.ok(label.length > 0, `${e.id} ${c.id}: label "${label}"`);
+      assert.equal(words(`${label} ${subtitle}`), words(c.title), `${e.id} ${c.id}: the label and the line under it are the title, nothing lost`);
+      if (/^(chapter|book) [0-9ivxlcdm]+\b/i.test(c.title)) assert.ok(label.length <= 28, `${e.id} ${c.id}: a numbered title has a short label, "${label}"`);
+      if (c.part) {
+        assert.ok(partName(c.part).length > 0 && partName(c.part).length <= c.part.length);
+        assert.equal(words(`${partName(c.part)} ${partSubtitle(c.part)}`), words(c.part), `${e.id}: the name of a part and the line under it are the part`);
+      }
       for (const b of c.blocks) if (b.k === 'p') assert.equal(pieces(b.t).join(''), b.t, `${e.id} ${c.id}: a paragraph is the same text in pieces`);
       assert.ok(layoutBlocks(c.blocks).length >= c.blocks.length);
     }

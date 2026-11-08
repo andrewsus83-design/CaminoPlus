@@ -16,7 +16,7 @@ import { ReadButton } from './BookUi';
 import { BOOK_TEXT_INDEX } from './bookText';
 import { bookById, type CatalogBook } from './catalog';
 import { NOT_YET_TEXT, NOT_YET_TITLE, UNKNOWN_TEXT, UNKNOWN_TITLE, readerPath } from './copy';
-import { bookFacts, chapterNav, partName, positionLine, readButtonLabel, readButtonSpoken, resumeAt, splitTitle, tocGroups, type TocEntry } from './reading';
+import { bookFacts, chapterNav, partName, partSubtitle, positionLine, readButtonLabel, readButtonSpoken, resumeAt, splitTitle, tocGroups, type TocEntry } from './reading';
 import { safeText } from './safeText';
 import { useBooksReading } from './useBooksReading';
 
@@ -154,7 +154,12 @@ function Page({ book, notice }: { book: CatalogBook; notice?: string }) {
             </View>
             {groups.map((g, gi) => (
               <View key={`${gi}-${g.part ?? ''}`} style={{ gap: 8 }}>
-                {!!g.part && <AppText variant="h4" accessibilityRole="header" style={{ fontSize: 19, lineHeight: 25, marginTop: gi === 0 ? 0 : 8 }}>{g.part}</AppText>}
+                {!!g.part && (
+                  <View accessible accessibilityRole="header" accessibilityLabel={g.part} style={{ gap: 2, marginTop: gi === 0 ? 0 : 8 }}>
+                    <AppText variant="h4" style={{ fontSize: 19, lineHeight: 25 }}>{partName(g.part)}</AppText>
+                    {!!partSubtitle(g.part) && <AppText variant="small" muted numberOfLines={4} style={{ fontSize: 15, lineHeight: 21 }}>{partSubtitle(g.part)}</AppText>}
+                  </View>
+                )}
                 <Card style={{ padding: 0, overflow: 'hidden' }}>
                   {g.entries.map((e, i) => (
                     <TocRow key={e.id} entry={e} first={i === 0} read={readSet.has(e.id)} here={!!place && place.c === e.id} onOpen={open} />

@@ -109,11 +109,14 @@ check('each text is in its role: titles and headings are the Fraunces variants (
   assert.match(page, /<AppText variant="mono" muted style=\{\{ fontSize: 14, lineHeight: 20 \}\}>\{book\.era\}<\/AppText>/);
   assert.match(page, /bookFacts\(index\.chapters, index\.words\)/, 'the chapters, words and reading time are mono');
   assert.match(page, /<AppText variant="mono" muted style=\{\{ fontSize: 14, lineHeight: 20 \}\}>\{`\$\{chapters\.length\}/);
-  assert.match(page, /<AppText variant="h4" accessibilityRole="header" style=\{\{ fontSize: 19, lineHeight: 25, marginTop: gi === 0 \? 0 : 8 \}\}>\{g\.part\}<\/AppText>/, 'a part is a heading in Fraunces');
+  assert.match(page, /<View accessible accessibilityRole="header" accessibilityLabel=\{g\.part\} style=\{\{ gap: 2, marginTop: gi === 0 \? 0 : 8 \}\}>/, 'a part is one heading for a screen reader, with its whole name');
+  assert.match(page, /<AppText variant="h4" style=\{\{ fontSize: 19, lineHeight: 25 \}\}>\{partName\(g\.part\)\}<\/AppText>/, 'a part is a heading in Fraunces: its name');
+  assert.match(page, /\{!!partSubtitle\(g\.part\) && <AppText variant="small" muted numberOfLines=\{4\}/, 'and what it is about under it, in Inter, in at most four lines');
   assert.match(page, /<AppText variant="mono" muted style=\{\{ width: 36, textAlign: 'right'/, 'the number of a chapter is mono');
   assert.match(page, /<AppText variant="label">\{label\}<\/AppText>/, 'the chapter in the contents is Inter');
   const reader = src['Reader.tsx'];
-  assert.match(reader, /<AppText variant="h3" maxFontSizeMultiplier=\{type\.title\.maxMultiplier\}[^>]*>\{head\.label\}<\/AppText>/, 'the title of a chapter is Fraunces');
+  assert.match(reader, /<AppText variant="h3" maxFontSizeMultiplier=\{face\.maxMultiplier\}[^>]*>\{head\.label\}<\/AppText>/, 'the title of a chapter is Fraunces');
+  assert.match(reader, /const face = head\.label\.length > LONG_LABEL \? type\.heading : type\.title;/, 'a label that is a whole sentence is set in the size of a heading, not of a title');
   assert.match(reader, /<AppText variant="mono" muted maxFontSizeMultiplier=\{type\.meta\.maxMultiplier\}[^>]*>\{`\$\{readingTime\(words\)\} · \$\{groupThousands\(words\)\} words`\}<\/AppText>/, 'the time and the words are mono');
   const blocks = src['ReaderBlocks.tsx'];
   for (const name of ['Paragraph', 'Quotation', 'Point']) {
@@ -386,7 +389,7 @@ check('the words of a chapter: a heading is a heading for a screen reader, a quo
   assert.doesNotMatch(blocks, /fontSize: \d/, 'no size of its own: they all come from the step chosen');
   assert.doesNotMatch(blocks, /textAlign: 'justify'/, 'no justified text: it makes rivers on a narrow column');
   const reader = src['Reader.tsx'];
-  assert.match(reader, /fontSize: type\.title\.size, lineHeight: type\.title\.lineHeight/);
+  assert.match(reader, /fontSize: face\.size, lineHeight: face\.lineHeight/);
 });
 
 /* ================================================================ what is kept on the phone */

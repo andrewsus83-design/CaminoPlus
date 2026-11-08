@@ -199,11 +199,11 @@ check('Library has no title and no diary button: its first row is the search fie
   assert.notDeepEqual(iconPaths('bookmark'), iconPaths('diary'));
 });
 
-check('Library: directly under the search row the tabs Bible, Books, Notes, and only then the banner of the tab; Notes has no banner; a search takes the place of all of it, and says its example books are examples', () => {
+check('Library: directly under the search row the tabs Bible, Books, Notes, and only then the banner of the tab; Notes has no banner; a search takes the place of all of it, and says so when a book that says Soon is among its results', () => {
   assert.deepEqual([...LIBRARY_TABS], ['Bible', 'Books', 'Notes']);
   assert.deepEqual([...ROW_TABS], ['Bible', 'Books']);
   assert.equal(BOOKS_NOTICE, 'Books are not in the app yet. We are checking the editions before we add them.');
-  assert.equal(SEARCH_NOTICE, 'The twelve books are examples: they are not in the app yet. The Bible text is.');
+  assert.equal(SEARCH_NOTICE, 'Books marked Soon are not in the app yet: we are still checking their editions. The Bible text and the books marked Free are.');
   assert.equal(BIBLE_SOURCE_LINE, 'World English Bible, Catholic edition · public domain');
   const screen = read(join('app', '(tabs)', 'library.tsx'));
   assert.match(screen, /<Screen keyboard>/, 'a button can be tapped while the keyboard is up');
@@ -217,13 +217,13 @@ check('Library: directly under the search row the tabs Bible, Books, Notes, and 
   assert.equal((screen.match(/\{top\}/g) ?? []).length, 2, 'both hosts draw the same top');
   // Bible and Books and the results: rows in the screen's own scroll, after the top: on Bible the card that continues the chapter, the compact banner, then the Bible tab (the choice of the part, the tiles)
   const screenAt = at('<Screen keyboard');
-  const card = at('<ContinueCard', screenAt), daily = at('<DailyBanner', screenAt), bible = at('<BibleTab', screenAt), books = at('<BooksBanner />', screenAt), booksTab = at('<BooksTab', screenAt);
+  const card = at('<ContinueCard', screenAt), daily = at('<DailyBanner', screenAt), bible = at('<BibleTab', screenAt), books = at('<BooksBanner reading={booksReading} />', screenAt), booksTab = at('<BooksTab', screenAt);
   assert.ok(at('{top}', screenAt) < card && card < daily && daily < bible && bible < books && books < booksTab, 'the top, the continue card, the Bible banner, Bible, the Books banner, Books');
   assert.match(screen, /\{searching \? \(\s*<SearchResults[^]*?\/>\s*\) : \(\s*<>\s*\{tab === 'Bible' && lastRead\.place && <ContinueCard/, 'the results take the place of the banners and the tab content, and clearing the field brings them back');
   assert.match(screen, /const searching = isSearching\(query\);/);
   // each banner is shown under its own tab only
   assert.match(screen, /\{tab === 'Bible' && <DailyBanner onOpen=\{\(\) => router\.push\('\/library\/daily'\)\} \/>\}/);
-  assert.match(screen, /\{tab === 'Books' && <BooksBanner \/>\}/);
+  assert.match(screen, /\{tab === 'Books' && <BooksBanner reading=\{booksReading\} \/>\}/);
   assert.equal((screen.match(/<DailyBanner/g) ?? []).length + (screen.match(/<BooksBanner/g) ?? []).length, 2, 'two banners, one for each tab that has one');
   // Notes, the third tab: no banner, no Screen (the feed owns its scroll), the top pinned above it, NotesTab filling the box under it
   const notesHost = screen.slice(at("if (tab === 'Notes') {"), screenAt);
@@ -233,12 +233,12 @@ check('Library: directly under the search row the tabs Bible, Books, Notes, and 
   assert.doesNotMatch(notesHost.slice(notesHost.indexOf(') : (')), /ScrollView/, 'no scroll view around the feed: it scrolls by itself');
   assert.match(notesHost, /\{searching \? \(\s*<ScrollView\b[^>]*keyboardShouldPersistTaps="handled"[^>]*>\s*<SearchResults\b[\s\S]*?\/>\s*<\/ScrollView>\s*\) : \(/, 'a search on Notes keeps this host: the top, and the search field in it, is not made again when the first letter is typed (a field that is made again loses the keyboard); the results take the place of the feed');
   assert.ok(notesHost.indexOf('{top}') < notesHost.indexOf('<NotesTab'), 'the notes start right under the tabs');
-  // the Books tab starts with its notice; the Bible tab has none (its text is in the app: one quiet source line instead)
+  // the Books tab starts with its notice (the Preview card while no book has a text, one quiet line while some have, nothing when all have); the Bible tab has none (its text is in the app: one quiet source line instead)
   const tabsSrc = read(join('src', 'features', 'library', 'LibraryTabs.tsx'));
-  assert.match(tabsSrc, /export function BooksTab[^]*?<Notice \/>/, 'the Books tab starts with its notice');
-  assert.match(tabsSrc, /const Notice = \(\) => <SampleNotice title="Preview">\{BOOKS_NOTICE\}<\/SampleNotice>;/);
+  assert.match(tabsSrc, /export function BooksTab[^]*?<BooksNotice \/>/, 'the Books tab starts with its notice');
+  assert.match(read(join('src', 'features', 'library', 'books', 'BooksNotice.tsx')), /if \(notice\.kind === 'card'\) return <SampleNotice title=\{notice\.title\}>\{notice\.text\}<\/SampleNotice>;/);
   const results = read(join('src', 'features', 'library', 'SearchResults.tsx'));
-  assert.match(results, /\{found\.hits\.Books\.length > 0 && <SampleNotice title="Preview">\{SEARCH_NOTICE\}<\/SampleNotice>\}/, 'the search keeps the Preview notice when the example books are among the results, and only then');
+  assert.match(results, /\{found\.hits\.Books\.some\(\(b\) => !hasBookText\(b\.id\)\) && <SampleNotice title="Coming soon">\{SEARCH_NOTICE\}<\/SampleNotice>\}/, 'the search keeps the Soon notice when a book that says Soon is among the results, and only then');
   assert.match(results, /Clear search/);
   assert.match(read(join('src', 'components', 'Screen.tsx')), /keyboardShouldPersistTaps=\{keyboard \? 'handled' : 'never'\}/);
 });
@@ -535,7 +535,7 @@ check('Bookmarks is a screen of its own: the file exists, it is registered next 
   assert.match(src, /<AppText variant="h2" accessibilityRole="header">Bookmarks<\/AppText>/);
   assert.match(src, /<AppText variant="h4" accessibilityRole="header">Library<\/AppText>/);
   assert.match(src, /<AppText variant="h4" accessibilityRole="header" style=\{\{ marginTop: 8 \}\}>Posts<\/AppText>/);
-  assert.match(src, /<SampleNotice title="Preview">\{BOOKMARKS_NOTICE\}<\/SampleNotice>/, 'the example books kept here are still examples, and it says so');
+  assert.match(src, /<SampleNotice title="Coming soon">\{BOOKMARKS_NOTICE\}<\/SampleNotice>/, 'a book kept here that says Soon is not in the app yet, and it says so');
   const design = readFileSync(join(root, '..', 'design', 'index.html'), 'utf8');
   const phone = design.slice(design.indexOf('<b>Library · Bookmarks</b>'), design.indexOf('<b>Library · Bookmarks, empty</b>'));
   assert.ok(phone.length > 2000);
