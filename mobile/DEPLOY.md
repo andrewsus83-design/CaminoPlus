@@ -63,6 +63,22 @@ Me > the gear at the top right > Settings > This build. Tap the card to copy its
 
 To check that a phone runs the code you expect, compare the 7 letters of the Code line with `git rev-parse --short=7 origin/main` after `git fetch` (or with the newest commit of `main` on GitHub): they must be the same for a build made from `main` just now.
 
+### What to look at in 1.1.0
+
+Once the build runs and the Code line says the commit you expect, these are the changes to look for. They are what the unit tests and the web export show; **nobody has looked at them on a phone yet**, so what you see there is news (CHANGELOG, "Not checked on a device").
+
+| Where | What you should see |
+|---|---|
+| Every screen with a Back | The same round Back button at the top left (48 by 48), also in the Bible and Books readers (#100) |
+| Tab bar | Inactive tabs thin and quiet, the active one heavier (heavier still in light mode); a darker bar with a hairline in dark mode (#91, #93, #97, #100) |
+| Me | The gear alone at the top right; one gold chat button at the bottom right of all four sub-tabs, with the unread badge (#99) |
+| Me > Journey | "All" is the first item of the highlights row: a tap shows stamps for the places of the route, and **4 of them, not 34**, until stages 4 to 33 are published (#106); the first tile of the grid is the "Write a journey post" card (#99) |
+| Me > Notes | One "Write a note" card; a new note is a Draft until you press Publish, with the marks inside the text box and Read and Publish in one row at the bottom (#99, #104) |
+| Library | Two tabs, Bible and Books. Bible: two book tiles to a row (#102). Books: 26 covers (#98). After you read something, a "Continue reading" bar with an X above the tab bar (#101) |
+| Daily reading (the banner of the Bible tab) | A 7-day strip, the liturgical day, and readings and a reflection that say they are samples (#96) |
+| Maps > Whole route, Near me | The route line follows the real path from Saint-Jean-Pied-de-Port to Pamplona; the Walk view names a turn about once in 1 to 2 km; after Pamplona the line is still straight between towns (#103) |
+| Settings > This build | `CaminoPlus 1.1.0` and the commit of the build |
+
 ### Still to do by the owner
 
 Two things only the owner can do, in the GitHub settings of the repository (and, for the token, on expo.dev). Neither is done yet; until they are, the app works as described above, without these two features.

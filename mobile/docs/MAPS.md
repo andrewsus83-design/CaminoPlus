@@ -19,7 +19,7 @@ In Expo Go and on web the tab shows the old SVG preview map with a red notice.
    you only need the optional MapTiler key:
    | Key | Where to get it |
    |---|---|
-   | `EXPO_PUBLIC_MAPTILER_KEY` | https://cloud.maptiler.com → Account → API keys (optional; restrict it to bundle id `plus.camino.app`). Leave empty to use the OSM offline style everywhere. |
+   | `EXPO_PUBLIC_MAPTILER_KEY` | https://cloud.maptiler.com → Account → API keys (optional; restrict it to bundle id `plus.camino.app`). Leave empty to use OpenFreeMap's keyless tiles online (offline always uses the packs). |
 
    For EAS cloud builds add it as an EAS environment variable
    (`npx eas-cli env:create --name EXPO_PUBLIC_MAPTILER_KEY --value … --environment development`)
@@ -58,8 +58,8 @@ npm run build:dev:ios         # needs an Apple Developer account ($99/yr) and yo
 | Sample route: the stages and the route (the OSM lines joined, the hand-placed lines only as the fallback, straight lines between towns after Pamplona), the towns, the sample pins and position (approximate) | `src/features/map/sampleRoute.ts` |
 | Pins: real stays and points of interest of the stage (`rpc list_stage_stays` / `list_stage_pois`), a saved copy, the sample pins as the fallback | `src/features/places/` (`useStagePois`, `useStageStays`, `choosePins`) |
 
-**Online vs offline.** One style draws both. Online (internet + MapTiler key): MapTiler
-`v3` tiles. Offline, or no key: our own OSM `.pmtiles` packs for the current stage ±1.
+**Online vs offline.** One style draws both. Online (internet): MapTiler `v3` tiles with a key,
+OpenFreeMap's keyless tiles without one. Offline: our own OSM `.pmtiles` packs for the current stage ±1.
 MapTiler's terms forbid offline caching, so MapTiler tiles are never put in a pack;
 only MapLibre's normal temporary cache is used. Labels use bundled Noto Sans glyphs
 (`assets/glyphs`, copied to the device on first launch), so text renders offline.
@@ -76,7 +76,9 @@ after its quality gates pass (OSM route, fresh data, size and tile count in the 
 offline). Registering a new version is one database call, `register_offline_pack` (service role only), which
 makes the new row current and retires the old ones in a single transaction, so a stage always has exactly one
 current pack and "Update" never points at nothing. Only map tiles exist today: there are no stay-detail or audio packs
-yet, so those screens need a connection. See `tools/offline-maps/README.md`.
+yet, so those screens need a connection. **No pack is published yet**: `offline_packs` is empty until the first publish run (an owner step,
+"First publish, step by step" in `tools/offline-maps/README.md`), so the Offline maps screen says "Map not published yet" and the offline items of the checklist
+below cannot be run. See `tools/offline-maps/README.md`.
 
 **Where the route line comes from.** The line the map draws for stages 1 to 3 is OpenStreetMap's. `tools/poi-audit/build_route_lines.py`
 joins the OSM route ways of each stage into one ordered line from the start town to the end town (the line `import_osm.py` measures the
@@ -156,7 +158,7 @@ pins are real there).
       Route details says stages 1 to 3 follow OpenStreetMap, with the credit.
 - [ ] Walk view at Refuge Orisson (km 7.4 of stage 1) and at the Trinidad de Arre albergue (km 15.8 of stage 3): the dotted route runs along the
       trail drawn on the base map and through those places, not beside them.
-- [ ] Offline maps → Download stage 1 (signed in, Pilgrim Plus) → progress → "Ready offline".
+- [ ] Offline maps → Download stage 1 (signed in, Pilgrim Plus) → progress → "Ready offline" (this one and the next two need a published pack: none is yet).
 - [ ] Airplane mode → map still draws stage 1 with labels; pill says "Offline pack ready".
 - [ ] Free account → Download shows the Pilgrim Plus prompt.
 - [ ] Battery: 1 h walk with screen mostly off in Battery saver; expect ≤ 2% for location.
