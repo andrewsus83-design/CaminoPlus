@@ -10,7 +10,7 @@ passage ready to paste into a `>` blockquote, its length, and the nearest headin
 read from the source and not from memory. It warns about what a copied stretch can carry that is not text:
 
   * a footnote marker such as (3) or [3] inside the stretch (end the stretch before it, or start after it);
-  * a paragraph number such as "2." (the same);
+  * a paragraph number such as "2.", an edition's section number such as {221}, or a marginal Scripture reference such as [Heb. 12:25] (the same);
   * a quotation mark opened and not closed in the stretch, or the reverse (end where the quotation ends);
   * `_italic_` marks, which are turned into *italic*.
 
@@ -39,6 +39,8 @@ CHAPTER_HEADING = re.compile(
     r"^\s*(?:CHAPTER [IVXLC\d]+\b.*|CANTO [IVXLC]+\b.*|PSALM \d+.*|[IVXLC]+\.\s*$|" + ORDINAL + r" (?:CONVERSATION|LETTER|SECTION|MEDITATION)\.?\s*)\s*$"
 )
 FOOTNOTE = re.compile(r"\(\d+\)|\[\d+\]")
+SECTION_NUMBER = re.compile(r"\{\d+\}")                                             # an edition's own numbering, e.g. {221}
+SCRIPTURE_REF = re.compile(r"\[(?:[1-3] ?)?[A-Z][a-z]{1,9}\.? ?\d+(?::\d+)?(?:[-,–][^\]]*)?\]")   # a marginal reference such as [Heb. 12:25] or [Ps. 23]
 PARAGRAPH_NUMBER = re.compile(r"(?<=\s)\d{1,2}\. (?=[A-Z“‘\"'])")
 
 
@@ -112,6 +114,10 @@ def extract(source: str, start: str, end: str, web: bool = False, text_from: str
     warnings: list[str] = []
     if FOOTNOTE.search(text):
         warnings.append(f"a footnote marker inside the stretch ({FOOTNOTE.search(text).group(0)}): end the stretch before it or start after it")
+    if SECTION_NUMBER.search(text):
+        warnings.append(f"an edition's section number inside the stretch ({SECTION_NUMBER.search(text).group(0)}): end the stretch before it or start after it")
+    if SCRIPTURE_REF.search(text):
+        warnings.append(f"a marginal Scripture reference inside the stretch ({SCRIPTURE_REF.search(text).group(0)}): it is the editor's note, not the author's text; end the stretch before it")
     if PARAGRAPH_NUMBER.search(text):
         warnings.append(f"a paragraph number inside the stretch ({PARAGRAPH_NUMBER.search(text).group(0).strip()!r}): end the stretch before it or start after it")
     if text.count("“") != text.count("”") or text.count('"') % 2:

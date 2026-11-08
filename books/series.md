@@ -35,7 +35,7 @@ recommendation (`route_slug` in `book.json`, one line to change), chosen for the
 |---|---|---|---|---|---|---|
 | 9 | `imitation-of-christ-readings` | The Quiet Road | *The Imitation of Christ*, Thomas à Kempis | 21 | Francés (`camino-frances`) | The great road and the great devotional classic; three weeks |
 | 10 | `confessions-readings` | The Restless Heart | *The Confessions*, Augustine of Hippo | 13 | Primitivo (`camino-primitivo`) | The hard mountain road; one day for each of the 13 books |
-| 11 | `pilgrims-progress-readings` | The Slough and the City | *The Pilgrim's Progress*, John Bunyan | 12 | Portugués Central (`camino-portugues`) | A walk with a road of about twelve stages, and the story of a pilgrim |
+| 11 | `pilgrims-progress-readings` | The Slough and the City | *The Pilgrim's Progress*, John Bunyan | 12 | Portugués Central (`camino-portugues`) | A road from Porto to Santiago, and the story of a pilgrim |
 | 12 | `purgatory-readings` | The Mountain of the Heart | *Purgatory* (*The Divine Comedy*), Dante, tr. Longfellow | 14 | Norte (`camino-del-norte`) | A long road of sea and hills; a climb in terraces |
 | 13 | `presence-of-god-readings` | Present at Every Step | *The Practice of the Presence of God*, Brother Lawrence | 6 | Inglés (`camino-ingles`) | A short, simple book for a short road of six stages |
 | 14 | `songs-of-ascents-readings` | Songs for the Climb | The Psalms of Ascent (Psalms 120 to 134) | 8 | Aragonés (`camino-aragones`) | The pilgrim psalms for the road that climbs over the Pyrenees: 15 psalms in 8 days |

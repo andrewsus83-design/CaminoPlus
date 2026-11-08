@@ -96,6 +96,14 @@ class Extract(unittest.TestCase):
         self.assertEqual(passage.extract(WEB, "My help comes from Yahweh", "heaven and earth.", web=True).where, ["121:2"])
         self.assertEqual(passage.extract(WEB, "Where does my help come from?", "who made heaven", web=True).where, ["121:1 to 2"])
 
+    def test_an_editions_section_numbers_and_marginal_scripture_references_are_reported(self):
+        src = ("*** START OF THE PROJECT GUTENBERG EBOOK X ***\n{221} Then I saw a fair, and it was kept all the year long [Heb. 12:25]; and {222} at the fair were all things sold.\n"
+               "A plain sentence, with nothing in it.\n*** END OF THE PROJECT GUTENBERG EBOOK X ***\n")
+        text = " ".join(passage.extract(src, "Then I saw a fair", "all things sold.").warnings)
+        self.assertIn("section number inside the stretch ({222})", text)
+        self.assertIn("marginal Scripture reference inside the stretch ([Heb. 12:25])", text)
+        self.assertEqual(passage.extract(src, "A plain sentence", "in it.").warnings, [])
+
     def test_straight_quotation_marks_are_counted_too(self):
         src = '*** START OF THE PROJECT GUTENBERG EBOOK X ***\nHe said, "Come here and rest, and I will give you peace." Then he left.\n*** END OF THE PROJECT GUTENBERG EBOOK X ***\n'
         self.assertTrue(any("quotation mark" in w for w in passage.extract(src, "Come here and rest", 'peace." Then').warnings))   # the opening mark is outside, the closing one inside
