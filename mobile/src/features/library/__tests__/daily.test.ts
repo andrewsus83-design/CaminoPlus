@@ -13,6 +13,8 @@ import {
 } from '../daily/calendar';
 import { CARD_PAD, COLUMNS, GRID_MAX, TOUCH, calendarMetrics } from '../daily/layout';
 import { DAILY_NOTICE, SAMPLE_READING, SAMPLE_REFLECTION, readingFor } from '../daily/sample';
+import { BOOKMARK_DAY, UNBOOKMARK_DAY } from '../daily/bookmarks';
+import { dayContent } from '../daily/content';
 import { arrows, dailyReducer, initDaily, type DailyAction, type DailyState } from '../daily/state';
 import './liturgy.test'; // the liturgical calendar (daily/liturgy.ts): its own file, run here so no script has to name it
 
@@ -504,16 +506,21 @@ const source = (f: string) => code(read(f));
 const all = () => dailyFiles.map((f) => `// ${f}\n${source(f)}`).join('\n');
 
 check('the feature is the files this test expects, so a new one is looked at (and the scans below see all of them)', () => {
-  assert.deepEqual(dailyFiles.map((f) => path.basename(f)).sort(), ['DayReading.tsx', 'MonthCalendar.tsx', 'calendar.ts', 'daily.tsx', 'layout.ts', 'liturgy.ts', 'sample.ts', 'state.ts', 'useDailyReading.ts']);
+  assert.deepEqual(dailyFiles.map((f) => path.basename(f)).sort(), [
+    'CalendarSheet.tsx', 'DailyHeader.tsx', 'DayReading.tsx', 'LiturgicalCard.tsx', 'MonthCalendar.tsx', 'WeekStrip.tsx', 'bookmarks.ts', 'calendar.ts', 'content.ts', 'daily.tsx',
+    'datekey.ts', 'layout.ts', 'liturgy.ts', 'sample.ts', 'state.ts', 'useDailyReading.ts', 'week.ts',
+  ]);
 });
 
-check('no new native module, no network and nothing stored: React, React Native, expo-router and the app\'s own components and theme, and no call to the account, the network or the phone\'s storage', () => {
-  const allowed = /^(react|react-native|expo-router)$|^\.{1,2}\/|^@\/(components\/|theme$|features\/library\/daily\/)/;
+check('no new native module and no network: React, React Native, expo-router and the app\'s own components, theme and Library bookmarks, and no call to the account, the network or the phone\'s storage from this feature itself', () => {
+  // NEW RULE: the screen keeps one thing on the phone, the bookmark of a day, and only through the Library's own hook (useLibraryBookmarks), which is the one place the
+  // Library's bookmarks are read and written; nothing of the feature itself touches the account, the network or the storage
+  const allowed = /^(react|react-native|expo-router|react-native-safe-area-context)$|^\.{1,2}\/|^@\/(components\/|theme$|features\/library\/daily\/|features\/library\/(useLibraryBookmarks|bookmarks)$)/;
   const offenders: string[] = [];
   for (const f of dailyFiles) for (const m of read(f).matchAll(/^import [^;]*? from '([^']+)';/gm)) if (!allowed.test(m[1])) offenders.push(`${f}: ${m[1]}`);
   assert.deepEqual(offenders, []);
   const text = all();
-  assert.doesNotMatch(text, /supabase|@\/lib\/|localStore|secureStorage|AsyncStorage|expo-file-system|\bfetch\(|XMLHttpRequest|WebSocket|NetInfo|navigator\.onLine/i, 'the screen works offline: it asks for nothing and keeps nothing');
+  assert.doesNotMatch(text, /supabase|@\/lib\/|localStore|secureStorage|AsyncStorage|expo-file-system|\bfetch\(|XMLHttpRequest|WebSocket|NetInfo|navigator\.onLine/i, 'the feature fetches nothing and stores nothing itself');
 });
 
 check('the calendar, the reducer, the layout and the sample are plain TypeScript: no React and no React Native in them', () => {
@@ -593,7 +600,8 @@ check('every control has a label for a screen reader, says it is a button, and i
   assert.match(cal, /\{ flex: 1, height: TOUCH,/, 'a day is as wide as its seventh of the card and 44 high');
   assert.match(cal, /minHeight: TOUCH, justifyContent: 'center'/, 'Today is 44 high');
   assert.match(cal, /accessibilityState=\{\{ disabled: !enabled \}\}\s+disabled=\{!enabled\}/, 'an arrow at the limit is off, and says so');
-  assert.match(source(ROUTE), /<IconButton name="back" label="Back" onPress=\{goBack\} \/>/);
+  assert.match(source(`${DIR}/DailyHeader.tsx`), /<HeaderButton name="back" label="Back" onPress=\{onBack\} \/>/);
+  assert.match(source(ROUTE), /<DailyHeader onBack=\{goBack\} /);
   // and what each one does: a day selects itself, the arrows go back and forward (and look it), Today goes to today
   assert.match(cal, /onPress=\{\(\) => onSelect\(day\)\}/, 'a day selects itself');
   assert.match(cal, /<Arrow direction="back" label=\{previousMonthLabel\(shown, range\)\} enabled=\{canGoBack\} onPress=\{onPrevious\} \/>/, 'the left arrow goes to the month before');
@@ -627,16 +635,44 @@ check('the calendar: ring for today, fill for the chosen day, a ring inside the 
   assert.match(cal, /maxWidth: GRID_MAX, alignSelf: 'center'/, 'a tablet or a browser window does not get days of 150 px');
 });
 
-check('the screen is a stack screen like Bookmarks: Back, the title "Daily reading", no room for a tab bar, the calendar, then the reading of the chosen day', () => {
+check('the screen is a stack screen like Bookmarks: one row (Back, the title, the calendar, the bookmark), the week strip, then the reading of the picked day', () => {
   const src = source(ROUTE);
   assert.match(src, /<Screen tabBar=\{false\}>/);
   assert.match(src, /router\.canGoBack\(\) \? router\.back\(\) : router\.replace\('\/library'\)/);
-  assert.match(src, /<AppText variant="h2" accessibilityRole="header">Daily reading<\/AppText>/);
-  assert.match(src, /const daily = useDailyReading\(\);/, 'the clock is the phone\'s unless a caller hands one in');
-  assert.ok(src.indexOf('<IconButton') < src.indexOf('<AppText variant="h2"') && src.indexOf('<AppText variant="h2"') < src.indexOf('<MonthCalendar') && src.indexOf('<MonthCalendar') < src.indexOf('<DayReading'), 'order: Back, title, calendar, reading');
-  assert.match(src, /<DayReading day=\{daily\.selected\} isToday=\{sameDay\(daily\.selected, daily\.today\)\} \/>/);
-  for (const prop of ['shown={daily.shown}', 'today={daily.today}', 'selected={daily.selected}', 'range={daily.range}', 'canGoBack={daily.canGoBack}', 'canGoForward={daily.canGoForward}', 'onSelect={daily.select}', 'onPrevious={daily.previousMonth}', 'onNext={daily.nextMonth}', 'onToday={daily.goToday}']) assert.ok(src.includes(prop), prop);
+  assert.match(src, /const daily = useDailyReading\(undefined, parseDateKey\(Array\.isArray\(date\) \? date\[0\] : date\)\);/, 'the clock is the phone\'s, and the date param is read, anything that is not a day meaning today');
+  assert.ok(src.indexOf('<DailyHeader') < src.indexOf('<WeekStrip') && src.indexOf('<WeekStrip') < src.indexOf('<DayReading') && src.indexOf('<DayReading') < src.indexOf('<CalendarSheet'), 'order: header, strip, reading, the sheet');
+  assert.match(src, /<DayReading day=\{daily\.selected\} \/>/);
+  for (const prop of ['selected={daily.selected}', 'today={daily.today}', 'range={daily.range}', 'canGoBack={daily.canGoBackWeek}', 'canGoForward={daily.canGoForwardWeek}', 'onSelect={daily.select}', 'onPrevious={daily.previousWeek}', 'onNext={daily.nextWeek}', 'onToday={daily.goToday}']) assert.ok(src.includes(prop), prop);
   assert.match(src, /export default function DailyReading\(\)/);
+  // the header: the title is next to Back, in the same row, with the calendar and the bookmark at the right edge, each at least 44
+  const header = source(`${DIR}/DailyHeader.tsx`);
+  assert.ok(header.indexOf('name="back"') < header.indexOf('>Daily reading</AppText>') && header.indexOf('>Daily reading</AppText>') < header.indexOf('name="calendar"') && header.indexOf('name="calendar"') < header.indexOf('name="bookmark"'), 'order in the row: Back, title, calendar, bookmark');
+  assert.match(header, /flexDirection: 'row', alignItems: 'center'/);
+  assert.match(header, /<AppText variant="h3" accessibilityRole="header" numberOfLines=\{2\}/, 'the Fraunces title, a header, which wraps to a second line rather than run under a button');
+  assert.match(header, /const SIZE = 44;/);
+  assert.match(header, /width: SIZE, height: SIZE/);
+  assert.equal((header.match(/<HeaderButton /g) ?? []).length, 3, 'Back, calendar, bookmark');
+  assert.match(header, /label="Open calendar"/);
+  assert.match(header, /label=\{bookmarked \? UNBOOKMARK_DAY : BOOKMARK_DAY\} selected=\{bookmarked\}/, 'the bookmark button says what a tap will do and exposes whether the day is bookmarked');
+  assert.match(header, /accessibilityState=\{selected === undefined \? undefined : \{ selected \}\}/);
+  assert.equal(BOOKMARK_DAY, 'Bookmark this day');
+  assert.equal(UNBOOKMARK_DAY, 'Remove bookmark');
+  // the calendar button opens the sheet, a day chosen in it closes it and picks the day, Today picks today and closes it, Close and the backdrop close it
+  assert.match(src, /const openCalendar = \(\) => \{ daily\.showMonth\(\); setCalendar\(true\); \};/);
+  assert.match(src, /onSelect=\{\(day\) => \{ daily\.select\(day\); setCalendar\(false\); \}\}/);
+  assert.match(src, /onToday=\{\(\) => \{ daily\.goToday\(\); setCalendar\(false\); \}\}/);
+  assert.match(src, /onClose=\{\(\) => setCalendar\(false\)\}/);
+  const sheet = source(`${DIR}/CalendarSheet.tsx`);
+  assert.match(sheet, /<Modal visible transparent animationType="fade" onRequestClose=\{onClose\} statusBarTranslucent>/, 'the back button of the phone, and Escape in a browser, close it');
+  assert.match(sheet, /accessibilityLabel="Close the calendar" onPress=\{onClose\}/, 'a tap on the dimmed part closes it');
+  assert.match(sheet, /accessibilityLabel="Close calendar"\s+onPress=\{onClose\}/, 'the Close button');
+  assert.match(sheet, /<MonthCalendar\s+shown=\{shown\}/, 'the month calendar of v1, with its five years back and ahead');
+  assert.match(sheet, /<AppText variant="label" color=\{role\.action\}>Close<\/AppText>/);
+  // and the bookmark: the Library's own list, under the key of the day
+  assert.match(src, /const marks = useLibraryBookmarks\(\);/);
+  assert.match(src, /const key = dailyKey\(daily\.selected\);/);
+  assert.match(src, /bookmarked=\{marks\.has\(key\)\} onBookmark=\{\(\) => marks\.toggle\(key\)\}/);
+  assert.match(src, /\{marks\.failed && <FormMessage>\{BOOKMARK_NOT_SAVED\}<\/FormMessage>\}/, 'a bookmark that could not be saved says so');
   const bookmarks = source('app/library/bookmarks.tsx');
   for (const shared of [/<Screen tabBar=\{false\}>/, /router\.canGoBack\(\) \? router\.back\(\) : router\.replace\('\/library'\)/, /<IconButton name="back" label="Back" onPress=\{goBack\} \/>/]) assert.match(bookmarks, shared, 'Bookmarks still has what this screen copies');
 });
@@ -662,35 +698,41 @@ check('the route is registered once, in the block for someone with a journey, ne
   assert.deepEqual(layouts.filter((f) => /name="library\/daily"/.test(read(f))), ['app/_layout.tsx'], 'no other layout registers it');
 });
 
-check('the reading under the calendar: heading of the day, the Preview notice, one sample reading and one sample reflection, each marked as a sample', () => {
+check('the reading under the strip: the liturgical day (real), the Preview notice, the readings and the reflection (samples, each marked as one), and one handwritten line', () => {
   const src = source(`${DIR}/DayReading.tsx`);
   assert.match(src, /<SampleNotice title="Preview">\{DAILY_NOTICE\}<\/SampleNotice>/);
-  assert.match(src, /<CardTop label="Sample reading" \/>/);
-  assert.match(src, /<CardTop label=\{reflection\.label\} \/>/);
-  assert.match(src, /<SampleTag \/>/);
-  assert.equal((src.match(/<ReadingCard /g) ?? []).length, 1, 'ONE sample reading');
-  assert.equal((src.match(/<ReflectionCard /g) ?? []).length, 1);
-  assert.match(src, /const \{ reading, reflection \} = readingFor\(day\);/);
-  assert.match(src, /const heading = readingHeading\(day, isToday\);/, 'the heading is the chosen day, and says Today when it is');
-  assert.match(src, /<View accessible accessibilityRole="header" accessibilityLabel=\{heading\.label\} accessibilityLiveRegion="polite"/, 'one heading for a screen reader, said again when another day is picked');
-  assert.ok(src.indexOf('accessibilityLabel={heading.label}') < src.indexOf('<SampleNotice') && src.indexOf('<SampleNotice') < src.indexOf('<ReadingCard reading') && src.indexOf('<ReadingCard reading') < src.indexOf('<ReflectionCard reflection'), 'order: heading, notice, reading, reflection');
-  assert.match(src, /\{reading\.reference\}/);
-  assert.match(src, /reading\.translation/);
-  assert.match(src, /reading\.verses\.map\(\(v\) => \(/);
-  assert.match(src, /<AppText variant="caption" muted>\{`\$\{v\.n\} `\}<\/AppText>\{v\.text\}/, 'the verse numbers are small and muted');
-  assert.match(src, /\.replace\(\/ \/g, NO_BREAK\)/, '"public domain" is not broken between its words');
-  assert.match(src, /const NO_BREAK = '\\u00A0';/);
-  const data = read(`${DIR}/sample.ts`) + src;
-  assert.doesNotMatch(data, /\$\d|€\d|\brating\b|★|available now|download|onPress/i, 'a sample never claims to be real');
-  assert.doesNotMatch(src, /onPress|Pressable/, 'the cards show what a reading will look like: nothing on them can be pressed');
+  assert.match(src, /<CardTop label="Readings" sample=\{content\.sample\} \/>/);
+  assert.match(src, /<CardTop label=\{reflection\.label\} sample=\{sample\} \/>/);
+  assert.match(src, /\{sample && <SampleTag \/>\}/);
+  assert.match(src, /const content = useMemo\(\(\) => dayContent\(key\), \[key\]\);/, 'the screen asks the one provider function for the day, and nothing else');
+  assert.ok(src.indexOf('<LiturgicalCard') < src.indexOf('<SampleNotice') && src.indexOf('<SampleNotice') < src.indexOf('label="Readings"') && src.indexOf('label="Readings"') < src.indexOf('<ReflectionCard key'), 'order: liturgical day, notice, readings, reflection');
+  assert.match(src, /accessibilityRole="button"[\s\S]*accessibilityState=\{\{ expanded: open \}\}/, 'a reading is a button that says whether its text is open');
+  assert.match(src, /<AppText variant="mono" muted style=\{\{ fontSize: 14, lineHeight: 20 \}\}>\{citation\}<\/AppText>/, 'the citation is in JetBrains Mono');
+  assert.match(src, /passage\.citation \?\? SAMPLE_CITATION/);
+  assert.match(src, /<AppText variant="caption" muted>\{`\$\{line\.n\} `\}<\/AppText>/, 'the verse numbers are small and muted');
+  assert.equal((src.match(/variant="accent"/g) ?? []).length, 1, 'Caveat is used once on the screen');
+  const card = source(`${DIR}/LiturgicalCard.tsx`);
+  assert.match(card, /const lit = liturgicalDayOf\(day\);/, 'the card is worked out from the day, not from the sample');
+  assert.match(card, /<AppText variant="h4" accessibilityRole="header" accessibilityLiveRegion="polite">\{lit\.title\}<\/AppText>/, 'the name of the celebration, in Fraunces, said again when another day is picked');
+  for (const label of ['Season', 'Rank', 'Sunday cycle', 'Weekday cycle']) assert.ok(card.includes(`<Fact label="${label}">`), label);
+  assert.match(card, /<AppText variant="caption" muted>\{LITURGY_NOTE\}<\/AppText>/, 'the small print');
+  const all3 = [src, card, source(`${DIR}/WeekStrip.tsx`), source(`${DIR}/content.ts`)].join('\n');
+  assert.doesNotMatch(all3, /\$\d|€\d|\brating\b|★|available now|download/i, 'a sample never claims to be real');
+  assert.doesNotMatch(card, /onPress|Pressable/, 'the card shows what the day is: nothing on it can be pressed');
+  // the sample says it is one, in every reading it gives
+  for (let i = 0; i < 60; i++) {
+    const d = dayContent('2026-11-08');
+    assert.equal(d.sample, true);
+    assert.ok(d.passages.every((p) => p.citation === null || p.citation === SAMPLE_READING.reference), 'no citation is given as a real one');
+  }
 });
 
 check('the clock is handed in once and read in one place: the phone\'s own is the default, today is read again when the screen draws and when the app comes back, and Today goes to the clock\'s day', () => {
   const hook = source(`${DIR}/useDailyReading.ts`);
   assert.match(hook, /const systemNow = \(\): Date => new Date\(\);/);
-  assert.match(hook, /export function useDailyReading\(now: \(\) => Date = systemNow\): DailyReading/);
+  assert.match(hook, /export function useDailyReading\(now: \(\) => Date = systemNow, requested: Ymd \| null = null\): DailyReading/);
   assert.equal((all().match(/new Date\(|Date\.now\(/g) ?? []).length, 1, 'the clock is read in exactly one place: the default of the hook');
-  assert.match(hook, /useReducer\(dailyReducer, undefined, \(\) => initDaily\(todayOf\(now\(\)\)\)\)/);
+  assert.match(hook, /useReducer\(dailyReducer, undefined, \(\) => initDaily\(todayOf\(now\(\)\), requested\)\)/);
   assert.match(hook, /const today = todayOf\(now\(\)\);/);
   assert.match(hook, /AppState\.addEventListener\('change', \(s\) => \{ if \(s === 'active'\) redraw\(\); \}\)/);
   assert.match(hook, /return \(\) => sub\.remove\(\);/);
