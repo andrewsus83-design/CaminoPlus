@@ -1,0 +1,42 @@
+{
+  "id": "walking-readings",
+  "kind": "reflection",
+  "order": 18,
+  "title": "Toward the Sunset",
+  "subtitle": "Five Days with Thoreau's Walking for Finisterre and Muxía",
+  "route_slug": "camino-finisterre-muxia",
+  "days": 5,
+  "description_short": "Five days with Thoreau's essay on walking, made for the road from Santiago to Finisterre and Muxía: a morning reading and an evening reflection for each day, walking west toward the sunset.",
+  "description_long": "Walking is an essay by the American writer Henry David Thoreau (1817 to 1862), first published in 1862, the year he died. It began as lectures. It is about the art of walking, about wildness and freedom, and about a habit he noticed in himself: when he goes out for a walk with no plan, he ends up heading west. It ends at sunset.\n\nToward the Sunset is made to go with the walk from Santiago de Compostela to Finisterre and Muxía, a road that also goes west, to the Atlantic coast. It has five days, one for each day of a short walk, or each day at home. Every day has a morning reading of about five minutes and an evening reflection of about three. The morning begins with a short passage from the essay, quoted word for word from the public-domain text. Then comes a reflection that starts from something on the road, and two small things to carry for the next hour: a question and a practice that needs nothing but attention. The evening looks back over the day with two or three gentle questions and ends with a short wish or prayer, open to a reader of any faith or none.\n\nThe days follow the essay's own direction: leaving the house, wildness and the open road, the west, sauntering as a kind of pilgrimage, and the sunset and the shore. This is not a Christian book. Thoreau speaks in his own voice, and so do we. The book says plainly where his famous derivation of the word saunter is doubted, and where the essay carries the assumptions of its time. Read it on a bench, in a pilgrim hostel, or at your own table.",
+  "keywords": [
+    "Camino de Santiago",
+    "Camino Finisterre and Muxia",
+    "Henry David Thoreau",
+    "Walking essay",
+    "pilgrimage reflections",
+    "daily readings",
+    "walking meditation"
+  ],
+  "categories": [
+    "Travel / Special Interest / Pilgrimages",
+    "Literary Collections / Essays",
+    "Nature / General"
+  ],
+  "cover": {
+    "colour": "goldWash",
+    "icon": "book"
+  },
+  "version": "1.0.0",
+  "date": "2026-11",
+  "sources": [
+    {
+      "id": "gutenberg-1022",
+      "work": "Walking",
+      "author": "Henry David Thoreau",
+      "translator": "none (English original)",
+      "year": "1862",
+      "licence": "Public domain",
+      "url": "https://www.gutenberg.org/ebooks/1022"
+    }
+  ]
+}

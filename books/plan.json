@@ -1,0 +1,182 @@
+{
+  "version": 1,
+  "comment": "The plan of the CaminoPlus Library in machine-readable form; books/series.md is the same plan for people. tools/check_series.py fails when books/ and this file disagree. routes_without_guide lists catalog routes that have no guide YET, on purpose.",
+  "books": [
+    {
+      "id": "camino-frances-guide",
+      "kind": "guide",
+      "order": 1,
+      "route_slug": "camino-frances"
+    },
+    {
+      "id": "camino-portugues-guide",
+      "kind": "guide",
+      "order": 2,
+      "route_slug": "camino-portugues"
+    },
+    {
+      "id": "camino-portugues-costero-guide",
+      "kind": "guide",
+      "order": 3,
+      "route_slug": "camino-portugues-costero"
+    },
+    {
+      "id": "camino-del-norte-guide",
+      "kind": "guide",
+      "order": 4,
+      "route_slug": "camino-del-norte"
+    },
+    {
+      "id": "camino-primitivo-guide",
+      "kind": "guide",
+      "order": 5,
+      "route_slug": "camino-primitivo"
+    },
+    {
+      "id": "camino-ingles-guide",
+      "kind": "guide",
+      "order": 6,
+      "route_slug": "camino-ingles"
+    },
+    {
+      "id": "camino-finisterre-muxia-guide",
+      "kind": "guide",
+      "order": 7,
+      "route_slug": "camino-finisterre-muxia"
+    },
+    {
+      "id": "camino-de-invierno-guide",
+      "kind": "guide",
+      "order": 8,
+      "route_slug": "camino-de-invierno"
+    },
+    {
+      "id": "imitation-of-christ-readings",
+      "kind": "reflection",
+      "order": 9,
+      "route_slug": "camino-frances",
+      "days": 21,
+      "sources": [
+        "gutenberg-1653"
+      ]
+    },
+    {
+      "id": "confessions-readings",
+      "kind": "reflection",
+      "order": 10,
+      "route_slug": "camino-primitivo",
+      "days": 13,
+      "sources": [
+        "gutenberg-3296"
+      ]
+    },
+    {
+      "id": "pilgrims-progress-readings",
+      "kind": "reflection",
+      "order": 11,
+      "route_slug": "camino-portugues",
+      "days": 12,
+      "sources": [
+        "gutenberg-131"
+      ]
+    },
+    {
+      "id": "purgatory-readings",
+      "kind": "reflection",
+      "order": 12,
+      "route_slug": "camino-del-norte",
+      "days": 14,
+      "sources": [
+        "gutenberg-1002"
+      ]
+    },
+    {
+      "id": "presence-of-god-readings",
+      "kind": "reflection",
+      "order": 13,
+      "route_slug": "camino-ingles",
+      "days": 6,
+      "sources": [
+        "gutenberg-13871"
+      ]
+    },
+    {
+      "id": "songs-of-ascents-readings",
+      "kind": "reflection",
+      "order": 14,
+      "route_slug": "camino-aragones",
+      "days": 8,
+      "sources": [
+        "gutenberg-8294"
+      ]
+    },
+    {
+      "id": "revelations-readings",
+      "kind": "reflection",
+      "order": 15,
+      "route_slug": "camino-de-invierno",
+      "days": 8,
+      "sources": [
+        "gutenberg-52958"
+      ]
+    },
+    {
+      "id": "teresa-life-readings",
+      "kind": "reflection",
+      "order": 16,
+      "route_slug": "camino-de-madrid",
+      "days": 10,
+      "sources": [
+        "gutenberg-8120"
+      ]
+    },
+    {
+      "id": "ignatius-pilgrim-readings",
+      "kind": "reflection",
+      "order": 17,
+      "route_slug": "camino-baztanes",
+      "days": 7,
+      "sources": [
+        "gutenberg-24534"
+      ]
+    },
+    {
+      "id": "walking-readings",
+      "kind": "reflection",
+      "order": 18,
+      "route_slug": "camino-finisterre-muxia",
+      "days": 5,
+      "sources": [
+        "gutenberg-1022"
+      ]
+    },
+    {
+      "id": "francis-readings",
+      "kind": "reflection",
+      "order": 19,
+      "route_slug": "camino-portugues-costero",
+      "days": 9,
+      "sources": [
+        "gutenberg-63084"
+      ]
+    },
+    {
+      "id": "pascal-readings",
+      "kind": "reflection",
+      "order": 20,
+      "route_slug": "camino-sanabres",
+      "days": 10,
+      "sources": [
+        "gutenberg-46921"
+      ]
+    }
+  ],
+  "routes_without_guide": [
+    "camino-aragones",
+    "camino-del-salvador",
+    "camino-sanabres",
+    "camino-de-madrid",
+    "camino-baztanes",
+    "camino-portugues-lisboa"
+  ]
+}

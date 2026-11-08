@@ -1,0 +1,43 @@
+{
+  "id": "francis-readings",
+  "kind": "reflection",
+  "order": 19,
+  "title": "The Poor Man of the Road",
+  "subtitle": "Nine Days with Chesterton's St. Francis of Assisi for the Camino Portugués Costero",
+  "route_slug": "camino-portugues-costero",
+  "days": 9,
+  "description_short": "Nine days with G. K. Chesterton's portrait of St. Francis, made for the Coastal Way: a morning reading and an evening reflection for each day, about joy, poverty, creation and going home.",
+  "description_long": "St. Francis of Assisi (about 1181 to 1226) gave up a merchant's son's comfortable life, took to the roads of Umbria in a brown tunic tied with a rope, and sang. In 1923 the English writer G. K. Chesterton (1874 to 1936) set out to tell his story for readers who admired Francis but did not quite understand him, and the result is one of the liveliest short books about a saint in English.\n\nThe Poor Man of the Road is made to go with the Camino Portugués Costero, the coastal route from Porto to Santiago de Compostela, which the app's catalogue gives as about 260 km. Francis loved water, sun and fire as a brother and sister, chose to own nothing, and called joy a form of thanks. A walk beside the Atlantic suits all three. The book has nine days, one for each day of walking or each day at home. Every day has a morning reading of about five minutes and an evening reflection of about three. The morning begins with a short passage from Chesterton, quoted word for word from the public-domain text. Then comes a reflection that starts from something on the road, and two small things to carry for the next hour: a question and a practice that needs nothing but attention. The evening looks back over the day with two or three gentle questions and ends with a short original prayer, open enough to be said as a wish by a reader who prays differently, or who does not pray.\n\nThe days follow the life: the young man of Assisi and his plans, the break with his father, the joy that came out of it, the poor man on the road, the creatures and the song of the sun, the brothers and their rule, the journey east and the mountain of Alverno, his death, and the question of how to go on. This is Chesterton's portrait, not Francis's own words, and it is a Christian and Catholic book written in the England of 1923. The book says so plainly, and says where Chesterton's assumptions belong to his time. Read it on a bench, in a pilgrim hostel bunk, or at your own table.",
+  "keywords": [
+    "Camino de Santiago",
+    "Camino Portugues Costero",
+    "St. Francis of Assisi",
+    "G. K. Chesterton",
+    "pilgrimage reflections",
+    "daily readings",
+    "walking meditation"
+  ],
+  "categories": [
+    "Religion / Christian Living / Spiritual Growth",
+    "Religion / Christianity / Catholic",
+    "Travel / Special Interest / Pilgrimages"
+  ],
+  "cover": {
+    "colour": "goldSoft",
+    "icon": "book"
+  },
+  "version": "1.0.0",
+  "date": "2026-11",
+  "sources": [
+    {
+      "id": "gutenberg-63084",
+      "work": "St. Francis of Assisi",
+      "author": "G. K. Chesterton",
+      "translator": "none (English original)",
+      "year": "1923",
+      "licence": "Public domain",
+      "url": "https://www.gutenberg.org/ebooks/63084",
+      "text_from": "A sketch of St. Francis of Assisi in modern English"
+    }
+  ]
+}

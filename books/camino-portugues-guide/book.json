@@ -1,0 +1,29 @@
+{
+  "id": "camino-portugues-guide",
+  "kind": "guide",
+  "order": 2,
+  "title": "The Portuguese Way",
+  "subtitle": "A Pilgrim's Guide to the Camino Portugués from Porto",
+  "route_slug": "camino-portugues",
+  "description_short": "A calm, honest guide to the Camino Portugués from Porto: eleven walking days to Santiago, the border at the Minho, when to go, what to carry, how the Compostela rule works and how to arrive.",
+  "description_long": "The Camino Portugués is the road from the cathedral of Porto to the cathedral of Santiago de Compostela: about 240 km in the CaminoPlus catalog, walked in eleven days, through northern Portugal and Galicia. It crosses the Cávado at Barcelos, the Lima at Ponte de Lima and, by the International Bridge, the Minho at Valença and Tui, the border between two countries and two clocks. Then it runs through O Porriño, Redondela, Pontevedra, Caldas de Reis and Padrón to Santiago.\n\nThis guide is written for the Planner first and the Walker's evenings second. It helps you decide whether this is your Camino, shape the walk, pack, and know what to check locally. It explains plainly how the Pilgrim's Office describes the rule for the Compostela, and it says where published distances disagree, which on this road they often do, by a kilometre or two a day and by ~20 km in the total.\n\nYou will find a day-by-day account of the eleven stages in four regional chapters, from the Sé of Porto to the Praterías entrance of the cathedral, with the legends, bridges and Roman roads you pass; chapters on when to go, with the climate of Porto and Santiago in plain numbers; on the credencial and the way there; on other ways to split the days, the Coastal Way and the Spiritual Variant; on sleeping, eating and resting; on body, weather and safety; on the inner side of walking; and on arriving, and going home.\n\nEvery distance is marked approximate. The book names no hostels, cafes or prices, because they change, and it sends you to the CaminoPlus app and to local information for the live answer. It was written with AI assistance from public sources, which it credits, by an author who has not walked the road.",
+  "keywords": [
+    "Camino Portugués",
+    "Portuguese Way",
+    "Camino de Santiago",
+    "Porto to Santiago",
+    "pilgrim guidebook",
+    "Camino Portugués Central",
+    "Compostela"
+  ],
+  "categories": [
+    "Travel / Special Interest / Pilgrimages",
+    "Travel / Europe / Portugal"
+  ],
+  "cover": {
+    "colour": "blue100",
+    "icon": "library"
+  },
+  "version": "1.0.0",
+  "date": "2026-11"
+}
