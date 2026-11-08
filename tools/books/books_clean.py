@@ -50,15 +50,25 @@ def decode(raw: bytes) -> list[str]:
     return [line.rstrip() for line in text.split("\n")]
 
 
-def blocks_of(lines: list[str], first_no: int = 1) -> list[Block]:
-    """Split lines into blocks at blank lines. `first_no` is the raw line number of lines[0]."""
+RULE_LINE = re.compile(r"^\s*_{20,}\s*$")  # the horizontal rule of the plain-text files of CCEL
+
+
+def blocks_of(lines: list[str], first_no: int = 1, isolate: re.Pattern[str] | None = None) -> list[Block]:
+    """Split lines into blocks at blank lines. `first_no` is the raw line number of lines[0]. A line that matches `isolate` is a block of its
+    own, with or without blank lines around it (the rules of the CCEL files stand right under the last line of a section)."""
     blocks: list[Block] = []
     cur: list[str] = []
     start = first_no
     gap = 0
     pending_gap = 0
     for i, line in enumerate(lines):
-        if line.strip():
+        if isolate is not None and isolate.match(line):
+            if cur:
+                blocks.append(Block(start, tuple(cur), pending_gap))
+                cur = []
+            blocks.append(Block(first_no + i, (line,), gap))
+            gap = 0
+        elif line.strip():
             if not cur:
                 start = first_no + i
                 pending_gap = gap
@@ -113,12 +123,12 @@ def unwrap(lines: list[str] | tuple[str, ...], stats: Counter | None = None) -> 
 
 
 def tidy(text: str, *, italics: bool = True) -> str:
-    """One paragraph, one line: no-break spaces and runs of spaces become one space, "--" becomes an em dash, the _underscores_ the
+    """One paragraph, one line: no-break spaces and runs of spaces become one space, "--" and "---" become an em dash, the _underscores_ the
     plain-text editions use for italics are removed (the words stay), and the text is in Unicode normal form."""
     t = unicodedata.normalize("NFC", text.replace("\u00a0", " ").replace("\t", " "))
     if italics:
         t = _ITALIC.sub(r"\1", t)
-    t = t.replace("--", "\u2014")
+    t = re.sub(r"(?<!-)-{2,3}(?!-)", "\u2014", t)  # "--" and "---" are dashes; a longer run is not (the blank lines of a form)
     t = re.sub(r" {2,}", " ", t)
     return t.strip()
 
@@ -148,13 +158,40 @@ def title_case(s: str) -> str:
     out = []
     for i, w in enumerate(words):
         core = re.sub(r"[^A-Za-z]", "", w)
+        starts_sentence = i == 0 or words[i - 1].endswith((".", "?", "!"))
         if _ROMAN.match(core) and len(core) > 1 or core == "I":
             out.append(w)
-        elif i > 0 and core.lower() in _SMALL_WORDS:
+        elif not starts_sentence and core.lower() in _SMALL_WORDS:
             out.append(w.lower())
         else:
-            out.append(re.sub(r"[A-Za-z][A-Za-z']*", lambda m: m.group(0)[:1].upper() + m.group(0)[1:].lower(), w))
+            out.append(re.sub(r"[A-Za-z][A-Za-z'\u2019]*", lambda m: m.group(0)[:1].upper() + m.group(0)[1:].lower(), w))
     return " ".join(out)
+
+
+_CONNECTIVES = {"A", "AN", "AND", "AS", "AT", "BE", "BY", "FOR", "FROM", "IN", "IS", "IT", "OF", "ON", "OR", "THE", "THEN", "TO", "WHEN", "WILL", "WITH"}
+
+
+def is_caps(s: str) -> bool:
+    """A heading line in capitals: at least two letters and no lower case letter."""
+    return sum(ch.isalpha() for ch in s) >= 2 and not any(ch.islower() for ch in s)
+
+
+def join_heading(parts: list[str]) -> str:
+    """The lines of a heading that the edition broke over several lines, as one title: a line that ends with a comma or a connecting word
+    ("IT IS ON" and "THE INCARNATION") runs on into the next, and a line that starts with one ("AND FIRST ON THE COMMANDMENTS") joins the line
+    before it; otherwise the lines are sentences of their own and are joined with a full stop."""
+    out = parts[0].strip()
+    for nxt in parts[1:]:
+        nxt = nxt.strip()
+        last = re.sub(r"[^A-Za-z]", "", out.split()[-1]).upper() if out.split() else ""
+        first = re.sub(r"[^A-Za-z]", "", nxt.split()[0]).upper() if nxt.split() else ""
+        if out.endswith((",", ";", ":")) or last in _CONNECTIVES or first in {"AND", "OR", "TO", "WHICH", "WHEN", "FOR", "IS", "WILL", "OF"}:
+            out += " " + nxt
+        elif out.endswith((".", "?", "!")):
+            out += " " + nxt
+        else:
+            out += ". " + nxt
+    return out
 
 
 # ------------------------------------------------------------------------------------------------------------- checks and counts

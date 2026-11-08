@@ -27,7 +27,7 @@ const json = <T,>(p: string) => JSON.parse(read(p)) as T;
 type ManifestEntry = {
   id: string; title: string; author: string; translator: string | null; translatorDied: number | null; translatorSource: string;
   firstPublished: number; edition: string; source: string; rawUrl: string; rawSha256: string; outputSha256: string; chapters: number;
-  words: number; verdict: string; credit: string; leftOut: string[]; dropped: Record<string, number>;
+  words: number; verdict: string; basis: string; credit: string; leftOut: string[]; counts: Record<string, number>;
 };
 type Manifest = { books: ManifestEntry[]; leftOut: { id: string; verdict: string; why: string }[] };
 
@@ -42,6 +42,9 @@ const wordsOf = (b: BookText) => allBlocks(b).reduce((total, blk) => total + tex
 
 // id -> chapters, parts, words, the first words of the first chapter's first paragraph and the title of the last chapter. Typed in from the editions.
 const PINNED: Record<string, { chapters: number; parts: number; words: number; opens: string; lastTitle: string }> = {
+  'spiritual-exercises': { chapters: 88, parts: 7, words: 27321, opens: 'First Annotation. The first Annotation is that by this name of Spiritual Exercises is meant', lastTitle: 'To Have the True Sentiment Which We Ought to Have in the Church. Militant' },
+  'devout-life': { chapters: 120, parts: 5, words: 80423, opens: 'Dear reader, I request you to read this Preface for your own satisfaction as well as mine.', lastTitle: 'Chapter XVIII. Three Important and Final Counsels.' },
+  'dialogue-of-st-catherine': { chapters: 94, parts: 4, words: 81926, opens: 'The soul, who is lifted by a very great and yearning desire for the honor of God and the s', lastTitle: 'Letter of Ser Barduccio di Piero Canigiani, containing the Transit of the Seraphic Virgin, Saint Catherine of Siena, to Sister Catherine Petriboni in the Monastery of San Piero a Monticelli near Florence. In the Name of Jesus Christ.' },
   'life-of-st-teresa': { chapters: 41, parts: 0, words: 138690, opens: 'As I have been commanded and left at liberty to describe at length my way of prayer', lastTitle: 'Chapter XL. Visions, Revelations, and Locutions.' },
   'imitation-of-christ': { chapters: 114, parts: 4, words: 59423, opens: 'He that followeth me shall not walk in darkness, saith the Lord.', lastTitle: 'Chapter XVIII. That a man should not be a curious searcher of the Sacrament, but a humble imitator of Christ, submitting his sense to holy faith' },
   confessions: { chapters: 13, parts: 0, words: 111775, opens: 'Great art Thou, O Lord, and greatly to be praised; great is Thy power', lastTitle: 'Book XIII' },
@@ -93,7 +96,7 @@ check('every book of the catalogue is either in the index or in the manifest as 
   assert.deepEqual([...ids, ...left].sort(), [...catalogIds].sort());
   for (const l of manifest.leftOut) {
     assert.notEqual(l.verdict, 'public domain everywhere', `${l.id}: a book that is left out is not public domain everywhere`);
-    assert.ok(['US only', 'unclear'].includes(l.verdict), l.id);
+    assert.ok(['US only', 'unclear', 'no clean text'].includes(l.verdict), l.id);
     assert.ok(l.why.trim().length > 40, `${l.id} says why`);
   }
 });
@@ -105,15 +108,16 @@ check('the files of the assets folder are exactly the index, the manifest and on
 
 /* ================================================================ the shape of every book */
 
-check('every book is a BookText of the contract: id, title and author as the catalogue has them, a translator, a credit, and chapters c1..cN in reading order', () => {
+check('every book is a BookText of the contract: id, title and author as the catalogue has them, its translator when it has a named one, a credit, and chapters c1..cN in reading order', () => {
   for (const id of ids) {
     const b = book(id);
-    assert.deepEqual(Object.keys(b), ['id', 'title', 'author', 'translator', 'credit', 'chapters'], id);
+    const m = manifest.books.find((x) => x.id === id)!;
+    assert.deepEqual(Object.keys(b), m.translator === null ? ['id', 'title', 'author', 'credit', 'chapters'] : ['id', 'title', 'author', 'translator', 'credit', 'chapters'], id);
     assert.equal(b.id, id);
     const cat = BOOK_CATALOG.find((c) => c.id === id)!;
     assert.equal(b.title, cat.title, `${id}: the title of the text is the title of the catalogue`);
     assert.equal(b.author, cat.author, `${id}: the author of the text is the author of the catalogue`);
-    assert.ok(b.translator && b.translator.trim() === b.translator, `${id} names its translator`);
+    assert.ok(m.translator === null ? b.translator === undefined : b.translator === m.translator && b.translator.trim() === b.translator, `${id} names its translator, or has none named`);
     assert.deepEqual(b.chapters.map((c) => c.id), b.chapters.map((_, i) => `c${i + 1}`), `${id}: ids are c1..cN`);
   }
 });
@@ -207,10 +211,16 @@ check('no double space, no tab or no-break space, no space at an end, and no str
   assert.deepEqual(offenders((t, k) => k !== 'hr' && t.length === 0), []);
 });
 
-check('no footnote marks and no page numbers: no [12] or (12) left in the books whose footnotes were dropped, and no block that is only a number', () => {
+// The mark each edition used for its footnotes, which the importer took out with the notes: (1) in the Imitation, [1] in the others. Where the author
+// himself writes "(1) ... (2) ..." in a sentence (the Devout Life does) that is his text and stays.
+const NOTE_MARK: Record<string, RegExp> = { 'imitation-of-christ': /\(\d{1,2}\)/ };
+const noteMark = (id: string) => NOTE_MARK[id] ?? /\[\d{1,3}\]/;
+
+check('no footnote marks and no page numbers: none of the mark the edition used is left in a book whose footnotes were dropped, and no block is only a number', () => {
   assert.deepEqual(offenders((t) => /^[\[(]?\d+[\])]?\.?$/.test(t) || /^[IVXLCDM]+\.?$/.test(t)), []);
-  assert.deepEqual(ids.flatMap((id) => (manifest.books.find((m) => m.id === id)!.dropped.footnotes ?? 0) > 0
-    ? blocksWithId().filter((x) => x.id === id && /\[\d{1,2}\]|\(\d{1,2}\)/.test(textOf(x.blk))).map((x) => `${id} ${x.chapter}: ${textOf(x.blk).slice(0, 60)}`) : []), []);
+  const dropped = ids.filter((id) => (manifest.books.find((m) => m.id === id)!.counts.footnotes ?? 0) > 0);
+  assert.ok(dropped.length >= 4, 'the books whose footnotes were dropped are checked');
+  assert.deepEqual(dropped.flatMap((id) => blocksWithId().filter((x) => x.id === id && noteMark(id).test(textOf(x.blk))).map((x) => `${id} ${x.chapter}: ${textOf(x.blk).slice(0, 60)}`)), []);
 });
 
 check('the text is not scraps: every paragraph is a sentence or part of one (no paragraph of one or two characters, none that is only punctuation)', () => {
@@ -220,7 +230,7 @@ check('the text is not scraps: every paragraph is a sentence or part of one (no 
 
 check('the text keeps its accents and dashes (a cleaning step that turned them into "?" or "\\u" would show here)', () => {
   assert.deepEqual(offenders((t) => /\?{2,}|\\u[0-9a-f]{4}|\ufffd/i.test(t)), []);
-  assert.deepEqual(offenders((t) => /--/.test(t)), [], 'a dash made of two hyphens is an em dash');
+  assert.deepEqual(offenders((t) => /(?<!-)-{2,3}(?!-)/.test(t)), [], 'a dash made of two or three hyphens is an em dash (a longer run is a blank line of a form)');
   assert.ok(blocksWithId().some(({ blk }) => textOf(blk).includes('\u2014')), 'em dashes are there');
 });
 
@@ -235,13 +245,18 @@ check('the manifest names the sha256 of every asset, and it is the sha256 of the
   }
 });
 
-check('every book of the index has the licence verdict "public domain everywhere", a translator who died in 1955 or earlier and a first publication in 1930 or earlier', () => {
+check('every book of the index has the licence verdict "public domain everywhere": a translator who died in 1955 or earlier, or none named in an edition older than 1900, and a first publication in 1930 or earlier', () => {
   for (const id of ids) {
     const m = manifest.books.find((x) => x.id === id)!;
     assert.equal(m.verdict, 'public domain everywhere', id);
-    assert.ok(m.translatorDied !== null && m.translatorDied <= 1955, `${id}: the translator died in ${m.translatorDied}`);
     assert.ok(m.firstPublished <= 1930, `${id}: first published in ${m.firstPublished}`);
-    assert.equal(m.translator, book(id).translator, id);
+    if (m.translator === null) {
+      assert.ok(m.firstPublished < 1900 && m.translatorDied === null && /not named/.test(m.basis), `${id}: an anonymous translation must be older than 1900 (it is of ${m.firstPublished})`);
+    } else {
+      assert.ok(m.translatorDied !== null && m.translatorDied <= 1955, `${id}: the translator died in ${m.translatorDied}`);
+    }
+    assert.equal(m.translator, book(id).translator ?? null, id);
+    assert.ok(m.basis.length > 20, `${id}: the rule applied to this book is written down`);
     assert.match(m.translatorSource, /^https:\/\//, `${id}: the page where the translator's dates were read`);
     assert.match(m.source, /^https:\/\//, id);
     assert.ok(m.edition.length > 20 && m.leftOut.length > 0, `${id}: the edition and what was left out are written down`);
@@ -253,9 +268,11 @@ check('the credit line names the translator, the year, the source and the licenc
     const b = book(id);
     const m = manifest.books.find((x) => x.id === id)!;
     assert.equal(b.credit, m.credit, id);
-    assert.ok(b.credit.includes(b.translator!), `${id}: the credit names ${b.translator}`);
+    if (m.translator !== null) {
+      assert.ok(b.credit.includes(m.translator), `${id}: the credit names ${m.translator}`);
+      assert.ok(b.credit.includes(String(m.translatorDied)), `${id}: the credit names the year the translator died`);
+    } else assert.match(b.credit, /translator not named/, `${id}: the credit says the translator is not named`);
     assert.ok(b.credit.includes(String(m.firstPublished)), `${id}: the credit names the year`);
-    assert.ok(b.credit.includes(String(m.translatorDied)), `${id}: the credit names the year the translator died`);
     assert.ok(/gutenberg\.org\/ebooks\/\d+|ccel\.org\/ccel\//.test(b.credit), `${id}: the credit names the source`);
     assert.match(m.source, /gutenberg\.org\/ebooks\/\d+$|ccel\.org\/ccel\//, id);
     assert.match(b.credit, /Public domain\.$/, id);
@@ -282,17 +299,21 @@ check('the size of the assets is known and kept in check: under 8 MB all togethe
 check('the licences screen has one entry for every book that has text: it is made from the manifest, so it cannot fall behind, and each entry is "Public domain" with the translator, the year and the page of the edition', () => {
   const src = read('app/licences.tsx');
   const code = src.split('\n').filter((l) => !/^\s*\/\//.test(l)).join('\n');
-  assert.match(code, /type ManifestBook = \{ title: string; author: string; translator: string; firstPublished: number; source: string \};/);
+  assert.match(code, /type ManifestBook = \{ title: string; author: string; translator: string \| null; firstPublished: number; source: string \};/);
   assert.match(code, /const BOOKS: Item\[\] = \(require\('\.\.\/assets\/books\/manifest\.json'\) as \{ books: ManifestBook\[\] \}\)\.books\.map\(\(b\) => \(\{/);
-  assert.match(code, /name: b\.title,/);
-  assert.match(code, /what: `\$\{b\.author\}, translated by \$\{b\.translator\} \(\$\{b\.firstPublished\}\)\. The full text of the book, to read offline`,/);
-  assert.match(code, /licence: 'Public domain',/);
-  assert.match(code, /url: b\.source,/);
+  // the four fields are looked for inside the BOOKS list itself: other lists of the screen have a "licence: 'Public domain'" of their own
+  const from = code.indexOf('const BOOKS: Item[]');
+  const list = code.slice(from, code.indexOf('}));', from) + 4);
+  assert.ok(from >= 0 && list.length > 100, 'the BOOKS list is found');
+  assert.match(list, /\n  name: b\.title,\n/);
+  assert.match(list, /\n  what: `\$\{b\.author\}, \$\{b\.translator \? `translated by \$\{b\.translator\}` : 'translator not named'\} \(\$\{b\.firstPublished\}\)\. The full text of the book, to read offline`,\n/);
+  assert.match(list, /\n  licence: 'Public domain',\n/);
+  assert.match(list, /\n  url: b\.source,\n\}\)\);$/);
   assert.match(code, /\{BOOKS\.length > 0 && <Group title="BOOKS IN THE LIBRARY" items=\{BOOKS\} \/>\}/, 'drawn only when there is a book');
   assert.equal(existsSync(join(root, 'assets/books/manifest.json')), true, 'the file the screen requires is there');
   // what the screen will print for each book of the manifest is complete: no "undefined" and no "null" can reach it
   for (const m of manifest.books) {
-    assert.ok(m.title && m.author && m.translator && Number.isInteger(m.firstPublished), `${m.id}: the fields the entry prints`);
+    assert.ok(m.title && m.author && Number.isInteger(m.firstPublished) && (m.translator === null || m.translator.length > 0), `${m.id}: the fields the entry prints`);
     assert.match(m.source, /^https:\/\//, `${m.id}: the link opens`);
     assert.equal(m.verdict, 'public domain everywhere', `${m.id}: an entry that says "Public domain" is only made for a book that is`);
   }

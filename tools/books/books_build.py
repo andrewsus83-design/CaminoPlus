@@ -59,7 +59,7 @@ class Collector:
         self._current(line).blocks.append({"k": "hr"})
 
     def paragraph(self, block: Block, *, markers: re.Pattern[str] | None = None, allow_quote: bool = True,
-                  verse: bool = False, kind: str | None = None) -> list[int]:
+                  verse: bool = False, kind: str | None = None, base: int = 0) -> list[int]:
         """The block as the edition set it: a row of asterisks is a break, an indented block is a quotation (a poem keeps its lines when
         `verse` is true), anything else is a paragraph. `markers` is the footnote mark to take out of the text; the numbers found are
         returned in order."""
@@ -69,7 +69,7 @@ class Collector:
         flat = block.flat()
         if len(flat.split()) <= 12 and (_HEADING_WORD.match(flat) or (sum(ch.isalpha() for ch in flat) >= 2 and not any(ch.islower() for ch in flat))):
             raise BookError(self.book, block.no, f"a heading that no rule of the recipe takes: {flat[:80]!r}")
-        quote = block.indent >= 2 and kind is None
+        quote = block.indent >= base + 2 and kind is None  # `base` is the indent of the paragraphs of the file (3 in a CCEL text)
         if quote and not allow_quote:
             raise BookError(self.book, block.no, f"an indented block where none is expected: {block.text[:60]!r}")
         numbers: list[int] = []
@@ -104,5 +104,6 @@ def markers_out(col: Collector, text: str, pattern: re.Pattern[str], numbers: li
 
     cleaned, found = strip_markers(text, pattern)
     numbers.extend(found)
-    col.stats["footnote marks"] += len(found)
+    if found:
+        col.stats["footnote marks"] += len(found)
     return tidy(cleaned)
