@@ -5,7 +5,7 @@ This folder holds everything needed to make on-brand social media content for Ca
 | File | What it is |
 |---|---|
 | [BRAND_GUIDELINE.md](BRAND_GUIDELINE.md) | Who we are, voice, logo, colour, type, photography, layout rules for social. |
-| [POSITIONING.md](POSITIONING.md) | What we sell: the stance, the four pillars (the road to Emmaus), the faith lane, and what we may say about the app today. |
+| [POSITIONING.md](POSITIONING.md) | What we sell: the stance, the four pillars (Listen, Meet, Remember, Share), the faith lane, and what we may say about the app today. |
 | [content-factory/README.md](content-factory/README.md) | How the content plan factory works, step by step. |
 | [content-factory/pillars-and-formats.md](content-factory/pillars-and-formats.md) | The 5 content pillars, the 10 repeatable formats, weekly cadence, seasonality. |
 | [content-factory/platforms.md](content-factory/platforms.md) | Platform playbook: Pinterest, YouTube Shorts, Threads, X, WhatsApp Channel and more, plus the repurpose map and size cheat sheet. |

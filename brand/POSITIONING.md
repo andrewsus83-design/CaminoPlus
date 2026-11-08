@@ -25,14 +25,16 @@ Faith is never hidden, and never the price of entry.
 
 We are not "anti social media". The app has friends, chat and likes. We are social media slowed down: you choose who sees a post, and the walk comes first.
 
-## 3. Four pillars: the road to Emmaus (Luke 24:13-35)
+## 3. The four pillars: Listen, Meet, Remember, Share
 
-Two travellers walk, a stranger joins them, their hearts burn as he speaks, they know him at the table, and they run back to tell the others. Four steps, in this order. **(Decided: the four steps. The wording below is a draft.)**
+**(Decided: the four pillars, their names and their order. The draft lines in the table can still change.)**
+
+The order follows a day on the Camino: a quiet morning, people in the afternoon and evening, then the night when you keep the day and send a piece of it to the few who matter. The road to Emmaus (Luke 24:13-35) holds all four: a stranger joins two walkers, their hearts burn as he speaks, they know him at the table, and they run back to tell the others. Emmaus puts the meeting first; the Camino day starts with the quiet, as Jesus did (Mark 1:35).
 
 | # | Pillar | Draft line | Built today | Ideas, not decided |
 |---|---|---|---|---|
-| 1 | **Walk together** | You never walk alone. | Friends, chat, group chat, group plans, an "Invite friends" link | Pilgrims on your stage: opt-in, approximate place (stage, not GPS), friends first |
-| 2 | **Hear the voice** | Turn the noise down. | Offline-first map and GPS (Pilgrim Plus), a private diary on the phone, a daily reading screen (sample today) | A quiet-while-walking mode that mutes like notifications on a walking day |
+| 1 | **Listen** | Turn the noise down. | Offline-first map and GPS (Pilgrim Plus), a private diary on the phone, a daily reading screen (sample today) | A quiet-while-walking mode that mutes like notifications on a walking day |
+| 2 | **Meet** | You never walk alone. | Friends, chat, group chat, group plans, an "Invite friends" link | Pilgrims on your stage: opt-in, approximate place (stage, not GPS), friends first |
 | 3 | **Remember** | Treasure the moment. | Journey posts with a choice of who sees them, passport stamps, 5 GB cloud backup of posts, photos, stamps and plan (Pilgrim Plus), data export | "On this day" and "one year on". **Gap:** the private diary is phone-only and not backed up |
 | 4 | **Share** | Share with the few. | The share sheet sends the pilgrim's own words and a link; the invite link | A keepsake card (stage, stamp, one line, small logo); sharing to a family WhatsApp group |
 
@@ -49,12 +51,14 @@ Two travellers walk, a stranger joins them, their hearts burn as he speaks, they
 
 | Persona | Leads with | Then |
 |---|---|---|
-| Dreamer | Hear the voice | Walk together |
-| Planner | Every step, even offline | Walk together |
+| Dreamer | Listen | Meet |
+| Planner | Every step, even offline | Meet |
 | Walker | All four | |
 | Returner | Remember | Share |
 
-Content formats from [`pillars-and-formats.md`](content-factory/pillars-and-formats.md): Walk together → F08 Pilgrim Story, F09 Ask the Camino. Hear the voice → F04 Trail Moment, F05 Reflection. Remember → F01 Stage Card, plus a new "one year on" format. Share → "Walk with me" invitations and keepsake cards, once they exist.
+**Message pillars and content pillars are different things.** The four message pillars above are *what we say*. The five content pillars in [`pillars-and-formats.md`](content-factory/pillars-and-formats.md) (Inspire, Guide, Product, Community, Culture) are the monthly planning mix. A post has one of each.
+
+Suggested formats per message pillar: Listen → F04 Trail Moment, F05 Reflection. Meet → F08 Pilgrim Story, F09 Ask the Camino. Remember → F01 Stage Card, plus a new "one year on" format. Share → "Walk with me" invitations and keepsake cards, once they exist.
 
 ## 5. Faith lane
 
@@ -101,10 +105,10 @@ Content formats from [`pillars-and-formats.md`](content-factory/pillars-and-form
 
 ## 8. Open decisions
 
-1. Master line for the front door: "Listen. Meet. Remember." or the four steps in plain words.
-2. Final wording of the four pillar lines.
-3. Which invitation line leads the faith lane.
-4. Whether the public site names the four steps.
+1. Final wording of the four draft lines under the pillar names.
+2. Which invitation line leads the faith lane.
+3. Whether ads and the public site show the pillars by name, as one line: "Listen. Meet. Remember. Share."
+4. Whether the five content pillars in the content factory get a new name, so "pillar" means only one thing.
 
 ---
 
@@ -112,7 +116,7 @@ Content formats from [`pillars-and-formats.md`](content-factory/pillars-and-form
 
 - **Sikap:** CaminoPlus adalah pendamping untuk the Way yang berakar Kristen, dan setiap pejalan diterima.
 - **Ide:** momen yang disimpan. Seperti Facebook awal yang menangkap momen, bukan hype. 5 GB ada supaya orang bisa mengenang kembali momen bersama Tuhan.
-- **Empat pilar (jalan Emmaus):** berjalan bersama, mendengar suara, mengenang, membagikan. Di bawahnya janji dan bukti: *Every step of the Way, even offline.*
+- **Empat pilar:** **Listen** (mendengar suara), **Meet** (berjalan bersama), **Remember** (mengenang), **Share** (membagikan). Urutannya mengikuti satu hari di Camino, dan kisah Emmaus memuat keempatnya. Di bawahnya janji dan bukti: *Every step of the Way, even offline.*
 - **Jujur soal fitur:** Alkitab sedang disiapkan, scavenger hunt menyusul, audio paling cepat setahun lagi, semua data contoh akan dihapus. Fitur yang masih ide jangan diiklankan.
 - **Iman:** mengundang, tidak menjanjikan hasil rohani. Satu ayat per posting, selalu dengan rujukannya.
 - **Sebelum rilis:** cek teolog, tinjau privasi (data keyakinan agama), putuskan cadangan diary.

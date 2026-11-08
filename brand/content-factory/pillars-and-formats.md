@@ -2,6 +2,8 @@
 
 ## Content pillars
 
+These five are the monthly planning mix. They are not the brand's message pillars (Listen, Meet, Remember, Share): those are in [`../POSITIONING.md`](../POSITIONING.md), and each post carries one of them as well.
+
 | # | Pillar | Share | Goal | Persona | Topics |
 |---|---|---|---|---|---|
 | P1 | **Inspire** (The Way) | 30% | Reach, follows | Dreamer, Returner | Landscapes, routes, small moments, reflections, "why people walk" |
