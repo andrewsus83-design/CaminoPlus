@@ -200,6 +200,74 @@ textarea.cp-input { height: 120px; border-radius: var(--cp-radius-lg); padding: 
 .lib-cover > .cp-icon { width: 28px; height: 28px; }
 .lib-cover .lib-mark { position: absolute; top: 4px; right: 4px; color: var(--cp-color-blue); }
 .lib-kind { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; font-size: 15px; line-height: 21px; letter-spacing: .4px; font-weight: 500; color: var(--cp-text-muted); }
+/* Books and notes: a book on its own screen, the reader with the side marks of notes, the note sheet, the reflection prompt and the Notebook
+   (features/library and features/notes in the app). The reading size is 19 on 30; the margin of the page is 28 wide and holds the marks. */
+.bk-card { border-radius: var(--cp-radius-lg); padding: 20px 24px 24px; min-height: 220px; display: flex; flex-direction: column; justify-content: space-between; gap: 28px; position: relative; color: var(--cp-color-blue); }
+.bk-card > .cp-icon { width: 36px; height: 36px; }
+.bk-card .lib-mark { position: absolute; top: 14px; right: 14px; color: var(--cp-color-blue); }
+.bk-card .ti { font-family: var(--cp-font-title); font-weight: 600; font-size: 28px; line-height: 34px; letter-spacing: -.25px; margin: 0 0 8px; }
+.bk-card .st { font-size: 17px; line-height: 25px; }
+.bk-meta { font-size: 17px; line-height: 22px; font-weight: 600; color: var(--cp-text-muted); }
+.bk-row { display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 10px 16px; border-top: 1px solid var(--cp-border); }
+.bk-row:first-child { border-top: 0; }
+.bk-row .t { font-weight: 600; font-size: 17px; line-height: 22px; }
+.bk-row .n { font-size: 15px; line-height: 21px; letter-spacing: .4px; font-weight: 500; color: var(--cp-text-muted); }
+.bk-row > .cp-icon { width: 20px; height: 20px; color: var(--cp-text-muted); flex: none; }
+.bk-row > .cp-icon.kept { width: 18px; height: 18px; color: var(--cp-action); fill: currentColor; }
+.bk-read { display: flex; flex-direction: column; gap: 18px; }
+.bk-read p { margin: 0; font-size: 19px; line-height: 30px; }
+.bk-read h4 { font-family: var(--cp-font-title); font-weight: 600; font-size: 24px; line-height: 30px; margin: 10px 0 0; }
+.bk-read .cap { font-size: 15px; line-height: 21px; letter-spacing: .4px; font-weight: 500; color: var(--cp-text-muted); }
+.bk-read .ti { font-family: var(--cp-font-title); font-weight: 600; font-size: 28px; line-height: 34px; letter-spacing: -.25px; margin: 0; }
+.bk-quote { border-left: 3px solid var(--cp-color-gold); padding-left: 16px; display: flex; flex-direction: column; gap: 12px; }
+.bk-quote .by { font-size: 17px; line-height: 25px; color: var(--cp-text-muted); }
+.bk-line { display: flex; }
+.bk-line > .t { flex: 1; min-width: 0; }
+.bk-line > .g { width: 28px; padding-top: 3px; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+.bk-mark { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; background: var(--cp-color-gold-wash); box-shadow: inset 0 0 0 1px var(--cp-color-gold-soft); color: var(--cp-color-gold-ink); }
+.bk-mark .cp-icon { width: 13px; height: 13px; }
+.bk-kept { width: 24px; display: grid; place-items: center; color: var(--cp-action); }
+.bk-kept .cp-icon { width: 17px; height: 17px; fill: currentColor; }
+.bk-sel { background: var(--cp-surface-sunken); border-radius: var(--cp-radius-sm); margin: 0 -8px; padding: 6px 8px; }
+.bk-act { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.bk-act span { min-height: 44px; display: inline-flex; align-items: center; gap: 8px; padding: 0 16px; border-radius: var(--cp-radius-pill); background: var(--cp-surface); box-shadow: inset 0 0 0 1px var(--cp-border); font-weight: 600; font-size: 17px; }
+.bk-act span .cp-icon { width: 20px; height: 20px; }
+.bk-act span .cp-icon.on { fill: currentColor; }
+.bk-ask { border-left: 4px solid var(--cp-color-gold); padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+.bk-ask .ey { font-family: var(--cp-font-mono); font-size: 12px; line-height: 22px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--cp-text-muted); }
+.bk-ask .q { display: flex; gap: 10px; }
+.bk-ask .q i { width: 14px; text-align: center; font-style: normal; color: var(--cp-text-accent); }
+.bk-ask p { margin: 0; font-size: 19px; line-height: 28px; }
+.bk-pill { min-height: 56px; display: flex; align-items: center; justify-content: center; border-radius: var(--cp-radius-pill); font-weight: 600; font-size: 17px; background: var(--cp-action); color: var(--cp-on-action); }
+.bk-pill.ghost { background: var(--cp-surface); color: var(--cp-text); box-shadow: inset 0 0 0 1px var(--cp-border); }
+.bk-next { display: flex; align-items: center; gap: 12px; min-height: 68px; padding: 12px 18px; border-radius: var(--cp-radius-lg); background: var(--cp-surface); box-shadow: inset 0 0 0 1px var(--cp-border); }
+.bk-next > div { flex: 1; min-width: 0; }
+.bk-next .a { font-size: 15px; line-height: 21px; letter-spacing: .4px; font-weight: 500; color: var(--cp-text-muted); }
+.bk-next .b { font-weight: 600; font-size: 17px; line-height: 22px; }
+.bk-next > .cp-icon { width: 22px; height: 22px; color: var(--cp-text-muted); flex: none; }
+.nt-dim { position: absolute; left: 0; right: 0; top: 54px; bottom: 0; z-index: 7; background: rgba(20, 54, 93, .45); }
+.nt-sheet { position: absolute; left: 0; right: 0; bottom: 0; z-index: 8; background: var(--cp-bg); border-radius: var(--cp-radius-lg) var(--cp-radius-lg) 0 0; padding: 20px var(--cp-screen-margin) 34px; display: flex; flex-direction: column; gap: 14px; }
+.nt-sheet .hd { display: flex; align-items: center; justify-content: space-between; }
+.nt-sheet .hd .x { width: 44px; height: 44px; display: grid; place-items: center; }
+.nt-sheet .hd .x .cp-icon { width: 26px; height: 26px; }
+.nt-quote { border-left: 3px solid var(--cp-color-gold); padding-left: 14px; font-size: 17px; line-height: 25px; color: var(--cp-text-muted); }
+.nt-card { background: var(--cp-surface); border-radius: var(--cp-radius-md); box-shadow: inset 0 0 0 1px var(--cp-border); padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+.nt-card p { margin: 0; font-size: 19px; line-height: 28px; }
+.nt-btns { display: flex; flex-wrap: wrap; gap: 8px; }
+.nt-btns span { min-height: 44px; display: inline-flex; align-items: center; padding: 0 16px; border-radius: var(--cp-radius-pill); background: var(--cp-bg); box-shadow: inset 0 0 0 1px var(--cp-border); font-weight: 600; font-size: 17px; }
+.nt-field { background: var(--cp-surface); border-radius: var(--cp-radius-lg); box-shadow: inset 0 0 0 2px var(--cp-color-gold); min-height: 140px; padding: 14px 18px; font-size: 19px; line-height: 28px; color: var(--cp-text-placeholder); }
+.nt-small { font-size: 15px; line-height: 21px; letter-spacing: .4px; font-weight: 500; color: var(--cp-text-muted); }
+.nt-chip { align-self: flex-start; height: 24px; padding: 0 10px; border-radius: var(--cp-radius-pill); display: inline-flex; align-items: center; background: var(--cp-color-gold-wash); box-shadow: inset 0 0 0 1px var(--cp-color-gold-soft); color: var(--cp-color-gold-ink); font-family: var(--cp-font-mono); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; }
+.nt-link { display: flex; align-items: center; gap: 14px; min-height: 72px; padding: 12px 16px; border-radius: var(--cp-radius-lg); background: var(--cp-surface); box-shadow: var(--cp-shadow-sm); }
+.nt-link .ic, .nt-empty .ic { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: var(--cp-color-gold-wash); box-shadow: inset 0 0 0 1px var(--cp-color-gold-soft); color: var(--cp-color-gold-ink); flex: none; }
+.nt-link > div { flex: 1; min-width: 0; }
+.nt-link .cp-icon { width: 22px; height: 22px; }
+.nt-link > .cp-icon { color: var(--cp-text-muted); }
+.nt-row { display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; border-top: 1px solid var(--cp-border); min-height: 64px; }
+.nt-row:first-child { border-top: 0; }
+.nt-row p { margin: 0; font-size: 17px; line-height: 25px; }
+.nt-search { height: 52px; display: flex; align-items: center; gap: 8px; padding: 0 5px 0 17px; border-radius: var(--cp-radius-pill); background: var(--cp-surface); box-shadow: inset 0 0 0 1px var(--cp-border); font-size: 17px; color: var(--cp-text-muted); }
+.nt-search .cp-icon { width: 22px; height: 22px; color: var(--cp-text); }
 .cp-switch { width: 52px; height: 32px; border-radius: var(--cp-radius-pill); background: var(--cp-border-strong); position: relative; flex: none; }
 .cp-switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 26px; height: 26px; border-radius: 50%; background: var(--cp-surface); box-shadow: var(--cp-shadow-sm); transition: left var(--cp-duration-base); }
 .cp-switch.on { background: var(--cp-color-blue); }
@@ -1709,7 +1777,8 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
   </div>
   <p class="spec" style="margin-top:16px">.cp-tabbar · height 72 · radius pill · shadow-lg · icon 24 in 52×32 pill · label 12/500 (active 700)</p>
   <p class="note" style="margin-top:12px;max-width:760px"><b>Settings is not a tab.</b> It opens from the gear at the top right of Me, next to the inbox bell, as a screen of its own: a back button on the left, light/dark and log out on the right, and no tab bar under it. <b>Library</b> is the fifth tab. It has no title: the row on top is a search field, then the round Bookmarks button, then the round diary button in the corner (the same size as the bell and the gear on Me), and under it a banner and the tabs Bible, Books and Music. Until we have chosen what we may include, those three tabs show example content and say so. <b>The diary</b> (Library, My diary) keeps its pages only on the phone: the list says so, nothing is uploaded, logging out keeps the pages, deleting the account deletes them, and a page is saved as it is typed, so there is no Save button.</p>
-  <p class="note" style="margin-top:12px;max-width:760px"><b>Library search</b> looks through all three tabs at once, as you type, and lists what it finds grouped by tab (Bible, Books, Music) under one Preview notice. A word counts when it starts a word of a row (its title, the line under it, or the name of the tab), so "music" lists the music rows. With nothing found it says "Nothing found for ..." and offers Clear search; clearing the field brings the banner and the tabs back. <b>Bookmarks</b> is a screen of its own, opened from the round button next to the diary: a back button, no tab bar, then two parts. Library lists the rows bookmarked from the tabs; they stay only on the phone and logging out clears them, and each is still an example. Posts lists the posts bookmarked in the journey viewer; they stay with the account, and with no signal the list from the last visit is shown, with a line that says so. A row that is taken off stays in place, with an empty bookmark, until the screen is left, so a slip can be put back with one tap.</p>
+  <p class="note" style="margin-top:12px;max-width:760px"><b>Library search</b> looks through all three tabs at once, as you type, and lists what it finds grouped by tab (Bible, Books, Music). A word counts when it starts a word of a row: its title, the line under it, for a book its subtitle and its kind (Guide, Readings), or the name of the tab, so "music" lists the music rows. The Books tab is real: the books are in the app and open without a signal. The Bible and Music rows are still examples, so the Preview notice appears only while one of them is in the results, and says which. With nothing found it says "Nothing found for ..." and offers Clear search; clearing the field brings the banner and the tabs back. <b>Bookmarks</b> is a screen of its own, opened from the round button next to the diary: a back button, no tab bar, a quiet row that opens the Notebook, then two parts. Library lists what was bookmarked in the Books tab and in the books (a book, a chapter or day, a paragraph, each opening the exact place) and the rows bookmarked in the Bible and Music tabs, which are examples and say so while one is on the screen; they stay only on the phone and logging out clears them. Posts lists the posts bookmarked in the journey viewer; they stay with the account, and with no signal the list from the last visit is shown, with a line that says so. A row that is taken off stays in place, with an empty bookmark, until the screen is left, so a slip can be put back with one tap.</p>
+  <p class="note" style="margin-top:12px;max-width:760px"><b>Books and notes.</b> A book opens on its own screen (cover colour, title, what it is and how long it reads, Continue reading, the chapters or days with their minutes, and who made it and how, exactly as the bundle says). The reader draws a chapter as it was written: a tap on a paragraph shows Add a note and Bookmark under it, a long press writes a note at once, and a small mark in the margin shows what a paragraph carries. A day of a reflection book ends with its questions as the reflection prompt and the button Write your reflection. <b>Notes are side notes, not a feed</b>: private, only on the phone, anchored to a paragraph, a chapter or a day, with the words they were made on; a note can grow into a page of the diary. There is nothing to share and no count of anything. The Notebook lists them by book and chapter, with a plain search; logging out clears the notes (the diary stays).</p>
 </section>
 
 <!-- =================================================================== BUSINESS -->
@@ -2679,30 +2748,25 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     </div>
 
     <div class="phone-wrap">
-      <p class="phone-label"><b>Library · Search</b>All three tabs at once · grouped by tab</p>
+      <p class="phone-label"><b>Library · Search</b>All three tabs at once · grouped by tab · a notice only for examples</p>
       <div class="phone">
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
         <div class="scroll">
           <div class="lib-head">
-            <div class="lib-search"><svg class="cp-icon"><use href="#i-search"/></svg><span class="t typed">pray</span><span class="x"><svg class="cp-icon"><use href="#i-x"/></svg></span></div>
+            <div class="lib-search"><svg class="cp-icon"><use href="#i-search"/></svg><span class="t typed">reading</span><span class="x"><svg class="cp-icon"><use href="#i-x"/></svg></span></div>
             <button class="cp-icon-btn flat" aria-label="Bookmarks"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button>
             <button class="cp-icon-btn flat" aria-label="My diary"><svg class="cp-icon"><use href="#i-diary"/></svg></button>
           </div>
-          <div class="lib-notice" style="margin-top:16px">
-            <svg class="cp-icon"><use href="#i-flag"/></svg>
-            <div><div class="h">Preview</div><div class="p">These results are examples. The Bible text, books and music are not in the app yet.</div></div>
-          </div>
-          <p class="note" style="margin:16px 0 0">2 results for “pray”</p>
+          <div class="lib-notice" style="margin-top:16px"><svg class="cp-icon"><use href="#i-flag"/></svg><div><div class="h">Preview</div><div class="p">The Bible results are examples. The Bible text is not in the app yet.</div></div></div>
+          <p class="note" style="margin:16px 0 0">3 results for “reading”</p>
           <div class="lib-label" style="margin-top:24px">Bible · 1</div>
           <div class="cp-card" style="margin-top:16px;padding:4px">
-            <div class="lib-row"><svg class="cp-icon"><use href="#i-book"/></svg><div style="flex:1;min-width:0;display:flex;flex-direction:column"><div class="t">Prayers for the road</div><div class="n">Morning, evening and the pilgrim blessing</div><span class="lib-chip soon" style="margin-top:6px">Soon</span></div><button class="lib-mark on" aria-label="Remove bookmark: Prayers for the road"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+            <div class="lib-row"><svg class="cp-icon"><use href="#i-book"/></svg><div style="flex:1;min-width:0;display:flex;flex-direction:column"><div class="t">Reading plans</div><div class="n">One reading for each stage of your Camino</div><span class="lib-chip soon" style="margin-top:6px">Soon</span></div><button class="lib-mark" aria-label="Bookmark: Reading plans"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
           </div>
-          <div class="lib-label" style="margin-top:24px">Books · 1</div>
+          <div class="lib-label" style="margin-top:24px">Books · 2</div>
           <div class="lib-covers" style="margin-top:16px">
-            <div>
-              <div class="lib-cover" style="background:var(--cp-success-wash)"><svg class="cp-icon"><use href="#i-book"/></svg>Prayers and blessings<button class="lib-mark" aria-label="Bookmark: Prayers and blessings"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
-              <div class="lib-kind"><span>Prayer</span><span class="lib-chip sample">Sample</span></div>
-            </div>
+            <div><div class="lib-cover" style="background:var(--cp-success-wash)"><svg class="cp-icon"><use href="#i-book"/></svg>The Quiet Road<button class="lib-mark" aria-label="Bookmark: The Quiet Road"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div><div class="lib-kind"><span>Readings · 2 h 45 min</span></div></div>
+            <div><div class="lib-cover" style="background:var(--cp-color-blue-100)"><svg class="cp-icon"><use href="#i-book"/></svg>Toward the Sunset<button class="lib-mark" aria-label="Bookmark: Toward the Sunset"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div><div class="lib-kind"><span>Readings · 40 min</span></div></div>
           </div>
         </div>
         <div class="fab-slot"><button class="cp-fab-write" aria-label="Write in your diary"><svg class="cp-icon "><use href="#i-compose"/></svg></button></div>
@@ -2718,7 +2782,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     </div>
 
     <div class="phone-wrap">
-      <p class="phone-label"><b>Library · Nothing found</b>A calm empty state · Clear search</p>
+      <p class="phone-label"><b>Library · Nothing found</b>A calm empty state · Clear search · no notice: nothing here is an example</p>
       <div class="phone">
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
         <div class="scroll">
@@ -2727,10 +2791,6 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
               <div class="lib-search"><svg class="cp-icon"><use href="#i-search"/></svg><span class="t typed">zzz</span><span class="x"><svg class="cp-icon"><use href="#i-x"/></svg></span></div>
               <button class="cp-icon-btn flat" aria-label="Bookmarks"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button>
               <button class="cp-icon-btn flat" aria-label="My diary"><svg class="cp-icon"><use href="#i-diary"/></svg></button>
-            </div>
-            <div class="lib-notice">
-              <svg class="cp-icon"><use href="#i-flag"/></svg>
-              <div><div class="h">Preview</div><div class="p">These results are examples. The Bible text, books and music are not in the app yet.</div></div>
             </div>
             <div class="cp-card" style="padding:32px 20px;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center">
               <span style="width:64px;height:64px;border-radius:50%;background:var(--cp-surface-sunken);display:grid;place-items:center"><svg class="cp-icon" style="width:30px;height:30px;color:var(--cp-text-muted)"><use href="#i-search"/></svg></span>
@@ -2753,26 +2813,34 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     </div>
 
     <div class="phone-wrap">
-      <p class="phone-label"><b>Library · Bookmarks</b>Library rows on this phone · bookmarked posts</p>
+      <p class="phone-label"><b>Library · Bookmarks</b>Books, chapters and paragraphs · examples say so · the way into the Notebook</p>
       <div class="phone">
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
         <div class="scroll">
           <div style="display:flex;flex-direction:column;gap:16px">
             <div class="biz-top"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon "><use href="#i-back"/></svg></button></div>
             <h1 class="scr-title" style="margin:0">Bookmarks</h1>
+            <div class="nt-link"><span class="ic"><svg class="cp-icon"><use href="#i-pencil"/></svg></span><div><div style="font-weight:600;font-size:17px;line-height:22px">Notebook</div><div class="nt-small">Your notes on the books, and your reflections. Only on this phone.</div></div><svg class="cp-icon"><use href="#i-chev"/></svg></div>
             <h4 class="lib-h">Library</h4>
-            <div class="lib-notice">
-              <svg class="cp-icon"><use href="#i-flag"/></svg>
-              <div><div class="h">Preview</div><div class="p">These are examples from the Library preview. They are kept only on this phone, and logging out clears them.</div></div>
-            </div>
+            <div class="lib-notice"><svg class="cp-icon"><use href="#i-flag"/></svg><div><div class="h">Preview</div><div class="p">The Bible and Music rows here are examples from the Library preview.</div></div></div>
             <div class="lib-label">Bible · 1</div>
             <div class="cp-card" style="padding:4px">
               <div class="lib-row"><svg class="cp-icon"><use href="#i-book"/></svg><div style="flex:1;min-width:0;display:flex;flex-direction:column"><div class="t">The Gospels</div><div class="n">One chapter a day</div><span class="lib-chip soon" style="margin-top:6px">Soon</span></div><button class="lib-mark on" aria-label="Remove bookmark: The Gospels"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+            </div>
+            <div class="lib-label">Books · 1</div>
+            <div class="lib-covers">
+              <div><div class="lib-cover" style="background:var(--cp-success-wash)"><svg class="cp-icon"><use href="#i-book"/></svg>The Quiet Road<button class="lib-mark on" aria-label="Remove bookmark: The Quiet Road"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div><div class="lib-kind"><span>Readings · 2 h 45 min</span></div></div>
             </div>
             <div class="lib-label">Music · 1</div>
             <div class="cp-card" style="padding:4px">
               <div class="lib-row"><span style="width:44px;height:44px;border-radius:50%;background:var(--cp-surface-sunken);display:grid;place-items:center;flex:none"><svg class="cp-icon" style="color:var(--cp-text-muted)"><use href="#i-music"/></svg></span><div style="flex:1;min-width:0;display:flex;flex-direction:column"><div class="t">Chants for the road</div><div class="n">Slow, simple chants for the road</div><span class="lib-chip soon" style="margin-top:6px">Soon</span></div><button class="lib-mark on" aria-label="Remove bookmark: Chants for the road"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
             </div>
+            <div class="lib-label">Places in books · 2</div>
+            <div class="cp-card" style="padding:4px">
+              <div class="lib-row" style="padding-left:16px"><svg class="cp-icon"><use href="#i-quote"/></svg><div style="flex:1;min-width:0;display:flex;flex-direction:column"><div class="n" style="font-size:17px;line-height:25px;letter-spacing:0;color:var(--cp-text);font-weight:400">Now the hard part. Thomas wrote for people in a cloister, and "the things of the world …</div><div class="n">Day 1. A stranger and a pilgrim · The Quiet Road</div></div><button class="lib-mark on" aria-label="Remove bookmark: Now the hard part."><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+              <div class="lib-row" style="padding-left:16px"><svg class="cp-icon"><use href="#i-library"/></svg><div style="flex:1;min-width:0;display:flex;flex-direction:column"><div class="t">Day 1. A stranger and a pilgrim</div><div class="n">The Quiet Road</div></div><button class="lib-mark on" aria-label="Remove bookmark: Day 1. A stranger and a pilgrim"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+            </div>
+            <div class="note" style="font-size:15px;line-height:21px">Kept only on this phone. Logging out clears them.</div>
             <h4 class="lib-h" style="margin-top:8px">Posts</h4>
             <div class="cp-card" style="padding:16px 6px 16px 20px;display:flex;align-items:center;gap:4px">
               <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px"><div style="font-weight:600;font-size:17px;line-height:22px">Hontanas · 6 Nov 2026</div><div class="note" style="display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">Sunrise over the meseta. Thirty kilometres and not one cloud.</div><div style="font-size:15px;line-height:21px;letter-spacing:.4px;font-weight:500;color:var(--cp-text-muted)">Your post · 2 photos or clips</div></div>
@@ -2780,6 +2848,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
             </div>
           </div>
         </div>
+
         <span class="home-ind"></span>
       </div>
     </div>
@@ -2792,12 +2861,244 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           <div style="display:flex;flex-direction:column;gap:16px">
             <div class="biz-top"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon "><use href="#i-back"/></svg></button></div>
             <h1 class="scr-title" style="margin:0">Bookmarks</h1>
+            <div class="nt-link"><span class="ic"><svg class="cp-icon"><use href="#i-pencil"/></svg></span><div><div style="font-weight:600;font-size:17px;line-height:22px">Notebook</div><div class="nt-small">Your notes on the books, and your reflections. Only on this phone.</div></div><svg class="cp-icon"><use href="#i-chev"/></svg></div>
             <h4 class="lib-h">Library</h4>
-            <div class="cp-card" style="padding:20px"><div class="note">Nothing bookmarked in the Library yet. Tap the bookmark on a row to keep it here.</div></div>
+            <div class="cp-card" style="padding:20px"><div class="note">Nothing bookmarked in the Library yet. Tap the bookmark on a cover or a row, or on a chapter or a paragraph in a book, to keep it here.</div></div>
             <h4 class="lib-h" style="margin-top:8px">Posts</h4>
             <div class="cp-card" style="padding:20px"><div class="note">No bookmarked posts yet. Tap the bookmark on a post in your journey to keep it here.</div></div>
           </div>
         </div>
+
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Library · Books</b>The real books · each cover opens its book · no Preview notice</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll">
+          <div class="lib-head">
+            <div class="lib-search"><svg class="cp-icon"><use href="#i-search"/></svg><span class="t">Search the Library</span></div>
+            <button class="cp-icon-btn flat" aria-label="Bookmarks"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button>
+            <button class="cp-icon-btn flat" aria-label="My diary"><svg class="cp-icon"><use href="#i-diary"/></svg></button>
+          </div>
+          <div class="cp-banner" style="margin-top:16px">
+            <span class="art"><svg class="cp-icon"><use href="#i-library"/></svg></span>
+            <div class="ey">Books</div>
+            <h4>Guides and readings for the Way</h4>
+            <button class="cp-btn sm">See the Books tab</button>
+          </div>
+          <div class="cp-dots"><i></i><i class="on"></i><i></i></div>
+          <div class="cp-subtabs" style="margin:16px 0"><span>Bible</span><span class="on">Books</span><span>Music</span></div>
+          <p class="note" style="margin:0 0 16px">3 books in the app. They are saved on this phone, so they read without a signal.</p>
+          <div class="lib-covers">
+            <div><div class="lib-cover" style="background:var(--cp-color-gold-soft)"><svg class="cp-icon"><use href="#i-library"/></svg>The French Way<button class="lib-mark" aria-label="Bookmark: The French Way"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div><div class="lib-kind"><span>Guide · 55 min</span></div></div>
+            <div><div class="lib-cover" style="background:var(--cp-success-wash)"><svg class="cp-icon"><use href="#i-book"/></svg>The Quiet Road<button class="lib-mark on" aria-label="Remove bookmark: The Quiet Road"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div><div class="lib-kind"><span>Readings · 2 h 45 min</span></div></div>
+            <div><div class="lib-cover" style="background:var(--cp-color-blue-100)"><svg class="cp-icon"><use href="#i-book"/></svg>Toward the Sunset<button class="lib-mark" aria-label="Bookmark: Toward the Sunset"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div><div class="lib-kind"><span>Readings · 40 min</span></div></div>
+          </div>
+        </div>
+        <div class="fab-slot"><button class="cp-fab-write" aria-label="Write in your diary"><svg class="cp-icon "><use href="#i-compose"/></svg></button></div>
+        <div class="tabdock"><nav class="cp-tabbar">
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Discover</div>
+          <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-library"/></svg></span>Library</div>
+        </nav></div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Book</b>A book on its own screen · Continue reading · the chapters or days · who made it</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll">
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div class="biz-top"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon "><use href="#i-back"/></svg></button></div>
+            <div class="bk-card" style="background:var(--cp-success-wash)">
+              <svg class="cp-icon"><use href="#i-book"/></svg>
+              <button class="lib-mark on" aria-label="Remove bookmark: The Quiet Road"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button>
+              <div><div class="ti">The Quiet Road</div><div class="st">Twenty-One Days with The Imitation of Christ for the Pilgrim</div></div>
+            </div>
+            <div class="bk-meta">Readings · 2 h 45 min · 21 days</div>
+            <p style="margin:0">Twenty-one days with a 600-year-old classic of the inner life: a morning reading and an evening reflection for each day on the Camino Francés. Slow, honest and quiet.</p>
+            <div><button class="cp-btn cp-btn-primary block" style="height:68px;font-size:22px">Continue reading</button><p class="note" style="margin:8px 0 0;text-align:center">You were reading: Day 2. The load that carries you</p></div>
+            <div class="lib-label">Contents</div>
+            <div class="cp-card" style="padding:4px"><div class="bk-row"><div style="flex:1;min-width:0"><div class="t">How to use this book</div><div class="n">4 min</div></div><svg class="cp-icon"><use href="#i-chev"/></svg></div><div class="bk-row"><div style="flex:1;min-width:0"><div class="t">About the book and its author</div><div class="n">4 min</div></div><svg class="cp-icon"><use href="#i-chev"/></svg></div><div class="bk-row"><div style="flex:1;min-width:0"><div class="t">Day 1. A stranger and a pilgrim</div><div class="n">7 min · Reflection written</div></div><svg class="cp-icon kept"><use href="#i-bookmark"/></svg><svg class="cp-icon"><use href="#i-chev"/></svg></div><div class="bk-row"><div style="flex:1;min-width:0"><div class="t">Day 2. The load that carries you</div><div class="n">7 min · Where you stopped</div></div><svg class="cp-icon"><use href="#i-chev"/></svg></div><div class="bk-row"><div style="flex:1;min-width:0"><div class="t">Day 3. The soft whisper</div><div class="n">7 min</div></div><svg class="cp-icon"><use href="#i-chev"/></svg></div></div>
+            <div class="lib-label">About this edition</div>
+            <p class="note" style="margin:0">The Imitation of Christ, Thomas à Kempis. Translated by William Benham (1886). Public domain.</p>
+            <p class="nt-small" style="margin:0">© 2026 CaminoPlus. All rights reserved. Passages quoted from the classics are in the public domain and are credited where they appear.</p>
+            <p class="nt-small" style="margin:0">Written with AI assistance (Claude, by Anthropic), under the direction of CaminoPlus.</p>
+          </div>
+        </div>
+
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Reader</b>A chapter as written · the side mark of a note in the margin · tap a paragraph for its two buttons</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll">
+          <div class="bk-read" style="margin:0 calc(var(--cp-screen-margin) * 0)">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon "><use href="#i-back"/></svg></button><button class="lib-mark on" aria-label="Remove bookmark: Day 1. A stranger and a pilgrim"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+            <div style="padding-right:28px"><div class="cap" style="margin-bottom:8px">The Quiet Road · 3 of 20</div><div class="ti">Day 1. A stranger and a pilgrim</div><div class="cap" style="margin-top:8px">Tap a paragraph to bookmark it or add a note beside it. Notes stay on this phone.</div></div>
+            <div class="bk-line"><div class="t"><p>There is a moment, somewhere between your own front door and the first yellow arrow, when you stop being someone who lives somewhere and become someone who is going.</p></div><div class="g"><span class="bk-mark" role="button" aria-label="Note on this paragraph"><svg class="cp-icon"><use href="#i-pencil"/></svg></span></div></div>
+            <div class="bk-line"><div class="t"><div class="bk-sel"><p>Thomas à Kempis had words for that state, and he did not keep them for people with rucksacks. He thought they described every reader.</p><div class="bk-act"><span><svg class="cp-icon"><use href="#i-pencil"/></svg>Add a note</span><span><svg class="cp-icon"><use href="#i-bookmark"/></svg>Bookmark</span></div></div></div><div class="g"></div></div>
+            <div class="bk-line"><div class="t"><p>The lines look severe at first. Keep yourself like a visitor, he says, to whom the things of the world do not belong.</p></div><div class="g"><span class="bk-kept"><svg class="cp-icon"><use href="#i-bookmark"/></svg></span></div></div>
+            <div class="bk-line"><div class="t"><div class="bk-quote"><p>If thou wilt stand fast and wilt profit as thou oughtest, hold thyself as an exile and a pilgrim upon the earth. … Keep thine heart free, and lifted up towards God.</p><div class="by">— Thomas à Kempis, <i>The Imitation of Christ</i>, Book 1, chapters 17 and 23 (tr. William Benham, 1886)</div></div></div><div class="g"></div></div>
+            <div style="padding-right:28px"><h4>Reflection</h4></div>
+          </div>
+        </div>
+
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Reader · Note</b>The side sheet · read, edit, delete, or grow into a Diary page</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll">
+          <div class="bk-read">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon "><use href="#i-back"/></svg></button><button class="lib-mark on" aria-label="Remove bookmark: Day 1. A stranger and a pilgrim"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+            <div style="padding-right:28px"><div class="cap" style="margin-bottom:8px">The Quiet Road · 3 of 20</div><div class="ti">Day 1. A stranger and a pilgrim</div><div class="cap" style="margin-top:8px">Tap a paragraph to bookmark it or add a note beside it. Notes stay on this phone.</div></div>
+            <div class="bk-line"><div class="t"><p>There is a moment, somewhere between your own front door and the first yellow arrow, when you stop being someone who lives somewhere and become someone who is going.</p></div><div class="g"><span class="bk-mark" role="button" aria-label="Note on this paragraph"><svg class="cp-icon"><use href="#i-pencil"/></svg></span></div></div>
+            <div class="bk-line"><div class="t"><div class="bk-sel"><p>Thomas à Kempis had words for that state, and he did not keep them for people with rucksacks. He thought they described every reader.</p><div class="bk-act"><span><svg class="cp-icon"><use href="#i-pencil"/></svg>Add a note</span><span><svg class="cp-icon"><use href="#i-bookmark"/></svg>Bookmark</span></div></div></div><div class="g"></div></div>
+            <div class="bk-line"><div class="t"><p>The lines look severe at first. Keep yourself like a visitor, he says, to whom the things of the world do not belong.</p></div><div class="g"><span class="bk-kept"><svg class="cp-icon"><use href="#i-bookmark"/></svg></span></div></div>
+            <div class="bk-line"><div class="t"><div class="bk-quote"><p>If thou wilt stand fast and wilt profit as thou oughtest, hold thyself as an exile and a pilgrim upon the earth. … Keep thine heart free, and lifted up towards God.</p><div class="by">— Thomas à Kempis, <i>The Imitation of Christ</i>, Book 1, chapters 17 and 23 (tr. William Benham, 1886)</div></div></div><div class="g"></div></div>
+            <div style="padding-right:28px"><h4>Reflection</h4></div>
+          </div>
+        </div>
+
+        <div class="nt-dim"></div>
+        <div class="nt-sheet">
+          <div class="hd"><h4 class="lib-h">Note</h4><span class="x"><svg class="cp-icon"><use href="#i-x"/></svg></span></div>
+          <div class="nt-quote">There is a moment, somewhere between your own front door and the first yellow arrow, when you stop being someone who lives somewhere and become someone …</div>
+          <div class="nt-card"><p>This is exactly how I felt at the airport. The shell on the pack made it real.</p><div class="nt-small">Friday 6 November</div><div class="nt-btns"><span>Edit</span><span>Delete</span><span>Grow into a Diary page</span></div></div>
+          <div class="bk-pill ghost">Add another note</div>
+          <div class="nt-small">Only on this phone, never uploaded. Logging out clears your notes.<br>A Diary page is yours to keep: logging out leaves the pages of your Diary.</div>
+        </div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Reader · Reflection</b>The end of a day · its questions are the prompt · before and after writing</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll">
+          <div class="bk-read">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon "><use href="#i-back"/></svg></button><button class="lib-mark on" aria-label="Remove bookmark: Day 1. A stranger and a pilgrim"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+            <p>Three small questions for the dark:</p>
+            <div class="cp-card bk-ask">
+              <div class="ey">Reflection</div>
+              <div class="q"><i>•</i><p>Where did I feel like a guest today, and where did I feel like an owner of something: a place in a queue, a bunk, a view, an opinion?</p></div>
+              <div class="q"><i>•</i><p>What did I carry today that I did not need?</p></div>
+              <div class="q"><i>•</i><p>What was given to me today that I did not earn?</p></div>
+              <div class="bk-pill">Write your reflection</div>
+            </div>
+            <p class="cap" style="margin:0">And once it is written:</p>
+            <div class="cp-card bk-ask">
+              <div class="ey">Reflection</div>
+              <div class="q"><i>•</i><p>What was given to me today that I did not earn?</p></div>
+              <div><div style="font-weight:600;font-size:17px;line-height:22px">You wrote a reflection</div><div class="note" style="margin-top:4px">Tired, and glad. The bunk was not mine and that was fine. I held very little today …</div></div>
+              <div class="bk-pill ghost">Open your reflection</div>
+            </div>
+            <div class="bk-next"><div><div class="a">Next</div><div class="b">Day 2. The load that carries you</div></div><svg class="cp-icon"><use href="#i-chev"/></svg></div>
+            <div class="bk-next"><svg class="cp-icon" style="transform:scaleX(-1)"><use href="#i-chev"/></svg><div><div class="a">Previous</div><div class="b">About the book and its author</div></div></div>
+          </div>
+        </div>
+
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Reader · Reflection sheet</b>Writing the answer · the questions stay in front of the pilgrim</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll">
+          <div class="bk-read">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon "><use href="#i-back"/></svg></button><button class="lib-mark on" aria-label="Remove bookmark: Day 1. A stranger and a pilgrim"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+            <p>Three small questions for the dark:</p>
+            <div class="cp-card bk-ask">
+              <div class="ey">Reflection</div>
+              <div class="q"><i>•</i><p>Where did I feel like a guest today, and where did I feel like an owner of something: a place in a queue, a bunk, a view, an opinion?</p></div>
+              <div class="q"><i>•</i><p>What did I carry today that I did not need?</p></div>
+              <div class="q"><i>•</i><p>What was given to me today that I did not earn?</p></div>
+              <div class="bk-pill">Write your reflection</div>
+            </div>
+            <p class="cap" style="margin:0">And once it is written:</p>
+            <div class="cp-card bk-ask">
+              <div class="ey">Reflection</div>
+              <div class="q"><i>•</i><p>What was given to me today that I did not earn?</p></div>
+              <div><div style="font-weight:600;font-size:17px;line-height:22px">You wrote a reflection</div><div class="note" style="margin-top:4px">Tired, and glad. The bunk was not mine and that was fine. I held very little today …</div></div>
+              <div class="bk-pill ghost">Open your reflection</div>
+            </div>
+            <div class="bk-next"><div><div class="a">Next</div><div class="b">Day 2. The load that carries you</div></div><svg class="cp-icon"><use href="#i-chev"/></svg></div>
+            <div class="bk-next"><svg class="cp-icon" style="transform:scaleX(-1)"><use href="#i-chev"/></svg><div><div class="a">Previous</div><div class="b">About the book and its author</div></div></div>
+          </div>
+        </div>
+
+        <div class="nt-dim"></div>
+        <div class="nt-sheet">
+          <div class="hd"><h4 class="lib-h">Your reflection</h4><span class="x"><svg class="cp-icon"><use href="#i-x"/></svg></span></div>
+          <div class="nt-quote">Day 2. The load that carries you</div>
+          <div class="nt-small">The questions for tonight</div>
+          <div style="display:flex;flex-direction:column;gap:8px;font-size:17px;line-height:25px">
+            <div style="display:flex;gap:10px"><i style="width:14px;text-align:center;font-style:normal;color:var(--cp-text-accent)">•</i><span>What did I argue with today that I might have simply carried?</span></div>
+            <div style="display:flex;gap:10px"><i style="width:14px;text-align:center;font-style:normal;color:var(--cp-text-accent)">•</i><span>Is there something in my pack, or in my head, that I could post home?</span></div>
+          </div>
+          <div class="nt-field">Write your reflection</div>
+          <div class="bk-pill" style="opacity:.55">Save reflection</div>
+          <div class="bk-pill ghost">Cancel</div>
+          <div class="nt-small">Only on this phone, never uploaded. Logging out clears your notes.</div>
+        </div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Notebook</b>Notes by book and chapter · a plain search · only on this phone · nothing to share</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll">
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div class="biz-top"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon "><use href="#i-back"/></svg></button></div>
+            <div style="display:flex;flex-direction:column;gap:8px"><h1 class="scr-title" style="margin:0">Notebook</h1><div style="font-weight:600;font-size:17px;line-height:22px;color:var(--cp-text-muted)">4 notes</div><div class="note">Only on this phone. Notes are not uploaded and not shared. Logging out clears them, and if you delete the app or lose this phone, they are gone.</div></div>
+            <div class="nt-search"><svg class="cp-icon"><use href="#i-search"/></svg><span>Search your notes</span></div>
+            <div><h4 class="lib-h">The English Way</h4><div class="nt-small">A Pilgrim's Guide to the Camino Inglés</div></div>
+            <div style="display:flex;flex-direction:column;gap:8px"><div style="font-weight:600;font-size:17px;color:var(--cp-text-muted)">Welcome</div><div class="cp-card" style="padding:4px"><div class="nt-row"><div class="nt-small">“A calm, honest guide to the Camino Inglés, with every fact …”</div><p>Check the 100 km rule for the credencial before booking.</p><div class="nt-small">Thursday 5 November</div></div></div></div>
+            <div><h4 class="lib-h">The Quiet Road</h4><div class="nt-small">Twenty-One Days with The Imitation of Christ for the Pilgrim</div></div>
+            <div style="display:flex;flex-direction:column;gap:8px"><div style="font-weight:600;font-size:17px;color:var(--cp-text-muted)">Day 1. A stranger and a pilgrim</div><div class="cp-card" style="padding:4px"><div class="nt-row"><span class="nt-chip">Reflection</span><p>Tired, and glad. The bunk was not mine and that was fine. I held very little today and the day went on being a day.</p><div class="nt-small">Sunday 8 November</div></div><div class="nt-row"><div class="nt-small">“There is a moment, somewhere between your own front door and the first yellow arrow …”</div><p>This is exactly how I felt at the airport. The shell on the pack made it real.</p><div class="nt-small">Friday 6 November</div></div><div class="nt-row"><div class="nt-small">“Now the hard part. Thomas wrote for people in a cloister, and "the things of the world …”</div><p>Open hand, not clenched fist. Writing it on my wrist.</p><div class="nt-small">Saturday 7 November</div></div></div></div>
+          </div>
+        </div>
+
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Notebook, empty</b>No notes yet · says how to write one</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll">
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div class="biz-top"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon "><use href="#i-back"/></svg></button></div>
+            <div style="display:flex;flex-direction:column;gap:8px"><h1 class="scr-title" style="margin:0">Notebook</h1><div class="note">Only on this phone. Notes are not uploaded and not shared. Logging out clears them, and if you delete the app or lose this phone, they are gone.</div></div>
+            <div class="cp-card" style="padding:32px 20px;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center">
+              <span class="nt-empty"><span class="ic" style="width:64px;height:64px"><svg class="cp-icon" style="width:30px;height:30px"><use href="#i-pencil"/></svg></span></span>
+              <div class="lib-h">No notes yet</div>
+              <div class="note">When you add a note beside a paragraph in a book, or write a reflection at the end of a day, it will be here.</div>
+              <div class="note">Tap a paragraph in a book, then Add a note.</div>
+            </div>
+          </div>
+        </div>
+
         <span class="home-ind"></span>
       </div>
     </div>

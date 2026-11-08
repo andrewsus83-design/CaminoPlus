@@ -85,80 +85,80 @@ export function NoteSheet({ target, notes, message, onAdd, onEdit, onDelete, onG
   const quote = target.quote.trim();
   return (
     <SheetModal onClose={onClose} closeLabel="Close the note">
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-            <AppText variant="h4" accessibilityRole="header">{title}</AppText>
-            <Pressable accessibilityRole="button" accessibilityLabel="Close" onPress={onClose} hitSlop={4} style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}>
-              <Icon name="close" color={role.text} size={26} />
-            </Pressable>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+        <AppText variant="h4" accessibilityRole="header">{title}</AppText>
+        <Pressable accessibilityRole="button" accessibilityLabel="Close" onPress={onClose} hitSlop={4} style={{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }}>
+          <Icon name="close" color={role.text} size={26} />
+        </Pressable>
+      </View>
+
+      <ScrollView style={{ flexGrow: 0 }} contentContainerStyle={{ gap: 14 }} keyboardShouldPersistTaps="handled">
+        {!!quote && (
+          <View style={{ borderLeftWidth: 3, borderLeftColor: c.gold, paddingLeft: 14 }}>
+            <AppText variant="small" muted numberOfLines={4}>{quote}</AppText>
           </View>
+        )}
 
-          <ScrollView style={{ flexGrow: 0 }} contentContainerStyle={{ gap: 14 }} keyboardShouldPersistTaps="handled">
-            {!!quote && (
-              <View style={{ borderLeftWidth: 3, borderLeftColor: c.gold, paddingLeft: 14 }}>
-                <AppText variant="small" muted numberOfLines={4}>{quote}</AppText>
-              </View>
-            )}
-
-            {reflection && !!target.prompts && target.prompts.length > 0 && (
-              <View style={{ gap: 8 }}>
-                <AppText variant="caption" muted>The questions for tonight</AppText>
-                {target.prompts.map((q, i) => (
-                  <View key={i} style={{ flexDirection: 'row', gap: 10 }}>
-                    <AppText variant="small" color={role.accentText} importantForAccessibility="no" accessibilityElementsHidden style={{ width: 14, textAlign: 'center' }}>•</AppText>
-                    <AppText variant="small" style={{ flex: 1 }}>{q}</AppText>
-                  </View>
-                ))}
-              </View>
-            )}
-
-            {writing === null && notes.map((n) => (
-              <View key={n.id} style={{ backgroundColor: role.surface, borderRadius: radius.md, borderWidth: 1, borderColor: role.border, padding: 16, gap: 10 }}>
-                <AppText selectable>{n.text}</AppText>
-                <AppText variant="caption" muted>{noteDate(n.createdAt)}</AppText>
-                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-                  <Action label="Edit" hint={reflection ? 'Changes your reflection' : 'Changes this note'} onPress={() => { setSaid(null); setWriting({ id: n.id, text: n.text }); }} />
-                  <Action label="Delete" hint={reflection ? 'Deletes your reflection' : 'Deletes this note'} onPress={() => remove(n)} />
-                  <Action label={GROW_LABEL} hint="Makes a page of your Diary from this" onPress={() => void grow(n)} disabled={busy} />
-                  {!!onOpenPlace && <Action label="Go to this place" hint="Opens the book where this note is" onPress={() => onOpenPlace(n)} />}
-                </View>
+        {reflection && !!target.prompts && target.prompts.length > 0 && (
+          <View style={{ gap: 8 }}>
+            <AppText variant="caption" muted>The questions for tonight</AppText>
+            {target.prompts.map((q, i) => (
+              <View key={i} style={{ flexDirection: 'row', gap: 10 }}>
+                <AppText variant="small" color={role.accentText} importantForAccessibility="no" accessibilityElementsHidden style={{ width: 14, textAlign: 'center' }}>•</AppText>
+                <AppText variant="small" style={{ flex: 1 }}>{q}</AppText>
               </View>
             ))}
-
-            {writing === null && !reflection && (
-              <Pill variant="ghost" label="Add another note" onPress={() => { setSaid(null); setWriting({ id: null, text: '' }); }} />
-            )}
-
-            {writing !== null && (
-              <View style={{ gap: 10 }}>
-                <View style={{ backgroundColor: role.surface, borderRadius: radius.lg, borderWidth: 2, borderColor: focused ? c.gold : role.border, overflow: 'hidden' }}>
-                  <TextInput
-                    value={writing.text}
-                    onChangeText={(text) => setWriting({ ...writing, text })}
-                    onFocus={() => setFocused(true)}
-                    onBlur={() => setFocused(false)}
-                    autoFocus
-                    multiline
-                    maxLength={NOTE_TEXT_MAX}
-                    placeholder={reflection ? 'Write your reflection' : 'Write a note'}
-                    placeholderTextColor={role.muted}
-                    accessibilityLabel={reflection ? 'Your reflection' : 'Your note'}
-                    style={[{ minHeight: 140, maxHeight: Math.max(140, height * 0.32), paddingHorizontal: 18, paddingTop: 14, paddingBottom: 14, fontFamily: fonts.body, fontSize: 19, lineHeight: 28, color: role.text, textAlignVertical: 'top' }, noOutline]}
-                  />
-                </View>
-                {count >= NOTE_TEXT_MAX - 500 && <AppText variant="caption" muted>{thousands(count)} / {thousands(NOTE_TEXT_MAX)}</AppText>}
-                <Pill label={reflection ? 'Save reflection' : 'Save note'} onPress={() => void save()} loading={busy} disabled={writing.text.trim().length === 0} />
-                <Pill variant="ghost" label="Cancel" onPress={cancel} disabled={busy} />
-              </View>
-            )}
-
-            {!!said && <FormMessage>{said}</FormMessage>}
-            {!!message && !said && <FormMessage>{message}</FormMessage>}
-          </ScrollView>
-
-          <View style={{ gap: 4 }}>
-            <AppText variant="caption" muted>{NOTE_SHEET_PRIVACY}</AppText>
-            {writing === null && notes.length > 0 && <AppText variant="caption" muted>{GROW_NOTE}</AppText>}
           </View>
+        )}
+
+        {writing === null && notes.map((n) => (
+          <View key={n.id} style={{ backgroundColor: role.surface, borderRadius: radius.md, borderWidth: 1, borderColor: role.border, padding: 16, gap: 10 }}>
+            <AppText selectable>{n.text}</AppText>
+            <AppText variant="caption" muted>{noteDate(n.createdAt)}</AppText>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+              <Action label="Edit" hint={reflection ? 'Changes your reflection' : 'Changes this note'} onPress={() => { setSaid(null); setWriting({ id: n.id, text: n.text }); }} />
+              <Action label="Delete" hint={reflection ? 'Deletes your reflection' : 'Deletes this note'} onPress={() => remove(n)} />
+              <Action label={GROW_LABEL} hint="Makes a page of your Diary from this" onPress={() => void grow(n)} disabled={busy} />
+              {!!onOpenPlace && <Action label="Go to this place" hint="Opens the book where this note is" onPress={() => onOpenPlace(n)} />}
+            </View>
+          </View>
+        ))}
+
+        {writing === null && !reflection && (
+          <Pill variant="ghost" label="Add another note" onPress={() => { setSaid(null); setWriting({ id: null, text: '' }); }} />
+        )}
+
+        {writing !== null && (
+          <View style={{ gap: 10 }}>
+            <View style={{ backgroundColor: role.surface, borderRadius: radius.lg, borderWidth: 2, borderColor: focused ? c.gold : role.border, overflow: 'hidden' }}>
+              <TextInput
+                value={writing.text}
+                onChangeText={(text) => setWriting({ ...writing, text })}
+                onFocus={() => setFocused(true)}
+                onBlur={() => setFocused(false)}
+                autoFocus
+                multiline
+                maxLength={NOTE_TEXT_MAX}
+                placeholder={reflection ? 'Write your reflection' : 'Write a note'}
+                placeholderTextColor={role.muted}
+                accessibilityLabel={reflection ? 'Your reflection' : 'Your note'}
+                style={[{ minHeight: 140, maxHeight: Math.max(140, height * 0.32), paddingHorizontal: 18, paddingTop: 14, paddingBottom: 14, fontFamily: fonts.body, fontSize: 19, lineHeight: 28, color: role.text, textAlignVertical: 'top' }, noOutline]}
+              />
+            </View>
+            {count >= NOTE_TEXT_MAX - 500 && <AppText variant="caption" muted>{thousands(count)} / {thousands(NOTE_TEXT_MAX)}</AppText>}
+            <Pill label={reflection ? 'Save reflection' : 'Save note'} onPress={() => void save()} loading={busy} disabled={writing.text.trim().length === 0} />
+            <Pill variant="ghost" label="Cancel" onPress={cancel} disabled={busy} />
+          </View>
+        )}
+
+        {!!said && <FormMessage>{said}</FormMessage>}
+        {!!message && !said && <FormMessage>{message}</FormMessage>}
+      </ScrollView>
+
+      <View style={{ gap: 4 }}>
+        <AppText variant="caption" muted>{NOTE_SHEET_PRIVACY}</AppText>
+        {writing === null && notes.length > 0 && <AppText variant="caption" muted>{GROW_NOTE}</AppText>}
+      </View>
     </SheetModal>
   );
 }

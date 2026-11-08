@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node10",
+    "ignoreDeprecations": "6.0",
+    "target": "es2022",
+    "strict": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "types": ["node"],
+    "outDir": "node_modules/.cache/notes-test",
+    "rootDir": "src"
+  },
+  "files": [
+    "src/features/notes/__tests__/notes.test.ts",
+    "src/features/notes/__tests__/wiring.test.ts"
+  ]
+}

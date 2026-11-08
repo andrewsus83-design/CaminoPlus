@@ -4,7 +4,7 @@
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
-import { chapterPlace, coverCaption, creditLine, findBook, formatMinutes, kindLabel, libraryBooks, spansText, type BookContent, type CatalogBook } from '../books';
+import { blockText, bookLine, chapterPlace, coverCaption, creditLine, dayCount, findBook, findChapter, formatMinutes, kindLabel, libraryBooks, snippet, spansText, type Block, type BookContent, type CatalogBook } from '../books';
 
 let n = 0;
 const check = (name: string, fn: () => void) => { fn(); n += 1; console.log(`ok   ${name}`); };
@@ -62,6 +62,44 @@ check('the credit of a reflection book names the work, the author, the translato
     'The Imitation of Christ, Thomas à Kempis. Translated by William Benham (1886). Public domain.');
   assert.equal(creditLine({ author: 'CaminoPlus' }), 'By CaminoPlus.');
   assert.equal(spansText([{ t: 'a ' }, { t: 'b', i: 1 }, { t: '.' }]), 'a b.');
+});
+
+check('the words of a block: a paragraph, a heading, a list, a quote (not its attribution) and a break, on one line without their marks', () => {
+  const sp = (...t: string[]) => t.map((x) => ({ t: x }));
+  assert.equal(blockText({ t: 'p', spans: [{ t: 'one ' }, { t: 'two', i: 1 }, { t: ',\n three', b: 1 }, { t: ' four', href: 'https://example.org' }] }), 'one two, three four');
+  assert.equal(blockText({ t: 'h', level: 2, spans: sp('The passage') }), 'The passage');
+  assert.equal(blockText({ t: 'ul', items: [sp('a'), sp('b ', 'c')] }), 'a b c');
+  assert.equal(blockText({ t: 'ol', items: [sp('first'), sp('second')] }), 'first second');
+  assert.equal(blockText({ t: 'quote', paras: [sp('First.'), sp('Second.')], cite: sp('Someone') }), 'First. Second.');
+  assert.equal(blockText({ t: 'hr' }), '');
+  assert.equal(blockText({ t: 'p', spans: [] }), '');
+  assert.equal(blockText({ t: 'unknown' } as unknown as Block), '', 'a block the reader does not know has no words');
+});
+
+check('a text is cut at a word with an ellipsis, never longer than asked, and never in the middle of an emoji', () => {
+  assert.equal(snippet('short', 10), 'short');
+  assert.equal(snippet('exactly ten', 11), 'exactly ten');
+  const cut = snippet('the quick brown fox jumps over the lazy dog', 20);
+  assert.ok(cut.length <= 20 && cut.endsWith('…') && !cut.endsWith(' …'), cut);
+  assert.equal(cut, 'the quick brown fox…');
+  assert.equal(snippet('x'.repeat(50), 10), `${'x'.repeat(9)}…`, 'no space to cut at: cut at the limit');
+  const emoji = snippet(`${'a'.repeat(8)}😀😀😀`, 10);
+  assert.ok(emoji.length <= 10);
+  assert.doesNotMatch(emoji, /[\ud800-\udbff](?![\udc00-\udfff])/);
+});
+
+check('a chapter is found by id, and a reflection book says how many days it has', () => {
+  const ch = [{ id: '00-a', title: 'A' }, { id: '01-b', title: 'B' }];
+  assert.equal(findChapter(ch, '01-b')?.title, 'B');
+  assert.equal(findChapter(ch, 'nope'), null);
+  assert.equal(findChapter(ch, undefined), null);
+  assert.equal(findChapter([], '00-a'), null);
+  const readings = book({ kind: 'reflection', minutes: 165, chapters: [{ id: '00-how', title: 'How to use this book', minutes: 4 }, { id: '02-day-01', title: 'Day 1. A stranger', minutes: 7 }, { id: '03-day-02', title: 'Day 2. The load', minutes: 7 }, { id: '04-day-10', title: 'Day 10. Rest', minutes: 7 }, { id: '05-carry', title: 'Carry it with you', minutes: 4 }] });
+  assert.equal(dayCount(readings), 3);
+  assert.equal(dayCount(book({})), 0, 'a guide has no days');
+  assert.equal(bookLine(readings), 'Readings · 2 h 45 min · 3 days');
+  assert.equal(bookLine(book({ kind: 'guide', minutes: 47 })), 'Guide · 47 min');
+  assert.equal(bookLine(book({ kind: 'reflection', minutes: 30, chapters: [{ id: '02-day-01', title: 'Day 1. Only one', minutes: 7 }] })), 'Readings · 30 min · 1 day');
 });
 
 check('books.ts is pure: it imports a type and nothing else', () => {

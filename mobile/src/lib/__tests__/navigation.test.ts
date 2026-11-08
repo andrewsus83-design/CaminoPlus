@@ -10,7 +10,7 @@
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
-import { LIBRARY_TABS, PREVIEW_NOTICE, SAMPLE_BOOKS, SEARCH_NOTICE } from '../../features/library/sample';
+import { LIBRARY_TABS, PREVIEW_NOTICE, searchNotice } from '../../features/library/sample';
 
 let n = 0;
 const check = (name: string, fn: () => void) => { fn(); n += 1; console.log(`ok   ${name}`); };
@@ -195,20 +195,25 @@ check('Library has no title and no diary card: its first row is the search field
   assert.notDeepEqual(iconPaths('bookmark'), iconPaths('diary'), 'the two buttons next to each other do not look alike');
 });
 
-check('Library: below the header a banner and the tabs Bible, Books, Music, each with an honest notice that it is a preview; a search takes their place while something is typed, and says so too', () => {
+check('Library: below the header a banner and the tabs Bible, Books, Music; Bible and Music say honestly that they are previews, the Books tab is real and says nothing of the kind; a search takes their place while something is typed, and says "examples" only while an example is in it', () => {
   assert.deepEqual([...LIBRARY_TABS], ['Bible', 'Books', 'Music']);
-  for (const t of LIBRARY_TABS) assert.ok(PREVIEW_NOTICE[t].length > 40, `${t} has no notice`);
-  assert.ok(SEARCH_NOTICE.length > 40 && /example/i.test(SEARCH_NOTICE), 'the search says its results are examples');
+  assert.deepEqual(Object.keys(PREVIEW_NOTICE), ['Bible', 'Music'], 'the books are real: no Preview notice for the Books tab');
+  for (const t of ['Bible', 'Music'] as const) assert.ok(PREVIEW_NOTICE[t].length > 40, `${t} has no notice`);
+  const withExamples = searchNotice(['Bible', 'Books', 'Music']);
+  assert.ok(withExamples && withExamples.length > 40 && /examples/i.test(withExamples), 'a search that lists examples says so');
+  assert.equal(searchNotice(['Books']), null, 'a search that lists only books has no notice: nothing on it is an example');
   const screen = read(join('app', '(tabs)', 'library.tsx'));
   assert.match(screen, /<Screen keyboard>/, 'a button can be tapped while the keyboard is up');
   assert.match(screen, /<PromoBanner promos=/);
   assert.match(screen, /<SubTabs tabs=\{LIBRARY_TABS\}/);
-  assert.match(screen, /isSearching\(query\) \? \(\s*<SearchResults query=\{query\} marks=\{marks\} onClear=\{\(\) => setQuery\(''\)\} \/>\s*\) : \(\s*<>\s*<PromoBanner promos=/, 'the results take the place of the banner and the tabs, and clearing the field brings them back');
+  assert.match(screen, /isSearching\(query\) \? \(\s*<SearchResults query=\{query\} books=\{books\} marks=\{marks\} onClear=\{\(\) => setQuery\(''\)\} \/>\s*\) : \(\s*<>\s*<PromoBanner promos=/, 'the results take the place of the banner and the tabs, and clearing the field brings them back');
+  assert.doesNotMatch(screen, /Preview · Books/, 'the banner does not call the books a preview');
   const tabsSrc = read(join('src', 'features', 'library', 'LibraryTabs.tsx'));
-  for (const t of LIBRARY_TABS) assert.match(tabsSrc, new RegExp(`<Notice tab="${t}" />`), `the ${t} tab does not start with its notice`);
+  for (const t of ['Bible', 'Music']) assert.match(tabsSrc, new RegExp(`<Notice tab="${t}" />`), `the ${t} tab does not start with its notice`);
+  assert.doesNotMatch(tabsSrc, /<Notice tab="Books" \/>/, 'the Books tab starts with no notice');
   assert.match(tabsSrc, /<SampleNotice title="Preview">/);
   const results = read(join('src', 'features', 'library', 'SearchResults.tsx'));
-  assert.match(results, /<SampleNotice title="Preview">\{SEARCH_NOTICE\}<\/SampleNotice>/, 'the search keeps the Preview notice, also when nothing is found');
+  assert.match(results, /\{!!notice && <SampleNotice title="Preview">\{notice\}<\/SampleNotice>\}/, 'the search keeps the Preview notice while an example is in the results, and has none when nothing is');
   assert.match(results, /Clear search/);
   assert.match(read(join('src', 'components', 'Screen.tsx')), /keyboardShouldPersistTaps=\{keyboard \? 'handled' : 'never'\}/);
 });
@@ -239,7 +244,7 @@ check('the search field: placeholder and label, the "search" key, no autocorrect
     assert.ok(contrast(roleColour('textMuted', dark), surface) >= 4.5, `the placeholder (role.muted) on the pill in ${mode}`);
     assert.ok(contrast(roleColour('action', dark), surface) >= 3, `the bookmark icon on a row in ${mode}`);
   }
-  for (const b of SAMPLE_BOOKS) assert.ok(contrast(tokens.color.blue, tokens.color[b.colour]) >= 4.5, `the navy on the ${b.colour} cover (covers do not change with dark)`);
+  for (const colour of ['goldSoft', 'blue100', 'successWash', 'red100', 'sand300', 'goldWash']) assert.ok(contrast(tokens.color.blue, tokens.color[colour]) >= 4.5, `the navy on the ${colour} cover (covers do not change with dark)`);
 });
 
 check('the design page shows the same Library: a search pill, the Bookmarks and diary buttons, no title and no diary card, and the diary glyph of its sprite is the app\'s', () => {
@@ -259,7 +264,7 @@ check('the design page shows the same Library: a search pill, the Bookmarks and 
   const sprite = /<symbol id="i-diary"[^>]*>(.*?)<\/symbol>/.exec(design);
   assert.ok(sprite, 'the sprite of the design page has no i-diary');
   assert.deepEqual([...sprite![1].matchAll(/ d="([^"]+)"/g)].map((m) => m[1]), iconPaths('diary'), 'the diary glyph of the design page and of the app are the same drawing');
-  for (const label of ['Library · Search', 'Library · Nothing found', 'Library · Bookmarks', 'Library · Bookmarks, empty']) assert.ok(design.includes(`<b>${label}</b>`), `the design page has no phone "${label}"`);
+  for (const label of ['Library · Books', 'Library · Search', 'Library · Nothing found', 'Library · Bookmarks', 'Library · Bookmarks, empty']) assert.ok(design.includes(`<b>${label}</b>`), `the design page has no phone "${label}"`);
 });
 
 check('the sample content never claims to be real: no price, no rating, no "available", no play button that plays', () => {
@@ -292,13 +297,59 @@ check('Bookmarks is a screen of its own: the file exists, it is registered next 
   assert.match(src, /<AppText variant="h2" accessibilityRole="header">Bookmarks<\/AppText>/);
   assert.match(src, /<AppText variant="h4" accessibilityRole="header">Library<\/AppText>/);
   assert.match(src, /<AppText variant="h4" accessibilityRole="header" style=\{\{ marginTop: 8 \}\}>Posts<\/AppText>/);
-  assert.match(src, /<SampleNotice title="Preview">\{BOOKMARKS_NOTICE\}<\/SampleNotice>/, 'the Library rows kept here are still examples, and it says so');
+  assert.match(src, /\{!!notice && <SampleNotice title="Preview">\{notice\}<\/SampleNotice>\}/, 'the Bible and Music rows kept here are still examples, and it says so while one is on the screen');
   const design = readFileSync(join(root, '..', 'design', 'index.html'), 'utf8');
   const phone = design.slice(design.indexOf('<b>Library · Bookmarks</b>'), design.indexOf('<b>Library · Bookmarks, empty</b>'));
   assert.ok(phone.length > 2000);
   assert.match(phone, />Bookmarks<\/h1>/);
   assert.match(phone, /class="lib-h">Library<\/h4>/);
   assert.match(phone, /class="lib-h"[^>]*>Posts<\/h4>/);
+});
+
+check('the books and the notes are screens of their own: the book, the reader and the Notebook are files, registered for someone with a journey, each with Back and no room for a tab bar, and the design page has a phone for each', () => {
+  const screens = ['library/notes', 'library/book/[id]/index', 'library/book/[id]/[chapter]'];
+  const layout = read(join('app', '_layout.tsx'));
+  const guard = layout.indexOf('<Stack.Protected guard={onboarded}>');
+  const end = layout.indexOf('</Stack.Protected>', guard);
+  for (const name of screens) {
+    assert.ok(exists(join('app', `${name}.tsx`)), `app/${name}.tsx exists`);
+    const at = layout.indexOf(`<Stack.Screen name="${name}" />`);
+    assert.ok(guard > 0 && at > guard && at < end, `${name} is registered inside the block of screens for someone who has a journey`);
+  }
+  for (const f of ['library/notes', 'library/book/[id]/index', 'library/book/[id]/[chapter]']) {
+    const src = read(join('app', `${f}.tsx`));
+    assert.match(src, /<Screen tabBar=\{false\}/, `${f}: no room for a tab bar it does not have`);
+    assert.match(src, /name="back" label="Back"/, `${f}: a Back button`);
+    assert.match(src, /router\.canGoBack\(\) \? router\.back\(\) : (router\.replace\(|toBook\(\))/, `${f}: Back works also when the screen was opened from a link (it goes to the book, or to the Library)`);
+  }
+  const design = readFileSync(join(root, '..', 'design', 'index.html'), 'utf8');
+  const phone = (label: string, next: string) => {
+    const a = design.indexOf(`<b>${label}</b>`);
+    assert.ok(a > 0, `the design page has no phone "${label}"`);
+    const b = design.indexOf(`<b>${next}</b>`, a);
+    assert.ok(b > a, `the phone "${next}" does not follow "${label}"`);
+    return design.slice(a, b);
+  };
+  assert.match(phone('Library · Books', 'Book'), /3 books in the app\. They are saved on this phone, so they read without a signal\./);
+  assert.doesNotMatch(phone('Library · Books', 'Book'), /lib-notice|Sample</, 'the Books tab shows no Preview notice and no Sample tag: its covers are real');
+  const book = phone('Book', 'Reader');
+  for (const text of ['Continue reading', 'Contents', 'About this edition', 'Written with AI assistance']) assert.ok(book.includes(text), `the Book phone says "${text}"`);
+  const reader = phone('Reader', 'Reader · Note');
+  assert.match(reader, /class="bk-mark"[^>]*aria-label="Note on this paragraph"/, 'the side mark of a note');
+  assert.match(reader, /Add a note<\/span><span>[^<]*<svg[^>]*><use href="#i-bookmark"\/><\/svg>Bookmark</, 'the two buttons under a selected paragraph');
+  const sheet = phone('Reader · Note', 'Reader · Reflection');
+  for (const text of ['Grow into a Diary page', 'Add another note', 'Only on this phone, never uploaded. Logging out clears your notes.']) assert.ok(sheet.includes(text), `the Note phone says "${text}"`);
+  const reflect = phone('Reader · Reflection', 'Reader · Reflection sheet');
+  for (const text of ['Write your reflection', 'You wrote a reflection', 'Open your reflection']) assert.ok(reflect.includes(text), `the Reflection phone says "${text}"`);
+  assert.ok(phone('Reader · Reflection sheet', 'Notebook').includes('The questions for tonight'));
+  const notebook = phone('Notebook', 'Notebook, empty');
+  assert.ok(notebook.includes('Only on this phone. Notes are not uploaded and not shared. Logging out clears them, and if you delete the app or lose this phone, they are gone.'));
+  assert.ok(notebook.includes('Search your notes'));
+  assert.doesNotMatch(notebook.slice(notebook.indexOf('<div class="phone">')), /Share|share<|#i-share|likes|followers/, 'nothing to share in the Notebook');
+  assert.ok(design.indexOf('<b>Notebook, empty</b>') > 0);
+  // the Bookmarks phones show the way into the Notebook
+  assert.match(phone('Library · Bookmarks', 'Library · Bookmarks, empty'), /<div style="font-weight:600;font-size:17px;line-height:22px">Notebook<\/div>/);
+  assert.doesNotMatch(phone('Library · Nothing found', 'Library · Bookmarks'), /lib-notice/, 'nothing found: nothing on screen is an example, so no Preview notice');
 });
 
 check('every screen registered in the root layout is a file, so the stack never warns about a missing route', () => {

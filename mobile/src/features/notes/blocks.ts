@@ -18,6 +18,8 @@ export type ReflectionPrompt = {
   headingIndex: number;
   /** The block index of the list of questions (the last list of the part), or null when the part has none. */
   listIndex: number | null;
+  /** Where the part stops: the index of the next heading, or the number of blocks. The button to write the reflection goes at the end of the part when there is no list. */
+  endIndex: number;
   /** The questions, as the book wrote them. */
   questions: Span[][];
 };
@@ -36,7 +38,7 @@ export function reflectionPrompt(blocks: readonly Block[]): ReflectionPrompt | n
   let listIndex: number | null = null;
   for (let i = headingIndex + 1; i < end; i++) if (blocks[i].t === 'ul' || blocks[i].t === 'ol') listIndex = i;
   const list = listIndex === null ? null : (blocks[listIndex] as { items: Span[][] });
-  return { headingIndex, listIndex, questions: list ? list.items : [] };
+  return { headingIndex, listIndex, endIndex: end, questions: list ? list.items : [] };
 }
 
 /** The questions as plain lines (a screen reader label, the sheet that shows them while the pilgrim writes). */

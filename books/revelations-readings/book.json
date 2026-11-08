@@ -1,0 +1,42 @@
+{
+  "id": "revelations-readings",
+  "kind": "reflection",
+  "order": 15,
+  "title": "All Shall Be Well",
+  "subtitle": "Eight Days with Julian of Norwich for the Camino de Invierno",
+  "route_slug": "camino-de-invierno",
+  "days": 8,
+  "description_short": "Eight days with Julian of Norwich, a medieval anchoress, for the quiet Camino de Invierno: a morning reading and an evening reflection each day. Quiet and consoling.",
+  "description_long": "Julian of Norwich was an English anchoress, a woman who lived in a small cell built against a church in Norwich. She tells us that her showings came to her on 13 May 1373, when she was thirty and a half years old and gravely ill, and that she spent years trying to understand what they meant. The book she left, Revelations of Divine Love, is one of the quietest and kindest books in the English language. It is a book about smallness, about being held, about doubt, and about a promise that she dared to believe: all shall be well.\n\nAll Shall Be Well is made to go with the Camino de Invierno, the Winter Way from Ponferrada to Santiago de Compostela, a quiet road of about 260 km. It has eight days. Every day has a morning reading of about five minutes and an evening reflection of about three. The morning begins with a short passage from Julian, quoted word for word from the 1901 edition of Grace Warrack, which is in the public domain. Then comes a reflection that starts from something on the road: a head torch, a coat, a host at a door, a long hill. Then two small things to carry for the next hour, a question and a practice that needs nothing but attention. The evening looks back over the day with two or three gentle questions and ends with a short original prayer, open enough to be said as a wish by a reader who prays differently, or who does not pray.\n\nThe days follow an arc: the smallness of things, being held, the courtesy of God, sin and suffering told honestly, the promise that all shall be well, the way of prayer, a long patience, and an ending that is also a beginning. Julian was a Christian of the fourteenth century and writes as one. This book says so plainly, invites and does not push, and is honest where she is hard to follow. Read it on a bench, in a pilgrim hostel bunk, or at your own kitchen table once the walking is done.",
+  "keywords": [
+    "Camino de Santiago",
+    "Camino de Invierno",
+    "Julian of Norwich",
+    "pilgrimage reflections",
+    "daily readings",
+    "Revelations of Divine Love",
+    "prayer"
+  ],
+  "categories": [
+    "Religion / Christian Living / Spiritual Growth",
+    "Religion / Christianity / Devotional",
+    "Travel / Special Interest / Pilgrimages"
+  ],
+  "cover": {
+    "colour": "sand300",
+    "icon": "book"
+  },
+  "version": "1.0.0",
+  "date": "2026-11",
+  "sources": [
+    {
+      "id": "gutenberg-52958",
+      "work": "Revelations of Divine Love",
+      "author": "Julian of Norwich",
+      "translator": "Grace Warrack (editor; modernised text)",
+      "year": "1901",
+      "licence": "Public domain",
+      "url": "https://www.gutenberg.org/ebooks/52958"
+    }
+  ]
+}

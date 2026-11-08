@@ -1,0 +1,42 @@
+{
+  "id": "songs-of-ascents-readings",
+  "kind": "reflection",
+  "order": 14,
+  "title": "Songs for the Climb",
+  "subtitle": "Eight Days with the Psalms of Ascent for the Camino Aragonés",
+  "route_slug": "camino-aragones",
+  "days": 8,
+  "description_short": "Eight days with the fifteen Psalms of Ascent, Psalms 120 to 134: a morning reading and an evening reflection for each day on the Camino Aragonés. Slow, honest and quiet.",
+  "description_long": "The Psalms of Ascent are fifteen short poems, Psalms 120 to 134, each headed as a song of ascents. They are traditionally understood as the songs pilgrims sang as they went up to Jerusalem, though scholars differ on how they were first used. They are about the things a long walk brings to the surface: distress and the wish to leave, a hill to climb, gladness at an arrival, a narrow escape, tears, tiredness, waiting for morning, and a quiet heart.\n\nSongs for the Climb is made to go with the Camino Aragonés, which runs from Somport, in the Pyrenees, to Puente la Reina, about 160 km. It has eight days, one for each day of walking or each day at home. Every day has a morning reading of about five minutes and an evening reflection of about three. The morning begins with two short stretches of the psalms, quoted word for word from the World English Bible, a modern English translation in the public domain. Then comes a reflection that starts from something on the road: a hill, a gate, a stream, a long afternoon. Then two small things to carry for the next hour, a question and a practice that needs nothing but attention. The evening looks back over the day with two or three gentle questions and ends with a short original prayer, open enough to be said as a wish by a reader who prays differently, or who does not pray.\n\nThe days follow the order of the psalms themselves, from distress and setting out, through danger, tears and the long affliction, to the house of God and a blessing at night. The psalms are Hebrew poems, Jewish before they were Christian, prayed by both for a very long time, and this book says so plainly. It invites and does not push, and it is honest where a psalm is hard. Read it on a bench, in a pilgrim hostel bunk, or at your own kitchen table.",
+  "keywords": [
+    "Camino de Santiago",
+    "Camino Aragonés",
+    "Psalms of Ascent",
+    "pilgrimage reflections",
+    "daily readings",
+    "prayer",
+    "walking"
+  ],
+  "categories": [
+    "Religion / Biblical Meditations / Old Testament",
+    "Religion / Christian Living / Spiritual Growth",
+    "Travel / Special Interest / Pilgrimages"
+  ],
+  "cover": {
+    "colour": "blue100",
+    "icon": "book"
+  },
+  "version": "1.0.0",
+  "date": "2026-11",
+  "sources": [
+    {
+      "id": "gutenberg-8294",
+      "work": "The Psalms of Ascent (Psalms 120 to 134), World English Bible",
+      "author": "The psalmists (the headings name David and Solomon for some), in the World English Bible",
+      "translator": "World English Bible contributors",
+      "year": "public domain, modern translation",
+      "licence": "Public domain",
+      "url": "https://www.gutenberg.org/ebooks/8294"
+    }
+  ]
+}

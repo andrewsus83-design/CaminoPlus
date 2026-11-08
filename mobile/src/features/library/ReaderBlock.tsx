@@ -4,6 +4,7 @@ import { Icon } from '@/components/Icon';
 import { c, radius, role } from '@/theme';
 import type { Block } from './books';
 import { BlockBody, hasLink } from './BookText';
+import { KeptMark } from './BookmarkToggle';
 
 /** The margin of the page, where the marks of notes and bookmarks sit. The reading column is this much narrower than the screen. */
 export const GUTTER = 28;
@@ -16,8 +17,8 @@ export const blockLabel = (text: string, notes: number, bookmarked: boolean): st
  * One paragraph (or quote, or list) of a chapter that can carry a note or a bookmark. A tap on the words shows two buttons under them (Add a
  * note, Bookmark); a long press opens the note sheet at once. In the margin on the right a side mark shows what the paragraph carries: a
  * small pen for a note, which a tap opens, and a small bookmark. The mark of a note is a button of its own; the bookmark mark is only a
- * picture (the screen reader hears "Bookmarked" in front of the paragraph). A screen reader reads the paragraph, and a double tap shows the
- * two buttons, which it can then reach.
+ * picture (the screen reader hears "Bookmarked" in front of the paragraph). A screen reader reads the paragraph (as a button, which is what a
+ * double tap on it is: it shows the two buttons, which it can then reach).
  */
 export function ReaderBlock({ block, italicReady, text, notes, bookmarked, active, onToggle, onNote, onBookmark }: {
   block: Block;
@@ -42,6 +43,7 @@ export function ReaderBlock({ block, italicReady, text, notes, bookmarked, activ
       <View style={[{ flex: 1, minWidth: 0 }, active && { backgroundColor: role.sunken, borderRadius: radius.sm, marginHorizontal: -8, paddingHorizontal: 8, paddingVertical: 6, marginVertical: -6 }]}>
         <Pressable
           accessible={whole}
+          accessibilityRole={whole ? 'button' : undefined}
           accessibilityLabel={whole ? label : undefined}
           accessibilityHint={whole ? 'Shows Add a note and Bookmark for this paragraph' : undefined}
           accessibilityActions={[{ name: 'note', label: 'Add a note' }, { name: 'bookmark', label: bookmarked ? 'Remove bookmark' : 'Bookmark this paragraph' }]}
@@ -74,7 +76,7 @@ export function ReaderBlock({ block, italicReady, text, notes, bookmarked, activ
         )}
         {bookmarked && (
           <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants" style={{ width: 24, alignItems: 'center' }}>
-            <Icon name="bookmark" color={role.action} size={17} filled />
+            <KeptMark size={17} />
           </View>
         )}
       </View>

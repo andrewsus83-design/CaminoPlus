@@ -128,7 +128,8 @@ export function snippet(text: string, max: number): string {
   if (last >= 0xd800 && last <= 0xdbff) end -= 1; // the first half of a pair: leave it out
   const cut = text.slice(0, end);
   const space = cut.lastIndexOf(' ');
-  return `${(space > max * 0.6 ? cut.slice(0, space) : cut).trimEnd()}…`;
+  const whole = /\s/.test(text.charAt(end)); // the cut falls between two words: nothing to take back
+  return `${(!whole && space > max * 0.6 ? cut.slice(0, space) : cut).trimEnd()}…`;
 }
 
 /** The chapter of a book's text by its id, or null. */

@@ -6,7 +6,7 @@ import { Icon } from '@/components/Icon';
 import { Pill } from '@/components/Pill';
 import { Card, IconButton, SectionLabel } from '@/components/ui';
 import { bookLine, creditLine, formatMinutes } from '@/features/library/books';
-import { BookmarkToggle } from '@/features/library/BookmarkToggle';
+import { BookmarkToggle, KeptMark } from '@/features/library/BookmarkToggle';
 import { NotHere } from '@/features/library/NotHere';
 import { resumePoint } from '@/features/library/reading';
 import { itemKey } from '@/features/library/search';
@@ -91,7 +91,7 @@ function BookView({ open, goBack }: { open: OpenBook; goBack: () => void }) {
                 <AppText variant="label">{ch.title}</AppText>
                 <AppText variant="caption" muted>{line}</AppText>
               </View>
-              {kept && <Icon name="bookmark" color={role.action} size={18} filled />}
+              {kept && <KeptMark />}
               <Icon name="chevron" color={role.muted} size={20} />
             </Pressable>
           );

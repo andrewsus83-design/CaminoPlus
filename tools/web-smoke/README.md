@@ -37,10 +37,14 @@ Then the **scenarios** ([scenarios.mjs](scenarios.mjs)), each in light and dark,
 - the tab bar shows Me, Stays, Maps, Discover and Library, and each tab opens;
 - the gear on Me opens `/settings` (no tab bar there) and Back returns to `/me`, also when Settings was opened from a link;
 - switching light/dark on Settings returns to Settings, and Back goes to Me;
-- Library shows a banner and the Bible, Books and Music tabs; the gold pen opens `/diary/new`; its top row is a search field, the Bookmarks
-  button and the diary button (no title, no diary card): the diary button opens `/diary`, a search lists what it finds from all three tabs
-  grouped by tab (and says "Nothing found for ..." with a way back), and the Bookmarks button opens `/library/bookmarks` with the
-  bookmarked row and post (the full account has one bookmarked post);
+- Library shows a banner and the Bible, Books and Music tabs (Bible and Music say they are previews; Books is real and says how many books are in the app);
+  the gold pen opens `/diary/new`; its top row is a search field, the Bookmarks button and the diary button (no title, no diary card): the diary
+  button opens `/diary`, a search lists what it finds from all three tabs grouped by tab (the Preview notice shows only while an example is in the
+  results, and says "Nothing found for ..." with a way back and no notice when nothing is), and the Bookmarks button opens `/library/bookmarks` with
+  the bookmarked row and post (the full account has one bookmarked post);
+- a Books cover opens its book (`/library/book/<id>`), Start reading opens the reader, Next replaces the chapter and Back returns to the book;
+- a note is written beside a paragraph, shows its mark, is listed in the Notebook (opened from Bookmarks, `/library/notes`) under its book, grows into a
+  Diary page and is deleted;
 - Stays lists the stays of the stage and one opens with its details;
 - logging out from Settings lands on Welcome;
 - launching the app lands on Welcome (signed out), Onboarding (signed in, no journey) or Me;

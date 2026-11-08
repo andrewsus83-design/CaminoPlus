@@ -97,7 +97,8 @@ export const SCENARIOS = [
       await page.getByRole('heading', { name: 'Library', exact: true }).waitFor();
       step('look for the banner');
       await page.getByText('Scripture for the long road', { exact: true }).waitFor();
-      const notice = { Bible: /The Bible text is not in the app yet/, Books: /Books are not in the app yet/, Music: /Music is not in the app yet/ };
+      // The Bible and Music tabs are previews and say so. The Books tab is real: it says how many books are in the app, and has no Preview notice.
+      const notice = { Bible: /The Bible text is not in the app yet/, Books: /\d+ books? in the app\. They are saved on this phone/, Music: /Music is not in the app yet/ };
       for (const tab of ['Bible', 'Books', 'Music']) {
         step(`tap ${tab}`);
         await page.getByText(tab, { exact: true }).last().click();
@@ -137,7 +138,7 @@ export const SCENARIOS = [
     },
   },
   {
-    name: 'Library search: all three tabs at once, grouped, a calm "nothing found", and Clear search brings the tabs back',
+    name: 'Library search: all three tabs at once, grouped, a notice only while an example is in the results, a calm "nothing found", and Clear search brings the tabs back',
     persona: 'in',
     async run({ page, step, go }) {
       step('open Library');
@@ -145,12 +146,15 @@ export const SCENARIOS = [
       const field = page.getByRole('textbox', { name: 'Search the library' });
       step('type "pray"');
       await field.fill('pray');
-      await page.getByText('2 results for “pray”', { exact: true }).waitFor();
+      await page.getByText(/^\d+ results? for “pray”$/).waitFor();
       await page.getByText('Prayers for the road', { exact: true }).waitFor();
-      await page.getByText('Prayers and blessings', { exact: true }).waitFor();
+      step('a Bible row is an example: the notice says so');
+      await page.getByText('The Bible results are examples. The Bible text is not in the app yet.', { exact: true }).waitFor();
       step('type something that is nowhere');
       await field.fill('zzz');
       await page.getByText('Nothing found for “zzz”', { exact: true }).waitFor();
+      step('nothing found: nothing on the screen is an example, so there is no Preview notice');
+      await eventually(() => page.getByText(/are examples\./).count(), (n) => n === 0, { what: 'the number of "examples" notices when nothing is found' });
       step('tap Clear search');
       await page.getByRole('button', { name: 'Clear search', exact: true }).first().click();
       await page.getByText('Scripture for the long road', { exact: true }).waitFor();
@@ -177,6 +181,78 @@ export const SCENARIOS = [
       await eventually(() => page.getByRole('tab').count(), (n) => n === 0, { what: 'the number of tabs shown on Bookmarks (there is no tab bar there)' });
       await back(ctx);
       await waitPath(page, '/library', 'the address after Back');
+    },
+  },
+  {
+    name: 'Books: a cover opens its book, Start reading opens the reader, Next replaces the chapter, and Back returns to the book',
+    persona: 'in',
+    async run(ctx) {
+      const { page, step, go } = ctx;
+      step('open Library, the Books tab');
+      await go('/library');
+      await page.getByText('Books', { exact: true }).last().click();
+      step('tap the first cover');
+      const cover = page.getByRole('button', { name: /\. (Guide|Readings) · / }).first();
+      await cover.waitFor();
+      await cover.click();
+      await eventually(() => pathOf(page), (p) => /^\/library\/book\/[a-z0-9-]+$/.test(p), { what: 'the address of the book' });
+      await page.getByText('About this edition', { exact: true }).waitFor();
+      const book = pathOf(page);
+      step('tap Start reading');
+      await page.getByRole('button', { name: /^(Start|Continue) reading$/ }).click();
+      await eventually(() => pathOf(page), (p) => p.startsWith(`${book}/`) && p.length > book.length + 1, { what: 'the address of the chapter' });
+      await page.getByText(/Tap a paragraph to bookmark it or add a note beside it\./).waitFor();
+      const first = pathOf(page);
+      step('tap Next: it replaces the chapter');
+      await page.getByRole('button', { name: /^Next: / }).click();
+      await eventually(() => pathOf(page), (p) => p.startsWith(`${book}/`) && p !== first, { what: 'the address of the next chapter' });
+      step('tap Back: the book, not the first chapter');
+      await page.getByRole('button', { name: 'Back', exact: true }).first().click();
+      await waitPath(page, book, 'the address after Back');
+      await page.getByRole('button', { name: /^Continue reading$/ }).waitFor();
+    },
+  },
+  {
+    name: 'Notes: a note is written beside a paragraph, it shows its mark and is in the Notebook (from Bookmarks) under its book, grows into a Diary page, and is deleted',
+    persona: 'in',
+    async run(ctx) {
+      const { page, step, go } = ctx;
+      step('open the first book and its first chapter');
+      await go('/library');
+      await page.getByText('Books', { exact: true }).last().click();
+      const cover = page.getByRole('button', { name: /\. (Guide|Readings) · / }).first();
+      await cover.waitFor();
+      await cover.click();
+      await page.getByRole('button', { name: /^Start reading$/ }).click();
+      await page.getByText(/Tap a paragraph to bookmark it or add a note beside it\./).waitFor();
+      step('tap a paragraph, then Add a note');
+      await page.getByRole('button', { name: /^[A-Z].{80,}/ }).first().click();
+      await page.getByRole('button', { name: 'Add a note', exact: true }).click();
+      step('write it');
+      await page.getByRole('textbox', { name: 'Your note' }).fill('Open hand, not a clenched fist.');
+      await page.getByRole('button', { name: 'Save note', exact: true }).click();
+      step('the paragraph shows the mark of a note, and it opens the note');
+      await page.getByRole('button', { name: /^Note on this paragraph$/ }).waitFor();
+      await eventually(() => page.evaluate(() => Object.keys(localStorage).filter((k) => /^kv:u\..*\.notes$/.test(k)).length), (n) => n === 1, { what: 'the notes saved on the phone, under a u.<id>. key' });
+      step('open the Notebook from Bookmarks');
+      await go('/library/bookmarks');
+      await page.getByRole('button', { name: 'Notebook', exact: true }).click();
+      await waitPath(page, '/library/notes', 'the address after the Notebook button');
+      await page.getByRole('heading', { name: 'Notebook', exact: true }).waitFor();
+      await page.getByText(/^Only on this phone\. Notes are not uploaded and not shared\./).waitFor();
+      await page.getByText('Open hand, not a clenched fist.').first().waitFor();
+      step('grow the note into a Diary page: the page opens with the words, and Back returns to the Notebook');
+      await page.getByRole('button', { name: /^Open hand, not a clenched fist\./ }).first().click();
+      await page.getByRole('button', { name: 'Grow into a Diary page', exact: true }).click();
+      await eventually(() => pathOf(page), (p) => /^\/diary\/[0-9a-f-]{36}$/.test(p), { what: 'the address of the new Diary page' });
+      await page.getByText('Open hand, not a clenched fist.').first().waitFor();
+      await page.getByRole('button', { name: 'Back', exact: true }).first().click();
+      await waitPath(page, '/library/notes', 'the address after Back from the Diary page');
+      step('open the note and delete it');
+      await page.getByRole('button', { name: /^Open hand, not a clenched fist\./ }).first().click();
+      page.once('dialog', (d) => d.accept());
+      await page.getByRole('button', { name: 'Delete', exact: true }).click();
+      await page.getByText('No notes yet', { exact: true }).waitFor();
     },
   },
   {

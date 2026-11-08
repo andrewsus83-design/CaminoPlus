@@ -5,14 +5,17 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import {
-  BOOKMARKS_MAX, bookmarkKeys, hasBookmark, packBookmarks, parseBookmarks, toggleBookmark, type Bookmark,
+  BOOKMARKS_MAX, BOOKMARK_KEY_MAX, bookmarkKeys, hasBookmark, packBookmarks, parseBookmarks, toggleBookmark, type Bookmark,
 } from '../bookmarks';
 import {
   POST_COLUMNS, SAVED_POSTS_MAX, buildSavedPosts, changeFailure, makeSavedPostsApi, mediaLabel, packSavedPosts, parseAuthorRows, parsePostRows,
   parseSaveRows, parseSavedCopy, postByline, postHeading, savedView, type SavedPost, type SavedPostsClient, type SavedPostsNet, type SavedPostsQuery,
 } from '../savedPosts';
-import { LIBRARY_TABS, SAMPLE_BOOKS, SAMPLE_PLAYLISTS, SAMPLE_SHELVES } from '../sample';
-import { hitCount, hitTabs, hitsForKeys, isSearching, itemKey, resultsLine, searchLibrary, shownQuery, wordsOf } from '../search';
+import { BOOKMARKS_PRIVATE_LINE, LIBRARY_TABS, PREVIEW_NOTICE, SAMPLE_PLAYLISTS, SAMPLE_SHELVES, bookmarksNotice, exampleNames, isExampleTab, searchNotice } from '../sample';
+import { bookWords, hitCount, hitTabs, hitsForKeys, isSearching, itemKey, resultsLine, searchLibrary, shownQuery, wordsOf } from '../search';
+import { libraryBooks, type CatalogBook, type LibraryBook } from '../books';
+import { READING_MAX, packReading, parseReading, rememberPlace, resumePoint, type ReadingPlace } from '../reading';
+import { bookPlaces } from '../places';
 
 let n = 0;
 const check = (name: string, fn: () => void) => { fn(); n += 1; console.log(`ok   ${name}`); };
@@ -26,51 +29,88 @@ const root = process.cwd(); // npm test runs from mobile/
 const read = (p: string) => readFileSync(join(root, p), 'utf8');
 
 const ids = (rows: readonly { id: string }[]) => rows.map((r) => r.id);
+
+// The Books tab is real: its rows are the books of the bundle, handed to the search. These stand in for a few of them.
+const cat = (id: string, order: number, kind: 'guide' | 'reflection', title: string, subtitle: string, minutes: number, chapters: [string, string][] = [['00-welcome', 'Welcome']]): CatalogBook => ({
+  id, kind, order, title, subtitle, description: 'D', words: minutes * 220, minutes, cover: { colour: kind === 'guide' ? 'sand300' : 'successWash', icon: kind === 'guide' ? 'library' : 'book' },
+  chapters: chapters.map(([cid, t]) => ({ id: cid, title: t, minutes: 1 })),
+});
+const CATALOG: CatalogBook[] = [
+  cat('camino-ingles-guide', 6, 'guide', 'The English Way', 'A Pilgrim\'s Guide to the Camino Inglés', 47, [['00-welcome', 'Welcome'], ['01-the-way-in-brief', 'The Way in brief']]),
+  cat('imitation-of-christ-readings', 9, 'reflection', 'The Quiet Road', 'Twenty-One Days with The Imitation of Christ for the Pilgrim', 165, [['00-how-to-use-this-book', 'How to use this book'], ['02-day-01-a-stranger-and-a-pilgrim', 'Day 1. A stranger and a pilgrim']]),
+  cat('walking-readings', 18, 'reflection', 'Toward the Sunset', 'Five Days with Thoreau on Walking', 40),
+  cat('camino-frances-guide', 1, 'guide', 'The French Way', 'A Pilgrim\'s Guide to the Camino Francés', 200),
+];
+const BOOKS: LibraryBook[] = libraryBooks(CATALOG);
 const found = (query: string) => {
-  const s = searchLibrary(query);
+  const s = searchLibrary(query, BOOKS);
   return { bible: ids(s.hits.Bible), books: ids(s.hits.Books), music: ids(s.hits.Music), total: s.total };
 };
 
 /* ================================================================ search */
 
-check('every example row is found by its own title, in capitals and with accents added, and by nothing that is not in it', () => {
+check('every row is found by its own title, in capitals and with accents added, and by nothing that is not in it: the examples of the Bible and Music tabs and the real books', () => {
   const accent = (t: string) => t.replace(/e/g, 'é').replace(/o/g, 'ò').toUpperCase();
-  for (const s of SAMPLE_SHELVES) for (const q of [s.title, s.title.toUpperCase(), accent(s.title)]) assert.ok(ids(searchLibrary(q).hits.Bible).includes(s.id), `${q} finds the Bible shelf ${s.id}`);
-  for (const b of SAMPLE_BOOKS) for (const q of [b.title, b.title.toUpperCase(), accent(b.title)]) assert.ok(ids(searchLibrary(q).hits.Books).includes(b.id), `${q} finds the book ${b.id}`);
-  for (const p of SAMPLE_PLAYLISTS) for (const q of [p.title, p.title.toUpperCase(), accent(p.title)]) assert.ok(ids(searchLibrary(q).hits.Music).includes(p.id), `${q} finds the playlist ${p.id}`);
+  for (const s of SAMPLE_SHELVES) for (const q of [s.title, s.title.toUpperCase(), accent(s.title)]) assert.ok(ids(searchLibrary(q, BOOKS).hits.Bible).includes(s.id), `${q} finds the Bible shelf ${s.id}`);
+  for (const b of BOOKS) for (const q of [b.title, b.title.toUpperCase(), accent(b.title)]) assert.ok(ids(searchLibrary(q, BOOKS).hits.Books).includes(b.id), `${q} finds the book ${b.id}`);
+  for (const p of SAMPLE_PLAYLISTS) for (const q of [p.title, p.title.toUpperCase(), accent(p.title)]) assert.ok(ids(searchLibrary(q, BOOKS).hits.Music).includes(p.id), `${q} finds the playlist ${p.id}`);
   assert.equal(found('zzzz').total, 0);
   assert.equal(found('psalmsx').total, 0, 'a word that is longer than the row\'s word is not found');
 });
 
-check('the line under a title is searched too: the note of a shelf or playlist, the kind of a book', () => {
+check('the line under a title is searched too: the note of a shelf or playlist, and for a book its subtitle and its kind', () => {
   assert.deepEqual(found('pilgrim blessing'), { bible: ['prayers'], books: [], music: [], total: 1 });
   assert.deepEqual(found('albergue'), { bible: [], books: [], music: ['evening'], total: 1 });
-  assert.deepEqual(found('language'), { bible: [], books: ['spanish'], music: [], total: 1 });
-  assert.deepEqual(found('Camino'), { bible: ['plans'], books: [], music: [], total: 1 });
+  assert.deepEqual(found('thoreau'), { bible: [], books: ['walking-readings'], music: [], total: 1 }, 'the subtitle of a book');
+  assert.deepEqual(found('imitation christ'), { bible: [], books: ['imitation-of-christ-readings'], music: [], total: 1 });
+  assert.deepEqual(found('inglés'), { bible: [], books: ['camino-ingles-guide'], music: [], total: 1 }, 'accents do not matter, in the subtitle either');
+  assert.deepEqual(found('ingles'), found('inglés'));
+  assert.deepEqual(found('Camino'), { bible: ['plans'], books: ['camino-frances-guide', 'camino-ingles-guide'], music: [], total: 3 }, 'in the order of the catalog (the French Way is the first of the guides)');
+});
+
+check('a book is found by its kind: "guide" lists the guides, "readings" and "reflection" the readings, and the length of a book is not a word to search by', () => {
+  assert.deepEqual(found('guide').books, ['camino-frances-guide', 'camino-ingles-guide']);
+  assert.deepEqual(found('guides').books, [], 'a word that is longer than the row\'s word is not found');
+  assert.deepEqual(found('guidebook').books, found('guide').books, 'what a person may type for a guide');
+  assert.deepEqual(found('readings').books, ['imitation-of-christ-readings', 'walking-readings']);
+  assert.deepEqual(found('reflection').books, ['imitation-of-christ-readings', 'walking-readings']);
+  assert.deepEqual(found('reflections').books, found('reflection').books);
+  assert.equal(found('min').books.length, 0, '"47 min" is how long it reads, not what it is');
+  assert.equal(found('165').total, 0);
+  assert.deepEqual(bookWords({ title: 'T', subtitle: 'S', kind: 'Guide · 3 h 20 min' }), ['books', 't', 's', 'guide', 'guidebook']);
+  assert.deepEqual(bookWords({ title: 'T', subtitle: 'S', kind: 'Readings · 2 h' }), ['books', 't', 's', 'readings', 'reflection', 'reflections']);
 });
 
 check('the name of a tab finds the whole tab, so "bible", "books" and "music" are not dead ends', () => {
   assert.deepEqual(found('bible'), { bible: ids(SAMPLE_SHELVES), books: [], music: [], total: SAMPLE_SHELVES.length });
-  assert.deepEqual(found('book'), { bible: [], books: ids(SAMPLE_BOOKS), music: [], total: SAMPLE_BOOKS.length });
+  assert.deepEqual(found('book'), { bible: [], books: ids(BOOKS), music: [], total: BOOKS.length });
   assert.deepEqual(found('BOOKS'), found('book'));
   assert.deepEqual(found('music'), { bible: [], books: [], music: ids(SAMPLE_PLAYLISTS), total: SAMPLE_PLAYLISTS.length });
 });
 
+check('with no books in the bundle the search still finds the examples, and the Books tab has nothing to find', () => {
+  const s = searchLibrary('road', []);
+  assert.deepEqual(ids(s.hits.Books), []);
+  assert.deepEqual(hitTabs(s.hits), ['Bible', 'Music']);
+  assert.equal(searchLibrary('book', []).total, 0);
+});
+
 check('a word counts when it is the start of a word of the row, and every word of the query has to: "pray", "road pray", not "ray"', () => {
-  assert.deepEqual(found('pray'), { bible: ['prayers'], books: ['prayers'], music: [], total: 2 });
+  assert.deepEqual(found('pray'), { bible: ['prayers'], books: [], music: [], total: 1 });
   assert.deepEqual(found('road pray'), { bible: ['prayers'], books: [], music: [], total: 1 }, 'the road AND a prayer: only the Bible shelf has both');
   assert.deepEqual(found('pray road'), found('road pray'), 'the order of the words does not matter');
   assert.equal(found('ray').total, 0, 'the middle of a word is not the start of one');
-  assert.deepEqual(found('road'), { bible: ['psalms', 'prayers'], books: ['spanish'], music: ['chants'], total: 4 });
+  assert.deepEqual(found('road'), { bible: ['psalms', 'prayers'], books: ['imitation-of-christ-readings'], music: ['chants'], total: 4 });
   assert.deepEqual(found('for the road').total, 4);
   assert.deepEqual(found('morning wa'), { bible: [], books: [], music: ['morning'], total: 1 }, 'a word still being typed matches');
+  assert.deepEqual(found('quiet road'), { bible: [], books: ['imitation-of-christ-readings'], music: [], total: 1 }, 'both words of a title');
 });
 
 check('case, accents, punctuation and blanks never matter', () => {
   assert.deepEqual(found('  ROAD.  '), found('road'));
   assert.deepEqual(found('road,'), found('road'));
   assert.deepEqual(found('“road”'), found('road'));
-  assert.deepEqual(found('spáñish'), found('spanish'));
+  assert.deepEqual(found('pílgrim'), found('pilgrim'));
   assert.deepEqual(found('Prayers  for\tthe\nroad'), found('prayers for the road'));
   assert.deepEqual(found('quiet-evening'), found('quiet evening'), 'a hyphen is a space');
   assert.deepEqual(wordsOf('Nájera, "La Rioja"!'), ['najera', 'la', 'rioja']);
@@ -86,20 +126,21 @@ check('no query is not a search, a query of only punctuation is one that finds n
   assert.equal(isSearching('   \n '), false);
   assert.equal(isSearching('a'), true);
   assert.equal(isSearching('...'), true);
-  for (const q of ['', '   ', '...', '?!', '“”']) assert.equal(searchLibrary(q).total, 0, JSON.stringify(q));
+  for (const q of ['', '   ', '...', '?!', '“”']) assert.equal(searchLibrary(q, BOOKS).total, 0, JSON.stringify(q));
 });
 
-check('the answer is grouped by tab in the order of the tabs, counts every row once, and does not touch the examples', () => {
-  const before = JSON.stringify([SAMPLE_SHELVES, SAMPLE_BOOKS, SAMPLE_PLAYLISTS]);
-  const s = searchLibrary('road');
+check('the answer is grouped by tab in the order of the tabs, counts every row once, and does not touch the examples or the books', () => {
+  const before = JSON.stringify([SAMPLE_SHELVES, BOOKS, SAMPLE_PLAYLISTS]);
+  const s = searchLibrary('road', BOOKS);
   assert.deepEqual(Object.keys(s.hits), [...LIBRARY_TABS]);
   assert.equal(s.total, hitCount(s.hits));
   assert.deepEqual(hitTabs(s.hits), ['Bible', 'Books', 'Music']);
-  assert.deepEqual(hitTabs(searchLibrary('music').hits), ['Music']);
-  assert.deepEqual(hitTabs(searchLibrary('zzzz').hits), []);
+  assert.deepEqual(hitTabs(searchLibrary('music', BOOKS).hits), ['Music']);
+  assert.deepEqual(hitTabs(searchLibrary('zzzz', BOOKS).hits), []);
   s.hits.Bible.pop();
-  assert.equal(JSON.stringify([SAMPLE_SHELVES, SAMPLE_BOOKS, SAMPLE_PLAYLISTS]), before, 'a result list is a copy');
-  assert.equal(searchLibrary('road').total, 4);
+  s.hits.Books.pop();
+  assert.equal(JSON.stringify([SAMPLE_SHELVES, BOOKS, SAMPLE_PLAYLISTS]), before, 'a result list is a copy');
+  assert.equal(searchLibrary('road', BOOKS).total, 4);
 });
 
 check('what is said back: one line, no runs of blanks, cut short, and the count in words', () => {
@@ -107,32 +148,59 @@ check('what is said back: one line, no runs of blanks, cut short, and the count 
   assert.equal(shownQuery('x'.repeat(100)).length, 40);
   assert.ok(shownQuery('x'.repeat(100)).endsWith('…'));
   assert.equal(shownQuery('x'.repeat(40)), 'x'.repeat(40), 'exactly the limit is not cut');
-  assert.equal(resultsLine(searchLibrary('psalms')), '1 result for “psalms”');
-  assert.equal(resultsLine(searchLibrary('road')), '4 results for “road”');
-  assert.equal(resultsLine(searchLibrary('zzz')), 'Nothing found for “zzz”');
-  assert.equal(resultsLine(searchLibrary('  zzz   qqq ')), 'Nothing found for “zzz qqq”');
-  assert.ok(resultsLine(searchLibrary('q'.repeat(300))).length < 80, 'a pasted paragraph does not break the line');
+  assert.equal(resultsLine(searchLibrary('psalms', BOOKS)), '1 result for “psalms”');
+  assert.equal(resultsLine(searchLibrary('road', BOOKS)), '4 results for “road”');
+  assert.equal(resultsLine(searchLibrary('zzz', BOOKS)), 'Nothing found for “zzz”');
+  assert.equal(resultsLine(searchLibrary('  zzz   qqq ', BOOKS)), 'Nothing found for “zzz qqq”');
+  assert.ok(resultsLine(searchLibrary('q'.repeat(300), BOOKS)).length < 80, 'a pasted paragraph does not break the line');
 });
 
-check('a row is bookmarked under its tab and id: the Bible shelf and the book that are both "prayers" are two rows', () => {
+check('only the Bible and Music tabs are examples: their notice says so, and a search or the Bookmarks screen says so only while one of their rows is on it', () => {
+  assert.equal(isExampleTab('Bible'), true);
+  assert.equal(isExampleTab('Music'), true);
+  assert.equal(isExampleTab('Books'), false, 'the books are real');
+  assert.deepEqual(Object.keys(PREVIEW_NOTICE), ['Bible', 'Music'], 'there is no Preview notice for the Books tab');
+  for (const t of ['Bible', 'Music'] as const) assert.match(PREVIEW_NOTICE[t], /not in the app yet/);
+  // a search that finds books alone has no notice at all
+  assert.equal(searchNotice(hitTabs(searchLibrary('guide', BOOKS).hits)), null);
+  assert.equal(searchNotice(hitTabs(searchLibrary('zzz', BOOKS).hits)), null, 'nothing found: nothing on screen is an example');
+  assert.equal(searchNotice(['Books']), null);
+  assert.equal(searchNotice(['Bible']), 'The Bible results are examples. The Bible text is not in the app yet.');
+  assert.equal(searchNotice(['Music']), 'The Music results are examples. Music is not in the app yet.');
+  assert.equal(searchNotice(['Bible', 'Books', 'Music']), 'The Bible and Music results are examples. The Bible text and music are not in the app yet.');
+  assert.equal(searchNotice(hitTabs(searchLibrary('road', BOOKS).hits)), 'The Bible and Music results are examples. The Bible text and music are not in the app yet.');
+  assert.equal(bookmarksNotice(['Books']), null);
+  assert.equal(bookmarksNotice([]), null);
+  assert.equal(bookmarksNotice(['Bible']), 'The Bible rows here are examples from the Library preview.');
+  assert.equal(bookmarksNotice(['Bible', 'Music']), 'The Bible and Music rows here are examples from the Library preview.');
+  assert.equal(exampleNames(['Books']), '');
+  assert.equal(exampleNames(['Music', 'Bible']), 'Bible and Music', 'in the order of the tabs');
+  assert.match(BOOKMARKS_PRIVATE_LINE, /^Kept only on this phone\. Logging out clears them\.$/);
+});
+
+check('a row is bookmarked under its own key: an example row under its tab and id, a book under its anchor (the same one a note on it carries)', () => {
   assert.equal(itemKey('Bible', 'prayers'), 'bible:prayers');
-  assert.equal(itemKey('Books', 'prayers'), 'books:prayers');
+  assert.equal(itemKey('Music', 'chants'), 'music:chants');
+  assert.equal(itemKey('Books', 'camino-ingles-guide'), 'book:camino-ingles-guide');
   const all = [
     ...SAMPLE_SHELVES.map((r) => itemKey('Bible', r.id)),
-    ...SAMPLE_BOOKS.map((r) => itemKey('Books', r.id)),
+    ...BOOKS.map((r) => itemKey('Books', r.id)),
     ...SAMPLE_PLAYLISTS.map((r) => itemKey('Music', r.id)),
   ];
   assert.equal(new Set(all).size, all.length, 'every key is its own');
   assert.equal(all.length, 12);
+  assert.ok(all.every((k) => k.length <= BOOKMARK_KEY_MAX));
 });
 
-check('the rows of a list of keys come back by tab, newest bookmark first, and a key that is no row any more shows nothing', () => {
-  const h = hitsForKeys(['music:sing', 'books:prayers', 'bible:prayers', 'bible:psalms', 'bible:gone', 'nonsense', 'music:morning']);
+check('the rows of a list of keys come back by tab, newest bookmark first; a key that is no row any more, and the key of a chapter or a paragraph, show nothing here', () => {
+  const h = hitsForKeys(['music:sing', 'book:walking-readings', 'bible:prayers', 'bible:psalms', 'bible:gone', 'nonsense', 'music:morning', 'book:camino-ingles-guide', 'book:withdrawn', 'books:prayers',
+    'book:camino-ingles-guide/00-welcome', 'book:camino-ingles-guide/00-welcome#2'], BOOKS);
   assert.deepEqual(ids(h.Bible), ['prayers', 'psalms'], 'in the order of the keys');
-  assert.deepEqual(ids(h.Books), ['prayers']);
+  assert.deepEqual(ids(h.Books), ['walking-readings', 'camino-ingles-guide'], 'the books too, and a book that is not in the bundle (or an old example key) is left out');
   assert.deepEqual(ids(h.Music), ['sing', 'morning']);
-  assert.equal(hitCount(hitsForKeys([])), 0);
-  assert.equal(hitCount(hitsForKeys(['bible:psalms', 'bible:psalms'])), 1, 'a key twice is one row');
+  assert.equal(hitCount(hitsForKeys([], BOOKS)), 0);
+  assert.equal(hitCount(hitsForKeys(['bible:psalms', 'bible:psalms'], BOOKS)), 1, 'a key twice is one row');
+  assert.equal(hitCount(hitsForKeys(['book:walking-readings'], [])), 0, 'no books in the bundle: nothing to show for it');
 });
 
 /* ================================================================ bookmarks of Library rows */
@@ -171,6 +239,91 @@ check('bookmarks: toggling puts a row in front, or takes it out; the list it was
   assert.equal(big.length, BOOKMARKS_MAX);
   assert.equal(big[0].key, `k:${BOOKMARKS_MAX + 19}`, 'the newest stay');
   assert.equal(parseBookmarks({ v: 1, items: Array.from({ length: BOOKMARKS_MAX + 50 }, (_, i) => ({ key: `k:${i}`, at: i })) })!.length, BOOKMARKS_MAX, 'a file that is too long is cut when it is read');
+});
+
+check('bookmarks: a book, a chapter or day and a paragraph are bookmarked under their anchors, in the same list as the rows of the tabs, and every anchor a book can make fits the limit', () => {
+  let list: Bookmark[] = [];
+  const keys = ['book:camino-ingles-guide', 'book:camino-ingles-guide/00-welcome', 'book:camino-ingles-guide/00-welcome#4', 'bible:psalms'];
+  keys.forEach((k, i) => { list = toggleBookmark(list, k, i + 1); });
+  assert.deepEqual(bookmarkKeys(list), [...keys].reverse(), 'newest first');
+  assert.deepEqual(parseBookmarks(JSON.parse(JSON.stringify(packBookmarks(list)))), list);
+  assert.equal(hasBookmark(list, 'book:camino-ingles-guide/00-welcome'), true);
+  assert.equal(hasBookmark(list, 'book:camino-ingles-guide/00-welcome#5'), false, 'another paragraph is another bookmark');
+  const longest = `book:camino-portugues-costero-guide/12-day-10-${'a-very-long-name-'.repeat(4)}for-a-day#9999`;
+  assert.ok(longest.length > 80 && longest.length <= BOOKMARK_KEY_MAX, `${longest.length}: longer than the first limit, within the new one`);
+  assert.equal(parseBookmarks({ v: 1, items: [{ key: longest, at: 1 }] })![0].key, longest, 'the anchor of a paragraph is kept whole');
+  assert.equal(parseBookmarks({ v: 1, items: [{ key: 'k'.repeat(BOOKMARK_KEY_MAX + 1), at: 1 }, { key: 'k'.repeat(BOOKMARK_KEY_MAX), at: 2 }] })!.length, 1, 'a key over the limit is skipped, one at the limit is kept');
+});
+
+/* ================================================================ where each book was last read */
+
+const rp = (bookId: string, chapterId: string, t = 1): ReadingPlace => ({ bookId, chapterId, at: t });
+
+check('reading places: what was packed reads back, through JSON as stored; anything else is "start empty" (null), never a throw', () => {
+  const list = [rp('a', '00-x', 30), rp('b', '01-y', 20)];
+  assert.deepEqual(parseReading(JSON.parse(JSON.stringify(packReading(list)))), list);
+  for (const junk of [undefined, null, 0, 'x', true, [], {}, { v: 2, items: [] }, { v: 1 }, { v: 1, items: 'x' }, { items: [] }]) assert.equal(parseReading(junk), null, JSON.stringify(junk));
+  assert.deepEqual(parseReading({ v: 1, items: [] }), []);
+});
+
+check('reading places: an item that does not read is skipped, a book twice is kept once (the first), a missing time is 0, at most READING_MAX', () => {
+  const list = parseReading({ v: 1, items: [null, 7, 'x', {}, { bookId: '', chapterId: 'c' }, { bookId: 'a' }, { bookId: 'a', chapterId: 5 }, { bookId: 'a', chapterId: '00-x', at: 9 }, { bookId: 'a', chapterId: '01-y', at: 99 },
+    { bookId: 'b', chapterId: '00-x', at: 'soon' }, { bookId: 'c', chapterId: '00-x', at: Infinity }, { bookId: 'x'.repeat(81), chapterId: '00-x' }, { bookId: 'd', chapterId: 'c'.repeat(121) }] });
+  assert.deepEqual(list, [rp('a', '00-x', 9), rp('b', '00-x', 0), rp('c', '00-x', 0)]);
+  assert.equal(parseReading({ v: 1, items: Array.from({ length: READING_MAX + 20 }, (_, i) => ({ bookId: `b${i}`, chapterId: '00-x', at: i })) })!.length, READING_MAX);
+});
+
+check('reading places: the book that was read last is in front, a book has one place, the list it was given is not changed, and at most READING_MAX books are kept', () => {
+  const none: ReadingPlace[] = [];
+  const one = rememberPlace(none, 'a', '00-x', 100);
+  assert.deepEqual(one, [rp('a', '00-x', 100)]);
+  assert.deepEqual(none, []);
+  const two = rememberPlace(one, 'b', '01-y', 200);
+  assert.deepEqual(two.map((p) => p.bookId), ['b', 'a']);
+  const moved = rememberPlace(two, 'a', '03-z', 300);
+  assert.deepEqual(moved, [rp('a', '03-z', 300), rp('b', '01-y', 200)], 'the place in a book is replaced, not added');
+  assert.deepEqual(two.map((p) => p.chapterId), ['01-y', '00-x'], 'the list it was given is not changed');
+  let big: ReadingPlace[] = [];
+  for (let i = 0; i < READING_MAX + 5; i++) big = rememberPlace(big, `b${i}`, '00-x', i);
+  assert.equal(big.length, READING_MAX);
+  assert.equal(big[0].bookId, `b${READING_MAX + 4}`, 'the newest stay');
+});
+
+check('Continue reading: the chapter last read when the book still has it, else the first chapter and "Start reading"; nothing for a book with no chapters', () => {
+  const b = CATALOG[1]; // two chapters
+  assert.deepEqual(resumePoint(b, []), { chapterId: '00-how-to-use-this-book', title: 'How to use this book', resumed: false });
+  assert.deepEqual(resumePoint(b, [rp(b.id, '02-day-01-a-stranger-and-a-pilgrim')]), { chapterId: '02-day-01-a-stranger-and-a-pilgrim', title: 'Day 1. A stranger and a pilgrim', resumed: true });
+  assert.equal(resumePoint(b, [rp(b.id, '09-a-chapter-the-new-edition-dropped')])?.resumed, false, 'a chapter that is gone is not a place to resume at');
+  assert.equal(resumePoint(b, [rp('another-book', '02-day-01-a-stranger-and-a-pilgrim')])?.resumed, false, 'the place in another book is no place in this one');
+  assert.equal(resumePoint({ id: 'empty', chapters: [] }, []), null);
+});
+
+/* ================================================================ chapters and paragraphs that were bookmarked */
+
+check('the chapters, days and paragraphs bookmarked come back as rows, newest first, with where they are; what is not there any more, and what is not a chapter or a paragraph, shows nothing', () => {
+  const texts: Record<string, { chapters: { id: string; title: string; blocks: unknown[] }[] }> = {
+    'camino-ingles-guide': { chapters: [{ id: '00-welcome', title: 'Welcome', blocks: [{ t: 'h', level: 2, spans: [{ t: 'Heading' }] }, { t: 'p', spans: [{ t: 'A calm, honest guide ' }, { t: 'to the Camino', i: 1 }, { t: ' Inglés, with every fact in a ledger.' }] }, { t: 'hr' }] }] },
+  };
+  let loads = 0;
+  const load = (id: string) => { loads += 1; return (texts[id] ?? null) as never; };
+  const keys = ['book:camino-ingles-guide/00-welcome#1', 'bible:psalms', 'book:camino-ingles-guide', 'book:imitation-of-christ-readings/02-day-01-a-stranger-and-a-pilgrim', 'book:camino-ingles-guide/00-welcome#0', 'book:camino-ingles-guide/00-welcome#2',
+    'book:camino-ingles-guide/00-welcome#99', 'book:camino-ingles-guide/09-gone', 'book:withdrawn/00-x', 'book:camino-ingles-guide/00-welcome#1', 'garbage', 'book:imitation-of-christ-readings/02-day-01-a-stranger-and-a-pilgrim#3'];
+  const rows = bookPlaces(keys, CATALOG, load);
+  assert.deepEqual(rows.map((r) => [r.key, r.level]), [
+    ['book:camino-ingles-guide/00-welcome#1', 'paragraph'],
+    ['book:imitation-of-christ-readings/02-day-01-a-stranger-and-a-pilgrim', 'chapter'],
+  ]);
+  assert.deepEqual(rows[0], { key: 'book:camino-ingles-guide/00-welcome#1', level: 'paragraph', bookId: 'camino-ingles-guide', chapterId: '00-welcome', block: 1,
+    title: 'A calm, honest guide to the Camino Inglés, with every fact in a ledger.', line: 'Welcome · The English Way' });
+  assert.deepEqual(rows[1], { key: 'book:imitation-of-christ-readings/02-day-01-a-stranger-and-a-pilgrim', level: 'chapter', bookId: 'imitation-of-christ-readings', chapterId: '02-day-01-a-stranger-and-a-pilgrim', block: null,
+    title: 'Day 1. A stranger and a pilgrim', line: 'The Quiet Road' });
+  assert.ok(loads <= 2, `a book's text is read only for a paragraph, and once for each book (${loads})`);
+  assert.deepEqual(bookPlaces(['book:camino-ingles-guide/00-welcome'], CATALOG, () => { throw new Error('a chapter needs no text'); }).map((r) => r.level), ['chapter']);
+  assert.deepEqual(bookPlaces([], CATALOG, load), []);
+  assert.deepEqual(bookPlaces(keys, [], load), [], 'with no books in the bundle there is nothing to open');
+  assert.equal(bookPlaces(['book:camino-ingles-guide/00-welcome#1'], CATALOG, () => null).length, 0, 'a book whose text cannot be read has no paragraph to show');
+  const long = bookPlaces(['book:camino-ingles-guide/00-welcome#1'], CATALOG, () => ({ chapters: [{ id: '00-welcome', title: 'W', blocks: [{ t: 'p', spans: [{ t: 'word '.repeat(100) }] }, { t: 'p', spans: [{ t: 'word '.repeat(100) }] }] }] }) as never);
+  assert.ok(long[0].title.length <= 140 && long[0].title.endsWith('…'), 'a long paragraph is cut for the row');
 });
 
 /* ================================================================ bookmarked posts: reading what the database answers */
@@ -417,7 +570,7 @@ const happy: Script = (c) => ({ data: c.table === 'post_saves' ? SAVES : c.table
     const src = read('src/features/library/savedPosts.ts').split('\n').filter((l) => !/^\s*(\/\/|\*|\/\*)/.test(l)).join('\n');
     assert.doesNotMatch(src, /\.(insert|update|upsert|delete|rpc)\(/, 'savedPosts.ts only selects');
     assert.doesNotMatch(src, /from 'react|from 'expo|supabase-js|lib\/supabase|lib\/net'/, 'no React Native and no real client in the logic file');
-    for (const f of ['bookmarks.ts', 'search.ts']) assert.doesNotMatch(read(`src/features/library/${f}`), /from '(react|react-native|expo|@\/)/, `${f} is pure`);
+    for (const f of ['bookmarks.ts', 'search.ts', 'reading.ts', 'places.ts', 'sample.ts']) assert.doesNotMatch(read(`src/features/library/${f}`), /from '(react|react-native|expo|@\/)/, `${f} is pure`);
   });
 
   console.log(`${n} of ${n} passed`);

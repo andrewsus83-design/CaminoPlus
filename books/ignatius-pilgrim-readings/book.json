@@ -1,0 +1,42 @@
+{
+  "id": "ignatius-pilgrim-readings",
+  "kind": "reflection",
+  "order": 17,
+  "title": "The Pilgrim's Tale",
+  "subtitle": "Seven Days with Ignatius of Loyola for the Camino Baztanes",
+  "route_slug": "camino-baztanes",
+  "days": 7,
+  "description_short": "Seven days with the autobiography of Ignatius of Loyola, the soldier wounded at Pamplona who became a pilgrim: a morning reading and an evening reflection for each day of the Camino Baztanes.",
+  "description_long": "The Autobiography of St. Ignatius is the account of his own life that Ignatius of Loyola dictated near the end of it, in the third person, as the story of a man he calls the pilgrim. It begins with a young soldier wounded by a cannon ball at the defence of Pamplona, follows him through a long and slow recovery, and then sets him on the road: a night of vigil at Montserrat, a year of struggle and quiet at Manresa, begging his bread, trusting and sometimes failing to trust, and going on.\n\nThe Pilgrim's Tale is made to go with the Camino Baztanes, which runs from Bayonne to Pamplona, so that you may reach the city where the story begins. It has seven days. Every day has a morning reading of about five minutes and an evening reflection of about three. The morning begins with a short passage from the autobiography, quoted word for word from the 1900 edition edited by J. F. X. O'Conor, S.J., which is in the public domain. Then comes a reflection that starts from something on the road, and then a question and a small practice to carry for the next hour. The evening looks back over the day with two or three gentle questions and ends with a short original prayer, open enough to be said as a wish by a reader who prays differently, or who does not pray.\n\nThe autobiography is a Catholic book of its time, and it tells of visions and severe penances. This book says so plainly, chooses passages that a walker can follow, and does not recommend that anyone hurt themselves. It invites and does not push. Read it on a bench, in a pilgrim hostel bunk, or at your own kitchen table once the walking is done.",
+  "keywords": [
+    "Camino de Santiago",
+    "Camino Baztanes",
+    "Ignatius of Loyola",
+    "pilgrimage reflections",
+    "daily readings",
+    "Pamplona",
+    "prayer"
+  ],
+  "categories": [
+    "Religion / Christianity / Catholic",
+    "Religion / Christian Living / Spiritual Growth",
+    "Travel / Special Interest / Pilgrimages"
+  ],
+  "cover": {
+    "colour": "successWash",
+    "icon": "book"
+  },
+  "version": "1.0.0",
+  "date": "2026-11",
+  "sources": [
+    {
+      "id": "gutenberg-24534",
+      "work": "The Autobiography of St. Ignatius",
+      "author": "Ignatius of Loyola",
+      "translator": "edited by J. F. X. O'Conor, S.J. (the edition names no translator)",
+      "year": "1900",
+      "licence": "Public domain",
+      "url": "https://www.gutenberg.org/ebooks/24534"
+    }
+  ]
+}

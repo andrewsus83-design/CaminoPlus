@@ -1,7 +1,6 @@
 import { type ComponentRef, useEffect, useMemo, useRef, useState } from 'react';
 import { Pressable, ScrollView, View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Screen } from '@/components/Screen';
 import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
@@ -49,7 +48,6 @@ export default function Reader() {
 
 function ChapterView({ open, chapter, startBlock, goBack }: { open: OpenBook; chapter: OpenBook['content']['chapters'][number]; startBlock: number | null; goBack: () => void }) {
   const router = useRouter();
-  const insets = useSafeAreaInsets();
   const { book } = open;
   const italicReady = useItalicFaces();
   const marks = useLibraryBookmarks();
@@ -87,7 +85,7 @@ function ChapterView({ open, chapter, startBlock, goBack }: { open: OpenBook; ch
           <IconButton name="back" label="Back" onPress={goBack} />
           <BookmarkToggle on={marks.has(chapterKey)} title={chapter.title} toggle={() => marks.toggle(chapterKey)} />
         </View>
-        <ScrollView ref={scroller} style={{ flex: 1 }} contentContainerStyle={{ gap: 18, paddingTop: 8, paddingHorizontal: layout.screenMargin, paddingBottom: insets.bottom + 40 }} keyboardShouldPersistTaps="handled">
+        <ScrollView ref={scroller} style={{ flex: 1 }} contentContainerStyle={{ gap: 18, paddingTop: 8, paddingHorizontal: layout.screenMargin, paddingBottom: 72 }} keyboardShouldPersistTaps="handled">
           <View style={{ gap: 8, paddingRight: GUTTER }}>
             {!!place && <AppText variant="caption" muted>{`${book.title} · ${place.index + 1} of ${place.count}`}</AppText>}
             <AppText variant="h3" accessibilityRole="header">{chapter.title}</AppText>
@@ -101,32 +99,27 @@ function ChapterView({ open, chapter, startBlock, goBack }: { open: OpenBook; ch
               scrolled.current = true;
               scroller.current?.scrollTo({ y: Math.max(0, e.nativeEvent.layout.y - 96), animated: false });
             } : undefined;
-            if (prompt && i === prompt.listIndex) {
-              return (
-                <View key={i} onLayout={onLayout}>
-                  <ReflectionCard questions={prompt.questions} reflection={notes.here.reflection} onOpen={writeReflection} />
-                </View>
-              );
-            }
-            if (!isNotable(block)) {
-              return <View key={i} onLayout={onLayout} style={{ paddingRight: GUTTER }}><BlockBody block={block} italicReady={italicReady} /></View>;
-            }
+            // The questions of the day are the prompt, drawn in place of their list; a day whose end has no list still ends with the button.
+            const card = prompt && (i === prompt.listIndex || (prompt.listIndex === null && i === prompt.endIndex - 1));
+            const asked = <ReflectionCard questions={prompt?.questions ?? []} reflection={notes.here.reflection} onOpen={writeReflection} />;
+            if (prompt && i === prompt.listIndex) return <View key={i} onLayout={onLayout}>{asked}</View>;
             const key = blockAnchor(book.id, chapter.id, i);
-            return (
-              <View key={i} onLayout={onLayout}>
-                <ReaderBlock
-                  block={block}
-                  italicReady={italicReady}
-                  text={blockText(block)}
-                  notes={notes.here.blocks[i]?.length ?? 0}
-                  bookmarked={marks.has(key)}
-                  active={active === i}
-                  onToggle={() => setActive((a) => (a === i ? null : i))}
-                  onNote={() => writeNote(i)}
-                  onBookmark={() => marks.toggle(key)}
-                />
-              </View>
+            const body = !isNotable(block) ? (
+              <View style={{ paddingRight: GUTTER }}><BlockBody block={block} italicReady={italicReady} /></View>
+            ) : (
+              <ReaderBlock
+                block={block}
+                italicReady={italicReady}
+                text={blockText(block)}
+                notes={notes.here.blocks[i]?.length ?? 0}
+                bookmarked={marks.has(key)}
+                active={active === i}
+                onToggle={() => setActive((a) => (a === i ? null : i))}
+                onNote={() => writeNote(i)}
+                onBookmark={() => marks.toggle(key)}
+              />
             );
+            return <View key={i} onLayout={onLayout} style={card ? { gap: 18 } : undefined}>{body}{card ? asked : null}</View>;
           })}
 
           {!prompt && (

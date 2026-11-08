@@ -2,13 +2,289 @@
  "version": 1,
  "books": [
   {
+   "id": "camino-frances-guide",
+   "kind": "guide",
+   "order": 1,
+   "title": "The French Way",
+   "subtitle": "A Pilgrim's Guide to the Camino Francés",
+   "description": "A calm, honest guide to the Camino Francés: 33 walking days from Saint-Jean-Pied-de-Port to Santiago, five regions, where to start, when to go, what to carry and how the Compostela works.",
+   "words": 9379,
+   "minutes": 43,
+   "cover": {
+    "colour": "goldSoft",
+    "icon": "library"
+   },
+   "chapters": [
+    {
+     "id": "00-welcome",
+     "title": "Welcome",
+     "minutes": 3
+    },
+    {
+     "id": "01-the-way-in-brief",
+     "title": "The Way in brief",
+     "minutes": 4
+    },
+    {
+     "id": "02-is-this-camino-for-you",
+     "title": "Is this Camino for you?",
+     "minutes": 3
+    },
+    {
+     "id": "03-where-to-start-and-how-many-days",
+     "title": "Where to start, and how many days",
+     "minutes": 3
+    },
+    {
+     "id": "04-when-to-go",
+     "title": "When to go",
+     "minutes": 4
+    },
+    {
+     "id": "05-before-you-go",
+     "title": "Before you go",
+     "minutes": 5
+    },
+    {
+     "id": "06-the-pyrenees-and-navarra",
+     "title": "The Pyrenees and Navarra",
+     "minutes": 4
+    },
+    {
+     "id": "07-la-rioja",
+     "title": "La Rioja",
+     "minutes": 2
+    },
+    {
+     "id": "08-burgos-and-the-meseta",
+     "title": "Burgos and the Meseta",
+     "minutes": 4
+    },
+    {
+     "id": "09-leon-and-the-mountains",
+     "title": "León and the mountains",
+     "minutes": 4
+    },
+    {
+     "id": "10-galicia",
+     "title": "Galicia",
+     "minutes": 4
+    },
+    {
+     "id": "11-sleeping-eating-resting",
+     "title": "Sleeping, eating, resting",
+     "minutes": 4
+    },
+    {
+     "id": "12-body-weather-and-safety",
+     "title": "Body, weather and safety",
+     "minutes": 3
+    },
+    {
+     "id": "13-the-inner-way",
+     "title": "The inner Way",
+     "minutes": 2
+    }
+   ],
+   "route_slug": "camino-frances"
+  },
+  {
+   "id": "camino-portugues-guide",
+   "kind": "guide",
+   "order": 2,
+   "title": "The Portuguese Way",
+   "subtitle": "A Pilgrim's Guide to the Camino Portugués from Porto",
+   "description": "A calm, honest guide to the Camino Portugués from Porto: eleven walking days to Santiago, the border at the Minho, when to go, what to carry, how the Compostela rule works and how to arrive.",
+   "words": 11210,
+   "minutes": 51,
+   "cover": {
+    "colour": "blue100",
+    "icon": "library"
+   },
+   "chapters": [
+    {
+     "id": "00-welcome",
+     "title": "Welcome",
+     "minutes": 3
+    },
+    {
+     "id": "01-the-way-in-brief",
+     "title": "The Way in brief",
+     "minutes": 4
+    },
+    {
+     "id": "02-is-this-camino-for-you",
+     "title": "Is this Camino for you?",
+     "minutes": 3
+    },
+    {
+     "id": "03-when-to-go",
+     "title": "When to go",
+     "minutes": 3
+    },
+    {
+     "id": "04-before-you-go",
+     "title": "Before you go",
+     "minutes": 4
+    },
+    {
+     "id": "05-porto-and-northern-portugal",
+     "title": "Porto and northern Portugal: Days 1 to 3",
+     "minutes": 6
+    },
+    {
+     "id": "06-the-minho-and-the-border",
+     "title": "The Minho and the border: Days 4 and 5",
+     "minutes": 4
+    },
+    {
+     "id": "07-galicia-tui-to-pontevedra",
+     "title": "Galicia, from Tui to Pontevedra: Days 6 to 8",
+     "minutes": 5
+    },
+    {
+     "id": "08-galicia-pontevedra-to-santiago",
+     "title": "Galicia, from Pontevedra to Santiago: Days 9 to 11",
+     "minutes": 5
+    },
+    {
+     "id": "09-other-ways-to-split-and-the-compostela-rule",
+     "title": "Other ways to split the days, other roads, and the Compostela rule",
+     "minutes": 4
+    },
+    {
+     "id": "10-sleeping-eating-resting",
+     "title": "Sleeping, eating, resting",
+     "minutes": 4
+    },
+    {
+     "id": "11-body-weather-and-safety",
+     "title": "Body, weather and safety",
+     "minutes": 3
+    },
+    {
+     "id": "12-the-inner-way",
+     "title": "The inner Way",
+     "minutes": 2
+    },
+    {
+     "id": "13-arriving",
+     "title": "Arriving",
+     "minutes": 3
+    },
+    {
+     "id": "14-going-home",
+     "title": "Going home",
+     "minutes": 2
+    },
+    {
+     "id": "15-with-the-app-and-sources",
+     "title": "With the app, and sources",
+     "minutes": 3
+    }
+   ],
+   "route_slug": "camino-portugues"
+  },
+  {
+   "id": "camino-primitivo-guide",
+   "kind": "guide",
+   "order": 5,
+   "title": "The Original Way",
+   "subtitle": "A Pilgrim's Guide to the Camino Primitivo",
+   "description": "An honest guide to the Camino Primitivo: fourteen walking days from Oviedo over the mountains of Asturias to Santiago, the high variant, when to go, what to carry and how to arrive.",
+   "words": 11238,
+   "minutes": 52,
+   "cover": {
+    "colour": "red100",
+    "icon": "library"
+   },
+   "chapters": [
+    {
+     "id": "00-welcome",
+     "title": "Welcome",
+     "minutes": 3
+    },
+    {
+     "id": "01-the-way-in-brief",
+     "title": "The Way in brief",
+     "minutes": 4
+    },
+    {
+     "id": "02-is-this-camino-for-you",
+     "title": "Is this Camino for you?",
+     "minutes": 3
+    },
+    {
+     "id": "03-when-to-go",
+     "title": "When to go",
+     "minutes": 4
+    },
+    {
+     "id": "04-before-you-go",
+     "title": "Before you go",
+     "minutes": 4
+    },
+    {
+     "id": "05-asturias-oviedo-to-grandas-de-salime",
+     "title": "Asturias: Oviedo to Grandas de Salime",
+     "minutes": 6
+    },
+    {
+     "id": "06-the-border-and-the-high-lugo-hills",
+     "title": "The border and the high Lugo hills",
+     "minutes": 5
+    },
+    {
+     "id": "07-galicia-lugo-to-santiago",
+     "title": "Galicia: Lugo to Santiago",
+     "minutes": 5
+    },
+    {
+     "id": "08-the-high-road-and-other-ways-to-split",
+     "title": "The high road, and other ways to split the days",
+     "minutes": 5
+    },
+    {
+     "id": "09-sleeping-eating-resting",
+     "title": "Sleeping, eating, resting",
+     "minutes": 4
+    },
+    {
+     "id": "10-body-weather-and-safety",
+     "title": "Body, weather and safety",
+     "minutes": 4
+    },
+    {
+     "id": "11-the-inner-way",
+     "title": "The inner Way",
+     "minutes": 3
+    },
+    {
+     "id": "12-arriving",
+     "title": "Arriving",
+     "minutes": 3
+    },
+    {
+     "id": "13-going-home",
+     "title": "Going home",
+     "minutes": 2
+    },
+    {
+     "id": "14-with-the-app-and-sources",
+     "title": "With the app, and sources",
+     "minutes": 3
+    }
+   ],
+   "route_slug": "camino-primitivo"
+  },
+  {
    "id": "camino-ingles-guide",
    "kind": "guide",
    "order": 6,
    "title": "The English Way",
    "subtitle": "A Pilgrim's Guide to the Camino Inglés",
    "description": "A calm, honest guide to the Camino Inglés: six walking days from Ferrol to Santiago, how the hundred-kilometre rule works, when to go, what to carry and how to arrive.",
-   "words": 10287,
+   "words": 10275,
    "minutes": 47,
    "cover": {
     "colour": "sand300",
@@ -63,7 +339,7 @@
     {
      "id": "09-body-weather-and-safety",
      "title": "Body, weather and safety",
-     "minutes": 3
+     "minutes": 4
     },
     {
      "id": "10-the-inner-way",
@@ -89,14 +365,111 @@
    "route_slug": "camino-ingles"
   },
   {
+   "id": "camino-finisterre-muxia-guide",
+   "kind": "guide",
+   "order": 7,
+   "title": "To the End of the Earth",
+   "subtitle": "A Pilgrim's Guide to Finisterre and Muxía",
+   "description": "A calm, honest guide to the road from Santiago to the Atlantic: Finisterre and Muxía, how to cut the days, the sunset, the sea, and what the official sources say about the certificates.",
+   "words": 10531,
+   "minutes": 48,
+   "cover": {
+    "colour": "goldWash",
+    "icon": "library"
+   },
+   "chapters": [
+    {
+     "id": "00-welcome",
+     "title": "Welcome",
+     "minutes": 3
+    },
+    {
+     "id": "01-the-way-in-brief",
+     "title": "The Way in brief",
+     "minutes": 4
+    },
+    {
+     "id": "02-is-this-camino-for-you",
+     "title": "Is this Camino for you?",
+     "minutes": 3
+    },
+    {
+     "id": "03-when-to-go",
+     "title": "When to go",
+     "minutes": 3
+    },
+    {
+     "id": "04-before-you-go",
+     "title": "Before you go",
+     "minutes": 4
+    },
+    {
+     "id": "05-santiago-to-olveiroa",
+     "title": "The inland days: Santiago to Olveiroa",
+     "minutes": 5
+    },
+    {
+     "id": "06-olveiroa-to-fisterra",
+     "title": "To the sea: Olveiroa to Fisterra",
+     "minutes": 4
+    },
+    {
+     "id": "07-at-the-cape",
+     "title": "At the cape: sunset, sea and boots",
+     "minutes": 5
+    },
+    {
+     "id": "08-fisterra-to-muxia",
+     "title": "The last day: Fisterra to Muxía",
+     "minutes": 5
+    },
+    {
+     "id": "09-variants-and-ways-to-split",
+     "title": "Variants, and ways to split the days",
+     "minutes": 4
+    },
+    {
+     "id": "10-sleeping-eating-resting",
+     "title": "Sleeping, eating, resting",
+     "minutes": 3
+    },
+    {
+     "id": "11-body-weather-and-safety",
+     "title": "Body, weather and safety",
+     "minutes": 3
+    },
+    {
+     "id": "12-the-inner-way",
+     "title": "The inner Way",
+     "minutes": 3
+    },
+    {
+     "id": "13-arriving-and-the-certificates",
+     "title": "Arriving, and the certificates",
+     "minutes": 3
+    },
+    {
+     "id": "14-going-home",
+     "title": "Going home",
+     "minutes": 1
+    },
+    {
+     "id": "15-with-the-app-and-sources",
+     "title": "With the app, and sources",
+     "minutes": 3
+    }
+   ],
+   "route_slug": "camino-finisterre-muxia"
+  },
+  {
    "id": "imitation-of-christ-readings",
    "kind": "reflection",
    "order": 9,
    "title": "The Quiet Road",
    "subtitle": "Twenty-One Days with The Imitation of Christ for the Pilgrim",
    "description": "Twenty-one days with a 600-year-old classic of the inner life: a morning reading and an evening reflection for each day on the Camino Francés. Slow, honest and quiet.",
-   "words": 27233,
-   "minutes": 124,
+   "words": 32738,
+   "minutes": 149,
    "cover": {
     "colour": "successWash",
     "icon": "book"
@@ -201,9 +574,359 @@
      "id": "19-day-18-shrines-and-memorials",
      "title": "Day 18. Shrines and memorials",
      "minutes": 7
+    },
+    {
+     "id": "20-day-19-the-hour-is-not-yet-come",
+     "title": "Day 19. The hour is not yet come",
+     "minutes": 7
+    },
+    {
+     "id": "21-day-20-walking-from-within",
+     "title": "Day 20. Walking from within",
+     "minutes": 7
+    },
+    {
+     "id": "22-day-21-do-earnestly-what-thou-dost",
+     "title": "Day 21. Do earnestly what thou dost",
+     "minutes": 7
+    },
+    {
+     "id": "23-carry-it-with-you",
+     "title": "Carry it with you",
+     "minutes": 3
     }
    ],
    "route_slug": "camino-frances"
+  },
+  {
+   "id": "presence-of-god-readings",
+   "kind": "reflection",
+   "order": 13,
+   "title": "Present at Every Step",
+   "subtitle": "Six Days with Brother Lawrence for the Camino Inglés",
+   "description": "Six days with Brother Lawrence, the Paris lay brother who kept God in mind among kitchen chores and errands: a short book of readings for a short road, the Camino Inglés.",
+   "words": 12035,
+   "minutes": 55,
+   "cover": {
+    "colour": "goldWash",
+    "icon": "book"
+   },
+   "chapters": [
+    {
+     "id": "00-how-to-use-this-book",
+     "title": "How to use this book",
+     "minutes": 4
+    },
+    {
+     "id": "01-about-the-book-and-its-author",
+     "title": "About the book and its author",
+     "minutes": 5
+    },
+    {
+     "id": "02-day-01-a-little-remembrance",
+     "title": "Day 1. A little remembrance",
+     "minutes": 8
+    },
+    {
+     "id": "03-day-02-an-unwelcome-errand",
+     "title": "Day 2. An unwelcome errand",
+     "minutes": 8
+    },
+    {
+     "id": "04-day-03-not-the-only-one",
+     "title": "Day 3. Not the only one",
+     "minutes": 8
+    },
+    {
+     "id": "05-day-04-lost-time",
+     "title": "Day 4. Lost time",
+     "minutes": 8
+    },
+    {
+     "id": "06-day-05-a-straw-from-the-ground",
+     "title": "Day 5. A straw from the ground",
+     "minutes": 8
+    },
+    {
+     "id": "07-day-06-the-same-thing-again",
+     "title": "Day 6. The same thing again",
+     "minutes": 8
+    },
+    {
+     "id": "08-carry-it-with-you",
+     "title": "Carry it with you",
+     "minutes": 3
+    }
+   ],
+   "route_slug": "camino-ingles"
+  },
+  {
+   "id": "songs-of-ascents-readings",
+   "kind": "reflection",
+   "order": 14,
+   "title": "Songs for the Climb",
+   "subtitle": "Eight Days with the Psalms of Ascent for the Camino Aragonés",
+   "description": "Eight days with the fifteen Psalms of Ascent, Psalms 120 to 134: a morning reading and an evening reflection for each day on the Camino Aragonés. Slow, honest and quiet.",
+   "words": 14816,
+   "minutes": 68,
+   "cover": {
+    "colour": "blue100",
+    "icon": "book"
+   },
+   "chapters": [
+    {
+     "id": "00-how-to-use-this-book",
+     "title": "How to use this book",
+     "minutes": 4
+    },
+    {
+     "id": "01-about-the-book-and-its-author",
+     "title": "About the Psalms of Ascent",
+     "minutes": 4
+    },
+    {
+     "id": "02-day-01-eyes-to-the-hills",
+     "title": "Day 1. Eyes to the hills",
+     "minutes": 8
+    },
+    {
+     "id": "03-day-02-glad-to-go",
+     "title": "Day 2. Glad to go",
+     "minutes": 8
+    },
+    {
+     "id": "04-day-03-the-snare-is-broken",
+     "title": "Day 3. The snare is broken",
+     "minutes": 7
+    },
+    {
+     "id": "05-day-04-sowing-in-tears",
+     "title": "Day 4. Sowing in tears",
+     "minutes": 8
+    },
+    {
+     "id": "06-day-05-a-table-and-a-furrow",
+     "title": "Day 5. A table and a furrow",
+     "minutes": 8
+    },
+    {
+     "id": "07-day-06-waiting-for-morning",
+     "title": "Day 6. Waiting for morning",
+     "minutes": 8
+    },
+    {
+     "id": "08-day-07-until-i-find-a-place",
+     "title": "Day 7. Until I find a place",
+     "minutes": 8
+    },
+    {
+     "id": "09-day-08-a-blessing-by-night",
+     "title": "Day 8. A blessing by night",
+     "minutes": 7
+    },
+    {
+     "id": "10-carry-it-with-you",
+     "title": "Carry it with you",
+     "minutes": 3
+    }
+   ],
+   "route_slug": "camino-aragones"
+  },
+  {
+   "id": "revelations-readings",
+   "kind": "reflection",
+   "order": 15,
+   "title": "All Shall Be Well",
+   "subtitle": "Eight Days with Julian of Norwich for the Camino de Invierno",
+   "description": "Eight days with Julian of Norwich, a medieval anchoress, for the quiet Camino de Invierno: a morning reading and an evening reflection each day. Quiet and consoling.",
+   "words": 13750,
+   "minutes": 63,
+   "cover": {
+    "colour": "sand300",
+    "icon": "book"
+   },
+   "chapters": [
+    {
+     "id": "00-how-to-use-this-book",
+     "title": "How to use this book",
+     "minutes": 4
+    },
+    {
+     "id": "01-about-the-book-and-its-author",
+     "title": "About the book and its author",
+     "minutes": 5
+    },
+    {
+     "id": "02-day-01-the-size-of-a-hazelnut",
+     "title": "Day 1. The size of a hazelnut",
+     "minutes": 7
+    },
+    {
+     "id": "03-day-02-clothed-in-goodness",
+     "title": "Day 2. Clothed in goodness",
+     "minutes": 7
+    },
+    {
+     "id": "04-day-03-homely-and-courteous",
+     "title": "Day 3. Homely and courteous",
+     "minutes": 7
+    },
+    {
+     "id": "05-day-04-the-great-hurt",
+     "title": "Day 4. The great hurt",
+     "minutes": 7
+    },
+    {
+     "id": "06-day-05-all-manner-of-things",
+     "title": "Day 5. All manner of things",
+     "minutes": 7
+    },
+    {
+     "id": "07-day-06-prayer-that-tastes-of-nothing",
+     "title": "Day 6. Prayer that tastes of nothing",
+     "minutes": 7
+    },
+    {
+     "id": "08-day-07-a-light-for-the-night",
+     "title": "Day 7. A light for the night",
+     "minutes": 7
+    },
+    {
+     "id": "09-day-08-where-love-began",
+     "title": "Day 8. Where love began",
+     "minutes": 7
+    },
+    {
+     "id": "10-carry-it-with-you",
+     "title": "Carry it with you",
+     "minutes": 3
+    }
+   ],
+   "route_slug": "camino-de-invierno"
+  },
+  {
+   "id": "ignatius-pilgrim-readings",
+   "kind": "reflection",
+   "order": 17,
+   "title": "The Pilgrim's Tale",
+   "subtitle": "Seven Days with Ignatius of Loyola for the Camino Baztanes",
+   "description": "Seven days with the autobiography of Ignatius of Loyola, the soldier wounded at Pamplona who became a pilgrim: a morning reading and an evening reflection for each day of the Camino Baztanes.",
+   "words": 12689,
+   "minutes": 58,
+   "cover": {
+    "colour": "successWash",
+    "icon": "book"
+   },
+   "chapters": [
+    {
+     "id": "00-how-to-use-this-book",
+     "title": "How to use this book",
+     "minutes": 4
+    },
+    {
+     "id": "01-about-the-book-and-its-author",
+     "title": "About the book and its author",
+     "minutes": 4
+    },
+    {
+     "id": "02-day-01-the-citadel-and-the-wound",
+     "title": "Day 1. The citadel and the wound",
+     "minutes": 7
+    },
+    {
+     "id": "03-day-02-two-ways-of-thinking",
+     "title": "Day 2. Two ways of thinking",
+     "minutes": 8
+    },
+    {
+     "id": "04-day-03-paying-what-is-owed",
+     "title": "Day 3. Paying what is owed",
+     "minutes": 7
+    },
+    {
+     "id": "05-day-04-the-sword-laid-down",
+     "title": "Day 4. The sword laid down",
+     "minutes": 7
+    },
+    {
+     "id": "06-day-05-beside-the-river",
+     "title": "Day 5. Beside the river",
+     "minutes": 7
+    },
+    {
+     "id": "07-day-06-bread-and-asking",
+     "title": "Day 6. Bread, and the asking for it",
+     "minutes": 8
+    },
+    {
+     "id": "08-day-07-on-foot-past-pamplona",
+     "title": "Day 7. On foot, past Pamplona",
+     "minutes": 7
+    },
+    {
+     "id": "09-carry-it-with-you",
+     "title": "Carry it with you",
+     "minutes": 3
+    }
+   ],
+   "route_slug": "camino-baztanes"
+  },
+  {
+   "id": "walking-readings",
+   "kind": "reflection",
+   "order": 18,
+   "title": "Toward the Sunset",
+   "subtitle": "Five Days with Thoreau's Walking for Finisterre and Muxía",
+   "description": "Five days with Thoreau's essay on walking, made for the road from Santiago to Finisterre and Muxía: a morning reading and an evening reflection for each day, walking west toward the sunset.",
+   "words": 10291,
+   "minutes": 47,
+   "cover": {
+    "colour": "goldWash",
+    "icon": "book"
+   },
+   "chapters": [
+    {
+     "id": "00-how-to-use-this-book",
+     "title": "How to use this book",
+     "minutes": 4
+    },
+    {
+     "id": "01-about-the-book-and-its-author",
+     "title": "About the book and its author",
+     "minutes": 4
+    },
+    {
+     "id": "02-day-01-ready-for-a-walk",
+     "title": "Day 1. Ready for a walk",
+     "minutes": 8
+    },
+    {
+     "id": "03-day-02-where-it-carries-me",
+     "title": "Day 2. Where it carries me",
+     "minutes": 8
+    },
+    {
+     "id": "04-day-03-westward-i-go-free",
+     "title": "Day 3. Westward I go free",
+     "minutes": 8
+    },
+    {
+     "id": "05-day-04-saunterers-in-the-good-sense",
+     "title": "Day 4. Saunterers in the good sense",
+     "minutes": 8
+    },
+    {
+     "id": "06-day-05-the-sun-on-our-backs",
+     "title": "Day 5. The sun on our backs",
+     "minutes": 8
+    },
+    {
+     "id": "07-carry-it-with-you",
+     "title": "Carry it with you",
+     "minutes": 4
+    }
+   ],
+   "route_slug": "camino-finisterre-muxia"
   }
  ]
 }

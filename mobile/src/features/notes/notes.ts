@@ -82,7 +82,8 @@ export function clipQuote(text: string): string {
   if (last >= 0xd800 && last <= 0xdbff) end -= 1; // never half an emoji
   const cut = one.slice(0, end);
   const space = cut.lastIndexOf(' ');
-  return `${(space > NOTE_QUOTE_MAX * 0.6 ? cut.slice(0, space) : cut).trimEnd()}…`;
+  const whole = /\s/.test(one.charAt(end)); // the cut falls between two words: nothing to take back
+  return `${(!whole && space > NOTE_QUOTE_MAX * 0.6 ? cut.slice(0, space) : cut).trimEnd()}…`;
 }
 
 /** A context as it is kept: a date that reads (else the day the note was written), a slug that is one, a stage that is a whole number from 1 to 999. */
@@ -209,7 +210,7 @@ export function notesAt(list: readonly Note[], anchor: string, type?: NoteType):
 }
 
 /** The one reflection on an anchor (a day): the newest, when there are several. */
-export const reflectionAt = (list: readonly Note[], anchor: string): Note | null => list.find((n) => n.anchor === anchor && n.type === 'reflection') ?? null;
+export const reflectionAt = (list: readonly Note[], anchor: string): Note | null => list.filter((n) => n.anchor === anchor && n.type === 'reflection').sort(byNewest)[0] ?? null;
 
 /** What a chapter or day of a book shows of the notes: the notes on the whole chapter, the reflection of a day, the notes of each paragraph by block index. */
 export type ChapterNotes = { chapter: Note[]; reflection: Note | null; blocks: Record<number, Note[]> };
