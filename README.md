@@ -67,6 +67,7 @@ CI (`.github/workflows/ci.yml`) runs these on every pull request and every push 
 | Edge functions | `deno test --allow-net --allow-env --allow-run --allow-read supabase/functions` |
 | Books | `python3 tools/fetch_book_sources.py <folder>`, then `python3 tools/check_books.py --strict --sources <folder>` and `python3 tools/check_series.py` |
 | Website in sync | `python3 tools/build_web.py /tmp/web-gen` and `diff -r` against `web/` (the generated files); `python3 tools/sync_tokens.py --check` |
+| Design lint (the app code against the design tokens: spacing, type, icons, radius, colours, tap targets, insets; the totals may only go down) | `python3 tools/design-audit/scan.py --check`; `--explain <file>` names the lines of one file, `--update-baseline` locks in what you fixed; see [`tools/design-audit/README.md`](tools/design-audit/README.md) |
 | Python tools | `python -m unittest discover -s tools/poi-audit/tests`, `python -m unittest discover -s tools/tests`, `python3 tools/check_docs_links.py` |
 | Offline map scripts | `cd tools/offline-maps && npm ci && npm test && npm run test:python && npm run test:render-fixture` |
 | Web smoke (every screen of the web export, light and dark, signed in and out, online and offline: nothing may throw) | `cd mobile && npx expo export --platform web --output-dir ../tools/web-smoke/dist/app`, then `cd tools/web-smoke && npm ci && npm test && npm run smoke` (needs Chromium: `npx playwright install chromium`); see `tools/web-smoke/README.md` |
@@ -82,7 +83,8 @@ GitHub Environment `pack-publish`) and `poi-audit` (monthly place audit, report 
   client-writable tables use client-generated ids and soft deletes so the app can sync after hours offline. See
   `supabase/README.md` and the comments at the top of each migration. Migrations that have been applied are never edited: add a new one.
 - **Design**: tokens in `design/tokens.json` / `design/tokens.css`. `mobile/src/theme/tokens.json` and `web/assets/tokens.css`
-  are copies, kept in step by `tools/sync_tokens.py`. The audience includes older pilgrims: body text at least 17 px, touch targets at least 48 dp.
+  are copies, kept in step by `tools/sync_tokens.py`. The audience includes older pilgrims: body text at least 17 px, touch targets at least 48 dp
+  (56 for primary actions). The rules for a screen in plain words are in [`mobile/docs/DESIGN-RULES.md`](mobile/docs/DESIGN-RULES.md); `tools/design-audit/scan.py` (the `design-lint` job of CI) enforces them.
 - **Voice and naming**: `brand/BRAND_GUIDELINE.md` (warm, second person, short sentences, "pilgrim" not "user", English first).
   The app's fourth tab is **Discover**.
 - **Honesty about what exists**: the website and posts say "coming soon" for anything not built; offline packs hold map tiles only

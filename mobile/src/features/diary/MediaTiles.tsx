@@ -77,7 +77,7 @@ function Tile({ uid, m, index, count, size, onOpen, onRemove }: { uid: string; m
       </Pressable>
       {onRemove && (
         // 48 by 48 to touch, with a smaller dark chip drawn in its corner, so it shows on any picture
-        <Pressable accessibilityRole="button" accessibilityLabel={`Remove ${kindWord(m)} ${index + 1}`} onPress={() => onRemove(m.id)} style={{ position: 'absolute', top: 0, right: 0, width: layout.touchMin - 8, height: layout.touchMin - 8, alignItems: 'flex-end', padding: 5 }}>
+        <Pressable accessibilityRole="button" accessibilityLabel={`Remove ${kindWord(m)} ${index + 1}`} onPress={() => onRemove(m.id)} style={{ position: 'absolute', top: 0, right: 0, width: layout.touchHard, height: layout.touchHard, alignItems: 'flex-end', padding: 5 }}>
           <View style={{ width: 28, height: 28, borderRadius: radius.pill, backgroundColor: FIXED.photoChip, alignItems: 'center', justifyContent: 'center' }}>
             <Icon name="close" color={FIXED.onPhoto} size={16} strokeWidth={2.2} />
           </View>
