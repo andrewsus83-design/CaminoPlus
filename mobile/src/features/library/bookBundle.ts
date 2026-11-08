@@ -6,7 +6,8 @@ import type { BookContent, CatalogBook } from './books';
 export const CATALOG: readonly CatalogBook[] = (require('../../../assets/library/catalog.json') as { books: CatalogBook[] }).books;
 
 const CONTENT: Record<string, () => BookContent> = {
-
+  'camino-ingles-guide': () => require('../../../assets/library/books/camino-ingles-guide.json') as BookContent,
+  'imitation-of-christ-readings': () => require('../../../assets/library/books/imitation-of-christ-readings.json') as BookContent,
 };
 
 /** The text of a book, or null when the catalog has no such book. */

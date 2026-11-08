@@ -10,7 +10,7 @@
 
 ## Reflection
 
-The best hour of a walking day is very often the first. The *albergue* is dark and full of small sounds: a zip, a rustle of plastic bags, someone trying hard not to wake anyone. You find your boots by feel. Outside, the street is cool and empty, and for a few minutes you have not yet done anything late, slow or wrong. The day is a blank sheet and your hand has not touched it.
+The best hour of a walking day is very often the first. The albergue is dark and full of small sounds: a zip, a rustle of plastic bags, someone trying hard not to wake anyone. You find your boots by feel. Outside, the street is cool and empty, and for a few minutes you have not yet done anything late, slow or wrong. The day is a blank sheet and your hand has not touched it.
 
 By the fourth morning that feeling needs some help. The novelty has worn off. The body has opinions. Yesterday's mood is still lying across the bed like a coat. This is exactly where Thomas à Kempis starts: renew your resolutions every day, he says, as if it were the first day of your new life. And then he gives the reader the words to say. *Help me, O God, in my good resolutions, and grant that this day I may make a good beginning, for hitherto I have done nothing!*
 

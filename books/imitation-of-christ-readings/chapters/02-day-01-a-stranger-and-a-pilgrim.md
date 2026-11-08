@@ -39,7 +39,7 @@ Look back over the day without hurry. Some of it was hard. Perhaps there was a m
 
 Some of it was good, even if you are too tired to feel it yet. A greeting from someone on the road. The first time you looked up and found you had walked a kilometre without thinking. Water that tasted of something. The smell of a bakery. Say that too.
 
-Today you were a stranger and a pilgrim, both at once. In a new town nobody knows you, and nobody expects you to be anyone in particular. That can be frightening and it can be a relief. Tonight it may be both.
+Today you were a stranger and a pilgrim, both at once. In a new town nobody knows you, and nobody expects you to be anyone in particular. That can be frightening and it can be a relief. Tonight it may be both. If you are walking with someone you already know, notice how they look in this strange place. A friend often shows a new side on the road. If you are alone, notice whose face you were glad to see today, however briefly.
 
 If today was easy, be careful of the opposite mistake. A day does not have to turn into a lesson before it can be allowed to be good. And if there are messages waiting from home, answer them in a sentence if you want to. You are allowed to be a stranger for a little while.
 
@@ -55,4 +55,4 @@ Down the room the lights go out, one by one. For a few breaths everybody in it i
 
 ## A short prayer
 
-*Tonight I am a guest in this bed, in this town, in this day. Thank you for the roof and for whoever lit the lamp. Let me hold lightly what I cannot keep, and receive without grabbing what is given. Forgive the day its clumsiness, and mine. Let my body rest and my heart stay open, ready to go on in the morning.*
+*Tonight I am a guest in this bed, in this town, in this day. Thank you for the roof and for whoever lit the lamp. Let me hold lightly what I cannot keep, and receive without grabbing what is given. Forgive the day its clumsiness, and mine. Let my body rest and my heart stay open, ready to go on in the morning. Bless the people I left behind, and the ones I have not yet met.*

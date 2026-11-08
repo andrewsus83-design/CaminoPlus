@@ -1,6 +1,7 @@
-// The Library has no real content yet: which Bible translation, which books and which music we may include is not
-// decided (licences and sources come first). Everything here is an example that shows where real content will go,
-// and every tab says so on screen (SampleNotice). Nothing here is fetched, so the Library works offline.
+// The Bible and Music tabs have no real content yet: which Bible translation and which music we may include is not decided
+// (licences and sources come first). Everything here is an example that shows where real content will go, and those two tabs say
+// so on screen (SampleNotice). The Books tab is real: its covers come from the bundle (books.ts, bookBundle.ts), not from here.
+// Nothing here is fetched, so the Library works offline.
 //
 // Plain data on purpose: no theme colours are read here (a colour read at import would never follow light/dark).
 // A cover names its colour; the screen looks it up when it draws.
@@ -8,10 +9,13 @@
 export const LIBRARY_TABS = ['Bible', 'Books', 'Music'] as const;
 export type LibraryTab = (typeof LIBRARY_TABS)[number];
 
-/** Why each tab is empty today, in the words the person reads. */
-export const PREVIEW_NOTICE: Record<LibraryTab, string> = {
+/** The tabs that still show examples. Books is not one of them: its covers are the real books. */
+export type ExampleTab = 'Bible' | 'Music';
+export const isExampleTab = (t: LibraryTab): t is ExampleTab => t === 'Bible' || t === 'Music';
+
+/** Why each of those tabs is empty today, in the words the person reads. */
+export const PREVIEW_NOTICE: Record<ExampleTab, string> = {
   Bible: 'The Bible text is not in the app yet. We are choosing a translation we are allowed to include. This tab shows how reading will look.',
-  Books: 'Books are not in the app yet. We are choosing which guides, pilgrim stories and prayers we may include. These covers are examples.',
   Music: 'Music is not in the app yet, and nothing plays today. We are choosing where the songs come from. These rows show how playlists will look.',
 };
 
@@ -25,13 +29,6 @@ export const SAMPLE_SHELVES = [
 
 export type CoverColour = 'goldSoft' | 'blue100' | 'successWash' | 'red100' | 'sand300' | 'goldWash';
 
-export const SAMPLE_BOOKS: readonly { id: string; title: string; kind: string; colour: CoverColour; icon: 'library' | 'book' | 'chat' }[] = [
-  { id: 'guide', title: 'Guide to the Way', kind: 'Guides', colour: 'goldSoft', icon: 'library' },
-  { id: 'stories', title: 'Stories from pilgrims', kind: 'Stories', colour: 'blue100', icon: 'book' },
-  { id: 'prayers', title: 'Prayers and blessings', kind: 'Prayer', colour: 'successWash', icon: 'book' },
-  { id: 'spanish', title: 'Spanish for the road', kind: 'Language', colour: 'red100', icon: 'chat' },
-];
-
 export const SAMPLE_PLAYLISTS = [
   { id: 'morning', title: 'Morning walk', note: 'Easy songs for the first hour' },
   { id: 'evening', title: 'Quiet evening', note: 'For the albergue, after the stamp' },
@@ -41,14 +38,32 @@ export const SAMPLE_PLAYLISTS = [
 
 /** One example row of each tab, as the screens and the search read them. */
 export type Shelf = (typeof SAMPLE_SHELVES)[number];
-export type Book = (typeof SAMPLE_BOOKS)[number];
 export type Playlist = (typeof SAMPLE_PLAYLISTS)[number];
 
-/**
- * The one Preview notice of a search: the results are these examples, so it says what they are, like each tab does.
- * A search never finds, opens or plays anything real.
- */
-export const SEARCH_NOTICE = 'These results are examples. The Bible text, books and music are not in the app yet.';
+const EXAMPLE_ORDER: readonly ExampleTab[] = ['Bible', 'Music'];
 
-/** The same, for the Bookmarks screen: the Library rows kept there are these examples. */
-export const BOOKMARKS_NOTICE = 'These are examples from the Library preview. They are kept only on this phone, and logging out clears them.';
+/** The example tabs that have a row in `tabs`, in tab order: "Bible", "Music", or "Bible and Music". Empty when the list holds no example. */
+export function exampleNames(tabs: readonly LibraryTab[]): string {
+  return EXAMPLE_ORDER.filter((t) => tabs.includes(t)).join(' and ');
+}
+
+/**
+ * The Preview notice of a search: only when a result of an example tab is on screen, and it names only the tabs that are there. The
+ * books are real, so a search that finds books alone has no notice at all (null). `tabs` are the tabs that have results.
+ */
+export function searchNotice(tabs: readonly LibraryTab[]): string | null {
+  const names = exampleNames(tabs);
+  if (!names) return null;
+  const has = EXAMPLE_ORDER.filter((t) => tabs.includes(t));
+  const what = has.length === 2 ? 'The Bible text and music are' : has[0] === 'Bible' ? 'The Bible text is' : 'Music is';
+  return `The ${names} results are examples. ${what} not in the app yet.`;
+}
+
+/** The same, for the Bookmarks screen: the Bible and Music rows kept there are examples. Null when none of them is on screen. */
+export function bookmarksNotice(tabs: readonly LibraryTab[]): string | null {
+  const names = exampleNames(tabs);
+  return names ? `The ${names} rows here are examples from the Library preview.` : null;
+}
+
+/** Said on the Bookmarks screen, wherever something is bookmarked: where the bookmarks are and what clears them. */
+export const BOOKMARKS_PRIVATE_LINE = 'Kept only on this phone. Logging out clears them.';

@@ -102,3 +102,34 @@ export function creditLine(book: Pick<BookContent, 'sources' | 'author'>): strin
   const s = book.sources?.[0];
   return s ? `${s.work}, ${s.author}. Translated by ${s.translator} (${s.year}). ${s.licence}.` : `By ${book.author}.`;
 }
+
+/** The words of a block without its marks, on one line: what a search, a screen reader label, a bookmark row and a note's quote are made of. A break has none. */
+export function blockText(block: Block): string {
+  const squash = (s: string) => s.replace(/\s+/g, ' ').trim();
+  switch (block.t) {
+    case 'h':
+    case 'p':
+      return squash(spansText(block.spans));
+    case 'ul':
+    case 'ol':
+      return squash(block.items.map(spansText).join(' '));
+    case 'quote':
+      return squash(block.paras.map(spansText).join(' '));
+    default:
+      return '';
+  }
+}
+
+/** At most `max` characters of a text, cut at a word where there is one and ended with an ellipsis; never in the middle of an emoji. */
+export function snippet(text: string, max: number): string {
+  if (text.length <= max) return text;
+  let end = max - 1;
+  const last = text.charCodeAt(end - 1);
+  if (last >= 0xd800 && last <= 0xdbff) end -= 1; // the first half of a pair: leave it out
+  const cut = text.slice(0, end);
+  const space = cut.lastIndexOf(' ');
+  return `${(space > max * 0.6 ? cut.slice(0, space) : cut).trimEnd()}…`;
+}
+
+/** The chapter of a book's text by its id, or null. */
+export const findChapter = <C extends { id: string }>(chapters: readonly C[], id: string | undefined): C | null => (id ? chapters.find((c) => c.id === id) : undefined) ?? null;

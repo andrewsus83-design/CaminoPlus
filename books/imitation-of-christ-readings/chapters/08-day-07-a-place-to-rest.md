@@ -24,7 +24,7 @@ Often the mind, given nothing to do, begins to review the whole week at speed: e
 
 There is also a more ordinary difficulty. Rest is a skill, and it can be out of practice. Nobody mentions this on the first day of a long walk, when everyone is thinking about distance and pace. By the seventh day you learn that stopping takes some learning too. You have to stop doing the things that feel like progress: counting, planning, checking the next stage. You have to let a slow hour be slow.
 
-It also happens that the first rest is not chosen. An injury, a storm, a closed bridge, a body that simply says no. If that is how the day has come to you, the passage has something kind to say. A place to rest is not a reward for walking. It is part of the walk, and it was always going to be needed.
+It also happens that the first rest is not chosen. An injury, a storm, a closed bridge, a body that simply says no. If that is how the day has come to you, the passage has something kind to say. A place to rest is not a reward for walking. It is part of the walk, and it was always going to be needed. It is hard to accept when you had a plan. But the plan was always going to meet a body, and bodies get a vote.
 
 Many traditions set aside one day in seven for stopping, and it was never meant as an indulgence. It was meant as a way of staying human. A pilgrim who cannot stop is only a very determined traveller.
 
@@ -33,7 +33,7 @@ What does it ask of an ordinary day, then? That for a few hours you do less than
 ## For the walk
 
 - When did I last stop without something to do next, and what did it feel like?
-- Sit for five minutes today with nothing in your hands: no phone, no map, no book. Watch the urge to do something rise and fall like a wave. When it has passed, stay one minute longer. If sitting is hard, count ten slow breaths and begin again.
+- Sit for five minutes today with nothing in your hands: no phone, no map, no book. Watch the urge to do something rise and fall like a wave. When it has passed, stay one minute longer. If sitting is hard, count ten slow breaths and begin again. If a church is open, you might sit there. If not, a bench will do.
 
 ## At the end of the day
 

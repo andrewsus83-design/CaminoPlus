@@ -2,6 +2,10 @@
 // Native, nothing stored here (plain node tests cover it, npm run test:library). useLibraryBookmarks.ts keeps the list on the
 // phone.
 //
+// What can be bookmarked. A row of the Bible and Music tabs (an example: "bible:psalms"), a book, a chapter or day of a book, and a paragraph:
+// the last three are bookmarked by their anchor (notes/anchor.ts: "book:<bookId>", "book:<bookId>/<chapterId>", "book:<bookId>/<chapterId>#<block>"),
+// the same scheme the notes use. A key is any string up to BOOKMARK_KEY_MAX; this file does not read it, search.ts and places.ts do.
+//
 // Where it lives. Only on this phone, in the phone's key-value store under `u.<userId>.library.bookmarks` (lib/localStore.ts
 // userKey). Every `u.<userId>.…` key is wiped when that person logs out (lib/auth.tsx, clearUserData), which is meant: a
 // bookmark of a Library row is a small convenience of this phone, not something the server knows. Another account on the
@@ -13,7 +17,13 @@ export const BOOKMARKS_NAME = 'library.bookmarks';
 /** Rows one person can bookmark. Far above the examples there are today; it only keeps a damaged or hostile file from growing a list. */
 export const BOOKMARKS_MAX = 500;
 
-/** A bookmarked row: its key (search.ts itemKey: "bible:psalms") and when, in milliseconds. */
+/**
+ * The longest key kept. An anchor of a paragraph is a book id, a chapter file name and a block number (about 100 characters at the most
+ * today); the limit only keeps a damaged or hostile file out.
+ */
+export const BOOKMARK_KEY_MAX = 160;
+
+/** A bookmarked row: its key (search.ts itemKey: "bible:psalms", or an anchor: "book:camino-ingles-guide") and when, in milliseconds. */
 export type Bookmark = { key: string; at: number };
 
 /** What is stored: the list, newest first. `v` is the version of the shape. */
@@ -33,7 +43,7 @@ export function parseBookmarks(raw: unknown): Bookmark[] | null {
     if (out.length >= BOOKMARKS_MAX) break;
     if (!item || typeof item !== 'object') continue;
     const { key, at } = item as { key?: unknown; at?: unknown };
-    if (typeof key !== 'string' || key.length === 0 || key.length > 80 || seen.has(key)) continue;
+    if (typeof key !== 'string' || key.length === 0 || key.length > BOOKMARK_KEY_MAX || seen.has(key)) continue;
     seen.add(key);
     out.push({ key, at: typeof at === 'number' && Number.isFinite(at) ? at : 0 });
   }
@@ -54,7 +64,7 @@ export function toggleBookmark(list: readonly Bookmark[], key: string, now: numb
 export const bookmarkKeys = (list: readonly Bookmark[]): string[] => list.map((b) => b.key);
 
 /** The Library part of the Bookmarks screen when nothing is bookmarked in the Library: it says how to. */
-export const LIBRARY_BOOKMARKS_EMPTY = 'Nothing bookmarked in the Library yet. Tap the bookmark on a row to keep it here.';
+export const LIBRARY_BOOKMARKS_EMPTY = 'Nothing bookmarked in the Library yet. Tap the bookmark on a cover or a row, or on a chapter or a paragraph in a book, to keep it here.';
 
 /** The sentence for a change that could not be written to the phone (a full disk): what is shown goes back to what is saved. */
 export const BOOKMARK_NOT_SAVED = 'That bookmark could not be saved on this phone. Please try again.';

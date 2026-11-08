@@ -43,6 +43,8 @@ Unpacking is a small ritual of its own. Lay out what you used today and what you
 
 Heavy days teach the body something too: how much it can bear, and how quickly it recovers once it is allowed to stop. What you could not manage this afternoon may be quite manageable after a night's sleep.
 
+If you walked beside someone today, think about how the load was shared between you: who set the pace, who waited, who took the heavier share of the silence. Companions carry things for each other that never go on any scale.
+
 Tonight, three gentle questions:
 
 - What did I argue with today that I might have simply carried?

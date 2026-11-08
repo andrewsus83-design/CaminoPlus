@@ -1,4 +1,209 @@
 {
  "version": 1,
- "books": []
+ "books": [
+  {
+   "id": "camino-ingles-guide",
+   "kind": "guide",
+   "order": 6,
+   "title": "The English Way",
+   "subtitle": "A Pilgrim's Guide to the Camino Inglés",
+   "description": "A calm, honest guide to the Camino Inglés: six walking days from Ferrol to Santiago, how the hundred-kilometre rule works, when to go, what to carry and how to arrive.",
+   "words": 10287,
+   "minutes": 47,
+   "cover": {
+    "colour": "sand300",
+    "icon": "library"
+   },
+   "chapters": [
+    {
+     "id": "00-welcome",
+     "title": "Welcome",
+     "minutes": 2
+    },
+    {
+     "id": "01-the-way-in-brief",
+     "title": "The Way in brief",
+     "minutes": 4
+    },
+    {
+     "id": "02-is-this-camino-for-you",
+     "title": "Is this Camino for you?",
+     "minutes": 4
+    },
+    {
+     "id": "03-when-to-go",
+     "title": "When to go",
+     "minutes": 4
+    },
+    {
+     "id": "04-before-you-go",
+     "title": "Before you go",
+     "minutes": 5
+    },
+    {
+     "id": "05-ferrol-to-betanzos",
+     "title": "The ría days: Ferrol to Betanzos",
+     "minutes": 6
+    },
+    {
+     "id": "06-betanzos-to-santiago",
+     "title": "Over the hills: Betanzos to Santiago",
+     "minutes": 5
+    },
+    {
+     "id": "07-the-coruna-start-and-other-ways-to-split",
+     "title": "The A Coruña start, and other ways to split the days",
+     "minutes": 5
+    },
+    {
+     "id": "08-sleeping-eating-resting",
+     "title": "Sleeping, eating, resting",
+     "minutes": 4
+    },
+    {
+     "id": "09-body-weather-and-safety",
+     "title": "Body, weather and safety",
+     "minutes": 3
+    },
+    {
+     "id": "10-the-inner-way",
+     "title": "The inner Way",
+     "minutes": 3
+    },
+    {
+     "id": "11-arriving",
+     "title": "Arriving",
+     "minutes": 3
+    },
+    {
+     "id": "12-going-home",
+     "title": "Going home",
+     "minutes": 2
+    },
+    {
+     "id": "13-with-the-app-and-sources",
+     "title": "With the app, and sources",
+     "minutes": 3
+    }
+   ],
+   "route_slug": "camino-ingles"
+  },
+  {
+   "id": "imitation-of-christ-readings",
+   "kind": "reflection",
+   "order": 9,
+   "title": "The Quiet Road",
+   "subtitle": "Twenty-One Days with The Imitation of Christ for the Pilgrim",
+   "description": "Twenty-one days with a 600-year-old classic of the inner life: a morning reading and an evening reflection for each day on the Camino Francés. Slow, honest and quiet.",
+   "words": 27233,
+   "minutes": 124,
+   "cover": {
+    "colour": "successWash",
+    "icon": "book"
+   },
+   "chapters": [
+    {
+     "id": "00-how-to-use-this-book",
+     "title": "How to use this book",
+     "minutes": 4
+    },
+    {
+     "id": "01-about-the-book-and-its-author",
+     "title": "About the book and its author",
+     "minutes": 4
+    },
+    {
+     "id": "02-day-01-a-stranger-and-a-pilgrim",
+     "title": "Day 1. A stranger and a pilgrim",
+     "minutes": 7
+    },
+    {
+     "id": "03-day-02-the-load-that-carries-you",
+     "title": "Day 2. The load that carries you",
+     "minutes": 7
+    },
+    {
+     "id": "04-day-03-the-soft-whisper",
+     "title": "Day 3. The soft whisper",
+     "minutes": 7
+    },
+    {
+     "id": "05-day-04-a-good-beginning",
+     "title": "Day 4. A good beginning",
+     "minutes": 7
+    },
+    {
+     "id": "06-day-05-not-more-than-you-are-able",
+     "title": "Day 5. Not more than you are able",
+     "minutes": 7
+    },
+    {
+     "id": "07-day-06-humble-work",
+     "title": "Day 6. Humble work",
+     "minutes": 7
+    },
+    {
+     "id": "08-day-07-a-place-to-rest",
+     "title": "Day 7. A place to rest",
+     "minutes": 7
+    },
+    {
+     "id": "09-day-08-one-anothers-burdens",
+     "title": "Day 8. One another's burdens",
+     "minutes": 7
+    },
+    {
+     "id": "10-day-09-if-i-only-knew",
+     "title": "Day 9. If I only knew",
+     "minutes": 7
+    },
+    {
+     "id": "11-day-10-he-doth-much-who-loveth-much",
+     "title": "Day 10. He doth much who loveth much",
+     "minutes": 7
+    },
+    {
+     "id": "12-day-11-all-is-not-lost",
+     "title": "Day 11. All is not lost",
+     "minutes": 7
+    },
+    {
+     "id": "13-day-12-a-little-puff-of-wind",
+     "title": "Day 12. A little puff of wind",
+     "minutes": 7
+    },
+    {
+     "id": "14-day-13-the-least-benefit",
+     "title": "Day 13. The least benefit",
+     "minutes": 7
+    },
+    {
+     "id": "15-day-14-my-silence-speaketh",
+     "title": "Day 14. My silence speaketh",
+     "minutes": 7
+    },
+    {
+     "id": "16-day-15-peace-on-the-way",
+     "title": "Day 15. Peace on the way",
+     "minutes": 7
+    },
+    {
+     "id": "17-day-16-my-planning-can-profit-but-little",
+     "title": "Day 16. My planning can profit but little",
+     "minutes": 7
+    },
+    {
+     "id": "18-day-17-less-rather-than-more",
+     "title": "Day 17. Less rather than more",
+     "minutes": 7
+    },
+    {
+     "id": "19-day-18-shrines-and-memorials",
+     "title": "Day 18. Shrines and memorials",
+     "minutes": 7
+    }
+   ],
+   "route_slug": "camino-frances"
+  }
+ ]
 }

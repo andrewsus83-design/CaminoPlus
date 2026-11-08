@@ -43,7 +43,7 @@ If you did a small kindness today, however trivial, hold it for a moment. It nee
 
 Take a moment to notice what the small tasks did for you. Work with the hands has a way of making the mind better company. It is worth remembering this, because the next flat afternoon will not announce itself either.
 
-And if there was a long grey patch today that nothing lifted, give that a plain note too. Not that you failed, only that some afternoons are stubborn. Say it to yourself in one line, so that tomorrow you can tell whether it was a day or the start of a pattern.
+And if there was a long grey patch today that nothing lifted, give that a plain note too. Not that you failed, only that some afternoons are stubborn. Say it to yourself in one line, so that tomorrow you can tell whether it was a day or the start of a pattern. And notice, before you sleep, how your body feels after the work: the tiredness that follows small honest tasks is different from the heaviness of drift. Many people sleep better after having done something finished.
 
 Three questions for tonight:
 

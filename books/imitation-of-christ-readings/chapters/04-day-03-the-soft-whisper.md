@@ -43,7 +43,7 @@ Inside, what was loudest? Today it might have been planning: tomorrow's distance
 
 And was there ever a quieter one? Often there is, and it is easy to miss: a moment when your breathing matched your steps, when something in the landscape stopped you, when a sentence you had been looking for turned up without being called. If you noticed such a moment today, you were already doing what the passage describes. If you did not, you are not behind.
 
-It is also worth noticing the voices you went looking for. A phone in the pocket is a very small door onto the whole world, and in the evening it is hard not to open it. There is no rule against that. But you might ask whether the last voice you hear tonight should be the world's, or only the room's.
+It is also worth noticing the voices you went looking for. A phone in the pocket is a very small door onto the whole world, and in the evening it is hard not to open it. There is no rule against that. But you might ask whether the last voice you hear tonight should be the world's, or only the room's. Evening bells, if there are any in the town, are a good last thing to listen to. They are only a regular sound, a way of cutting the day into pieces small enough to carry. If you hear one, let it end the day.
 
 Three questions for the end of a day:
 
