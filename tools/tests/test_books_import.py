@@ -93,6 +93,10 @@ class Cleaning(unittest.TestCase):
     def test_a_dash_made_of_two_hyphens_becomes_an_em_dash_also_across_a_line_end(self):
         self.assertEqual(C.tidy(C.unwrap(["the Saints--and", "she--", "began"])), "the Saints\u2014and she\u2014began")
 
+    def test_a_run_of_hyphens_is_a_dash_when_it_is_two_or_three_and_a_blank_line_when_it_is_longer(self):
+        self.assertEqual(C.tidy("love,---turtle-doves; yes--no"), "love,\u2014turtle-doves; yes\u2014no")
+        self.assertEqual(C.tidy("the first line of the G------- as many"), "the first line of the G------- as many")
+
     def test_underscores_for_italics_are_removed_and_the_words_stay(self):
         self.assertEqual(C.tidy("_He that followeth me shall not walk in darkness_, saith the Lord. _i.e._, so"),
                          "He that followeth me shall not walk in darkness, saith the Lord. i.e., so")
@@ -528,7 +532,8 @@ def fake_recipe(text: str = gutenberg(CONFESSIONS), **kw) -> tuple[R.Recipe, byt
     base = dict(
         id="confessions", title="Confessions", author="Augustine of Hippo", translator="E. B. Pusey", translator_died=1882, translator_source="https://example.org/pusey",
         first_published=1838, edition="Pusey, 1838", source="https://example.org/3296", raw_url="https://example.org/pg3296.txt", raw_file="pg3296.txt",
-        raw_kind="gutenberg", raw_sha256=hashlib.sha256(data).hexdigest(), verdict=R.PD, why_not="", credit="Pusey's Confessions. Public domain.",
+        raw_kind="gutenberg", raw_sha256=hashlib.sha256(data).hexdigest(), basis="translator died 1882, first published 1838", verdict=R.PD,
+        why_not="", credit="Pusey's Confessions. Public domain.",
         chapters=2, dropped=("title page",), parse=R.parse_confessions)
     base.update(kw)
     return R.Recipe(**base), data
@@ -700,16 +705,22 @@ class Repository(unittest.TestCase):
         for r in R.RECIPES:
             self.assertRegex(r.raw_sha256, HEX64, r.id)
             self.assertIn(r.verdict, (R.PD, "US only", "unclear"), r.id)
-            self.assertTrue(r.credit.strip() and r.edition.strip() and r.source.startswith("https://"), r.id)
+            self.assertTrue(r.credit.strip() and r.edition.strip() and r.basis.strip() and r.source.startswith("https://"), r.id)
             self.assertLessEqual(r.first_published, 1930, f"{r.id}: first published after 1930 is not public domain in the US in 2026")
             if r.verdict == R.PD:
-                self.assertIsNotNone(r.translator_died, f"{r.id}: a death year is needed for 'public domain everywhere'")
-                self.assertLessEqual(r.translator_died, 1955, f"{r.id}: the translator died after 1955")
-                self.assertIn(r.translator, r.credit, r.id)
-                self.assertIn(str(r.translator_died), r.credit, r.id)
+                if r.translator is None:  # the second way in: an anonymous translator and an edition older than 1900
+                    self.assertLess(r.first_published, 1900, f"{r.id}: an anonymous translation must be older than 1900")
+                    self.assertIsNone(r.translator_died, r.id)
+                    self.assertIn("not named", r.basis + r.credit, r.id)
+                else:
+                    self.assertIsNotNone(r.translator_died, f"{r.id}: a death year is needed for 'public domain everywhere'")
+                    self.assertLessEqual(r.translator_died, 1955, f"{r.id}: the translator died after 1955")
+                    self.assertIn(r.translator, r.credit, r.id)
+                    self.assertIn(str(r.translator_died), r.credit, r.id)
                 self.assertIn(str(r.first_published), r.credit, r.id)
                 self.assertRegex(r.credit, r"Public domain\.$", r.id)
                 self.assertNotIn("gutenberg", r.credit.replace("gutenberg.org/ebooks/", "").lower(), f"{r.id}: the name of the library is not used as a stamp")
+                self.assertRegex(r.credit, r"(gutenberg\.org/ebooks/\d+|ccel\.org/ccel/[a-z_/]+)", f"{r.id}: the credit names the source")
                 self.assertEqual(r.why_not, "", r.id)
             else:
                 self.assertTrue(r.why_not.strip(), f"{r.id}: a book that is left out says why")

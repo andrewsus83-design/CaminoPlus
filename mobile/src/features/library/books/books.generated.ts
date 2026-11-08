@@ -4,6 +4,9 @@ import type { BookText } from './bookTextTypes';
 
 export const BOOK_TEXT_LOADERS: Readonly<Record<string, () => BookText>> = {
   'life-of-st-teresa': () => require('../../../../assets/books/life-of-st-teresa.json') as BookText,
+  'spiritual-exercises': () => require('../../../../assets/books/spiritual-exercises.json') as BookText,
   'imitation-of-christ': () => require('../../../../assets/books/imitation-of-christ.json') as BookText,
+  'devout-life': () => require('../../../../assets/books/devout-life.json') as BookText,
   'confessions': () => require('../../../../assets/books/confessions.json') as BookText,
+  'dialogue-of-st-catherine': () => require('../../../../assets/books/dialogue-of-st-catherine.json') as BookText,
 };

@@ -30,10 +30,10 @@ const SOFTWARE: Item[] = [
 
 // The books of the Books tab that have text in the app: one entry for each book of assets/books/manifest.json (written by tools/books/import_books.py,
 // public domain everywhere), so this list cannot fall behind the texts. The link is the page of the edition the text was taken from.
-type ManifestBook = { title: string; author: string; translator: string; firstPublished: number; source: string };
+type ManifestBook = { title: string; author: string; translator: string | null; firstPublished: number; source: string };
 const BOOKS: Item[] = (require('../assets/books/manifest.json') as { books: ManifestBook[] }).books.map((b) => ({
   name: b.title,
-  what: `${b.author}, translated by ${b.translator} (${b.firstPublished}). The full text of the book, to read offline`,
+  what: `${b.author}, ${b.translator ? `translated by ${b.translator}` : 'translator not named'} (${b.firstPublished}). The full text of the book, to read offline`,
   licence: 'Public domain',
   url: b.source,
 }));

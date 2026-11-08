@@ -115,7 +115,7 @@ def manifest_entry(b: Built) -> dict:
         "id": r.id, "title": r.title, "author": r.author, "translator": r.translator, "translatorDied": r.translator_died,
         "translatorSource": r.translator_source, "firstPublished": r.first_published, "edition": r.edition, "source": r.source,
         "rawUrl": r.raw_url, "rawSha256": r.raw_sha256, "outputSha256": b.sha256, "chapters": b.chapters, "words": b.words,
-        "verdict": r.verdict, "credit": r.credit, "leftOut": list(r.dropped), "dropped": dict(sorted(b.stats.items())),
+        "verdict": r.verdict, "basis": r.basis, "credit": r.credit, "leftOut": list(r.dropped), "counts": dict(sorted(b.stats.items())),
     }
 
 
