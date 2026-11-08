@@ -22,17 +22,5 @@ export type RowTab = (typeof ROW_TABS)[number];
 /** The one line the Bible tab says about its words, quiet, under its heading. */
 export const BIBLE_SOURCE_LINE = 'World English Bible, Catholic edition · public domain';
 
-/** Why the Books tab has no text at all while none of the twelve has one, in the words the person reads (books/copy.ts booksNotice says the rest). The Bible tab has no notice any more: its text is in the app. */
-export const BOOKS_NOTICE = 'Books are not in the app yet. We are checking the editions before we add them.';
-
-/**
- * The notice of a search, shown only when a book that has no text yet (it says "Soon") is among the results: the page of such a book says it is not in the app
- * yet. What is found in the Bible (verses and books) and the books marked "Free" are real and need no notice.
- */
-export const SEARCH_NOTICE = 'Books marked Soon are not in the app yet: we are still checking their editions. The Bible text and the books marked Free are.';
-
-/** The same, for the Bookmarks screen, when a book that says "Soon" is among the bookmarks. */
-export const BOOKMARKS_NOTICE = 'Books marked Soon are not in the app yet: we are still checking their editions. Bookmarks are kept only on this phone, and logging out clears them.';
-
-/** What the Bookmarks screen says under the Library rows when none of them is a book of the Books tab: where they are kept. */
+/** What the Bookmarks screen says under the Library rows: where they are kept. */
 export const BOOKMARKS_KEPT = 'Kept only on this phone. Logging out clears them.';

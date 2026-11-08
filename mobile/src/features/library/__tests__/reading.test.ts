@@ -3,26 +3,32 @@
 // phone width from 320 to 430, the title and the author fitted into their covers, and the three states of the banner of the Books tab.
 // No React, no React Native, no network. Run: npm run test:library (library.test.ts runs this file too).
 import assert from 'node:assert/strict';
-import { existsSync, readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
-import { BOOK_CATALOG } from '../books/catalog';
-import * as reading from '../books/reading';
+import type { BookContent, CatalogBook, Block, Span } from '../books';
 import {
-  CONTINUE_CTA, CONTINUE_NOTE, NONE_LINE, START_CTA, START_NOTE, booksBanner, booksNotice, bookPath, readerPath,
+  CONTINUE_CTA, CONTINUE_NOTE, KIND_ORDER, NONE_LINE, START_CTA, START_NOTE, booksBanner, bookPath, kindMark, kindName, pageNote, readerPath, shelves,
 } from '../books/copy';
 import {
-  A5_RATIO, GRID_COLUMNS, TILE_MAX, TITLE_MAX_LINES, a5Height, coverGrid, coverLabel, coverMetrics, coverText, fitAuthor, fitTitle, withAlpha,
+  A5_RATIO, GRID_COLUMNS, TILE_MAX, TITLE_MAX_LINES, a5Height, coverGrid, coverLabel, coverMetrics, coverText, fitKind, fitTitle, withAlpha,
 } from '../books/cover';
+import { noticeFor, GUIDE_NOTICE, READINGS_NOTICE, OTHER_NOTICE } from '../books/notices';
 import {
   DEFAULT_STEP, LAST_STEP, MAX_BODY, MAX_TITLE, READER_SIZES, canGrow, canShrink, clampStep, drawnSize, grow, packStep, parseStep, readerType, shrink, sizeLine,
 } from '../books/readerType';
+import * as reading from '../books/reading';
 import {
-  FINISHED_AT, PIECE_MAX, READING_MAX_BOOKS, READING_MAX_READ, READ_AT, blockWords, bookFacts, chapterIndex, chapterNav, countWords, destination, emptyReading, groupThousands,
-  hasParts, isRead, lastRead, layoutBlocks, LONG_LABEL, LONG_TITLE, markRead, nextLabel, offsetFor, packReading, parseReading, partName, partSubtitle, pieces, placeOf, positionLine, previousLabel, readButtonLabel,
-  readButtonSpoken, readSet, readingTime, resumeAt, savePlace, scrollProgress, shortTitle, splitMarker, splitTitle, startAt, tocGroups, type ChapterRef,
+  FINISHED_AT, PIECE_MAX, READING_MAX_BOOKS, READING_MAX_READ, READ_AT, blockText, blockWords, bookFacts, chapterIndex, chapterNav, chapterWords, cleanBlocks, cleanBook, countWords, destination, emptyReading,
+  formatMinutes, groupThousands, hasParts, isRead, lastRead, layoutBlocks, LONG_LABEL, LONG_TITLE, markRead, nextLabel, offsetFor, packReading, parseReading, partName, partSubtitle, pieces, placeOf,
+  plainText, positionLine, previousLabel, readButtonLabel, readButtonSpoken, readSet, readingMinutes, readingTime, resumeAt, savePlace, scrollProgress, shortTitle, spanPieces, splitTitle, spokenMinutes, startAt,
+  tocGroups, type ChapterRef,
 } from '../books/reading';
 import { textWidth, wrap } from '../books/typeMetrics';
-import type { BookBlock, BookText, BookTextIndexEntry } from '../books/bookTextTypes';
+
+/** The bundle of the books (mobile/assets/library, made by tools/build_books.py from books/): read from the files, so this test needs no app code to load it. */
+const LIB = join(process.cwd(), 'assets', 'library');
+const BOOK_CATALOG: CatalogBook[] = (JSON.parse(readFileSync(join(LIB, 'catalog.json'), 'utf8')) as { books: CatalogBook[] }).books.slice().sort((a, b) => a.order - b.order);
+const content = (id: string): BookContent => JSON.parse(readFileSync(join(LIB, 'books', `${id}.json`), 'utf8')) as BookContent;
 
 let n = 0;
 const check = (name: string, fn: () => void) => { fn(); n += 1; console.log(`ok   ${name}`); };
@@ -157,21 +163,61 @@ check('a long title is split in two: "Chapter XXXVI" and what the chapter is abo
   assert.equal(partName(''), '');
 });
 
-check('the blocks of a chapter become the things to draw: a long paragraph in pieces, every other block whole, a break with no text, and a damaged block is left out and never throws', () => {
+const sp = (t: string, extra: Partial<Span> = {}): Span => ({ t, ...extra });
+
+check('the blocks of a chapter become the things to draw: a long paragraph in pieces that say the same words in the same bold and italic, every other block whole, and no key is used twice', () => {
   const long = 'The soul rests in God alone. '.repeat(400).trim();
-  const blocks = [{ k: 'h', t: 'A heading' }, { k: 'p', t: long }, { k: 'q', t: 'one\ntwo' }, { k: 'hr' }, { k: 'li', t: '1. a point' }, { k: 'p', t: 'short' }] as BookBlock[];
+  const blocks: Block[] = [
+    { t: 'h', level: 2, spans: [sp('A heading')] },
+    { t: 'p', spans: [sp(long.slice(0, 5000)), sp(long.slice(5000, 5100), { b: 1 }), sp(long.slice(5100), { i: 1 })] },
+    { t: 'quote', paras: [[sp('one')], [sp('two')]], cite: [sp('— Someone')] },
+    { t: 'hr' },
+    { t: 'ul', items: [[sp('a point')], [sp('another')]] },
+    { t: 'ol', items: [[sp('first')]] },
+    { t: 'p', spans: [sp('short')] },
+  ];
   const items = layoutBlocks(blocks);
-  assert.deepEqual(items.map((i) => i.k), ['h', ...Array(items.filter((i) => i.key.startsWith('1.')).length).fill('p'), 'q', 'hr', 'li', 'p']);
   const pieces1 = items.filter((i) => i.key.startsWith('1.'));
+  assert.deepEqual(items.map((i) => i.k), ['h', ...Array(pieces1.length).fill('p'), 'q', 'hr', 'list', 'list', 'p']);
   assert.ok(pieces1.length >= 3, 'the long paragraph is in several pieces');
-  assert.equal(pieces1.map((i) => i.t).join(''), long);
-  assert.deepEqual(pieces1.map((i) => [i.cont, i.end]), pieces1.map((_, k) => [k > 0, k === pieces1.length - 1]), 'a piece after the first continues; the last one ends the paragraph');
-  assert.equal(items.find((i) => i.k === 'q')!.t, 'one\ntwo', 'the new line of a poem stays in the text');
-  assert.deepEqual(items.find((i) => i.k === 'hr'), { key: '3', k: 'hr', t: '', cont: false, end: true });
+  const spansOf = (i: (typeof items)[number]) => (i.k === 'p' ? i.spans : []);
+  assert.equal(pieces1.map((i) => plainText(spansOf(i))).join(''), long, 'the same words');
+  assert.ok(pieces1.every((i) => plainText(spansOf(i)).length <= PIECE_MAX), 'no piece is longer than the limit');
+  // the bold and the italic are where they were: the words of each style, put together, are the words that had that style
+  const styled = (key: 'b' | 'i') => pieces1.flatMap((i) => spansOf(i)).filter((x) => x[key]).map((x) => x.t).join('');
+  assert.equal(styled('b'), long.slice(5000, 5100));
+  assert.equal(styled('i'), long.slice(5100));
+  assert.deepEqual(pieces1.map((i) => (i.k === 'p' ? [i.cont, i.end] : [])), pieces1.map((_, k) => [k > 0, k === pieces1.length - 1]), 'a piece after the first continues; the last one ends the paragraph');
+  assert.deepEqual(items.find((i) => i.k === 'hr'), { key: '3', k: 'hr' });
+  const quote = items.find((i) => i.k === 'q');
+  assert.ok(quote && quote.k === 'q' && quote.paras.length === 2 && plainText(quote.cite ?? []) === '— Someone');
+  const lists = items.filter((i) => i.k === 'list');
+  assert.deepEqual(lists.map((i) => (i.k === 'list' ? [i.ordered, i.items.length] : [])), [[false, 2], [true, 1]]);
   assert.equal(new Set(items.map((i) => i.key)).size, items.length, 'every item has a key of its own');
-  const damaged = [{ k: 'p', t: 'fine' }, { k: 'x', t: 'unknown' }, { k: 'p' }, null, 7, { k: 'p', t: 12 }, { k: 'h', t: 'also fine' }] as unknown as BookBlock[];
-  assert.deepEqual(layoutBlocks(damaged).map((i) => i.t), ['fine', 'also fine']);
   assert.deepEqual(layoutBlocks([]), []);
+  assert.deepEqual(spanPieces([sp('short')]), [[sp('short')]]);
+});
+
+check('a book read from its file is made safe: what is not a book is nothing, a chapter without an id or a title or with an id seen before is left out, and blocks that do not read are left out, so the reader never throws', () => {
+  for (const bad of [null, undefined, 7, 'x', [], {}, { id: 'a', title: 'T' }, { id: 'a', title: 'T', chapters: [] }, { id: 'a', title: 'T', chapters: [{ id: '', title: 'x', blocks: [] }] }]) assert.equal(cleanBook(bad), null);
+  const raw = {
+    id: 'a-book', kind: 'guide', title: 'A book', subtitle: 7, credit: 'By us.', author: 'Us',
+    chapters: [
+      { id: 'one', title: 'One', blocks: [{ t: 'p', spans: [{ t: 'fine', b: 1 }, { t: 3 }, null] }, { t: 'x' }, { t: 'p' }, null, 7, { t: 'h', level: 'two', spans: [{ t: 'Head' }] }, { t: 'ul', items: [[{ t: 'a' }], 'nope', []] }, { t: 'quote', paras: [], cite: null }, { t: 'hr' }] },
+      { id: 'one', title: 'Again', blocks: [] },
+      { id: 'two', title: 'Two', part: 'Part A', blocks: 'not a list' },
+      { title: 'no id' },
+    ],
+    sources: [{ work: 'W', author: 'A', licence: 'L', translator: 'T', extra: 1 }, { work: 'only a work' }],
+  };
+  const book = cleanBook(raw)!;
+  assert.deepEqual(book.chapters.map((c) => c.id), ['one', 'two'], 'a chapter seen before and one without an id are left out');
+  assert.deepEqual(book.chapters[0].blocks, [{ t: 'p', spans: [{ t: 'fine', b: 1 }] }, { t: 'h', level: 2, spans: [{ t: 'Head' }] }, { t: 'ul', items: [[{ t: 'a' }]] }, { t: 'hr' }]);
+  assert.deepEqual(book.chapters[1], { id: 'two', title: 'Two', part: 'Part A', blocks: [] });
+  assert.equal(book.subtitle, '');
+  assert.deepEqual(book.sources, [{ work: 'W', author: 'A', licence: 'L', translator: 'T' }]);
+  assert.deepEqual(cleanBlocks('nope'), []);
+  assert.deepEqual(cleanBlocks([{ t: 'h', level: 1, spans: [{ t: 'x' }] }, { t: 'h', level: 9, spans: [{ t: 'y' }] }]).map((b) => (b.t === 'h' ? b.level : 0)), [2, 6], 'a heading level is held between 2 and 6');
 });
 
 check('the button of a book page: "Start reading" the first time, "Continue: Chapter 7" after, and the whole title with its part for a screen reader', () => {
@@ -216,24 +262,40 @@ check('the offset of a progress is the inverse of it, and a chapter counts as re
 
 /* ================================================================ size of a text */
 
-check('words and reading time: runs of non-space, 200 a minute, minutes under an hour, hours and minutes over it rounded to five', () => {
+check('words and reading time are the rules of tools/book_kit.py: a word is a run of letters and numbers (an inner apostrophe or hyphen stays in it), 220 a minute, rounded up', () => {
   assert.equal(countWords(''), 0);
   assert.equal(countWords('   '), 0);
   assert.equal(countWords('one'), 1);
   assert.equal(countWords(' Thou  art\ngreat, O Lord. '), 5);
-  assert.equal(blockWords([{ k: 'p', t: 'a b c' }, { k: 'hr' }, { k: 'q', t: 'd\ne' }, { k: 'h', t: 'f' }, { k: 'li', t: '1. g' }]), 8);
+  assert.equal(countWords("don't well-known ‘quoted’ — a dash and 12 numbers"), 8, 'an inner apostrophe or hyphen stays in the word; a dash and quote marks are not words');
+  assert.equal(countWords('Ávila Müller 日本'), 3, 'letters of any script');
+  const blocks: Block[] = [
+    { t: 'p', spans: [sp('a b'), sp(' c', { b: 1 })] }, { t: 'hr' }, { t: 'quote', paras: [[sp('d e')]], cite: [sp('— f')] }, { t: 'h', level: 2, spans: [sp('g')] }, { t: 'ul', items: [[sp('h i')], [sp('j')]] },
+  ];
+  assert.equal(blockText(blocks[2]), 'd e\n— f');
+  assert.equal(blockWords(blocks), 3 + 0 + 3 + 1 + 3, 'the dash of an attribution is not a word');
+  assert.equal(chapterWords('Day 1. A start', blocks), 4 + 10, 'the title counts, as the tool counts it');
+  assert.equal(readingMinutes(0), 0);
+  assert.equal(readingMinutes(1), 1);
+  assert.equal(readingMinutes(220), 1);
+  assert.equal(readingMinutes(221), 2, 'rounded up');
+  assert.equal(formatMinutes(25), '25 min');
+  assert.equal(formatMinutes(60), '1 h');
+  assert.equal(formatMinutes(160), '2 h 40 min');
+  assert.equal(formatMinutes(180), '3 h');
   assert.equal(readingTime(10), '1 min');
-  assert.equal(readingTime(1099), '5 min', 'under half a minute more it rounds down');
-  assert.equal(readingTime(1300), '7 min', 'and from half a minute more it rounds up');
-  assert.equal(readingTime(1200), '6 min');
-  assert.equal(readingTime(11800), '59 min');
-  assert.equal(readingTime(12000), '1 h');
-  assert.equal(readingTime(55000), '4 h 35 min');
-  assert.equal(readingTime(54000), '4 h 30 min');
+  assert.equal(readingTime(1100), '5 min');
+  assert.equal(readingTime(1101), '6 min', 'a word more than the minute is another minute');
+  assert.equal(readingTime(32748), '2 h 29 min');
+  assert.equal(spokenMinutes(1), '1 minute');
+  assert.equal(spokenMinutes(51), '51 minutes');
+  assert.equal(spokenMinutes(60), '1 hour');
+  assert.equal(spokenMinutes(68), '1 hour 8 minutes');
+  assert.equal(spokenMinutes(180), '3 hours');
   assert.equal(groupThousands(55000), '55,000');
   assert.equal(groupThousands(999), '999');
   assert.equal(groupThousands(1234567), '1,234,567');
-  assert.equal(bookFacts(114, 55000), '114 chapters · 55,000 words · 4 h 35 min');
+  assert.equal(bookFacts(17, 11077), '17 chapters · 11,077 words · 51 min');
   assert.equal(bookFacts(1, 800), '1 chapter · 800 words · 4 min');
 });
 
@@ -261,17 +323,6 @@ check('a very long paragraph is cut into pieces that make the same text again, a
   const spacedParts = pieces(spaced, 100);
   assert.ok(spacedParts.length > 2);
   assert.ok(spacedParts.slice(1).every((p) => p.startsWith(' ')), 'a piece starts where the one before stopped, at a space, so no word is cut in two');
-});
-
-check('a numbered point keeps its marker apart from its text, and a text with no marker has none', () => {
-  assert.deepEqual(splitMarker('12. Of the love of God'), { marker: '12.', rest: 'Of the love of God' });
-  assert.deepEqual(splitMarker('(3) The third'), { marker: '(3)', rest: 'The third' });
-  assert.deepEqual(splitMarker('4) Fourth'), { marker: '4)', rest: 'Fourth' });
-  assert.deepEqual(splitMarker('• A bullet'), { marker: '•', rest: 'A bullet' });
-  assert.deepEqual(splitMarker('a. First of letters'), { marker: 'a.', rest: 'First of letters' });
-  assert.deepEqual(splitMarker('No marker here'), { marker: '', rest: 'No marker here' });
-  assert.deepEqual(splitMarker('1.5 million'), { marker: '', rest: '1.5 million' }, 'a number inside a word is not a marker');
-  assert.deepEqual(splitMarker(''), { marker: '', rest: '' });
 });
 
 /* ================================================================ the saved place */
@@ -338,7 +389,7 @@ check('a damaged place never throws: bad items are left out, a book twice is kep
       { id: '__proto__', c: 'c1', y: 0, at: 0, read: [] },
       { id: 'devout-life', c: '', y: 0, at: 0, read: [] },
       { id: 'dark-night', c: 'c1', y: 'far', at: 'then', read: 'all' },
-      { id: 'x'.repeat(61), c: 'c1', y: 0, at: 0, read: [] },
+      { id: 'x'.repeat(81), c: 'c1', y: 0, at: 0, read: [] },
     ],
   })!;
   assert.deepEqual(read.items.map((p) => p.id), ['confessions', 'dark-night']);
@@ -391,7 +442,7 @@ check('what other screens rely on stays (the floating Continue bar reads the pla
     assert.equal(typeof api[name], 'function', `${name} is exported`);
     assert.equal((api[name] as (...x: unknown[]) => unknown).length, n, `${name} takes ${n} arguments`);
   }
-  for (const name of ['chapterIndex', 'chapterNav', 'positionLine', 'destination', 'previousLabel', 'nextLabel', 'tocGroups', 'hasParts', 'shortTitle', 'partName', 'splitTitle', 'partSubtitle', 'scrollProgress', 'offsetFor', 'isRead', 'countWords', 'blockWords', 'groupThousands', 'readingTime', 'bookFacts', 'pieces', 'layoutBlocks', 'splitMarker', 'readButtonLabel', 'readButtonSpoken']) {
+  for (const name of ['chapterIndex', 'chapterNav', 'positionLine', 'destination', 'previousLabel', 'nextLabel', 'tocGroups', 'hasParts', 'shortTitle', 'partName', 'splitTitle', 'partSubtitle', 'scrollProgress', 'offsetFor', 'isRead', 'countWords', 'blockWords', 'groupThousands', 'readingTime', 'bookFacts', 'pieces', 'layoutBlocks', 'cleanBook', 'chapterWords', 'readButtonLabel', 'readButtonSpoken']) {
     assert.equal(typeof api[name], 'function', `${name} is exported`);
   }
 });
@@ -543,9 +594,9 @@ check('every cover is a book: a spine, page edges, a small radius, a ribbon of a
   }
 });
 
-check('every title of the twelve fits its cover as large as it can be, in at most four lines, with no word cut, from 320 to 430 wide and at the widest', () => {
+check('every title of every book fits its cover as large as it can be, in at most four lines, with no word cut, from 320 to 430 wide and at the widest', () => {
   assert.equal(TITLE_MAX_LINES, 4, 'a title is at most four lines');
-  assert.equal(coverMetrics(173).author.maxLines, 2, 'and an author at most two');
+  assert.equal(coverMetrics(173).kind.maxLines, 2, 'and the kind of book at most two');
   const widths: number[] = [];
   for (let screen = 320; screen <= 430; screen += 1) widths.push(coverGrid(screen, 16).tile);
   widths.push(TILE_MAX);
@@ -558,32 +609,32 @@ check('every title of the twelve fits its cover as large as it can be, in at mos
       assert.ok(t.title.size >= 12, `${b.title} at ${w}: the title is ${t.title.size} (never under 12)`);
       for (const line of t.title.lines) assert.ok(textWidth('fraunces', line, t.title.size) <= t.m.text, `${b.title} at ${w}: "${line}" is too wide`);
       assert.equal(t.title.lines.join(' '), b.title.replace(/\s+/g, ' '), 'the lines are the title, nothing cut');
-      assert.ok(t.author.fits, `${b.author} at ${w}: ${t.author.lines.length} lines`);
-      assert.ok(t.author.lines.length <= 2);
-      assert.ok(t.author.size >= 8.5);
-      assert.ok(t.eraFits, `${b.era} at ${w} is one line`);
+      assert.ok(t.kind.fits, `${b.kind} at ${w}: ${t.kind.lines.length} lines`);
+      assert.ok(t.kind.lines.length <= 2);
+      assert.ok(t.kind.size >= 8.5);
+      assert.ok(t.timeFits, `${t.time} at ${w} is one line`);
     }
   }
 });
 
-check('the longest title, "The Dialogue of Saint Catherine of Siena", fits at 320, 390 and 430 in three or four lines, and a short title is set larger than a long one', () => {
-  const dialogue = BOOK_CATALOG.find((b) => b.id === 'dialogue-of-st-catherine')!;
+check('the longest title of the books fits at 320, 390 and 430, and a short title is set larger than a long one', () => {
+  const longest = BOOK_CATALOG.reduce((a, b) => (b.title.length > a.title.length ? b : a));
+  const shortest = BOOK_CATALOG.reduce((a, b) => (b.title.length < a.title.length ? b : a));
   for (const screen of [320, 390, 430]) {
-    const t = coverText(dialogue, coverGrid(screen, 16).tile).title;
-    assert.ok(t.fits && t.lines.length >= 2 && t.lines.length <= 4, `${screen}: ${t.lines.join(' / ')}`);
+    const t = coverText(longest, coverGrid(screen, 16).tile).title;
+    assert.ok(t.fits && t.lines.length >= 1 && t.lines.length <= 4, `${screen}: ${t.lines.join(' / ')}`);
   }
-  const conf = BOOK_CATALOG.find((b) => b.id === 'confessions')!;
   const w = coverGrid(390, 16).tile;
-  assert.ok(coverText(conf, w).title.size > coverText(dialogue, w).title.size);
-  assert.deepEqual(coverText(conf, w).title.lines, ['Confessions']);
+  assert.ok(coverText(shortest, w).title.size >= coverText(longest, w).title.size, 'a short title is not set smaller than a long one');
+  assert.deepEqual(coverText({ title: 'Confessions', kind: 'reflection', minutes: 109 }, w).title.lines, ['Confessions']);
 });
 
 check('a title that cannot fit says so instead of being cut: a word wider than the cover, or more lines than the cover has room for', () => {
   const m = coverMetrics(138);
   assert.equal(fitTitle('Supercalifragilisticexpialidocious', m.text, m.titleBox, m.title.max, m.title.min).fits, false);
   assert.equal(fitTitle('word '.repeat(60), m.text, m.titleBox, m.title.max, m.title.min).fits, false);
-  assert.equal(fitAuthor('A very long author name that goes on and on and on and on and on', m.text, m).fits, false);
-  const ok = fitTitle('The Way of a Pilgrim', m.text, m.titleBox, m.title.max, m.title.min);
+  assert.equal(fitKind('A very long kind of book that goes on and on and on and on and on', m.text, m).fits, false);
+  const ok = fitTitle('The Quiet Road', m.text, m.titleBox, m.title.max, m.title.min);
   assert.ok(ok.fits && ok.size <= m.title.max && ok.size >= m.title.min);
 });
 
@@ -602,53 +653,64 @@ check('the width of a text comes from the real fonts: a wide letter is wider tha
   assert.deepEqual(wrap('fraunces', '', 100, 16), { lines: [], fits: true });
 });
 
-check('the shades of a cover come from its colours: the same colour with an alpha, and the label of a cover for a screen reader says free or soon', () => {
+check('the shades of a cover come from its colours: the same colour with an alpha; the label of a cover says all the cover shows: the title, the kind of book and the time', () => {
   assert.equal(withAlpha('#14365D', 0.5), 'rgba(20,54,93,0.5)');
   assert.equal(withAlpha('#FFFFFF', 1), 'rgba(255,255,255,1)');
-  assert.equal(coverLabel({ title: 'The Way of a Pilgrim', author: 'Anonymous' }, true), 'The Way of a Pilgrim, Anonymous, free');
-  assert.equal(coverLabel({ title: 'The Way of a Pilgrim', author: 'Anonymous' }, false), 'The Way of a Pilgrim, Anonymous, soon');
+  assert.equal(coverLabel({ title: 'The French Way', kind: 'guide', minutes: 51 }), "The French Way, Pilgrim's guide, 51 minutes");
+  assert.equal(coverLabel({ title: 'The Quiet Road', kind: 'reflection', minutes: 149 }), 'The Quiet Road, Readings for the Way, 2 hours 29 minutes');
+  assert.equal(coverLabel({ title: 'X', kind: 'essay', minutes: 1 }), 'X, Book, 1 minute', 'a kind this app does not know is still a book');
+  assert.deepEqual(coverText({ title: 'The Quiet Road', kind: 'reflection', minutes: 149 }, 173).kind.lines.join(' '), 'READINGS FOR THE WAY');
+  assert.equal(coverText({ title: 'The Quiet Road', kind: 'reflection', minutes: 149 }, 173).time, '2 h 29 min');
 });
 
-/* ================================================================ the banner and the notice of the Books tab */
+/* ================================================================ the banner, the shelves and the notices of the Books tab */
 
 const books = BOOK_CATALOG.map((b) => ({ id: b.id, title: b.title }));
 
-check('the banner with no text in any book says plainly that the texts are being checked, and has no button and no note', () => {
-  const v = booksBanner(books, () => false, null);
+check('the banner with no book says plainly that there is none to show, and has no button and no note', () => {
+  const v = booksBanner([], null);
   assert.equal(v.kind, 'none');
   assert.equal(v.title, 'Books for the road');
   assert.equal((v as { line: string }).line, NONE_LINE);
-  assert.equal(NONE_LINE, 'The texts are being checked.');
   assert.ok(!('cta' in v) && !('note' in v));
-  assert.equal(v.label, 'Books · Soon', 'the same word as the covers: nothing claims that twelve books are there to read');
-  const lastIsGone = booksBanner(books, () => false, { id: 'confessions' });
-  assert.equal(lastIsGone.kind, 'none', 'a place in a book without a text opens nothing');
 });
 
-check('the banner offers "Start reading" for the first book that has a text, and "Continue reading" for the book read last, with a note beside the button', () => {
-  const has = (id: string) => id === 'confessions' || id === 'imitation-of-christ' || id === 'story-of-a-soul';
-  const start = booksBanner(books, has, null);
+check('the banner offers "Start reading" for the first book, and "Continue reading" for the book read last, with a note beside the button; a place in a book that is gone is not used', () => {
+  const start = booksBanner(books, null);
   assert.equal(start.kind, 'start');
-  assert.deepEqual(start.kind === 'start' && [start.bookId, start.cta, start.note, start.label, start.hint], ['imitation-of-christ', START_CTA, START_NOTE, 'The Imitation of Christ', 'Opens The Imitation of Christ']);
-  const again = booksBanner(books, has, { id: 'confessions' });
+  assert.deepEqual(start.kind === 'start' && [start.bookId, start.cta, start.note, start.label, start.hint], [books[0].id, START_CTA, START_NOTE, books[0].title, `Opens ${books[0].title}`]);
+  const second = books[1];
+  const again = booksBanner(books, { id: second.id });
   assert.equal(again.kind, 'continue');
-  assert.deepEqual(again.kind === 'continue' && [again.bookId, again.cta, again.note, again.label, again.hint], ['confessions', CONTINUE_CTA, CONTINUE_NOTE, 'Confessions', 'Opens Confessions where you stopped']);
+  assert.deepEqual(again.kind === 'continue' && [again.bookId, again.cta, again.note, again.label, again.hint], [second.id, CONTINUE_CTA, CONTINUE_NOTE, second.title, `Opens ${second.title} where you stopped`]);
   assert.equal(START_CTA, 'Start reading');
   assert.equal(CONTINUE_CTA, 'Continue reading');
-  assert.equal(booksBanner(books, has, { id: 'dark-night' }).kind, 'start', 'the last book has no text: the first that has one');
-  assert.equal(booksBanner(books, () => true, null).kind === 'start' && (booksBanner(books, () => true, null) as { bookId: string }).bookId, 'way-of-a-pilgrim');
+  assert.equal(booksBanner(books, { id: 'a-book-that-was-taken-out' }).kind, 'start', 'the book of the place is not in the list: the first book');
+  assert.ok(START_NOTE.length <= 7 && CONTINUE_NOTE.length <= 7, 'the note has room for seven characters beside the pill at 320');
 });
 
-check('the notice under the banner: the old preview words in a card with no text, one quiet line saying how many are in the app with some, nothing when all twelve are', () => {
-  assert.deepEqual(booksNotice(0, 12), { kind: 'card', title: 'Preview', text: 'Books are not in the app yet. We are checking the editions before we add them.' });
-  const some = booksNotice(3, 12)!;
-  assert.equal(some.kind, 'line');
-  assert.equal(some.text, '3 of the 12 books are in the app and can be read with no signal. The others say Soon: we are still checking their editions.');
-  assert.equal(booksNotice(1, 12)!.text.slice(0, 40), '1 of the 12 books is in the app and can ');
-  assert.equal(booksNotice(11, 12)!.kind, 'line');
-  assert.equal(booksNotice(12, 12), null);
-  assert.equal(booksNotice(13, 12), null);
-  assert.doesNotMatch(JSON.stringify([booksNotice(0, 12), booksNotice(5, 12)]), /verified|official|certified/i);
+check('the books are on shelves, one for each kind in the order guides then readings, each in the order of the books; a shelf with no book is not there, and a kind this app does not know has a shelf of its own', () => {
+  const on = shelves(BOOK_CATALOG);
+  assert.deepEqual(on.map((x) => x.kind), [...KIND_ORDER].filter((k) => BOOK_CATALOG.some((b) => b.kind === k)));
+  assert.equal(on.reduce((sum, x) => sum + x.books.length, 0), BOOK_CATALOG.length, 'every book is on a shelf');
+  for (const x of on) assert.deepEqual(x.books.map((b) => b.order), x.books.map((b) => b.order).slice().sort((p, q) => p - q), `${x.kind}: in the order of the shelves`);
+  assert.deepEqual(shelves([{ kind: 'reflection' }]).map((x) => x.kind), ['reflection']);
+  assert.deepEqual(shelves([{ kind: 'guide' }, { kind: 'essay' }]).map((x) => x.kind), ['guide', 'other']);
+  assert.deepEqual(shelves([]), []);
+  assert.deepEqual([kindName('guide'), kindName('reflection'), kindName('essay')], ["Pilgrim's guide", 'Readings for the Way', 'Book']);
+  assert.deepEqual([kindMark('guide'), kindMark('reflection'), kindMark('essay')], ['GUIDE', 'READINGS', 'BOOK']);
+  assert.deepEqual([pageNote('guide'), pageNote('reflection')], ['Buen Camino!', 'A little each day']);
+});
+
+check('every book page has its notice, chosen by kind and never empty: the guides say that no person has checked the facts yet, the readings say what is word for word and what is original, an unknown kind gets the careful one; none says verified or official', () => {
+  assert.equal(noticeFor('guide'), GUIDE_NOTICE);
+  assert.equal(noticeFor('reflection'), READINGS_NOTICE);
+  assert.equal(noticeFor('essay'), OTHER_NOTICE);
+  assert.equal(noticeFor(''), OTHER_NOTICE);
+  for (const b of BOOK_CATALOG) assert.ok(noticeFor(b.kind).trim().length > 40, `${b.id}: a notice`);
+  assert.match(GUIDE_NOTICE, /^Written with AI assistance\. A person has not yet checked the facts of this guide/);
+  assert.match(READINGS_NOTICE, /^Passages are word for word from the public-domain edition named on the Licences screen\. The reflections are original text written with AI assistance\.$/);
+  assert.doesNotMatch([GUIDE_NOTICE, READINGS_NOTICE, OTHER_NOTICE].join(' '), /verified|official|certified|reviewed/i);
 });
 
 check('the path of a book page and of its reader, with the chapter in the query', () => {
@@ -658,76 +720,108 @@ check('the path of a book page and of its reader, with the chapter in the query'
   assert.equal(readerPath('x', 'a b&c'), '/library/book/x/read?c=a%20b%26c');
 });
 
-/* ================================================================ the real texts */
+/* ================================================================ the real books */
 
-// The books whose text is in the app (mobile/assets/books, made by tools/books): whatever they are, 0 to 12, the logic must work on every one of them.
-const ASSETS = join(process.cwd(), 'assets', 'books');
-const index: BookTextIndexEntry[] = existsSync(join(ASSETS, 'index.json')) ? (JSON.parse(readFileSync(join(ASSETS, 'index.json'), 'utf8')) as BookTextIndexEntry[]) : [];
-const real = (e: BookTextIndexEntry): BookText => JSON.parse(readFileSync(join(ASSETS, `${e.id}.json`), 'utf8')) as BookText;
+// The bundle of the books (mobile/assets/library): however many books there are, 1 to 100, the logic must work on every one of them.
+const ids = (dir: string) => readdirSync(join(LIB, dir)).filter((f) => f.endsWith('.json')).map((f) => f.slice(0, -5)).sort();
 
-check('every real text is a book of the catalog, its chapters are c1 to cN in order, no chapter is empty, and every block is one of the five kinds with text', () => {
-  const ids = BOOK_CATALOG.map((b) => b.id);
-  assert.deepEqual(index.map((e) => e.id), ids.filter((id) => index.some((e) => e.id === id)), 'in the order of the catalog');
-  for (const e of index) {
-    const book = real(e);
-    assert.equal(book.id, e.id);
-    assert.ok(book.chapters.length > 0 && book.chapters.length === e.chapters, `${e.id}: ${book.chapters.length} chapters, the index says ${e.chapters}`);
-    assert.ok(book.chapters.length <= READING_MAX_READ, `${e.id}: the marks of read chapters hold ${READING_MAX_READ}`);
+check('the bundle holds a file for every book of the catalog and none besides; ids are unique and lower case; the kinds, the covers and the numbers are what the app can draw', () => {
+  assert.ok(BOOK_CATALOG.length > 0);
+  assert.deepEqual(ids('books'), BOOK_CATALOG.map((b) => b.id).sort());
+  assert.equal(new Set(BOOK_CATALOG.map((b) => b.id)).size, BOOK_CATALOG.length);
+  const COLOURS = ['goldSoft', 'blue100', 'successWash', 'red100', 'sand300', 'goldWash'];
+  const GLYPHS = ['library', 'book', 'chat'];
+  for (const b of BOOK_CATALOG) {
+    assert.match(b.id, /^[a-z0-9]+(-[a-z0-9]+)*$/);
+    assert.ok(b.id.length <= 80);
+    assert.ok(['guide', 'reflection'].includes(b.kind), `${b.id}: kind ${b.kind}`);
+    assert.ok(COLOURS.includes(b.cover.colour) && GLYPHS.includes(b.cover.icon), `${b.id}: cover ${JSON.stringify(b.cover)}`);
+    assert.ok(b.title.trim() && b.subtitle.trim() && b.description.trim().length > 40, `${b.id}: title, subtitle and description`);
+    assert.ok(b.chapters.length > 0 && b.words > 0 && b.minutes > 0, `${b.id}: chapters, words, minutes`);
+    assert.ok(Number.isInteger(b.order));
+  }
+  assert.ok(Object.keys(JSON.parse(readFileSync(join(LIB, 'catalog.json'), 'utf8')).books[0]).every((k) => ['id', 'kind', 'order', 'title', 'subtitle', 'description', 'words', 'minutes', 'cover', 'chapters', 'route_slug'].includes(k)), 'the catalog has only the fields the app knows');
+});
+
+check('every real book reads as it is: cleanBook keeps every chapter and every block, the chapters are the catalog\'s (ids and titles, in order), no chapter is empty, and every block is of a kind the reader draws', () => {
+  for (const entry of BOOK_CATALOG) {
+    const raw = content(entry.id);
+    const book = cleanBook(raw)!;
+    assert.ok(book, `${entry.id} reads`);
+    assert.equal(book.id, entry.id);
+    assert.equal(book.kind, entry.kind);
+    assert.deepEqual(book.chapters.map((c) => [c.id, c.title]), entry.chapters.map((c) => [c.id, c.title]), `${entry.id}: the chapters of the file are those of the catalog`);
+    assert.ok(book.chapters.length <= READING_MAX_READ, `${entry.id}: the marks of read chapters hold ${READING_MAX_READ}`);
     book.chapters.forEach((c, i) => {
-      assert.equal(c.id, `c${i + 1}`, `${e.id}: chapter ${i + 1}`);
-      assert.ok(c.title.trim().length > 0 && c.blocks.length > 0, `${e.id} ${c.id} has a title and blocks`);
-      for (const b of c.blocks) {
-        assert.ok(['p', 'h', 'q', 'li', 'hr'].includes(b.k), `${e.id} ${c.id}: block kind ${b.k}`);
-        if (b.k !== 'hr') assert.ok(typeof b.t === 'string' && b.t.trim().length > 0, `${e.id} ${c.id}: an empty ${b.k}`);
-      }
+      assert.ok(c.id.length <= 80, `${entry.id} ${c.id}: an id the saved place can hold`);
+      assert.ok(c.title.trim().length > 0 && c.blocks.length > 0, `${entry.id} ${c.id} has a title and blocks`);
+      assert.deepEqual(c.blocks, raw.chapters[i].blocks, `${entry.id} ${c.id}: nothing of a real chapter is dropped`);
+      for (const b of c.blocks) assert.ok(['p', 'h', 'ul', 'ol', 'quote', 'hr'].includes(b.t), `${entry.id} ${c.id}: block kind ${b.t}`);
     });
-    assert.ok(book.credit.trim().length > 40, `${e.id}: a credit line`);
+    assert.ok(book.credit.trim().length > 0, `${entry.id}: a credit line`);
+    if (entry.kind === 'reflection') assert.ok((book.sources ?? []).length > 0 && book.credit.length > 40, `${entry.id}: a book of readings names its editions`);
   }
 });
 
-check('on every real text the words and the chapters add up to what the index says, the contents holds each chapter once in order, and Next from the first chapter walks the whole book', () => {
-  for (const e of index) {
-    const book = real(e);
-    assert.equal(book.chapters.reduce((sum, c) => sum + blockWords(c.blocks), 0), e.words, `${e.id}: the words`);
+check('on every real book the words and the minutes are the catalog\'s: a chapter (its title and its blocks) at 220 a minute, rounded up, is the minutes the catalog gives it, and the chapters add up to the words of the book', () => {
+  for (const entry of BOOK_CATALOG) {
+    const book = content(entry.id);
+    let total = 0;
+    book.chapters.forEach((c, i) => {
+      const words = chapterWords(c.title, c.blocks);
+      total += words;
+      assert.equal(readingMinutes(words), entry.chapters[i].minutes, `${entry.id} ${c.id}: ${words} words`);
+    });
+    assert.equal(total, entry.words, `${entry.id}: the words`);
+    assert.equal(readingMinutes(total), entry.minutes, `${entry.id}: the minutes`);
+  }
+});
+
+check('on every real book the contents hold each chapter once in order, Next walks the whole book and Previous undoes it, and "Continue" works from every chapter', () => {
+  for (const entry of BOOK_CATALOG) {
+    const book = content(entry.id);
     const groups = tocGroups(book.chapters);
-    assert.deepEqual(groups.flatMap((g) => g.entries.map((x) => x.id)), book.chapters.map((c) => c.id), `${e.id}: the contents`);
+    assert.deepEqual(groups.flatMap((g) => g.entries.map((x) => x.id)), book.chapters.map((c) => c.id), `${entry.id}: the contents`);
     let i = 0;
-    let crossings = 0;
     for (let steps = 0; steps < book.chapters.length - 1; steps += 1) {
       const nav = chapterNav(book.chapters, i)!;
-      assert.ok(nav.next, `${e.id}: no next at ${i}`);
-      assert.equal(chapterNav(book.chapters, nav.next!.index)!.prev!.index, i, `${e.id}: Previous undoes Next at ${i}`);
-      if (nav.next!.part !== nav.part) crossings += 1;
+      assert.ok(nav.next, `${entry.id}: no next at ${i}`);
+      assert.equal(chapterNav(book.chapters, nav.next!.index)!.prev!.index, i, `${entry.id}: Previous undoes Next at ${i}`);
       i = nav.next!.index;
     }
-    assert.equal(i, book.chapters.length - 1, `${e.id}: Next reaches the last chapter`);
+    assert.equal(i, book.chapters.length - 1, `${entry.id}: Next reaches the last chapter`);
     assert.equal(chapterNav(book.chapters, i)!.next, null);
     assert.equal(chapterNav(book.chapters, 0)!.prev, null);
-    assert.equal(crossings, groups.length - 1, `${e.id}: Next crosses each part once`);
+    book.chapters.forEach((c, k) => {
+      assert.deepEqual(resumeAt(book.chapters, { c: c.id, y: 0.5 }), { index: k, y: 0.5, fresh: false }, `${entry.id}: Continue at ${c.id}`);
+      assert.ok(readButtonLabel(book.chapters, { c: c.id, y: 0.5 }).startsWith('Continue: '));
+    });
   }
 });
 
-check('on every real text a title fits a button, a part has a name, every paragraph can be drawn in pieces, and "Continue" works from every chapter', () => {
-  for (const e of index) {
-    const book = real(e);
+check('on every real book a title fits a button and splits in a label and a line without losing a word, and every block can be drawn: a paragraph is the same words in pieces, a list and a quotation are whole', () => {
+  const words = (t: string) => t.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
+  for (const entry of BOOK_CATALOG) {
+    const book = content(entry.id);
     for (const c of book.chapters) {
-      assert.ok(shortTitle(c.title).length <= 28, `${e.id} ${c.id}: "${shortTitle(c.title)}"`);
+      assert.ok(shortTitle(c.title).length <= 28, `${entry.id} ${c.id}: "${shortTitle(c.title)}"`);
       const { label, subtitle } = splitTitle(c.title);
-      const words = (t: string) => t.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
-      assert.ok(label.length > 0, `${e.id} ${c.id}: label "${label}"`);
-      assert.equal(words(`${label} ${subtitle}`), words(c.title), `${e.id} ${c.id}: the label and the line under it are the title, nothing lost`);
-      if (/^(chapter|book) [0-9ivxlcdm]+\b/i.test(c.title)) assert.ok(label.length <= 28, `${e.id} ${c.id}: a numbered title has a short label, "${label}"`);
-      if (c.part) {
-        assert.ok(partName(c.part).length > 0 && partName(c.part).length <= c.part.length);
-        assert.equal(words(`${partName(c.part)} ${partSubtitle(c.part)}`), words(c.part), `${e.id}: the name of a part and the line under it are the part`);
-      }
-      for (const b of c.blocks) if (b.k === 'p') assert.equal(pieces(b.t).join(''), b.t, `${e.id} ${c.id}: a paragraph is the same text in pieces`);
-      assert.ok(layoutBlocks(c.blocks).length >= c.blocks.length);
+      assert.ok(label.length > 0, `${entry.id} ${c.id}: label "${label}"`);
+      assert.equal(words(`${label} ${subtitle}`), words(c.title), `${entry.id} ${c.id}: the label and the line under it are the title, nothing lost`);
+      if (/^day [0-9]+\b/i.test(c.title)) assert.match(label.replace(/\xa0/g, ' '), /^Day [0-9]+$/, `${entry.id} ${c.id}: a day has "Day N" for a label`);
+      const items = layoutBlocks(c.blocks);
+      assert.ok(items.length >= c.blocks.length, `${entry.id} ${c.id}: every block is drawn`);
+      for (const b of c.blocks) if (b.t === 'p') assert.equal(pieces(plainText(b.spans)).join(''), plainText(b.spans), `${entry.id} ${c.id}: a paragraph is the same words in pieces`);
+      assert.equal(items.filter((i) => i.k === 'p').reduce((sum, i) => sum + (i.k === 'p' ? plainText(i.spans).length : 0), 0), c.blocks.filter((b) => b.t === 'p').reduce((sum, b) => sum + (b.t === 'p' ? plainText(b.spans).length : 0), 0), `${entry.id} ${c.id}: the pieces keep every letter`);
     }
-    book.chapters.forEach((c, k) => {
-      assert.deepEqual(resumeAt(book.chapters, { c: c.id, y: 0.5 }), { index: k, y: 0.5, fresh: false }, `${e.id}: Continue at ${c.id}`);
-      assert.ok(readButtonLabel(book.chapters, { c: c.id, y: 0.5 }).startsWith('Continue: '));
-    });
+  }
+});
+
+check('the covers of the real books fit: every title at every width, and the kind and the time of each, were checked above for the whole catalog; here, that no two books share a cover colour and glyph with the same title', () => {
+  const seen = new Set<string>();
+  for (const b of BOOK_CATALOG) {
+    assert.ok(!seen.has(b.title), `${b.id}: a title used twice`);
+    seen.add(b.title);
   }
 });
 

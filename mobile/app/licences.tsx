@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
 import { Card, IconButton } from '@/components/ui';
+import { ORIGINAL_TEXT, READING_SOURCES, type ReadingSource } from '@/features/library/books/sources';
 import { c, layout, role } from '@/theme';
 
 // Credits and licences for the data and software CaminoPlus is built on. Several of these licences
@@ -35,15 +36,11 @@ const SOFTWARE: Item[] = [
   { name: 'Expo, React Native, React, Supabase', what: 'App framework and backend client', licence: 'MIT', url: 'https://github.com/expo/expo/blob/main/LICENSE' },
 ];
 
-// The books of the Books tab that have text in the app: one entry for each book of assets/books/manifest.json (written by tools/books/import_books.py,
-// public domain everywhere), so this list cannot fall behind the texts. The link is the page of the edition the text was taken from.
-type ManifestBook = { title: string; author: string; translator: string | null; firstPublished: number; source: string };
-const BOOKS: Item[] = (require('../assets/books/manifest.json') as { books: ManifestBook[] }).books.map((b) => ({
-  name: b.title,
-  what: `${b.author}, ${b.translator ? `translated by ${b.translator}` : 'translator not named'} (${b.firstPublished}). The full text of the book, to read offline`,
-  licence: 'Public domain',
-  url: b.source,
-}));
+// The books of the Library: the passages of the twelve books of readings are word for word from public-domain editions (one entry for each, from features/library/books/sources.ts,
+// which __tests__/booksWiring.test.ts reads against every books/*/book.json, so a source cannot be missing here), and the rest of the text of the books is original, written for
+// CaminoPlus: the last entry says only that, and claims no licence. The link is the page of the edition.
+const credit = (s: ReadingSource): string => [s.author, s.translator && !/^none\b/i.test(s.translator) ? s.translator : null, s.year].filter(Boolean).join(' · ');
+const BOOKS: Item[] = READING_SOURCES.map((s) => ({ name: s.work, what: `${credit(s)}. Quoted word for word in “${s.usedIn}”.`, licence: s.licence, url: s.url }));
 
 function Group({ title, items }: { title: string; items: Item[] }) {
   return (
@@ -65,6 +62,16 @@ function Group({ title, items }: { title: string; items: Item[] }) {
   );
 }
 
+/** The text of the books around the passages: only where it comes from, and no licence is claimed for it. */
+function OriginalText() {
+  return (
+    <Card style={{ gap: 4 }}>
+      <AppText variant="label">{ORIGINAL_TEXT.name}</AppText>
+      <AppText variant="small" muted>{ORIGINAL_TEXT.what}</AppText>
+    </Card>
+  );
+}
+
 export default function Licences() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -79,7 +86,8 @@ export default function Licences() {
         <Group title="MAPS AND DATA" items={DATA} />
         <Group title="THE BIBLE TEXT" items={TEXT} />
         <Group title="FONTS AND SOFTWARE" items={SOFTWARE} />
-        {BOOKS.length > 0 && <Group title="BOOKS IN THE LIBRARY" items={BOOKS} />}
+        <Group title="BOOKS IN THE LIBRARY" items={BOOKS} />
+        <OriginalText />
         <AppText variant="caption" muted>Map data and places © OpenStreetMap contributors · © OpenMapTiles. Packs are rebuilt every month from fresh OpenStreetMap data. Places from OpenStreetMap are shown as they are, with where they came from and how far they were checked.</AppText>
       </ScrollView>
     </View>

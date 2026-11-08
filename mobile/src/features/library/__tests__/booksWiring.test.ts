@@ -22,17 +22,17 @@ const DIR = 'src/features/library/books';
 const B = (f: string) => `${DIR}/${f}`;
 const count = (src: string, re: RegExp) => (src.match(re) ?? []).length;
 
-/** The files of this feature that are mine: the screens and what they use. (bookText.ts, bookTextApi.ts, books.generated.ts, bookTextTypes.ts are the texts', catalog.ts is the catalog.) */
-const SCREENS = ['BookCover.tsx', 'BookPage.tsx', 'BookRows.tsx', 'BookUi.tsx', 'BooksBanner.tsx', 'BooksGrid.tsx', 'BooksNotice.tsx', 'ChapterFooter.tsx', 'Reader.tsx', 'ReaderBlocks.tsx', 'ReaderHeader.tsx'];
-const LOGIC = ['copy.ts', 'cover.ts', 'readerType.ts', 'reading.ts', 'typeMetrics.ts'];
+/** The files of this feature that are mine: the screens and what they use. (catalog.ts reads the bundle that tools/build_books.py makes, and index.ts, sources.ts and notices.ts are plain data.) */
+const SCREENS = ['BookCover.tsx', 'BookPage.tsx', 'BookRows.tsx', 'BookUi.tsx', 'BooksBanner.tsx', 'BooksGrid.tsx', 'ChapterFooter.tsx', 'Reader.tsx', 'ReaderBlocks.tsx', 'ReaderHeader.tsx'];
+const LOGIC = ['copy.ts', 'cover.ts', 'index.ts', 'notices.ts', 'readerType.ts', 'reading.ts', 'sources.ts', 'typeMetrics.ts'];
 const HOOKS = ['readingStore.ts', 'safeText.ts', 'useBooksReading.ts', 'useReaderSize.ts', 'useReadingWriter.ts'];
 const MINE = [...SCREENS, ...LOGIC, ...HOOKS];
 const ROUTES = ['app/library/book/[id]/index.tsx', 'app/library/book/[id]/read.tsx'];
 const sources = (): Record<string, string> => Object.fromEntries([...MINE.map((f) => [f, code(read(B(f)))] as const), ...ROUTES.map((f) => [f, code(read(f))] as const)]);
 const src = sources();
 
-check('the Books feature is the files this test expects: every file of the books folder is one of mine, the texts\' or the catalog\'s (a new one is looked at by the scans below)', () => {
-  const theirs = ['bookText.ts', 'bookTextApi.ts', 'bookTextTypes.ts', 'books.generated.ts', 'catalog.ts'];
+check('the Books feature is the files this test expects: every file of the books folder is one of mine or the catalog\'s (a new one is looked at by the scans below)', () => {
+  const theirs = ['catalog.ts'];
   const inFolder = fs.readdirSync(path.join(root, DIR)).filter((f) => /\.tsx?$/.test(f)).sort();
   assert.deepEqual(inFolder, [...MINE, ...theirs].sort());
   for (const r of ROUTES) assert.ok(fs.existsSync(path.join(root, r)), r);
@@ -41,9 +41,9 @@ check('the Books feature is the files this test expects: every file of the books
 check('the pure files stay pure: reading, covers, sizes, metrics and words import nothing but each other and the plain data of the feature (no React, no React Native, no theme, no store)', () => {
   for (const f of LOGIC) {
     for (const m of src[f].matchAll(/^import [^;]*? from '([^']+)';/gm)) assert.match(m[1], /^\.\.?\//, `${f} imports ${m[1]}`);
-    assert.doesNotMatch(src[f], /from '\.\.?\/[^']*(?:\.tsx|bookText'|readingStore|use[A-Z])/, `${f} reaches a screen, a hook or the text data`);
+    assert.doesNotMatch(src[f], /from '\.\.?\/[^']*(?:\.tsx|bookBundle|catalog'|safeText|readingStore|use[A-Z])/, `${f} reaches a screen, a hook or the bundle of the books`);
   }
-  assert.match(src['copy.ts'], /from '\.\.\/sample';/, 'copy.ts reads only sample.ts, which is plain data too');
+  assert.doesNotMatch(src['copy.ts'], /from '\.\.\//, 'copy.ts reads no file of the Library: it is told what it needs');
 });
 
 check('no new native module and no network: the Books files import React, React Native, expo-router, the safe-area module and the app\'s own files, and never fetch, link out or touch the account', () => {
@@ -74,7 +74,7 @@ check('no colour of its own: no hex, no rgb(a) of numbers, no named colour but "
   const cover = src['BookCover.tsx'];
   assert.match(cover, /import \{ fixed, shadowStyle \} from '@\/theme';/);
   assert.match(cover, /const INK = fixed\.blue;/, 'what is printed on a cover is the navy of the brand');
-  assert.match(cover, /backgroundColor: fixed\[book\.cover\]/, 'the colour of a cover is one of the catalog\'s six');
+  assert.match(cover, /const paper = fixed\[book\.cover\.colour\]/, 'the colour of a cover is the one the book names, one of the six');
   assert.doesNotMatch(cover, /\brole\.|\bc\.(?!\w*Bright)/, 'a cover does not change with light and dark: no role, no flipping palette colour');
   assert.match(cover, /fixed\.goldBright/, 'the ribbon of a bookmarked book is the bright gold');
   for (const f of ['BookPage.tsx', 'BookRows.tsx', 'BookUi.tsx', 'ChapterFooter.tsx', 'ReaderBlocks.tsx', 'ReaderHeader.tsx', 'Reader.tsx']) {
@@ -104,25 +104,24 @@ check('the four fonts keep their roles, as the brand design system says: Fraunce
 check('each text is in its role: titles and headings are the Fraunces variants (h1 to h4), the numbers, the era and the chips are mono, the running text of the reader and the page is Inter', () => {
   const cover = src['BookCover.tsx'];
   assert.match(cover, /variant="h4"[^\n]*(?:\n[^\n]*){0,2}color=\{INK\}[\s\S]{0,200}text\.title\.lines\.join/, 'the title of a cover is Fraunces');
-  assert.match(cover, /variant="label"[\s\S]{0,420}text\.author\.lines\.join/, 'the author is Inter, in small spaced capitals');
-  assert.match(cover, /variant="mono"[^\n]*>\{book\.era\}</, 'the era is JetBrains Mono');
-  assert.match(cover, /variant="mono"[^\n]*>\{free \? 'FREE' : 'SOON'\}</, 'Free and Soon are JetBrains Mono');
+  assert.match(cover, /variant="label"[\s\S]{0,420}text\.kind\.lines\.join/, 'the kind of book is Inter, in small spaced capitals');
+  assert.match(cover, /variant="mono"[^\n]*>\{text\.time\}</, 'the time is JetBrains Mono');
   const page = src['BookPage.tsx'];
   assert.match(page, /<AppText variant="h3" accessibilityRole="header" style=\{\{ textAlign: 'center' \}\}>\{book\.title\}<\/AppText>/, 'the title of the book is Fraunces');
-  assert.match(page, /<AppText variant="mono" muted style=\{\{ fontSize: 14, lineHeight: 20 \}\}>\{book\.era\}<\/AppText>/);
-  assert.match(page, /bookFacts\(index\.chapters, index\.words\)/, 'the chapters, words and reading time are mono');
+  assert.match(page, /<AppText variant="mono" color=\{role\.muted\} style=\{\{ fontSize: 12, lineHeight: 16, letterSpacing: 1 \}\}>\{kindName\(kind\)\.toUpperCase\(\)\}<\/AppText>/, 'the kind of book is a mono mark');
+  assert.match(page, /bookFacts\(book\.chapters\.length, book\.words\)/, 'the chapters, words and reading time are mono');
   assert.match(page, /<AppText variant="mono" muted style=\{\{ fontSize: 14, lineHeight: 20 \}\}>\{`\$\{chapters\.length\}/);
   assert.match(page, /<View accessible accessibilityRole="header" accessibilityLabel=\{g\.part\} style=\{\{ gap: 2, marginTop: gi === 0 \? 0 : 8 \}\}>/, 'a part is one heading for a screen reader, with its whole name');
   assert.match(page, /<AppText variant="h4" style=\{\{ fontSize: 19, lineHeight: 25 \}\}>\{partName\(g\.part\)\}<\/AppText>/, 'a part is a heading in Fraunces: its name');
   assert.match(page, /\{!!partSubtitle\(g\.part\) && <AppText variant="small" muted numberOfLines=\{4\}/, 'and what it is about under it, in Inter, in at most four lines');
-  assert.match(page, /<AppText variant="mono" muted style=\{\{ width: 36, textAlign: 'right'/, 'the number of a chapter is mono');
+  assert.match(page, /<AppText variant="mono" muted style=\{\{ width: 28, textAlign: 'right'/, 'the number of a chapter is mono');
   assert.match(page, /<AppText variant="label">\{label\}<\/AppText>/, 'the chapter in the contents is Inter');
   const reader = src['Reader.tsx'];
   assert.match(reader, /<AppText variant="h3" maxFontSizeMultiplier=\{face\.maxMultiplier\}[^>]*>\{head\.label\}<\/AppText>/, 'the title of a chapter is Fraunces');
   assert.match(reader, /const face = head\.label\.length > LONG_LABEL \? type\.heading : type\.title;/, 'a label that is a whole sentence is set in the size of a heading, not of a title');
   assert.match(reader, /<AppText variant="mono" muted maxFontSizeMultiplier=\{type\.meta\.maxMultiplier\}[^>]*>\{`\$\{readingTime\(words\)\} · \$\{groupThousands\(words\)\} words`\}<\/AppText>/, 'the time and the words are mono');
   const blocks = src['ReaderBlocks.tsx'];
-  for (const name of ['Paragraph', 'Quotation', 'Point']) {
+  for (const name of ['Paragraph', 'Quotation', 'List']) {
     const from = blocks.indexOf(`const ${name} = memo(`);
     assert.ok(from >= 0, name);
     const body = blocks.slice(from, blocks.indexOf('\n});', from));
@@ -140,7 +139,7 @@ check('each text is in its role: titles and headings are the Fraunces variants (
 check('the handwritten font, Caveat Bold, is one short note on a screen, max one, and never in a button or in running text: the Books tab, the book page and the reader each have one at most', () => {
   const accent = (f: string) => count(src[f], /variant="accent"/g);
   // the Books tab: the one note is the banner's (CompactBanner draws it, beside the gold pill), and nothing else of the tab is handwritten
-  for (const f of ['BookCover.tsx', 'BooksGrid.tsx', 'BooksNotice.tsx', 'BookRows.tsx', 'BookUi.tsx']) assert.equal(accent(f), 0, `${f}: the Books tab has one handwritten note, the banner's`);
+  for (const f of ['BookCover.tsx', 'BooksGrid.tsx', 'BookRows.tsx', 'BookUi.tsx']) assert.equal(accent(f), 0, `${f}: the Books tab has one handwritten note, the banner's`);
   const banner = src['BooksBanner.tsx'];
   assert.equal(count(banner, /note=\{view\.note\}/g), 1);
   assert.match(banner, /if \(view\.kind === 'none'\) return <CompactBanner label=\{view\.label\} title=\{view\.title\} line=\{view\.line\} \/>;/, 'no note when there is no button: the plain line says the texts are being checked');
@@ -156,17 +155,18 @@ check('the handwritten font, Caveat Bold, is one short note on a screen, max one
     assert.match(src[f].slice(at - 20, at + 160), /<AppText variant="accent" color=\{role\.accentText\} style=\{\{ textAlign: 'center'/, `${f}: drawn alone, in the accent colour of the text`);
   }
   const { START_NOTE, CONTINUE_NOTE } = { START_NOTE: /START_NOTE = '([^']+)'/.exec(src['copy.ts'])![1], CONTINUE_NOTE: /CONTINUE_NOTE = '([^']+)'/.exec(src['copy.ts'])![1] };
-  const notes = [START_NOTE, CONTINUE_NOTE, /PAGE_NOTE = '([^']+)'/.exec(src['BookPage.tsx'])![1], /CHAPTER_NOTE = '([^']+)'/.exec(src['ChapterFooter.tsx'])![1], /BOOK_NOTE = '([^']+)'/.exec(src['ChapterFooter.tsx'])![1]];
+  const pageNotes = /PAGE_NOTE: Record<BookKind, string> = \{ guide: '([^']+)', reflection: '([^']+)' \}/.exec(src['copy.ts'])!.slice(1);
+  const notes = [START_NOTE, CONTINUE_NOTE, ...pageNotes, /CHAPTER_NOTE = '([^']+)'/.exec(src['ChapterFooter.tsx'])![1], /BOOK_NOTE = '([^']+)'/.exec(src['ChapterFooter.tsx'])![1]];
   for (const note of notes) assert.ok(note.split(' ').length <= 5 && note.length <= 24, `"${note}" is a few words`);
   for (const note of [START_NOTE, CONTINUE_NOTE]) assert.ok(note.length <= 7, `"${note}": the note beside the pill on a 320 phone has room for about seven characters`);
 });
 
 /* ================================================================ the cover and the grid */
 
-check('a cover is ONE button labelled "title, author, free" (or soon) and its ribbon is another button beside it, never inside it; a small cover is no button and has no ribbon', () => {
+check('a cover is ONE button labelled "title, kind of book, time" and its ribbon is another button beside it, never inside it; a small cover is no button and has no ribbon', () => {
   const cover = src['BookCover.tsx'];
-  assert.match(cover, /accessibilityLabel=\{coverLabel\(book, hasText\)\}/);
-  assert.match(cover, /accessibilityRole="button"\s+accessibilityLabel=\{coverLabel\(book, hasText\)\}/);
+  assert.match(cover, /accessibilityLabel=\{coverLabel\(book\)\}/);
+  assert.match(cover, /accessibilityRole="button"\s+accessibilityLabel=\{coverLabel\(book\)\}/);
   assert.match(cover, /onPress=\{\(\) => onOpen\(book\.id\)\}/);
   const body = cover.indexOf('const body = (');
   const pressable = cover.indexOf('const cover = onOpen ? (');
@@ -186,15 +186,14 @@ check('a cover is drawn as a book: a spine with a groove and the shade of the hi
   assert.match(cover, /left: m\.spine \+ 1, top: 0, bottom: 0, width: 1, backgroundColor: withAlpha\(fixed\.white, 0\.6\)/, 'and a light one');
   assert.match(cover, /const HINGE = \[0\.1, 0\.07, 0\.05, 0\.035, 0\.02\] as const;/);
   assert.match(cover, /width: m\.edge, backgroundColor: withAlpha\(fixed\.white, 0\.9\)/, 'the page edges are a pale strip on the right');
-  assert.match(cover, /borderRadius: m\.radius, overflow: 'hidden', backgroundColor: fixed\[book\.cover\]/);
+  assert.match(cover, /borderRadius: m\.radius, overflow: 'hidden', backgroundColor: paper/);
   assert.match(cover, /\.\.\.shadowStyle\('md'\)/, 'a soft shadow under the book');
   assert.match(cover, /const height = a5Height\(width\);/, 'an A5 page: as high as 210/148 of its width');
-  assert.match(cover, /style=\{\{ width, height, borderRadius: m\.radius, backgroundColor: fixed\[book\.cover\], \.\.\.shadowStyle\('md'\) \}\}/);
+  assert.match(cover, /style=\{\{ width, height, borderRadius: m\.radius, backgroundColor: paper, \.\.\.shadowStyle\('md'\) \}\}/);
   assert.match(cover, /right: right - \(touch - width\) \/ 2, width: touch, height: touch/, 'the ribbon button is touch by touch (44)');
   assert.equal(count(cover, /borderTopWidth: notch/g), 2, 'the notch at the foot of the ribbon is two triangles');
-  assert.match(cover, /color=\{on \? fixed\.goldBright : PAPER\}[^\n]*filled=\{on\}/, 'a bookmarked book has a gold, filled bookmark on its ribbon; the others an outline: not the colour alone');
-  assert.match(cover, /\{free \? 'FREE' : 'SOON'\}/);
-  assert.match(cover, /backgroundColor: free \? INK : 'transparent', borderWidth: 1, borderColor: INK/, 'Free is a filled mark and Soon an empty ring: different in shape, not only in colour');
+  assert.match(cover, /color=\{on \? fixed\.goldBright : fixed\.parchment\}[^\n]*filled=\{on\}/, 'a bookmarked book has a gold, filled bookmark on its ribbon; the others an outline: not the colour alone');
+  assert.doesNotMatch(cover, /FREE|SOON|hasText/, 'no mark of free or soon: every book of the bundle has its text');
 });
 
 check('the words of a cover never grow with the phone\'s text size (the cover is a page of a fixed size, and the same words are on the book page), and are set where the fit was measured', () => {
@@ -202,24 +201,27 @@ check('the words of a cover never grow with the phone\'s text size (the cover is
   assert.equal(count(cover, /<AppText\b/g), count(cover, /maxFontSizeMultiplier=\{1\}/g), 'every text of a cover has a multiplier of 1');
   assert.match(cover, /\{text\.title\.lines\.join\('\\n'\)\}/, 'the title breaks where cover.ts measured it');
   assert.match(cover, /numberOfLines=\{text\.title\.lines\.length\} adjustsFontSizeToFit minimumFontScale=\{0\.8\}/, 'and shrinks if a phone sets a word wider than the table says');
-  assert.match(cover, /\{text\.author\.lines\.join\('\\n'\)\}/);
+  assert.match(cover, /\{text\.kind\.lines\.join\('\\n'\)\}/);
   assert.match(cover, /const text = coverText\(book, width\);/);
 });
 
-check('the Books tab: the notice, then the twelve books as covers in two columns that open the book page, each with the ribbon that keeps the bookmark under "books:<id>"', () => {
+check('the Books tab: the books as covers in two columns on one shelf for each kind, that open the book page, each with the ribbon that keeps the bookmark under "books:<id>"', () => {
   const grid = src['BooksGrid.tsx'];
   assert.match(grid, /const grid = coverGrid\(width, layout\.screenMargin\);/, 'the width of a cover comes from the width of the screen and the margins of the screens');
   assert.match(grid, /const \{ width \} = useWindowDimensions\(\);/);
   assert.match(grid, /width: grid\.width, alignSelf: 'center', flexDirection: 'row', flexWrap: 'wrap', columnGap: grid\.gap, rowGap: ROW_GAP/);
+  assert.match(grid, /const onShelves = useMemo\(\(\) => shelves\(items\), \[items\]\);/, 'a shelf for each kind of book, in the order of the shelves');
+  assert.match(grid, /<AppText variant="h4" accessibilityRole="header">\{shelf\.title\}<\/AppText>/, 'the heading of a shelf is Fraunces and a heading for a screen reader');
   assert.match(grid, /export const ROW_GAP = 16;/);
   assert.match(grid, /const open = useCallback\(\(id: string\) => router\.push\(bookPath\(id\)\), \[router\]\);/, 'a cover opens the book page');
-  assert.match(grid, /hasText=\{hasBookText\(b\.id\)\}/, 'whether a book has a text is asked of bookText.ts, never kept by hand');
+  assert.doesNotMatch(grid, /hasText|hasBookText/, 'every book of the bundle has its text: there is nothing to ask');
   assert.match(grid, /bookmarked=\{marks \? marks\.has\(itemKey\('Books', b\.id\)\) : undefined\}/);
   assert.match(grid, /const bookmark = useCallback\(\(id: string\) => toggle\?\.\(itemKey\('Books', id\)\), \[toggle\]\);/, 'the key of the bookmark is still books:<id>');
   assert.match(grid, /onOpen=\{open\}/);
   const tabs = code(read('src/features/library/LibraryTabs.tsx'));
   const tab = tabs.slice(tabs.indexOf('export function BooksTab'));
-  assert.match(tab, /<BooksNotice \/>\s+<BooksGrid items=\{BOOK_CATALOG\} marks=\{marks\} \/>/);
+  assert.match(tab, /<BooksGrid items=\{BOOK_CATALOG\} marks=\{marks\} \/>/);
+  assert.doesNotMatch(tab, /BooksNotice|SampleNotice/, 'no notice above the covers');
   assert.doesNotMatch(tab, /BookRows|Pressable/);
   assert.match(tabs, /import \{ BooksGrid \} from '\.\/books\/BooksGrid';/);
   assert.match(tabs, /\{group === 'Books' && <BookRows items=\{hits\.Books\} marks=\{marks\} \/>\}/, 'a search and Bookmarks still list the books as rows, which open the page');
@@ -230,11 +232,11 @@ check('the Books tab: the notice, then the twelve books as covers in two columns
   assert.doesNotMatch(screen, /BooksBanner\b[^;]*from '@\/features\/library\/LibraryBanner'/, 'the banner of the Books tab is not the old one of LibraryBanner.tsx');
 });
 
-check('the banner of the Books tab is the compact banner of the Bible tab with words of its own: nothing to press while no book has a text, "Start reading" opens the first book that has one, "Continue reading" opens the reader of the book read last', () => {
+check('the banner of the Books tab is the compact banner of the Bible tab with words of its own: nothing to press while there is no book, "Start reading" opens the first book, "Continue reading" opens the reader of the book read last', () => {
   const banner = src['BooksBanner.tsx'];
   assert.match(banner, /import \{ CompactBanner \} from '\.\.\/LibraryBanner';/, 'the same card, fonts and pill as the daily reading, not a second invention');
   assert.equal(count(banner, /<Pressable\b/g), 0, 'the card is the one button CompactBanner makes of it');
-  assert.match(banner, /const view = booksBanner\(BOOK_CATALOG, hasBookText, reading\.last\);/);
+  assert.match(banner, /const view = booksBanner\(BOOK_CATALOG, reading\.last\);/);
   assert.match(banner, /router\.push\(view\.kind === 'continue' \? readerPath\(view\.bookId\) : bookPath\(view\.bookId\)\)/);
   assert.match(banner, /note=\{view\.note\} cta=\{view\.cta\} onPress=\{open\} hint=\{view\.hint\}/);
   const compact = code(read('src/features/library/LibraryBanner.tsx'));
@@ -243,44 +245,52 @@ check('the banner of the Books tab is the compact banner of the Bible tab with w
   assert.match(compact, /export const COMPACT_BANNER_MAX_HEIGHT = 120;/);
 });
 
-check('the rows of a search and of Bookmarks: ONE button that opens the book page, the bookmark button beside it, a small cover, the mark Free or Soon; the Soon notices come only with a book that says Soon', () => {
+check('the rows of a search and of Bookmarks: ONE button that opens the book page, the bookmark button beside it, a small cover, the title, the subtitle, the description and the kind of book; no notice: every book is in the app', () => {
   const rows = src['BookRows.tsx'];
-  assert.match(rows, /accessibilityLabel=\{coverLabel\(b, has\)\}/);
+  assert.match(rows, /accessibilityLabel=\{coverLabel\(b\)\}/);
   assert.match(rows, /onPress=\{\(\) => router\.push\(bookPath\(b\.id\)\)\}/);
-  assert.match(rows, /<BookCover book=\{b\} width=\{THUMB_WIDTH\} hasText=\{has\} thumb \/>/);
-  assert.match(rows, /\{has \? <Free \/> : <Soon \/>\}/, 'Free for a book with a text, Soon for one without: never both');
+  assert.match(rows, /<BookCover book=\{b\} width=\{THUMB_WIDTH\} thumb \/>/);
+  assert.match(rows, /<AppText variant="h4" style=\{\{ fontSize: 19, lineHeight: 24 \}\}>\{b\.title\}<\/AppText>/, 'the title is Fraunces');
+  assert.match(rows, /<AppText variant="caption" muted>\{b\.subtitle\}<\/AppText>/);
+  assert.match(rows, /<AppText variant="small" numberOfLines=\{3\}>\{b\.description\}<\/AppText>/, 'the description, in at most three lines');
   assert.match(rows, /<BookmarkToggle on=\{marks\.has\(key\)\} title=\{b\.title\} toggle=\{\(\) => marks\.toggle\(key\)\} \/>/);
   assert.match(rows, /const key = itemKey\('Books', b\.id\);/);
-  assert.match(rows, /Free to read/);
-  assert.match(rows, /Coming soon/);
-  assert.match(rows, /<Chip label="FREE" spoken="Free to read" bg=\{c\.successWash\} fg=\{c\.success\} \/>/, 'the mark of a row says FREE, as the cover does');
-  assert.match(rows, /<Chip label="SOON" spoken="Coming soon" bg=\{role\.sunken\} fg=\{role\.muted\} \/>/, 'and SOON, as the cover does');
-  assert.match(code(read('src/features/library/SearchResults.tsx')), /found\.hits\.Books\.some\(\(b\) => !hasBookText\(b\.id\)\) && <SampleNotice title="Coming soon">\{SEARCH_NOTICE\}<\/SampleNotice>/);
-  assert.match(code(read('app/library/bookmarks.tsx')), /hits\.Books\.some\(\(b\) => !hasBookText\(b\.id\)\)\s+\? <SampleNotice title="Coming soon">\{BOOKMARKS_NOTICE\}<\/SampleNotice>/);
+  assert.match(rows, /<AppText variant="mono" color=\{role\.muted\}[^>]*>\{kindMark\(kind\)\}<\/AppText>/, 'the kind of book is a mono mark');
+  assert.doesNotMatch(rows, /FREE|SOON|Free to read|Coming soon|hasBookText/, 'no mark of free or soon');
+  assert.doesNotMatch(code(read('src/features/library/SearchResults.tsx')), /SampleNotice|SEARCH_NOTICE/);
+  assert.doesNotMatch(code(read('app/library/bookmarks.tsx')), /SampleNotice|BOOKMARKS_NOTICE/);
 });
 
 /* ================================================================ the book page */
 
-check('the book page: the cover with its ribbon, the title, the author, the era and Free or Soon; for a book with a text the gold button, the contents and the credit of the edition; for one without, "Not in the app yet" and no button', () => {
+check('the book page: the cover with its ribbon, the title, the subtitle, the kind, the facts and the description; THE NOTICE OF ITS KIND on every page; for a book that reads the gold button, the contents with the minutes of each chapter and the credit; for one that does not read, a calm sentence and no button', () => {
   const page = src['BookPage.tsx'];
-  assert.match(page, /<BookCover book=\{book\} width=\{coverWidth\} hasText=\{!!text\} bookmarked=\{marks\.has\(key\)\} onBookmark=\{toggle\} \/>/);
+  assert.match(page, /<BookCover book=\{book\} width=\{coverWidth\} bookmarked=\{marks\.has\(key\)\} onBookmark=\{toggle\} \/>/);
   assert.match(page, /export const coverWidthOf = \(screen: number\): number => Math\.min\(Math\.max\(Math\.round\(\(screen - 32\) \* 0\.6\), 150\), 240\);/, 'larger than the covers of the grid');
-  assert.match(page, /\{text && target && nav \? \(/, 'the button and the contents are for a book that has a text, and can be read');
-  assert.match(page, /\) : \(\s*<Card style=\{\{ gap: 8 \}\}>\s*<AppText variant="h4" accessibilityRole="header">\{NOT_YET_TITLE\}<\/AppText>\s*<AppText variant="small">\{NOT_YET_TEXT\}<\/AppText>/);
+  assert.match(page, /\{!!book\.subtitle && <AppText variant="small" muted style=\{\{ textAlign: 'center' \}\}>\{book\.subtitle\}<\/AppText>\}/);
+  assert.match(page, /<AppText variant="body">\{book\.description\}<\/AppText>/);
+  // the notice: once, unconditionally, before the button, for every book; its words are in notices.ts and nowhere else
+  assert.equal(count(page, /<BookNotice text=\{noticeFor\(book\.kind\)\} \/>/g), 1, 'the notice of its kind is on the page');
+  assert.ok(page.indexOf('<BookNotice') > page.indexOf('{book.description}') && page.indexOf('<BookNotice') < page.indexOf('{text && target && nav ? ('), 'under the description, before the button, outside any condition');
+  assert.match(page, /import \{ noticeFor \} from '\.\/notices';/);
+  for (const f of Object.keys(src)) if (f !== 'notices.ts') assert.doesNotMatch(src[f], /Written with AI assistance|word for word from the public-domain/, `${f}: the wording of the notice is in notices.ts only`);
+  assert.match(page, /\{text && target && nav \? \(/, 'the button and the contents are for a book whose text reads');
+  assert.match(page, /\) : \(\s*<Card style=\{\{ gap: 8 \}\}>\s*<AppText variant="h4" accessibilityRole="header">\{UNREADABLE_TITLE\}<\/AppText>\s*<AppText variant="small">\{UNREADABLE_TEXT\}<\/AppText>/);
   const readable = page.slice(page.indexOf('{text && target && nav ? ('), page.indexOf(') : (\n        <Card'));
-  assert.match(readable, /<ReadButton\s+label=\{readButtonLabel\(chapters, place\)\}\s+spoken=\{readButtonSpoken\(chapters, place\)\}/, '"Start reading" or "Continue: Chapter 7", and the whole title for a screen reader');
+  assert.match(readable, /<ReadButton\s+label=\{readButtonLabel\(chapters, place\)\}\s+spoken=\{readButtonSpoken\(chapters, place\)\}/, '"Start reading" or "Continue: Day 3", and the whole title for a screen reader');
   assert.match(readable, /onPress=\{\(\) => open\(target\.id\)\}/);
   assert.match(page, /router\.push\(readerPath\(book\.id, chapterId\)\)/);
-  assert.match(readable, /\{text\.credit\}/, 'the credit line of the edition, as the text gives it');
-  assert.doesNotMatch(page.slice(page.indexOf(') : (\n        <Card')), /ReadButton|Pressable|TocRow/, 'a book without a text has no button and no contents');
-  assert.match(page, /const text = useMemo\(\(\) => safeText\(book\.id\), \[book\.id\]\);/, 'a text that cannot be read is a book that is not in the app yet');
+  assert.match(readable, /\{text\.credit\}/, 'the credit line of the book, as the file gives it');
+  assert.doesNotMatch(page.slice(page.indexOf(') : (\n        <Card')), /ReadButton|Pressable|TocRow/, 'a book that does not read has no button and no contents');
+  assert.match(page, /const text = useMemo\(\(\) => safeText\(book\.id\), \[book\.id\]\);/, 'a text that cannot be read is a book that could not be opened');
+  assert.match(page, /const minutes = useMemo\(\(\) => new Map\(book\.chapters\.map\(\(x\) => \[x\.id, x\.minutes\] as const\)\), \[book\]\);/, 'the minutes of a chapter are the catalog\'s');
   assert.match(page, /const groups = useMemo\(\(\) => tocGroups\(chapters\), \[chapters\]\);/);
-  assert.match(page, /\{groups\.map\(\(g, gi\) => \(/, 'the chapters under their parts');
+  assert.match(page, /\{groups\.map\(\(g, gi\) => \(/, 'the chapters under their parts, when a book has parts');
   assert.match(page, /read=\{readSet\.has\(e\.id\)\} here=\{!!place && place\.c === e\.id\}/, 'the chapters read are marked, and the one where the person stopped');
-  assert.match(page, /\{read && <View style=\{\{ marginTop: 1 \}\}><Icon name="check"/);
+  assert.match(page, /\{read && <Icon name="check"/);
   assert.match(page, /LAST READ/);
   assert.match(page, /minHeight: 56/, 'a row of the contents is at least 56 high');
-  assert.match(page, /const spoken = `\$\{entry\.title\}\$\{read \? ', read' : ''\}\$\{here \? ', where you stopped' : ''\}`;/);
+  assert.match(page, /const spoken = `\$\{entry\.title\}\$\{minutes \? `, \$\{formatMinutes\(minutes\)\}` : ''\}\$\{read \? ', read' : ''\}\$\{here \? ', where you stopped' : ''\}`;/);
   const missing = page.slice(page.indexOf('function Missing()'), page.indexOf('/** The page of the book with this id'));
   assert.match(missing, /UNKNOWN_TITLE/);
   assert.match(page, /if \(!book\) return <Missing \/>;/, 'an id that is no book is a calm sentence with the way to the Library');
@@ -382,21 +392,26 @@ check('the header of the reader: Contents, Smaller and Larger text, Previous and
   assert.match(footer, /<Step side="next" nav=\{nav\} onPress=\{onNext\} \/>\s+<Step side="previous" nav=\{nav\} onPress=\{onPrevious\} \/>/);
 });
 
-check('the words of a chapter: a heading is a heading for a screen reader, a quotation or a poem is indented with a rule, a point has its marker hanging in a column of its own, a break is for the eye only, and every size comes from the step', () => {
+check('the words of a chapter: a heading is a heading for a screen reader, a quotation is indented with a rule and says whose words they are, a list has its bullet or number hanging in a column of its own, bold and italic are drawn, a break is for the eye only, and every size comes from the step', () => {
   const blocks = src['ReaderBlocks.tsx'];
-  assert.match(blocks, /<AppText variant="h4" accessibilityRole="header" maxFontSizeMultiplier=\{t\.heading\.maxMultiplier\}/);
+  assert.match(blocks, /<AppText variant="h4" accessibilityRole="header" maxFontSizeMultiplier=\{face\.maxMultiplier\}/);
+  assert.match(blocks, /const face = item\.level <= 2 \? t\.heading : t\.body;/, 'a heading of a lower level is Fraunces at the size of the text');
   assert.match(blocks, /borderLeftWidth: RULE, borderLeftColor: role\.borderStrong/);
   assert.match(blocks, /const INDENT = 18;/);
-  assert.match(blocks, /paddingLeft: INDENT, borderLeftWidth: RULE/, 'a quotation or a poem is indented from the rule at its left');
-  assert.match(blocks, /const \{ marker, rest \} = splitMarker\(item\.t\);/);
-  assert.match(blocks, /width: Math\.round\(t\.body\.size \* 1\.9\)/);
+  assert.match(blocks, /paddingLeft: INDENT, borderLeftWidth: RULE/, 'a quotation is indented from the rule at its left');
+  assert.match(blocks, /\{!!item\.cite && <AppText muted /, 'under a quotation, muted, whose words they are');
+  assert.match(blocks, /\{item\.ordered \? `\$\{i \+ 1\}\.` : '•'\}/, 'a number or a bullet, hanging');
+  assert.match(blocks, /const column = Math\.round\(t\.body\.size \* \(item\.ordered \? 1\.9 : 1\.2\)\);/);
+  assert.match(blocks, /variant=\{x\.b \? 'label' : 'body'\}[^\n]*fontStyle: x\.i \? 'italic' : 'normal'/, 'bold is Inter SemiBold and italic is a slant: no family of its own');
   assert.match(blocks, /<View aria-hidden accessibilityElementsHidden importantForAccessibility="no-hide-descendants" style=\{\{ alignSelf: 'center', width: 48, height: 1/);
   assert.match(blocks, /marginBottom: item\.end \? t\.gap : 0/, 'the pieces of a long paragraph follow each other with no space');
-  assert.equal(count(blocks, /maxFontSizeMultiplier=\{t\.(?:body|quote|heading)\.maxMultiplier\}/g), 5, 'every text of the chapter has the cap of its face');
+  assert.equal(count(blocks, /maxFontSizeMultiplier=\{(?:t\.(?:body|quote|heading)|face).maxMultiplier\}/g), 7, 'every text of the chapter has the cap of its face');
   assert.doesNotMatch(blocks, /fontSize: \d/, 'no size of its own: they all come from the step chosen');
   assert.doesNotMatch(blocks, /textAlign: 'justify'/, 'no justified text: it makes rivers on a narrow column');
+  assert.doesNotMatch(blocks, /href|Linking|openURL/, 'a link in a book is its words and nothing to follow: no network, nowhere to go');
   const reader = src['Reader.tsx'];
   assert.match(reader, /fontSize: face\.size, lineHeight: face\.lineHeight/);
+  assert.match(reader, /const words = useMemo\(\(\) => chapterWords\(chapter\.title, chapter\.blocks\), \[chapter\]\);/, 'the words of a chapter are counted as the bundle counts them: its title and its blocks');
 });
 
 /* ================================================================ what is kept on the phone */
@@ -419,7 +434,8 @@ check('what is kept stays on the phone: the places under u.<userId>.library.read
   assert.doesNotMatch(store, /userKey/, 'the text size belongs to the phone, not to a person: logging out does not wipe it');
   assert.match(src['useBooksReading.ts'], /const key = uid \? userKey\(uid, READING_NAME\) : null;/);
   assert.match(src['useBooksReading.ts'], /useFocusEffect\(/, 'read again every time the screen comes back: the reader changes the places under it');
-  assert.match(src['useBooksReading.ts'], /last: ready \? lastRead\(stored, hasBookText\) : null,/, 'a place in a book that has no text is never offered');
+  assert.match(src['useBooksReading.ts'], /last: ready \? lastRead\(stored, inLibrary\) : null,/, 'a place in a book that is no longer in the Library is never offered');
+  assert.match(src['useBooksReading.ts'], /const inLibrary = \(id: string\): boolean => !!bookById\(id\);/);
   assert.match(src['useReaderSize.ts'], /void saveSize\(next\);/);
   assert.match(src['readerType.ts'], /export const SIZE_NAME = 'library\.books\.size';/);
   assert.match(src['reading.ts'], /export const READING_NAME = 'library\.reading';/);
@@ -439,26 +455,50 @@ check('what other screens rely on stays: useBooksReading() gives { ready, last, 
   assert.match(code(read(B('useReadingWriter.ts'))), /current\.current = savePlace\(current\.current, bookId, chapterId, y, Date\.now\(\)\);/, 'every place that is saved is stamped with the time');
 });
 
-check('honest words: a book without a text says Soon and why, nothing says "verified", "official" or "certified", and whether a book has a text is asked of bookText.ts and never kept in the catalog', () => {
-  for (const [f, s] of Object.entries(src)) assert.doesNotMatch(s, /verified|official|certified|approved|guaranteed/i, `${f}: an honest word`);
+check('honest words: no book says Soon or Preview (every book has its text), nothing says "verified", "official" or "certified", and the notice of each kind is in notices.ts and in nothing else', () => {
+  for (const [f, s] of Object.entries(src)) {
+    assert.doesNotMatch(s, /verified|official|certified|approved|guaranteed/i, `${f}: an honest word`);
+    assert.doesNotMatch(s, /\bSoon\b|\bSOON\b|Preview|Coming soon|not in the app yet|Not in the app yet/i, `${f}: no book is "soon": the bundle holds the books that can be read`);
+  }
+  assert.doesNotMatch(read('src/features/library/sample.ts'), /BOOKS_NOTICE|SEARCH_NOTICE|BOOKMARKS_NOTICE|verified|official|certified/i, 'the notices about books that were not there yet are gone');
   const copy = read(B('copy.ts'));
-  assert.match(copy, /export const NOT_YET_TITLE = 'Not in the app yet';/);
-  assert.match(copy, /export const NOT_YET_TEXT = 'We are checking the edition of this book before we add it\.';/, 'the one honest sentence: the edition is being checked');
-  assert.match(copy, /export const NONE_LINE = 'The texts are being checked\.';/);
-  assert.doesNotMatch(read('src/features/library/sample.ts'), /verified|official|certified/i);
+  assert.match(copy, /export const NONE_LINE = 'There are no books to show yet\.';/);
+  assert.match(copy, /export const UNREADABLE_TITLE = 'This book could not be opened';/);
   const catalog = code(read(B('catalog.ts')));
-  assert.doesNotMatch(catalog, /\b(?:hasText|available|isReady|ready|readable|inApp)\b\s*[:?]/, 'availability is never a field of the catalog');
-  assert.doesNotMatch(catalog, /bookText|BOOK_TEXT_INDEX/, 'the catalog does not know the texts');
-  for (const f of ['BooksGrid.tsx', 'BookRows.tsx', 'BooksNotice.tsx', 'BooksBanner.tsx']) assert.match(src[f], /hasBookText/, `${f} asks bookText.ts`);
-  assert.match(src['BookPage.tsx'], /safeText\(book\.id\)/, 'the page asks for the text through safeText, which asks bookText.ts');
-  assert.match(src['safeText.ts'], /if \(!hasBookText\(id\)\) return null;/);
+  assert.doesNotMatch(catalog, /\b(?:hasText|available|isReady|ready|readable|inApp)\b\s*[:?]/, 'availability is never a field of the catalog: a book of the bundle is a book that can be read');
+  assert.match(catalog, /import \{ CATALOG \} from '\.\.\/bookBundle';/, 'the list of books is the bundle of tools/build_books.py, and nothing kept by hand');
+  assert.match(src['safeText.ts'], /import \{ loadBookContent \} from '\.\.\/bookBundle';/);
 });
 
-check('data only: the screens of the books never read or print the group, the source, the licence flag or note, or the edition to confirm of a book', () => {
-  for (const [f, s] of Object.entries(src)) {
-    assert.doesNotMatch(s, /\blicence\w*|editionToConfirm|\.group\b|\.source\b|\bgroup:|\bsource:/, `${f}: data that is only for later`);
-    assert.doesNotMatch(s, /gutenberg|ccel\.org/i, `${f}: names a source site`);
+check('data only: the screens of the books never print the rights, the disclosure or the Camino of a book (the wording of what is said about how the books were written is notices.ts, the editions are on the Licences screen)', () => {
+  for (const f of [...SCREENS, 'copy.ts', 'cover.ts']) {
+    assert.doesNotMatch(src[f], /ai_disclosure|\brights\b|route_slug|\blicence\w*/, `${f}: data that is not for this screen`);
+    assert.doesNotMatch(src[f], /gutenberg|ccel\.org/i, `${f}: names a source site`);
   }
+});
+
+check('the Licences screen lists every source of every book of readings, as books/*/book.json says it (the id, the work, the author, the translator, the year, the licence and the page), and the original text with no licence claimed', () => {
+  const root2 = path.join(root, '..', 'books');
+  const dirs = fs.readdirSync(root2).filter((d) => fs.existsSync(path.join(root2, d, 'book.json')));
+  assert.ok(dirs.length >= 12, 'the books are there');
+  const screen = read('app/licences.tsx');
+  const sources = read(B('sources.ts'));
+  let seen = 0;
+  for (const d of dirs) {
+    const book = JSON.parse(fs.readFileSync(path.join(root2, d, 'book.json'), 'utf8')) as { id: string; title: string; kind: string; sources?: Array<Record<string, string>> };
+    if (book.kind === 'reflection') assert.ok((book.sources ?? []).length > 0, `${book.id}: a book of readings names its source`);
+    for (const x of book.sources ?? []) {
+      seen += 1;
+      const q = (v: string) => `'${v.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`;
+      const entry = `{ id: ${q(x.id)}, work: ${q(x.work)}, author: ${q(x.author)}${x.translator ? `, translator: ${q(x.translator)}` : ''}${x.year ? `, year: ${q(x.year)}` : ''}, licence: ${q(x.licence)}, url: ${q(x.url)}, bookId: ${q(book.id)}, usedIn: ${q(book.title)} }`;
+      assert.ok(sources.includes(entry), `${book.id}: the source ${x.id} is on the Licences screen as book.json says it`);
+    }
+  }
+  assert.equal(count(sources, /\{ id: 'gutenberg-/g), seen, 'and nothing is listed that no book has');
+  assert.match(screen, /import \{ ORIGINAL_TEXT, READING_SOURCES, type ReadingSource \} from '@\/features\/library\/books\/sources';/);
+  assert.match(screen, /<Group title="BOOKS IN THE LIBRARY" items=\{BOOKS\} \/>\s*<OriginalText \/>/);
+  assert.match(sources, /export const ORIGINAL_TEXT = \{ name: 'The books of the Library', what: 'Original text written for CaminoPlus\.' \} as const;/);
+  assert.doesNotMatch(sources.slice(sources.indexOf('export const ORIGINAL_TEXT')), /licen[cs]e|copyright|©|rights/i, 'no licence is claimed for the original text: who holds the rights is the owner\'s to say');
 });
 
 check('every button of the Books screens has a role, a label for a screen reader and a touch target of at least 44, and nothing in them is pressed that is not a button', () => {
@@ -475,7 +515,7 @@ check('every button of the Books screens has a role, a label for a screen reader
   assert.match(src['ChapterFooter.tsx'], /minHeight: 64/);
   assert.match(src['BookRows.tsx'], /import \{ BookmarkToggle \} from '\.\.\/BookmarkToggle';/, 'the bookmark button of a row is the one of the Library, 44 by 44');
   assert.match(read('src/features/library/BookmarkToggle.tsx'), /width: 44, height: 44/);
-  for (const f of ['BooksBanner.tsx', 'BooksGrid.tsx', 'BooksNotice.tsx', 'ReaderBlocks.tsx']) assert.equal(count(src[f], /<Pressable\b/g), 0, `${f} is not a button`);
+  for (const f of ['BooksBanner.tsx', 'BooksGrid.tsx', 'ReaderBlocks.tsx']) assert.equal(count(src[f], /<Pressable\b/g), 0, `${f} is not a button`);
 });
 
 check('text sizes grow with the phone, up to a cap: the running text of the reader and the contents have no fixed size, the header, the cover and the banner are held at their own limits', () => {
@@ -487,101 +527,13 @@ check('text sizes grow with the phone, up to a cap: the running text of the read
   assert.match(page, /numberOfLines=\{3\}/, 'except the line under a chapter in the contents, which is cut at three lines');
 });
 
-check('the design page shows the Books screens as the app draws them: the twelve covers at the size the grid works out, Free or Soon as their label says, the paper of the tokens, one handwritten note a phone, and the group stays before the daily reading', () => {
+check('the design page: the group of the Books phones stands before the daily reading, once, and no phone has more than one handwritten note (the phones show the twelve books of the earlier plan, not the books of books/: they have to be drawn again before the design page can be said to show the Books tab as it is)', () => {
   const design = fs.readFileSync(path.join(root, '..', 'design', 'index.html'), 'utf8');
-  const tokens = JSON.parse(read('src/theme/tokens.json')) as { color: Record<string, string> };
-  const esc = (t: string) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-  /** The phone with this label: the text from its label to the next phone (or the script or the heading that follows the last of the group). */
-  const phoneOf = (label: string): string => {
-    const open = `<p class="phone-label"><b>${label}</b>`;
-    assert.equal(design.split(open).length - 1, 1, `the design page has exactly one phone "${label}"`);
-    const start = design.indexOf(open);
-    const ends = ['<p class="phone-label">', '<script>', '<h3 '].map((x) => design.indexOf(x, start + 10)).filter((i) => i > 0);
-    return design.slice(start, Math.min(...ends));
-  };
-  const GROUP = ['Library · Books', 'Books · dark', 'Books · 320 wide', 'Books · no texts yet', 'Book page', 'Book page · Continue', 'Book page · Soon', 'Reader', 'Reader · dark', 'Reader · large text', 'Reader · end of a chapter'];
-  const phones = Object.fromEntries(GROUP.map((l) => [l, phoneOf(l)] as const));
-
-  // the group stands before the daily reading (which stays the last of the screens), once, between its markers
   const at = (needle: string) => design.indexOf(needle);
   assert.ok(at('<h3 id="books-reader">') > 0 && at('<h3 id="books-reader">') < at('<h3 id="daily-reading">'), 'the Books group is before the Daily reading group');
   assert.equal(count(design, /<h3 id="books-reader">/g), 1);
-  assert.ok(at('<!-- Library · Books phone (start) -->') > 0 && at('<!-- Library · Books phone (start) -->') < at('<!-- Library · Books phone (end) -->'));
-  assert.doesNotMatch(design, /class="lib-book"|Preview · Books|Twelve free companions for the road/, 'the old Books rows and banner are gone from the phones');
-
-  // the grid: twelve covers of the size the grid works out, A5 portrait, in the order of the catalog, each ONE button whose label says what the mark says
-  const grids: Array<[string, number]> = [['Library · Books', 390], ['Books · dark', 390], ['Books · 320 wide', 320], ['Books · no texts yet', 390]];
-  for (const [label, width] of grids) {
-    const phone = phones[label];
-    const g = coverGrid(width, 16);
-    const m = coverMetrics(g.tile);
-    assert.equal(m.height, a5Height(g.tile), `${label}: the cover is an A5 page`);
-    const covers = phone.split('<div class="bk-cover"').slice(1);
-    assert.equal(covers.length, 12, `${label}: twelve covers`);
-    covers.forEach((seg, i) => {
-      const book = BOOK_CATALOG[i];
-      assert.match(seg, new RegExp(`^ style="width:${g.tile}px;height:${m.height}px;border-radius:${m.radius}px;--paper:var\\(--bk-paper-${book.cover}\\)"`), `${label}: ${book.title} is ${g.tile} by ${m.height}`);
-      const spoken = /role="button" aria-label="([^"]+)"/.exec(seg)?.[1];
-      const mark = /class="bk-mark (free|soon)"/.exec(seg)?.[1];
-      assert.ok(spoken && mark, `${label}: ${book.title} is one button with a mark`);
-      assert.equal(spoken, esc(coverLabel(book, mark === 'free')), `${label}: the label of ${book.title} says what its mark says`);
-      assert.match(seg, new RegExp(`class="bk-ribbon[^"]*" aria-label="(Remove bookmark|Bookmark): ${esc(book.title)}"`), `${label}: the ribbon of ${book.title} is a button of its own`);
-      assert.equal(count(seg, /role="button"/g), 1, `${label}: ${book.title} has one button inside its cover`);
-    });
-    assert.match(phone, new RegExp(`grid-template-columns:repeat\\(2,${g.tile}px\\)`), `${label}: two columns`);
-  }
-  assert.doesNotMatch(phones['Books · no texts yet'], /class="bk-mark free"/, 'with no text in any book every cover says Soon');
-  assert.match(phones['Books · no texts yet'], /<div class="cp-banner cmp"><div class="ey">Books · Soon<\/div><h4>Books for the road<\/h4><div class="row"><span class="ln">The texts are being checked\.<\/span><\/div><\/div>/, 'and the banner has no button and says why');
-  assert.match(phones['Books · no texts yet'], /<div class="h">Preview<\/div><div class="p">Books are not in the app yet\. We are checking the editions before we add them\.<\/div>/);
-
-  // the banner of a phone with books: one button for a screen reader that opens a book which the same phone shows as Free
-  for (const [label, cta, note] of [['Library · Books', 'Start reading', 'No rush'], ['Books · dark', 'Continue reading', 'Onward!'], ['Books · 320 wide', 'Start reading', 'No rush']]) {
-    const phone = phones[label];
-    const m = /<div class="cp-banner cmp" role="button" aria-label="([^"]+)"><div class="ey">([^<]+)<\/div><h4>Books for the road<\/h4><div class="row"><span class="hw">([^<]+)<\/span><span class="pill">([^<]+)<\/span><\/div><\/div>/.exec(phone);
-    assert.ok(m, `${label}: the compact banner with a note and a pill`);
-    assert.deepEqual([m[3], m[4]], [note, cta], `${label}: the words of the banner`);
-    assert.equal(m[1], `${cta}. Books for the road. ${m[2]}`, `${label}: what a screen reader says`);
-    const book = BOOK_CATALOG.find((b) => esc(b.title) === m[2]);
-    assert.ok(book, `${label}: the label of the banner is the title of a book`);
-    assert.ok(phone.includes(`aria-label="${esc(coverLabel(book, true))}"`), `${label}: the book the banner opens says Free on its cover`);
-  }
-  assert.match(phones['Books · dark'], /<div class="phone dk"/);
-  assert.match(phones['Books · 320 wide'], /<div class="phone" style="width:320px">/);
-
-  // the paper of a cover is the pale colours of the LIGHT palette, which dark mode does not swap
-  const grid = /\.bk-cover, \.bk-pg, \.bk-grid \{([^}]*)\}/.exec(design)?.[1] ?? '';
-  for (const colour of new Set(BOOK_CATALOG.map((b) => b.cover))) {
-    assert.match(grid, new RegExp(`--bk-paper-${colour}:\\s*${tokens.color[colour]}\\b`, 'i'), `the paper ${colour} is ${tokens.color[colour]}`);
-  }
-  assert.match(grid, new RegExp(`--bk-ink:\\s*${tokens.color.blue}`, 'i'), 'the ink on a cover is the navy of the light palette');
-
-  // one handwritten note on a screen, at most: the banner, the page of a book, the end of a chapter
-  for (const label of GROUP) assert.ok(count(phones[label], /class="hw"/g) <= 1, `${label}: at most one handwritten note`);
-  assert.equal(count(phones['Book page'], /class="hw"/g), 1);
-  assert.equal(count(phones['Book page · Soon'], /class="hw"/g), 0, 'a book without a text has no note and no button');
-  assert.equal(count(phones['Reader · end of a chapter'], /class="hw"/g), 1);
-
-  // the book page: a book with a text has the gold button and the contents, one without says Not in the app yet and has neither
-  assert.match(phones['Book page'], /<div class="btn" role="button" aria-label="Start reading">Start reading<\/div>[^]*<h4>Contents<\/h4>/);
-  assert.match(phones['Book page · Continue'], /aria-label="Continue: [^"]+">Continue: [^<]+<\/div>/);
-  assert.match(phones['Book page · Continue'], /LAST READ/);
-  assert.match(phones['Book page · Continue'], /<div class="phone dk">/);
-  assert.match(phones['Book page · Soon'], /<h4>Not in the app yet<\/h4><p>We are checking the edition of this book before we add it\.<\/p>/);
-  assert.doesNotMatch(phones['Book page · Soon'], /class="btn"|bk-contents|class="bk-toc"/);
-
-  // the reader: the sizes are the ones readerType works out for the step, the header is the one of the app
-  const body = (step: number) => readerType(step).body;
-  assert.match(phones['Reader'], new RegExp(`<p style="font-size:${body(DEFAULT_STEP).size}px;line-height:${body(DEFAULT_STEP).lineHeight}px;`));
-  assert.match(phones['Reader · large text'], new RegExp(`<p style="font-size:${body(LAST_STEP).size}px;line-height:${body(LAST_STEP).lineHeight}px;`));
-  assert.match(phones['Reader · large text'], /aria-label="Larger text"/);
-  assert.match(phones['Reader · large text'], /class="a l off"/, 'at the largest step the larger button is dimmed');
-  for (const label of ['Reader', 'Reader · dark', 'Reader · large text', 'Reader · end of a chapter']) {
-    assert.match(phones[label], /aria-label="Contents"[^]*aria-label="Smaller text"[^]*aria-label="Larger text"/, `${label}: the header has Contents and the two sizes`);
-    assert.match(phones[label], /class="bk-prog"/, `${label}: the thin progress line`);
-    assert.match(phones[label], /aria-label="(Previous|Next): [^"]+"/, `${label}: Previous and Next name where they go`);
-  }
-  assert.match(phones['Reader · dark'], /<div class="phone dk">/);
-  assert.match(phones['Reader · end of a chapter'], /class="step next" role="button" aria-label="Next: Chapter II[^"]*"[^]*class="step off" role="button" aria-label="Previous chapter\. This is the first chapter" aria-disabled="true"/, 'at the end of the first chapter Next is there and Previous is off');
+  const group = design.slice(at('<h3 id="books-reader">'), at('<h3 id="daily-reading">'));
+  for (const phone of group.split('<p class="phone-label">').slice(1)) assert.ok(count(phone, /class="hw"/g) <= 1, 'at most one handwritten note on a screen');
 });
 
 console.log(`${n} of ${n} passed (Books screens)`);

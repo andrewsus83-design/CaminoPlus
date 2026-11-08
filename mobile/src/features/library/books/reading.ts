@@ -409,7 +409,7 @@ export function cleanBook(raw: unknown): BookContent | null {
   for (const c of raw.chapters) {
     if (!isObject(c) || typeof c.id !== 'string' || c.id.length === 0 || typeof c.title !== 'string' || seen.has(c.id)) continue;
     seen.add(c.id);
-    chapters.push({ id: c.id, title: c.title, blocks: cleanBlocks(c.blocks) });
+    chapters.push({ id: c.id, title: c.title, ...(typeof c.part === 'string' && c.part.trim() ? { part: c.part } : {}), blocks: cleanBlocks(c.blocks) });
   }
   if (chapters.length === 0) return null;
   const sources = Array.isArray(raw.sources)

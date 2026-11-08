@@ -11,8 +11,9 @@
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
+import '../../features/library/__tests__/bundleShim'; // first: the compiled bookBundle.ts finds the files of the books through it
 import { BOOK_CATALOG } from '../../features/library/books/catalog';
-import { BIBLE_SOURCE_LINE, BOOKS_NOTICE, LIBRARY_TABS, ROW_TABS, SEARCH_NOTICE } from '../../features/library/sample';
+import { BIBLE_SOURCE_LINE, LIBRARY_TABS, ROW_TABS } from '../../features/library/sample';
 
 let n = 0;
 const check = (name: string, fn: () => void) => { fn(); n += 1; console.log(`ok   ${name}`); };
@@ -202,8 +203,6 @@ check('Library has no title and no diary button: its first row is the search fie
 check('Library: directly under the search row the tabs Bible, Books, Notes, and only then the banner of the tab; Notes has no banner; a search takes the place of all of it, and says so when a book that says Soon is among its results', () => {
   assert.deepEqual([...LIBRARY_TABS], ['Bible', 'Books', 'Notes']);
   assert.deepEqual([...ROW_TABS], ['Bible', 'Books']);
-  assert.equal(BOOKS_NOTICE, 'Books are not in the app yet. We are checking the editions before we add them.');
-  assert.equal(SEARCH_NOTICE, 'Books marked Soon are not in the app yet: we are still checking their editions. The Bible text and the books marked Free are.');
   assert.equal(BIBLE_SOURCE_LINE, 'World English Bible, Catholic edition · public domain');
   const screen = read(join('app', '(tabs)', 'library.tsx'));
   assert.match(screen, /<Screen keyboard>/, 'a button can be tapped while the keyboard is up');
@@ -233,12 +232,11 @@ check('Library: directly under the search row the tabs Bible, Books, Notes, and 
   assert.doesNotMatch(notesHost.slice(notesHost.indexOf(') : (')), /ScrollView/, 'no scroll view around the feed: it scrolls by itself');
   assert.match(notesHost, /\{searching \? \(\s*<ScrollView\b[^>]*keyboardShouldPersistTaps="handled"[^>]*>\s*<SearchResults\b[\s\S]*?\/>\s*<\/ScrollView>\s*\) : \(/, 'a search on Notes keeps this host: the top, and the search field in it, is not made again when the first letter is typed (a field that is made again loses the keyboard); the results take the place of the feed');
   assert.ok(notesHost.indexOf('{top}') < notesHost.indexOf('<NotesTab'), 'the notes start right under the tabs');
-  // the Books tab starts with its notice (the Preview card while no book has a text, one quiet line while some have, nothing when all have); the Bible tab has none (its text is in the app: one quiet source line instead)
+  // neither tab has a notice: the text of the Bible is in the app (one quiet source line instead) and so are the books (each book page says how they were written, notices.ts)
   const tabsSrc = read(join('src', 'features', 'library', 'LibraryTabs.tsx'));
-  assert.match(tabsSrc, /export function BooksTab[^]*?<BooksNotice \/>/, 'the Books tab starts with its notice');
-  assert.match(read(join('src', 'features', 'library', 'books', 'BooksNotice.tsx')), /if \(notice\.kind === 'card'\) return <SampleNotice title=\{notice\.title\}>\{notice\.text\}<\/SampleNotice>;/);
+  assert.doesNotMatch(tabsSrc, /BooksNotice|booksNotice/, 'the Books tab has no notice above its covers');
   const results = read(join('src', 'features', 'library', 'SearchResults.tsx'));
-  assert.match(results, /\{found\.hits\.Books\.some\(\(b\) => !hasBookText\(b\.id\)\) && <SampleNotice title="Coming soon">\{SEARCH_NOTICE\}<\/SampleNotice>\}/, 'the search keeps the Soon notice when a book that says Soon is among the results, and only then');
+  assert.doesNotMatch(results, /SampleNotice|SEARCH_NOTICE|hasBookText/, 'a search has no notice about books: every book found is in the app');
   assert.match(results, /Clear search/);
   assert.match(read(join('src', 'components', 'Screen.tsx')), /keyboardShouldPersistTaps=\{keyboard \? 'handled' : 'never'\}/);
 });
@@ -294,7 +292,7 @@ check('the search field: placeholder and label, the "search" key, no autocorrect
     assert.ok(contrast(roleColour('textMuted', dark), surface) >= 4.5, `the placeholder (role.muted) on the pill in ${mode}`);
     assert.ok(contrast(roleColour('action', dark), surface) >= 3, `the bookmark icon on a row in ${mode}`);
   }
-  for (const b of BOOK_CATALOG) assert.ok(contrast(tokens.color.blue, tokens.color[b.cover]) >= 4.5, `the navy on the ${b.cover} cover (covers do not change with dark)`);
+  for (const b of BOOK_CATALOG) assert.ok(contrast(tokens.color.blue, tokens.color[b.cover.colour]) >= 4.5, `the navy on the ${b.cover.colour} cover (covers do not change with dark)`);
 });
 
 check('the design page shows the same Library: the compact banner, the three parts as a segmented pill under it, the books as tiles, the chapters, the reader, the verses of a search and of Bookmarks, in light and dark', () => {
@@ -463,7 +461,7 @@ check('the design page shows the same Library: the compact banner, the three par
   const building = /<symbol id="i-building"[^>]*>(.*?)<\/symbol>/.exec(design);
   assert.ok(building, 'the sprite of the design page has no i-building');
   assert.deepEqual([...building![1].matchAll(/ d="([^"]+)"/g)].map((m) => m[1]), iconPaths('building'));
-  for (const b of BOOK_CATALOG) assert.ok(new RegExp(`<symbol id="i-${b.icon === 'pen' ? 'pencil' : b.icon}"`).test(design), `the design page sprite has no glyph for the cover of ${b.id}`);
+  for (const b of BOOK_CATALOG) assert.ok(new RegExp(`<symbol id="i-${b.cover.icon}"`).test(design), `the design page sprite has no glyph for the cover of ${b.id}`);
 });
 
 check('the sample content never claims to be real: no price, no rating, no "available", no download, nothing in the data or the rows of the example books that acts when touched', () => {
@@ -529,7 +527,7 @@ check('what is new in Library keeps its contrast in light and dark: text 4.5 : 1
     assert.ok(contrast(r('textMuted'), r('surface')) >= 4.5, `the credit and the muted lines in ${mode}`);
   }
   // a cover does not change with light and dark, and neither does the navy glyph on it
-  for (const b of BOOK_CATALOG) assert.ok(contrast(tokens.color.blue, tokens.color[b.cover]) >= 4.5, `the navy glyph on the ${b.cover} cover of ${b.id}`);
+  for (const b of BOOK_CATALOG) assert.ok(contrast(tokens.color.blue, tokens.color[b.cover.colour]) >= 4.5, `the navy glyph on the ${b.cover.colour} cover of ${b.id}`);
 });
 
 check('Bookmarks is a screen of its own: the file exists, it is registered next to the diary routes for a pilgrim with a journey, it has Back and a heading and no room for a tab bar', () => {
@@ -546,7 +544,7 @@ check('Bookmarks is a screen of its own: the file exists, it is registered next 
   assert.match(src, /<AppText variant="h2" accessibilityRole="header">Bookmarks<\/AppText>/);
   assert.match(src, /<AppText variant="h4" accessibilityRole="header">Library<\/AppText>/);
   assert.match(src, /<AppText variant="h4" accessibilityRole="header" style=\{\{ marginTop: 8 \}\}>Posts<\/AppText>/);
-  assert.match(src, /<SampleNotice title="Coming soon">\{BOOKMARKS_NOTICE\}<\/SampleNotice>/, 'a book kept here that says Soon is not in the app yet, and it says so');
+  assert.doesNotMatch(src, /SampleNotice|BOOKMARKS_NOTICE/, 'no notice about books on Bookmarks');
   const design = readFileSync(join(root, '..', 'design', 'index.html'), 'utf8');
   const phone = design.slice(design.indexOf('<b>Library · Bookmarks</b>'), design.indexOf('<b>Library · Bookmarks, empty</b>'));
   assert.ok(phone.length > 2000);
@@ -571,7 +569,7 @@ check('the four fonts by role on the Bible side of the Library: Fraunces for nam
   assert.equal(fontOf('mono'), 'mono');
   assert.equal(fontOf('accent'), 'accent');
   assert.deepEqual(Object.keys((tokens as unknown as { font: Record<string, string> }).font).filter((k) => ['title', 'body', 'mono', 'accent'].includes(k)), ['title', 'body', 'mono', 'accent']);
-  assert.match(read(join('app', '_layout.tsx')), /Fraunces_600SemiBold, Inter_400Regular, Inter_500Medium, Inter_600SemiBold, JetBrainsMono_400Regular, Caveat_700Bold/, 'all four are loaded: no new font file, no new package');
+  assert.match(read(join('app', '_layout.tsx')), /Fraunces_600SemiBold, (?:Inter_300Light, )?Inter_400Regular, Inter_500Medium, Inter_600SemiBold, JetBrainsMono_400Regular, Caveat_700Bold/, 'all four are loaded: no new font file, no new package (the light cut of Inter is the inactive label of the tab bar)');
   // the roles, element by element: [file, what must be there, what it says]
   const L = join('src', 'features', 'library');
   const roles: Array<[string, RegExp, string]> = [

@@ -12,18 +12,17 @@ import { VERSES_CAPPED_NOTE, versesLabel } from './bible/verseRows';
 import { BOOK_CATALOG } from './books/catalog';
 import { BookRows } from './books/BookRows';
 import { BooksGrid } from './books/BooksGrid';
-import { BooksNotice } from './books/BooksNotice';
 import { BIBLE_SOURCE_LINE, type RowTab } from './sample';
 import { hitGroups, itemKey, type Hits } from './search';
 import type { LibraryMarks } from './useLibraryBookmarks';
 
-// The two Library tabs that hold rows: Bible (the books of the Bible, one part at a time, as a grid of square tiles) and Books (twelve free classics, as a grid
-// of A5 covers, books/BooksGrid.tsx). The Bible is real: its text is in the app (see sample.ts). The Books tab has the text of the books whose edition is
-// confirmed, and says "Soon" on the others, with a notice that says so honestly (books/BooksNotice.tsx). The third tab, Notes, is the diary and lives in
+// The two Library tabs that hold rows: Bible (the books of the Bible, one part at a time, as a grid of square tiles) and Books (the books of the Library, as a grid
+// of A5 covers on one shelf for each kind of book, books/BooksGrid.tsx). The Bible is real: its text is in the app (see sample.ts), and so is the text of every book
+// (each book page says how the books were written, books/notices.ts). The third tab, Notes, is the diary and lives in
 // features/library/notes. Colours are read while drawing, never at import.
 //
-// A row can carry a bookmark button (when `marks` is given): the button is its own component. The rows of a book of the Bible and of the twelve books are also
-// what a search result and the Bookmarks screen draw (LibraryGroups), where a tap opens the book (books/BookRows.tsx for the twelve). The banners are in
+// A row can carry a bookmark button (when `marks` is given): the button is its own component. The rows of a book of the Bible and of the books of the Library are also
+// what a search result and the Bookmarks screen draw (LibraryGroups), where a tap opens the book (books/BookRows.tsx for the Library's). The banners are in
 // LibraryBanner.tsx (the Bible tab's) and books/BooksBanner.tsx (the Books tab's).
 
 /** The padding of a row: 16 at the start, and 6 at the end when the bookmark button (44 wide) is there. */
@@ -123,7 +122,6 @@ export function BibleTab({ testament, onTestament, onOpenBook }: { testament: Te
 export function BooksTab({ marks }: { marks?: LibraryMarks }) {
   return (
     <View style={{ gap: 16 }}>
-      <BooksNotice />
       <BooksGrid items={BOOK_CATALOG} marks={marks} />
     </View>
   );

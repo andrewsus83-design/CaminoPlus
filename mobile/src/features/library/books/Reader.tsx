@@ -8,10 +8,10 @@ import { BookPage } from './BookPage';
 import { ChapterFooter } from './ChapterFooter';
 import { ReaderBlocks } from './ReaderBlocks';
 import { ReaderHeader, type ProgressApi } from './ReaderHeader';
-import type { BookText } from './bookTextTypes';
+import type { BookContent } from './index';
 import { bookById } from './catalog';
 import { NO_CHAPTER_TEXT, bookPath, readerPath } from './copy';
-import { LONG_LABEL, blockWords, chapterIndex, chapterNav, groupThousands, isRead, layoutBlocks, offsetFor, partName, readingTime, resumeAt, scrollProgress, splitTitle, startAt } from './reading';
+import { LONG_LABEL, chapterIndex, chapterNav, chapterWords, groupThousands, isRead, layoutBlocks, offsetFor, partName, readingTime, resumeAt, scrollProgress, splitTitle, startAt } from './reading';
 import { readerType } from './readerType';
 import { safeText } from './safeText';
 import { useReaderSize, type ReaderSize } from './useReaderSize';
@@ -30,7 +30,7 @@ import { useReadingWriter, type ReadingWriter } from './useReadingWriter';
 // Previous and Next replace this screen, so Back still goes to where the reader came from (the contents, the Books tab) and not through every chapter read; the
 // way back to the contents is one tap on "Contents". The scroll is one ScrollView: a chapter is drawn once, and while it scrolls only the thin line is drawn again.
 
-type ViewProps = { bookId: string; text: BookText; index: number; startY: number; size: ReaderSize; writer: ReadingWriter };
+type ViewProps = { bookId: string; text: BookContent; index: number; startY: number; size: ReaderSize; writer: ReadingWriter };
 
 /** One chapter on the screen. Made again for another chapter (the screen gives it a key), so every number it keeps is the chapter's own. */
 function ChapterView({ bookId, text, index, startY, size, writer }: ViewProps) {
@@ -40,7 +40,7 @@ function ChapterView({ bookId, text, index, startY, size, writer }: ViewProps) {
   const nav = chapterNav(text.chapters, index)!;
   const type = useMemo(() => readerType(size.step), [size.step]);
   const items = useMemo(() => layoutBlocks(chapter.blocks), [chapter]);
-  const words = useMemo(() => blockWords(chapter.blocks), [chapter]);
+  const words = useMemo(() => chapterWords(chapter.title, chapter.blocks), [chapter]);
   const head = useMemo(() => splitTitle(chapter.title), [chapter]);
   // a label that is a whole sentence ("Of the excellence of the obedient, and of the misery of the disobedient members of the religious orders") is set in the size of a heading, not of a title
   const face = head.label.length > LONG_LABEL ? type.heading : type.title;
@@ -152,7 +152,7 @@ function ChapterView({ bookId, text, index, startY, size, writer }: ViewProps) {
 }
 
 /** Reads what the reader needs from the phone (the text size, the place in the book) and then shows the chapter. Until then it shows only the page. */
-function Chapter({ bookId, text, chapterId }: { bookId: string; text: BookText; chapterId?: string }) {
+function Chapter({ bookId, text, chapterId }: { bookId: string; text: BookContent; chapterId?: string }) {
   const size = useReaderSize();
   const writer = useReadingWriter(bookId);
   const ready = size.ready && writer.ready;

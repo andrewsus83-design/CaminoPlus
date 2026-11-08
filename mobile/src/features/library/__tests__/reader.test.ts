@@ -32,7 +32,7 @@ import {
   EXCERPT_MAX, SLOW_SEARCH_MS, VERSES_CAPPED_NOTE, VERSE_RESULTS_MAX, announcesSearch, cleanMarks, excerpt, rowOfHit, rowOfKey, rowsOfHits, segments, verseQuery,
   versesLabel, type TextSource,
 } from '../bible/verseRows';
-import { BIBLE_SOURCE_LINE, BOOKMARKS_KEPT, BOOKMARKS_NOTICE, BOOKS_NOTICE, SEARCH_NOTICE } from '../sample';
+import { BIBLE_SOURCE_LINE, BOOKMARKS_KEPT } from '../sample';
 import { emptyHits, hitCount, hitGroups, hitsForKeys, verseKey } from '../search';
 import { BOOKMARKS_MAX, bookmarkKeys, packBookmarks, parseBookmarks, toggleBookmark } from '../bookmarks';
 
@@ -1007,12 +1007,12 @@ check('what is looked for: the words of the query with one space between, nothin
 });
 
 check('Bookmarks: the verses kept are rows in the order they were kept, a book by its id is a row, and everything that has no row (a verse that is not in the text, a book that was taken out) is left out without a word', () => {
-  const keys = ['bible:PSA.121.3', 'bible:bible-psalms', 'bible:JHN.3.15-16', 'bible:bible-additions-to-esther', 'bible:PSA.999.1', 'bible:SIR.11.15-16', 'bible:XXX.1.1', 'bible:PSA.121', 'bible:bible-additions-to-daniel', 'books:confessions', 'bible:PSA.121.1'];
+  const keys = ['bible:PSA.121.3', 'bible:bible-psalms', 'bible:JHN.3.15-16', 'bible:bible-additions-to-esther', 'bible:PSA.999.1', 'bible:SIR.11.15-16', 'bible:XXX.1.1', 'bible:PSA.121', 'bible:bible-additions-to-daniel', 'books:confessions-readings', 'bible:PSA.121.1'];
   const h = hitsForKeys(keys, source);
   assert.deepEqual(h.Verses.map((r) => r.label), ['Psalm 121:3', 'John 3:15-16', 'Psalm 121:1'], 'in the order of the keys');
   assert.deepEqual(h.Verses.map((r) => r.key), ['PSA.121.3', 'JHN.3.15-16', 'PSA.121.1']);
   assert.deepEqual(h.Bible.map((b) => b.id), ['bible-psalms']);
-  assert.deepEqual(h.Books.map((b) => b.id), ['confessions']);
+  assert.deepEqual(h.Books.map((b) => b.id), ['confessions-readings']);
   assert.equal(hitCount(h), 5);
   assert.deepEqual(hitGroups(h), ['Bible', 'Books', 'Verses']);
   // without a text no verse is a row (a book is still one)
@@ -1112,14 +1112,10 @@ check('the end of a chapter: the credit of the translation, then one plain line 
   assert.ok(READER_NOTE.split(' ').length <= 5 && CHAPTERS_NOTE.split(' ').length <= 5, 'the handwritten notes are a few words');
 });
 
-check('the words of the Bible tab and of the notices: the source line is one quiet line; the notices are honest about what is real (the Bible, and the books marked Free) and what is not in the app yet (the books marked Soon)', () => {
+check('the words of the Bible tab and of Bookmarks: the source line is one quiet line, and Bookmarks says where they are kept; nothing says verified or official', () => {
   assert.equal(BIBLE_SOURCE_LINE, 'World English Bible, Catholic edition · public domain');
-  assert.equal(BOOKS_NOTICE, 'Books are not in the app yet. We are checking the editions before we add them.');
-  assert.equal(SEARCH_NOTICE, 'Books marked Soon are not in the app yet: we are still checking their editions. The Bible text and the books marked Free are.');
-  assert.match(BOOKMARKS_NOTICE, /^Books marked Soon are not in the app yet/);
   assert.equal(BOOKMARKS_KEPT, 'Kept only on this phone. Logging out clears them.');
-  for (const text of [BIBLE_SOURCE_LINE, BOOKS_NOTICE, SEARCH_NOTICE, BOOKMARKS_NOTICE]) assert.doesNotMatch(text, /verified|official|certified/i, text);
-  assert.doesNotMatch(`${BIBLE_SOURCE_LINE} ${SEARCH_NOTICE} ${BOOKMARKS_NOTICE}`, /not in the app yet\. We are choosing a translation/, 'the old "Bible text is not in the app yet" is gone');
+  for (const text of [BIBLE_SOURCE_LINE, BOOKMARKS_KEPT]) assert.doesNotMatch(text, /verified|official|certified/i, text);
 });
 
 console.log(`${n} of ${n} passed (Reader)`);

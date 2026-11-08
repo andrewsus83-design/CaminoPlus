@@ -12,43 +12,41 @@ import { BOOKMARK_NOT_SAVED } from '../bookmarks';
 import { itemKey } from '../search';
 import { useLibraryBookmarks } from '../useLibraryBookmarks';
 import { BookCover } from './BookCover';
-import { ReadButton } from './BookUi';
-import { BOOK_TEXT_INDEX } from './bookText';
+import { BookNotice, ReadButton } from './BookUi';
 import { bookById, type CatalogBook } from './catalog';
-import { NOT_YET_TEXT, NOT_YET_TITLE, UNKNOWN_TEXT, UNKNOWN_TITLE, readerPath } from './copy';
-import { bookFacts, chapterNav, partName, partSubtitle, positionLine, readButtonLabel, readButtonSpoken, resumeAt, splitTitle, tocGroups, type TocEntry } from './reading';
+import { UNKNOWN_TEXT, UNKNOWN_TITLE, UNREADABLE_TEXT, UNREADABLE_TITLE, kindName, pageNote, readerPath } from './copy';
+import { noticeFor } from './notices';
+import { bookFacts, chapterNav, formatMinutes, partName, partSubtitle, positionLine, readButtonLabel, readButtonSpoken, resumeAt, splitTitle, tocGroups, type TocEntry } from './reading';
 import { safeText } from './safeText';
 import { useBooksReading } from './useBooksReading';
 
-// The page of one book, where a cover opens to: the cover, large (with its ribbon, the bookmark), the title in Fraunces, the author, the era and the mark
-// "Free" or "Soon", the blurb, and then one of two things.
-//  - A book with a text: the gold button ("Start reading" the first time, "Continue: Chapter 7" after), a line that says where that is, one short handwritten note,
-//    the table of contents (the chapters under their parts, the ones read marked, the place where you stopped marked), and the credit of the edition.
-//  - A book without one: "Not in the app yet" and one honest sentence (its edition is being checked), and no button.
-// A book that is not one of the twelve (an old or a wrong link) gets a calm sentence and the way to the Library. Nothing here uses the network: the words and the
-// contents are inside the app, and what is read and where you stopped is kept on the phone (useBooksReading.ts).
-
-/** The one short handwritten note of the page (Caveat), for a book you can read. */
-export const PAGE_NOTE = 'A little each day';
+// The page of one book, where a cover opens to: the cover, large (with its ribbon, the bookmark), the title in Fraunces, the subtitle, the kind of book, how long it is, the
+// description, THE NOTICE OF ITS KIND (notices.ts: written with AI assistance, and what has and has not been checked: every book page has it, whatever the book), and then one
+// of two things.
+//  - A book whose text reads: the gold button ("Start reading" the first time, "Continue: Day 3" after), a line that says where that is, one short handwritten note, the table
+//    of contents (the chapters with how long each takes, the ones read marked, the place where you stopped marked), and the credit of the book.
+//  - A book whose text cannot be read (a damaged file): a calm sentence that says so, and no button.
+// A book that is not in the Library (an old or a wrong link) gets a calm sentence and the way to the Library. Nothing here uses the network: the words and the contents
+// are inside the app, and what is read and where you stopped is kept on the phone (useBooksReading.ts).
 
 /** How wide the cover is on the page: about 60 % of the screen's width, so larger than the covers of the grid (173 on a 390 phone) and never more than 240. */
 export const coverWidthOf = (screen: number): number => Math.min(Math.max(Math.round((screen - 32) * 0.6), 150), 240);
 
-/** The mark under the title, in JetBrains Mono: "FREE" for a book with a text, "SOON" for one without. */
-function Mark({ free }: { free: boolean }) {
+/** The kind of book under the title, in JetBrains Mono capitals on a pale ground. */
+function KindMark({ kind }: { kind: string }) {
   return (
-    <View accessibilityLabel={free ? 'Free to read' : 'Coming soon'} style={{ paddingHorizontal: 12, height: 26, borderRadius: radius.pill, backgroundColor: free ? c.successWash : role.sunken, justifyContent: 'center' }}>
-      <AppText variant="mono" color={free ? c.success : role.muted} style={{ fontSize: 12, lineHeight: 16, letterSpacing: 1 }}>{free ? 'FREE' : 'SOON'}</AppText>
+    <View accessibilityLabel={kindName(kind)} style={{ paddingHorizontal: 12, height: 26, borderRadius: radius.pill, backgroundColor: role.sunken, justifyContent: 'center' }}>
+      <AppText variant="mono" color={role.muted} style={{ fontSize: 12, lineHeight: 16, letterSpacing: 1 }}>{kindName(kind).toUpperCase()}</AppText>
     </View>
   );
 }
 
 /**
- * One chapter in the table of contents: its number in the book (mono), its title split in two ("Chapter XXXVI" in Inter, and under it what the chapter is about,
- * muted, in at most three lines), a tick when it is read, and "Last read" where you stopped. One button; a screen reader hears the whole title.
+ * One chapter in the table of contents: its number in the book (mono), its title split in two ("Day 3" in Inter, and under it what the day is about, muted, in at most three
+ * lines), how long it takes (mono), a tick when it is read, and "Last read" where you stopped. One button; a screen reader hears the whole title.
  */
-const TocRow = memo(function TocRow({ entry, read, here, first, onOpen }: { entry: TocEntry; read: boolean; here: boolean; first: boolean; onOpen: (chapterId: string) => void }) {
-  const spoken = `${entry.title}${read ? ', read' : ''}${here ? ', where you stopped' : ''}`;
+const TocRow = memo(function TocRow({ entry, minutes, read, here, first, onOpen }: { entry: TocEntry; minutes?: number; read: boolean; here: boolean; first: boolean; onOpen: (chapterId: string) => void }) {
+  const spoken = `${entry.title}${minutes ? `, ${formatMinutes(minutes)}` : ''}${read ? ', read' : ''}${here ? ', where you stopped' : ''}`;
   const { label, subtitle } = splitTitle(entry.title);
   return (
     <Pressable
@@ -57,7 +55,7 @@ const TocRow = memo(function TocRow({ entry, read, here, first, onOpen }: { entr
       onPress={() => onOpen(entry.id)}
       style={({ pressed }) => ({ minHeight: 56, flexDirection: 'row', alignItems: 'flex-start', gap: 12, paddingVertical: 17, paddingHorizontal: 12, borderTopWidth: first ? 0 : 1, borderTopColor: role.border, backgroundColor: pressed ? role.sunken : 'transparent' })}
     >
-      <AppText variant="mono" muted style={{ width: 36, textAlign: 'right', fontSize: 14, lineHeight: 20, marginTop: 1 }}>{entry.index + 1}</AppText>
+      <AppText variant="mono" muted style={{ width: 28, textAlign: 'right', fontSize: 14, lineHeight: 20, marginTop: 1 }}>{entry.index + 1}</AppText>
       <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
         <AppText variant="label">{label}</AppText>
         {!!subtitle && <AppText variant="small" muted numberOfLines={3} style={{ fontSize: 15, lineHeight: 21 }}>{subtitle}</AppText>}
@@ -67,7 +65,10 @@ const TocRow = memo(function TocRow({ entry, read, here, first, onOpen }: { entr
           </View>
         )}
       </View>
-      {read && <View style={{ marginTop: 1 }}><Icon name="check" color={c.success} size={20} strokeWidth={2.2} /></View>}
+      <View style={{ alignItems: 'flex-end', gap: 4 }}>
+        {!!minutes && <AppText variant="mono" muted style={{ fontSize: 13, lineHeight: 20 }}>{formatMinutes(minutes)}</AppText>}
+        {read && <Icon name="check" color={c.success} size={20} strokeWidth={2.2} />}
+      </View>
     </Pressable>
   );
 });
@@ -101,10 +102,10 @@ function Page({ book, notice }: { book: CatalogBook; notice?: string }) {
   const reading = useBooksReading();
   const text = useMemo(() => safeText(book.id), [book.id]);
   const chapters = text?.chapters ?? [];
+  const minutes = useMemo(() => new Map(book.chapters.map((x) => [x.id, x.minutes] as const)), [book]);
   const key = itemKey('Books', book.id);
   const place = reading.placeOf(book.id);
   const groups = useMemo(() => tocGroups(chapters), [chapters]);
-  const index = BOOK_TEXT_INDEX.find((e) => e.id === book.id);
   const readSet = reading.readSet(book.id);
   const resume = resumeAt(chapters, place);
   const target = chapters[resume.index];
@@ -120,18 +121,16 @@ function Page({ book, notice }: { book: CatalogBook; notice?: string }) {
       {!!notice && <FormMessage tone="info">{notice}</FormMessage>}
       {marks.failed && <FormMessage>{BOOKMARK_NOT_SAVED}</FormMessage>}
       <View style={{ alignItems: 'center', gap: 12 }}>
-        <BookCover book={book} width={coverWidth} hasText={!!text} bookmarked={marks.has(key)} onBookmark={toggle} />
+        <BookCover book={book} width={coverWidth} bookmarked={marks.has(key)} onBookmark={toggle} />
         <View style={{ alignItems: 'center', gap: 4, marginTop: 8 }}>
           <AppText variant="h3" accessibilityRole="header" style={{ textAlign: 'center' }}>{book.title}</AppText>
-          <AppText variant="small" muted style={{ textAlign: 'center' }}>{book.author}</AppText>
+          {!!book.subtitle && <AppText variant="small" muted style={{ textAlign: 'center' }}>{book.subtitle}</AppText>}
         </View>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-          <AppText variant="mono" muted style={{ fontSize: 14, lineHeight: 20 }}>{book.era}</AppText>
-          <Mark free={!!text} />
-        </View>
-        {!!text && !!index && <AppText variant="mono" muted style={{ fontSize: 13, lineHeight: 19, textAlign: 'center' }}>{bookFacts(index.chapters, index.words)}</AppText>}
+        <KindMark kind={book.kind} />
+        <AppText variant="mono" muted style={{ fontSize: 13, lineHeight: 19, textAlign: 'center' }}>{bookFacts(book.chapters.length, book.words)}</AppText>
       </View>
-      <AppText variant="body">{book.blurb}</AppText>
+      <AppText variant="body">{book.description}</AppText>
+      <BookNotice text={noticeFor(book.kind)} />
 
       {text && target && nav ? (
         <>
@@ -145,7 +144,7 @@ function Page({ book, notice }: { book: CatalogBook; notice?: string }) {
             {!resume.fresh && (
               <AppText variant="mono" muted style={{ fontSize: 13, lineHeight: 19, textAlign: 'center' }}>{[nav.part ? partName(nav.part) : null, positionLine(nav)].filter(Boolean).join(' · ')}</AppText>
             )}
-            <AppText variant="accent" color={role.accentText} style={{ textAlign: 'center' }}>{PAGE_NOTE}</AppText>
+            <AppText variant="accent" color={role.accentText} style={{ textAlign: 'center' }}>{pageNote(book.kind)}</AppText>
           </View>
           <View style={{ gap: 12 }}>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'baseline', justifyContent: 'space-between', columnGap: 12 }}>
@@ -162,21 +161,23 @@ function Page({ book, notice }: { book: CatalogBook; notice?: string }) {
                 )}
                 <Card style={{ padding: 0, overflow: 'hidden' }}>
                   {g.entries.map((e, i) => (
-                    <TocRow key={e.id} entry={e} first={i === 0} read={readSet.has(e.id)} here={!!place && place.c === e.id} onOpen={open} />
+                    <TocRow key={e.id} entry={e} minutes={minutes.get(e.id)} first={i === 0} read={readSet.has(e.id)} here={!!place && place.c === e.id} onOpen={open} />
                   ))}
                 </Card>
               </View>
             ))}
           </View>
-          <View style={{ gap: 4 }}>
-            <AppText variant="mono" muted style={{ fontSize: 12, lineHeight: 16, letterSpacing: 1.5, textTransform: 'uppercase' }}>The edition</AppText>
-            <AppText variant="caption" muted>{text.credit}</AppText>
-          </View>
+          {!!text.credit && (
+            <View style={{ gap: 4 }}>
+              <AppText variant="mono" muted style={{ fontSize: 12, lineHeight: 16, letterSpacing: 1.5, textTransform: 'uppercase' }}>Credit</AppText>
+              <AppText variant="caption" muted>{text.credit}</AppText>
+            </View>
+          )}
         </>
       ) : (
         <Card style={{ gap: 8 }}>
-          <AppText variant="h4" accessibilityRole="header">{NOT_YET_TITLE}</AppText>
-          <AppText variant="small">{NOT_YET_TEXT}</AppText>
+          <AppText variant="h4" accessibilityRole="header">{UNREADABLE_TITLE}</AppText>
+          <AppText variant="small">{UNREADABLE_TEXT}</AppText>
         </Card>
       )}
     </Screen>

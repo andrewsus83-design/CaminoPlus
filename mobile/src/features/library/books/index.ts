@@ -46,7 +46,8 @@ export type CatalogBook = {
   route_slug?: string;
 };
 
-export type BookChapter = { id: string; title: string; blocks: Block[] };
+/** A chapter's text. `part` (a heading over several chapters) is for a book that has parts; none of the books has any today, and the page and the reader draw one when it is there. */
+export type BookChapter = { id: string; title: string; part?: string; blocks: Block[] };
 
 /** Where the passages of a book of readings come from. The tool keeps these five of the seven fields of book.json (the id and the link are for the Licences screen, sources.ts). */
 export type BookSource = { work: string; author: string; translator?: string; year?: string; licence: string };

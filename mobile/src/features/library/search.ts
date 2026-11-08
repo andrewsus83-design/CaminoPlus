@@ -1,9 +1,9 @@
 // Searching the Library, and picking out the bookmarked rows, as pure functions: no React, no React Native, so plain node
 // tests cover all of it (npm run test:library).
 //
-// This file searches the ROWS: for a book of the Bible its name, its part (Old Testament, Deuterocanon, New Testament) and its line; for one of
-// the twelve books its title, its author, its era and its blurb; and the name of the tab itself, so "bible" lists all the Bible rows and "books" the
-// twelve. It looks at both tabs at once and answers with the rows grouped by tab: one list, nothing to switch to. Notes (the diary) are not searched
+// This file searches the ROWS: for a book of the Bible its name, its part (Old Testament, Deuterocanon, New Testament) and its line; for a book
+// its title, its subtitle, its description and the titles of its chapters; and the name of the tab itself, so "bible" lists all the Bible rows and "books" all the
+// books. It looks at both tabs at once and answers with the rows grouped by tab: one list, nothing to switch to. Notes (the diary) are not searched
 // here. The verses of the Bible are searched by searchText.ts, which is slower (the first search reads the books), so the screen asks it after the
 // keystroke (bible/useVerseSearch.ts) and adds its rows to the third group, Verses.
 //
@@ -16,13 +16,14 @@ import { BIBLE_BOOKS, TESTAMENT_SEARCH, type BibleBook } from './bible/books';
 import { refKey, type Ref } from './bible/ref';
 import { rowOfKey, type TextSource, type VerseRow } from './bible/verseRows';
 import { BOOK_CATALOG, type CatalogBook } from './books/catalog';
+import { kindName } from './books/copy';
 import type { RowTab } from './sample';
 
-/** The three groups of a list of results or of Bookmarks, in the order they are drawn: the books of the Bible, the twelve books, the verses. */
+/** The three groups of a list of results or of Bookmarks, in the order they are drawn: the books of the Bible, the books of the Library, the verses. */
 export const RESULT_GROUPS = ['Bible', 'Books', 'Verses'] as const;
 export type ResultGroup = (typeof RESULT_GROUPS)[number];
 
-/** The rows by group: the books of the Bible, the twelve books, and the verses (a search or a bookmark found). */
+/** The rows by group: the books of the Bible, the books of the Library, and the verses (a search or a bookmark found). */
 export type Hits = { Bible: BibleBook[]; Books: CatalogBook[]; Verses: VerseRow[] };
 
 export const emptyHits = (): Hits => ({ Bible: [], Books: [], Verses: [] });
@@ -53,8 +54,8 @@ const matches = (query: readonly string[], row: readonly string[]): boolean => q
 /** What the search reads of a book of the Bible. */
 const bibleWords = (b: BibleBook): string[] => wordsOf(`Bible ${b.name} ${b.detail ?? ''} ${TESTAMENT_SEARCH[b.testament]}`);
 
-/** What the search reads of one of the twelve books: what the row shows, and "free", which is on every row. The group and the licence notes are not on screen, so they are not read. */
-const bookWords = (b: CatalogBook): string[] => wordsOf(`Books ${b.title} ${b.author} ${b.era} ${b.blurb} free`);
+/** What the search reads of a book: its title, its subtitle, its description, the titles of its chapters and what kind of book it is ("Pilgrim's guide"). */
+const bookWords = (b: CatalogBook): string[] => wordsOf(`Books ${b.title} ${b.subtitle} ${b.description} ${kindName(b.kind)} ${b.chapters.map((c) => c.title).join(' ')}`);
 
 /** The longest query that is repeated back to the person ("Nothing found for ..."): a pasted paragraph must not break the layout. */
 export const QUERY_SHOWN_MAX = 40;

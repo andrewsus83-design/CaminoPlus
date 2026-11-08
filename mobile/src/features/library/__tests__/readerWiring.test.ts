@@ -254,7 +254,7 @@ check('the search of verses never stands between a keystroke and the screen: it 
   const results = code(read('src/features/library/SearchResults.tsx'));
   assert.match(results, /const verses = useVerseSearch\(query\);/);
   assert.match(results, /const goTo = useMemo\(\(\) => parseRef\(query\), \[query\]\);/);
-  assert.match(results, /\{found\.hits\.Books\.some\(\(b\) => !hasBookText\(b\.id\)\) && <SampleNotice title="Coming soon">\{SEARCH_NOTICE\}<\/SampleNotice>\}/, 'the notice only when a book that says Soon is among the results');
+  assert.doesNotMatch(results, /SampleNotice|SEARCH_NOTICE|hasBookText/, 'no notice about books: every book that is found is in the app');
   assert.match(results, /accessibilityLabel=\{`Go to \$\{refLabel\(goTo\)\}`\}\s+onPress=\{\(\) => onOpenVerse\(goTo\)\}/);
   assert.match(results, /\{verses\.state === 'searching' && <AppText variant="caption" muted>\{SEARCHING\}<\/AppText>\}/);
   assert.match(results, /export const SEARCHING = 'Searching…';/);

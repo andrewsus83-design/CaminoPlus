@@ -9,6 +9,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import './bundleShim'; // first: the compiled bookBundle.ts finds the files of the books through it
 
 let n = 0;
 const check = (name: string, fn: () => void) => { fn(); n += 1; console.log(`ok   ${name}`); };
@@ -46,10 +47,11 @@ check('the feature is the files this test expects, so a new one is looked at (an
     `${DIR}/bible/searchCore.ts`, `${DIR}/bible/searchText.ts`,
     `${DIR}/bible/text.ts`, `${DIR}/bible/textCore.ts`, `${DIR}/bible/textTypes.ts`, `${DIR}/bible/webc.generated.ts`,
     `${DIR}/books/BookCover.tsx`, `${DIR}/books/BookPage.tsx`, `${DIR}/books/BookRows.tsx`, `${DIR}/books/BookUi.tsx`, `${DIR}/books/BooksBanner.tsx`, `${DIR}/books/BooksGrid.tsx`,
-    `${DIR}/books/BooksNotice.tsx`, `${DIR}/books/ChapterFooter.tsx`, `${DIR}/books/Reader.tsx`, `${DIR}/books/ReaderBlocks.tsx`, `${DIR}/books/ReaderHeader.tsx`,
-    `${DIR}/books/bookText.ts`, `${DIR}/books/bookTextApi.ts`, `${DIR}/books/bookTextTypes.ts`, `${DIR}/books/books.generated.ts`, `${DIR}/books/catalog.ts`, `${DIR}/books/copy.ts`,
-    `${DIR}/books/cover.ts`, `${DIR}/books/readerType.ts`, `${DIR}/books/reading.ts`, `${DIR}/books/readingStore.ts`, `${DIR}/books/safeText.ts`, `${DIR}/books/typeMetrics.ts`,
+    `${DIR}/books/ChapterFooter.tsx`, `${DIR}/books/Reader.tsx`, `${DIR}/books/ReaderBlocks.tsx`, `${DIR}/books/ReaderHeader.tsx`,
+    `${DIR}/books/catalog.ts`, `${DIR}/books/copy.ts`, `${DIR}/books/cover.ts`, `${DIR}/books/index.ts`, `${DIR}/books/notices.ts`, `${DIR}/books/readerType.ts`, `${DIR}/books/reading.ts`,
+    `${DIR}/books/readingStore.ts`, `${DIR}/books/safeText.ts`, `${DIR}/books/sources.ts`, `${DIR}/books/typeMetrics.ts`,
     `${DIR}/books/useBooksReading.ts`, `${DIR}/books/useReaderSize.ts`, `${DIR}/books/useReadingWriter.ts`,
+    `${DIR}/bookBundle.ts`,
   ].sort());
   for (const f of ['text.ts', 'searchText.ts', 'textTypes.ts']) assert.ok(fs.existsSync(path.join(root, DIR, 'bible', f)), `${f} is the text layer of the Bible: the screens read the words only through it`);
 });
@@ -283,7 +285,8 @@ check('the Bookmarks screen groups the Library rows with the same component as t
   const src = code(read('app/library/bookmarks.tsx'));
   assert.match(src, /<LibraryGroups hits=\{hits\} marks=\{marks\} onOpenBook=\{\(code\) => router\.push\(bookHref\(code\)\)\} onOpenVerse=\{\(ref\) => router\.push\(readerHref\(ref\)\)\} \/>/, 'a book opens its chapters, a verse opens the reader at it');
   assert.match(src, /hitCount\(hits\) > 0 \? \(/);
-  assert.match(src, /hits\.Books\.some\(\(b\) => !hasBookText\(b\.id\)\)\s+\? <SampleNotice title="Coming soon">\{BOOKMARKS_NOTICE\}<\/SampleNotice>\s+: <AppText variant="caption" muted>\{BOOKMARKS_KEPT\}<\/AppText>/, 'the examples notice only when a book of the Books tab is among them');
+  assert.match(src, /<AppText variant="caption" muted>\{BOOKMARKS_KEPT\}<\/AppText>/, 'where they are kept, said once');
+  assert.doesNotMatch(src, /SampleNotice|BOOKMARKS_NOTICE|hasBookText/, 'no notice about books: every book kept here is in the app');
   assert.match(src, /LIBRARY_BOOKMARKS_EMPTY/);
   const tabs = code(read(`${DIR}/LibraryTabs.tsx`));
   assert.match(tabs, /\{hitGroups\(hits\)\.map\(\(group\) => \(/, 'a group that has no row in it is not drawn');

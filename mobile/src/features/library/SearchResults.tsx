@@ -3,15 +3,12 @@ import { Pressable, View } from 'react-native';
 import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
 import { Pill } from '@/components/Pill';
-import { SampleNotice } from '@/components/SampleNotice';
 import { Card } from '@/components/ui';
 import { radius, role, shadowStyle } from '@/theme';
 import { refLabel } from './bible/order';
 import { parseRef, type Ref } from './bible/ref';
 import { useVerseSearch } from './bible/useVerseSearch';
-import { hasBookText } from './books/bookText';
 import { LibraryGroups } from './LibraryTabs';
-import { SEARCH_NOTICE } from './sample';
 import { resultsLine, searchLibrary } from './search';
 import type { LibraryMarks } from './useLibraryBookmarks';
 
@@ -22,10 +19,9 @@ export const SEARCHING = 'Searching…';
 
 /**
  * What the Library shows while something is typed in the search field, in place of the banner and the tabs: how many were found, and the rows grouped
- * (the books of the Bible, the twelve books, the verses). The rows are found at once (a pure function, search.ts, run again for every letter); the verses are
+ * (the books of the Bible, the books of the Library, the verses). The rows are found at once (a pure function, search.ts, run again for every letter); the verses are
  * found after the keystroke, when the typing has paused, and never in the way of it (bible/useVerseSearch.ts), with a quiet "Searching…" while that runs. A
- * reference that is typed ("Ps 121", "john 3:16") is offered first as a card that goes straight to it. One Preview notice, only when books of the Books tab
- * are among the results (they are examples; the Bible is real). Nothing found is a calm sentence with a way back (Clear search), never a blank.
+ * reference that is typed ("Ps 121", "john 3:16") is offered first as a card that goes straight to it. No notice: what is found is in the app. Nothing found is a calm sentence with a way back (Clear search), never a blank.
  */
 export function SearchResults({ query, marks, onClear, onOpenBook, onOpenVerse }: { query: string; marks: LibraryMarks; onClear: () => void; onOpenBook: (code: string) => void; onOpenVerse: (ref: Ref) => void }) {
   const found = useMemo(() => searchLibrary(query), [query]);
@@ -36,7 +32,6 @@ export function SearchResults({ query, marks, onClear, onOpenBook, onOpenVerse }
   const looking = verses.state === 'waiting' || verses.state === 'searching';
   return (
     <>
-      {found.hits.Books.some((b) => !hasBookText(b.id)) && <SampleNotice title="Coming soon">{SEARCH_NOTICE}</SampleNotice>}
       {goTo && (
         <Pressable
           accessibilityRole="button"

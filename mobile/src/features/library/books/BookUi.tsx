@@ -1,4 +1,4 @@
-import { Pressable } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { AppText } from '@/components/AppText';
 import { Icon, type IconName } from '@/components/Icon';
 import { c, radius, role } from '@/theme';
@@ -19,6 +19,16 @@ export function ReadButton({ label, spoken, hint, onPress }: { label: string; sp
     >
       <AppText variant="label" color={role.onHighlight} style={{ textAlign: 'center' }}>{label}</AppText>
     </Pressable>
+  );
+}
+
+/** The notice every book page shows (notices.ts says what it says): small and plain, in a quiet box with a flag, so that it is seen and is not an alarm. */
+export function BookNotice({ text }: { text: string }) {
+  return (
+    <View accessibilityRole="summary" style={{ flexDirection: 'row', gap: 12, padding: 14, borderRadius: radius.lg, backgroundColor: role.sunken, alignItems: 'flex-start' }}>
+      <Icon name="flag" color={role.muted} size={20} />
+      <AppText variant="small" style={{ flex: 1, minWidth: 0 }}>{text}</AppText>
+    </View>
   );
 }
 
