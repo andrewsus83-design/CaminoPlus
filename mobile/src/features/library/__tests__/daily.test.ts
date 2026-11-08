@@ -14,7 +14,9 @@ import {
 import { CARD_PAD, COLUMNS, GRID_MAX, TOUCH, calendarMetrics } from '../daily/layout';
 import { DAILY_NOTICE, SAMPLE_READING, SAMPLE_REFLECTION, readingFor } from '../daily/sample';
 import { BOOKMARK_DAY, DAILY_GROUP, UNBOOKMARK_DAY, dailyKey, dailyTitle } from '../daily/bookmarks';
-import { dayContent } from '../daily/content';
+import { SAMPLE_CITATION, dayContent } from '../daily/content';
+import { COLOUR_NAMES, LITURGY_NOTE, RANK_NAMES, SEASON_NAMES, liturgicalDay } from '../daily/liturgy';
+import { WEEKDAY_LETTERS, canMoveWeek, dayCellLabel, nextWeekLabel, previousWeekLabel, weekDays, weekSpoken, weekTitle } from '../daily/week';
 import { arrows, dailyReducer, initDaily, type DailyAction, type DailyState } from '../daily/state';
 import './liturgy.test'; // the liturgical calendar (daily/liturgy.ts): its own file, run here so no script has to name it
 import './weekstrip.test'; // the week strip, the date of a bookmark, the readings provider and the bookmark key of a day: its own file, run here too
@@ -796,75 +798,157 @@ const design = fs.readFileSync(path.join(root, '..', 'design', 'index.html'), 'u
 const group = design.slice(design.indexOf('id="daily-reading"'), design.indexOf('<!-- =================================================================== ICONS -->'));
 const phones = group.split('<div class="phone-wrap">').slice(1);
 const labelOf = (p: string) => /<p class="phone-label"><b>([^<]+)<\/b>/.exec(p)?.[1] ?? '';
-const plain = (s: string) => s.replace(/&nbsp;/g, '\u00A0').replace(/&amp;/g, '&');
-const PHONE_LABELS = ['Daily reading', 'Daily reading · Another day', 'Daily reading · The reading', 'Daily reading · Dark', 'Daily reading · Dark, the reading', 'Daily reading · 320 wide', 'Daily reading · The last month'];
+const plain = (s: string) => s.replace(/&nbsp;/g, ' ').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&amp;/g, '&');
+// NEW SHAPE: the page draws the v2 screen (the header row with the two buttons, the week strip, the liturgical card, the Preview notice, the readings, the reflection, the
+// calendar sheet) in light and in dark, the 320 phone, and the Bookmarks screen with a bookmarked day, instead of the v1 screen with its month calendar
+const PHONE_LABELS = [
+  'Daily reading', 'Daily reading · Another day', 'Daily reading · The reading', 'Daily reading · Calendar', 'Daily reading · Dark', 'Daily reading · Dark, the reading', 'Daily reading · Dark, calendar',
+  'Daily reading · 320 wide', 'Daily reading · In Bookmarks',
+];
+const SCREENS = phones.filter((p) => labelOf(p) !== 'Daily reading · In Bookmarks');
+const BOOKMARKS_PHONE = phones.find((p) => labelOf(p) === 'Daily reading · In Bookmarks') ?? '';
+const TODAY = day(2026, 11, 8);
 
-check('the design page has the Daily reading phones, in a group of their own at the end of the Screens section: light, dark, the reading, the 320 phone and the last month', () => {
+check('the design page has the Daily reading phones, in a group of their own at the end of the Screens section: light, dark, the reading, the calendar sheet, the 320 phone and the Bookmarks screen', () => {
   assert.ok(group.length > 20000, 'the group was not found in design/index.html');
   assert.deepEqual(phones.map(labelOf), PHONE_LABELS);
   assert.equal(design.split('id="daily-reading"').length, 2, 'the group is there once');
   assert.ok(design.indexOf('id="daily-reading"') > design.indexOf('<b>Business · Dashboard</b>') && design.indexOf('id="daily-reading"') < design.indexOf('id="icons"'), 'after the last phone of Screens, before Icons');
-  assert.equal((phones.filter((p) => /class="phone dk"/.test(p))).length, 2, 'two dark phones');
+  assert.equal((phones.filter((p) => /class="phone dk"/.test(p))).length, 3, 'three dark phones');
   assert.equal((phones.filter((p) => /style="width:320px"/.test(p))).length, 1, 'one 320 phone');
+  assert.equal((phones.filter((p) => /class="dr-scrim"/.test(p))).length, 2, 'the calendar sheet, in light and in dark');
   const labels = [...design.matchAll(/<p class="phone-label"><b>([^<]+)<\/b>/g)].map((m) => m[1]);
   assert.equal(new Set(labels).size, labels.length, 'no two phones of the page have the same label (render_screens.mjs finds a picture by its label)');
+  assert.doesNotMatch(group, /dr-cal fit|<h1 class="scr-title" style="margin:0">Daily reading<\/h1>/, 'the v1 screen (the title on a line of its own, the month calendar as the body) is gone');
 });
 
-check('each phone draws the calendar of the app: the title, Today, the arrows with their labels (off at the end), the weekdays, and the days with the labels the app says, in the places the app draws them', () => {
-  const today = day(2026, 11, 8);
-  const range = rangeAround(today);
-  const chosen: Ymd[] = [];
-  phones.forEach((p, i) => {
+check('each phone draws the screen of the app: the header row (Back, the title, the calendar, the bookmark), the week strip with its seven days, the arrows and Today, the liturgical card, the notice, the readings and the reflection', () => {
+  const range = rangeAround(TODAY);
+  const iso = (x: Ymd) => `${x.y}-${String(x.m).padStart(2, '0')}-${String(x.d).padStart(2, '0')}`;
+  const picked: Ymd[] = [];
+  SCREENS.forEach((p, i) => {
     const where = `phone ${i + 1} (${labelOf(p)})`;
-    const [, , d, monthName, y] = /aria-level="2" aria-label="(?:Today, )?(\w+) (\d+) (\w+) (\d{4})"/.exec(p) ?? [];
-    const selected = day(Number(y), MONTHS.indexOf(monthName as (typeof MONTHS)[number]) + 1, Number(d));
-    assert.ok(isValidDay(selected), `${where}: the day of the heading`);
-    chosen.push(selected);
-    const shown = /<span class="m" role="heading" aria-level="3">(\w+) (\d{4})<\/span>/.exec(p);
-    assert.ok(shown, `${where}: the month title`);
-    const month: Ym = { y: Number(shown![2]), m: MONTHS.indexOf(shown![1] as (typeof MONTHS)[number]) + 1 };
-    assert.ok(month.m >= 1 && monthInRange(month, range), `${where}: a month the calendar goes to`);
-    assert.match(p, /<button class="dr-today" aria-label="Today">Today<\/button>/, where);
-    // the arrows: where they go, and "disabled" with the plain name when there is nowhere to go
-    const arrow = (label: string, on: boolean) => on ? `<button class="dr-arrow" aria-label="${label}">` : `<button class="dr-arrow" disabled aria-label="${label}">`;
-    assert.ok(p.includes(arrow(previousMonthLabel(month, range), canGoBack(month, range))), `${where}: the back arrow`);
-    assert.ok(p.includes(arrow(nextMonthLabel(month, range), canGoForward(month, range))), `${where}: the forward arrow`);
-    assert.match(p, /<div class="dr-week" aria-hidden="true"><span>Mo<\/span><span>Tu<\/span><span>We<\/span><span>Th<\/span><span>Fr<\/span><span>Sa<\/span><span>Su<\/span><\/div>/, where);
-    // the 42 places, in order: an empty one, or a day with the label, the ring and the fill that the app gives it
-    const grid = monthGrid(month).flat();
-    const places = [...p.matchAll(/<(?:button class="dr-d([^"]*)" aria-label="([^"]+)"><span class="k">(\d+)<\/span><\/button>|span class="dr-d"><\/span>)/g)];
-    assert.equal(places.length, 42, `${where}: six rows of seven`);
-    places.forEach((m, k) => {
-      const cell = grid[k];
-      if (!cell) { assert.equal(m[2], undefined, `${where}: place ${k} is empty`); return; }
-      const isToday = sameDay(cell, today), isSelected = sameDay(cell, selected);
-      assert.equal(m[2], dayLabel(cell, { today: isToday, selected: isSelected }), `${where}: place ${k}`);
-      assert.equal(m[3], String(cell.d));
-      assert.equal(/\bsel\b/.test(m[1]), isSelected, `${where}: the fill of ${cell.d}`);
-      assert.equal(/\btoday\b/.test(m[1]), isToday, `${where}: the ring of ${cell.d}`);
+    // the header: one row, in this order, with the labels the app gives, the bookmark said and exposed the way the app does
+    const header = /<div class="dr-hd">(.*?)<\/div>/s.exec(p)?.[1] ?? '';
+    assert.ok(header, `${where}: the header row`);
+    const bookmarked = /<button class="dr-hb on" aria-label="Remove bookmark" aria-selected="true">/.test(header);
+    assert.deepEqual([...header.matchAll(/aria-label="([^"]+)"/g)].map((m) => m[1]), ['Back', 'Open calendar', bookmarked ? UNBOOKMARK_DAY : BOOKMARK_DAY], `${where}: the three buttons`);
+    assert.ok(header.indexOf('#i-back') < header.indexOf('>Daily reading</h1>') && header.indexOf('>Daily reading</h1>') < header.indexOf('#i-calendar') && header.indexOf('#i-calendar') < header.indexOf('#i-bookmark'), `${where}: Back, the title, the calendar, the bookmark`);
+    if (!bookmarked) assert.match(header, /<button class="dr-hb" aria-label="Bookmark this day" aria-selected="false">/, where);
+    // the strip: seven days, the days of the week of the picked one, each with the label, letter, number and dot colour the app gives it
+    const cells = [...p.matchAll(/<button class="dr-c([^"]*)" aria-label="([^"]+)" aria-selected="(true|false)"><span class="w">(\w)<\/span><span class="k">(\d+)<\/span><span class="dr-dot (\w+)"><\/span><\/button>/g)];
+    assert.equal(cells.length, 7, `${where}: exactly seven days`);
+    const selectedAt = cells.findIndex((m) => /\bsel\b/.test(m[1]));
+    assert.ok(selectedAt >= 0, `${where}: one day is picked`);
+    assert.equal(cells.filter((m) => /\bsel\b/.test(m[1])).length, 1);
+    const title = /<span class="m" role="heading" aria-level="3" aria-label="([^"]+)">([^<]+)<\/span>/.exec(p);
+    assert.ok(title, `${where}: the title of the week`);
+    // the picked day is the one whose label is that of the picked cell and whose week has the title of the strip (a label has no year, the title has)
+    let found: Ymd | null = null;
+    for (let k = toDays(day(2021, 1, 1)); k <= toDays(day(2031, 12, 31)) && !found; k++) {
+      const x = fromDays(k);
+      if (dayCellLabel(x, sameDay(x, TODAY)) === plain(cells[selectedAt][2]) && weekTitle(weekDays(x)) === title![2]) found = x;
+    }
+    assert.ok(found, `${where}: the picked day`);
+    const guess: Ymd = found!;
+    picked.push(guess);
+    const week = weekDays(guess);
+    assert.equal(weekdayIndex(week[0]), 0, 'Monday first');
+    assert.equal(title![1], weekSpoken(week), `${where}: the title of the week, said aloud`);
+    assert.equal(title![2], weekTitle(week), `${where}: the title of the week`);
+    week.forEach((x, k) => {
+      const isToday = sameDay(x, TODAY), isSelected = sameDay(x, guess);
+      const [, classes, label, state, letter, number, colour] = cells[k];
+      assert.equal(plain(label), dayCellLabel(x, isToday), `${where}: the label of ${x.d}`);
+      assert.equal(/\bsel\b/.test(classes), isSelected, `${where}: the fill of ${x.d}`);
+      assert.equal(state === 'true', isSelected);
+      assert.equal(/\btoday\b/.test(classes), isToday, `${where}: the ring of ${x.d}`);
+      assert.equal(letter, WEEKDAY_LETTERS[k]);
+      assert.equal(number, String(x.d));
+      assert.equal(colour, liturgicalDay(x.y, x.m, x.d).colour, `${where}: the dot of ${x.d}`);
     });
-    const head = readingHeading(selected, sameDay(selected, today));
-    assert.ok(p.includes(`aria-label="${head.label}"><div class="dr-eyebrow">${head.eyebrow}</div><div class="dr-title">${head.title}</div>`), `${where}: the heading of the day`);
+    const away = !sameDay(guess, TODAY);
+    assert.equal(/<span class="m" role="heading" aria-level="3" aria-label="[^"]+">[^<]+<\/span><button class="dr-today" aria-label="Today">Today<\/button>/.test(p), away, `${where}: Today shows when another day is picked`);
+    const arrow = (label: string, on: boolean) => on ? `<button class="dr-arrow" aria-label="${label}">` : `<button class="dr-arrow" disabled aria-label="${label}">`;
+    assert.ok(p.includes(arrow(previousWeekLabel(guess, range), canMoveWeek(guess, -1, range))), `${where}: the back arrow`);
+    assert.ok(p.includes(arrow(nextWeekLabel(guess, range), canMoveWeek(guess, 1, range))), `${where}: the forward arrow`);
+    // the liturgical card
+    const l = liturgicalDay(guess.y, guess.m, guess.d);
+    assert.ok(p.includes(`<div class="dr-eyebrow">Liturgical day</div><div class="dr-title" role="heading" aria-level="3">${l.title}</div>`), `${where}: the name of the day`);
+    assert.ok(p.includes(`<span class="l">Season</span><span class="v"><i class="dr-sw ${l.colour}"></i>${SEASON_NAMES[l.season]} · ${COLOUR_NAMES[l.colour]}</span>`), `${where}: the season and its colour`);
+    assert.ok(p.includes(`<span class="l">Rank</span><span class="v">${RANK_NAMES[l.rank]}</span>`), `${where}: the rank`);
+    assert.ok(p.includes(`<span class="l">Sunday cycle</span><span class="v">Year ${l.sundayCycle}</span>`), `${where}: the Sunday cycle`);
+    assert.ok(p.includes(`<span class="l">Weekday cycle</span><span class="v">Year ${l.weekdayCycle}</span>`), `${where}: the weekday cycle`);
+    assert.ok(p.includes(`<div class="dr-cap">${LITURGY_NOTE}</div>`), `${where}: the small print`);
+    // the order: header, strip, card, notice, readings, reflection, the one handwritten line
+    const at = (s: string) => p.indexOf(s);
+    assert.ok(at('class="dr-hd"') < at('class="dr-strip') && at('class="dr-strip') < at('class="cp-card dr-lit"') && at('class="cp-card dr-lit"') < at('class="lib-notice"') && at('class="lib-notice"') < at('dr-readings') && at('dr-readings') < at('dr-refl') && at('dr-refl') < at('class="dr-hand"'), `${where}: the order of the screen`);
+    assert.equal((p.match(/class="dr-hand"/g) ?? []).length, 1, 'Caveat is used once');
   });
-  assert.deepEqual(chosen, [day(2026, 11, 8), day(2026, 11, 14), day(2026, 11, 14), day(2026, 11, 14), day(2026, 11, 14), day(2026, 11, 30), day(2026, 11, 8)], 'today selected on the first, another day on the others, and the reading stays on today in the last month');
-  assert.match(phones[6], /<span class="m" role="heading" aria-level="3">November 2031<\/span>/, 'the last phone is the last month the calendar goes to');
-  assert.ok(phones[6].includes('<button class="dr-arrow" disabled aria-label="Next month">'), 'the forward arrow is off there');
+  // today picked on the first, another day on the second, and the reading phones keep today
+  assert.deepEqual(picked.map(iso), ['2026-11-08', '2026-11-22', '2026-11-08', '2026-11-08', '2026-11-08', '2026-11-08', '2026-11-08', '2026-12-13']);
+  assert.match(SCREENS[1], /<button class="dr-hb on" aria-label="Remove bookmark" aria-selected="true">/, 'a bookmarked day shows its bookmark filled');
+  assert.match(SCREENS[7], /<div class="dr-strip fit">/, 'the card of the 320 phone reaches into the margins');
+  assert.ok(SCREENS.filter((_, i) => i !== 7).every((p) => /<div class="dr-strip">/.test(p)), 'the others stay inside them');
+  assert.ok(SCREENS[1].includes('white'), 'Christ the King is white: its dot has a ring on the page');
+  assert.match(group, /\.dr-dot\.white, \.dr-sw\.white \{ background: var\(--dr-white\); box-shadow: inset 0 0 0 1\.5px var\(--cp-text-muted\); \}/);
 });
 
-check('each phone has the same sample as the app, word for word: the notice, the passage, the reflection and the labels', () => {
-  for (const p of phones) {
+check('the calendar sheet of the page is the one of the app: a dimmed page, the sheet with "Calendar" and Close, and the month calendar of the picked day with its Today', () => {
+  for (const p of SCREENS.filter((q) => /class="dr-scrim"/.test(q))) {
+    assert.match(p, /<div class="dr-scrim"><\/div><div class="dr-sheet" role="dialog" aria-label="Calendar"><div class="dr-sh2"><span class="h" role="heading" aria-level="3">Calendar<\/span><button class="dr-close" aria-label="Close calendar">Close<\/button><\/div><div class="dr-cal">/);
+    assert.match(p, /<span class="m" role="heading" aria-level="3">November 2026<\/span><button class="dr-today" aria-label="Today">Today<\/button>/);
+    const days = [...p.matchAll(/<button class="dr-d([^"]*)" aria-label="([^"]+)"><span class="k">(\d+)<\/span><\/button>/g)];
+    assert.equal(days.length, 30, 'the 30 days of November');
+    assert.ok(days.some((m) => m[2] === 'Sunday 8 November 2026, today, selected' && /\bsel\b/.test(m[1]) && /\btoday\b/.test(m[1])), 'today is picked');
+    assert.match(p, /<div class="dr-week" aria-hidden="true"><span>Mo<\/span><span>Tu<\/span><span>We<\/span><span>Th<\/span><span>Fr<\/span><span>Sa<\/span><span>Su<\/span><\/div>/);
+  }
+  assert.match(group, /\.dr-scrim \{ position: absolute; inset: 0; background: rgba\(20,54,93,\.45\); z-index: 8; \}/, 'the dimming of the app (theme scrim): navy at 45 %');
+  assert.match(read('src/theme/index.ts'), /export const scrim = 'rgba\(20,54,93,0\.45\)';/);
+});
+
+check('each phone has the same samples as the app, word for word: the notice, the Sample tags, the readings with their citations (the Psalm opened where the page opens it), the reflection and its source', () => {
+  for (const p of SCREENS) {
     assert.ok(p.includes(`<div class="p">${DAILY_NOTICE}</div>`), 'the Preview notice');
     assert.ok(p.includes('<div class="h">Preview</div>'));
-    assert.ok(p.includes(`>${SAMPLE_READING.reference}</div>`), 'the reference');
-    assert.ok(p.includes(`${SAMPLE_READING.translation} · ${SAMPLE_READING.licence.replace(/ /g, '&nbsp;')}`), 'the translation, named');
-    assert.ok(p.includes(`<div class="note">${SAMPLE_READING.title}</div>`));
-    const verses = [...p.matchAll(/<p class="dr-v"><i>(\d+)<\/i> ([^<]+)<\/p>/g)].map((m) => ({ n: Number(m[1]), text: plain(m[2]) }));
-    assert.deepEqual(verses, SAMPLE_READING.verses.map((v) => ({ ...v })), 'the verses');
-    assert.ok(p.includes(`<p class="dr-text">${SAMPLE_REFLECTION.text}</p>`), 'the reflection');
-    assert.ok(p.includes('<span class="dr-eyebrow">Sample reading</span><span class="lib-chip sample">Sample</span>'));
+    const rows = [...p.matchAll(/<button class="dr-rb" aria-expanded="(true|false)" aria-label="([^"]+)"><span class="tx"><span class="t">([^<]+)<\/span><span class="c">([^<]+)<\/span><\/span>/g)];
+    const kinds = rows.map((m) => m[3]);
+    const hasSecond = kinds.includes('Second reading');
+    assert.deepEqual(kinds, hasSecond ? ['First reading', 'Psalm', 'Second reading', 'Gospel acclamation', 'Gospel'] : ['First reading', 'Psalm', 'Gospel acclamation', 'Gospel'], 'the readings of the day, in order');
+    for (const m of rows) assert.equal(plain(m[2]), `${m[3]}, ${m[4]}`, 'what a reading says to a screen reader');
+    assert.deepEqual(rows.filter((m) => m[3] !== 'Psalm').map((m) => m[4]), rows.filter((m) => m[3] !== 'Psalm').map(() => SAMPLE_CITATION), 'no citation is made up: the rows without text say they are samples');
+    assert.equal(rows.find((m) => m[3] === 'Psalm')![4], SAMPLE_READING.reference);
+    assert.equal((p.match(/class="lib-chip sample">Sample<\/span>/g) ?? []).length, 2, 'the readings and the reflection are each tagged as a sample');
+    assert.ok(p.includes('<span class="dr-eyebrow">Readings</span><span class="lib-chip sample">Sample</span>'));
     assert.ok(p.includes(`<span class="dr-eyebrow">${SAMPLE_REFLECTION.label}</span><span class="lib-chip sample">Sample</span>`));
-    assert.ok(p.includes(`aria-level="3">${SAMPLE_REFLECTION.title}</div>`));
+    const reflection = dayContent('2026-11-08').reflections[0];
+    assert.ok(p.includes(`<div class="dr-title" role="heading" aria-level="3">${SAMPLE_REFLECTION.title}</div><div class="dr-ps">${reflection.paragraphs.map((t) => `<p class="dr-text">${t}</p>`).join('')}</div><div class="dr-cap">${reflection.source}</div>`), 'the reflection: its paragraphs and its source');
+    assert.equal(reflection.paragraphs.join(' '), SAMPLE_REFLECTION.text);
+    const opened = rows.filter((m) => m[1] === 'true');
+    if (opened.length) {
+      assert.deepEqual(opened.map((m) => m[3]), ['Psalm']);
+      const verses = [...p.matchAll(/<p class="dr-v"><i>(\d+)<\/i> ([^<]+)<\/p>/g)].map((m) => ({ n: Number(m[1]), text: plain(m[2]) }));
+      assert.deepEqual(verses, SAMPLE_READING.verses.map((v) => ({ ...v })), 'the verses');
+      assert.ok(p.includes(`<div class="dr-cap">${SAMPLE_READING.translation} · ${SAMPLE_READING.licence} · an example, not the psalm of this day</div>`), 'the credit says it is an example');
+    } else assert.doesNotMatch(p, /class="dr-v"/);
   }
+  assert.equal(SCREENS.filter((p) => /aria-expanded="true"/.test(p)).length, 2, 'the two reading phones open the Psalm');
+  assert.equal(SCREENS.filter((p) => /data-scroll-card="1"/.test(p)).length, 2);
+});
+
+check('the Bookmarks phone draws the part of the app: Library as it was, then "Daily reading" with a row for each bookmarked day (its date, its liturgical name, its bookmark), then Posts', () => {
+  const p = BOOKMARKS_PHONE;
+  assert.ok(p.length > 1000);
+  assert.ok(p.indexOf('<h4 class="lib-h">Library</h4>') < p.indexOf(`<h4 class="lib-h" style="margin-top:8px">${DAILY_GROUP}</h4>`) && p.indexOf(`>${DAILY_GROUP}</h4>`) < p.indexOf('style="margin-top:8px">Posts</h4>'), 'Library, Daily reading, Posts');
+  const rows = [...p.matchAll(/<div class="lib-row"><div class="lib-tx"><div class="t">([^<]+)<\/div><div class="n">([^<]+)<\/div><\/div><button class="lib-mark on" aria-label="([^"]+)">/g)];
+  assert.deepEqual(rows.map((m) => [m[1], plain(m[2]), plain(m[3])]), [
+    ['Sunday 22 November 2026', 'Our Lord Jesus Christ, King of the Universe', 'Remove bookmark: Daily reading, Sunday 22 November 2026'],
+    ['Sunday 8 November 2026', '32nd Sunday in Ordinary Time', 'Remove bookmark: Daily reading, Sunday 8 November 2026'],
+  ]);
+  for (const m of rows) assert.ok(/^(Mon|Tues|Wednes|Thurs|Fri|Satur|Sun)day \d+ \w+ \d{4}$/.test(m[1]));
+  assert.equal(formatDate(day(2026, 11, 22)), rows[0][1]);
+  assert.equal(dailyTitle(day(2026, 11, 22)), plain(rows[0][2]));
+  assert.match(p, /Nothing bookmarked in the Library yet\. Tap the bookmark on a row to keep it here\./, 'the Library part says what it said before');
 });
 
 check('the dark phones are the dark palette of tokens.json, role by role (the page has no second copy of it that could drift)', () => {
@@ -885,19 +969,61 @@ check('the dark phones are the dark palette of tokens.json, role by role (the pa
   assert.deepEqual(props, expected);
 });
 
-check('the 320 phone is drawn as the app draws it there: the card reaches 10 px into each margin, the phone is 320 wide, and the same screen in 390 does not', () => {
-  const small = phones[5];
+check('the five colours of the liturgical year are the theme\'s, in light and in dark, and each keeps 3 : 1 on the page and on a card in both modes (the white one has a ring)', () => {
+  const theme = read('src/theme/index.ts');
+  const grab = (name: string) => Object.fromEntries([...(new RegExp(`const ${name} = \\{([^}]*)\\}`).exec(theme)?.[1] ?? '').matchAll(/(\w+): '(#[0-9A-Fa-f]{6})'/g)].map((m) => [m[1], m[2].toUpperCase()]));
+  const light = grab('LITURGICAL_LIGHT'), dark = grab('LITURGICAL_DARK');
+  assert.deepEqual(Object.keys(light), ['green', 'violet', 'white', 'red', 'rose']);
+  assert.deepEqual(Object.keys(dark), ['green', 'violet', 'white', 'red', 'rose']);
+  const css = (selector: string) => Object.fromEntries([...(new RegExp(`${selector} \\{ (--dr-green[^}]*)\\}`).exec(group)?.[1] ?? '').matchAll(/--dr-(\w+):(#[0-9A-Fa-f]{6})/g)].map((m) => [m[1], m[2].toUpperCase()]));
+  assert.deepEqual(css('\\.phone'), light, 'the page draws the light dots with the theme\'s colours');
+  assert.deepEqual(css('\\.phone\\.dk'), dark, 'and the dark ones');
+  assert.match(theme, /Object\.assign\(liturgical, scheme === 'dark' \? LITURGICAL_DARK : LITURGICAL_LIGHT\);/, 'applyScheme swaps them with the rest of the theme');
+  type Tokens = { color: Record<string, string>; role: Record<string, string>; dark: { color: Record<string, string>; role: Record<string, string> } };
+  const tokens = JSON.parse(read('src/theme/tokens.json')) as Tokens;
+  const luminance = (hex: string): number => {
+    const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255).map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  };
+  const contrast = (a: string, b: string): number => { const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x); return (hi + 0.05) / (lo + 0.05); };
+  for (const [mode, colours, palette] of [['light', light, tokens.color], ['dark', dark, { ...tokens.color, ...tokens.dark.color }]] as const) {
+    const page = palette[tokens.role.bg], card = palette[tokens.role.surface];
+    for (const [name, hex] of Object.entries(colours)) {
+      if (name === 'white') { assert.ok(contrast(palette[tokens.role.textMuted], card) >= 3, `${mode}: the ring of the white dot on a card`); continue; }
+      assert.ok(contrast(hex, card) >= 3, `${mode}: ${name} on a card is ${contrast(hex, card).toFixed(2)} : 1`);
+      assert.ok(contrast(hex, page) >= 3, `${mode}: ${name} on the page is ${contrast(hex, page).toFixed(2)} : 1`);
+    }
+  }
+  assert.match(read('src/features/library/daily/WeekStrip.tsx'), /backgroundColor: liturgical\[colour\], borderWidth: colour === 'white' \? 1\.5 : 0, borderColor: role\.muted/);
+});
+
+check('the 320 phone is drawn as the app draws it there: the card reaches 10 px into each margin, the phone is 320 wide, and the same screen in 390 does not; every button and day is 44 or more', () => {
+  const small = SCREENS[7];
   assert.match(small, /<div class="phone" style="width:320px">/);
-  assert.match(small, /<div class="dr-cal fit">/);
-  assert.ok(phones.filter((_, i) => i !== 5).every((p) => /<div class="dr-cal">/.test(p)), 'the others are inside the margins');
   const bleed = calendarMetrics(320, 16).bleed;
   assert.equal(bleed, 10);
-  assert.match(group, new RegExp(`\\.dr-cal\\.fit \\{ margin: 0 -${bleed}px; padding: 8px 0; \\}`), 'the margin of the page is the bleed of layout.ts');
-  assert.match(group, /\.dr-d \{ flex: 1; height: 44px;/, 'a day is 44 high in the page too');
+  assert.match(group, new RegExp(`\\.dr-strip\\.fit \\{ margin: 0 -${bleed}px; padding: 8px 0; \\}`), 'the margin of the page is the bleed of layout.ts');
+  assert.match(group, /\.dr-cal\.fit \{ margin: 0 -10px; padding: 8px 0; \}/, 'and the month calendar of the sheet the same');
+  assert.match(group, /\.dr-c \{ flex: 1; min-height: 84px;/, 'a day of the strip is a seventh of the card and 84 high');
   assert.match(group, /\.dr-arrow \{ width: 44px; height: 44px;/);
-  assert.match(group, /\.dr-head \{ display: flex; align-items: center; min-height: 44px; \}/);
-  assert.match(group, /\.dr-d\.sel \.k \{ background: var\(--cp-action\); color: var\(--cp-on-action\);/);
-  assert.match(group, /\.dr-d\.today \.k \{ box-shadow: inset 0 0 0 2px var\(--cp-action\);/);
+  assert.match(group, /\.dr-hb \{ width: 44px; height: 44px;/, 'the three buttons of the header');
+  assert.match(group, /\.dr-sh \{ display: flex; align-items: center; min-height: 44px; \}/);
+  assert.match(group, /\.dr-d \{ flex: 1; height: 44px;/, 'a day of the month calendar is 44 high in the page too');
+  assert.match(group, /\.dr-rb \{ width: 100%; min-height: 64px;/);
+  assert.match(group, /\.dr-h1 \{ flex: 1; min-width: 0; margin: 0; font-family: var\(--cp-font-title\); font-weight: 600; font-size: 28px; line-height: 34px; letter-spacing: -\.25px; \}/, 'the title is the h3 of the type scale: Fraunces 600, 28 on 34');
+  assert.match(group, /\.dr-c\.sel \.k \{ background: var\(--cp-action\); color: var\(--cp-on-action\);/);
+  assert.match(group, /\.dr-c\.today \.k \{ box-shadow: inset 0 0 0 2px var\(--cp-action\);/);
+  assert.match(group, /\.dr-hand \{[^}]*font-family: var\(--cp-font-accent\)/, 'the one handwritten line');
+});
+
+check('the page and the app keep the same icon: the calendar glyph of Icon.tsx and the symbol i-calendar of the sprite are one drawing', () => {
+  const icon = read('src/components/Icon.tsx');
+  const paths = [...(/\n  calendar: \[([^\]]*)\],/.exec(icon)?.[1] ?? '').matchAll(/'([^']+)'/g)].map((m) => m[1]);
+  assert.equal(paths.length, 3, 'the page, a line under its top, two rings');
+  const sprite = /<symbol id="i-calendar"[^>]*>(.*?)<\/symbol>/.exec(design);
+  assert.ok(sprite, 'the sprite of the design page has no i-calendar');
+  assert.deepEqual([...sprite![1].matchAll(/ d="([^"]+)"/g)].map((m) => m[1]), paths, 'the calendar glyph of the design page and of the app are the same drawing');
+  assert.notDeepEqual(paths, [...(/\n  diary: \[([^\]]*)\],/.exec(icon)?.[1] ?? '').matchAll(/'([^']+)'/g)].map((m) => m[1]), 'not the diary');
 });
 
 console.log(`${n} of ${n} passed`);
