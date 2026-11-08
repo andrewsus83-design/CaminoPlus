@@ -38,7 +38,7 @@ Then the **scenarios** ([scenarios.mjs](scenarios.mjs)), each in light and dark,
 - the gear on Me opens `/settings` (no tab bar there) and Back returns to `/me`, also when Settings was opened from a link;
 - switching light/dark on Settings returns to Settings, and Back goes to Me;
 - Library: its top row is a search field and the Bookmarks button (no title, no diary button); directly under it, before any banner, the two tabs
-  Bible and Books, in that order, and no Notes tab and no gold pen; Bible and Books each have a banner, neither has a notice (the text of the Bible is real, and every book is in the app);
+  Bible and Books, in that order, and no Notes tab, no write card and no chat button; Bible and Books each have a banner, neither has a notice (the text of the Bible is real, and every book is in the app);
   the Books tab lists a cover for every book of the bundle, and shows nothing that is only
   data (rights, links, the id of a source); the banner of the Bible tab (the whole card
   and its "Read today" button) opens `/library/daily`; a search lists what it finds in Bible, Books and Verses (and says "Nothing found
@@ -70,10 +70,23 @@ Then the **scenarios** ([scenarios.mjs](scenarios.mjs)), each in light and dark,
   the book at its start; a link with `?c=`, a chapter and a book that do not exist (and one of the twelve classics of an earlier plan); the ribbon, Bookmarks and the search
   (title, subtitle, chapters); and the same with no signal. The books are read from `mobile/assets/library/catalog.json` (the bundle of `tools/build_books.py`), so every
   scenario works with however many there are;
-- Me: the strip is Notes, Journey, Plan, Health, in that order, and Me opens on Journey with its one gold pen, "Write a journey post"; at 320 px
-  wide the four labels are one row, each on one line, none clipped; Notes is the first sub-tab: it shows the feed ("Notes stay on this phone.",
-  "No notes yet" for the new account) with one gold pen, "Write a note", and not the journey pen; Plan and Health have no pen; Journey has its
-  own again; the note pen opens `/diary/new`, and a note written there is in the feed after Back;
+- Me ([scenarios.mjs](scenarios.mjs) and [me.scenarios.mjs](me.scenarios.mjs)): the strip is Notes, Journey, Plan, Health, in that order, and Me opens on Journey, with the card of the
+  journey and not the card of Notes; at 320 px wide the four labels are one row, each on one line, none clipped;
+  - the header: the right half of the top row of Me has the gear and nothing else (no bell, no inbox button, no badge);
+  - the chat button: ONE gold round button, 60 by 60, floats 16 from the right edge, above the tab bar, on Notes, Journey, Plan and Health, labelled
+    "Inbox, 3 unread" for the full account with its badge ("3") inside the screen; it opens `/inbox` on Messages (a chat is unread) and Back returns to
+    Me; with the unread totals made up in the walk it opens on Messages for a chat or a group, on Notifications when only notifications wait, and on Messages
+    when nothing does, the label has the real number and the badge stops at "99+" (and shows "99" at 99); with no signal it is just "Inbox" with no badge;
+    the Library has neither a chat button nor a write card;
+  - Journey: the first tile of the grid is the card "Write a journey post": one button in the top left, 2 px from the screen edge and from the next tile,
+    the size of a post tile (192 by 341 on a 390 screen, 9:16), its words at least 16 px; the posts follow it (the second post is under the card, in the
+    left column), the second post opens the viewer on that post and the first on the first (the page that is on the screen, never one above or below it),
+    and the card opens `/write`; a pilgrim with no post yet (the account with nothing in it) has the sample journey, whose banner says to tap the first card,
+    with the card in front of the ten samples (the last sample is alone on its row);
+  - Notes is the first sub-tab: its feed starts, right under the strip, with ONE card, "Write a note" (full width, at least 64 high, "Notes stay on this
+    phone." under its title); there is no filter row (no tab named All, Photos and videos or Places, none of those words, no tab list); the empty diary says
+    "No notes yet" with no button of its own; Plan and Health have no card; Journey has its own; the card opens `/diary/new`, and a note written there is
+    in the feed after Back;
 - Stays lists the stays of the stage and one opens with its details;
 - logging out from Settings lands on Welcome;
 - launching the app lands on Welcome (signed out), Onboarding (signed in, no journey) or Me;
@@ -81,8 +94,8 @@ Then the **scenarios** ([scenarios.mjs](scenarios.mjs)), each in light and dark,
   and with an expired login (also with nothing saved: "No signal right now") the app does not wait for the network.
 
 The diary screens and the Notes feed (the first sub-tab of Me) belong to their own features: they are swept (they must load without errors),
-and the scenarios only check where the pen leads, that Notes is the first sub-tab and that a note written there shows up, never what those
-screens contain. The Bible screens are the Bible feature's own, and they run on the real text (Psalm 121, John 1, Psalm 119, Malachi 4, Tobit 1),
+and the scenarios only check where the card leads, that Notes is the first sub-tab, that its feed has the one card and no filter tabs, and that a note written there
+shows up, never what those screens contain. The Bible screens are the Bible feature's own, and they run on the real text (Psalm 121, John 1, Psalm 119, Malachi 4, Tobit 1),
 so those walks fail when the text is missing or the import is wrong. The daily reading has scenarios of its own ([daily.scenarios.mjs](daily.scenarios.mjs)),
 which never name a date (the browser's clock is the phone's, and "today" is found as a person finds it, by the day that says "today"):
 
@@ -197,6 +210,7 @@ Chromium; a test checks they agree). Bump both on purpose, with the tests looked
 | [routes.mjs](routes.mjs) | routes from `mobile/app`, account states from the guards |
 | [plan.mjs](plan.mjs) | which checks exist (route x state x scheme x mode, then the scenarios), the redirect list |
 | [scenarios.mjs](scenarios.mjs) | the walks a person does |
+| [me.scenarios.mjs](me.scenarios.mjs) | the walks of Me: the header with the gear alone, the chat button and where it opens, the card of Journey (also in the sample journey), the card of Notes |
 | [bible.scenarios.mjs](bible.scenarios.mjs) | the walks of the Bible tab and the reader (kept apart so the other walks stay short) |
 | [books.scenarios.mjs](books.scenarios.mjs) | the walks of the Books tab: the covers, a book page, the reader, the place kept on the phone, the notice of each kind |
 | [fixtures.mjs](fixtures.mjs) | the Supabase project, the saved state of the phone, the realtime socket |

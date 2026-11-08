@@ -4,15 +4,17 @@
 import assert from 'node:assert/strict';
 import { existsSync, statSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
+import { LEADING_CELLS, gridRows } from '../gridLayout';
 import { SAMPLE_BANNER, SAMPLE_JOURNEY, SAMPLE_VIEWER_LABEL, isSampleId, sampleId } from '../sampleJourney';
 
 let n = 0;
 const check = (name: string, fn: () => void) => { fn(); n += 1; console.log(`ok   ${name}`); };
 const dir = join(process.cwd(), 'assets', 'journey-sample'); // npm test runs from mobile/
 
-check('an even number of posts, so the two-column grid ends on a full row', () => {
-  assert.equal(SAMPLE_JOURNEY.length % 2, 0);
+check('at least 8 samples; the write card is the first cell of their grid, so ten samples and the card are 11 cells and the last sample stands alone on its row, as it does for any even number of real posts', () => {
   assert.ok(SAMPLE_JOURNEY.length >= 8);
+  assert.equal(SAMPLE_JOURNEY.length, 10);
+  assert.equal(gridRows(SAMPLE_JOURNEY.length + LEADING_CELLS).at(-1)?.length, 1, 'the last row: one tile (by design: the grid already ends on one tile for an odd number of cells)');
 });
 
 check('keys and ids are unique, ids are recognised as samples and real ids are not', () => {
@@ -40,6 +42,8 @@ check('clips are mixed in between stills: several of each, never three clips in 
 check('the labels say Sample and AI-generated (the pictures are never passed off as pilgrims photos)', () => {
   assert.match(SAMPLE_BANNER, /Sample/);
   assert.match(SAMPLE_BANNER, /AI-generated/);
+  assert.match(SAMPLE_BANNER, /Tap the first card to write your own first post\./, 'the way to write is the first card of the grid');
+  assert.doesNotMatch(SAMPLE_BANNER, /\bpen\b/, 'there is no pen on this tab any more: the gold button of Me is the chat button');
   assert.match(SAMPLE_VIEWER_LABEL, /Sample/);
   assert.match(SAMPLE_VIEWER_LABEL, /AI-generated/);
   assert.ok(!SAMPLE_BANNER.includes('—') && !SAMPLE_VIEWER_LABEL.includes('—'), 'no em dashes in the copy');

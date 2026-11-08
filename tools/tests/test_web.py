@@ -141,6 +141,19 @@ class Claims(unittest.TestCase):
         for page, content in HTML.items():
             self.assertNotRegex(content, r"keep working[^.]*stays", page)  # offline stays do not exist yet
 
+    def test_the_me_section_names_the_chat_button_and_the_cards_not_the_gold_button_the_pen_or_the_bell(self):
+        # Me has ONE gold button, the chat button at the bottom right (it opens friends, notifications and messages); writing is a card (the first tile of Journey,
+        # the top of Notes). The bell, the pen button and the gold button that writes are gone from the app, so they must be gone from the words about it.
+        text = html.unescape(re.sub(r"<[^>]+>", " ", self.all_text()))
+        for stale in ("gold button", "pen button", "behind the bell", "gold pen", "Photos and videos"):
+            self.assertNotIn(stale, text, f"the site still says \"{stale}\", which is no longer how Me works")
+        features = HTML["features.html"]
+        for words in ("Tap the card at the top, Write a note,", "tap the first card, Write a journey post,", "behind the chat button at the bottom right: friend requests, notifications, chats and group chats"):
+            self.assertIn(words, features)
+        for alt in ("Me tab, Journey: your posts in a grid, the first card writes a new one, and the chat button at the bottom right opens friends, notifications and messages",
+                    "Me tab, Notes: the card that writes a note, then your private notes, and the chat button at the bottom right"):
+            self.assertIn(f'alt="{alt}"', features)
+
     def test_store_buttons_are_plain_text_without_third_party_logos(self):
         for page, content in HTML.items():
             self.assertIn("iOS: coming soon", content, page)

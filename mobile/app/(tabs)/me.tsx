@@ -21,7 +21,7 @@ import { JourneyGrid } from '@/features/me/JourneyGrid';
 import { SampleJourney } from '@/features/me/SampleJourney';
 import { Highlights, ShowAllBar } from '@/features/me/Highlights';
 import { buildHighlights } from '@/features/me/highlights';
-import { DEFAULT_ME_TAB, ME_FAB, ME_TABS, type MeTab } from '@/features/me/tabs';
+import { DEFAULT_ME_TAB, ME_FAB, ME_TABS, badgeText, inboxLabel, inboxTab, type MeTab } from '@/features/me/tabs';
 import { usePostMedia } from '@/features/me/usePostMedia';
 import { NotesTab } from '@/features/notes/NotesTab';
 import { updateProfile } from '@/lib/api';
@@ -76,7 +76,7 @@ function PlanTracker({ days }: { days: DayT[] }) {
             <View key={d.id} style={{ flexDirection: 'row', gap: 16 }}>
               <View style={{ alignItems: 'center', width: 36 }}>
                 <View style={{ width: 36, height: 36, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center', backgroundColor: done ? c.success : isNext ? c.gold : role.surface, borderWidth: done || isNext ? 0 : 2, borderColor: c.sand300 }}>
-                  {done ? <Icon name="check" color={c.white} size={20} /> : <AppText variant="caption" color={isNext ? c.blue : role.muted} style={{ fontFamily: 'Inter_600SemiBold' }}>{d.day_number}</AppText>}
+                  {done ? <Icon name="check" color={c.white} size={20} /> : <AppText variant="caption" color={isNext ? role.onHighlight : role.muted} style={{ fontFamily: 'Inter_600SemiBold' }}>{d.day_number}</AppText>}
                 </View>
                 {i < days.length - 1 && <View style={{ width: 3, flex: 1, minHeight: 28, backgroundColor: done ? c.success : c.sand300 }} />}
               </View>
@@ -191,13 +191,14 @@ export default function Me() {
   const loading = <ActivityIndicator color={role.action} style={{ marginTop: 24 }} />;
 
   const onNotes = tab === 'Notes';
-  // The one floating button follows the sub-tab (features/me/tabs.ts): a note on Notes, a journey post on Journey, none on Plan and Health.
-  const fab = ME_FAB[tab];
-  // Everything above the content of a sub-tab: the header (handle, bell and gear, avatar and stats, name and bio, the My Camino card, the highlights) and the strip
+  // The one floating button is the chat button, the same on Notes, Journey, Plan and Health (features/me/tabs.ts). It opens the inbox on the tab where
+  // something waits (Messages, else Notifications, else Messages) and carries the unread badge that the bell used to carry.
+  const openInbox = () => router.push({ pathname: ME_FAB.href, params: { tab: inboxTab(unread) } });
+  // Everything above the content of a sub-tab: the header (handle and gear, avatar and stats, name and bio, the My Camino card, the highlights) and the strip
   // of sub-tabs. Both hosts below draw it, so it looks the same on every sub-tab.
   const top = (
     <>
-      {/* Header follows the design system: handle pill + bell, avatar with stats, name and bio. */}
+      {/* Header follows the design system: handle pill + gear, avatar with stats, name and bio. */}
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 52 }}>
         <AppText variant="h4" numberOfLines={1} style={{ flexShrink: 1 }}>{profile?.username ?? name}</AppText>
         {!!profile?.username && (
@@ -205,9 +206,8 @@ export default function Me() {
             <Icon name={copied ? 'check' : 'copy'} color={copied ? c.success : role.muted} size={16} />
           </Pressable>
         )}
-        {/* Top right: the inbox, and Settings last, in the corner. Settings is a screen of its own, no longer a tab. */}
+        {/* Top right: Settings only, in the corner. The inbox is the chat button at the bottom right. Settings is a screen of its own, no longer a tab. */}
         <View style={{ marginLeft: 'auto', flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-          <IconButton name="bell" label={unread.total ? `Inbox, ${unread.total} unread` : 'Inbox'} badge={Math.min(unread.total, 99)} onPress={() => router.push('/inbox')} size={52} />
           <IconButton name="settings" label="Settings" onPress={() => router.push('/settings')} size={52} />
         </View>
       </View>
@@ -296,6 +296,8 @@ export default function Me() {
           {tab === 'Plan' && (!days ? (offline ? <Empty text="You are offline and your plan is not saved on this phone yet. Open it once with a connection." /> : loading) : <PlanTracker days={days} />)}
 
           {tab === 'Health' && <Health />}
+          {/* Room under the last thing for the chat button over the corner: with the gap above it, 56 more, so the room is the one the Notes feed leaves (the bar, the button, a margin). */}
+          <View style={{ height: 40 }} />
         </Screen>
       )}
       <Modal visible={editBio} transparent animationType="slide" onRequestClose={() => setEditBio(false)}>
@@ -311,7 +313,7 @@ export default function Me() {
           </View>
         </KeyboardAvoidingView>
       </Modal>
-      {fab && <Fab label={fab.label} icon={fab.icon} onPress={() => router.push(fab.href)} />}
+      <Fab label={inboxLabel(unread.total)} icon={ME_FAB.icon} hint={ME_FAB.hint} badge={badgeText(unread.total)} onPress={openInbox} />
     </View>
   );
 }
