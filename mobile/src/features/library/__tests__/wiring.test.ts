@@ -112,16 +112,15 @@ check('what can be pressed in the feature: the bookmark button, the search field
   for (const f of ['sample.ts', 'bible/books.ts', 'books/catalog.ts', 'search.ts', 'bookmarks.ts']) assert.doesNotMatch(code(read(`${DIR}/${f}`)), /onPress|Pressable|onClick|=>\s*router/, f);
 });
 
-check('the compact banner of the Bible tab is ONE button for a screen reader (the gold pill is its look), it opens the daily reading, and the same component is the base of the banner of the Books tab', () => {
+check('the compact banner is the base of the banner of the Books tab, and ONE button for a screen reader when it has a pill (the gold pill is its look): its card, its four fonts, and its budget of height', () => {
   const src = code(read(`${DIR}/LibraryBanner.tsx`));
   const compact = src.slice(src.indexOf('export function CompactBanner'), src.indexOf('export function DailyBanner'));
   assert.equal((compact.match(/<Pressable\b/g) ?? []).length, 1, 'the card is the one Pressable; the gold pill inside it is a View');
   assert.match(compact, /if \(!cta \|\| !onPress\) return card;/, 'without a pill and something to do the card is only a card');
   assert.match(compact, /accessibilityRole="button"\s+accessibilityLabel=\{\[cta, title, label, line\]\.filter\(Boolean\)\.join\('\. '\)\}\s+accessibilityHint=\{hint\}\s+onPress=\{onPress\}/, 'the label is the pill\'s words, then the title and the date; the note is not said');
   assert.match(src, /export const DAILY_TITLE = 'Daily reading';/);
-  assert.match(src, /export const DAILY_NOTE = 'Buen Camino!';/);
+  assert.doesNotMatch(src, /DAILY_NOTE|Buen Camino/, 'the banner of the daily reading has no handwritten note (the Books banner keeps its own, through the note prop)');
   assert.match(src, /export const DAILY_CTA = 'Read today';/);
-  assert.match(src, /<CompactBanner label=\{todayLine\(now\)\} title=\{DAILY_TITLE\} note=\{DAILY_NOTE\} cta=\{DAILY_CTA\} onPress=\{onOpen\} hint="Opens today's reading and the calendar" \/>/);
   assert.match(src, /useFocusEffect\(useCallback\(\(\) => \{ setNow\(new Date\(\)\); \}, \[\]\)\);/, 'the date is read again whenever the Library comes into view');
   // the earlier tall banner and the words of the old preview of the Books tab are gone: the banner of the Books tab is books/BooksBanner.tsx, on CompactBanner
   assert.doesNotMatch(src, /BOOKS_KICKER|BOOKS_TITLE|BOOKS_LINE|\bBannerProps\b|export function LibraryBanner|export function BooksBanner|Preview|Twelve free/, 'nothing of the earlier banner of the Books tab is left');
@@ -155,6 +154,47 @@ check('the compact banner of the Bible tab is ONE button for a screen reader (th
   assert.match(src, /COMPACT_BANNER_MAX_FONT_SCALE = 1\.2;/);
   assert.match(compact, /adjustsFontSizeToFit minimumFontScale=\{0\.8\}/, 'a handwritten note beside a pill shrinks a little before it is cut');
   // contrast of what is on the card is checked in navigation.test.ts, for light and dark
+});
+
+check('the banner of the daily reading (the Bible tab) is ONE button for a screen reader that says the date, the day and the readings, opens the daily reading, has no handwritten note, and is a card of its own: the Books banner is not touched', () => {
+  const src = code(read(`${DIR}/LibraryBanner.tsx`));
+  const daily = src.slice(src.indexOf('export function DailyBanner'));
+  const compact = src.slice(src.indexOf('export function CompactBanner'), src.indexOf('export const DAILY_BANNER_MAX_HEIGHT'));
+  assert.equal((daily.match(/<Pressable\b/g) ?? []).length, 1, 'the card is the one Pressable; the gold pill inside it is a View');
+  assert.match(daily, /accessibilityRole="button"\s+accessibilityLabel=\{\[DAILY_CTA, DAILY_TITLE, label, brief\.title, spoken\]\.filter\(Boolean\)\.join\('\. '\)\}\s+accessibilityHint="Opens today's reading and the calendar"\s+onPress=\{onOpen\}/, 'the pill\'s words, the title, the date, the day, then the readings');
+  assert.match(daily, /const spoken = brief\.readings \? `Readings: \$\{readingsSpoken\(brief\.readings\)\}` : NO_READINGS;/, 'the readings said with their references; a day with none says so');
+  assert.match(daily, /const brief = useMemo\(\(\) => dayBrief\(dateKey\(todayOf\(now\)\)\), \[now\]\);/, 'what the day is and its references: the same function as the screen, without opening a book of the Bible');
+  assert.match(daily, /const line = brief\.readings \? readingsLine\(brief\.readings\) : NO_READINGS;/);
+  assert.match(daily, /const \[now, setNow\] = useState\(\(\) => new Date\(\)\);\s+useFocusEffect\(useCallback\(\(\) => \{ setNow\(new Date\(\)\); \}, \[\]\)\);/, 'the date is read again whenever the Library comes into view');
+  assert.match(daily, /<AppText variant="mono"[^>]*numberOfLines=\{1\}[^>]*>\{label\}<\/AppText>/, 'the date and the weekday: JetBrains Mono');
+  assert.match(daily, /<AppText variant="h4"[^>]*>\{DAILY_TITLE\}<\/AppText>/, 'the title: Fraunces');
+  assert.match(daily, /<AppText variant="label"[^>]*>\{brief\.title\}<\/AppText>/, 'the day: Inter at 17');
+  assert.match(daily, /<AppText variant="caption"[^>]*>\{line\}<\/AppText>/, 'the readings: Inter at 15');
+  assert.match(daily, /<AppText variant="label"[^>]*>\{DAILY_CTA\}<\/AppText>/, 'the pill: Inter at 17, never the handwriting');
+  assert.doesNotMatch(daily, /variant="accent"|fontFamily|fontSize|#[0-9a-fA-F]{3,8}\b|\bfixed\.|adjustsFontSizeToFit/, 'no handwriting, no size of its own, no literal colour, nothing that shrinks');
+  assert.match(daily, /const beside = pillBesideTitle\(width, fontScale, COMPACT_BANNER_MAX_FONT_SCALE\);/, 'the pill beside the title when they fit, under the last line when they do not');
+  assert.match(daily, /\{beside && pill\}/);
+  assert.match(daily, /\{!beside && <View style=\{\{ alignSelf: 'flex-end', marginTop: space\[1\] \}\}>\{pill\}<\/View>\}/);
+  assert.equal((daily.match(/maxFontSizeMultiplier=\{COMPACT_BANNER_MAX_FONT_SCALE\}/g) ?? []).length, 5, 'every word of the card stops growing at 1.2');
+  assert.match(daily, /backgroundColor: role\.inverse/, 'a hero card: it keeps its contrast in light and in dark');
+  assert.match(daily, /color=\{role\.onInverse\}/);
+  assert.match(daily, /color=\{role\.onInverseAccent\}/);
+  // the budget: at the normal text size, on a phone of 390, the card is the date (22), the title row (44: the pill), the day (22, or 44 on two lines), the readings (21 a line, two or three lines)
+  const tokens = JSON.parse(read('src/theme/tokens.json')) as { space: Record<string, number>; text: Record<string, { lineHeight: number }> };
+  const padV = tokens.space[/paddingVertical: space\[(\d+)\]/.exec(daily)![1]];
+  const gap = tokens.space[/paddingVertical: space\[\d+\], gap: space\[(\d+)\]/.exec(daily)![1]];
+  const typical = 2 * padV + tokens.text.mono.lineHeight + 44 + tokens.text.label.lineHeight + 2 * tokens.text.caption.lineHeight + 3 * gap; // the pill in the title row, a day on one line, readings on two
+  assert.equal(typical, 24 + 22 + 44 + 22 + 42 + 12, 'the card of the Sunday: 166 high');
+  const worst = 2 * padV + tokens.text.mono.lineHeight + 44 + 2 * tokens.text.label.lineHeight + 3 * tokens.text.caption.lineHeight + 3 * gap; // a day on two lines, readings on three
+  assert.ok(worst <= Number(/export const DAILY_BANNER_MAX_HEIGHT = (\d+);/.exec(src)![1]), `the longest card is ${worst} high`);
+  assert.equal(Number(/DAILY_BANNER_MAX_HEIGHT = (\d+)/.exec(src)![1]), 216);
+  assert.equal(Number(/DAILY_BANNER_MAX_HEIGHT_NARROW = (\d+)/.exec(src)![1]), 276);
+  assert.match(daily, /<AppText variant="label"[^>]*numberOfLines=\{2\}[^>]*>\{brief\.title\}<\/AppText>/, 'a saint with a very long name is cut after two lines on the banner: the screen has the whole name');
+  // the Books banner is not touched: the compact banner is what it was, with its note and its pill row
+  assert.match(compact, /<AppText variant="accent"[^>]*>\{note\}<\/AppText>/);
+  assert.doesNotMatch(compact, /dayBrief|readingsLine|pillBesideTitle|brief\./, 'the compact banner knows nothing of the readings');
+  assert.match(code(read(`${DIR}/books/BooksBanner.tsx`)), /import \{ CompactBanner \} from '\.\.\/LibraryBanner';/, 'the Books banner is still built on the compact one');
+  assert.doesNotMatch(code(read(`${DIR}/books/BooksBanner.tsx`)), /DailyBanner/);
 });
 
 check('the three choices of the Bible tab are an inline segmented pill: radio buttons in a radio group (not tabs), checked state for web and phone, a label each, never under 44, roles for every colour, and nothing floats', () => {

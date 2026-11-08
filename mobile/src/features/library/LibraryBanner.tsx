@@ -85,9 +85,13 @@ export function CompactBanner({ label, title, line, note, cta, onPress, hint }: 
   );
 }
 
-/** The card of the daily reading is never taller than the first number on a phone 390 wide, nor than the second on one 320 wide (the phone's text at its normal size, the longest day of the readings we have). */
-export const DAILY_BANNER_MAX_HEIGHT = 190;
-export const DAILY_BANNER_MAX_HEIGHT_NARROW = 250;
+/**
+ * The card of the daily reading is never taller than the first number on a phone 390 wide, nor than the second on one 320 wide (the phone's text at its normal size), on the longest day of the
+ * readings we have: a day of two lines (a saint with a long name: the banner cuts it after two, the screen has it whole) and readings on three lines (four on a phone of 320, with the pill under them).
+ * A Sunday is 166 high on a phone of 390 and 204 on one of 320; the tallest day of 2026 is 209 and 268 (measured in a browser, tools/web-smoke), and the numbers have a few points to spare.
+ */
+export const DAILY_BANNER_MAX_HEIGHT = 216;
+export const DAILY_BANNER_MAX_HEIGHT_NARROW = 276;
 
 /**
  * The banner of the Bible tab: the daily reading. In the four fonts of the brand and on the colours of a hero card (role.inverse, so it keeps its contrast in light and in dark): the
@@ -128,7 +132,7 @@ export function DailyBanner({ onOpen }: { onOpen: () => void }) {
           <AppText variant="h4" maxFontSizeMultiplier={COMPACT_BANNER_MAX_FONT_SCALE} color={role.onInverse} style={{ flexShrink: 1 }}>{DAILY_TITLE}</AppText>
           {beside && pill}
         </View>
-        <AppText variant="label" maxFontSizeMultiplier={COMPACT_BANNER_MAX_FONT_SCALE} color={role.onInverse}>{brief.title}</AppText>
+        <AppText variant="label" maxFontSizeMultiplier={COMPACT_BANNER_MAX_FONT_SCALE} numberOfLines={2} color={role.onInverse}>{brief.title}</AppText>
         <AppText variant="caption" maxFontSizeMultiplier={COMPACT_BANNER_MAX_FONT_SCALE} color={role.onInverseAccent}>{line}</AppText>
         {!beside && <View style={{ alignSelf: 'flex-end', marginTop: space[1] }}>{pill}</View>}
       </View>

@@ -344,10 +344,12 @@ check('the design page shows the same Library: the two tabs Bible and Books, the
   assert.doesNotMatch(bible, /scr-title|<h1/, 'a title is back on the Library phone');
 
   // Bible: the tab strip, then the compact banner, then the three parts, the heading and the count, the source line, the tiles, the tab bar; no notice, no chip, no floating bar, no gold pen
-  const order = ['class="lib-head"', 'class="cp-subtabs"', 'class="cp-banner cmp"', 'class="lib-seg"', 'class="lib-hrow"', 'class="lib-src"', 'class="lib-grid"', 'class="lib-tile"', 'class="tabdock"'].map((needle) => bible.indexOf(needle));
+  const order = ['class="lib-head"', 'class="cp-subtabs"', 'class="cp-banner cmp dl"', 'class="lib-seg"', 'class="lib-hrow"', 'class="lib-src"', 'class="lib-grid"', 'class="lib-tile"', 'class="tabdock"'].map((needle) => bible.indexOf(needle));
   assert.ok(order.every((i) => i > 0) && order.every((i, k) => k === 0 || i > order[k - 1]), `Bible: head, tabs, banner, the three parts, heading, source line, tiles, the tab bar (${order})`);
   assert.match(bible, /<div class="cp-subtabs"[^>]*><span class="on">Bible<\/span><span>Books<\/span><\/div>/, 'two tabs: there is no Notes tab in the Library');
-  assert.match(bible, /<div class="cp-banner cmp" role="button" aria-label="Read today\. Daily reading\. Sunday 8 November">\s*<div class="ey">Sunday 8 November<\/div>\s*<h4>Daily reading<\/h4>\s*<div class="row"><span class="hw">Buen Camino!<\/span><span class="pill">Read today<\/span><\/div>/);
+  // the daily banner (drawn by designDaily.ts from the functions of the app): the date, the title with the pill, the day of the Church's year, the readings; no handwritten note
+  assert.match(bible, /<div class="cp-banner cmp dl" role="button" aria-label="Read today\. Daily reading\. Sunday 8 November\. 32nd Sunday in Ordinary Time\. Readings: Wisdom 6:12-16; Psalm 63:2, 3-4, 5-6, 7-8; 1 Thessalonians 4:13-18; Matthew 25:1-13">\s*<div class="ey">Sunday 8 November<\/div>\s*<div class="tr"><h4>Daily reading<\/h4><span class="pill">Read today<\/span><\/div>\s*<div class="dd">32nd Sunday in Ordinary Time<\/div>\s*<div class="rf">Wisdom&nbsp;6:12-16&nbsp;· Psalm&nbsp;63&nbsp;· 1&nbsp;Thessalonians&nbsp;4:13-18&nbsp;· Matthew&nbsp;25:1-13<\/div>\s*<\/div>/);
+  assert.doesNotMatch(bible.slice(bible.indexOf('class="cp-banner cmp dl"'), bible.indexOf('class="lib-seg"')), /Buen Camino|class="hw"/, 'the owner asked for the words to go: the banner has the day and the readings instead');
   assert.doesNotMatch(bible, /cp-dots|cp-banner lib|art"/, 'the banner is one compact card: no dots, no big glyph');
   assert.match(bible, /<h4 class="lib-h">Books of the Bible<\/h4><span class="cnt" aria-label="Old Testament, 39 books">39 books<\/span>/);
   assert.match(bible, /<p class="lib-src">World English Bible, Catholic edition · public&nbsp;domain<\/p>/);
@@ -372,7 +374,7 @@ check('the design page shows the same Library: the two tabs Bible and Books, the
   // the place is drawn in two pieces, the name and the chapter; the New Testament chosen, 27 tiles
   assert.doesNotMatch(cont, /cont-card/, 'the card is gone from the page');
   assert.match(cont, /<div class="cont-bar">\s*<div class="main" role="button" aria-label="Continue reading, Psalm 121"><svg class="cp-icon ic"><use href="#i-book"\/><\/svg><div class="t"><div class="k">Continue reading<\/div><div class="r"><span class="h">Psalm<\/span><span class="c">121<\/span><\/div><\/div><\/div>\s*<button class="x" aria-label="Hide Continue reading"><svg class="cp-icon"><use href="#i-x"\/><\/svg><\/button>\s*<\/div>/);
-  assert.ok(cont.indexOf('class="cp-subtabs"') < cont.indexOf('class="cp-banner cmp"'), 'the banner is right under the tabs, with no card between');
+  assert.ok(cont.indexOf('class="cp-subtabs"') < cont.indexOf('class="cp-banner cmp dl"'), 'the banner is right under the tabs, with no card between');
   assert.ok(cont.indexOf('class="cont-bar"') < cont.indexOf('class="scroll"'), 'the bar is not inside the scroll: it floats, and the cover grid of a phone ends before anything of it');
   assert.equal(count(cont, /class="cont-bar"/g), 1, 'one bar on the screen');
   assert.equal(count(cont, /class="hw"/g), 1, 'the bar adds no handwriting: the banner has the one note');
@@ -785,7 +787,9 @@ check('the four fonts by role on the Bible side of the Library: Fraunces for nam
     return (design.slice(start, next > 0 ? next : undefined).match(/class="hw"/g) ?? []).length;
   };
   for (const label of phones) assert.ok(handwriting(label) <= 1, `the phone "${label}" has ${handwriting(label)} handwritten notes`);
-  for (const label of ['Library', 'Library · Continue', 'Library · Dark', 'Library · Deuterocanon', 'Library · Chapters', 'Reader · Psalm 121', 'Reader · John 1']) assert.equal(handwriting(label), 1, `the phone "${label}" has its handwritten note`);
+  for (const label of ['Library · Chapters', 'Reader · Psalm 121', 'Reader · John 1']) assert.equal(handwriting(label), 1, `the phone "${label}" has its handwritten note`);
+  // the banner of the Bible tab has none since the daily reading says the day and the readings there: the Library phones that show it have no handwritten note
+  for (const label of ['Library', 'Library · Continue', 'Library · Dark', 'Library · Deuterocanon', 'Library · 320 wide']) assert.equal(handwriting(label), 0, `the phone "${label}" has no handwritten note`);
 });
 
 check('every screen registered in the root layout is a file, so the stack never warns about a missing route', () => {

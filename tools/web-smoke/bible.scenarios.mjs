@@ -61,7 +61,7 @@ const scrollPage = (page, y) => page.evaluate((to) => {
 
 export const BIBLE_SCENARIOS = [
   {
-    name: 'Library: the daily reading banner is compact (at most 128 high at 390 wide, 148 at 320), ONE button, and the banner, the three choices, the heading and the first row of tiles (two) are all on the first screen, clear of the tab bar',
+    name: 'Library: the daily reading banner is compact (at most 216 high at 390 wide, 276 at 320, on the longest day), says the date, the day of the Church and the readings, is ONE button, and the banner, the three choices, the heading and the first row of tiles (two) are all on the first screen, clear of the tab bar',
     persona: 'in',
     async run({ page, step, go }) {
       step('open Library at 390 x 844');
@@ -69,12 +69,19 @@ export const BIBLE_SCENARIOS = [
       const banner = page.getByRole('button', { name: /^Read today/ });
       await eventually(() => banner.count(), (n) => n === 1, { what: 'the number of "Read today" buttons: the card is one button, the gold pill is not a second one' });
       const b = await box(banner, 'the banner');
-      assert(b.height <= 128, `the banner is ${b.height} high at 390 wide`);
-      assert(b.height >= 90, `the banner is ${b.height} high: it has its label, title, note and pill`);
-      step('the card holds the date, the title, one handwritten note and the gold pill with its label');
-      await page.getByText('Daily reading', { exact: true }).first().waitFor();
-      await page.getByText('Buen Camino!', { exact: true }).first().waitFor();
+      assert(b.height <= 216, `the banner is ${b.height} high at 390 wide`);
+      assert(b.height >= 120, `the banner is ${b.height} high: it has its date, title, day, readings and pill`);
+      step('the card holds the date, the title, the day of the Church (a Sunday, a feast, a memorial), the readings or the line that says there are none, and the gold pill: no handwritten note');
+      const title = await box(page.getByText('Daily reading', { exact: true }).first(), 'the title of the banner');
       await page.getByText(/^(Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday) \d{1,2} (January|February|March|April|May|June|July|August|September|October|November|December)$/i).first().waitFor();
+      await eventually(() => page.getByText('Buen Camino!', { exact: true }).count(), (n) => n === 0, { what: 'the number of handwritten notes on the banner of the Bible tab' });
+      const said = await banner.getAttribute('aria-label');
+      assert(/^Read today\. Daily reading\. (Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday) \d{1,2} \w+\. .+\. (Readings: .+|The readings for this day are not in the app yet\.)$/.test(said), `what the banner says: ${said}`);
+      const pill = await box(page.getByText('Read today', { exact: true }).first(), 'the pill');
+      assert(Math.abs((pill.y + pill.height / 2) - (title.y + title.height / 2)) < 12 && pill.x > title.x + title.width, 'on a phone of 390 the pill is in the row of the title, at its right');
+      const dayTitle = /^Read today\. Daily reading\. [^.]+\. (.+?)\. (?:Readings: |The readings for this day)/.exec(said)[1];
+      const day = await box(banner.getByText(dayTitle, { exact: true }), 'the day of the Church');
+      assert(day.y >= title.y + title.height - 2, `the day ("${dayTitle}") is under the title`);
       step('the choice of the part, the heading and the first row of tiles are under it, and clear of the tab bar, without scrolling');
       const group = await box(page.getByRole('radiogroup', { name: 'Part of the Bible' }), 'the three choices');
       const heading = await box(page.getByRole('heading', { name: 'Books of the Bible', exact: true }), 'the heading');
@@ -88,11 +95,15 @@ export const BIBLE_SCENARIOS = [
       assert(Math.abs(second.y - first.y) <= 1 && second.x > first.x + first.width, 'Genesis and Exodus are the two tiles of the first row');
       assert(Math.abs(first.height - tileSums(390).height) <= 1, `a tile is ${tileSums(390).height} high at 390 (${first.height})`);
       assert(second.y + second.height <= tabs.y + 1, 'and so is the second tile of the row');
-      step('at 320 x 640 the banner is at most 148 high');
+      step('at 320 x 640 the banner is at most 276 high, and the pill is under the last line');
       await page.setViewportSize({ width: 320, height: 640 });
       await domQuiet(page, 300);
       const narrow = await box(banner, 'the banner at 320');
-      assert(narrow.height <= 148, `the banner is ${narrow.height} high at 320 wide`);
+      assert(narrow.height <= 276, `the banner is ${narrow.height} high at 320 wide`);
+      const narrowPill = await box(page.getByText('Read today', { exact: true }).first(), 'the pill at 320');
+      const narrowTitle = await box(page.getByText('Daily reading', { exact: true }).first(), 'the title at 320');
+      assert(narrowPill.y >= narrowTitle.y + narrowTitle.height, 'on a phone of 320 the title and the pill do not share a row: the pill is under');
+      assert(narrowPill.x + narrowPill.width <= 320 - 12 && narrow.x >= 0 && narrow.x + narrow.width <= 320, 'nothing runs out of the screen');
       step('tapping the title (not the pill) and tapping the pill both open the daily reading');
       await page.setViewportSize({ width: 390, height: 844 });
       await domQuiet(page, 300);

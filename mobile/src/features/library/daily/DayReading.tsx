@@ -19,21 +19,31 @@ import { runsOf, type PassageText } from './reference';
 /** The small line over a card: mono (the 15 of the type scale), capitals, muted, like the label of the Bible tab's "Today's reading" card. */
 const EYEBROW = { textTransform: 'uppercase' } as const;
 
-/** The words of a reading: each run of verses is one paragraph with its small muted verse numbers in it; a psalm shown whole says so under the words. */
-function PassageBody({ text }: { text: PassageText }) {
+/**
+ * The words of a reading. Prose (a first reading, a second reading, the Gospel): each run of verses is one paragraph with its small muted verse numbers in it. A psalm is poetry:
+ * each verse is a line of its own. A psalm shown whole says so under the words.
+ */
+function PassageBody({ text, poem }: { text: PassageText; poem: boolean }) {
   const runs = useMemo(() => runsOf(text.lines), [text]);
   return (
     <View style={{ gap: space[3], paddingBottom: space[4] }}>
-      {runs.map((run, r) => (
-        <AppText key={r} variant="body">
-          {run.map((line, i) => (
-            <Fragment key={i}>
+      {poem
+        ? runs.flat().map((line, i) => (
+            <AppText key={i} variant="body">
               {!!line.n && <AppText variant="caption" muted>{`${line.n} `}</AppText>}
-              {i < run.length - 1 ? `${line.text} ` : line.text}
-            </Fragment>
+              {line.text}
+            </AppText>
+          ))
+        : runs.map((run, r) => (
+            <AppText key={r} variant="body">
+              {run.map((line, i) => (
+                <Fragment key={i}>
+                  {!!line.n && <AppText variant="caption" muted>{`${line.n} `}</AppText>}
+                  {i < run.length - 1 ? `${line.text} ` : line.text}
+                </Fragment>
+              ))}
+            </AppText>
           ))}
-        </AppText>
-      ))}
       {text.whole && <AppText variant="caption" muted>{WHOLE_PSALM_NOTE}</AppText>}
     </View>
   );
@@ -66,7 +76,7 @@ function ReadingRow({ reading, first }: { reading: Reading; first: boolean }) {
         {head}
         <View style={{ transform: [{ rotate: open ? '90deg' : '0deg' }] }}><Icon name="chevron" color={role.muted} /></View>
       </Pressable>
-      {open && <PassageBody text={reading.text} />}
+      {open && <PassageBody text={reading.text} poem={reading.kind === 'psalm'} />}
     </View>
   );
 }

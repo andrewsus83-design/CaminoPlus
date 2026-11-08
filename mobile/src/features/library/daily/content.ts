@@ -68,8 +68,11 @@ export function celebrationOf(lit: LiturgicalDay, record: DayRecord | null): { t
   return { title: lit.title, under: null };
 }
 
-/** The references of a day as a line: "Wisdom 6:12-16 · Psalm 63 · Matthew 25:1-13". */
-export const readingsLine = (readings: readonly ReadingRef[]): string => readings.map((r) => r.short).join(' · ');
+/**
+ * The references of a day as a line: "Wisdom 6:12-16 · Psalm 63 · Matthew 25:1-13". The spaces inside a reference are no-break spaces and the dot stays with the reference before it, so
+ * that a line that has to wrap does it between two references, never inside "1 Thessalonians 4:13-18".
+ */
+export const readingsLine = (readings: readonly ReadingRef[]): string => readings.map((r) => r.short.replace(/ /g, '\u00a0')).join('\u00a0· ');
 
 /** The same for a screen reader: the middle dots are not said, the semicolons make a pause. */
 export const readingsSpoken = (readings: readonly ReadingRef[]): string => readings.map((r) => r.reference).join('; ');

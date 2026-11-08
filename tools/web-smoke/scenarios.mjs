@@ -168,7 +168,7 @@ export const SCENARIOS = [
       step('there are exactly two tabs: no Notes tab, and no gold pen (writing is on Me)');
       await eventually(() => page.getByText('Notes', { exact: true }).filter({ visible: true }).count(), (n) => n === 0, { what: 'the number of "Notes" labels on Library' });
       await eventually(() => page.getByRole('button', { name: /^Write a (note|journey post)$/ }).count(), (n) => n === 0, { what: 'the number of gold pens on Library' });
-      step('Bible: the banner (today\'s date, title, a handwritten note, a gold button), no Preview notice, and the one quiet line that says which translation it is');
+      step('Bible: the banner (today\'s date, title, the day of the Church and its readings, a gold button), no Preview notice, and the one quiet line that says which translation it is');
       await page.getByText(/^(Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday) \d{1,2} (January|February|March|April|May|June|July|August|September|October|November|December)$/i).waitFor();
       await page.getByRole('button', { name: /^Read today/ }).waitFor();
       await page.getByText('World English Bible, Catholic edition · public domain', { exact: true }).waitFor();
