@@ -48,7 +48,11 @@ test('the real plan: all routes, all modes, and the scenarios the owner asked fo
   const names = SCENARIOS.map((s) => s.name).join('\n');
   for (const must of [
     /Tab bar/, /gear on Me opens Settings/, /switching light and dark/i, /Library: the tabs Bible and Books/, /Me: the strip is Notes, Journey, Plan, Health/,
-    /Me: Notes is the first sub-tab and shows the feed with one gold pen/,
+    // Me: the Notes feed starts with ONE card and has no filter tabs; the header is the gear alone; the chat button on every sub-tab opens the inbox where something waits, says the
+    // number, and says just "Inbox" with no signal; the first tile of Journey is the card that writes a post (in the sample journey too); the Library has neither
+    /Me: Notes is the first sub-tab and its feed starts with ONE card/, /top right of the header is the gear alone/, /chat button opens the inbox where something waits/,
+    /Me, with no signal: the chat button is just "Inbox"/, /Me, Journey: the first tile of the grid is the card/, /Me, Journey with no post yet: the sample journey has the card too/,
+    /Library: the chat button and the cards are Me's/,
     /three choices under the banner/, /banner of the Bible tab opens \/library\/daily/, /bookmarks kept before the tabs changed/,
     // the Bible: the grid of books, the chapters, the reader, Next and Previous across a boundary, a verse bookmarked, a link to a verse, the search of verses, Continue reading
     /daily reading banner is compact/, /73 book names fits its square tile/, /a tile opens the numbers of the chapters/, /Next and Previous cross the books/, /touching a verse chooses it/,
@@ -58,6 +62,14 @@ test('the real plan: all routes, all modes, and the scenarios the owner asked fo
     /covers, A5 in two columns, on a shelf for each kind of book/, /cover opens the book page/, /every kind of book has its notice on its page/, /reader opens at the first chapter, Next and Previous/, /remembers where you stopped/,
     /links go where they say/, /ribbon of a cover bookmarks the book/, /Books with no signal/,
   ]) assert.match(names, must);
+});
+
+test('a scenario may ask for the empty account (a new pilgrim\'s Me); the others run on the full one', () => {
+  const sc = [{ name: 'full', persona: 'in' }, { name: 'empty', persona: 'in', data: 'empty', schemes: ['light'] }];
+  const tasks = buildTasks({ routes: [], scenarios: sc });
+  assert.deepEqual(tasks.map((t) => `${t.scenario.name}:${t.data ?? 'full'}:${t.scheme}`), ['full:full:light', 'full:full:dark', 'empty:empty:light']);
+  const real = buildTasks({ routes: [], scenarios: SCENARIOS }).filter((t) => t.data === 'empty').map((t) => t.scenario.name);
+  assert.ok(real.some((n) => /sample journey has the card too/.test(n)), 'the sample journey is walked with the account that has no post');
 });
 
 test('redirects on purpose are listed with a reason, and only for the account states named', () => {

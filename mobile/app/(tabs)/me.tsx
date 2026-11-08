@@ -76,7 +76,7 @@ function PlanTracker({ days }: { days: DayT[] }) {
             <View key={d.id} style={{ flexDirection: 'row', gap: 16 }}>
               <View style={{ alignItems: 'center', width: 36 }}>
                 <View style={{ width: 36, height: 36, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center', backgroundColor: done ? c.success : isNext ? c.gold : role.surface, borderWidth: done || isNext ? 0 : 2, borderColor: c.sand300 }}>
-                  {done ? <Icon name="check" color={c.white} size={20} /> : <AppText variant="caption" color={isNext ? c.blue : role.muted} style={{ fontFamily: 'Inter_600SemiBold' }}>{d.day_number}</AppText>}
+                  {done ? <Icon name="check" color={c.white} size={20} /> : <AppText variant="caption" color={isNext ? role.onHighlight : role.muted} style={{ fontFamily: 'Inter_600SemiBold' }}>{d.day_number}</AppText>}
                 </View>
                 {i < days.length - 1 && <View style={{ width: 3, flex: 1, minHeight: 28, backgroundColor: done ? c.success : c.sand300 }} />}
               </View>
