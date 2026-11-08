@@ -1,6 +1,6 @@
 # The CaminoPlus Library: 26 books
 
-Twenty-six books written for the app's **Library** and for sale as EPUB and PDF (neither is done yet: see "In the app" below): **fourteen route guidebooks** (one for each route of the app's catalog) and **twelve reflection books**, each reflection book
+Twenty-six books written for the app's **Library** (they are in it: see "In the app") and for sale as EPUB and PDF (built, but not uploaded, priced or published: see "Status"): **fourteen route guidebooks** (one for each route of the app's catalog) and **twelve reflection books**, each reflection book
 made from a famous book in the public domain and paired with one Camino. Written with the [`book-writer`](../.claude/skills/book-writer/SKILL.md) skill, built and
 packaged with the [`book-publisher`](../.claude/skills/book-publisher/SKILL.md) skill. Where the classics come from: [`sources/SOURCES.md`](sources/SOURCES.md).
 
@@ -66,16 +66,20 @@ All twelve are free to publish: every edition was opened and its translator, edi
 (not found in a clean public-domain edition yet), *The Cloud of Unknowing*, *The Little Flowers of St Francis*, Marcus Aurelius's *Meditations*, *Introduction to the Devout Life*.
 *The Way of a Pilgrim* is a natural fit for walkers, but its common English translation may still be protected.
 
-## In the app: not yet
+## In the app
 
-**The books are not in the app.** They are written, checked and ready: `python3 tools/build_books.py` turns them into the data an app can read (a catalog and one file per book, in blocks), but that bundle is **not
-in the repository**, and the app's Library does not read it.
+**The books are in the app** (pull request #98). The Books tab of the Library lists them as covers, a book page shows the notice of its kind and the contents, and a reader shows the chapters. `python3 tools/build_books.py --no-render` turns
+`books/` into the data the app reads: `mobile/assets/library/catalog.json`, one `books/<id>.json` per book (in blocks, see `tools/book_kit.py`) and `mobile/src/features/library/bookBundle.ts`, all committed. `python3 tools/build_books.py --check`
+fails when that bundle is out of date with the books; CI does not run it yet, so run it before a pull request that touches `books/`. The bundle names no model: it leaves out `ai_disclosure`, which `store.json` and the EPUB keep.
 
-Why. While these books were being written, the owner rebuilt the Library on `main` (Bible, Books and Notes tabs; a Books tab of twelve free classics with a licence check for each; a Notes tab that shows the diary as a
-feed) and other branches (`claude/books-text`, `claude/books-reader`, `claude/bible-reader`, `claude/bible-text`) were building the text importer and a reader. A reader with side notes, bookmarks on a paragraph and a
-Notebook was built here as well, in the history of the branch `claude/funny-mendel-uphqz3` (the last commit that has it is `c7a3844`; it passed 724 app checks, the typecheck and the Android export on the Library as it was
-then), and it was **not merged**: it would have conflicted in 14 files with the new Library and duplicated the reader of the other branch. How these books (and anchored side notes, which are not the same thing as the
-Notes tab) join the owner's Library is a decision for the owner. The design is in `.claude/skills/book-publisher/SKILL.md` ("In the app") and the data format in `tools/book_kit.py` and `tools/build_books.py`.
+What a pilgrim can do with a book: read it, with Previous and Next in a bar at the bottom (the place they stopped and the size of the text are kept on the phone); bookmark a passage (a paragraph, a quotation or a list) the way a verse of the Bible is
+bookmarked, and open the reader there from Bookmarks; copy and share a passage; and **Note**, which starts a diary note with the passage quoted (a chosen Bible verse can be noted the same way). The Licences screen names the reading sources of each book.
+Each book page carries a notice of its kind (`mobile/src/features/library/books/notices.ts`): a guide says it was written with AI assistance and that a person has not yet checked its facts; a book of readings says its passages are word for word from
+the public-domain edition named on the Licences screen and that its reflections are original text written with AI assistance.
+
+**What is not built.** Notes anchored beside a paragraph, a Notebook organised by anchor, and the answer to a day's question as a note of its own kind. The design is in `.claude/skills/book-publisher/SKILL.md` ("In the app"); it was built once in the
+history of the branch `claude/funny-mendel-uphqz3` (the last commit that has it is `c7a3844`) and not merged. What exists is the Note action above, which writes an ordinary diary page. An earlier plan for the Books tab (twelve free public-domain
+classics, each with a licence check) was replaced by these 26 books.
 
 ## What is decided and what is yours to decide
 
@@ -84,14 +88,14 @@ guides, parchment for reflection books), the format of a day.
 
 Yours to decide (the build leaves these open on purpose): who holds the rights to the original text and how it is licensed; the wording of the AI disclosure (it says today only that the books
 were written with AI assistance under CaminoPlus's direction); who checks the facts of each guide before it is sold; ISBNs and prices; and whether and where to publish. Putting the books in the
-app's Library is a product decision too (see "In the app: not yet").
+app's Library was the owner's decision and is done (#98); the wording of the notices on the book pages is drafted and still to be confirmed by the owner.
 
 ## Status (8 November 2026)
 
 | | Written | Strict checker | EPUB, PDF, cover, store data | In the app |
 |---|---|---|---|---|
-| 14 route guidebooks | yes | passes, no warnings | built, structure checked | not yet |
-| 12 reflection books | yes | passes, no warnings (every passage verified word for word) | built, structure checked | not yet |
+| 14 route guidebooks | yes | passes, no warnings | built, structure checked | yes (#98) |
+| 12 reflection books | yes | passes, no warnings (every passage verified word for word) | built, structure checked | yes (#98) |
 
 The checker prints the real numbers for each book (`python3 tools/check_books.py --strict --sources <folder>`). Together the books are about 373,000 words (the guides about 150,000, the reflection books about 224,000); the longest
 reflection book reads in about 2 h 29 min (the ceiling is 3 hours) and the longest guide has 11,658 words (the cap is 12,000).
