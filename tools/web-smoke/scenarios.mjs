@@ -7,13 +7,15 @@
 // sweep checks that they load without errors, and the Me scenarios below only check that Notes is the first sub-tab, WHERE its pen goes and that one
 // note written there shows up in the feed, never what the notes look like. The daily reading (/library/daily) has its own scenarios, in
 // daily.scenarios.mjs (the header, the week strip, the calendar sheet, the bookmark, the date of the address); the Library scenarios below only
-// check that the banner leads there. The Bible side of the Library (the grid of books, the chapters, the reader, the search of verses, Continue
-// reading) is in bible.scenarios.mjs.
+// check that the banner leads there.
+// The Bible side of the Library (the grid of books, the chapters, the reader, the search of verses, Continue reading) is in bible.scenarios.mjs,
+// and the Books side (the covers, the book page, the reader of a book) in books.scenarios.mjs.
 import assert from 'node:assert/strict';
 import { DAILY_SCENARIOS } from './daily.scenarios.mjs';
 import { UID } from './fixtures.mjs';
 import { domQuiet, eventually, pathOf } from './harness.mjs';
 import { BIBLE_SCENARIOS } from './bible.scenarios.mjs';
+import { BOOKS_SCENARIOS, CATALOG, COVER_LABEL } from './books.scenarios.mjs';
 
 const TABS = ['Me', 'Stays', 'Maps', 'Discover', 'Library'];
 const TAB_PATH = { Me: '/me', Stays: '/stays', Maps: '/maps', Discover: '/explore', Library: '/library' };
@@ -97,7 +99,7 @@ export const SCENARIOS = [
     },
   },
   {
-    name: 'Library: the tabs Bible and Books sit directly under the search row, before the banner; Bible and Books each have a banner, Books has a notice and Bible none (its text is real); there is no Notes tab and no gold pen',
+    name: 'Library: the tabs Bible and Books sit directly under the search row, before the banner; each has a banner; neither has a notice (the Bible text is real, and so is every book); there is no Notes tab and no gold pen',
     persona: 'in',
     async run({ page, step, go }) {
       const strip = (label) => page.getByText(label, { exact: true }).filter({ visible: true }).first();
@@ -127,19 +129,15 @@ export const SCENARIOS = [
       await page.getByText('World English Bible, Catholic edition · public domain', { exact: true }).waitFor();
       await eventually(() => page.getByText('Preview', { exact: true }).count(), (n) => n === 0, { what: 'the number of Preview notices on the Bible tab' });
       await eventually(() => page.getByText(/The Bible text is not in the app yet/).count(), (n) => n === 0, { what: 'the number of "not in the app yet" lines on the Bible tab' });
-      step('Books: its own banner without a button, the notice, twelve books');
+      step('Books: its own compact banner, a cover for every book of the bundle (each one button: title, kind, time); the banner and the covers are checked in books.scenarios.mjs');
       await strip('Books').click();
-      await page.getByText('Twelve free companions for the road', { exact: true }).waitFor();
-      await page.getByText('Classics to read on the way. Free to read.', { exact: true }).waitFor();
-      await page.getByText(/Books are not in the app yet/).first().waitFor();
+      await page.getByText('Books for the road', { exact: true }).waitFor();
+      await eventually(() => page.getByRole('button', { name: COVER_LABEL }).count(), (n) => n === CATALOG.length, { what: 'the number of covers on Books' });
       await eventually(() => page.getByRole('button', { name: /^Read today/ }).count(), (n) => n === 0, { what: 'the number of "Read today" buttons on Books' });
-      await eventually(() => page.getByLabel('Free to read').count(), (n) => n === 12, { what: 'the number of books marked Free' });
-      await eventually(() => page.getByLabel('Coming soon').count(), (n) => n === 12, { what: 'the number of books marked Soon' });
-      await page.getByText('The Way of a Pilgrim', { exact: true }).waitFor();
-      await page.getByText('The Story of a Soul', { exact: true }).waitFor();
-      step('Books: what is only data for later (links, licence notes, groups) is nowhere on the screen');
+      await page.getByRole('button', { name: new RegExp(`^${CATALOG[0].title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}, `) }).waitFor();
+      step('Books: what is only data (rights, links, the id of a source) is nowhere on the screen');
       const text = (await page.locator('body').innerText()).replace(/\s+/g, ' ');
-      assert(!/gutenberg|ccel\.org|licen[cs]e|translator|public domain|check-edition|Pilgrims on foot|Spanish and contemplative|Reflection and inner peace|Great classics/i.test(text), `the Books tab shows data that is not meant for the screen: ${text.slice(0, 200)}`);
+      assert(!/gutenberg|ai_disclosure|route_slug/i.test(text), `the Books tab shows data that is not meant for the screen: ${text.slice(0, 200)}`);
       await eventually(() => page.getByRole('button', { name: /^Write a (note|journey post)$/ }).count(), (n) => n === 0, { what: 'the number of gold pens on Books' });
     },
   },
@@ -261,15 +259,15 @@ export const SCENARIOS = [
       step('open Library');
       await go('/library');
       const field = page.getByRole('textbox', { name: 'Search the library' });
-      step('type "john": the four books of John in the Bible, the book by John of the Cross');
-      await field.fill('john');
-      await page.getByText('Bible · 4', { exact: true }).waitFor();
-      await page.getByText('Books · 1', { exact: true }).waitFor();
-      await page.getByRole('button', { name: /^1 John, / }).waitFor();
-      await page.getByText('Dark Night of the Soul', { exact: true }).waitFor();
-      step('the tabs and the banner give way to the results');
+      step('type "psalm": the Psalms in the Bible, and the book of readings about the Psalms of Ascent');
+      await field.fill('psalm');
+      await page.getByText('Bible · 1', { exact: true }).waitFor();
+      await page.getByText(/^Books · \d+$/).waitFor();
+      await page.getByRole('button', { name: /^Psalms, / }).waitFor();
+      await page.getByRole('button', { name: /^Songs for the Climb, Readings for the Way, / }).waitFor();
+      step('the tabs and the banner give way to the results, and no notice about books comes with them: every book is in the app');
       await eventually(() => page.getByText('Daily reading', { exact: true }).count(), (n) => n === 0, { what: 'the number of banners while searching' });
-      await page.getByText('The twelve books are examples: they are not in the app yet. The Bible text is.', { exact: true }).waitFor();
+      await eventually(() => page.getByText(/Coming soon|Books marked Soon/).count(), (n) => n === 0, { what: 'the number of notices about books in a search' });
       step('type something in the Deuterocanon, then an author');
       await field.fill('maccabees');
       await page.getByText('2 results for “maccabees”', { exact: true }).waitFor();
@@ -278,8 +276,8 @@ export const SCENARIOS = [
       await page.getByText('Bible · 1', { exact: true }).waitFor();
       await page.getByRole('button', { name: /^Daniel, / }).waitFor();
       await field.fill('Ávila');
-      await page.getByText('2 results for “Ávila”', { exact: true }).waitFor();
-      await page.getByText('The Interior Castle', { exact: true }).waitFor();
+      await page.getByText(/^\d+ results? for “Ávila”$/).waitFor();
+      await page.getByText('The Road to Ávila', { exact: true }).waitFor();
       step('type something that is nowhere');
       await field.fill('zzz');
       await page.getByText('Nothing found for “zzz”', { exact: true }).waitFor();
@@ -306,8 +304,8 @@ export const SCENARIOS = [
       await waitPath(page, '/library', 'the address after Back from the chapters of Genesis');
       step('bookmark a book of the Books tab');
       await page.getByText('Books', { exact: true }).filter({ visible: true }).first().click();
-      await page.getByRole('button', { name: 'Bookmark: Confessions', exact: true }).click();
-      await page.getByRole('button', { name: 'Remove bookmark: Confessions', exact: true }).waitFor();
+      await page.getByRole('button', { name: `Bookmark: ${CATALOG[0].title}`, exact: true }).click();
+      await page.getByRole('button', { name: `Remove bookmark: ${CATALOG[0].title}`, exact: true }).waitFor();
       step('tap the Bookmarks button');
       await page.getByRole('button', { name: 'Bookmarks', exact: true }).click();
       await waitPath(page, '/library/bookmarks', 'the address after the Bookmarks button');
@@ -316,7 +314,7 @@ export const SCENARIOS = [
       await shown('Bible · 1').waitFor();
       await shown('Books · 1').waitFor();
       await shown('Genesis').waitFor();
-      await shown('Confessions').waitFor();
+      await shown(CATALOG[0].title).waitFor();
       await page.getByText(/Sunrise over the meseta/).filter({ visible: true }).first().waitFor();
       await eventually(() => page.getByRole('tab').count(), (n) => n === 0, { what: 'the number of tabs shown on Bookmarks (there is no tab bar there)' });
       await page.getByRole('button', { name: /^Genesis, Old Testament/ }).click();
@@ -336,26 +334,27 @@ export const SCENARIOS = [
       const save = (keys) => page.evaluate(([k, list]) => localStorage.setItem(k, JSON.stringify({ v: 1, items: list.map((name, i) => ({ key: name, at: 100 - i })) })), [key, keys]);
       step('open Library once, so that the app has made its own keys');
       await go('/library');
-      step('keep only old marks on the phone: a Music row, an example Bible shelf, an example cover, two Notes keys, the two rows taken out of the Bible list, keys of verses that are not in the text, and open Bookmarks');
+      step('keep only old marks on the phone: a Music row, an example Bible shelf, an example cover, two Notes keys, the rows taken out of the Bible list, verses that are not in the text, and open Bookmarks');
       await save(['music:morning', 'music:sing', 'bible:psalms', 'books:guide', 'notes:2f6c1a', 'notes:', 'bible:bible-additions-to-esther', 'bible:bible-additions-to-daniel', 'bible:PSA.999.1', 'bible:PSA.121.99', 'bible:XXX.1.1', 'bible:SIR.11.15-16', 'bible:PSA.0.1']);
       await go('/library/bookmarks');
       await page.getByRole('heading', { name: 'Bookmarks', exact: true }).waitFor();
       await page.getByText('Nothing bookmarked in the Library yet. Tap the bookmark on a row to keep it here.', { exact: true }).waitFor();
       for (const gone of ['Chants for the road', 'Morning walk', 'Psalms for walking', 'Guide to the Way']) await eventually(() => page.getByText(gone, { exact: true }).count(), (n) => n === 0, { what: `the number of "${gone}" rows` });
       step('add a current mark next to them: it shows, and the old ones still do not');
-      await save(['music:morning', 'notes:2f6c1a', 'bible:bible-additions-to-daniel', 'books:confessions', 'bible:psalms', 'bible:bible-job', 'bible:PSA.121.3', 'bible:PSA.999.1']);
+      await save(['music:morning', 'notes:2f6c1a', 'bible:bible-additions-to-daniel', `books:${CATALOG[0].id}`, 'bible:psalms', 'bible:bible-job', 'bible:PSA.121.3', 'bible:PSA.999.1']);
       await go('/library/bookmarks');
       await page.getByText('Bible · 1', { exact: true }).waitFor();
       await page.getByText('Books · 1', { exact: true }).waitFor();
       await page.getByText('Verses · 1', { exact: true }).waitFor();
       await page.getByText('Job', { exact: true }).waitFor();
-      await page.getByText('Confessions', { exact: true }).waitFor();
+      await page.getByText(CATALOG[0].title, { exact: true }).waitFor();
       await page.getByText('Psalm 121:3', { exact: true }).first().waitFor();
       await eventually(() => page.getByText('Morning walk', { exact: true }).count(), (n) => n === 0, { what: 'the number of Music rows' });
       await eventually(() => page.getByText(/Additions to/).count(), (n) => n === 0, { what: 'the number of rows of the added passages that were taken out' });
     },
   },
   ...BIBLE_SCENARIOS,
+  ...BOOKS_SCENARIOS,
   {
     name: 'Stays: the stays of the stage are listed, and one opens with its details',
     persona: 'in',

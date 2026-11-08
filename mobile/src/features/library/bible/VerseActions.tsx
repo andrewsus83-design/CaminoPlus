@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { AccessibilityInfo, Pressable, Share, View } from 'react-native';
+import { AccessibilityInfo, Pressable, Share, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '@/components/AppText';
 import { Icon, type IconName } from '@/components/Icon';
@@ -12,14 +12,18 @@ import {
 } from './actionBar';
 import { COPIED, COPIED_MS, chosenAnnouncement, verseShareText } from './verseActions';
 
-type ButtonProps = { icon: IconName; label: string; spoken: string; filled?: boolean; disabled?: boolean; onPress: () => void };
+type ButtonProps = { icon: IconName; label: string; spoken: string; filled?: boolean; disabled?: boolean; compact?: boolean; onPress: () => void };
 
 /**
  * One action: a glyph (30) over a short word (Inter SemiBold 16), at least 88 wide and 68 high, a third of the bar wide. The word never changes with the state
  * (it would not fit 88 at 16: "Bookmarked"); a verse that is bookmarked has its glyph filled and its button tinted, and a screen reader says "Remove bookmark".
- * The word may shrink a little when the phone's own text is large, never under 16.
+ * The word may shrink a little when the phone's own text is large, never under 16. With four actions (Note is the fourth, and Copy is there) they share the bar: at 390 each
+ * is 82 wide, at 320 64, and the word shrinks to fit (never under 12); with three they keep their 88.
  */
-function ActionButton({ icon, label, spoken, filled, disabled, onPress }: ButtonProps) {
+function ActionButton({ icon, label, spoken, filled, disabled, compact, onPress }: ButtonProps) {
+  // four actions on a phone narrower than 360 each have about 64: the word is 13 there (a phone shrinks it itself, a browser does not), 16 everywhere else
+  const { width } = useWindowDimensions();
+  const size = compact && width < 360 ? 13 : ACTION_LABEL;
   return (
     <Pressable
       accessibilityRole="button"
@@ -27,10 +31,10 @@ function ActionButton({ icon, label, spoken, filled, disabled, onPress }: Button
       accessibilityState={{ disabled: !!disabled }}
       disabled={disabled}
       onPress={onPress}
-      style={({ pressed }) => ({ flex: 1, minWidth: ACTION_MIN_WIDTH, minHeight: ACTION_MIN_HEIGHT, alignItems: 'center', justifyContent: 'center', gap: 4, borderRadius: radius.md, backgroundColor: pressed || filled ? role.sunken : 'transparent', opacity: disabled ? 0.5 : 1 })}
+      style={({ pressed }) => ({ flex: 1, minWidth: compact ? 0 : ACTION_MIN_WIDTH, minHeight: ACTION_MIN_HEIGHT, alignItems: 'center', justifyContent: 'center', gap: 4, borderRadius: radius.md, backgroundColor: pressed || filled ? role.sunken : 'transparent', opacity: disabled ? 0.5 : 1 })}
     >
       <Icon name={icon} color={role.action} size={ACTION_ICON} filled={filled} />
-      <AppText variant="label" maxFontSizeMultiplier={1.3} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.77} style={{ fontSize: ACTION_LABEL, lineHeight: ACTION_LABEL_LINE }}>{label}</AppText>
+      <AppText variant="label" maxFontSizeMultiplier={1.3} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.77} style={{ fontSize: size, lineHeight: ACTION_LABEL_LINE }}>{label}</AppText>
     </Pressable>
   );
 }
@@ -43,10 +47,11 @@ function ActionButton({ icon, label, spoken, filled, disabled, onPress }: Button
  * it is asked for first, lib/optionalNative.ts; without it the button is not drawn) and Share (the phone's own share sheet, from React Native). What is copied and
  * shared is the verse, then where it is and "(World English Bible)". The sizes are in actionBar.ts: a glyph of 30, a word of 16, every action at least 88 by 68.
  */
-export function VerseActions({ place, words, bookmarked, canBookmark, onBookmark, onClose }: { place: string; words: string; bookmarked: boolean; canBookmark: boolean; onBookmark: () => void; onClose: () => void }) {
+export function VerseActions({ place, words, bookmarked, canBookmark, onBookmark, onNote, onClose }: { place: string; words: string; bookmarked: boolean; canBookmark: boolean; onBookmark: () => void; onNote: () => void; onClose: () => void }) {
   const insets = useSafeAreaInsets();
   const [copied, setCopied] = useState(false);
   const canCopy = hasNativeModule(NativeName.clipboard);
+  const compact = canCopy;
   const text = verseShareText(place, words);
 
   // a screen reader hears which verse was chosen (the announcement is also the name of the live region below, so it is said once on the web too)
@@ -72,16 +77,18 @@ export function VerseActions({ place, words, bookmarked, canBookmark, onBookmark
         </Pressable>
       </View>
       <View style={{ flexDirection: 'row', gap: ACTION_GAP }}>
-        <ActionButton icon="bookmark" filled={bookmarked} label="Bookmark" spoken={bookmarkLabel(bookmarked, place)} disabled={!canBookmark} onPress={onBookmark} />
+        <ActionButton icon="bookmark" filled={bookmarked} label="Bookmark" spoken={bookmarkLabel(bookmarked, place)} disabled={!canBookmark} compact={compact} onPress={onBookmark} />
+        <ActionButton icon="pen" label="Note" spoken={`Write a note: ${place}`} compact={compact} onPress={onNote} />
         {canCopy && (
           <ActionButton
             icon="copy"
             label={copied ? COPIED : 'Copy'}
             spoken={copied ? `${COPIED}: ${place}` : `Copy: ${place}`}
+            compact={compact}
             onPress={() => { void copyText(text).then((ok) => { if (ok) setCopied(true); }); }}
           />
         )}
-        <ActionButton icon="share" label="Share" spoken={`Share: ${place}`} onPress={() => { void Share.share({ message: text }).catch(() => {}); }} />
+        <ActionButton icon="share" label="Share" spoken={`Share: ${place}`} compact={compact} onPress={() => { void Share.share({ message: text }).catch(() => {}); }} />
       </View>
     </View>
   );

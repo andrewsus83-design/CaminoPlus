@@ -284,13 +284,15 @@ TABS = [
    "Photos of you: buy shots other pilgrims took of you on the way <span class=\"tag gold\">Coming later</span>"],
   [("discover", "Discover full-screen stories"), ("discover-photos", "Photos of you marketplace")]),
  ("library", "book", "Library", "Scripture and books for the road.",
-  "A search field and your bookmarks along the top, then two tabs: Bible and Books. The Bible tab is real: all 73 books of the World English Bible, Catholic edition, a modern English translation in the public domain, are in the app, so you can read with no signal. It is not the translation read at Mass. A small banner for the daily reading comes first, then a pill to pick the part (Old Testament, Deuterocanon or New Testament) and the books of that part as square tiles. Tap a book, tap a chapter number and read; Previous and Next carry on across the books. The daily reading and the Books tab, twelve free classics for the road, are examples today, and the app says so. Your own notes are not here: they are the first tab of Me.",
+  "A search field and your bookmarks along the top, then two tabs: Bible and Books. The Bible tab is real: all 73 books of the World English Bible, Catholic edition, a modern English translation in the public domain, are in the app, so you can read with no signal. It is not the translation read at Mass. A small banner for the daily reading comes first, then a pill to pick the part (Old Testament, Deuterocanon or New Testament) and the books of that part as square tiles. Tap a book, tap a chapter number and read; Previous and Next carry on across the books. The daily reading is an example today, and the app says so. The Books tab holds the books written for the app, as covers two in a row: pilgrim's guides to the Caminos, and books of readings, each a famous book of the past, a few pages a day, paired with a Camino. They were written with AI assistance, and no person has checked the facts of the guides yet: the page of every book says so. Tap a cover and then Start reading, with a table of contents, Previous and Next, a text size you choose and your place kept on your phone only. Your own notes are not here: they are the first tab of Me.",
   ["The whole Bible in the app: 73 books of the World English Bible, Catholic edition (public domain), readable with no signal",
    "Pick a part, tap a book, tap a chapter number and read. Previous and Next name where they go and carry on from book to book, and Continue reading takes you back to the chapter you left (remembered only on your phone)",
    "Tap a verse to bookmark it or share it. The search finds verses by their words and opens the chapter at that verse",
-   f"The daily reading and the twelve free classics on the Books tab are examples for now {COMING}",
+   f"The daily reading is an example for now {COMING}",
+   "The Books tab: pilgrim's guides and books of readings, as covers. Every book is in the app, so you can read it with no signal: Previous and Next name where they go, you choose the size of the text, and your place is kept only on your phone",
+   "The books were written with AI assistance. No person has checked the facts of the guides yet, and each page says so: confirm distances, water and services before you walk",
    "Bookmarks also keep the posts you bookmark on your journey"],
-  [("library", "Library tab with a search field and a bookmarks button on top, the tabs Bible and Books, a small banner for the daily reading, the pill that picks Old Testament, Deuterocanon or New Testament, and the books of the Bible as square tiles"), ("library-books", "Library, Books tab: twelve free classics, each marked Free and Soon")]),
+  [("library", "Library tab with a search field and a bookmarks button on top, the tabs Bible and Books, a small banner for the daily reading, the pill that picks Old Testament, Deuterocanon or New Testament, and the books of the Bible as square tiles"), ("library-books", "Library, Books tab: the books written for the app as covers on two shelves, pilgrim's guides and readings, each cover with its kind and its time")]),
 ]
 
 # The routes of the route picker, in the order of the database (supabase/migrations/..._more_caminos.sql).
@@ -869,6 +871,20 @@ LICENCES_DATA = [
  ("Wikimedia Commons", "Photos of places, where we use them", "Each file has its own licence (CC0, CC BY, CC BY-SA ...); the author and licence are credited where a photo is shown", "https://commons.wikimedia.org/wiki/Commons:Licensing"),
  ("AI-generated sample pictures and clips", "The sample journey in the app, shown before you have posts of your own", "Made by CaminoPlus with Google Nano Banana 2 and Veo 3.1 through OpenArt. AI-generated, not photographs of real places or people", "https://openart.ai/"),
 ]
+def reading_sources():
+    """The passages of the books of readings are word for word from public-domain editions: one row for each edition named in the `sources` of a books/<id>/book.json (in the order of
+    the books), with the page of the edition, as the Licences screen of the app lists them (mobile/src/features/library/books/sources.ts keeps the app's copy, and a test keeps that copy
+    equal to these files)."""
+    books = [json.loads(f.read_text(encoding="utf-8")) for f in (ROOT / "books").glob("*/book.json")]
+    rows = []
+    for b in sorted((b for b in books if b.get("sources")), key=lambda b: (b.get("order", 999), b["id"])):
+        for src in b["sources"]:
+            translator = src.get("translator")
+            by = " · ".join(x for x in (src["author"], translator if translator and not re.match(r"none\b", translator, re.I) else None, src.get("year")) if x)
+            rows.append((src["work"], f"{by}. Quoted word for word in “{b['title']}”.", src["licence"], src["url"]))
+    return rows
+
+
 LICENCES_TEXT = [
  ("World English Bible, Catholic edition", "The text of the Bible in the Library: 73 books, kept in the app, so it reads without a signal. Strong’s numbers, footnotes and cross references are not included", "Public domain. The name “World English Bible” is a trademark of eBible.org", "https://ebible.org/eng-web-c/"),
 ]
@@ -907,6 +923,11 @@ def licences():
 <h2>Software and fonts</h2>
 </div>
 {table(LICENCES_SOFTWARE)}
+<div class="prose">
+<h2>Books in the Library</h2>
+<p>The passages of the books of readings are word for word from the public-domain editions below, each with the page of the edition. The rest of the text of the books is original text written for CaminoPlus.</p>
+</div>
+{table(reading_sources())}
 <div class="prose">
 <h2>Photos on this website</h2>
 <p>The background photos on this website are AI-generated illustrations, not photographs, and are marked as such wherever they appear. App screens are rendered from our own design.</p>
