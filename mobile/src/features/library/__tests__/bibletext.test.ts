@@ -505,7 +505,7 @@ check('the licences screen has an entry for the translation: its name, "Public d
   assert.match(what, /^The text of the Bible in the Library: 73 books, kept in the app, so it reads without a signal\./);
   assert.match(what, /Strong’s numbers, footnotes and cross references are not included\.$/);
   assert.match(src, /<Group title="MAPS AND DATA" items=\{DATA\} \/>\s*<Group title="THE BIBLE TEXT" items=\{TEXT\} \/>\s*<Group title="FONTS AND SOFTWARE" items=\{SOFTWARE\} \/>/, 'its own group, between the data and the software');
-  assert.doesNotMatch(src, /^import .*(library\/bible|assets\/bible)|\brequire\(/m, 'the screen does not pull the text of the Bible into its own code: the entry is plain text');
+  assert.doesNotMatch(src, /^import .*(library\/bible|assets\/bible)|\brequire\([^)]*(library\/bible|assets\/bible)/m, 'the screen does not pull the text of the Bible into its own code: the entry is plain text (the list of the books\' editions is read from assets/books/manifest.json, which is a few lines of credits and not a text)');
   assert.match(src, /Pressable key=\{i\.name\} accessibilityRole="link" accessibilityLabel=\{`\$\{i\.name\}: open licence details`\} onPress=\{\(\) => \{ void WebBrowser\.openBrowserAsync\(i\.url\); \}\}/, 'it opens the page of the translation like every other entry');
 });
 
