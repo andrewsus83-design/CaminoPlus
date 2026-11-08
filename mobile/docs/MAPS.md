@@ -58,6 +58,17 @@ npm run build:dev:ios         # needs an Apple Developer account ($99/yr) and yo
 | Sample route: the stages and the route (the OSM lines joined, the hand-placed lines only as the fallback, straight lines between towns after Pamplona), the towns, the sample pins and position (approximate) | `src/features/map/sampleRoute.ts` |
 | Pins: real stays and points of interest of the stage (`rpc list_stage_stays` / `list_stage_pois`), a saved copy, the sample pins as the fallback | `src/features/places/` (`useStagePois`, `useStageStays`, `choosePins`) |
 
+**The round controls on the map** (`src/features/map/WalkUi.tsx`, `controlLayout.ts`, `app/(tabs)/maps.tsx`). One family, on the whole route and in the Walk view: round buttons of 56
+(`layout.touchPrimary`) with a 28 icon (`icon.mdPlus`), 12 apart (`space[3]`), 16 from the edge of the screen; zoom in and out are one capsule of 56 x 112; the Re-center pill is 56 high with a
+24 arrow and "Re-center" at the `label` variant, at the left and level with the bottom of the column. The column ends 12 above the bottom card in the Walk view and 16 above the tab bar on the
+whole route. The whole family (eight 56 buttons) needs 532 px, which no phone has between the banner and the card, so `controlLayout.ts` shows the controls in order of importance while they
+fit (the zoom pair, the help bell, the compass or "Show my position", "What is near", the map light, GPS, and on the whole route the flag) and the rest are rows of "Map options" in the route
+sheet that the flag button opens (its label then says "Route details and map options"). The zoom pair never folds; the help bell moves into the row of buttons of the bottom card when the
+column has no room for it; when not even one button fits (the largest text on a 320 x 568 phone) the column is not drawn and Zoom in and Zoom out are rows of Map options too. The label of a
+control stops growing at 1.3 times the text setting (`CONTROL_TEXT_MAX`); the banner, the card and the sheets grow without a limit and the column folds to make room. The overlay has its own
+day and night (`walkTheme`): it reads the fixed palette, never `c.*`, so a dark app does not turn the icons of a night map dark. Tests: `features/map/__tests__/controlLayout.test.ts` (the
+arithmetic), `lib/__tests__/mapControls.test.ts` (the code), `tools/web-smoke/maps.scenarios.mjs` (the real screen on four phones, light and dark, and with large text).
+
 **Online vs offline.** One style draws both. Online (internet): MapTiler `v3` tiles with a key,
 OpenFreeMap's keyless tiles without one. Offline: our own OSM `.pmtiles` packs for the current stage ±1.
 MapTiler's terms forbid offline caching, so MapTiler tiles are never put in a pack;

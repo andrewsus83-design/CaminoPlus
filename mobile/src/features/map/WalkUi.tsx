@@ -9,7 +9,7 @@ import { AccessibilityInfo, Animated, PanResponder, Platform, Pressable, ScrollV
 import Svg, { Circle, G, Polygon } from 'react-native-svg';
 import { AppText } from '@/components/AppText';
 import { Icon, IconName } from '@/components/Icon';
-import { c, fixed, icon, layout, radius, role, shadowStyle, space } from '@/theme';
+import { c, fixed, fonts, icon, layout, radius, role, shadowStyle, space } from '@/theme';
 import type { Banner, Card, AheadItem } from './nav';
 import type { PoiKind } from './sampleRoute';
 import { POI_KINDS, kindHex } from './walkLayers';
@@ -388,7 +388,7 @@ export function WalkCard(p: CardProps) {
             onPress={p.onExit}
             style={({ pressed }) => ({ flex: 1, height: BTN, borderRadius: radius.pill, backgroundColor: c.red, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.88 : 1 })}
           >
-            <AppText variant="label" color={c.parchment} maxFontSizeMultiplier={CONTROL_TEXT_MAX}>Exit</AppText>
+            <AppText variant="lead" color={c.parchment} maxFontSizeMultiplier={CONTROL_TEXT_MAX} style={{ fontFamily: fonts.bodyBold }}>Exit</AppText>
           </Pressable>
         </View>
       </View>

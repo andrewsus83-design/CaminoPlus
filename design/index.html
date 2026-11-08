@@ -405,7 +405,6 @@ textarea.cp-input { height: 120px; border-radius: var(--cp-radius-lg); padding: 
 .cp-alert .bubble { width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; flex: none; }
 .cp-alert .t { font-weight: 600; font-size: 17px; line-height: 20px; }
 .cp-alert .m { font-size: 15px; line-height: 18px; color: var(--cp-text-muted); }
-.cp-fab-stack { display: flex; flex-direction: column; gap: 12px; }
 .cp-report-fab { width: 64px; height: 64px; border-radius: 50%; background: var(--cp-color-gold); color: var(--cp-color-blue); display: grid; place-items: center; box-shadow: var(--cp-shadow-gold); border: 0; }
 .cp-report-fab .cp-icon { width: 30px; height: 30px; stroke-width: 2.2px; }
 .cp-eta { display: flex; align-items: center; gap: 14px; }
@@ -978,24 +977,45 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
 .cp-menu small { display: block; font-family: var(--cp-font-body); font-weight: 400; font-size: 15px; color: var(--cp-text-muted); }
 
 /* ---- v4: map layers (helicopter / city) ---- */
-.cp-layer-switch { align-self: flex-start; display: inline-flex; padding: 4px; border-radius: var(--cp-radius-pill); background: rgba(255,253,248,.94); backdrop-filter: blur(10px); box-shadow: var(--cp-shadow-md); }
-.cp-layer-switch span { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 14px; border-radius: var(--cp-radius-pill); font-size: 15px; font-weight: 600; color: var(--cp-text-muted); white-space: nowrap; }
+.cp-layer-switch { align-self: flex-start; display: inline-flex; padding: 4px; border-radius: var(--cp-radius-pill); background: var(--cp-color-parchment); box-shadow: var(--cp-shadow-md); }
+.cp-layer-switch span { display: inline-flex; align-items: center; gap: 8px; height: 48px; padding: 0 16px; border-radius: var(--cp-radius-pill); font-size: 17px; line-height: 22px; font-weight: 600; color: var(--cp-color-blue); white-space: nowrap; }
 .cp-layer-switch span .cp-icon { width: 18px; height: 18px; }
 .cp-layer-switch span.on { background: var(--cp-color-blue); color: var(--cp-color-parchment); }
 .cp-pin.sm { width: 34px; height: 34px; border-width: 2.5px; }
 .cp-pin.sm .cp-icon { width: 17px; height: 17px; }
 .cp-pin.iconic.md { width: 50px; height: 50px; }
-.cp-hint { display: inline-flex; align-items: center; gap: 8px; height: 34px; padding: 0 14px; border-radius: var(--cp-radius-pill); background: rgba(12,35,64,.82); color: var(--cp-color-parchment); font-family: var(--cp-font-mono); font-size: 11px; white-space: nowrap; }
-.cp-hint .cp-icon { width: 16px; height: 16px; }
+.cp-hint { display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 16px; border-radius: var(--cp-radius-pill); background: rgba(12,35,64,.82); color: var(--cp-color-parchment); font-family: var(--cp-font-mono); font-size: 15px; white-space: nowrap; }
+.cp-hint .cp-icon { width: 18px; height: 18px; }
 .cp-elev { display: block; width: 100%; height: 64px; }
 .cp-youhere { position: absolute; z-index: 3; display: flex; align-items: center; gap: 8px; }
 .cp-youhere .ring { width: 50px; height: 50px; border-radius: 50%; background: rgba(217,162,27,.28); display: grid; place-items: center; }
 .cp-youhere .dot { width: 30px; height: 30px; border-radius: 50%; background: var(--cp-color-blue); border: 3px solid var(--cp-color-white); box-shadow: var(--cp-shadow-md); display: grid; place-items: center; }
 .cp-youhere .dot .cp-icon { width: 14px; height: 14px; fill: var(--cp-color-gold); stroke: var(--cp-color-gold); }
-.cp-youhere .tag { background: var(--cp-color-white); border-radius: var(--cp-radius-pill); padding: 4px 10px; font-size: 11px; font-weight: 700; box-shadow: var(--cp-shadow-sm); white-space: nowrap; }
+.cp-youhere .tag { background: var(--cp-color-white); border-radius: var(--cp-radius-pill); padding: 4px 12px; font-size: 15px; font-weight: 700; box-shadow: var(--cp-shadow-sm); white-space: nowrap; }
 .cp-legend { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 20px; font-size: 16px; }
 .cp-legend div { display: flex; align-items: center; gap: 10px; }
 .cp-legend i { width: 26px; height: 0; display: block; flex: none; }
+
+/* ---- Map controls: ONE family on the map (mobile/src/features/map/WalkUi.tsx, controlLayout.ts). Round buttons of 56 (touchPrimary) with a 28 icon, 12 apart, 16 from the edge
+   of the screen; the zoom pair is one capsule of 56 x 112; the Re-center pill is 56 high with a 24 arrow and its label in Inter SemiBold 17. The map has its own day and night
+   (.map-night), and neither follows the app's dark mode. A short phone shows the controls that fit, most important first, and folds the rest into "Map options" of the route sheet. ---- */
+.cp-map-btn { position: relative; width: 56px; height: 56px; padding: 0; border: 0; border-radius: 50%; display: inline-grid; place-items: center; background: var(--cp-color-parchment); color: var(--cp-color-blue); box-shadow: var(--cp-shadow-md); cursor: pointer; }
+.cp-map-btn .cp-icon { width: 28px; height: 28px; stroke-width: 2px; }
+.cp-map-btn.bell { color: var(--cp-color-red); }
+.cp-map-btn.on { background: var(--cp-color-gold-wash); box-shadow: inset 0 0 0 1.5px var(--cp-color-gold), var(--cp-shadow-md); }
+.cp-map-btn .auto { position: absolute; right: 2px; bottom: 2px; width: 20px; height: 20px; border-radius: 50%; background: var(--cp-color-gold); color: var(--cp-color-blue); display: grid; place-items: center; font: 600 17px/20px var(--cp-font-body); }
+.cp-map-stack { display: flex; flex-direction: column; align-items: flex-end; gap: 12px; }
+.cp-map-zoom { position: relative; width: 56px; height: 112px; border-radius: 28px; display: grid; grid-template-rows: 56px 56px; background: var(--cp-color-parchment); color: var(--cp-color-blue); box-shadow: var(--cp-shadow-md); }
+.cp-map-zoom button { border: 0; padding: 0; background: none; color: inherit; display: grid; place-items: center; cursor: pointer; }
+.cp-map-zoom .cp-icon { width: 28px; height: 28px; stroke-width: 2px; }
+.cp-map-zoom::after { content: ""; position: absolute; left: 12px; right: 12px; top: 56px; height: 1px; background: var(--cp-color-sand-300); }
+.cp-recenter { display: inline-flex; align-items: center; gap: 8px; height: 56px; padding: 0 20px; border: 0; border-radius: 28px; background: var(--cp-color-blue); color: var(--cp-color-parchment); font: 600 17px/22px var(--cp-font-body); box-shadow: var(--cp-shadow-md); cursor: pointer; white-space: nowrap; }
+.cp-recenter .cp-icon { width: 24px; height: 24px; stroke-width: 2.2px; }
+.map-night .cp-map-btn, .map-night .cp-map-zoom { background: #13243C; color: #F6EFE2; box-shadow: inset 0 0 0 1.5px rgba(246,239,226,.24), var(--cp-shadow-md); }
+.map-night .cp-map-btn.bell { color: #E8776A; }
+.map-night .cp-map-btn.on { background: #1E3A63; box-shadow: inset 0 0 0 1.5px var(--cp-color-gold), var(--cp-shadow-md); }
+.map-night .cp-map-zoom::after { background: rgba(246,239,226,.24); }
+.map-night .cp-recenter { background: #13243C; box-shadow: inset 0 0 0 1.5px rgba(246,239,226,.24), var(--cp-shadow-md); }
 
 /* ---- v5: inbox, notifications, Instagram-style post flow ---- */
 .cp-inbox-top { display: flex; align-items: center; gap: 10px; }
@@ -1683,12 +1703,12 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
       <div class="cp-alert"><span class="bubble b-blue"><svg class="cp-icon"><use href="#i-crowd"/></svg></span><div style="flex:1"><div class="t">Busy at Hontanas</div><div class="m">Albergues filling fast after 14:00</div></div></div>
       <div class="cp-alert"><span class="bubble b-red"><svg class="cp-icon"><use href="#i-bed-full"/></svg></span><div style="flex:1"><div class="t">Albergue Municipal is full</div><div class="m">2 alternatives within 800 m</div></div></div>
       <div class="panel row" style="justify-content:space-between">
-        <div class="cp-fab-stack"><button class="cp-icon-btn"><svg class="cp-icon"><use href="#i-layers"/></svg></button><button class="cp-icon-btn"><svg class="cp-icon"><use href="#i-locate"/></svg></button></div>
+        <div class="cp-map-stack"><button class="cp-map-btn"><svg class="cp-icon"><use href="#i-layers"/></svg></button><button class="cp-map-btn"><svg class="cp-icon"><use href="#i-locate"/></svg></button></div>
         <span class="cp-badge glass" style="height:40px;padding:0 16px;font-size:15px"><svg class="cp-icon sm"><use href="#i-sun"/></svg>24° · Clear</span>
         <span class="cp-badge glass" style="height:40px;padding:0 16px;font-size:15px"><svg class="cp-icon sm"><use href="#i-offline"/></svg>Offline ready</span>
         <button class="cp-report-fab"><svg class="cp-icon"><use href="#i-plus"/></svg></button>
       </div>
-      <p class="spec" style="margin:0">.cp-alert (pill toast, shadow-lg) · floating .cp-icon-btn 48 · weather / offline glass pills · .cp-report-fab (gold, bottom-right)</p>
+      <p class="spec" style="margin:0">.cp-alert (pill toast, shadow-lg) · floating .cp-map-btn 56 with a 28 icon (see Map controls, in Map layers) · weather / offline glass pills · .cp-report-fab (gold, bottom-right)</p>
     </div>
   </div>
 </section>
@@ -1868,6 +1888,40 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
       <p class="note" style="margin:16px 0 0">Switch with the pill, or pinch: below zoom 9 the app shows Helicopter, above zoom 12 it shows City. The change flies the camera over 320 ms. Both layers work offline from the downloaded route pack.</p>
     </div>
   </div>
+
+  <h3>Map controls: one family</h3>
+  <div class="grid g2" style="align-items:start">
+    <div class="panel" style="background:#E7E0CB">
+      <div style="display:flex;gap:28px;align-items:flex-end;flex-wrap:wrap">
+        <div class="cp-map-stack">
+          <button class="cp-map-btn bell" aria-label="Need help"><svg class="cp-icon"><use href="#i-bell"/></svg></button>
+          <button class="cp-map-btn" aria-label="Compass"><svg class="cp-icon"><use href="#i-compass"/></svg></button>
+          <button class="cp-map-btn on" aria-label="What is near"><svg class="cp-icon"><use href="#i-search"/></svg></button>
+          <button class="cp-map-btn" aria-label="Map light: automatic"><svg class="cp-icon"><use href="#i-sun"/></svg><span class="auto" aria-hidden="true">A</span></button>
+          <div class="cp-map-zoom"><button aria-label="Zoom in"><svg class="cp-icon"><use href="#i-plus"/></svg></button><button aria-label="Zoom out"><svg class="cp-icon" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:16px;align-items:flex-start">
+          <button class="cp-recenter"><svg class="cp-icon"><use href="#i-nav"/></svg>Re-center</button>
+          <div class="cp-layer-switch"><span class="on">Whole route</span><span class="">Near me</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="panel map-night" style="background:#0C1626">
+      <div style="display:flex;gap:28px;align-items:flex-end;flex-wrap:wrap">
+        <div class="cp-map-stack">
+          <button class="cp-map-btn bell" aria-label="Need help"><svg class="cp-icon"><use href="#i-bell"/></svg></button>
+          <button class="cp-map-btn" aria-label="Compass"><svg class="cp-icon"><use href="#i-compass"/></svg></button>
+          <button class="cp-map-btn on" aria-label="What is near"><svg class="cp-icon"><use href="#i-search"/></svg></button>
+          <button class="cp-map-btn" aria-label="Map light: night"><svg class="cp-icon"><use href="#i-moon"/></svg></button>
+          <div class="cp-map-zoom"><button aria-label="Zoom in"><svg class="cp-icon"><use href="#i-plus"/></svg></button><button aria-label="Zoom out"><svg class="cp-icon" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:16px;align-items:flex-start">
+          <button class="cp-recenter"><svg class="cp-icon"><use href="#i-nav"/></svg>Re-center</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="spec" style="margin:16px 0 0">.cp-map-btn 56 round, icon 28 (.bell red, .on gold ring, .auto the A of the automatic light) · .cp-map-stack 12 apart, 16 from the edge · .cp-map-zoom one capsule 56 x 112, the halves 56 · .cp-recenter 56 high, 24 arrow, label 17 SemiBold, 16 from the left edge and level with the bottom of the stack · .map-night is the night of the map (it does not follow the app's dark mode). The zoom pair never folds; the help bell is in the column or in the row of buttons of the bottom card. On a short phone the column shows the controls that fit, most important first (zoom pair, help bell, compass or locate, what is near, light, GPS), and the rest are rows of "Map options" in the route sheet that the flag button opens. Nothing under 15 px, nothing under 48 to tap.</p>
 
   <h3>Inbox & notifications</h3>
   <div class="grid g2" style="align-items:start">
@@ -2986,13 +3040,15 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
         <div style="position:absolute;top:62px;left:16px;right:16px;display:flex;flex-direction:column;gap:10px;z-index:4">
           <div style="display:flex;gap:10px;align-items:center">
             <div class="cp-hud" style="flex:1"><span class="cp-level">7</span><div style="flex:1"><div class="t">Peregrino<span>1,240 / 1,500 XP</span></div><div class="cp-xp"><span style="width:82%"></span></div></div></div>
-            <button class="cp-icon-btn" aria-label="Search"><svg class="cp-icon "><use href="#i-search"/></svg></button>
+            <button class="cp-map-btn" aria-label="Search"><svg class="cp-icon "><use href="#i-search"/></svg></button>
           </div>
-          <div class="cp-layer-switch"><span class="on"><svg class="cp-icon "><use href="#i-heli"/></svg>Helicopter</span><span class=""><svg class="cp-icon "><use href="#i-city"/></svg>City</span></div>
+          <div class="cp-layer-switch"><span class="on">Whole route</span><span class="">Near me</span></div>
         </div>
-        <div class="cp-fab-stack" style="position:absolute;right:16px;top:188px;z-index:4">
-          <button class="cp-icon-btn" style="align-self:flex-end"><svg class="cp-icon "><use href="#i-layers"/></svg></button>
-          <button class="cp-icon-btn" style="align-self:flex-end"><svg class="cp-icon "><use href="#i-locate"/></svg></button>
+        <div class="cp-map-stack" style="position:absolute;right:16px;bottom:340px;z-index:4">
+          <button class="cp-map-btn bell" aria-label="Need help"><svg class="cp-icon "><use href="#i-bell"/></svg></button>
+          <button class="cp-map-btn" aria-label="Show my position"><svg class="cp-icon "><use href="#i-locate"/></svg></button>
+          <button class="cp-map-btn" aria-label="Map light: automatic"><svg class="cp-icon "><use href="#i-sun"/></svg><span class="auto" aria-hidden="true">A</span></button>
+          <div class="cp-map-zoom"><button aria-label="Zoom in"><svg class="cp-icon "><use href="#i-plus"/></svg></button><button aria-label="Zoom out"><svg class="cp-icon" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button></div>
         </div>
         <div class="cp-sheet" style="position:absolute;left:0;right:0;bottom:0;padding-bottom:124px;z-index:5">
           <div class="grab"></div>
@@ -3035,7 +3091,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           <g font-family="Inter" font-size="11" font-weight="600" fill="#8C8272" paint-order="stroke" stroke="#EDE5D3" stroke-width="3"><text x="70" y="114">Calle Mayor</text><text x="198" y="444">Rúa de San Juan</text><text x="308" y="228" transform="rotate(-90 308 228)">Camino Real</text></g>
         </svg>
         <div class="cp-pin iconic" style="position:absolute;left:222px;top:250px;z-index:2"><svg class="cp-icon "><use href="#i-landmark"/></svg><span class="xp">+80 XP</span><span class="cp-pin-label">Cathedral</span></div>
-        <div class="cp-pin church" style="position:absolute;left:107px;top:350px;z-index:2"><svg class="cp-icon "><use href="#i-church"/></svg><span class="cp-pin-label">San Juan</span></div>
+        <div class="cp-pin church" style="position:absolute;left:107px;top:336px;z-index:2"><svg class="cp-icon "><use href="#i-church"/></svg></div>
         <div class="cp-pin hunt" style="position:absolute;left:57px;top:277px;z-index:2"><svg class="cp-icon "><use href="#i-chest"/></svg><span class="cp-pin-label">Shell hunt</span></div>
         <div class="cp-pin story" style="position:absolute;left:236px;top:168px;z-index:2"><svg class="cp-icon "><use href="#i-headphones"/></svg></div>
         <div class="cp-pin water" style="position:absolute;left:26px;top:408px;z-index:2"><svg class="cp-icon "><use href="#i-drop"/></svg></div>
@@ -3045,18 +3101,18 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
         <div style="position:absolute;top:62px;left:16px;right:16px;display:flex;flex-direction:column;gap:10px;z-index:4">
           <div style="display:flex;gap:10px;align-items:center">
             <div class="cp-hud" style="flex:1"><span class="cp-level">7</span><div style="flex:1"><div class="t">Peregrino<span>1,240 / 1,500 XP</span></div><div class="cp-xp"><span style="width:82%"></span></div></div></div>
-            <button class="cp-icon-btn" aria-label="Search"><svg class="cp-icon"><use href="#i-search"/></svg></button>
+            <button class="cp-map-btn" aria-label="Search"><svg class="cp-icon"><use href="#i-search"/></svg></button>
           </div>
-          <div class="cp-layer-switch"><span class=""><svg class="cp-icon "><use href="#i-heli"/></svg>Helicopter</span><span class="on"><svg class="cp-icon "><use href="#i-city"/></svg>City</span></div>
+          <div class="cp-layer-switch"><span class="">Whole route</span><span class="on">Near me</span></div>
         </div>
-        <div class="cp-fab-stack" style="position:absolute;right:16px;top:188px;z-index:4">
-          <span class="cp-badge glass" style="height:40px;padding:0 12px;font-size:14px"><svg class="cp-icon sm"><use href="#i-sun"/></svg>24°</span>
-          <button class="cp-icon-btn" style="align-self:flex-end"><svg class="cp-icon"><use href="#i-layers"/></svg></button>
-          <button class="cp-icon-btn" style="align-self:flex-end"><svg class="cp-icon"><use href="#i-locate"/></svg></button>
+        <div class="cp-map-stack" style="position:absolute;right:16px;bottom:384px;z-index:4">
+          <button class="cp-map-btn bell" aria-label="Need help"><svg class="cp-icon"><use href="#i-bell"/></svg></button>
+          <button class="cp-map-btn" aria-label="Compass"><svg class="cp-icon"><use href="#i-compass"/></svg></button>
+          <div class="cp-map-zoom"><button aria-label="Zoom in"><svg class="cp-icon"><use href="#i-plus"/></svg></button><button aria-label="Zoom out"><svg class="cp-icon" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button></div>
         </div>
+        <div style="position:absolute;left:16px;bottom:384px;z-index:4"><button class="cp-recenter"><svg class="cp-icon"><use href="#i-nav"/></svg>Re-center</button></div>
         <div class="cp-sheet" style="position:absolute;left:0;right:0;bottom:0;padding-bottom:124px;z-index:5">
           <div class="grab"></div>
-          <button class="cp-report-fab" style="position:absolute;right:20px;top:-80px" aria-label="Report"><svg class="cp-icon"><use href="#i-plus"/></svg></button>
           <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
             <div><div style="font-family:var(--cp-font-title);font-weight:600;font-size:24px;line-height:28px">Iglesia de San Juan</div><div class="note" style="font-size:14px">Church · 12th century · 300 m</div></div>
             <span class="cp-badge gold">+40 XP</span>
