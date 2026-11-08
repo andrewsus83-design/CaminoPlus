@@ -58,9 +58,9 @@ type Notice = { tone: 'error' | 'info'; text: string };
 /** The friendly page the feed shows when there is nothing to list: the diary has no note, or the filter holds none. */
 function Empty({ title, text, button, ghost, onPress }: { title: string; text: string; button: string; ghost?: boolean; onPress: () => void }) {
   return (
-    <View style={{ alignItems: 'center', gap: 12, paddingHorizontal: 32, paddingTop: 40, paddingBottom: 24 }}>
-      <View style={{ width: 64, height: 64, borderRadius: radius.pill, backgroundColor: role.highlight, alignItems: 'center', justifyContent: 'center' }}>
-        <Icon name="compose" color={role.onHighlight} size={30} />
+    <View style={{ alignItems: 'center', gap: 12, paddingHorizontal: 32, paddingTop: 24, paddingBottom: 24 }}>
+      <View style={{ width: 56, height: 56, borderRadius: radius.pill, backgroundColor: role.highlight, alignItems: 'center', justifyContent: 'center' }}>
+        <Icon name="compose" color={role.onHighlight} size={28} />
       </View>
       <AppText variant="h4" accessibilityRole="header" style={{ textAlign: 'center' }}>{title}</AppText>
       <AppText variant="small" muted style={{ textAlign: 'center' }}>{text}</AppText>

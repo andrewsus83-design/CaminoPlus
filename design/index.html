@@ -637,6 +637,64 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
 .dy-read .q { border-left: 3px solid var(--cp-color-gold); padding-left: 14px; }
 .dy-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .dy-grid .dy-tile { width: auto; height: auto; aspect-ratio: 1 / 1; }
+/* ---- Library · Notes: the diary's pages as a feed (start) ---- */
+.nt-top { position: absolute; top: 54px; left: 0; right: 0; z-index: 4; padding: var(--cp-screen-top) var(--cp-screen-margin) 0; background: var(--cp-bg); }
+.nt-top .cp-subtabs { margin-top: 16px; }
+.nt-feed.scroll { top: 181px; padding: 0 0 140px; }
+.nt-av { width: 44px; height: 44px; border-radius: 50%; flex: none; background: #C9A48A; color: var(--cp-color-blue); display: grid; place-items: center; font-weight: 600; font-size: 16px; line-height: 20px; }
+.nt-compose { display: flex; gap: 12px; padding: 12px 16px 0; }
+.nt-compose .nt-body { flex: 1; min-width: 0; }
+.nt-prompt { min-height: 48px; display: flex; align-items: center; font-size: 19px; line-height: 28px; color: var(--cp-text-muted); }
+.nt-short { display: flex; margin-left: -11px; color: var(--cp-action); }
+.nt-short span { width: 44px; height: 44px; display: grid; place-items: center; }
+.nt-short .cp-icon { width: 22px; height: 22px; }
+.nt-private { margin: 0; padding: 2px 16px 14px; font-size: 15px; line-height: 21px; letter-spacing: .4px; font-weight: 500; color: var(--cp-text-muted); }
+.nt-filters { display: flex; border-top: 1px solid var(--cp-border); border-bottom: 1px solid var(--cp-border); }
+.nt-filters span { flex: 1 1 auto; text-align: center; min-height: 44px; padding: 12px 12px 10px; font-size: 17px; line-height: 22px; font-weight: 600; color: var(--cp-text-muted); border-bottom: 3px solid transparent; margin-bottom: -1px; }
+.nt-filters span.on { color: var(--cp-text); border-color: var(--cp-color-blue); }
+.nt-row { display: flex; gap: 12px; padding: 12px 16px 4px; border-bottom: 1px solid var(--cp-border); }
+.nt-row.noacts { padding-bottom: 14px; }
+.nt-main { flex: 1; min-width: 0; }
+.nt-hd { display: flex; align-items: center; min-height: 24px; }
+.nt-hd .who { flex: 0 1 auto; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; font-size: 17px; line-height: 22px; }
+.nt-hd .who i { font-style: normal; font-weight: 500; font-size: 15px; letter-spacing: .4px; color: var(--cp-text-muted); }
+.nt-hd .tm { flex: none; white-space: pre; font-size: 15px; line-height: 21px; letter-spacing: .4px; font-weight: 500; color: var(--cp-text-muted); }
+.nt-hd .more { flex: none; width: 44px; height: 44px; margin: -10px -12px -10px auto; display: grid; place-items: center; color: var(--cp-text-muted); }
+.nt-hd .more .cp-icon { width: 22px; height: 22px; }
+.nt-title { margin: 2px 0 0; font-family: var(--cp-font-title); font-weight: 600; font-size: 20px; line-height: 26px; }
+.nt-words { margin-top: 4px; position: relative; }
+.nt-words.cut { max-height: 224px; overflow: hidden; }
+.nt-words.cut::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 16px; background: linear-gradient(to bottom, transparent, var(--cp-bg)); }
+.nt-showmore { min-height: 44px; display: flex; align-items: center; font-weight: 600; font-size: 17px; line-height: 22px; color: var(--cp-text-accent); }
+.nt-grid { margin-top: 10px; aspect-ratio: 16 / 9; border-radius: var(--cp-radius-md); overflow: hidden; display: flex; gap: 2px; background: var(--cp-bg); }
+.nt-grid .col { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.nt-tile { flex: 1; position: relative; overflow: hidden; min-height: 0; }
+.nt-tile .cp-img { position: absolute; inset: 0; border-radius: 0; }
+.nt-tile.clip { background: #000; display: grid; place-items: center; }
+.nt-tile.clip .play { width: 44px; height: 44px; border-radius: 50%; border: 2px solid #fff; background: rgba(0, 0, 0, .45); color: #fff; display: grid; place-items: center; }
+.nt-tile.clip.big .play { width: 56px; height: 56px; }
+.nt-tile.clip .play .cp-icon { width: 20px; height: 20px; fill: currentColor; }
+.nt-tile.clip.big .play .cp-icon { width: 26px; height: 26px; }
+.nt-tile .len { position: absolute; left: 6px; bottom: 6px; background: rgba(0, 0, 0, .45); color: #fff; border-radius: 8px; padding: 2px 6px; font-size: 13px; line-height: 17px; }
+.nt-tile .plus { position: absolute; inset: 0; background: rgba(0, 0, 0, .45); color: #fff; display: grid; place-items: center; font-family: var(--cp-font-title); font-weight: 600; font-size: 24px; line-height: 30px; }
+.nt-place { margin-top: 10px; display: inline-flex; align-items: center; gap: 8px; max-width: 100%; min-height: 44px; padding: 0 14px; border-radius: var(--cp-radius-pill); background: var(--cp-surface); box-shadow: inset 0 0 0 1px var(--cp-border); font-size: 15px; line-height: 21px; letter-spacing: .4px; font-weight: 500; }
+.nt-place .cp-icon { width: 18px; height: 18px; stroke-width: 2px; color: var(--cp-text-accent); }
+.nt-acts { display: flex; margin: 4px 0 0 -11px; color: var(--cp-text-muted); }
+.nt-acts span { width: 44px; height: 44px; display: grid; place-items: center; }
+.nt-acts .cp-icon { width: 22px; height: 22px; }
+.nt-empty { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 24px 32px 24px; text-align: center; }
+.nt-empty .badge { width: 56px; height: 56px; border-radius: 50%; background: var(--cp-highlight); color: var(--cp-on-highlight); display: grid; place-items: center; }
+.nt-empty .badge .cp-icon { width: 28px; height: 28px; }
+.nt-empty h4 { margin: 0; font-family: var(--cp-font-title); font-weight: 600; font-size: 24px; line-height: 30px; }
+.nt-empty p { margin: 0; font-size: 17px; line-height: 25px; color: var(--cp-text-muted); }
+.nt-scrim { position: absolute; inset: 0; z-index: 8; background: rgba(20, 54, 93, .45); }
+.nt-sheet { position: absolute; left: 0; right: 0; bottom: 0; z-index: 9; background: var(--cp-surface); border-radius: var(--cp-radius-lg) var(--cp-radius-lg) 0 0; padding: 20px 16px 34px; display: flex; flex-direction: column; gap: 4px; }
+.nt-sheet .what { padding: 0 12px 8px; font-size: 17px; line-height: 25px; color: var(--cp-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nt-sheet .item { display: flex; align-items: center; gap: 16px; min-height: 56px; padding: 0 12px; font-size: 22px; line-height: 32px; }
+.nt-sheet .item .cp-icon { width: 24px; height: 24px; }
+.nt-sheet .item.danger { color: var(--cp-danger); }
+.nt-sheet .cp-btn { margin-top: 12px; height: 68px; font-size: 22px; background: var(--cp-surface); color: var(--cp-text); box-shadow: inset 0 0 0 1px var(--cp-border); }
+/* ---- Library · Notes (end) ---- */
 .cp-toolbar { display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; background: var(--cp-surface); border-radius: var(--cp-radius-pill); box-shadow: var(--cp-shadow-lg); }
 .cp-toolbar .cp-icon-btn { box-shadow: none; background: transparent; }
 .cp-toolbar .cp-icon-btn.on { background: var(--cp-color-gold-soft); }
@@ -2900,6 +2958,214 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
       </div>
     </div>
 
+<!-- Library · Notes phones (start) -->
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Library · Notes</b>The diary's pages as a feed · only on this phone</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="nt-top">
+          <div class="lib-head">
+            <div class="lib-search"><svg class="cp-icon"><use href="#i-search"/></svg><span class="t">Search the Library</span></div>
+            <button class="cp-icon-btn flat" aria-label="Bookmarks"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button>
+          </div>
+          <div class="cp-subtabs"><span>Bible</span><span>Books</span><span class="on">Notes</span></div>
+        </div>
+        <div class="scroll nt-feed">
+          <div class="nt-compose">
+            <span class="nt-av" aria-hidden="true">AG</span>
+            <div class="nt-body">
+              <div class="nt-prompt">What's happening on your Camino?</div>
+              <div class="nt-short"><span aria-label="Write a new note, then add a photo"><svg class="cp-icon"><use href="#i-image"/></svg></span><span aria-label="Write a new note, then add a place"><svg class="cp-icon"><use href="#i-pin"/></svg></span></div>
+            </div>
+          </div>
+          <p class="nt-private">Notes stay on this phone.</p>
+          <div class="nt-filters" role="tablist"><span class="on" role="tab" aria-selected="true">All</span><span class="" role="tab" aria-selected="false">Photos and videos</span><span class="" role="tab" aria-selected="false">Places</span></div>
+          <article class="nt-row">
+            <span class="nt-av" aria-hidden="true">AG</span>
+            <div class="nt-main">
+              <div class="nt-hd"><span class="who">Ana García <i>@ana.camina</i></span><span class="tm"> · 3m</span><span class="more" aria-label="More: edit or delete this note"><svg class="cp-icon"><use href="#i-dots"/></svg></span></div>
+              <h4 class="nt-title">Hontanas</h4><div class="dy-read nt-words"><p>A long, flat day across the meseta. <b>Wind in my face</b> from the first step and <i>no shade</i> at all.</p></div><div class="nt-place"><svg class="cp-icon"><use href="#i-pin"/></svg>Hontanas, Castilla y León</div><div class="nt-acts"><span aria-label="Share the words of this note"><svg class="cp-icon"><use href="#i-share"/></svg></span></div>
+            </div>
+          </article>
+          <article class="nt-row">
+            <span class="nt-av" aria-hidden="true">AG</span>
+            <div class="nt-main">
+              <div class="nt-hd"><span class="who">Ana García <i>@ana.camina</i></span><span class="tm"> · Yesterday</span><span class="more" aria-label="More: edit or delete this note"><svg class="cp-icon"><use href="#i-dots"/></svg></span></div>
+              <h4 class="nt-title">Two of us</h4><div class="nt-grid"><div class="col"><div class="nt-tile"><div class="cp-img v5"></div></div></div><div class="col"><div class="nt-tile"><div class="cp-img v4"></div></div></div></div><div class="nt-acts"><span aria-label="Share the words of this note"><svg class="cp-icon"><use href="#i-share"/></svg></span></div>
+            </div>
+          </article>
+        </div>
+        <div class="fab-slot"><button class="cp-fab-write" aria-label="Write in your diary"><svg class="cp-icon"><use href="#i-compose"/></svg></button></div>
+        <div class="tabdock"><nav class="cp-tabbar">
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Discover</div>
+          <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-library"/></svg></span>Library</div>
+        </nav></div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Library · Notes, scrolled</b>Eight lines, then Show more · a hairline between notes</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="nt-top">
+          <div class="lib-head">
+            <div class="lib-search"><svg class="cp-icon"><use href="#i-search"/></svg><span class="t">Search the Library</span></div>
+            <button class="cp-icon-btn flat" aria-label="Bookmarks"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button>
+          </div>
+          <div class="cp-subtabs"><span>Bible</span><span>Books</span><span class="on">Notes</span></div>
+        </div>
+        <div class="scroll nt-feed">
+          <article class="nt-row">
+            <span class="nt-av" aria-hidden="true">AG</span>
+            <div class="nt-main">
+              <div class="nt-hd"><span class="who">Ana García <i>@ana.camina</i></span><span class="tm"> · 5h</span><span class="more" aria-label="More: edit or delete this note"><svg class="cp-icon"><use href="#i-dots"/></svg></span></div>
+              <div class="dy-read nt-words cut"><p>Left Burgos in the dark. The cathedral stayed lit behind me for a long time. I met a Dutch woman who has walked the Camino three times and she told me to slow down: the road, she said, is not a race and the albergues will not run out of beds if you arrive at four instead of two.</p><div class="gap"></div><p>I laughed, and then I did slow down. The sun came up over the meseta and the whole plain turned gold for ten minutes.</p></div><div class="nt-showmore">Show more</div><div class="nt-acts"><span aria-label="Share the words of this note"><svg class="cp-icon"><use href="#i-share"/></svg></span></div>
+            </div>
+          </article>
+          <article class="nt-row">
+            <span class="nt-av" aria-hidden="true">AG</span>
+            <div class="nt-main">
+              <div class="nt-hd"><span class="who">Ana García <i>@ana.camina</i></span><span class="tm"> · 30 Oct</span><span class="more" aria-label="More: edit or delete this note"><svg class="cp-icon"><use href="#i-dots"/></svg></span></div>
+              <h4 class="nt-title">San Juan de Ortega</h4><div class="dy-read nt-words"><p>Soup at the monastery.</p></div><div class="nt-grid"><div class="col"><div class="nt-tile"><div class="cp-img v4"></div></div></div></div><div class="nt-place"><svg class="cp-icon"><use href="#i-pin"/></svg>42.4172° N, 4.2477° W</div><div class="nt-acts"><span aria-label="Share the words of this note"><svg class="cp-icon"><use href="#i-share"/></svg></span></div>
+            </div>
+          </article>
+        </div>
+        <div class="fab-slot"><button class="cp-fab-write" aria-label="Write in your diary"><svg class="cp-icon"><use href="#i-compose"/></svg></button></div>
+        <div class="tabdock"><nav class="cp-tabbar">
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Discover</div>
+          <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-library"/></svg></span>Library</div>
+        </nav></div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Library · Notes, photo grids</b>One wide tile, two, three, four · a clip shows its length · “+3” for the rest</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="nt-top">
+          <div class="lib-head">
+            <div class="lib-search"><svg class="cp-icon"><use href="#i-search"/></svg><span class="t">Search the Library</span></div>
+            <button class="cp-icon-btn flat" aria-label="Bookmarks"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button>
+          </div>
+          <div class="cp-subtabs"><span>Bible</span><span>Books</span><span class="on">Notes</span></div>
+        </div>
+        <div class="scroll nt-feed">
+          <article class="nt-row noacts">
+            <span class="nt-av" aria-hidden="true">AG</span>
+            <div class="nt-main">
+              <div class="nt-hd"><span class="who">Ana García <i>@ana.camina</i></span><span class="tm"> · 28 Oct</span><span class="more" aria-label="More: edit or delete this note"><svg class="cp-icon"><use href="#i-dots"/></svg></span></div>
+              <h4 class="nt-title">The three of us</h4><div class="nt-grid"><div class="col"><div class="nt-tile"><div class="cp-img "></div></div></div><div class="col"><div class="nt-tile"><div class="cp-img v3"></div></div><div class="nt-tile"><div class="cp-img v2"></div></div></div></div>
+            </div>
+          </article>
+          <article class="nt-row noacts">
+            <span class="nt-av" aria-hidden="true">AG</span>
+            <div class="nt-main">
+              <div class="nt-hd"><span class="who">Ana García <i>@ana.camina</i></span><span class="tm"> · 2 Oct</span><span class="more" aria-label="More: edit or delete this note"><svg class="cp-icon"><use href="#i-dots"/></svg></span></div>
+              <h4 class="nt-title">A day in pictures</h4><div class="nt-grid"><div class="col"><div class="nt-tile"><div class="cp-img "></div></div><div class="nt-tile clip"><span class="play"><svg class="cp-icon"><use href="#i-play"/></svg></span><span class="len">0:42</span></div></div><div class="col"><div class="nt-tile"><div class="cp-img v3"></div></div><div class="nt-tile"><div class="cp-img v5"></div><span class="plus">+3</span></div></div></div>
+            </div>
+          </article>
+        </div>
+        <div class="fab-slot"><button class="cp-fab-write" aria-label="Write in your diary"><svg class="cp-icon"><use href="#i-compose"/></svg></button></div>
+        <div class="tabdock"><nav class="cp-tabbar">
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Discover</div>
+          <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-library"/></svg></span>Library</div>
+        </nav></div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Library · Notes, empty</b>No note yet · a button to write the first</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="nt-top">
+          <div class="lib-head">
+            <div class="lib-search"><svg class="cp-icon"><use href="#i-search"/></svg><span class="t">Search the Library</span></div>
+            <button class="cp-icon-btn flat" aria-label="Bookmarks"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button>
+          </div>
+          <div class="cp-subtabs"><span>Bible</span><span>Books</span><span class="on">Notes</span></div>
+        </div>
+        <div class="scroll nt-feed">
+          <div class="nt-compose">
+            <span class="nt-av" aria-hidden="true">AG</span>
+            <div class="nt-body">
+              <div class="nt-prompt">What's happening on your Camino?</div>
+              <div class="nt-short"><span aria-label="Write a new note, then add a photo"><svg class="cp-icon"><use href="#i-image"/></svg></span><span aria-label="Write a new note, then add a place"><svg class="cp-icon"><use href="#i-pin"/></svg></span></div>
+            </div>
+          </div>
+          <p class="nt-private">Notes stay on this phone.</p>
+          <div class="nt-filters" role="tablist"><span class="on" role="tab" aria-selected="true">All</span><span class="" role="tab" aria-selected="false">Photos and videos</span><span class="" role="tab" aria-selected="false">Places</span></div>
+          <div class="nt-empty">
+            <span class="badge"><svg class="cp-icon"><use href="#i-compose"/></svg></span>
+            <h4>No notes yet</h4>
+            <p>Write a few lines about your day on the Way: what you saw, who you met, how you feel.</p>
+            <button class="cp-btn cp-btn-primary block" style="height:68px;font-size:22px;margin-top:8px">Write your first note</button>
+          </div>
+        </div>
+        <div class="fab-slot"><button class="cp-fab-write" aria-label="Write in your diary"><svg class="cp-icon"><use href="#i-compose"/></svg></button></div>
+        <div class="tabdock"><nav class="cp-tabbar">
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Discover</div>
+          <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-library"/></svg></span>Library</div>
+        </nav></div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Library · Notes, menu</b>The … on a note: Edit, Delete · Delete asks first</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="nt-top">
+          <div class="lib-head">
+            <div class="lib-search"><svg class="cp-icon"><use href="#i-search"/></svg><span class="t">Search the Library</span></div>
+            <button class="cp-icon-btn flat" aria-label="Bookmarks"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button>
+          </div>
+          <div class="cp-subtabs"><span>Bible</span><span>Books</span><span class="on">Notes</span></div>
+        </div>
+        <div class="scroll nt-feed">
+          <div class="nt-compose">
+            <span class="nt-av" aria-hidden="true">AG</span>
+            <div class="nt-body">
+              <div class="nt-prompt">What's happening on your Camino?</div>
+              <div class="nt-short"><span aria-label="Write a new note, then add a photo"><svg class="cp-icon"><use href="#i-image"/></svg></span><span aria-label="Write a new note, then add a place"><svg class="cp-icon"><use href="#i-pin"/></svg></span></div>
+            </div>
+          </div>
+          <p class="nt-private">Notes stay on this phone.</p>
+          <div class="nt-filters" role="tablist"><span class="on" role="tab" aria-selected="true">All</span><span class="" role="tab" aria-selected="false">Photos and videos</span><span class="" role="tab" aria-selected="false">Places</span></div>
+          <article class="nt-row">
+            <span class="nt-av" aria-hidden="true">AG</span>
+            <div class="nt-main">
+              <div class="nt-hd"><span class="who">Ana García <i>@ana.camina</i></span><span class="tm"> · 3m</span><span class="more" aria-label="More: edit or delete this note"><svg class="cp-icon"><use href="#i-dots"/></svg></span></div>
+              <h4 class="nt-title">Hontanas</h4><div class="dy-read nt-words"><p>A long, flat day across the meseta. <b>Wind in my face</b> from the first step and <i>no shade</i> at all.</p></div><div class="nt-place"><svg class="cp-icon"><use href="#i-pin"/></svg>Hontanas, Castilla y León</div><div class="nt-acts"><span aria-label="Share the words of this note"><svg class="cp-icon"><use href="#i-share"/></svg></span></div>
+            </div>
+          </article>
+        </div>
+        <div class="nt-scrim"></div>
+        <div class="nt-sheet" role="dialog" aria-label="Menu of the note Hontanas">
+          <div class="what">Hontanas</div>
+          <div class="item"><svg class="cp-icon"><use href="#i-pencil"/></svg>Edit</div>
+          <div class="item danger"><svg class="cp-icon"><use href="#i-trash"/></svg>Delete</div>
+          <button class="cp-btn">Cancel</button>
+        </div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+<!-- Library · Notes phones (end) -->
     <div class="phone-wrap">
       <p class="phone-label"><b>Settings</b>Gear on Me · billing · smartwatch · business</p>
       <div class="phone">
