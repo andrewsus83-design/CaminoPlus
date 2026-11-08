@@ -54,6 +54,18 @@ async function noBar(page, what) {
   await eventually(() => anyBar(page).count(), (n) => n === 0, { what });
 }
 
+/**
+ * The bar reads the phone again whenever the Library comes into view, so a stored value that was changed is picked up by leaving the Library for a screen over it (Bookmarks) and
+ * coming back: much quicker than loading the app again, and the same read.
+ */
+async function reread({ page }) {
+  await page.getByRole('button', { name: 'Bookmarks', exact: true }).click();
+  await waitPath(page, '/library/bookmarks');
+  await page.getByRole('button', { name: 'Back', exact: true }).first().click();
+  await waitPath(page, '/library');
+  await page.getByRole('radiogroup', { name: 'Part of the Bible' }).waitFor();
+}
+
 /** The book with the longest title of the Library, and its chapter with the most blocks (so the reader opens on a chapter longer than a screen, and the place kept is not "finished"). */
 function longBook() {
   const entry = [...CATALOG].sort((a, b) => b.title.length - a.title.length || a.order - b.order)[0];
@@ -297,14 +309,14 @@ export const CONTINUE_SCENARIOS = [
     },
   },
   {
-    name: 'Library: a closed bar is told apart by the place and its time: a newer time brings it back, a value that does not read hides nothing, and a place that no longer exists gives no bar',
+    name: 'Library: a closed bar is told apart by the place and its time: a newer time brings it back, another chapter brings it back, and a stored mark that does not read hides nothing',
     persona: 'in',
     async run(ctx) {
       const { page, step } = ctx;
       const psalm = { v: 1, code: 'PSA', chapter: 121, at: 5000 };
       const closed = (at, extra = {}) => ({ v: 1, kind: 'bible', code: 'PSA', chapter: 121, at, ...extra });
-      const gone = async (what) => { await openLibrary(ctx); await noBar(page, what); };
-      const shownNow = async (what) => { await openLibrary(ctx); await bar(page, 'Continue reading, Psalm 121').waitFor(); await eventually(() => anyBar(page).count(), (n) => n === 1, { what }); };
+      const gone = async (what) => { await reread(ctx); await noBar(page, what); };
+      const shownNow = async (what) => { await reread(ctx); await domQuiet(page, 300); await bar(page, 'Continue reading, Psalm 121').waitFor(); await eventually(() => anyBar(page).count(), (n) => n === 1, { what }); };
       await openLibrary(ctx);
       step('a place with a mark for the very same place and time stays closed');
       await setKey(page, 'lastRead', psalm);
@@ -315,7 +327,7 @@ export const CONTINUE_SCENARIOS = [
       await shownNow('the number of bars for a newer time');
       step('another chapter than the closed one brings it back');
       await setKey(page, 'lastRead', { v: 1, code: 'PSA', chapter: 122, at: 5000 });
-      await openLibrary(ctx);
+      await reread(ctx);
       await bar(page, 'Continue reading, Psalm 122').waitFor();
       step('a stored mark that does not read hides nothing: text that is not JSON, another version, a chapter that is a word, a time that is not a time');
       await setKey(page, 'lastRead', psalm);
@@ -323,8 +335,22 @@ export const CONTINUE_SCENARIOS = [
         await setKey(page, 'continueHidden', bad);
         await shownNow(`the number of bars for the stored mark ${JSON.stringify(bad)}`);
       }
-      step('a place that no longer exists gives no bar and no error: a book that is gone, a chapter past the last, another version, a damaged value');
-      await setKey(page, 'continueHidden', 'RAW:null');
+      step('the app is started again with a mark that does not read: the bar is there');
+      await setKey(page, 'continueHidden', 'RAW:not json at all');
+      await openLibrary(ctx);
+      await bar(page, 'Continue reading, Psalm 121').waitFor();
+    },
+  },
+  {
+    name: 'Library: a place that no longer exists gives no bar and no error, and never takes the place of the Bible away: a chapter past the last, a book that is not in the Library, a damaged store of the books',
+    persona: 'in',
+    async run(ctx) {
+      const { page, step } = ctx;
+      const first = CATALOG[0];
+      const gone = async (what) => { await reread(ctx); await noBar(page, what); };
+      const shownNow = async (what) => { await reread(ctx); await domQuiet(page, 300); await bar(page, 'Continue reading, Psalm 121').waitFor(); await eventually(() => anyBar(page).count(), (n) => n === 1, { what }); };
+      await openLibrary(ctx);
+      step('a place of the Bible that no longer exists gives no bar and no error: a book that is gone, a chapter past the last, another version, a damaged value');
       for (const bad of [{ v: 1, code: 'ZZZ', chapter: 1, at: 1 }, { v: 1, code: 'PSA', chapter: 151, at: 1 }, { v: 2, code: 'PSA', chapter: 1 }, 'x', { v: 1, code: 'bible-additions-to-esther', chapter: 1 }]) {
         await setKey(page, 'lastRead', bad);
         await gone(`the number of bars for ${JSON.stringify(bad)}`);
@@ -334,14 +360,13 @@ export const CONTINUE_SCENARIOS = [
       await shownNow('the number of bars for a place with no time');
 
       step('a place in a book that is not in the Library (the id of an earlier list) is passed over, even when its time is the newest: no bar when it is the only place, the chapter of the Bible when there is one');
-      const first = CATALOG[0];
       await setKey(page, 'lastRead', 'RAW:null');
       await setKey(page, 'reading', { v: 1, last: 'confessions', items: [{ id: 'confessions', c: 'c1', y: 0.2, at: 9000000000000, read: [] }] });
       await gone('the number of bars for a book that is not in the Library');
       await setKey(page, 'lastRead', { v: 1, code: 'PSA', chapter: 121, at: 5000 });
       await shownNow('the number of bars for the Bible beside a book that is not in the Library');
 
-      step('a book store that does not read (not JSON, another version, a place with no chapter) hides nothing of the Bible, and a book that is in the Library is offered once its place reads');
+      step('a store of the books that does not read (not JSON, another version, a place with no chapter) hides nothing of the Bible, and a book that is in the Library is offered once its place reads');
       for (const bad of ['RAW:{{{', { v: 2, last: first.id, items: [] }, { v: 1, last: first.id, items: [{ id: first.id }] }, 'RAW:"x"']) {
         await setKey(page, 'reading', bad);
         await shownNow(`the number of bars for the stored books ${JSON.stringify(bad)}`);
