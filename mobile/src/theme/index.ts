@@ -58,8 +58,12 @@ const roleFor = (k: Palette, scheme: Scheme) => ({
   onInverseAccent: pick('textInverseAccent', k, scheme),
   /** The active tab of the bottom tab bar (icon and label): the brand blue in light mode, white in dark mode. Only the tab bar uses it. */
   tabActive: pick('tabActive', k, scheme),
-  /** The inactive tabs (icon and label): a lighter, quieter stone than muted text in both modes, so the active tab stands out; never below 4.5 : 1 on the bar. Only the tab bar uses it. */
+  /** The inactive tabs (icon and label): a lighter, quieter stone than muted text in both modes, so the active tab stands out; between 4.5 : 1 and 5 : 1 on the bar. Only the tab bar uses it. */
   tabInactive: pick('tabInactive', k, scheme),
+  /** The floating tab bar itself: the card white in light mode, as always; in dark mode a navy darker than the page and than every card, so a card that scrolls under the bar can never be the colour of the bar. Only the tab bar uses it. */
+  tabBar: pick('tabBar', k, scheme),
+  /** The 1 px hairline around the tab bar: invisible in light mode (the shadow separates the bar there), a lighter navy in dark mode, where a shadow cannot be seen. Only the tab bar uses it. */
+  tabBarBorder: pick('tabBarBorder', k, scheme),
 });
 
 export const role = roleFor(c, 'light');
@@ -79,6 +83,8 @@ export const shadow = tokens.shadow;
 
 export const fonts = {
   title: 'Fraunces_600SemiBold',
+  /** Only the inactive tab labels of the tab bar: the active one is bodyBold, so the weight says which is which as well as the colour. */
+  bodyLight: 'Inter_300Light',
   body: 'Inter_400Regular',
   bodyMedium: 'Inter_500Medium',
   bodyBold: 'Inter_600SemiBold',
