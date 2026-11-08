@@ -1,4 +1,5 @@
 // Plain-node checks for the pure map logic (no React Native). Run: npm run test:map
+import './lineShim'; // first: it lets the compiled sampleRoute find the OSM lines in assets/map/lines
 import assert from 'node:assert/strict';
 import { distanceM, lineLengthM, nearestOnLine, pointAlong, splitLine, type LngLat } from '../geo';
 import { buildStyle } from '../style';
@@ -17,9 +18,9 @@ test('distance SJPdP to Roncesvalles is ~17 km as the crow flies', () => {
   assert.ok(d > 16_000 && d < 19_000, String(d));
 });
 
-test('stage 1 sample line is ~20 km (real path 24.2 km)', () => {
+test('stage 1 line is ~24 km, the real path (24.2 km in the seed data)', () => {
   const km = lineLengthM(stages[0].line) / 1000;
-  assert.ok(km > 18 && km < 26, String(km));
+  assert.ok(Math.abs(km - stages[0].distanceKm) < stages[0].distanceKm * 0.05, String(km));
 });
 
 test('split at the sample position: done + remaining = whole route', () => {
@@ -46,10 +47,14 @@ test('stageForAlong changes stage the moment the walker passes a stage end', () 
   assert.equal(stageForAlong(0).number, 1);
   assert.equal(stageForAlong(9000).number, 1);
   assert.equal(stageForAlong(stageEndAlongM[0] - 5).number, 1);
-  assert.equal(stageForAlong(stageEndAlongM[0] + 100).number, 2, '100 m into stage 2 (stageForPoint would still say stage 1 here)');
+  assert.equal(stageForAlong(stageEndAlongM[0] + 100).number, 2, '100 m into stage 2');
   assert.equal(stageForAlong(stageEndAlongM[1] + 100).number, 3);
   assert.equal(stageForAlong(stageEndAlongM[2] + 5000).number, 3, 'past the last stage: the last one');
-  assert.equal(stageForPoint(pointAlong(routeLine, stageEndAlongM[0] + 100)).number, 1);
+  // stageForPoint measures to the line, so a point on stage 2 is stage 2 (it measured to the vertices, and the hand-placed lines had one
+  // every few kilometres: 100 m into stage 2 it still said stage 1)
+  assert.equal(stageForPoint(pointAlong(routeLine, stageEndAlongM[0] + 100)).number, 2);
+  assert.equal(stageForPoint(pointAlong(routeLine, stageEndAlongM[0] - 100)).number, 1);
+  assert.equal(stageForPoint(pointAlong(routeLine, stageEndAlongM[1] + 100)).number, 3);
   assert.ok(Math.abs(stageEndAlongM[0] - lineLengthM(stages[0].line)) < 1e-6);
 });
 
@@ -86,3 +91,6 @@ test('timeAgo and formatMb', () => {
 });
 
 console.log(`\n${n} passed`);
+
+// The real lines of the stages from OpenStreetMap, and the hand-placed ones as the fallback: their own file, run from here so that `npm run test:map` runs it.
+import './routeLines.test';

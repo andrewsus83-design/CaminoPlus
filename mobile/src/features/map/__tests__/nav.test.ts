@@ -1,4 +1,5 @@
 // Plain-node checks for the Walk view maths (nav.ts). Run: npm run test:map
+import './lineShim'; // first: it lets the compiled sampleRoute find the OSM lines in assets/map/lines
 import assert from 'node:assert/strict';
 import { distanceM, lineLengthM, pointAlong, type LngLat } from '../geo';
 import {
@@ -191,16 +192,30 @@ test('nextManeuver: arrive at the end of the stage, and no turn is reported past
   assert.equal(nextManeuver(beyond, 0).kind, 'right', 'without a stage end the bend is a turn');
 });
 
-test('nextManeuver on the sample route: one bend of 36 degrees in stage 1, then arrive', () => {
+test('nextManeuver on the real route of stage 1: every corner it names is a corner of the line, never past the stage end, then arrive', () => {
+  // (The test used to check one bend of 36 degrees on the 10 hand-placed points of the stage; the OSM line has about 300 and winds, so
+  // what is checked is what must hold on any line: the turn it names is the turn the line makes where it says, and it is a real one.)
   const stage = stages[0];
   const end = progressAlong(routeLine, stage.line[stage.line.length - 1]).alongM;
-  const m = nextManeuver(routeLine, 5800, end);
-  assert.equal(m.kind, 'slight-right');
-  near(m.distanceM, 6152 - 5800, 8);
-  assert.equal(nextManeuver(routeLine, 9000, end).kind, 'straight');
-  const arr = nextManeuver(routeLine, end - 300, end);
+  const turnAt = (m: number) => angleDiff(bearingDeg(pointAtAlong(routeLine, m - 40).point, pointAtAlong(routeLine, m).point), bearingDeg(pointAtAlong(routeLine, m).point, pointAtAlong(routeLine, m + 40).point));
+  let corners = 0;
+  for (let along = 0; along < end - 500; along += 53) {
+    const m = nextManeuver(routeLine, along, end);
+    // it looks 400 m ahead and names the top of the turn it finds there, up to 60 m further on
+    assert.ok(m.distanceM >= 0 && m.distanceM <= 460 && along + m.distanceM <= end, `at ${along}: ${m.kind} in ${m.distanceM} m`);
+    if (m.kind === 'straight') {
+      assert.equal(m.turnDeg, 0);
+      continue;
+    }
+    corners += 1;
+    assert.ok(Math.abs(m.turnDeg) >= 35 && m.kind === classifyTurn(m.turnDeg), `at ${along}: ${m.kind} ${m.turnDeg}`);
+    near(turnAt(along + m.distanceM), m.turnDeg, 1, `at ${along}: the turn at the place it names`);
+  }
+  assert.ok(corners > 100, `a path that winds has corners to name, found ${corners} of ${Math.floor((end - 500) / 53)}`);
+  assert.equal(nextManeuver(routeLine, 9000, end).kind, 'straight', 'the sample position: nothing to turn at in the next 400 m');
+  const arr = nextManeuver(routeLine, end - 20, end);
   assert.equal(arr.kind, 'arrive');
-  near(arr.distanceM, 300, 1);
+  near(arr.distanceM, 20, 1);
 });
 
 /* ---------------------------------------------------------------- sample route progress */
@@ -214,24 +229,25 @@ test('stage end along the route: remaining + walked = the stage end, and the sam
   near(end.offM, 0, 0.01);
   near(end.alongM, lineLengthM(stage.line), 2, 'stage 1 ends where its own line ends');
   const remaining = end.alongM - pos.alongM;
-  near(remaining, 11275, 10);
+  near(remaining, lineLengthM(stage.line) - 9000, 10);
   assert.ok(Math.abs(remaining + pos.alongM - end.alongM) < 1e-6);
 });
 
 test('remainingToStageEnd: distance along the route to the end of the stage, never negative', () => {
   const stage = stages[0];
   const end = stage.line[stage.line.length - 1];
+  const stageLen = lineLengthM(stage.line);
   const here = remainingToStageEnd(routeLine, samplePosition, end);
   near(here.pos.alongM, 9000, 5);
-  near(here.remainingM, 11275, 10);
-  near(here.endAlongM, 20274.6, 1);
+  near(here.remainingM, stageLen - 9000, 10);
+  near(here.endAlongM, stageLen, 1);
   // 1 km off the route: measured from the point of the route nearest to the walker
   const off1km: LngLat = [samplePosition[0] + 0.0123, samplePosition[1]];
   const offRoute = remainingToStageEnd(routeLine, off1km, end);
   assert.ok(offRoute.pos.offM > 800 && offRoute.pos.offM < 1100);
-  assert.ok(Math.abs(offRoute.remainingM - 11275) < 900, `snapped remaining ${offRoute.remainingM}`);
+  assert.ok(Math.abs(offRoute.remainingM - (stageLen - 9000)) < 900, `snapped remaining ${offRoute.remainingM}`);
   // past the end of the stage (in stage 2): 0 left, not a negative number
-  const stage2 = pointAlong(routeLine, 25_000);
+  const stage2 = pointAlong(routeLine, stageLen + 1000);
   assert.equal(remainingToStageEnd(routeLine, stage2, end).remainingM, 0);
   // at the very start of the stage the whole stage is left
   near(remainingToStageEnd(routeLine, stage.line[0], end).remainingM, lineLengthM(stage.line), 5);
@@ -247,7 +263,7 @@ test('nextOnTheWay lists the next places ahead with distances along the route', 
   assert.equal(next.length, 3);
   assert.deepEqual(next.map((x) => x.name), ['Fontaine de Roland', 'Col de Lepoeder', 'Roncesvalles'], 'a town wins over the pins inside it');
   assert.ok(next[0].distanceM > 0 && next[0].distanceM < next[1].distanceM && next[1].distanceM < next[2].distanceM);
-  near(next[2].distanceM, 11275, 60);
+  near(next[2].distanceM, lineLengthM(stages[0].line) - 9000, 60);
   const all = nextOnTheWay(routeLine, pos.alongM, items, 99, 0);
   assert.ok(all.every((x) => x.distanceM > 0), 'nothing behind the walker');
   assert.ok(!all.some((x) => x.name === 'Refuge Orisson'), 'already passed');
