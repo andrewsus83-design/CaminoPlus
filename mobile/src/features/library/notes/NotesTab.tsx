@@ -32,6 +32,8 @@ import {
 // are on screen, and pull to refresh belongs to it. Mount it in a box that has a height of its own (flex: 1 under the search row and the tab
 // strip, never inside a ScrollView) and that is as wide as the screen: the rows run from edge to edge and are parted by a hairline. It leaves
 // room at the bottom for the floating tab bar and for the gold pen, which the shell draws (this tab draws no pen of its own).
+// A drag on the list puts the keyboard of the search field away on a phone. On the web it does not: there is no keyboard to put away, and the
+// browser reports scrolls that nobody made (a list that is taken out of the page, say) as drags, which took the focus from the field being typed in.
 
 const keyOf = (e: DiaryEntry) => e.id;
 
@@ -184,7 +186,7 @@ export function NotesTab() {
         maxToRenderPerBatch={6}
         windowSize={7}
         keyboardShouldPersistTaps="handled"
-        keyboardDismissMode="on-drag"
+        keyboardDismissMode={Platform.OS === 'web' ? 'none' : 'on-drag'}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} tintColor={role.action} colors={[role.action]} progressBackgroundColor={role.surface} />}
         contentContainerStyle={{ paddingBottom: layout.tabbarHeight + insets.bottom + 96 }}
         style={{ flex: 1 }}
