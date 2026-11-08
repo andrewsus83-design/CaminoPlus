@@ -21,12 +21,12 @@ const noOutline = (Platform.OS === 'web' ? { outlineStyle: 'none' } : null) as o
 export function PlaceChip({ place, onOpen }: { place: DiaryPlace; onOpen: () => void }) {
   const label = placeLabel(place);
   return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', minHeight: layout.touchMin, borderRadius: radius.pill, borderWidth: 1, borderColor: role.border, backgroundColor: role.surface, paddingHorizontal: 16, alignSelf: 'flex-start', maxWidth: '100%' }}>
+    <View style={{ flexDirection: 'row', alignItems: 'center', minHeight: layout.touchPrimary, borderRadius: radius.pill, borderWidth: 1, borderColor: role.border, backgroundColor: role.surface, paddingHorizontal: 16, alignSelf: 'flex-start', maxWidth: '100%' }}>
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={`Place: ${label}. Opens it in your maps app`}
         onPress={onOpen}
-        style={({ pressed }) => ({ flexShrink: 1, flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: layout.touchMin, opacity: pressed ? 0.8 : 1 })}
+        style={({ pressed }) => ({ flexShrink: 1, flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: layout.touchPrimary, opacity: pressed ? 0.8 : 1 })}
       >
         <Icon name="pin" color={role.accentText} size={22} strokeWidth={2} />
         <AppText variant="label" numberOfLines={2} style={{ flexShrink: 1 }}>{label}</AppText>
@@ -45,7 +45,7 @@ export function PlaceEditRow({ place, onOpen, onRemove, onName, onFocusChange }:
   const [focus, setFocus] = useState(false);
   return (
     <View style={{ gap: 6 }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', minHeight: layout.touchMin, borderRadius: radius.pill, borderWidth: focus ? 2 : 1, borderColor: focus ? c.gold : role.border, backgroundColor: role.surface, paddingHorizontal: 4 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', minHeight: layout.touchPrimary, borderRadius: radius.pill, borderWidth: focus ? 2 : 1, borderColor: focus ? c.gold : role.border, backgroundColor: role.surface, paddingHorizontal: 4 }}>
         <Pressable accessibilityRole="button" accessibilityLabel={`Open ${placeLabel(place)} in your maps app`} onPress={onOpen} style={{ width: 48, height: 48, alignItems: 'center', justifyContent: 'center' }}>
           <Icon name="pin" color={role.accentText} size={22} strokeWidth={2} />
         </Pressable>

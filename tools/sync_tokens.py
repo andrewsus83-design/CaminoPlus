@@ -6,7 +6,7 @@ design/tokens.css and design/tokens.json are the single source of truth. This sc
   1. writes web/assets/tokens.css from design/tokens.css (the website's copy),
   2. checks that design/tokens.json and mobile/src/theme/tokens.json are the same file,
   3. checks that tokens.css and tokens.json agree on the values they both carry
-     (colours, type sizes, line heights and letter spacing, spacing, radius, layout).
+     (colours, type sizes, line heights and letter spacing, spacing, radius, layout, icon sizes).
      The type-scale table of the design page is checked against tokens.json by
      tools/tests/test_type_scale.py.
 
@@ -99,6 +99,8 @@ def compare_css_json(css: dict[str, str], data: dict) -> list[str]:
         check(f"--cp-radius-{k}", v, "px")
     for k, v in data["layout"].items():
         check(f"--cp-{kebab(k)}", v, "px")
+    for k, v in data["icon"].items():
+        check(f"--cp-icon-{kebab(k)}", v, "px")
     return problems
 
 
