@@ -600,7 +600,8 @@ DEVOUT = "\n".join([
     "   know that it is a thing pleasing to God. [2]", "",
     "CHAPTER IV. The Need of a Guide for those who would enter upon and advance in", "the Devout Life.", "",
     "   1. PLACE yourself in the presence of God. 2. Ask Him to inspire your heart.", "", "   Preparation.", "",
-    "   3. A numbered paragraph stays a paragraph with its number.", "", "   Amen.", RULE, "",
+    "   3. A numbered paragraph stays a paragraph with its number.", "", "   Beware of self-accusations such as: I have not prayed as much as I", "",
+    "   ought; I have not loved my neighbour.", "", "   Amen.", RULE, "",
     "   [2] A footnote of the chapter.", "", "   A second paragraph of the same footnote.", RULE, "",
     "                   PART II. CONTAINING SUNDRY COUNSELS AS TO UPLIFTING THE SOUL.", RULE, "",
     "CHAPTER IX. FIRST MEDITATION.", "", "   BEGIN with an act of faith.", RULE, "",
@@ -620,9 +621,11 @@ class DevoutLifeRecipe(unittest.TestCase):
         self.assertEqual(blocks_of_chapter(out, 1)[0]["t"], "You aim at a devout life, dear child, because as a Christian you know that it is a thing pleasing to God.")
         self.assertEqual(blocks_of_chapter(out, 2), [
             {"k": "li", "t": "1. Place yourself in the presence of God."}, {"k": "li", "t": "2. Ask Him to inspire your heart."}, {"k": "h", "t": "Preparation"},
-            {"k": "p", "t": "3. A numbered paragraph stays a paragraph with its number."}, {"k": "p", "t": "Amen."}])
+            {"k": "p", "t": "3. A numbered paragraph stays a paragraph with its number."},
+            {"k": "p", "t": "Beware of self-accusations such as: I have not prayed as much as I ought; I have not loved my neighbour."}, {"k": "p", "t": "Amen."}])
         self.assertEqual(blocks_of_chapter(out, 3)[0]["t"], "Begin with an act of faith.")
         self.assertEqual((out.stats["footnotes"], out.stats["footnote marks"], out.stats["points split"], out.stats["first words set in lower case"], out.stats["footnote lines"]), (2, 2, 1, 4, 1))
+        self.assertEqual(out.stats["paragraphs rejoined after a page break"], 1)
         self.assertNotIn("Contents text", json.dumps([c.blocks for c in out.chapters]))
         self.assertNotIn("ABJECTION", json.dumps([c.blocks for c in out.chapters]))
 

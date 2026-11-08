@@ -405,12 +405,20 @@ def ccel_paragraph(out: Collector, b: Block, marks: list[int], pattern: re.Patte
     before = len(out.chapters[-1].blocks) if out.chapters else 0
     marks.extend(out.paragraph(b, markers=pattern, allow_quote=True, base=3))
     if out.chapters and len(out.chapters[-1].blocks) > before:
-        blk = out.chapters[-1].blocks[-1]
+        blocks = out.chapters[-1].blocks
+        blk = blocks[-1]
         if blk["k"] == "p":
+            prev = blocks[-2] if len(blocks) > 1 else None
+            if prev and prev["k"] == "p" and blk["t"][:1].islower() and not prev["t"].endswith((".", "!", "?", ":", '"', "\u201d", "'", "\u2019", ")")):
+                # a paragraph that a page break cut in the middle of a sentence (the file has a blank line there): one paragraph again
+                prev["t"] += " " + blk["t"]
+                del blocks[-1]
+                out.stats["paragraphs rejoined after a page break"] += 1
+                return
             blk["t"] = unshout(blk["t"], out.stats)
             points = split_points(blk["t"])
             if len(points) > 1:
-                out.chapters[-1].blocks[-1:] = [{"k": "li", "t": t} for t in points]
+                blocks[-1:] = [{"k": "li", "t": t} for t in points]
                 out.stats["points split"] += len(points) - 1
 
 
