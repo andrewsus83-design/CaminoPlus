@@ -218,7 +218,7 @@ check('Library: directly under the search row the two tabs Bible and Books, and 
   assert.deepEqual([...ROW_TABS], ['Bible', 'Books']);
   assert.equal(BIBLE_SOURCE_LINE, 'World English Bible, Catholic edition · public domain');
   const screen = read(join('app', '(tabs)', 'library.tsx'));
-  assert.match(screen, /<Screen keyboard>/, 'a button can be tapped while the keyboard is up');
+  assert.match(screen, /<Screen keyboard overlay=\{<ContinueBar \/>\}>/, 'a button can be tapped while the keyboard is up, and the Continue reading bar is the one thing that floats over this screen');
   assert.doesNotMatch(screen, /PromoBanner/, 'the carousel with dots is gone from Library: one banner for each of two tabs');
   assert.doesNotMatch(screen, /MusicTab|'Music'/);
   // the Notes tab is gone from the screen for good: no tab, no feed, no host, no pen, no keyboard special case
@@ -234,15 +234,16 @@ check('Library: directly under the search row the two tabs Bible and Books, and 
   assert.ok(header < strip, 'the search row comes first, the tab strip directly after it');
   assert.match(screen, /\{!searching && <SubTabs tabs=\{LIBRARY_TABS\} value=\{tab\} onChange=\{setTab\} \/>\}/, 'the tab strip is drawn unless something is typed, and it is drawn before any banner or content');
   assert.equal((screen.match(/\{top\}/g) ?? []).length, 1, 'the top is drawn once, in the screen\'s own scroll');
-  // Bible and Books and the results: rows in the screen's own scroll, after the top: on Bible the card that continues the chapter, the compact banner, then the Bible tab (the choice of the part, the tiles)
+  // Bible and Books and the results: rows in the screen's own scroll, after the top: on Bible the compact banner, then the Bible tab (the choice of the part, the tiles). There is no continue card among them: "Continue reading" floats above the tab bar instead (the bar, mounted as the overlay of this Screen)
   const screenAt = at('<Screen keyboard');
-  const card = at('<ContinueCard', screenAt), daily = at('<DailyBanner', screenAt), bible = at('<BibleTab', screenAt), books = at('<BooksBanner reading={booksReading} />', screenAt), booksTab = at('<BooksTab', screenAt);
-  assert.ok(at('{top}', screenAt) < card && card < daily && daily < bible && bible < books && books < booksTab, 'the top, the continue card, the Bible banner, Bible, the Books banner, Books');
-  assert.match(screen, /\{searching \? \(\s*<SearchResults[^]*?\/>\s*\) : \(\s*<>\s*\{tab === 'Bible' && lastRead\.place && <ContinueCard/, 'the results take the place of the banners and the tab content, and clearing the field brings them back');
+  const daily = at('<DailyBanner', screenAt), bible = at('<BibleTab', screenAt), books = at('<BooksBanner />', screenAt), booksTab = at('<BooksTab', screenAt);
+  assert.ok(at('{top}', screenAt) < daily && daily < bible && bible < books && books < booksTab, 'the top, the Bible banner, Bible, the Books banner, Books');
+  assert.doesNotMatch(screen, /ContinueCard/, 'the continue card is gone from the page: the bar above the tab bar replaced it');
+  assert.match(screen, /\{searching \? \(\s*<SearchResults[^]*?\/>\s*\) : \(\s*<>\s*\{tab === 'Bible' && <DailyBanner/, 'the results take the place of the banners and the tab content, and clearing the field brings them back');
   assert.match(screen, /const searching = isSearching\(query\);/);
   // each banner is shown under its own tab only
   assert.match(screen, /\{tab === 'Bible' && <DailyBanner onOpen=\{\(\) => router\.push\('\/library\/daily'\)\} \/>\}/);
-  assert.match(screen, /\{tab === 'Books' && <BooksBanner reading=\{booksReading\} \/>\}/);
+  assert.match(screen, /\{tab === 'Books' && <BooksBanner \/>\}/);
   assert.equal((screen.match(/<DailyBanner/g) ?? []).length + (screen.match(/<BooksBanner/g) ?? []).length, 2, 'two banners, one for each tab that has one');
   // neither tab has a notice: the text of the Bible is in the app (one quiet source line instead) and so are the books (each book page says how they were written, notices.ts)
   const tabsSrc = read(join('src', 'features', 'library', 'LibraryTabs.tsx'));
@@ -254,9 +255,10 @@ check('Library: directly under the search row the two tabs Bible and Books, and 
   assert.match(read(join('src', 'components', 'Screen.tsx')), /keyboardShouldPersistTaps=\{keyboard \? 'handled' : 'never'\}/);
 });
 
-check('what floats at the bottom of the Library: nothing. The three choices of the Bible are in the page, directly under the banner, and the gold pen moved to Me', () => {
+check('what floats at the bottom of the Library: the one Continue reading bar above the tab bar and nothing else (no gold pen: it moved to Me); the three choices of the Bible are in the page, directly under the banner, and nothing of them floats', () => {
   const screen = read(join('app', '(tabs)', 'library.tsx'));
   assert.equal((screen.match(/<Fab\b/g) ?? []).length, 0, 'the gold pen moved to Me: one pen there, following the sub-tab');
+  assert.equal((screen.match(/<ContinueBar\b/g) ?? []).length, 1, 'one bar, mounted once');
   assert.equal((screen.match(/<TestamentBar\b/g) ?? []).length, 0, 'the screen draws no bar of its own: the Bible tab draws the choices in the page');
   // Default: the Old Testament
   assert.match(screen, /useState<Testament>\('old'\)/);
@@ -364,12 +366,41 @@ check('the design page shows the same Library: the two tabs Bible and Books, the
   assert.match(bible, /aria-label="Song of Songs, 8 chapters"><span class="nm" style="[^"]*">Song of<br>Songs<\/span>/);
   assert.equal(count(bible, /class="hw"/g), 1, 'one handwritten note on the screen');
 
-  // Continue: the card above the banner, with the chapter in JetBrains Mono; the New Testament chosen, 27 tiles
-  assert.match(cont, /<div class="cont-card" role="button" aria-label="Continue reading, Psalm 121">\s*<span class="ic">[^]*?<div class="k">Continue reading<\/div><div class="r">Psalm 121<\/div>/);
-  assert.ok(cont.indexOf('class="cont-card"') > cont.indexOf('class="cp-subtabs"') && cont.indexOf('class="cont-card"') < cont.indexOf('class="cp-banner cmp"'), 'the card is under the tabs and above the banner');
+  // Continue: no card in the page (the banner is right under the tabs), and the Continue reading bar floats above the tab bar, drawn over the dock's fade (its z-index is above the dock's) and before the scroll in the markup;
+  // the place is drawn in two pieces, the name and the chapter; the New Testament chosen, 27 tiles
+  assert.doesNotMatch(cont, /cont-card/, 'the card is gone from the page');
+  assert.match(cont, /<div class="cont-bar">\s*<div class="main" role="button" aria-label="Continue reading, Psalm 121"><svg class="cp-icon ic"><use href="#i-book"\/><\/svg><div class="t"><div class="k">Continue reading<\/div><div class="r"><span class="h">Psalm<\/span><span class="c">121<\/span><\/div><\/div><\/div>\s*<button class="x" aria-label="Hide Continue reading"><svg class="cp-icon"><use href="#i-x"\/><\/svg><\/button>\s*<\/div>/);
+  assert.ok(cont.indexOf('class="cp-subtabs"') < cont.indexOf('class="cp-banner cmp"'), 'the banner is right under the tabs, with no card between');
+  assert.ok(cont.indexOf('class="cont-bar"') < cont.indexOf('class="scroll"'), 'the bar is not inside the scroll: it floats, and the cover grid of a phone ends before anything of it');
+  assert.equal(count(cont, /class="cont-bar"/g), 1, 'one bar on the screen');
+  assert.equal(count(cont, /class="hw"/g), 1, 'the bar adds no handwriting: the banner has the one note');
   assert.equal(count(cont, /class="lib-tile"/g), 27);
   assert.match(cont, /aria-label="1 Thessalonians, 5 chapters"><span class="nm" style="font-size:14px;/, 'the longest word of all comes down to 14 on a phone of 390: the fit counts every letter rounded up to a pixel, as a browser that hints the glyphs draws it');
-  assert.equal(count(bible, /cont-card/g), 0, 'without a chapter read there is no card');
+  assert.equal(count(bible, /cont-bar|cont-card/g), 0, 'without a chapter read there is no bar and no card');
+  // the list keeps the bar's room at its end, as Screen does: what a list keeps for the tab bar (130 on the page) and the room the bar says it takes (64 and 8)
+  const layoutOfBar = read(join('src', 'features', 'library', 'continueBar', 'barLayout.ts'));
+  const barRoom = Number(/export const BAR_HEIGHT = (\d+);/.exec(layoutOfBar)?.[1]) + Number(/export const BAR_GAP = (\d+);/.exec(layoutOfBar)?.[1]);
+  const listEnd = Number(/\.phone \.scroll \{[^}]*padding: [^;}]*? (\d+)px;/.exec(design)?.[1]);
+  assert.equal(listEnd, 130, 'what a list of the page keeps free at its end for the tab bar');
+  assert.equal(barRoom, 72);
+  assert.equal(count(cont, new RegExp(`<div class="scroll" style="padding-bottom:${listEnd + barRoom}px">`, 'g')), 1, 'the list of the phone keeps the bar\'s room at its end: 130 for the tab bar and 72 for the bar');
+  // the bar's numbers are the tab dock's: the pill is 26 above the bottom and 88 high, so the bar is 26 + 88 + 8 = 122 up, with the pill's side margins, 64 high, a pill, the hero card colours and the tab bar's shadow
+  const css = (selector: string) => new RegExp(`${selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')} \\{([^}]*)\\}`).exec(design)?.[1] ?? '';
+  const dockCss = css('.phone .tabdock'), pillCss = css('.cp-tabbar'), barCss = css('.cont-bar');
+  const px = (rule: string, prop: string) => Number(new RegExp(`(?:^|[; ])${prop}: (\\d+)px`).exec(rule)?.[1]);
+  assert.equal(px(barCss, 'bottom'), px(dockCss, 'padding-bottom') + px(pillCss, 'height') + 8, 'the bar is 8 above the pill');
+  assert.equal(px(barCss, 'min-height'), 64);
+  assert.ok(Number(/z-index: (\d+)/.exec(barCss)?.[1]) > Number(/z-index: (\d+)/.exec(dockCss)?.[1]), 'drawn over the fade of the tab dock');
+  assert.match(pillCss, /margin: 0 (\d+)px/);
+  assert.equal(px(barCss, 'left'), Number(/margin: 0 (\d+)px/.exec(pillCss)?.[1]), 'the pill\'s side margin');
+  assert.equal(px(barCss, 'right'), px(barCss, 'left'));
+  assert.match(barCss, /border-radius: var\(--cp-radius-pill\)/);
+  assert.match(barCss, /background: var\(--cp-surface-inverse\); color: var\(--cp-text-inverse\); box-shadow: var\(--cp-shadow-lg\)/);
+  assert.match(css('.cont-bar .x'), /width: 48px; height: 48px/, 'the X is at least 44 by 44');
+  assert.match(css('.cont-bar .ic'), /color: var\(--cp-highlight\)/, 'a gold glyph');
+  assert.match(css('.cont-bar .r'), /font-family: var\(--cp-font-title\)/, 'the place is Fraunces');
+  assert.match(css('.cont-bar .r .h'), /flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis/, 'the name gives way, with an ellipsis');
+  assert.match(css('.cont-bar .r .c'), /flex: none/, 'the chapter does not');
   // Dark: the same screen in the dark palette
   assert.match(dark, /^[^]*?<div class="phone dk">/);
   assert.equal(count(dark, /class="lib-tile"/g), 39);
@@ -698,8 +729,9 @@ check('the four fonts by role on the Bible side of the Library: Fraunces for nam
     [join(L, 'LibraryBanner.tsx'), /<AppText variant="h4"[^>]*>\{title\}<\/AppText>/, 'the title of the banner is Fraunces'],
     [join(L, 'LibraryBanner.tsx'), /<AppText variant="accent"[^>]*>\{note\}<\/AppText>/, 'the one note of the banner is Caveat'],
     [join(L, 'LibraryBanner.tsx'), /<AppText variant="label"[^>]*>\{cta\}<\/AppText>/, 'the label of the gold pill is Inter, never the handwriting'],
-    [join(L, 'bible', 'ContinueCard.tsx'), /<AppText variant="mono"[^>]*>\{placeLabel\(place\)\}<\/AppText>/, 'the chapter on the continue card is a reference: JetBrains Mono'],
-    [join(L, 'bible', 'ContinueCard.tsx'), /<AppText variant="label" muted[^>]*>\{CONTINUE_TITLE\}<\/AppText>/, 'the words over it are Inter'],
+    [join(L, 'continueBar', 'ContinueBar.tsx'), /<AppText variant="h4"[^>]*>\{view\.head\}<\/AppText>/, 'the name of the place on the Continue reading bar is Fraunces (h4)'],
+    [join(L, 'continueBar', 'ContinueBar.tsx'), /<AppText variant="h4"[^>]*>\{view\.tail\}<\/AppText>/, 'and so is its chapter: the one piece of it that is never cut'],
+    [join(L, 'continueBar', 'ContinueBar.tsx'), /<AppText variant="label"[^>]*>\{CONTINUE_TITLE\}<\/AppText>/, 'the words over it are Inter'],
     [join(L, 'bible', 'Reader.tsx'), /<AppText variant="h4" color=\{role\.accentText\}[^>]*>\{book\.name\}<\/AppText>/, 'the name of the book over the chapter is Fraunces'],
     [join(L, 'bible', 'Reader.tsx'), /<AppText variant="h2" accessibilityRole="header"[^>]*>\{chapterTitle\(place\)\}<\/AppText>/, 'the title of the chapter is Fraunces'],
     [join(L, 'bible', 'Reader.tsx'), /\{!!chapter\.title && <AppText variant="h4" muted /, 'the title of a psalm is Fraunces'],
@@ -730,7 +762,7 @@ check('the four fonts by role on the Bible side of the Library: Fraunces for nam
   // Caveat: ONE short note per screen, never more (the brand: max one per design), counted over the files each screen draws
   const accent = (files: string[]) => files.reduce((sum, f) => sum + (strip(read(f)).match(/variant="accent"/g) ?? []).length, 0);
   const screens: Record<string, { files: string[]; notes: number }> = {
-    'the Bible tab': { files: [join('app', '(tabs)', 'library.tsx'), join(L, 'LibraryBanner.tsx'), join(L, 'LibraryTabs.tsx'), join(L, 'bible', 'BookGrid.tsx'), join(L, 'bible', 'TestamentBar.tsx'), join(L, 'bible', 'ContinueCard.tsx')], notes: 1 },
+    'the Bible tab': { files: [join('app', '(tabs)', 'library.tsx'), join(L, 'LibraryBanner.tsx'), join(L, 'LibraryTabs.tsx'), join(L, 'bible', 'BookGrid.tsx'), join(L, 'bible', 'TestamentBar.tsx'), join(L, 'continueBar', 'ContinueBar.tsx')], notes: 1 },
     'the chapters of a book': { files: [join('app', 'library', 'bible', '[code]', 'index.tsx'), join(L, 'bible', 'ChapterGrid.tsx')], notes: 1 },
     'the reader': { files: [join(L, 'bible', 'Reader.tsx'), join(L, 'bible', 'ReaderText.tsx'), join(L, 'bible', 'ChapterNav.tsx'), join(L, 'bible', 'VerseActions.tsx')], notes: 1 },
     'the results of a search': { files: [join(L, 'SearchResults.tsx'), join(L, 'bible', 'VerseRows.tsx')], notes: 0 },

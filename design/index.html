@@ -249,12 +249,21 @@ textarea.cp-input { height: 120px; border-radius: var(--cp-radius-lg); padding: 
 .lib-tile { width: 111px; height: 111px; padding: 7px 4px; display: flex; flex-direction: column; justify-content: space-between; align-items: flex-start; text-align: left; border: 0; border-radius: var(--cp-radius-md); background: var(--cp-surface); box-shadow: inset 0 0 0 1px var(--cp-border), var(--cp-shadow-sm); color: var(--cp-text); font: inherit; cursor: pointer; }
 .lib-tile .nm { font-family: var(--cp-font-title); font-weight: 600; }
 .lib-tile .ct { font-family: var(--cp-font-mono); font-weight: 400; letter-spacing: 0; color: var(--cp-text-muted); white-space: nowrap; }
-.cont-card { min-height: 64px; display: flex; align-items: center; gap: 14px; padding: 10px 12px 10px 16px; border-radius: var(--cp-radius-lg); background: var(--cp-surface); box-shadow: inset 0 0 0 1px var(--cp-border), var(--cp-shadow-sm); }
-.cont-card .ic { width: 40px; height: 40px; flex: none; border-radius: 50%; display: grid; place-items: center; background: var(--cp-surface-sunken); color: var(--cp-action); }
-.cont-card .ic .cp-icon { width: 22px; height: 22px; }
-.cont-card .k { font-size: 14px; line-height: 18px; font-weight: 600; color: var(--cp-text-muted); }
-.cont-card .r { font-family: var(--cp-font-mono); font-size: 17px; line-height: 24px; }
-.cont-card > .cp-icon { width: 22px; height: 22px; color: var(--cp-text-muted); flex: none; }
+/* The "Continue reading" bar (mobile/src/features/library/continueBar/ContinueBar.tsx): one bar that floats above the tab bar, the place read last in the Bible or in a book. On a phone it is
+   placed from the tab dock: the pill is 26 above the bottom and 88 high, the bar is 8 above it (26 + 88 + 8 = 122) with the pill's side margins, 64 high, a pill itself, in the colours of a
+   hero card (the surface-inverse of the banners, the gold of the highlight for the glyph), with the tab bar's shadow. The X is a button of its own, 48 by 48. The place is drawn in two pieces,
+   the name (.h: the one that gives way, with an ellipsis) and the chapter (.c: never cut), because the books of the Library have titles of their own and some are long. */
+.cont-bar { --acc: #F3DFA6; position: absolute; left: 12px; right: 12px; bottom: 122px; z-index: 7; min-height: 64px; box-sizing: border-box; display: flex; align-items: center; padding: 0 8px 0 16px; border-radius: var(--cp-radius-pill); background: var(--cp-surface-inverse); color: var(--cp-text-inverse); box-shadow: var(--cp-shadow-lg); }
+.cont-bar.static { position: relative; left: auto; right: auto; bottom: auto; max-width: 366px; }
+.cont-bar .main { flex: 1; min-width: 0; min-height: 64px; display: flex; align-items: center; gap: 12px; cursor: pointer; }
+.cont-bar .ic { width: 28px; height: 28px; color: var(--cp-highlight); stroke-width: 1.9px; flex: none; }
+.cont-bar .t { flex: 1; min-width: 0; }
+.cont-bar .k { font-size: 14px; line-height: 18px; font-weight: 600; color: var(--acc); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cont-bar .r { display: flex; align-items: baseline; gap: 5px; font-family: var(--cp-font-title); font-weight: 600; font-size: 18px; line-height: 24px; white-space: nowrap; }
+.cont-bar .r .h { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.cont-bar .r .c { flex: none; }
+.cont-bar .x { flex: none; width: 48px; height: 48px; display: grid; place-items: center; padding: 0; border: 0; background: none; color: var(--cp-text-inverse); cursor: pointer; }
+.cont-bar .x .cp-icon { width: 22px; height: 22px; stroke-width: 2px; }
 .rd-count { margin: 2px 0 0; font-family: var(--cp-font-mono); font-size: 15px; line-height: 22px; color: var(--cp-text-muted); }
 .ch-grid { display: grid; grid-template-columns: repeat(5, 65px); gap: 8px; }
 .ch-tile { width: 65px; height: 65px; display: grid; place-items: center; border: 0; padding: 0; border-radius: var(--cp-radius-sm); background: var(--cp-surface); box-shadow: inset 0 0 0 1px var(--cp-border), var(--cp-shadow-sm); color: var(--cp-text); font: 400 20px/26px var(--cp-font-mono); cursor: pointer; }
@@ -1704,6 +1713,10 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
       <p class="spec" style="margin:0 0 16px">.cp-fab-write · gold, 60 round, icon only, bottom-right above the tab bar. Me: ONE gold button floats and it is the same on every sub-tab, Notes, Journey, Plan and Health: the chat button. It opens the inbox (notifications, messages and groups), on Messages when a chat or a group has something unread, else on Notifications when a notification has, else on Messages, and it carries the unread badge (.cp-fab-badge: red, 99+, ringed in the page colour); the header of Me keeps only the gear at the top right. Writing does not float: the first tile of the Journey grid is the card Write a journey post, and the card Write a note tops the Notes feed. The Library has none. One component in the app (components/Fab.tsx).</p>
       <div class="row" style="gap:28px"><button class="cp-fab-write" aria-label="Inbox, 3 unread"><svg class="cp-icon"><use href="#i-chat"/></svg><span class="cp-fab-badge" aria-hidden="true">3</span></button><button class="cp-fab-write" aria-label="Inbox, 120 unread"><svg class="cp-icon"><use href="#i-chat"/></svg><span class="cp-fab-badge" aria-hidden="true">99+</span></button><button class="cp-fab-write" aria-label="Inbox"><svg class="cp-icon"><use href="#i-chat"/></svg></button></div>
     </div>
+    <div class="panel">
+      <p class="spec" style="margin:0 0 16px">.cont-bar · "Continue reading" · one bar above the tab bar of the Library (Bible and Books), 64 high, 8 above the pill, the pill's side margins, a pill itself, the colours of a hero card, a gold glyph, Fraunces for the place. One component (features/library/continueBar). It continues the place read last in the Bible or in a book, reopens the reader there, and the X (48 by 48, "Hide Continue reading") hides it until the saved place changes. A long title is cut with an ellipsis and the chapter is not. It steps aside while the keyboard is open or the search field has the focus, and the lists keep its room at their end.</p>
+      <div class="cont-bar static"><div class="main" role="button" aria-label="Continue reading, Genesis 3"><svg class="cp-icon ic"><use href="#i-book"/></svg><div class="t"><div class="k">Continue reading</div><div class="r"><span class="h">Genesis</span><span class="c">3</span></div></div></div><button class="x" aria-label="Hide Continue reading"><svg class="cp-icon"><use href="#i-x"/></svg></button></div>
+    </div>
   </div>
 
   <h3>Blog & article cards</h3>
@@ -2959,21 +2972,19 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     </div>
 
     <div class="phone-wrap">
-      <p class="phone-label"><b>Library · Continue</b>The card that reopens the chapter read last · New Testament chosen</p>
+      <p class="phone-label"><b>Library · Continue</b>The bar above the tab bar that reopens the chapter read last · the X hides it · New Testament chosen</p>
       <div class="phone">
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
-        <div class="scroll">
+        <div class="cont-bar">
+          <div class="main" role="button" aria-label="Continue reading, Psalm 121"><svg class="cp-icon ic"><use href="#i-book"/></svg><div class="t"><div class="k">Continue reading</div><div class="r"><span class="h">Psalm</span><span class="c">121</span></div></div></div>
+          <button class="x" aria-label="Hide Continue reading"><svg class="cp-icon"><use href="#i-x"/></svg></button>
+        </div>
+        <div class="scroll" style="padding-bottom:202px">
           <div class="lib-head">
             <div class="lib-search"><svg class="cp-icon"><use href="#i-search"/></svg><span class="t">Search the Library</span></div>
             <button class="cp-icon-btn flat" aria-label="Bookmarks"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button>
           </div>
           <div class="cp-subtabs" style="margin:16px 0"><span class="on">Bible</span><span>Books</span></div>
-          <div class="cont-card" role="button" aria-label="Continue reading, Psalm 121">
-            <span class="ic"><svg class="cp-icon"><use href="#i-book"/></svg></span>
-            <div style="flex:1;min-width:0"><div class="k">Continue reading</div><div class="r">Psalm 121</div></div>
-            <svg class="cp-icon"><use href="#i-chev"/></svg>
-          </div>
-          <div style="height:16px"></div>
           <div class="cp-banner cmp" role="button" aria-label="Read today. Daily reading. Sunday 8 November">
             <div class="ey">Sunday 8 November</div>
             <h4>Daily reading</h4>
@@ -4407,7 +4418,8 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
   Each is drawn like a book: a spine with a groove and the shade of the hinge, the edges of the pages on the right, a small radius, a soft shadow, the glyph of the book in a ring, the title set like a cover in Fraunces
   (as large as fits, never a word cut: "The French Way" is set at 22), the kind of book in small spaced capitals (Inter) and how long it takes in JetBrains Mono. There is no mark of free or soon: every book is in the app.
   The paper does not change with light and dark, nor does the navy printed on it. A cover is <b>one button</b> ("The French Way, Pilgrim's guide, 51 minutes") and the ribbon at its top right is <b>another</b>, 44 by 44, that bookmarks the book (the key is <code>books:id</code>).
-  The banner is the compact one of the Bible tab: a label (the first book, or the one read last), a title, one short handwritten note and a gold pill: <b>Start reading</b> or, once something was read, <b>Continue reading</b>, which goes on at the line where you stopped.
+  The banner is the compact one of the Bible tab: a label (the first book), a title, one short handwritten note and a gold pill: <b>Start reading</b>. It does not continue a book: going back to the place read last, in a book or in the Bible,
+  is the <b>Continue reading</b> bar that floats above the tab bar (the same bar on both tabs of the Library, with a close button of its own, and room kept for it at the end of the lists): a book is named by its title and the chapter the reader will open ("The French Way · Chapter 3").
   A cover opens the <b>book page</b>: a larger cover, the title, the subtitle, the kind, the chapters, the words and the time, the description, <b>the notice of its kind</b> (what was written with AI assistance and what has not been checked: <code>notices.ts</code>) above the gold button
   (<b>Start reading</b> or <b>Continue: Is this Camino for you?</b>), the table of contents with the minutes of each chapter, the ones read ticked and the place where you stopped marked, and the credit.
   The <b>reader</b> keeps a header at the top while the chapter scrolls under it, with one row as on a Kindle: the <b>Back button</b> of every screen (round, 48, with the chevron: here it goes to the contents of the book) and two round buttons of the same size for smaller and larger text (five steps, kept on the phone). At the bottom it keeps a bar: a thin line that shows how far down you are,
@@ -4564,16 +4576,20 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     </div>
 
     <div class="phone-wrap">
-      <p class="phone-label"><b>Books · dark</b>Continue reading · the covers are paper: they do not change</p>
+      <p class="phone-label"><b>Books · dark</b>The Continue reading bar names a book and its chapter · the banner still starts the first book · the covers are paper: they do not change</p>
       <div class="phone dk">
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
-        <div class="scroll">
+        <div class="cont-bar">
+          <div class="main" role="button" aria-label="Continue reading, The French Way, Chapter 3"><svg class="cp-icon ic"><use href="#i-library"/></svg><div class="t"><div class="k">Continue reading</div><div class="r"><span class="h">The French Way</span><span class="c">· Chapter 3</span></div></div></div>
+          <button class="x" aria-label="Hide Continue reading"><svg class="cp-icon"><use href="#i-x"/></svg></button>
+        </div>
+        <div class="scroll" style="padding-bottom:202px">
           <div class="lib-head">
             <div class="lib-search"><svg class="cp-icon"><use href="#i-search"/></svg><span class="t">Search the Library</span></div>
             <button class="cp-icon-btn flat" aria-label="Bookmarks"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button>
           </div>
           <div class="cp-subtabs" style="margin:16px 0"><span>Bible</span><span class="on">Books</span></div>
-          <div class="cp-banner cmp" role="button" aria-label="Continue reading. Books for the road. The French Way"><div class="ey">The French Way</div><h4>Books for the road</h4><div class="row"><span class="hw">Onward!</span><span class="pill">Continue reading</span></div></div>
+          <div class="cp-banner cmp" role="button" aria-label="Start reading. Books for the road. The French Way"><div class="ey">The French Way</div><h4>Books for the road</h4><div class="row"><span class="hw">No rush</span><span class="pill">Start reading</span></div></div>
           <div style="margin-top:24px">
             <div class="bk-shelf">
               <div class="hd"><h4>Pilgrim's guides</h4><span class="ct">14 books</span></div>

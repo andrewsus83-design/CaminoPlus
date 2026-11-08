@@ -43,7 +43,7 @@ const SCROLL_MARGIN = 90;
  * (ChapterNav; they cross the books and the parts, Malachi 4 to Tobit 1); then the words (ReaderText); at the end the same two buttons, one handwritten note,
  * and the credit of the translation with the plain line that it is not the one read at Mass. Touching a verse chooses it and raises the bar of actions (Bookmark,
  * Copy, Share); touching it again, or the close button, lets it go; a verse touched where the bar is about to be is scrolled up above it. A link that names a verse
- * (/library/bible/PSA/121?v=3) opens with that verse chosen and scrolled into view. The chapter is remembered as the one last read (the Bible tab's "Continue reading"). The words come from text.ts, which reads files inside the app:
+ * (/library/bible/PSA/121?v=3) opens with that verse chosen and scrolled into view. The chapter is remembered as the one last read (what the Continue reading bar above the tab bar of the Library goes back to). The words come from text.ts, which reads files inside the app:
  * nothing here uses the network.
  */
 export function Reader({ place, verse }: { place: Place; verse: number | null }) {
