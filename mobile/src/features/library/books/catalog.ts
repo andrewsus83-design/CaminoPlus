@@ -1,16 +1,19 @@
 // The twelve free books of the Books tab, chosen by the owner: classics that are good companions on the Camino. They are in the
-// order the owner gave them, as one flat list. No text of any book is in the app yet, so every row says "Soon" and the tab says it
-// is a preview (see ../sample.ts). Plain data on purpose: no theme colours are read here (a colour read at import would never follow
-// light/dark); a cover names its colour and the screen looks it up when it draws. Pure: no React, no React Native.
+// order the owner gave them, as one flat list. Whether a book has a text in the app is NOT said here: bookText.ts is the only place that
+// knows (`hasBookText(id)`), because the texts come from their own data files and a field kept by hand here would drift from them.
+// A book with a text says "Free" on its cover and opens in the reader; one without says "Soon" and why (its edition is still being
+// checked, see copy.ts). Plain data on purpose: no theme colours are read here (a colour read at import would never follow light/dark);
+// a cover names its colour and the screen looks it up when it draws. Pure: no React, no React Native.
 //
-// What is on screen, per book: the cover (colour and glyph), the title, "author · era", the blurb, and the chips "Free" and "Soon".
-// Everything else is DATA ONLY and is never drawn by any component (a test reads every screen file to make sure of it):
+// What is on screen, per book: the cover (colour and glyph, drawn by BookCover.tsx), the title, the author, the era, the blurb, and the
+// marks "Free" and "Soon". Everything else is DATA ONLY and is never drawn by any component (a test reads every screen file to make sure of it):
 //   group             how the owner sorted the twelve; the list on screen is flat, with no headings
 //   source            a page where an edition can be read, once the edition is chosen and checked; absent until then
 //   licenceFlag       'check-edition' when the edition we would use may still be protected somewhere, else 'public-domain-original'
 //   licenceNote       why, in one or two sentences, for whoever picks the editions later
 //   editionToConfirm  what must be confirmed about the edition before the book goes into the app
-// An id is stable and lower case, because a bookmark is kept under it ("books:confessions", see ../search.ts itemKey).
+// An id is stable and lower case, because a bookmark is kept under it ("books:confessions", see ../search.ts itemKey) and so is the place
+// where a person stopped reading it (see reading.ts).
 
 export type CoverColour = 'goldSoft' | 'blue100' | 'successWash' | 'red100' | 'sand300' | 'goldWash';
 
@@ -125,3 +128,6 @@ const NO_BREAK_SPACE = '\u00a0';
  * "16th century" and "1522 to 1524", never inside them ("century" alone on a second line).
  */
 export const bookByline = (b: Pick<CatalogBook, 'author' | 'era'>): string => `${b.author} · ${b.era.replace(/ /g, NO_BREAK_SPACE)}`;
+
+/** The book with this id, or undefined (an old or a wrong link). */
+export const bookById = (id: string | null | undefined): CatalogBook | undefined => BOOK_CATALOG.find((b) => b.id === id);
