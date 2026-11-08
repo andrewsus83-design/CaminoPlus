@@ -669,7 +669,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
 .dy-read .q { border-left: 3px solid var(--cp-color-gold); padding-left: 14px; }
 .dy-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .dy-grid .dy-tile { width: auto; height: auto; aspect-ratio: 1 / 1; }
-/* ---- Library · Notes: the diary's pages as a feed (start) ---- */
+/* ---- Me · Notes: the diary's pages as a feed, under the header of Me and its four sub-tabs (start) ---- */
 .nt-top { position: absolute; top: 54px; left: 0; right: 0; z-index: 4; padding: var(--cp-screen-top) var(--cp-screen-margin) 0; background: var(--cp-bg); }
 .nt-top .cp-subtabs { margin-top: 16px; }
 .nt-feed.scroll { top: 181px; padding: 0 0 140px; }
@@ -726,7 +726,9 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
 .nt-sheet .item .cp-icon { width: 24px; height: 24px; }
 .nt-sheet .item.danger { color: var(--cp-danger); }
 .nt-sheet .cp-btn { margin-top: 12px; height: 68px; font-size: 22px; background: var(--cp-surface); color: var(--cp-text); box-shadow: inset 0 0 0 1px var(--cp-border); }
-/* ---- Library · Notes (end) ---- */
+.nt-me.scroll { padding: var(--cp-screen-top) 0 140px; }
+.nt-metop { display: flex; flex-direction: column; padding: 0 var(--cp-screen-margin); }
+/* ---- Me · Notes (end) ---- */
 .cp-toolbar { display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; background: var(--cp-surface); border-radius: var(--cp-radius-pill); box-shadow: var(--cp-shadow-lg); }
 .cp-toolbar .cp-icon-btn { box-shadow: none; background: transparent; }
 .cp-toolbar .cp-icon-btn.on { background: var(--cp-color-gold-soft); }
@@ -1603,7 +1605,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
       <div style="display:flex;align-items:center;gap:10px"><span class="un">ana.camina</span><span class="cp-edit-pill"><svg class="cp-icon "><use href="#i-pencil"/></svg>camino.plus/ana</span></div>
     </div>
     <div class="panel">
-      <p class="spec" style="margin:0 0 16px">.cp-fab-write · gold, 60 round, icon only, bottom-right above the tab bar. Me: the pen writes a journey post. Library: on the Notes tab the note icon writes a note. One component in the app (components/Fab.tsx).</p>
+      <p class="spec" style="margin:0 0 16px">.cp-fab-write · gold, 60 round, icon only, bottom-right above the tab bar. Me: one pen at a time, and it follows the sub-tab: on Notes the note icon writes a note, on Journey the pen writes a journey post, on Plan and Health there is none. The Library has none. One component in the app (components/Fab.tsx).</p>
       <div class="row"><button class="cp-fab-write" aria-label="Write a journey post"><svg class="cp-icon "><use href="#i-pencil"/></svg></button></div>
     </div>
   </div>
@@ -1796,11 +1798,11 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
         <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-library"/></svg></span>Library</div>
       </nav>
     </div>
-    <div class="panel" style="padding:12px 24px 0"><div class="cp-subtabs" style="margin:0"><span class="on"><svg class="cp-icon sm"><use href="#i-steps"/></svg>Journey</span><span class=""><svg class="cp-icon sm"><use href="#i-shell"/></svg>Passport</span><span class=""><svg class="cp-icon sm"><use href="#i-flag"/></svg>Plan</span></div><p class="spec" style="margin:16px 0 20px">.cp-subtabs · 15/600 · 3px blue underline</p></div>
+    <div class="panel" style="padding:12px 24px 0"><div class="cp-subtabs" style="margin:0"><span>Notes</span><span class="on">Journey</span><span>Plan</span><span>Health</span></div><p class="spec" style="margin:16px 0 20px">.cp-subtabs · 17/600 · 3px blue underline · Me: Notes, Journey, Plan, Health, and it opens on Journey</p></div>
   </div>
   <p class="spec" style="margin-top:16px">.cp-tabbar · height 72 · radius pill · shadow-lg · icon 24 in 52×32 pill · label 12/500 (active 700)</p>
-  <p class="note" style="margin-top:12px;max-width:760px"><b>Settings is not a tab.</b> It opens from the gear at the top right of Me, next to the inbox bell, as a screen of its own: a back button on the left, light/dark and log out on the right, and no tab bar under it. <b>Library</b> is the fifth tab. It has no title: the row on top is a search field and the round Bookmarks button in the corner (the same size as the bell and the gear on Me), and directly under it the tabs Bible, Books and Notes, then the banner of the tab. Bible has a banner for the daily reading and Books one for its twelve books; Notes, which is the diary, has none. Until we have chosen what we may include, Bible and Books show example rows and say so. At the bottom of Bible three choices float above the tab bar (Old Testament, Deuterocanon, New Testament); on Notes the gold button writes a note, and the search row and the tabs stay at the top while the notes scroll under them. <b>The diary</b> (Library, Notes) keeps its pages only on the phone: the list says so, nothing is uploaded, logging out keeps the pages, deleting the account deletes them, and a page is saved as it is typed, so there is no Save button.</p>
-  <p class="note" style="margin-top:12px;max-width:760px"><b>Library search</b> looks through the Bible and Books tabs at once, as you type (every book of the Bible and the twelve books; Notes are not searched here), and lists what it finds grouped by tab (Bible, Books) under one Preview notice. A word counts when it starts a word of a row (a name or title, the author, the part of the Bible, the line under it, or the name of the tab), so "new testament" lists the 27 books of the New Testament. With nothing found it says "Nothing found for ..." and offers Clear search; clearing the field brings the tabs and the banner back. <b>Bookmarks</b> is a screen of its own, opened from the round button in the corner: a back button, no tab bar, then two parts. Library lists the rows bookmarked from the tabs; they stay only on the phone and logging out clears them, and each is still an example. Posts lists the posts bookmarked in the journey viewer; they stay with the account, and with no signal the list from the last visit is shown, with a line that says so. A row that is taken off stays in place, with an empty bookmark, until the screen is left, so a slip can be put back with one tap.</p>
+  <p class="note" style="margin-top:12px;max-width:760px"><b>Settings is not a tab.</b> It opens from the gear at the top right of Me, next to the inbox bell, as a screen of its own: a back button on the left, light/dark and log out on the right, and no tab bar under it. <b>Library</b> is the fifth tab. It has no title: the row on top is a search field and the round Bookmarks button in the corner (the same size as the bell and the gear on Me), and directly under it the two tabs Bible and Books, then the banner of the tab. Bible has a banner for the daily reading and Books one for its twelve books. Until we have chosen what we may include, Bible and Books show example rows and say so. At the bottom of Bible three choices float above the tab bar (Old Testament, Deuterocanon, New Testament); there is no gold button on the Library. <b>Me</b> has four sub-tabs under the highlights, left to right Notes, Journey, Plan and Health, and it opens on Journey; one gold button floats at a time and follows the sub-tab: a note on Notes, a journey post on Journey, none on Plan and Health. <b>The diary</b> (Me, Notes) keeps its pages only on the phone: the list says so, nothing is uploaded, logging out keeps the pages, deleting the account deletes them, and a page is saved as it is typed, so there is no Save button.</p>
+  <p class="note" style="margin-top:12px;max-width:760px"><b>Library search</b> looks through the Bible and Books tabs at once, as you type (every book of the Bible and the twelve books; the diary is not searched here, it is the Notes sub-tab of Me), and lists what it finds grouped by tab (Bible, Books) under one Preview notice. A word counts when it starts a word of a row (a name or title, the author, the part of the Bible, the line under it, or the name of the tab), so "new testament" lists the 27 books of the New Testament. With nothing found it says "Nothing found for ..." and offers Clear search; clearing the field brings the tabs and the banner back. <b>Bookmarks</b> is a screen of its own, opened from the round button in the corner: a back button, no tab bar, then two parts. Library lists the rows bookmarked from the tabs; they stay only on the phone and logging out clears them, and each is still an example. Posts lists the posts bookmarked in the journey viewer; they stay with the account, and with no signal the list from the last visit is shown, with a line that says so. A row that is taken off stays in place, with an empty bookmark, until the screen is left, so a slip can be put back with one tap.</p>
 </section>
 
 <!-- =================================================================== BUSINESS -->
@@ -2024,7 +2026,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
 <section class="doc" id="screens">
   <p class="eyebrow">15 · Screens @ 390 × 844</p>
   <h2>The app, tab by tab</h2>
-  <p class="intro">Reference layouts at iPhone 15 size. Scroll sideways to see all of them. Me has the My Camino card with its Change button, a row of highlights (one round picture for each destination of the day plan: a gold ring when you posted there, a dashed circle while it is still ahead), three sub-tabs, an inbox, a two-step write flow, a share screen and a stamp pop-up. Maps has two layers: helicopter view and city view. Stays opens into Airbnb / Agoda-style detail pages for stays and cafes. Explore has a second screen for the photo marketplace. Library has a search field with a bookmarks button on top and directly under it the tabs Bible, Books and Notes, each with its banner except Notes; Bible has three choices at the bottom (Old Testament, Deuterocanon, New Testament) and Notes a gold button that writes a note; a search lists its results grouped by tab, Bookmarks lists what the pilgrim kept, and the diary has a list of pages and an editor. Settings is a screen opened from the gear at the top right of Me; it opens the business-owner flow: a welcome page, five registration steps, the review status and the owner dashboard.</p>
+  <p class="intro">Reference layouts at iPhone 15 size. Scroll sideways to see all of them. Me has the My Camino card with its Change button, a row of highlights (one round picture for each destination of the day plan: a gold ring when you posted there, a dashed circle while it is still ahead), four sub-tabs (Notes, Journey, Plan, Health), an inbox, a two-step write flow, a share screen and a stamp pop-up. Maps has two layers: helicopter view and city view. Stays opens into Airbnb / Agoda-style detail pages for stays and cafes. Explore has a second screen for the photo marketplace. Library has a search field with a bookmarks button on top and directly under it the tabs Bible and Books, each with its banner; Bible has three choices at the bottom (Old Testament, Deuterocanon, New Testament); a search lists its results grouped by tab, Bookmarks lists what the pilgrim kept, and the diary (the Notes sub-tab of Me) has a feed of pages and an editor. Settings is a screen opened from the gear at the top right of Me; it opens the business-owner flow: a welcome page, five registration steps, the review status and the owner dashboard.</p>
 
   <div class="phones">
 
@@ -2060,7 +2062,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
             <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#D7C6E0,#6E5470)"></span></span>Burgos</div>
             <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Hornillos</div>
             <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Castrojeriz</div>
-          </div><div class="cp-subtabs" style="margin:22px -24px 20px;padding:0 12px"><span class="on"><svg class="cp-icon sm"><use href="#i-steps"/></svg>Journey</span><span class=""><svg class="cp-icon sm"><use href="#i-shell"/></svg>Passport</span><span class=""><svg class="cp-icon sm"><use href="#i-flag"/></svg>Plan</span></div>
+          </div><div class="cp-subtabs" style="margin:22px -24px 20px;padding:0 12px"><span>Notes</span><span class="on">Journey</span><span>Plan</span><span>Health</span></div>
           <article class="cp-post">
             <div class="hd"><span class="cp-avatar"></span><div style="flex:1"><div class="n">Ana García</div><div class="m">Day 12 · Burgos · 2h ago</div></div><svg class="cp-icon" style="color:var(--cp-text-muted)"><use href="#i-dots"/></svg></div>
             <div class="tx">Reached the cathedral at sunrise. 31 km to Hontanas tomorrow, legs say no, heart says yes.</div>
@@ -2238,7 +2240,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
             <span class="cp-ring"><span class="cp-avatar" style="width:52px;height:52px"></span></span>
             <div style="flex:1"><div style="font-weight:600;font-size:17px">Ana García</div><div class="note" style="font-size:13px">@ana.camina · Day 12</div></div>
             <button class="cp-icon-btn flat" aria-label="Share"><svg class="cp-icon"><use href="#i-share"/></svg></button>
-          </div><div class="cp-subtabs" style="margin:22px -24px 20px;padding:0 12px"><span class=""><svg class="cp-icon sm"><use href="#i-steps"/></svg>Journey</span><span class=""><svg class="cp-icon sm"><use href="#i-shell"/></svg>Passport</span><span class="on"><svg class="cp-icon sm"><use href="#i-flag"/></svg>Plan</span></div>
+          </div><div class="cp-subtabs" style="margin:22px -24px 20px;padding:0 12px"><span>Notes</span><span>Journey</span><span class="on">Plan</span><span>Health</span></div>
           <div class="tiles" style="margin-bottom:24px">
             <div class="tile"><div class="k">Days left</div><div class="v">21</div></div>
             <div class="tile"><div class="k">Arrive Santiago</div><div class="v" style="font-size:24px">25 Nov</div></div>
@@ -2737,7 +2739,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
             <div class="lib-search"><svg class="cp-icon"><use href="#i-search"/></svg><span class="t">Search the Library</span></div>
             <button class="cp-icon-btn flat" aria-label="Bookmarks"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button>
           </div>
-          <div class="cp-subtabs" style="margin:16px 0"><span class="on">Bible</span><span>Books</span><span>Notes</span></div>
+          <div class="cp-subtabs" style="margin:16px 0"><span class="on">Bible</span><span>Books</span></div>
           <div class="cp-banner lib" role="button" aria-label="Read today. Today's reading and a short reflection. Sunday 8 November">
             <span class="art"><svg class="cp-icon"><use href="#i-book"/></svg></span>
             <div class="ey">Today · Daily reading</div>
@@ -2818,7 +2820,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
             <div class="lib-search"><svg class="cp-icon"><use href="#i-search"/></svg><span class="t">Search the Library</span></div>
             <button class="cp-icon-btn flat" aria-label="Bookmarks"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button>
           </div>
-          <div class="cp-subtabs" style="margin:16px 0"><span>Bible</span><span class="on">Books</span><span>Notes</span></div>
+          <div class="cp-subtabs" style="margin:16px 0"><span>Bible</span><span class="on">Books</span></div>
           <div class="cp-banner lib">
             <span class="art"><svg class="cp-icon"><use href="#i-library"/></svg></span>
             <div class="ey">Preview · Books</div>
@@ -3065,19 +3067,44 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
       </div>
     </div>
 
-<!-- Library · Notes phones (start) -->
+<!-- Me · Notes phones (start) -->
     <div class="phone-wrap">
-      <p class="phone-label"><b>Library · Notes</b>The diary's pages as a feed · only on this phone</p>
+      <p class="phone-label"><b>Me · Notes</b>The first sub-tab · the diary's pages as a feed · only on this phone · one pen</p>
       <div class="phone">
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
-        <div class="nt-top">
-          <div class="lib-head">
-            <div class="lib-search"><svg class="cp-icon"><use href="#i-search"/></svg><span class="t">Search the Library</span></div>
-            <button class="cp-icon-btn flat" aria-label="Bookmarks"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button>
+        <div class="scroll nt-me" data-scroll-strip="1">
+          <div class="nt-metop">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span class="un">ana.camina</span>
+            <span class="cp-edit-pill" role="button" aria-label="Edit profile"><svg class="cp-icon "><use href="#i-pencil"/></svg>camino.plus/ana</span>
+            <span class="cp-bellwrap" style="margin-left:auto"><button class="cp-icon-btn flat" style="width:44px;height:44px" aria-label="Notifications (3 new)"><svg class="cp-icon "><use href="#i-bell"/></svg></button><span class="cp-bell-badge">3</span></span><button class="cp-icon-btn flat" style="width:44px;height:44px;margin-left:-4px" aria-label="Settings"><svg class="cp-icon "><use href="#i-settings"/></svg></button>
           </div>
-          <div class="cp-subtabs"><span>Bible</span><span>Books</span><span class="on">Notes</span></div>
-        </div>
-        <div class="scroll nt-feed">
+          <div class="profile-top" style="margin-top:20px">
+            <span class="cp-ring"><span class="cp-avatar" style="width:86px;height:86px"></span></span>
+            <div class="pstats"><div><b>312</b><span>km</span></div><div><b>12</b><span>stamps</span></div><div><b>148</b><span>friends</span></div></div>
+          </div>
+          <div style="margin-top:14px"><div style="font-weight:600;font-size:17px">Ana García</div>
+          <div style="font-size:15px;line-height:22px">Camino Francés, day 12. Walking for my grandmother. Ultreia!</div></div>
+          <div style="margin-top:14px;display:flex;align-items:center;gap:14px;padding:14px;border-radius:var(--cp-radius-lg);background:var(--cp-surface-inverse);color:var(--cp-text-inverse);box-shadow:var(--cp-shadow-md)">
+            <span style="width:52px;height:52px;border-radius:50%;border:1.5px solid rgba(217,162,27,.55);display:grid;place-items:center;flex:none"><svg width="48" height="48" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="20" fill="#14365D"/><g transform="translate(0 -2.12)"><path d="M20 28.5L5.84 22.20A2.84 2.84 0 0 1 8.64 17.96A2.84 2.84 0 0 1 12.66 14.85A2.84 2.84 0 0 1 17.46 13.21A2.84 2.84 0 0 1 22.54 13.21A2.84 2.84 0 0 1 27.34 14.85A2.84 2.84 0 0 1 31.36 17.96A2.84 2.84 0 0 1 34.16 22.20z" fill="#D9A21B"/><path d="M20 29.0Q14.09 22.35 8.49 17.82M20 29.0Q16.22 20.86 12.56 14.67M20 29.0Q18.70 20.07 17.43 13.01M20 29.0Q21.30 20.07 22.57 13.01M20 29.0Q23.78 20.86 27.44 14.67M20 29.0Q25.91 22.35 31.51 17.82" stroke="#14365D" stroke-width="1.15" stroke-linecap="round" fill="none"/><path d="M15.2 31.4Q18 30.6 18.4 28.3H21.6Q22 30.6 24.8 31.4Q24.6 32.6 20 32.6Q15.4 32.6 15.2 31.4z" fill="#D9A21B"/></g></svg></span>
+            <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+              <div style="font-family:var(--cp-font-accent);font-weight:700;font-size:24px;line-height:28px;color:var(--cp-color-gold)">Buen Camino!</div>
+              <div style="font-family:var(--cp-font-title);font-weight:600;font-size:17px;line-height:21px;color:var(--cp-color-gold-soft)">My Camino</div>
+              <div style="font-size:17px;line-height:22px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Camino Francés</div>
+              <div style="font-size:15px;line-height:21px;font-weight:500;letter-spacing:.4px;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">From stage 1 · 11 stages done</div>
+            </div>
+            <span style="height:40px;padding:0 16px;border-radius:999px;background:var(--cp-color-gold);color:var(--cp-color-blue);font-size:17px;font-weight:600;display:inline-flex;align-items:center;flex:none">Change</span>
+          </div>
+          <div class="highlights" style="margin-top:14px">
+            <div><span class="cp-ring seen"><span class="cp-avatar" style="background:linear-gradient(150deg,#F2D8B6,#A0583F)"></span></span>Pamplona</div>
+            <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#9DB4CC,#14365D)"></span></span>Logroño</div>
+            <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#D7C6E0,#6E5470)"></span></span>Burgos</div>
+            <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Hornillos</div>
+            <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Castrojeriz</div>
+          </div>
+            <div class="cp-subtabs" style="margin:22px -24px 0;padding:0 12px"><span class="on">Notes</span><span>Journey</span><span>Plan</span><span>Health</span></div>
+          </div>
+          <div class="nt-feedbody" style="padding-top:16px">
           <div class="nt-compose">
             <span class="nt-av" aria-hidden="true">AG</span>
             <div class="nt-body">
@@ -3101,149 +3128,57 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
               <h4 class="nt-title">Two of us</h4><div class="nt-grid"><div class="col"><div class="nt-tile"><div class="cp-img v5"></div></div></div><div class="col"><div class="nt-tile"><div class="cp-img v4"></div></div></div></div><div class="nt-acts"><span aria-label="Share the words of this note"><svg class="cp-icon"><use href="#i-share"/></svg></span></div>
             </div>
           </article>
+          </div>
         </div>
-        <div class="fab-slot"><button class="cp-fab-write" aria-label="Write in your diary"><svg class="cp-icon"><use href="#i-compose"/></svg></button></div>
+        <div class="fab-slot"><button class="cp-fab-write" aria-label="Write a note"><svg class="cp-icon"><use href="#i-compose"/></svg></button></div>
         <div class="tabdock"><nav class="cp-tabbar">
-          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
+          <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Discover</div>
-          <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-library"/></svg></span>Library</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-library"/></svg></span>Library</div>
         </nav></div>
         <span class="home-ind"></span>
       </div>
     </div>
 
     <div class="phone-wrap">
-      <p class="phone-label"><b>Library · Notes, scrolled</b>Eight lines, then Show more · a hairline between notes</p>
-      <div class="phone">
+      <p class="phone-label"><b>Me · Notes, dark</b>The same screen after sunset</p>
+      <div class="phone dk">
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
-        <div class="nt-top">
-          <div class="lib-head">
-            <div class="lib-search"><svg class="cp-icon"><use href="#i-search"/></svg><span class="t">Search the Library</span></div>
-            <button class="cp-icon-btn flat" aria-label="Bookmarks"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button>
+        <div class="scroll nt-me" data-scroll-strip="1">
+          <div class="nt-metop">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span class="un">ana.camina</span>
+            <span class="cp-edit-pill" role="button" aria-label="Edit profile"><svg class="cp-icon "><use href="#i-pencil"/></svg>camino.plus/ana</span>
+            <span class="cp-bellwrap" style="margin-left:auto"><button class="cp-icon-btn flat" style="width:44px;height:44px" aria-label="Notifications (3 new)"><svg class="cp-icon "><use href="#i-bell"/></svg></button><span class="cp-bell-badge">3</span></span><button class="cp-icon-btn flat" style="width:44px;height:44px;margin-left:-4px" aria-label="Settings"><svg class="cp-icon "><use href="#i-settings"/></svg></button>
           </div>
-          <div class="cp-subtabs"><span>Bible</span><span>Books</span><span class="on">Notes</span></div>
-        </div>
-        <div class="scroll nt-feed">
-          <article class="nt-row">
-            <span class="nt-av" aria-hidden="true">AG</span>
-            <div class="nt-main">
-              <div class="nt-hd"><span class="who">Ana García <i>@ana.camina</i></span><span class="tm"> · 5h</span><span class="more" aria-label="More: edit or delete this note"><svg class="cp-icon"><use href="#i-dots"/></svg></span></div>
-              <div class="dy-read nt-words cut"><p>Left Burgos in the dark. The cathedral stayed lit behind me for a long time. I met a Dutch woman who has walked the Camino three times and she told me to slow down: the road, she said, is not a race and the albergues will not run out of beds if you arrive at four instead of two.</p><div class="gap"></div><p>I laughed, and then I did slow down. The sun came up over the meseta and the whole plain turned gold for ten minutes.</p></div><div class="nt-showmore">Show more</div><div class="nt-acts"><span aria-label="Share the words of this note"><svg class="cp-icon"><use href="#i-share"/></svg></span></div>
+          <div class="profile-top" style="margin-top:20px">
+            <span class="cp-ring"><span class="cp-avatar" style="width:86px;height:86px"></span></span>
+            <div class="pstats"><div><b>312</b><span>km</span></div><div><b>12</b><span>stamps</span></div><div><b>148</b><span>friends</span></div></div>
+          </div>
+          <div style="margin-top:14px"><div style="font-weight:600;font-size:17px">Ana García</div>
+          <div style="font-size:15px;line-height:22px">Camino Francés, day 12. Walking for my grandmother. Ultreia!</div></div>
+          <div style="margin-top:14px;display:flex;align-items:center;gap:14px;padding:14px;border-radius:var(--cp-radius-lg);background:var(--cp-surface-inverse);color:var(--cp-text-inverse);box-shadow:var(--cp-shadow-md)">
+            <span style="width:52px;height:52px;border-radius:50%;border:1.5px solid rgba(217,162,27,.55);display:grid;place-items:center;flex:none"><svg width="48" height="48" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="20" fill="#14365D"/><g transform="translate(0 -2.12)"><path d="M20 28.5L5.84 22.20A2.84 2.84 0 0 1 8.64 17.96A2.84 2.84 0 0 1 12.66 14.85A2.84 2.84 0 0 1 17.46 13.21A2.84 2.84 0 0 1 22.54 13.21A2.84 2.84 0 0 1 27.34 14.85A2.84 2.84 0 0 1 31.36 17.96A2.84 2.84 0 0 1 34.16 22.20z" fill="#D9A21B"/><path d="M20 29.0Q14.09 22.35 8.49 17.82M20 29.0Q16.22 20.86 12.56 14.67M20 29.0Q18.70 20.07 17.43 13.01M20 29.0Q21.30 20.07 22.57 13.01M20 29.0Q23.78 20.86 27.44 14.67M20 29.0Q25.91 22.35 31.51 17.82" stroke="#14365D" stroke-width="1.15" stroke-linecap="round" fill="none"/><path d="M15.2 31.4Q18 30.6 18.4 28.3H21.6Q22 30.6 24.8 31.4Q24.6 32.6 20 32.6Q15.4 32.6 15.2 31.4z" fill="#D9A21B"/></g></svg></span>
+            <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+              <div style="font-family:var(--cp-font-accent);font-weight:700;font-size:24px;line-height:28px;color:var(--cp-color-gold)">Buen Camino!</div>
+              <div style="font-family:var(--cp-font-title);font-weight:600;font-size:17px;line-height:21px;color:var(--cp-color-gold-soft)">My Camino</div>
+              <div style="font-size:17px;line-height:22px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Camino Francés</div>
+              <div style="font-size:15px;line-height:21px;font-weight:500;letter-spacing:.4px;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">From stage 1 · 11 stages done</div>
             </div>
-          </article>
-          <article class="nt-row">
-            <span class="nt-av" aria-hidden="true">AG</span>
-            <div class="nt-main">
-              <div class="nt-hd"><span class="who">Ana García <i>@ana.camina</i></span><span class="tm"> · 30 Oct</span><span class="more" aria-label="More: edit or delete this note"><svg class="cp-icon"><use href="#i-dots"/></svg></span></div>
-              <h4 class="nt-title">San Juan de Ortega</h4><div class="dy-read nt-words"><p>Soup at the monastery.</p></div><div class="nt-grid"><div class="col"><div class="nt-tile"><div class="cp-img v4"></div></div></div></div><div class="nt-place"><svg class="cp-icon"><use href="#i-pin"/></svg>42.4172° N, 4.2477° W</div><div class="nt-acts"><span aria-label="Share the words of this note"><svg class="cp-icon"><use href="#i-share"/></svg></span></div>
-            </div>
-          </article>
-        </div>
-        <div class="fab-slot"><button class="cp-fab-write" aria-label="Write in your diary"><svg class="cp-icon"><use href="#i-compose"/></svg></button></div>
-        <div class="tabdock"><nav class="cp-tabbar">
-          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
-          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
-          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
-          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Discover</div>
-          <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-library"/></svg></span>Library</div>
-        </nav></div>
-        <span class="home-ind"></span>
-      </div>
-    </div>
-
-    <div class="phone-wrap">
-      <p class="phone-label"><b>Library · Notes, photo grids</b>One wide tile, two, three, four · a clip shows its length · “+3” for the rest</p>
-      <div class="phone">
-        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
-        <div class="nt-top">
-          <div class="lib-head">
-            <div class="lib-search"><svg class="cp-icon"><use href="#i-search"/></svg><span class="t">Search the Library</span></div>
-            <button class="cp-icon-btn flat" aria-label="Bookmarks"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button>
+            <span style="height:40px;padding:0 16px;border-radius:999px;background:var(--cp-color-gold);color:var(--cp-color-blue);font-size:17px;font-weight:600;display:inline-flex;align-items:center;flex:none">Change</span>
           </div>
-          <div class="cp-subtabs"><span>Bible</span><span>Books</span><span class="on">Notes</span></div>
-        </div>
-        <div class="scroll nt-feed">
-          <article class="nt-row noacts">
-            <span class="nt-av" aria-hidden="true">AG</span>
-            <div class="nt-main">
-              <div class="nt-hd"><span class="who">Ana García <i>@ana.camina</i></span><span class="tm"> · 28 Oct</span><span class="more" aria-label="More: edit or delete this note"><svg class="cp-icon"><use href="#i-dots"/></svg></span></div>
-              <h4 class="nt-title">The three of us</h4><div class="nt-grid"><div class="col"><div class="nt-tile"><div class="cp-img "></div></div></div><div class="col"><div class="nt-tile"><div class="cp-img v3"></div></div><div class="nt-tile"><div class="cp-img v2"></div></div></div></div>
-            </div>
-          </article>
-          <article class="nt-row noacts">
-            <span class="nt-av" aria-hidden="true">AG</span>
-            <div class="nt-main">
-              <div class="nt-hd"><span class="who">Ana García <i>@ana.camina</i></span><span class="tm"> · 2 Oct</span><span class="more" aria-label="More: edit or delete this note"><svg class="cp-icon"><use href="#i-dots"/></svg></span></div>
-              <h4 class="nt-title">A day in pictures</h4><div class="nt-grid"><div class="col"><div class="nt-tile"><div class="cp-img "></div></div><div class="nt-tile clip"><span class="play"><svg class="cp-icon"><use href="#i-play"/></svg></span><span class="len">0:42</span></div></div><div class="col"><div class="nt-tile"><div class="cp-img v3"></div></div><div class="nt-tile"><div class="cp-img v5"></div><span class="plus">+3</span></div></div></div>
-            </div>
-          </article>
-        </div>
-        <div class="fab-slot"><button class="cp-fab-write" aria-label="Write in your diary"><svg class="cp-icon"><use href="#i-compose"/></svg></button></div>
-        <div class="tabdock"><nav class="cp-tabbar">
-          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
-          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
-          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
-          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Discover</div>
-          <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-library"/></svg></span>Library</div>
-        </nav></div>
-        <span class="home-ind"></span>
-      </div>
-    </div>
-
-    <div class="phone-wrap">
-      <p class="phone-label"><b>Library · Notes, empty</b>No note yet · a button to write the first</p>
-      <div class="phone">
-        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
-        <div class="nt-top">
-          <div class="lib-head">
-            <div class="lib-search"><svg class="cp-icon"><use href="#i-search"/></svg><span class="t">Search the Library</span></div>
-            <button class="cp-icon-btn flat" aria-label="Bookmarks"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button>
+          <div class="highlights" style="margin-top:14px">
+            <div><span class="cp-ring seen"><span class="cp-avatar" style="background:linear-gradient(150deg,#F2D8B6,#A0583F)"></span></span>Pamplona</div>
+            <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#9DB4CC,#14365D)"></span></span>Logroño</div>
+            <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#D7C6E0,#6E5470)"></span></span>Burgos</div>
+            <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Hornillos</div>
+            <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Castrojeriz</div>
           </div>
-          <div class="cp-subtabs"><span>Bible</span><span>Books</span><span class="on">Notes</span></div>
-        </div>
-        <div class="scroll nt-feed">
-          <div class="nt-compose">
-            <span class="nt-av" aria-hidden="true">AG</span>
-            <div class="nt-body">
-              <div class="nt-prompt">What's happening on your Camino?</div>
-              <div class="nt-short"><span aria-label="Write a new note, then add a photo"><svg class="cp-icon"><use href="#i-image"/></svg></span><span aria-label="Write a new note, then add a place"><svg class="cp-icon"><use href="#i-pin"/></svg></span></div>
-            </div>
+            <div class="cp-subtabs" style="margin:22px -24px 0;padding:0 12px"><span class="on">Notes</span><span>Journey</span><span>Plan</span><span>Health</span></div>
           </div>
-          <p class="nt-private">Notes stay on this phone.</p>
-          <div class="nt-filters" role="tablist"><span class="on" role="tab" aria-selected="true">All</span><span class="" role="tab" aria-selected="false">Photos and videos</span><span class="" role="tab" aria-selected="false">Places</span></div>
-          <div class="nt-empty">
-            <span class="badge"><svg class="cp-icon"><use href="#i-compose"/></svg></span>
-            <h4>No notes yet</h4>
-            <p>Write a few lines about your day on the Way: what you saw, who you met, how you feel.</p>
-            <button class="cp-btn cp-btn-primary block" style="height:68px;font-size:22px;margin-top:8px">Write your first note</button>
-          </div>
-        </div>
-        <div class="fab-slot"><button class="cp-fab-write" aria-label="Write in your diary"><svg class="cp-icon"><use href="#i-compose"/></svg></button></div>
-        <div class="tabdock"><nav class="cp-tabbar">
-          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
-          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
-          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
-          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Discover</div>
-          <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-library"/></svg></span>Library</div>
-        </nav></div>
-        <span class="home-ind"></span>
-      </div>
-    </div>
-
-    <div class="phone-wrap">
-      <p class="phone-label"><b>Library · Notes, menu</b>The … on a note: Edit, Delete · Delete asks first</p>
-      <div class="phone">
-        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
-        <div class="nt-top">
-          <div class="lib-head">
-            <div class="lib-search"><svg class="cp-icon"><use href="#i-search"/></svg><span class="t">Search the Library</span></div>
-            <button class="cp-icon-btn flat" aria-label="Bookmarks"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button>
-          </div>
-          <div class="cp-subtabs"><span>Bible</span><span>Books</span><span class="on">Notes</span></div>
-        </div>
-        <div class="scroll nt-feed">
+          <div class="nt-feedbody" style="padding-top:16px">
           <div class="nt-compose">
             <span class="nt-av" aria-hidden="true">AG</span>
             <div class="nt-body">
@@ -3260,6 +3195,277 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
               <h4 class="nt-title">Hontanas</h4><div class="dy-read nt-words"><p>A long, flat day across the meseta. <b>Wind in my face</b> from the first step and <i>no shade</i> at all.</p></div><div class="nt-place"><svg class="cp-icon"><use href="#i-pin"/></svg>Hontanas, Castilla y León</div><div class="nt-acts"><span aria-label="Share the words of this note"><svg class="cp-icon"><use href="#i-share"/></svg></span></div>
             </div>
           </article>
+          <article class="nt-row">
+            <span class="nt-av" aria-hidden="true">AG</span>
+            <div class="nt-main">
+              <div class="nt-hd"><span class="who">Ana García <i>@ana.camina</i></span><span class="tm"> · Yesterday</span><span class="more" aria-label="More: edit or delete this note"><svg class="cp-icon"><use href="#i-dots"/></svg></span></div>
+              <h4 class="nt-title">Two of us</h4><div class="nt-grid"><div class="col"><div class="nt-tile"><div class="cp-img v5"></div></div></div><div class="col"><div class="nt-tile"><div class="cp-img v4"></div></div></div></div><div class="nt-acts"><span aria-label="Share the words of this note"><svg class="cp-icon"><use href="#i-share"/></svg></span></div>
+            </div>
+          </article>
+          </div>
+        </div>
+        <div class="fab-slot"><button class="cp-fab-write" aria-label="Write a note"><svg class="cp-icon"><use href="#i-compose"/></svg></button></div>
+        <div class="tabdock"><nav class="cp-tabbar">
+          <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Discover</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-library"/></svg></span>Library</div>
+        </nav></div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Me · Notes, scrolled</b>Eight lines, then Show more · a hairline between notes</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll nt-me" data-scroll-strip="1">
+          <div class="nt-metop">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span class="un">ana.camina</span>
+            <span class="cp-edit-pill" role="button" aria-label="Edit profile"><svg class="cp-icon "><use href="#i-pencil"/></svg>camino.plus/ana</span>
+            <span class="cp-bellwrap" style="margin-left:auto"><button class="cp-icon-btn flat" style="width:44px;height:44px" aria-label="Notifications (3 new)"><svg class="cp-icon "><use href="#i-bell"/></svg></button><span class="cp-bell-badge">3</span></span><button class="cp-icon-btn flat" style="width:44px;height:44px;margin-left:-4px" aria-label="Settings"><svg class="cp-icon "><use href="#i-settings"/></svg></button>
+          </div>
+          <div class="profile-top" style="margin-top:20px">
+            <span class="cp-ring"><span class="cp-avatar" style="width:86px;height:86px"></span></span>
+            <div class="pstats"><div><b>312</b><span>km</span></div><div><b>12</b><span>stamps</span></div><div><b>148</b><span>friends</span></div></div>
+          </div>
+          <div style="margin-top:14px"><div style="font-weight:600;font-size:17px">Ana García</div>
+          <div style="font-size:15px;line-height:22px">Camino Francés, day 12. Walking for my grandmother. Ultreia!</div></div>
+          <div style="margin-top:14px;display:flex;align-items:center;gap:14px;padding:14px;border-radius:var(--cp-radius-lg);background:var(--cp-surface-inverse);color:var(--cp-text-inverse);box-shadow:var(--cp-shadow-md)">
+            <span style="width:52px;height:52px;border-radius:50%;border:1.5px solid rgba(217,162,27,.55);display:grid;place-items:center;flex:none"><svg width="48" height="48" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="20" fill="#14365D"/><g transform="translate(0 -2.12)"><path d="M20 28.5L5.84 22.20A2.84 2.84 0 0 1 8.64 17.96A2.84 2.84 0 0 1 12.66 14.85A2.84 2.84 0 0 1 17.46 13.21A2.84 2.84 0 0 1 22.54 13.21A2.84 2.84 0 0 1 27.34 14.85A2.84 2.84 0 0 1 31.36 17.96A2.84 2.84 0 0 1 34.16 22.20z" fill="#D9A21B"/><path d="M20 29.0Q14.09 22.35 8.49 17.82M20 29.0Q16.22 20.86 12.56 14.67M20 29.0Q18.70 20.07 17.43 13.01M20 29.0Q21.30 20.07 22.57 13.01M20 29.0Q23.78 20.86 27.44 14.67M20 29.0Q25.91 22.35 31.51 17.82" stroke="#14365D" stroke-width="1.15" stroke-linecap="round" fill="none"/><path d="M15.2 31.4Q18 30.6 18.4 28.3H21.6Q22 30.6 24.8 31.4Q24.6 32.6 20 32.6Q15.4 32.6 15.2 31.4z" fill="#D9A21B"/></g></svg></span>
+            <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+              <div style="font-family:var(--cp-font-accent);font-weight:700;font-size:24px;line-height:28px;color:var(--cp-color-gold)">Buen Camino!</div>
+              <div style="font-family:var(--cp-font-title);font-weight:600;font-size:17px;line-height:21px;color:var(--cp-color-gold-soft)">My Camino</div>
+              <div style="font-size:17px;line-height:22px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Camino Francés</div>
+              <div style="font-size:15px;line-height:21px;font-weight:500;letter-spacing:.4px;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">From stage 1 · 11 stages done</div>
+            </div>
+            <span style="height:40px;padding:0 16px;border-radius:999px;background:var(--cp-color-gold);color:var(--cp-color-blue);font-size:17px;font-weight:600;display:inline-flex;align-items:center;flex:none">Change</span>
+          </div>
+          <div class="highlights" style="margin-top:14px">
+            <div><span class="cp-ring seen"><span class="cp-avatar" style="background:linear-gradient(150deg,#F2D8B6,#A0583F)"></span></span>Pamplona</div>
+            <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#9DB4CC,#14365D)"></span></span>Logroño</div>
+            <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#D7C6E0,#6E5470)"></span></span>Burgos</div>
+            <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Hornillos</div>
+            <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Castrojeriz</div>
+          </div>
+            <div class="cp-subtabs" style="margin:22px -24px 0;padding:0 12px"><span class="on">Notes</span><span>Journey</span><span>Plan</span><span>Health</span></div>
+          </div>
+          <div class="nt-feedbody" style="padding-top:16px">
+          <article class="nt-row">
+            <span class="nt-av" aria-hidden="true">AG</span>
+            <div class="nt-main">
+              <div class="nt-hd"><span class="who">Ana García <i>@ana.camina</i></span><span class="tm"> · 5h</span><span class="more" aria-label="More: edit or delete this note"><svg class="cp-icon"><use href="#i-dots"/></svg></span></div>
+              <div class="dy-read nt-words cut"><p>Left Burgos in the dark. The cathedral stayed lit behind me for a long time. I met a Dutch woman who has walked the Camino three times and she told me to slow down: the road, she said, is not a race and the albergues will not run out of beds if you arrive at four instead of two.</p><div class="gap"></div><p>I laughed, and then I did slow down. The sun came up over the meseta and the whole plain turned gold for ten minutes.</p></div><div class="nt-showmore">Show more</div><div class="nt-acts"><span aria-label="Share the words of this note"><svg class="cp-icon"><use href="#i-share"/></svg></span></div>
+            </div>
+          </article>
+          <article class="nt-row">
+            <span class="nt-av" aria-hidden="true">AG</span>
+            <div class="nt-main">
+              <div class="nt-hd"><span class="who">Ana García <i>@ana.camina</i></span><span class="tm"> · 30 Oct</span><span class="more" aria-label="More: edit or delete this note"><svg class="cp-icon"><use href="#i-dots"/></svg></span></div>
+              <h4 class="nt-title">San Juan de Ortega</h4><div class="dy-read nt-words"><p>Soup at the monastery.</p></div><div class="nt-grid"><div class="col"><div class="nt-tile"><div class="cp-img v4"></div></div></div></div><div class="nt-place"><svg class="cp-icon"><use href="#i-pin"/></svg>42.4172° N, 4.2477° W</div><div class="nt-acts"><span aria-label="Share the words of this note"><svg class="cp-icon"><use href="#i-share"/></svg></span></div>
+            </div>
+          </article>
+          </div>
+        </div>
+        <div class="fab-slot"><button class="cp-fab-write" aria-label="Write a note"><svg class="cp-icon"><use href="#i-compose"/></svg></button></div>
+        <div class="tabdock"><nav class="cp-tabbar">
+          <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Discover</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-library"/></svg></span>Library</div>
+        </nav></div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Me · Notes, photo grids</b>One wide tile, two, three, four · a clip shows its length · “+3” for the rest</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll nt-me" data-scroll-strip="1">
+          <div class="nt-metop">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span class="un">ana.camina</span>
+            <span class="cp-edit-pill" role="button" aria-label="Edit profile"><svg class="cp-icon "><use href="#i-pencil"/></svg>camino.plus/ana</span>
+            <span class="cp-bellwrap" style="margin-left:auto"><button class="cp-icon-btn flat" style="width:44px;height:44px" aria-label="Notifications (3 new)"><svg class="cp-icon "><use href="#i-bell"/></svg></button><span class="cp-bell-badge">3</span></span><button class="cp-icon-btn flat" style="width:44px;height:44px;margin-left:-4px" aria-label="Settings"><svg class="cp-icon "><use href="#i-settings"/></svg></button>
+          </div>
+          <div class="profile-top" style="margin-top:20px">
+            <span class="cp-ring"><span class="cp-avatar" style="width:86px;height:86px"></span></span>
+            <div class="pstats"><div><b>312</b><span>km</span></div><div><b>12</b><span>stamps</span></div><div><b>148</b><span>friends</span></div></div>
+          </div>
+          <div style="margin-top:14px"><div style="font-weight:600;font-size:17px">Ana García</div>
+          <div style="font-size:15px;line-height:22px">Camino Francés, day 12. Walking for my grandmother. Ultreia!</div></div>
+          <div style="margin-top:14px;display:flex;align-items:center;gap:14px;padding:14px;border-radius:var(--cp-radius-lg);background:var(--cp-surface-inverse);color:var(--cp-text-inverse);box-shadow:var(--cp-shadow-md)">
+            <span style="width:52px;height:52px;border-radius:50%;border:1.5px solid rgba(217,162,27,.55);display:grid;place-items:center;flex:none"><svg width="48" height="48" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="20" fill="#14365D"/><g transform="translate(0 -2.12)"><path d="M20 28.5L5.84 22.20A2.84 2.84 0 0 1 8.64 17.96A2.84 2.84 0 0 1 12.66 14.85A2.84 2.84 0 0 1 17.46 13.21A2.84 2.84 0 0 1 22.54 13.21A2.84 2.84 0 0 1 27.34 14.85A2.84 2.84 0 0 1 31.36 17.96A2.84 2.84 0 0 1 34.16 22.20z" fill="#D9A21B"/><path d="M20 29.0Q14.09 22.35 8.49 17.82M20 29.0Q16.22 20.86 12.56 14.67M20 29.0Q18.70 20.07 17.43 13.01M20 29.0Q21.30 20.07 22.57 13.01M20 29.0Q23.78 20.86 27.44 14.67M20 29.0Q25.91 22.35 31.51 17.82" stroke="#14365D" stroke-width="1.15" stroke-linecap="round" fill="none"/><path d="M15.2 31.4Q18 30.6 18.4 28.3H21.6Q22 30.6 24.8 31.4Q24.6 32.6 20 32.6Q15.4 32.6 15.2 31.4z" fill="#D9A21B"/></g></svg></span>
+            <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+              <div style="font-family:var(--cp-font-accent);font-weight:700;font-size:24px;line-height:28px;color:var(--cp-color-gold)">Buen Camino!</div>
+              <div style="font-family:var(--cp-font-title);font-weight:600;font-size:17px;line-height:21px;color:var(--cp-color-gold-soft)">My Camino</div>
+              <div style="font-size:17px;line-height:22px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Camino Francés</div>
+              <div style="font-size:15px;line-height:21px;font-weight:500;letter-spacing:.4px;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">From stage 1 · 11 stages done</div>
+            </div>
+            <span style="height:40px;padding:0 16px;border-radius:999px;background:var(--cp-color-gold);color:var(--cp-color-blue);font-size:17px;font-weight:600;display:inline-flex;align-items:center;flex:none">Change</span>
+          </div>
+          <div class="highlights" style="margin-top:14px">
+            <div><span class="cp-ring seen"><span class="cp-avatar" style="background:linear-gradient(150deg,#F2D8B6,#A0583F)"></span></span>Pamplona</div>
+            <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#9DB4CC,#14365D)"></span></span>Logroño</div>
+            <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#D7C6E0,#6E5470)"></span></span>Burgos</div>
+            <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Hornillos</div>
+            <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Castrojeriz</div>
+          </div>
+            <div class="cp-subtabs" style="margin:22px -24px 0;padding:0 12px"><span class="on">Notes</span><span>Journey</span><span>Plan</span><span>Health</span></div>
+          </div>
+          <div class="nt-feedbody" style="padding-top:16px">
+          <article class="nt-row noacts">
+            <span class="nt-av" aria-hidden="true">AG</span>
+            <div class="nt-main">
+              <div class="nt-hd"><span class="who">Ana García <i>@ana.camina</i></span><span class="tm"> · 28 Oct</span><span class="more" aria-label="More: edit or delete this note"><svg class="cp-icon"><use href="#i-dots"/></svg></span></div>
+              <h4 class="nt-title">The three of us</h4><div class="nt-grid"><div class="col"><div class="nt-tile"><div class="cp-img "></div></div></div><div class="col"><div class="nt-tile"><div class="cp-img v3"></div></div><div class="nt-tile"><div class="cp-img v2"></div></div></div></div>
+            </div>
+          </article>
+          <article class="nt-row noacts">
+            <span class="nt-av" aria-hidden="true">AG</span>
+            <div class="nt-main">
+              <div class="nt-hd"><span class="who">Ana García <i>@ana.camina</i></span><span class="tm"> · 2 Oct</span><span class="more" aria-label="More: edit or delete this note"><svg class="cp-icon"><use href="#i-dots"/></svg></span></div>
+              <h4 class="nt-title">A day in pictures</h4><div class="nt-grid"><div class="col"><div class="nt-tile"><div class="cp-img "></div></div><div class="nt-tile clip"><span class="play"><svg class="cp-icon"><use href="#i-play"/></svg></span><span class="len">0:42</span></div></div><div class="col"><div class="nt-tile"><div class="cp-img v3"></div></div><div class="nt-tile"><div class="cp-img v5"></div><span class="plus">+3</span></div></div></div>
+            </div>
+          </article>
+          </div>
+        </div>
+        <div class="fab-slot"><button class="cp-fab-write" aria-label="Write a note"><svg class="cp-icon"><use href="#i-compose"/></svg></button></div>
+        <div class="tabdock"><nav class="cp-tabbar">
+          <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Discover</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-library"/></svg></span>Library</div>
+        </nav></div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Me · Notes, empty</b>No note yet · a button to write the first</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll nt-me" data-scroll-strip="1">
+          <div class="nt-metop">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span class="un">ana.camina</span>
+            <span class="cp-edit-pill" role="button" aria-label="Edit profile"><svg class="cp-icon "><use href="#i-pencil"/></svg>camino.plus/ana</span>
+            <span class="cp-bellwrap" style="margin-left:auto"><button class="cp-icon-btn flat" style="width:44px;height:44px" aria-label="Notifications (3 new)"><svg class="cp-icon "><use href="#i-bell"/></svg></button><span class="cp-bell-badge">3</span></span><button class="cp-icon-btn flat" style="width:44px;height:44px;margin-left:-4px" aria-label="Settings"><svg class="cp-icon "><use href="#i-settings"/></svg></button>
+          </div>
+          <div class="profile-top" style="margin-top:20px">
+            <span class="cp-ring"><span class="cp-avatar" style="width:86px;height:86px"></span></span>
+            <div class="pstats"><div><b>312</b><span>km</span></div><div><b>12</b><span>stamps</span></div><div><b>148</b><span>friends</span></div></div>
+          </div>
+          <div style="margin-top:14px"><div style="font-weight:600;font-size:17px">Ana García</div>
+          <div style="font-size:15px;line-height:22px">Camino Francés, day 12. Walking for my grandmother. Ultreia!</div></div>
+          <div style="margin-top:14px;display:flex;align-items:center;gap:14px;padding:14px;border-radius:var(--cp-radius-lg);background:var(--cp-surface-inverse);color:var(--cp-text-inverse);box-shadow:var(--cp-shadow-md)">
+            <span style="width:52px;height:52px;border-radius:50%;border:1.5px solid rgba(217,162,27,.55);display:grid;place-items:center;flex:none"><svg width="48" height="48" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="20" fill="#14365D"/><g transform="translate(0 -2.12)"><path d="M20 28.5L5.84 22.20A2.84 2.84 0 0 1 8.64 17.96A2.84 2.84 0 0 1 12.66 14.85A2.84 2.84 0 0 1 17.46 13.21A2.84 2.84 0 0 1 22.54 13.21A2.84 2.84 0 0 1 27.34 14.85A2.84 2.84 0 0 1 31.36 17.96A2.84 2.84 0 0 1 34.16 22.20z" fill="#D9A21B"/><path d="M20 29.0Q14.09 22.35 8.49 17.82M20 29.0Q16.22 20.86 12.56 14.67M20 29.0Q18.70 20.07 17.43 13.01M20 29.0Q21.30 20.07 22.57 13.01M20 29.0Q23.78 20.86 27.44 14.67M20 29.0Q25.91 22.35 31.51 17.82" stroke="#14365D" stroke-width="1.15" stroke-linecap="round" fill="none"/><path d="M15.2 31.4Q18 30.6 18.4 28.3H21.6Q22 30.6 24.8 31.4Q24.6 32.6 20 32.6Q15.4 32.6 15.2 31.4z" fill="#D9A21B"/></g></svg></span>
+            <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+              <div style="font-family:var(--cp-font-accent);font-weight:700;font-size:24px;line-height:28px;color:var(--cp-color-gold)">Buen Camino!</div>
+              <div style="font-family:var(--cp-font-title);font-weight:600;font-size:17px;line-height:21px;color:var(--cp-color-gold-soft)">My Camino</div>
+              <div style="font-size:17px;line-height:22px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Camino Francés</div>
+              <div style="font-size:15px;line-height:21px;font-weight:500;letter-spacing:.4px;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">From stage 1 · 11 stages done</div>
+            </div>
+            <span style="height:40px;padding:0 16px;border-radius:999px;background:var(--cp-color-gold);color:var(--cp-color-blue);font-size:17px;font-weight:600;display:inline-flex;align-items:center;flex:none">Change</span>
+          </div>
+          <div class="highlights" style="margin-top:14px">
+            <div><span class="cp-ring seen"><span class="cp-avatar" style="background:linear-gradient(150deg,#F2D8B6,#A0583F)"></span></span>Pamplona</div>
+            <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#9DB4CC,#14365D)"></span></span>Logroño</div>
+            <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#D7C6E0,#6E5470)"></span></span>Burgos</div>
+            <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Hornillos</div>
+            <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Castrojeriz</div>
+          </div>
+            <div class="cp-subtabs" style="margin:22px -24px 0;padding:0 12px"><span class="on">Notes</span><span>Journey</span><span>Plan</span><span>Health</span></div>
+          </div>
+          <div class="nt-feedbody" style="padding-top:16px">
+          <div class="nt-compose">
+            <span class="nt-av" aria-hidden="true">AG</span>
+            <div class="nt-body">
+              <div class="nt-prompt">What's happening on your Camino?</div>
+              <div class="nt-short"><span aria-label="Write a new note, then add a photo"><svg class="cp-icon"><use href="#i-image"/></svg></span><span aria-label="Write a new note, then add a place"><svg class="cp-icon"><use href="#i-pin"/></svg></span></div>
+            </div>
+          </div>
+          <p class="nt-private">Notes stay on this phone.</p>
+          <div class="nt-filters" role="tablist"><span class="on" role="tab" aria-selected="true">All</span><span class="" role="tab" aria-selected="false">Photos and videos</span><span class="" role="tab" aria-selected="false">Places</span></div>
+          <div class="nt-empty">
+            <span class="badge"><svg class="cp-icon"><use href="#i-compose"/></svg></span>
+            <h4>No notes yet</h4>
+            <p>Write a few lines about your day on the Way: what you saw, who you met, how you feel.</p>
+            <button class="cp-btn cp-btn-primary block" style="height:68px;font-size:22px;margin-top:8px">Write your first note</button>
+          </div>
+          </div>
+        </div>
+        <div class="fab-slot"><button class="cp-fab-write" aria-label="Write a note"><svg class="cp-icon"><use href="#i-compose"/></svg></button></div>
+        <div class="tabdock"><nav class="cp-tabbar">
+          <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Discover</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-library"/></svg></span>Library</div>
+        </nav></div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Me · Notes, menu</b>The … on a note: Edit, Delete · Delete asks first</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll nt-me" data-scroll-strip="1">
+          <div class="nt-metop">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span class="un">ana.camina</span>
+            <span class="cp-edit-pill" role="button" aria-label="Edit profile"><svg class="cp-icon "><use href="#i-pencil"/></svg>camino.plus/ana</span>
+            <span class="cp-bellwrap" style="margin-left:auto"><button class="cp-icon-btn flat" style="width:44px;height:44px" aria-label="Notifications (3 new)"><svg class="cp-icon "><use href="#i-bell"/></svg></button><span class="cp-bell-badge">3</span></span><button class="cp-icon-btn flat" style="width:44px;height:44px;margin-left:-4px" aria-label="Settings"><svg class="cp-icon "><use href="#i-settings"/></svg></button>
+          </div>
+          <div class="profile-top" style="margin-top:20px">
+            <span class="cp-ring"><span class="cp-avatar" style="width:86px;height:86px"></span></span>
+            <div class="pstats"><div><b>312</b><span>km</span></div><div><b>12</b><span>stamps</span></div><div><b>148</b><span>friends</span></div></div>
+          </div>
+          <div style="margin-top:14px"><div style="font-weight:600;font-size:17px">Ana García</div>
+          <div style="font-size:15px;line-height:22px">Camino Francés, day 12. Walking for my grandmother. Ultreia!</div></div>
+          <div style="margin-top:14px;display:flex;align-items:center;gap:14px;padding:14px;border-radius:var(--cp-radius-lg);background:var(--cp-surface-inverse);color:var(--cp-text-inverse);box-shadow:var(--cp-shadow-md)">
+            <span style="width:52px;height:52px;border-radius:50%;border:1.5px solid rgba(217,162,27,.55);display:grid;place-items:center;flex:none"><svg width="48" height="48" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="20" fill="#14365D"/><g transform="translate(0 -2.12)"><path d="M20 28.5L5.84 22.20A2.84 2.84 0 0 1 8.64 17.96A2.84 2.84 0 0 1 12.66 14.85A2.84 2.84 0 0 1 17.46 13.21A2.84 2.84 0 0 1 22.54 13.21A2.84 2.84 0 0 1 27.34 14.85A2.84 2.84 0 0 1 31.36 17.96A2.84 2.84 0 0 1 34.16 22.20z" fill="#D9A21B"/><path d="M20 29.0Q14.09 22.35 8.49 17.82M20 29.0Q16.22 20.86 12.56 14.67M20 29.0Q18.70 20.07 17.43 13.01M20 29.0Q21.30 20.07 22.57 13.01M20 29.0Q23.78 20.86 27.44 14.67M20 29.0Q25.91 22.35 31.51 17.82" stroke="#14365D" stroke-width="1.15" stroke-linecap="round" fill="none"/><path d="M15.2 31.4Q18 30.6 18.4 28.3H21.6Q22 30.6 24.8 31.4Q24.6 32.6 20 32.6Q15.4 32.6 15.2 31.4z" fill="#D9A21B"/></g></svg></span>
+            <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+              <div style="font-family:var(--cp-font-accent);font-weight:700;font-size:24px;line-height:28px;color:var(--cp-color-gold)">Buen Camino!</div>
+              <div style="font-family:var(--cp-font-title);font-weight:600;font-size:17px;line-height:21px;color:var(--cp-color-gold-soft)">My Camino</div>
+              <div style="font-size:17px;line-height:22px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Camino Francés</div>
+              <div style="font-size:15px;line-height:21px;font-weight:500;letter-spacing:.4px;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">From stage 1 · 11 stages done</div>
+            </div>
+            <span style="height:40px;padding:0 16px;border-radius:999px;background:var(--cp-color-gold);color:var(--cp-color-blue);font-size:17px;font-weight:600;display:inline-flex;align-items:center;flex:none">Change</span>
+          </div>
+          <div class="highlights" style="margin-top:14px">
+            <div><span class="cp-ring seen"><span class="cp-avatar" style="background:linear-gradient(150deg,#F2D8B6,#A0583F)"></span></span>Pamplona</div>
+            <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#9DB4CC,#14365D)"></span></span>Logroño</div>
+            <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#D7C6E0,#6E5470)"></span></span>Burgos</div>
+            <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Hornillos</div>
+            <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Castrojeriz</div>
+          </div>
+            <div class="cp-subtabs" style="margin:22px -24px 0;padding:0 12px"><span class="on">Notes</span><span>Journey</span><span>Plan</span><span>Health</span></div>
+          </div>
+          <div class="nt-feedbody" style="padding-top:16px">
+          <div class="nt-compose">
+            <span class="nt-av" aria-hidden="true">AG</span>
+            <div class="nt-body">
+              <div class="nt-prompt">What's happening on your Camino?</div>
+              <div class="nt-short"><span aria-label="Write a new note, then add a photo"><svg class="cp-icon"><use href="#i-image"/></svg></span><span aria-label="Write a new note, then add a place"><svg class="cp-icon"><use href="#i-pin"/></svg></span></div>
+            </div>
+          </div>
+          <p class="nt-private">Notes stay on this phone.</p>
+          <div class="nt-filters" role="tablist"><span class="on" role="tab" aria-selected="true">All</span><span class="" role="tab" aria-selected="false">Photos and videos</span><span class="" role="tab" aria-selected="false">Places</span></div>
+          <article class="nt-row">
+            <span class="nt-av" aria-hidden="true">AG</span>
+            <div class="nt-main">
+              <div class="nt-hd"><span class="who">Ana García <i>@ana.camina</i></span><span class="tm"> · 3m</span><span class="more" aria-label="More: edit or delete this note"><svg class="cp-icon"><use href="#i-dots"/></svg></span></div>
+              <h4 class="nt-title">Hontanas</h4><div class="dy-read nt-words"><p>A long, flat day across the meseta. <b>Wind in my face</b> from the first step and <i>no shade</i> at all.</p></div><div class="nt-place"><svg class="cp-icon"><use href="#i-pin"/></svg>Hontanas, Castilla y León</div><div class="nt-acts"><span aria-label="Share the words of this note"><svg class="cp-icon"><use href="#i-share"/></svg></span></div>
+            </div>
+          </article>
+          </div>
         </div>
         <div class="nt-scrim"></div>
         <div class="nt-sheet" role="dialog" aria-label="Menu of the note Hontanas">
@@ -3272,7 +3478,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
       </div>
     </div>
 
-<!-- Library · Notes phones (end) -->
+<!-- Me · Notes phones (end) -->
     <div class="phone-wrap">
       <p class="phone-label"><b>Settings</b>Gear on Me · billing · smartwatch · business</p>
       <div class="phone">
@@ -3664,6 +3870,19 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
       document.querySelectorAll('[data-scroll-card]').forEach(function (el) {
         var card = el.querySelector('.dr-card');
         if (card) el.scrollTop = card.offsetTop - 4;
+      });
+    };
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(go);
+    window.addEventListener('load', go);
+  })();
+  </script>
+  <script>
+  /* The Me · Notes phones are shown scrolled to the strip of sub-tabs, as the screen is after a swipe up: the notes are what the phone is about. */
+  (function () {
+    var go = function () {
+      document.querySelectorAll('[data-scroll-strip]').forEach(function (el) {
+        var strip = el.querySelector('.nt-metop .cp-subtabs');
+        if (strip) el.scrollTop = strip.offsetTop - 20;
       });
     };
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(go);

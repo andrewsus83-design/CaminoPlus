@@ -394,6 +394,49 @@ check('the design page shows the same Library: a search pill and one Bookmarks b
   for (const b of BOOK_CATALOG) assert.ok(new RegExp(`<symbol id="i-${b.icon === 'pen' ? 'pencil' : b.icon}"`).test(design), `the design page sprite has no glyph for the cover of ${b.id}`);
 });
 
+check('the design page shows Me with the strip Notes, Journey, Plan, Health (Notes first), and the Me · Notes phones: one pen that writes a note, Me on in the tab bar, a dark twin, and no Library tab strip', () => {
+  const design = readFileSync(join(root, '..', 'design', 'index.html'), 'utf8');
+  const phoneOf = (label: string): string => {
+    const start = design.indexOf(`<p class="phone-label"><b>${label}</b>`);
+    assert.ok(start > 0, `the design page has no phone "${label}"`);
+    const next = design.indexOf('<p class="phone-label">', start + 10);
+    return design.slice(start, next > 0 ? next : undefined);
+  };
+  const strip = (on: string) => ['Notes', 'Journey', 'Plan', 'Health'].map((t) => (t === on ? `<span class="on">${t}</span>` : `<span>${t}</span>`)).join('');
+  const journey = phoneOf('Me · Journey');
+  const plan = phoneOf('Me · Plan');
+  assert.ok(journey.includes(`<div class="cp-subtabs" style="margin:22px -24px 20px;padding:0 12px">${strip('Journey')}</div>`), 'Me · Journey: the four labels, Journey on');
+  assert.ok(plan.includes(`<div class="cp-subtabs" style="margin:22px -24px 20px;padding:0 12px">${strip('Plan')}</div>`), 'Me · Plan: the four labels, Plan on');
+  assert.ok(design.includes(`<div class="cp-subtabs" style="margin:0">${strip('Journey')}</div>`), 'the component sample of the strip');
+  assert.match(journey, /aria-label="Write a journey post"/, 'on Journey the pen writes a journey post');
+  assert.equal((journey.match(/cp-fab-write/g) ?? []).length, 1);
+  assert.doesNotMatch(plan, /cp-fab-write/, 'Plan has no pen');
+  // the Me · Notes phones
+  const labels = ['Me · Notes', 'Me · Notes, dark', 'Me · Notes, scrolled', 'Me · Notes, photo grids', 'Me · Notes, empty', 'Me · Notes, menu'];
+  for (const label of labels) {
+    const phone = phoneOf(label);
+    assert.ok(phone.length > 3000, `${label} is too short to be a screen`);
+    assert.ok(phone.includes(`<div class="cp-subtabs" style="margin:22px -24px 0;padding:0 12px">${strip('Notes')}</div>`), `${label}: the four labels, Notes on and first`);
+    assert.match(phone, /<div class="nt-metop">/, `${label}: it is the Me header over the feed, not the Library's search row`);
+    assert.doesNotMatch(phone, /class="lib-search"|aria-label="Bookmarks"/, `${label}: no Library search row`);
+    assert.doesNotMatch(phone, /<span>Bible<\/span>|<span>Books<\/span>/, `${label}: no Library tab strip`);
+    assert.ok((phone.match(/cp-fab-write/g) ?? []).length <= 1, `${label}: never two pens`);
+    if (label !== 'Me · Notes, menu') {
+      assert.equal((phone.match(/cp-fab-write/g) ?? []).length, 1, `${label}: one pen`);
+      assert.match(phone, /<button class="cp-fab-write" aria-label="Write a note"><svg class="cp-icon"><use href="#i-compose"\/><\/svg><\/button>/, `${label}: the pen writes a note`);
+      assert.match(phone, /<div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-me"\/>/, `${label}: Me is the tab that is on`);
+    }
+    assert.doesNotMatch(phone, /Write in your diary|Library · Notes/);
+  }
+  assert.match(phoneOf('Me · Notes, dark'), /<div class="phone dk">/, 'the dark twin');
+  assert.match(phoneOf('Me · Notes, empty'), /<h4>No notes yet<\/h4>/);
+  assert.match(phoneOf('Me · Notes'), /Notes stay on this phone\./);
+  assert.doesNotMatch(design, /<b>Library · Notes/, 'no Notes phone is labelled as a Library phone');
+  const all = labels.map((l) => design.indexOf(`<b>${l}</b>`));
+  assert.ok(all.every((i) => i > 0), 'every Me · Notes phone is on the page');
+  assert.equal(new Set([...design.matchAll(/<p class="phone-label"><b>([^<]+)<\/b>/g)].map((m) => m[1])).size, [...design.matchAll(/<p class="phone-label"><b>([^<]+)<\/b>/g)].length, 'no two phones share a label');
+});
+
 check('the sample content never claims to be real: no price, no rating, no "available", no download, nothing in the data or the rows that acts when touched', () => {
   const data = ['sample.ts', 'LibraryTabs.tsx', join('bible', 'books.ts'), join('books', 'catalog.ts')].map((f) => read(join('src', 'features', 'library', f))).join('\n');
   assert.doesNotMatch(data, /\$\d|€\d|\brating\b|★|available now|download|onPress/i);
