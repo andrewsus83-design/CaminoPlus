@@ -2,28 +2,22 @@ import { useCallback, useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import { AppText } from '@/components/AppText';
-import { Icon, type IconName } from '@/components/Icon';
-import { c, fonts, radius, role } from '@/theme';
+import { c, radius, role } from '@/theme';
 import { todayLine } from './bible/today';
 
-// The banners at the top of the Bible tab and of the Books tab, under the tab strip. Its own file, apart from the rows (LibraryTabs.tsx).
+// The compact banner at the top of the Bible tab (the daily reading) and the base the banner of the Books tab is built on (books/BooksBanner.tsx), under the tab
+// strip. Its own file, apart from the rows (LibraryTabs.tsx).
 //
-// CompactBanner is the one the Bible tab has (the daily reading), and the base the Books tab builds its banner on: a dark blue card no taller than 120 on a
+// CompactBanner is the one the Bible tab has, and the base of the Books tab's: a dark blue card no taller than 120 on a
 // 390 wide phone (140 on a 320 wide one), in the four fonts of the brand: a small gold line in JetBrains Mono (a date, or a few words), the title in
 // Fraunces, an optional short line in Inter, one short handwritten note in Caveat (the one accent of the card) and, on the right, the gold pill with its
 // label in Inter. With a pill and something to do, the whole card is ONE button for a screen reader (the pill is its look, not a second stop), so a tap
 // anywhere on it does the same; the note is decoration and is not said. Colours are roles and the gold, as on the promo banner: the card is role.inverse
 // (dark blue in light mode, a lighter blue in dark mode) and what is on it keeps its contrast in both.
-//
-// LibraryBanner further down is the earlier, taller banner (the look of components/PromoBanner.tsx, the one on Stays). The Books tab still draws it, until
-// its banner is rebuilt on CompactBanner.
 
 export const DAILY_TITLE = 'Daily reading';
 export const DAILY_NOTE = 'Buen Camino!';
 export const DAILY_CTA = 'Read today';
-export const BOOKS_KICKER = 'Preview · Books';
-export const BOOKS_TITLE = 'Twelve free companions for the road';
-export const BOOKS_LINE = 'Classics to read on the way. Free to read.';
 
 /** The compact banner is never taller than the first number on a phone 390 wide, nor than the second on one 320 wide (with the phone's text at its normal size). */
 export const COMPACT_BANNER_MAX_HEIGHT = 120;
@@ -32,7 +26,7 @@ export const COMPACT_BANNER_MAX_HEIGHT_NARROW = 140;
 export const COMPACT_BANNER_MAX_FONT_SCALE = 1.2;
 
 export type CompactBannerProps = {
-  /** The small gold line, in JetBrains Mono capitals: a date ("Sunday 8 November") or a few words ("Preview · Books"). */
+  /** The small gold line, in JetBrains Mono capitals: a date ("Sunday 8 November") or a few words ("The French Way"). */
   label: string;
   /** The title, in Fraunces. */
   title: string;
@@ -87,55 +81,6 @@ export function CompactBanner({ label, title, line, note, cta, onPress, hint }: 
   );
 }
 
-type BannerProps = {
-  kicker: string;
-  title: string;
-  /** A line under the title: the date, or one short sentence. */
-  line?: string;
-  /** The big gold glyph in the corner. */
-  icon: IconName;
-  /** The gold button. Without one the banner only says something and cannot be pressed. */
-  cta?: string;
-  /** What the banner does when it is pressed (the whole card, the button included). Only with a `cta`. */
-  onOpen?: () => void;
-  hint?: string;
-};
-
-/**
- * One banner card. With a button the whole card is ONE button for a screen reader (the gold button is its look, not a second stop),
- * so a tap anywhere on it, the gold pill included, does the same. Colours are roles and the gold, as on the promo banner: the card is
- * role.inverse (dark blue in light mode, a lighter blue in dark mode) and what is on it keeps its contrast in both.
- */
-export function LibraryBanner({ kicker, title, line, icon, cta, onOpen, hint }: BannerProps) {
-  const card = (
-    <View style={{ minHeight: 190, borderRadius: radius.xl, backgroundColor: role.inverse, padding: 24, overflow: 'hidden', justifyContent: 'space-between' }}>
-      <View style={{ position: 'absolute', right: -36, bottom: -44, opacity: 0.9 }}><Icon name={icon} color={c.gold} size={200} strokeWidth={1.2} /></View>
-      <View style={{ gap: 8 }}>
-        <AppText variant="mono" color={role.onInverseAccent} style={{ textTransform: 'uppercase', letterSpacing: 1.5 }}>{kicker}</AppText>
-        <AppText style={{ fontFamily: fonts.title, fontSize: 28, lineHeight: 34, color: role.onInverse, maxWidth: 230 }}>{title}</AppText>
-        {!!line && <AppText variant="small" color={role.onInverse} style={{ maxWidth: 230 }}>{line}</AppText>}
-      </View>
-      {!!cta && (
-        <View style={{ alignSelf: 'flex-start', height: 48, paddingHorizontal: 24, borderRadius: radius.pill, backgroundColor: c.gold, alignItems: 'center', justifyContent: 'center', marginTop: 16 }}>
-          <AppText variant="label" color={role.onHighlight}>{cta}</AppText>
-        </View>
-      )}
-    </View>
-  );
-  if (!cta || !onOpen) return card;
-  return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={[cta, title, line].filter(Boolean).join('. ')}
-      accessibilityHint={hint}
-      onPress={onOpen}
-      style={({ pressed }) => ({ opacity: pressed ? 0.92 : 1 })}
-    >
-      {card}
-    </Pressable>
-  );
-}
-
 /**
  * The banner of the Bible tab: the daily reading, with today's date and a gold "Read today", and one handwritten note. The whole card opens the
  * daily reading (the screen decides where: app/(tabs)/library.tsx). The date is read again each time the Library comes into view, so the banner
@@ -145,9 +90,4 @@ export function DailyBanner({ onOpen }: { onOpen: () => void }) {
   const [now, setNow] = useState(() => new Date());
   useFocusEffect(useCallback(() => { setNow(new Date()); }, []));
   return <CompactBanner label={todayLine(now)} title={DAILY_TITLE} note={DAILY_NOTE} cta={DAILY_CTA} onPress={onOpen} hint="Opens today's reading and the calendar" />;
-}
-
-/** The banner of the Books tab: it says what the tab is for, and has no button, because no book opens yet. */
-export function BooksBanner() {
-  return <LibraryBanner kicker={BOOKS_KICKER} title={BOOKS_TITLE} line={BOOKS_LINE} icon="library" />;
 }

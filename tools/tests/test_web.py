@@ -1,5 +1,6 @@
 """Tests for tools/build_web.py: the generated site must be consistent with the rest of the repo.
 Run from the repository root:  python3 -m unittest discover -s tools/tests -v"""
+import html
 import json
 import os
 import pathlib
@@ -189,6 +190,23 @@ class Claims(unittest.TestCase):
             self.assertIn(needle, content)
         for page, c in HTML.items():
             self.assertIn('href="/licences"', c, f"{page}: footer must link to the licences page")
+
+    def test_licences_page_lists_the_editions_of_the_books_of_readings_and_where_the_rest_of_the_text_comes_from(self):
+        """Like the Licences screen of the app: one row for every edition named in the sources of a books/<id>/book.json, with its page and its licence, and the words about the
+        original text. The page is made from those files, so a book of readings added to the Library is on it the day the generator runs."""
+        content = HTML["licences.html"]
+        books = [json.loads(f.read_text(encoding="utf-8")) for f in sorted((ROOT / "books").glob("*/book.json"))]
+        seen = 0
+        for b in books:
+            for src in b.get("sources", []):
+                seen += 1
+                self.assertIn(html.escape(src["work"], quote=True), content, b["id"])
+                self.assertIn(f'href="{html.escape(src["url"], quote=True)}"', content, b["id"])
+                self.assertIn(html.escape(f"Quoted word for word in “{b['title']}”.", quote=True), content, b["id"])
+        self.assertGreaterEqual(seen, 12, "the books of readings are there")
+        self.assertIn("<h2>Books in the Library</h2>", content)
+        self.assertIn("original text written for CaminoPlus", content)
+        self.assertNotRegex(content, r"(?i)verified|official")
 
 
 # ---- markup --------------------------------------------------------------------------------

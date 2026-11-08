@@ -11,8 +11,11 @@
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
+import '../../features/library/__tests__/bundleShim'; // first: the compiled bookBundle.ts finds the files of the books through it
 import { BOOK_CATALOG } from '../../features/library/books/catalog';
-import { BIBLE_SOURCE_LINE, BOOKS_NOTICE, LIBRARY_TABS, ROW_TABS, SEARCH_NOTICE } from '../../features/library/sample';
+import { shelves } from '../../features/library/books/copy';
+import { coverLabel } from '../../features/library/books/cover';
+import { BIBLE_SOURCE_LINE, LIBRARY_TABS, ROW_TABS } from '../../features/library/sample';
 import { ME_FAB, ME_TABS } from '../../features/me/tabs';
 
 let n = 0;
@@ -209,11 +212,9 @@ check('Library has no title and no diary button: its first row is the search fie
   assert.notDeepEqual(iconPaths('bookmark'), iconPaths('diary'));
 });
 
-check('Library: directly under the search row the two tabs Bible and Books, and only then the banner of the tab; a search takes the place of all of it, and says its example books are examples; there is no Notes tab, no Notes host and no second scroll view', () => {
+check('Library: directly under the search row the two tabs Bible and Books, and only then the banner of the tab; a search takes the place of all of it; there is no Notes tab, no Notes host and no second scroll view', () => {
   assert.deepEqual([...LIBRARY_TABS], ['Bible', 'Books']);
   assert.deepEqual([...ROW_TABS], ['Bible', 'Books']);
-  assert.equal(BOOKS_NOTICE, 'Books are not in the app yet. We are checking the editions before we add them.');
-  assert.equal(SEARCH_NOTICE, 'The twelve books are examples: they are not in the app yet. The Bible text is.');
   assert.equal(BIBLE_SOURCE_LINE, 'World English Bible, Catholic edition · public domain');
   const screen = read(join('app', '(tabs)', 'library.tsx'));
   assert.match(screen, /<Screen keyboard>/, 'a button can be tapped while the keyboard is up');
@@ -234,20 +235,19 @@ check('Library: directly under the search row the two tabs Bible and Books, and 
   assert.equal((screen.match(/\{top\}/g) ?? []).length, 1, 'the top is drawn once, in the screen\'s own scroll');
   // Bible and Books and the results: rows in the screen's own scroll, after the top: on Bible the card that continues the chapter, the compact banner, then the Bible tab (the choice of the part, the tiles)
   const screenAt = at('<Screen keyboard');
-  const card = at('<ContinueCard', screenAt), daily = at('<DailyBanner', screenAt), bible = at('<BibleTab', screenAt), books = at('<BooksBanner />', screenAt), booksTab = at('<BooksTab', screenAt);
+  const card = at('<ContinueCard', screenAt), daily = at('<DailyBanner', screenAt), bible = at('<BibleTab', screenAt), books = at('<BooksBanner reading={booksReading} />', screenAt), booksTab = at('<BooksTab', screenAt);
   assert.ok(at('{top}', screenAt) < card && card < daily && daily < bible && bible < books && books < booksTab, 'the top, the continue card, the Bible banner, Bible, the Books banner, Books');
   assert.match(screen, /\{searching \? \(\s*<SearchResults[^]*?\/>\s*\) : \(\s*<>\s*\{tab === 'Bible' && lastRead\.place && <ContinueCard/, 'the results take the place of the banners and the tab content, and clearing the field brings them back');
   assert.match(screen, /const searching = isSearching\(query\);/);
   // each banner is shown under its own tab only
   assert.match(screen, /\{tab === 'Bible' && <DailyBanner onOpen=\{\(\) => router\.push\('\/library\/daily'\)\} \/>\}/);
-  assert.match(screen, /\{tab === 'Books' && <BooksBanner \/>\}/);
-  assert.equal((screen.match(/<DailyBanner/g) ?? []).length + (screen.match(/<BooksBanner/g) ?? []).length, 2, 'two banners, one for each tab');
-  // the Books tab starts with its notice; the Bible tab has none (its text is in the app: one quiet source line instead)
+  assert.match(screen, /\{tab === 'Books' && <BooksBanner reading=\{booksReading\} \/>\}/);
+  assert.equal((screen.match(/<DailyBanner/g) ?? []).length + (screen.match(/<BooksBanner/g) ?? []).length, 2, 'two banners, one for each tab that has one');
+  // neither tab has a notice: the text of the Bible is in the app (one quiet source line instead) and so are the books (each book page says how they were written, notices.ts)
   const tabsSrc = read(join('src', 'features', 'library', 'LibraryTabs.tsx'));
-  assert.match(tabsSrc, /export function BooksTab[^]*?<Notice \/>/, 'the Books tab starts with its notice');
-  assert.match(tabsSrc, /const Notice = \(\) => <SampleNotice title="Preview">\{BOOKS_NOTICE\}<\/SampleNotice>;/);
+  assert.doesNotMatch(tabsSrc, /BooksNotice|booksNotice/, 'the Books tab has no notice above its covers');
   const results = read(join('src', 'features', 'library', 'SearchResults.tsx'));
-  assert.match(results, /\{found\.hits\.Books\.length > 0 && <SampleNotice title="Preview">\{SEARCH_NOTICE\}<\/SampleNotice>\}/, 'the search keeps the Preview notice when the example books are among the results, and only then');
+  assert.doesNotMatch(results, /SampleNotice|SEARCH_NOTICE|hasBookText/, 'a search has no notice about books: every book found is in the app');
   assert.match(results, /Clear search/);
   assert.doesNotMatch(results, /Notes|diary/i, 'the search shows no notes: it never did');
   assert.match(read(join('src', 'components', 'Screen.tsx')), /keyboardShouldPersistTaps=\{keyboard \? 'handled' : 'never'\}/);
@@ -302,10 +302,10 @@ check('the search field: placeholder and label, the "search" key, no autocorrect
     assert.ok(contrast(roleColour('textMuted', dark), surface) >= 4.5, `the placeholder (role.muted) on the pill in ${mode}`);
     assert.ok(contrast(roleColour('action', dark), surface) >= 3, `the bookmark icon on a row in ${mode}`);
   }
-  for (const b of BOOK_CATALOG) assert.ok(contrast(tokens.color.blue, tokens.color[b.cover]) >= 4.5, `the navy on the ${b.cover} cover (covers do not change with dark)`);
+  for (const b of BOOK_CATALOG) assert.ok(contrast(tokens.color.blue, tokens.color[b.cover.colour]) >= 4.5, `the navy on the ${b.cover.colour} cover (covers do not change with dark)`);
 });
 
-check('the design page shows the same Library: a search pill and one Bookmarks button, the two tabs Bible and Books right under them, the compact banner, the three parts as a segmented pill under it, the books as tiles, the chapters, the reader, the verses of a search and of Bookmarks, in light and dark; no gold pen, no Music, no diary button', () => {
+check('the design page shows the same Library: the two tabs Bible and Books, the compact banner, the three parts as a segmented pill under it, the books as tiles, the covers of the Books tab, the chapters, the reader, the verses of a search and of Bookmarks, in light and dark', () => {
   const design = readFileSync(join(root, '..', 'design', 'index.html'), 'utf8');
   /** The phone with this label, as the text between its label and the label of the next phone. */
   const phoneOf = (label: string): string => {
@@ -380,22 +380,28 @@ check('the design page shows the same Library: a search pill and one Bookmarks b
   assert.match(deutero, /<p class="lib-note">Esther and Daniel, in the Old Testament, include their Greek additions: Daniel 3 holds the Prayer of Azariah and the Song of the Three, 13 is Susanna and 14 is Bel and the Dragon\.<\/p>\s*<p class="lib-note">Orthodox Bibles include a few more books\.<\/p>/);
   assert.doesNotMatch(deutero, /Additions to|Added passages/);
 
-  // Books: Books on, a banner with no button, the notice, rows with a cover, title, author and era, the blurb, and the chips Free and Soon; no choices at the bottom, no gold pen
+  // Books: Books on, the compact banner with the words of the tab (Start reading, and no second button), the shelves with their headings and the counts of their books, a cover for every book
+  // (A5, two in a row, each ONE button named title, kind, time, and a ribbon of its own), no mark of free, soon or preview; no choices at the bottom, no gold pen. The phones of the Books are drawn
+  // from the bundle by designBooks.ts and checked closer in designBooks.test.ts
   assert.match(books, /<div class="cp-subtabs"[^>]*><span>Bible<\/span><span class="on">Books<\/span><\/div>/);
-  const banner = books.slice(books.indexOf('class="cp-banner lib"'), books.indexOf('class="lib-notice"'));
-  assert.match(banner, /<div class="ey">Preview · Books<\/div>\s*<h4>Twelve free companions for the road<\/h4>\s*<p class="line">Classics to read on the way\. Free to read\.<\/p>/);
-  assert.doesNotMatch(banner, /cp-btn|<button|role="button"/, 'the Books banner has no button');
-  assert.match(books, /<div class="p">Books are not in the app yet\. We are checking the editions before we add them\.<\/div>/);
-  assert.match(books, /class="t">The Way of a Pilgrim<\/div><div class="a">Anonymous · 19th century<\/div>[\s\S]*A Russian wanderer walks and prays the Jesus Prayer\.[\s\S]*<span class="lib-chip free">Free<\/span><span class="lib-chip soon">Soon<\/span>/);
-  assert.doesNotMatch(books, /lib-seg|role="radiogroup"|lib-tile|fab-slot|cp-fab-write/, 'Books has neither the choices of the Bible nor the gold pen');
-  assert.doesNotMatch(books, /gutenberg|ccel|licen[cs]e|translator|public domain/i, 'the data that is only for later is not on the design page either');
+  const banner = books.slice(books.indexOf('class="cp-banner cmp"'), books.indexOf('class="bk-shelf"'));
+  assert.match(banner, /^class="cp-banner cmp" role="button" aria-label="Start reading\. Books for the road\. [^"]+"><div class="ey">[^<]+<\/div><h4>Books for the road<\/h4><div class="row"><span class="hw">No rush<\/span><span class="pill">Start reading<\/span><\/div><\/div>/);
+  assert.doesNotMatch(banner, /<button|cp-btn/, 'the Books banner is one button for a screen reader, the pill is only its look');
+  const shelf = shelves(BOOK_CATALOG)[0];
+  assert.match(books, new RegExp(`<div class="hd"><h4>${shelf.title.replace(/'/g, "'")}</h4><span class="ct">${shelf.books.length} books</span></div>`), 'the heading of the first shelf, with the number of its books');
+  assert.equal(count(books, /class="bk-cover"/g), shelf.books.length, 'a cover for every book of the first shelf');
+  assert.ok(books.includes(`aria-label="${coverLabel(BOOK_CATALOG[0]).replace(/"/g, '&quot;')}"`), 'a cover is one button named title, kind, time');
+  assert.doesNotMatch(books, /lib-seg|role="radiogroup"|lib-tile|fab-slot|cp-fab-write|lib-book|lib-chip|lib-notice|Soon|SOON|FREE|Free to read|Preview/, 'Books has neither the choices of the Bible nor the gold pen, nor the old rows, nor a mark of free or soon');
+  assert.doesNotMatch(books, /gutenberg|ccel|licen[cs]e|translator|public domain/i, 'the data that is only for later is not on the Books tab of the design page either');
 
-  // Search: the books of the Bible, the example books and the verses under one notice; no choices, no gold pen
-  assert.match(search, /105 results for “john”/);
-  assert.match(search, /class="lib-label"[^>]*>Bible · 4<\/div>[\s\S]*class="lib-label"[^>]*>Books · 1<\/div>[\s\S]*class="lib-label"[^>]*>Verses · 100\+<\/div>/);
-  assert.match(search, /The twelve books are examples: they are not in the app yet\. The Bible text is\./);
+  // Search: the books of the Bible and the verses of a word that finds no book of the Library, grouped, and no notice (everything found is in the app); no choices, no gold pen. The word that
+  // finds books has a phone of its own ("Library · Search, books"), checked in designBooks.test.ts
+  assert.match(search, /<p class="lib-count" style="margin:16px 0 0">104 results for “john”<\/p>/);
+  assert.match(search, /class="lib-label"[^>]*>Bible · 4<\/div>[\s\S]*class="lib-label"[^>]*>Verses · 100\+<\/div>/);
+  assert.doesNotMatch(search, /class="lib-label"[^>]*>Books · |lib-notice|Coming soon|Preview|lib-chip/, 'no group of books for this word, and no notice');
   assert.match(search, /<div class="lib-bk">1 John<\/div><div class="lib-line">New&nbsp;Testament · <span class="mn">5&nbsp;chapters<\/span><\/div>/, 'a book of the Bible in a list: its name in Fraunces, the count in JetBrains Mono');
   assert.match(search, /<div class="vl">1 Maccabees 2:1<\/div><div class="vt">/, 'a verse in a list: the place in JetBrains Mono, then the words');
+  assert.match(phoneOf('Library · Search, books'), /class="lib-label"[^>]*>Books · \d+<\/div>[\s\S]*class="bk-brow"/, 'a book in a list: a small cover, the title, the subtitle, the description, the kind and the time');
   // the verses of a search: the match is marked, and no notice because no example book is among the results
   assert.match(verses, /20 results for “love one another”/);
   assert.match(verses, /class="lib-label"[^>]*>Verses · 20<\/div>/);
@@ -406,11 +412,11 @@ check('the design page shows the same Library: a search pill and one Bookmarks b
   assert.doesNotMatch(nothing, /lib-notice/, 'nothing found has no Preview notice: no example is among the results');
   for (const [name, phone] of Object.entries({ search, verses, goto, nothing })) assert.doesNotMatch(phone, /lib-seg|role="radiogroup"|fab-slot|cp-fab-write/, `${name}: nothing floats while results show`);
 
-  // Bookmarks: the groups Bible (a row that opens the chapters), Books and Verses, then the posts
-  assert.match(marks, /class="lib-label">Bible · 1<\/div>[\s\S]*Old&nbsp;Testament · <span class="mn">150&nbsp;chapters<\/span>[\s\S]*class="lib-label">Books · 1<\/div>[\s\S]*class="lib-label">Verses · 2<\/div>/);
+  // Bookmarks: the groups Bible (a row that opens the chapters), Books, Verses and Passages, then the posts; one line says where they are kept, and no notice about books
+  assert.match(marks, /class="lib-label">Bible · 1<\/div>[\s\S]*Old&nbsp;Testament · <span class="mn">150&nbsp;chapters<\/span>[\s\S]*class="lib-label">Books · 1<\/div>[\s\S]*class="lib-label">Verses · 2<\/div>[\s\S]*class="lib-label">Passages · 1<\/div>/);
   assert.match(marks, /<div class="vl">Psalm 121:3<\/div>[\s\S]*<div class="vl">John 3:16<\/div>/);
-  assert.match(marks, /The twelve books are examples: they are not in the app yet\. Bookmarks are kept only on this phone, and logging out clears them\./);
-  assert.doesNotMatch(marks, /Music|Soon<\/span><\/div><button/);
+  assert.match(marks, /<p class="bk-cap" style="margin:0">Kept only on this phone\. Logging out clears them\.<\/p>/, 'where they are kept, said once');
+  assert.doesNotMatch(marks, /Music|lib-notice|lib-chip|Coming soon|Preview|Soon<|SOON/, 'no notice, no mark of soon');
 
   // the chapters of the Psalms
   const chapters = phoneOf('Library · Chapters');
@@ -434,10 +440,12 @@ check('the design page shows the same Library: a search pill and one Bookmarks b
   assert.equal(count(psalm, /class="hw"/g), 1);
   const chosen = phoneOf('Reader · Verse chosen');
   assert.match(chosen, /<span class="rd-v sel"><span class="rd-n">³<\/span>/);
-  assert.match(chosen, /<div class="rd-act" role="toolbar" aria-label="Actions for Psalm 121:3">\s*<div class="top"><span class="pl">Psalm 121:3<\/span><button class="x" aria-label="Close the verse actions">/);
-  assert.match(chosen, /aria-label="Bookmark: Psalm 121:3">[^]*?<span>Bookmark<\/span><\/button><button aria-label="Copy: Psalm 121:3">[^]*?<span>Copy<\/span><\/button><button aria-label="Share: Psalm 121:3">[^]*?<span>Share<\/span>/);
+  assert.match(chosen, /<div class="rd-act four" role="toolbar" aria-label="Actions for Psalm 121:3">\s*<div class="top"><span class="pl">Psalm 121:3<\/span><button class="x" aria-label="Close the verse actions">/);
+  assert.match(chosen, /aria-label="Bookmark: Psalm 121:3">[^]*?<span>Bookmark<\/span><\/button><button aria-label="Write a note: Psalm 121:3">[^]*?<span>Note<\/span><\/button><button aria-label="Copy: Psalm 121:3">[^]*?<span>Copy<\/span><\/button><button aria-label="Share: Psalm 121:3">[^]*?<span>Share<\/span>/);
   assert.match(phoneOf('Reader · Verse bookmarked'), /<button class="on" aria-label="Remove bookmark: Psalm 121:3">[^]*?<span>Bookmark<\/span>/, 'the word stays, the glyph is filled and the button tinted');
-  // the bar is made to be hit: a glyph of 30, a word of 16 (Inter SemiBold), each action at least 88 by 68, the reference 17, 12 from the sides, 8 between the actions
+  // the bar is made to be hit: a glyph of 30, a word of 16 (Inter SemiBold), each action at least 88 by 68 (with Note, four actions share the bar: a quarter each, the word 13 under 360 wide), the reference 17, 12 from the sides, 8 between the actions
+  assert.match(design, /\.rd-act\.four \.btns button \{ min-width: 0; \}/);
+  assert.equal(count(design, /class="rd-act four" role="toolbar"/g), 3, 'every bar of the Bible phones (the verse chosen, bookmarked, and the dark one) has Note');
   assert.match(design, /\.rd-act \{ position: absolute; left: 12px; right: 12px; bottom: 26px;/);
   assert.match(design, /\.rd-act \.pl \{ flex: 1; font-family: var\(--cp-font-mono\); font-size: 17px;/);
   assert.match(design, /\.rd-act \.btns \{ display: flex; gap: 8px; margin-top: 4px; \}/);
@@ -473,7 +481,7 @@ check('the design page shows the same Library: a search pill and one Bookmarks b
   const building = /<symbol id="i-building"[^>]*>(.*?)<\/symbol>/.exec(design);
   assert.ok(building, 'the sprite of the design page has no i-building');
   assert.deepEqual([...building![1].matchAll(/ d="([^"]+)"/g)].map((m) => m[1]), iconPaths('building'));
-  for (const b of BOOK_CATALOG) assert.ok(new RegExp(`<symbol id="i-${b.icon === 'pen' ? 'pencil' : b.icon}"`).test(design), `the design page sprite has no glyph for the cover of ${b.id}`);
+  for (const b of BOOK_CATALOG) assert.ok(new RegExp(`<symbol id="i-${b.cover.icon}"`).test(design), `the design page sprite has no glyph for the cover of ${b.id}`);
 });
 
 check('the design page shows Me with the strip Notes, Journey, Plan, Health (Notes first), and the Me · Notes phones: one pen that writes a note, Me on in the tab bar, a dark twin, and no Library tab strip', () => {
@@ -519,7 +527,7 @@ check('the design page shows Me with the strip Notes, Journey, Plan, Health (Not
   assert.equal(new Set([...design.matchAll(/<p class="phone-label"><b>([^<]+)<\/b>/g)].map((m) => m[1])).size, [...design.matchAll(/<p class="phone-label"><b>([^<]+)<\/b>/g)].length, 'no two phones share a label');
 });
 
-check('the sample content never claims to be real: no price, no rating, no "available", no download, nothing in the data or the rows of the example books that acts when touched', () => {
+check('the sample content never claims to be real: no price, no rating, no "available", no download, nothing in the data or the rows of the books that acts when touched', () => {
   const lib = (f: string) => read(join('src', 'features', 'library', f));
   const tabs = lib('LibraryTabs.tsx');
   const books = tabs.slice(tabs.indexOf('export function BookRows'), tabs.indexOf('export function LibraryGroups'));
@@ -589,7 +597,7 @@ check('what is new in Library keeps its contrast in light and dark: text 4.5 : 1
     assert.ok(contrast(r('textMuted'), r('surface')) >= 4.5, `the credit and the muted lines in ${mode}`);
   }
   // a cover does not change with light and dark, and neither does the navy glyph on it
-  for (const b of BOOK_CATALOG) assert.ok(contrast(tokens.color.blue, tokens.color[b.cover]) >= 4.5, `the navy glyph on the ${b.cover} cover of ${b.id}`);
+  for (const b of BOOK_CATALOG) assert.ok(contrast(tokens.color.blue, tokens.color[b.cover.colour]) >= 4.5, `the navy glyph on the ${b.cover.colour} cover of ${b.id}`);
 });
 
 check('Bookmarks is a screen of its own: the file exists, it is registered next to the diary routes for a pilgrim with a journey, it has Back and a heading and no room for a tab bar', () => {
@@ -606,7 +614,7 @@ check('Bookmarks is a screen of its own: the file exists, it is registered next 
   assert.match(src, /<AppText variant="h2" accessibilityRole="header">Bookmarks<\/AppText>/);
   assert.match(src, /<AppText variant="h4" accessibilityRole="header">Library<\/AppText>/);
   assert.match(src, /<AppText variant="h4" accessibilityRole="header" style=\{\{ marginTop: 8 \}\}>Posts<\/AppText>/);
-  assert.match(src, /<SampleNotice title="Preview">\{BOOKMARKS_NOTICE\}<\/SampleNotice>/, 'the example books kept here are still examples, and it says so');
+  assert.doesNotMatch(src, /SampleNotice|BOOKMARKS_NOTICE/, 'no notice about books on Bookmarks');
   const design = readFileSync(join(root, '..', 'design', 'index.html'), 'utf8');
   const phone = design.slice(design.indexOf('<b>Library · Bookmarks</b>'), design.indexOf('<b>Library · Bookmarks, empty</b>'));
   assert.ok(phone.length > 2000);
@@ -675,10 +683,10 @@ check('the four fonts by role on the Bible side of the Library: Fraunces for nam
   const strip = (src: string) => src.split('\n').filter((l) => !/^\s*(\/\/|\/?\*)/.test(l)).join('\n');
   const own = bibleSide.filter((f) => /fontFamily|\bfonts\./.test(strip(read(f))));
   assert.deepEqual(own, [], 'these files name a font of their own: use the variant of AppText that has it');
-  // the compact banner and the daily banner are the Bible side of LibraryBanner.tsx; the earlier tall banner (the Books tab) is not touched here
+  // the compact banner and the daily banner are all that LibraryBanner.tsx has now (the Books tab's banner is books/BooksBanner.tsx, on the compact one)
   const banner = strip(read(join(L, 'LibraryBanner.tsx')));
-  const compact = banner.slice(banner.indexOf('export function CompactBanner'), banner.indexOf('type BannerProps'));
-  assert.doesNotMatch(compact + banner.slice(banner.indexOf('export function DailyBanner'), banner.indexOf('export function BooksBanner')), /fontFamily|\bfonts\./);
+  const compact = banner.slice(banner.indexOf('export function CompactBanner'), banner.indexOf('export function DailyBanner'));
+  assert.doesNotMatch(compact + banner.slice(banner.indexOf('export function DailyBanner')), /fontFamily|\bfonts\./);
   // Caveat: ONE short note per screen, never more (the brand: max one per design), counted over the files each screen draws
   const accent = (files: string[]) => files.reduce((sum, f) => sum + (strip(read(f)).match(/variant="accent"/g) ?? []).length, 0);
   const screens: Record<string, { files: string[]; notes: number }> = {

@@ -3,6 +3,7 @@ Run from the repository root:  python3 -m unittest discover -s tools/tests -v
 """
 import json
 import pathlib
+import re
 import sys
 import tempfile
 import unittest
@@ -482,6 +483,24 @@ class Build(unittest.TestCase):
             self.assertEqual(bb.app_book(book)["credit"], "The Imitation of Christ, Thomas à Kempis. Translated by William Benham (1886). Public domain.")
             g = write_book(root, guide_meta(), {"00-a.md": "# A\n\nx\n"}, FACTS)
             self.assertEqual(bb.app_book(bk.load_book(g))["credit"], "By Test Author.")
+
+    def test_the_app_book_does_not_carry_the_disclosure_of_the_series(self):
+        """The disclosure of the series may name the tool that helped: it stays in store.json and in the EPUB, where a store asks for it. The app has its own words (the notice of each kind) and never reads it."""
+        with tempfile.TemporaryDirectory() as t:
+            root = pathlib.Path(t) / "books"
+            book = bk.load_book(write_book(root, reflection_meta(id="demo-reflection"), {"00-a.md": "# A\n\nx\n"}))
+            self.assertNotIn("ai_disclosure", bb.app_book(book))
+            self.assertEqual(bb.store_json(book, None)["ai_disclosure"], SERIES["ai_disclosure"])
+
+    def test_the_committed_app_bundle_names_no_model(self):
+        bundle = TOOLS.parent / "mobile" / "assets" / "library"
+        files = sorted(bundle.rglob("*.json"))
+        self.assertGreater(len(files), 2, "the bundle is there")
+        model = re.compile(r"\b(?:claude|anthropic|sonnet|opus|haiku|gpt|chatgpt|openai|gemini|llama|mistral|copilot)\b", re.I)
+        for f in files:
+            text = f.read_text(encoding="utf-8")
+            self.assertIsNone(model.search(text), f"{f.name} names a model")
+            self.assertNotIn('"ai_disclosure"', text, f"{f.name} carries the disclosure of the series")
 
     def test_store_json_leaves_isbn_and_price_to_the_publisher(self):
         with tempfile.TemporaryDirectory() as t:
