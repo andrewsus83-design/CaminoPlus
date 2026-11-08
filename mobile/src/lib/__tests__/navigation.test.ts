@@ -177,7 +177,7 @@ check('Library has no title and no diary button: its first row is the search fie
   const header = screen.indexOf('<LibraryHeader ');
   assert.ok(hidden > 0 && header > hidden, 'the hidden heading comes first, then the header row');
   // where the button leads: decided by the screen, in one place
-  assert.match(screen, /<LibraryHeader query=\{query\} onQuery=\{setQuery\} onBookmarks=\{\(\) => router\.push\('\/library\/bookmarks'\)\} \/>/);
+  assert.match(screen, /<LibraryHeader query=\{query\} onQuery=\{setQuery\} onBookmarks=\{\(\) => router\.push\('\/library\/bookmarks'\)\} onSearchFocus=\{prepareSearch\} \/>/);
   // the row: search field, then Bookmarks and nothing else; the button is the size of Me's bell and gear (52) and labelled with a hint
   const row = read(join('src', 'features', 'library', 'LibraryHeader.tsx'));
   const search = row.indexOf('<SearchBar ');

@@ -170,7 +170,12 @@ check('a query with no words in it finds nothing: blanks, punctuation, quotes, d
   assert.deepEqual(queryWords('  “Love”, —the LORD’s  love! '), ['love', 'the', "lord's"]);
   assert.deepEqual(queryWords("it's it’s IT'S"), ["it's"]);
   assert.deepEqual(queryWords('3:16'), ['3', '16']);
-  assert.deepEqual(queryWords('a'.repeat(5) + ' ' + Array.from({ length: 30 }, (_, i) => `w${i}`).join(' ')).length, MAX_QUERY_WORDS, 'the words after the 16th are not looked at');
+  assert.equal(MAX_QUERY_WORDS, 16);
+  assert.equal(queryWords(Array.from({ length: 30 }, (_, i) => `w${i}`).join(' ')).length, 16, 'at most 16 words are looked at');
+  const sixteen = 'for god so loved the world that he gave his only born son whoever believes in';
+  assert.equal(queryWords(sixteen).length, 16);
+  assert.ok(searchVerses(`${sixteen} zzzqx`).some((h) => ref(h) === 'JHN 3:16'), 'a 17th word is not looked at: a word that is nowhere does not hide John 3:16');
+  assert.deepEqual(searchVerses(`zzzqx ${sixteen}`), [], 'but the first 16 are looked at, and the first is nowhere');
 });
 
 check('the places to highlight are inside the text, in order, never touching or overlapping, and each starts a word that starts with a word of the query', () => {
@@ -206,6 +211,8 @@ check('a hit is {code, chapter, verse, text, marks}: the label of the verse as p
     assert.doesNotMatch(h.text, /[\t\n]/);
     assert.equal(h.text, oneLine(loadBook(h.code).chapters[h.chapter - 1].verses.find((v) => v.n === h.verse)!.t));
   }
+  const letter = searchVerses('copy letter artaxerxes').find((x) => ref(x) === 'EZR 4:11')!;
+  assert.equal(letter.text, 'This is the copy of the letter that they sent: To King Artaxerxes, from your servants, the people beyond the River.', 'a blank line inside a verse is one space, not two');
   const psalm = searchVerses('blessed man walk', 5).find((x) => ref(x) === 'PSA 1:1')!;
   assert.equal(psalm.text, 'Blessed is the man who doesn’t walk in the counsel of the wicked, nor stand on the path of sinners, nor sit in the seat of scoffers;', 'poetry is joined by a space');
   const empty = new Set(['SIR 1:5', 'SIR 11:15-16', 'LUK 17:36', 'ACT 8:37', 'ROM 16:25']);

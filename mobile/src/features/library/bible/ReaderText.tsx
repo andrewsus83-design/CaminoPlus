@@ -69,7 +69,8 @@ function Prose({ block, selected, onSelect }: { block: ProseBlock; selected: str
 /**
  * A stanza is ONE text, a line after the other: a screen reader reads it as it reads a paragraph, and a Psalm of 176 verses is 22 texts, not 350. A line that is
  * too long for the phone is cut by the reader (wrap.ts) and its rest goes in one em further than the line itself: a hanging indent, which React Native does not
- * have, so that a long line of a psalm never comes back to the margin looking like a line of its own.
+ * have, so that a long line of a psalm never comes back to the margin looking like a line of its own. A line that two verses share (Psalm 55:2 and 55:3) is
+ * one line with a part for each verse: each part is a text of its own that a touch chooses, the second with its number in the middle of the line.
  */
 function Poem({ block, selected, onSelect }: { block: PoemBlock; selected: string | null; onSelect: Select }) {
   const { width, fontScale } = useWindowDimensions();
@@ -80,7 +81,12 @@ function Poem({ block, selected, onSelect }: { block: PoemBlock; selected: strin
       {lines.map((l, k) => (
         <Text key={k}>
           {INDENT.repeat(l.indent)}
-          <Words verse={l.verse} number={l.n} text={l.text} on={l.verse === selected} onSelect={onSelect} />
+          {l.parts.map((p, j) => (
+            <Text key={j}>
+              {j > 0 ? ' ' : ''}
+              <Words verse={p.verse} number={p.n} text={p.text} on={p.verse === selected} onSelect={onSelect} />
+            </Text>
+          ))}
           {k < lines.length - 1 ? '\n' : ''}
         </Text>
       ))}

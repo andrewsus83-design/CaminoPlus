@@ -183,7 +183,9 @@ class Claims(unittest.TestCase):
         content = HTML["licences.html"]
         for needle in ("OpenStreetMap", "ODbL", "OpenMapTiles", "CC BY 4.0", "Natural Earth", "Public domain", "Overture", "CDLA-Permissive-2.0",
                        "Wikidata", "CC0", "Wikipedia", "CC BY-SA", "Wikimedia Commons", "Noto Sans", "Fraunces", "Inter", "JetBrains Mono", "Caveat",
-                       "SIL Open Font License", "MapLibre", "BSD-3-Clause", "Expo", "MIT", "Supabase"):
+                       "SIL Open Font License", "MapLibre", "BSD-3-Clause", "Expo", "MIT", "Supabase",
+                       "World English Bible, Catholic edition", "https://ebible.org/eng-web-c/", "is a trademark of eBible.org",
+                       "Strong’s numbers, footnotes and cross references are not included"):
             self.assertIn(needle, content)
         for page, c in HTML.items():
             self.assertIn('href="/licences"', c, f"{page}: footer must link to the licences page")

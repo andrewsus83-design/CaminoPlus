@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import {
-  buildBlocks, findVerse, labelOfNumber, locateVerse, blocksOfVerse, superscript, verseLabels, verseText, type Block,
+  buildBlocks, findVerse, labelOfNumber, locateVerse, blocksOfVerse, superscript, verseLabels, verseText, type Block, type PoemLine,
 } from '../bible/blocks';
 import { BIBLE_BOOKS, bookByCode } from '../bible/books';
 import { CHAPTERS_NOTE, NOT_AT_MASS, READER_NOTE, creditLines } from '../bible/credit';
@@ -186,16 +186,15 @@ check('a psalm is stanzas of lines gone in by their tabs: the number only on the
   const blocks = buildBlocks(chapter('PSA', 121));
   assert.deepEqual(kinds(blocks), ['poem', 'poem']);
   const [first, second] = blocks as Array<Extract<Block, { kind: 'poem' }>>;
-  assert.deepEqual(first.lines.map((l) => [l.verse, l.n, l.indent, l.text]), [
-    ['1', '1', 1, 'I will lift up my eyes to the hills.'],
-    ['1', null, 2, 'Where does my help come from?'],
-    ['2', '2', 1, 'My help comes from the LORD,'],
-    ['2', null, 2, 'who made heaven and earth.'],
+  assert.deepEqual(first.lines.map((l) => [l.parts.length, l.parts[0].verse, l.parts[0].n, l.indent, l.parts[0].text]), [
+    [1, '1', '1', 1, 'I will lift up my eyes to the hills.'],
+    [1, '1', null, 2, 'Where does my help come from?'],
+    [1, '2', '2', 1, 'My help comes from the LORD,'],
+    [1, '2', null, 2, 'who made heaven and earth.'],
   ]);
   assert.equal(first.gap, 'none', 'the first block has nothing above it');
   assert.equal(second.gap, 'stanza', 'a verse with `b` begins a stanza after a blank line');
-  assert.deepEqual(second.lines.map((l) => [l.verse, l.indent]), [['3', 1], ['3', 2], ['3', 1], ['3', 2]].slice(0, 2));
-  assert.equal(second.lines.length, 2);
+  assert.deepEqual(second.lines.map((l) => [l.parts[0].verse, l.indent]), [['3', 1], ['3', 2]]);
 });
 
 check('prose is paragraphs: the verses without `p` flow on in the paragraph before them, each with its own number; `p` starts the next paragraph; the first paragraph has no space above it', () => {
@@ -214,7 +213,7 @@ check('a heading is a block of its own and whatever follows starts a new block; 
   assert.deepEqual(kinds(all), ['heading', 'prose', 'heading', 'prose']);
   assert.deepEqual(buildBlocks({ c: 1, verses: [] }), []);
   const sir = buildBlocks(chapter('SIR', 11));
-  assert.deepEqual(sir.flatMap((b) => (b.kind === 'poem' ? b.lines.map((l) => l.verse) : [])), ['14', '17'], 'the verse "15-16" has no words and is not drawn');
+  assert.deepEqual(sir.flatMap((b) => (b.kind === 'poem' ? b.lines.flatMap((l) => l.parts.map((p) => p.verse)) : [])), ['14', '17'], 'the verse "15-16" has no words and is not drawn');
   assert.deepEqual(verseLabels(chapter('SIR', 11)), ['14', '17']);
   assert.equal(findVerse(chapter('SIR', 11), '15-16'), undefined, 'and it cannot be chosen, linked to or bookmarked');
   assert.equal(findVerse(chapter('SIR', 11), '14')!.n, '14');
@@ -222,14 +221,14 @@ check('a heading is a block of its own and whatever follows starts a new block; 
   assert.equal(lone.length, 1);
 });
 
-check('a "\\n" inside a verse of prose is a new paragraph and the number is not said again; a break `b` or a poem above also starts a new block; prose after poetry never goes on in the stanza', () => {
+check('a "\\n" inside a verse of prose is a new paragraph and the number is not said again; a break `b` or a poem above also starts a new block; `p` after poetry starts a paragraph of prose (without it the verse goes on in the last line)', () => {
   const split = buildBlocks({ c: 1, verses: [v('1', 'First part.\nSecond part, a new paragraph.', { p: true }), v('2', 'And on.')] });
   assert.deepEqual(kinds(split), ['prose', 'prose']);
   const [a, b] = split as Array<Extract<Block, { kind: 'prose' }>>;
   assert.deepEqual(a.spans.map((s) => [s.verse, s.n]), [['1', '1']]);
   assert.deepEqual(b.spans.map((s) => [s.verse, s.n]), [['1', null], ['2', '2']], 'the second part has no number; verse 2 goes on after it');
   assert.equal(b.gap, 'paragraph');
-  const mixed = buildBlocks({ c: 1, verses: [v('1', 'Prose.', { p: true }), v('2', '\tA poem line.\n\t\tIts second.'), v('3', 'Prose again.'), v('4', 'With a break.', { b: true })] });
+  const mixed = buildBlocks({ c: 1, verses: [v('1', 'Prose.', { p: true }), v('2', '\tA poem line.\n\t\tIts second.'), v('3', 'Prose again.', { p: true }), v('4', 'With a break.', { b: true })] });
   assert.deepEqual(kinds(mixed), ['prose', 'poem', 'prose', 'prose']);
   assert.equal(mixed[1].kind === 'poem' && mixed[1].gap, 'paragraph');
   assert.equal(mixed[3].kind === 'prose' && mixed[3].gap, 'stanza', 'a blank line before a verse of prose is a bigger gap than a paragraph');
@@ -237,15 +236,79 @@ check('a "\\n" inside a verse of prose is a new paragraph and the number is not 
   assert.deepEqual(kinds(poem), ['poem', 'poem'], '`p` on a verse of poetry begins a stanza too');
 });
 
-check('the tabs at the start of a line are its indent, three at the most; a line with none in a verse of poetry stays in the stanza; other tabs inside a line are blanks', () => {
+check('the tabs at the start of a line are its indent, three at the most; a line with none after a "\\n" is a paragraph of prose, also under poetry; other tabs inside a line are blanks', () => {
   const lines = (t: string) => {
     const [b] = buildBlocks({ c: 1, verses: [v('1', t)] });
-    return b.kind === 'poem' ? b.lines.map((l) => [l.indent, l.text]) : b.kind === 'prose' ? b.spans.map((s) => [0, s.text]) : [];
+    return b.kind === 'poem' ? b.lines.map((l) => [l.indent, l.parts[0].text]) : b.kind === 'prose' ? b.spans.map((s) => [0, s.text]) : [];
   };
   assert.deepEqual(lines('\tA\n\t\tB\n\t\t\tC\n\t\t\t\tD'), [[1, 'A'], [2, 'B'], [3, 'C'], [3, 'D']]);
-  assert.deepEqual(lines('\tA\nB'), [[1, 'A'], [0, 'B']], 'a line with no tab inside a verse of poetry is a poetry line at the margin');
   assert.deepEqual(lines('Plain words.'), [[0, 'Plain words.']]);
   assert.deepEqual(lines('\t  A\tB '), [[1, 'A B']]);
+  const tail = buildBlocks({ c: 1, verses: [v('1', '\tA poem line.\n\t\tIts second.\nsays the LORD.')] });
+  assert.deepEqual(kinds(tail), ['poem', 'prose'], 'a line with no tab after poetry in the same verse is a new paragraph of prose (John 8:11 is the same in prose)');
+  assert.equal(tail[1].kind === 'prose' && tail[1].gap, 'paragraph');
+  assert.deepEqual(tail[1].kind === 'prose' && tail[1].spans.map((s) => [s.verse, s.n, s.text]), [['1', null, 'says the LORD.']], 'and the number of the verse is not said again');
+  for (const b of tail) if (b.kind === 'poem') assert.ok(b.lines.every((l) => l.indent >= 1), 'a line of poetry always has a tab: a line at the margin is prose');
+});
+
+check('a verse with neither `p` nor a tab goes on in the line before it, also a line of poetry that two verses share (Psalm 55:2-3, 66:13-14): one line, a part for each verse, the second number in the middle of it', () => {
+  const shared = buildBlocks({
+    c: 55,
+    verses: [
+      v('1', '\tListen to my prayer, God.\n\t\tDon’t hide yourself.'),
+      v('2', '\tAttend to me, and answer me.\n\t\tI am restless in my complaint,\n\t\tand moan'),
+      v('3', 'because of the voice of the enemy,\n\t\tbecause of the oppression of the wicked.\n\tFor they bring suffering on me.'),
+      v('4', '\tMy heart is severely pained within me.'),
+    ],
+  });
+  assert.deepEqual(kinds(shared), ['poem'], 'one stanza: no paragraph of prose in the middle of a psalm');
+  const lines = (shared[0] as Extract<Block, { kind: 'poem' }>).lines;
+  assert.deepEqual(lines.map((l) => [l.indent, l.parts.map((p) => [p.verse, p.n, p.text])]), [
+    [1, [['1', '1', 'Listen to my prayer, God.']]],
+    [2, [['1', null, 'Don’t hide yourself.']]],
+    [1, [['2', '2', 'Attend to me, and answer me.']]],
+    [2, [['2', null, 'I am restless in my complaint,']]],
+    [2, [['2', null, 'and moan'], ['3', '3', 'because of the voice of the enemy,']]],
+    [2, [['3', null, 'because of the oppression of the wicked.']]],
+    [1, [['3', null, 'For they bring suffering on me.']]],
+    [1, [['4', '4', 'My heart is severely pained within me.']]],
+  ]);
+  assert.deepEqual(blocksOfVerse(shared, '3'), [0], 'the verse is in the block');
+  assert.deepEqual(locateVerse(shared, '3'), { block: 0, at: 4 / 8 }, 'and its first words are in the fifth line of eight');
+  assert.deepEqual(locateVerse(shared, '2'), { block: 0, at: 2 / 8 });
+  // in prose it is the usual case: the next words of the paragraph
+  const prose = buildBlocks({ c: 1, verses: [v('1', 'One.', { p: true }), v('2', 'Two.')] });
+  assert.deepEqual(kinds(prose), ['prose']);
+  // `p` or `b` on such a verse starts something new; a heading too
+  assert.deepEqual(kinds(buildBlocks({ c: 1, verses: [v('1', '\tA.'), v('2', 'B.', { p: true })] })), ['poem', 'prose']);
+  assert.deepEqual(kinds(buildBlocks({ c: 1, verses: [v('1', '\tA.'), v('2', 'B.', { b: true })] })), ['poem', 'prose']);
+  assert.deepEqual(kinds(buildBlocks({ c: 1, verses: [v('1', '\tA.'), v('2', 'B.', { h: 'Head' })] })), ['poem', 'heading', 'prose']);
+  // a verse of poetry after prose is a poem of its own
+  assert.deepEqual(kinds(buildBlocks({ c: 1, verses: [v('1', 'Prose.', { p: true }), v('2', '\tA line.')] })), ['prose', 'poem']);
+});
+
+check('a blank line inside a verse is a blank line (a stanza gap) for the lines after it, in poetry and in prose; a verse with no words that begins a paragraph hands that on (Acts 8:37)', () => {
+  const stanzas = buildBlocks({ c: 1, verses: [v('1', '\tA.\n\t\tB.\n\n\tC.\n\t\tD.')] });
+  assert.deepEqual(kinds(stanzas), ['poem', 'poem']);
+  assert.deepEqual(stanzas.map((b) => b.kind === 'poem' && b.gap), ['none', 'stanza'], 'the blank line is the gap of the second stanza');
+  assert.deepEqual(stanzas.map((b) => b.kind === 'poem' && b.lines.map((l) => l.parts[0].n)), [['1', null], [null, null]], 'the number is not said again');
+  const mixed = buildBlocks({ c: 1, verses: [v('1', '\tA.\n\n\tB.\n\nTail.')] });
+  assert.deepEqual(kinds(mixed), ['poem', 'poem', 'prose']);
+  assert.deepEqual(mixed.map((b) => b.kind !== 'heading' && b.gap), ['none', 'stanza', 'stanza']);
+  const prose = buildBlocks({ c: 1, verses: [v('1', 'First.\n\nSecond.\nThird.', { p: true })] });
+  assert.deepEqual(prose.map((b) => b.kind !== 'heading' && b.gap), ['none', 'stanza', 'paragraph'], 'a blank line is more than a paragraph; a "\\n" alone is a paragraph');
+  assert.deepEqual(kinds(buildBlocks({ c: 1, verses: [v('1', '\n\nWords.')] })), ['prose'], 'blank lines at the start draw nothing of their own');
+  // an empty verse that begins a paragraph or has a blank line above it: the next verse does
+  const carried = buildBlocks({ c: 8, verses: [v('36', 'The eunuch said, “Behold, here is water.”', { p: true }), v('37', '', { p: true }), v('38', 'He commanded the chariot to stand still.')] });
+  assert.deepEqual(kinds(carried), ['prose', 'prose'], 'verse 38 begins a paragraph because verse 37, which draws nothing, did');
+  assert.deepEqual(carried.map((b) => b.kind === 'prose' && b.spans.map((s) => s.verse)), [['36'], ['38']]);
+  assert.deepEqual(kinds(buildBlocks({ c: 1, verses: [v('1', 'One.', { p: true }), v('2', ''), v('3', 'Three.')] })), ['prose'], 'an empty verse with nothing on it changes nothing');
+  assert.equal(buildBlocks({ c: 1, verses: [v('1', '\tA.'), v('2', '', { b: true }), v('3', '\tB.')] })[1].kind === 'poem', true);
+  assert.deepEqual(buildBlocks({ c: 1, verses: [v('1', '\tA.'), v('2', '', { b: true }), v('3', '\tB.')] }).map((b) => b.kind !== 'heading' && b.gap), ['none', 'stanza'], 'the blank line before an empty verse goes to the verse after it');
+  // `b` and `h` on one verse: the space first, the heading under it (the heading has its own space above it)
+  const both = buildBlocks({ c: 6, verses: [v('3', '\tFirst.'), v('4', '\tSecond.', { b: true, h: 'Beloved' })] });
+  assert.deepEqual(kinds(both), ['poem', 'heading', 'poem']);
+  assert.equal(both[2].kind === 'poem' && both[2].gap, 'none', 'under a heading a block has no space of its own');
 });
 
 check('where a verse is: the block that holds it and how far into it, and which blocks hold it; for a verse that is not drawn, nowhere', () => {
@@ -324,31 +387,67 @@ check('a line is cut at spaces only, the first part with its own room and the ot
 });
 
 const SIZES = { size: 19, numberSize: 17, numberOf: superscript };
-type Logical = { verse: string; n: string | null; indent: 0 | 1 | 2 | 3; text: string };
-const draw = (lines: Logical[], width: number, scale = 1) => wrapPoem(lines, { ...SIZES, width, scale });
+const draw = (lines: PoemLine[], width: number, scale = 1) => wrapPoem(lines, { ...SIZES, width, scale });
+const lineOf = (verse: string, n: string | null, indent: 1 | 2 | 3, text: string): PoemLine => ({ indent, parts: [{ verse, n, text }] });
+/** The words of a drawn row or of a line, as one text. */
+const flat = (l: { parts: Array<{ text: string }> }): string => l.parts.map((p) => p.text).join(' ');
+/** The room the number of a verse takes in a row, em of the body text. */
+const numberRoom = (n: string | null): number => (n === null ? 0 : (superscript(n).length * 0.6 * 17) / 19 + THIN_SPACE_EM);
 
 check('a long line of poetry goes on in the line under it one em further in; a line that fits is as it was; the number of a verse stays on the first line of it and takes room there', () => {
-  const fits: Logical = { verse: '1', n: '1', indent: 1, text: 'I will lift up my eyes' };
-  const long: Logical = { verse: '1', n: null, indent: 2, text: 'Where does my help come from, who made heaven and earth and everything in them' };
+  const fits = lineOf('1', '1', 1, 'I will lift up my eyes');
+  const long = lineOf('1', null, 2, 'Where does my help come from, who made heaven and earth and everything in them');
   const wide = draw([fits, long], 1000);
-  assert.deepEqual(wide, [{ verse: '1', n: '1', indent: 1, text: fits.text, cont: false }, { verse: '1', n: null, indent: 2, text: long.text, cont: false }], 'on a page that is wide enough nothing is cut');
+  assert.deepEqual(wide, [{ indent: 1, cont: false, parts: fits.parts }, { indent: 2, cont: false, parts: long.parts }], 'on a page that is wide enough nothing is cut');
   const narrow = draw([fits, long], 358);
-  assert.equal(narrow[0].text, fits.text);
+  assert.equal(flat(narrow[0]), flat(fits));
   assert.ok(narrow.length > 2, 'the long line is cut');
   assert.deepEqual(narrow.slice(1).map((l) => l.indent), narrow.slice(1).map((_, k) => (k === 0 ? 2 : 3)), 'the first part of the long line is at its own indent (2), the rest one em further (3)');
-  assert.equal(narrow.slice(1).map((l) => l.text).join(' '), long.text);
-  assert.ok(narrow.every((l) => l.verse === '1'));
-  assert.deepEqual(narrow.map((l) => l.n), ['1', ...narrow.slice(1).map(() => null)], 'the number is on the first line only');
+  assert.deepEqual(narrow.map((l) => l.cont), [false, false, ...narrow.slice(2).map(() => true)], 'the rows after the first of a line are marked');
+  assert.equal(narrow.slice(1).map(flat).join(' '), flat(long));
+  assert.ok(narrow.every((l) => l.parts.length === 1 && l.parts[0].verse === '1'));
+  assert.deepEqual(narrow.map((l) => l.parts[0].n), ['1', ...narrow.slice(1).map(() => null)], 'the number is on the first line only');
   // a number of three digits and a joined label take more room on the first line
   const text = 'Your word is a lamp to my feet and a light for my path in the dark night';
-  const one = draw([{ verse: '5', n: '5', indent: 1, text }], 358);
-  const three = draw([{ verse: '105', n: '105', indent: 1, text }], 358);
-  assert.ok(one[0].text.length >= three[0].text.length, 'a longer number leaves less room for the words');
+  const five = draw([lineOf('5', '5', 1, text)], 358);
+  const hundred = draw([lineOf('105', '105', 1, text)], 358);
+  assert.ok(flat(five[0]).length >= flat(hundred[0]).length, 'a longer number leaves less room for the words');
   assert.deepEqual(draw([], 358), []);
-  assert.deepEqual(draw([{ verse: '1', n: '1', indent: 0, text: '' }], 358), [], 'a line with no words draws nothing');
+  assert.deepEqual(draw([lineOf('1', '1', 1, '')], 358), [], 'a line with no words draws nothing');
 });
 
-check('in every line of poetry of the whole Bible, at 320, 390, 430 and 768 wide and at text sizes 1 and 1.6, no part is wider than the page by the real widths of the font, none breaks a word, and together the parts are the line', () => {
+check('a line that two verses share is cut like any other, with the second number in the middle of it: it takes room there, appears once, and the parts keep their verses', () => {
+  const shared: PoemLine = { indent: 2, parts: [{ verse: '2', n: null, text: 'and moan' }, { verse: '3', n: '3', text: 'because of the voice of the enemy,' }] };
+  assert.deepEqual(draw([shared], 1000), [{ indent: 2, cont: false, parts: shared.parts }], 'on a wide page the two parts are one row');
+  let cut = 0;
+  for (let width = 120; width <= 700; width += 3) {
+    const rows = draw([shared], width);
+    assert.equal(rows.flatMap((r) => r.parts).map((p) => p.text).join(' '), 'and moan because of the voice of the enemy,', `${width}: nothing is lost`);
+    assert.deepEqual(rows.flatMap((r) => r.parts.map((p) => p.n)).filter((n) => n !== null), ['3'], `${width}: the number of verse 3 is said once`);
+    assert.deepEqual(rows.map((r) => r.indent), rows.map((_, k) => (k === 0 ? 2 : 2 + HANG_EM)), `${width}: the rows after the first hang one em in`);
+    // the number is on the row the words of verse 3 begin in, and on that row only
+    const start = rows.findIndex((r) => r.parts.some((p) => p.verse === '3'));
+    assert.ok(rows[start].parts.find((p) => p.verse === '3')!.n === '3' && rows.slice(start + 1).every((r) => r.parts.every((p) => p.n === null)), `${width}: the number is where the verse begins`);
+    // every row fits: the words, the space between the parts and the number, unless it is one word
+    rows.forEach((r, k) => {
+      const used = textWidth(flat(r)) * WRAP_SAFETY + r.parts.reduce((sum, p) => sum + numberRoom(p.n), 0);
+      const room = width / 19 - r.indent;
+      assert.ok(flat(r).split(' ').length === 1 || used <= room + 1e-9, `${width} row ${k}: "${flat(r)}" needs ${used.toFixed(2)} em of ${room.toFixed(2)}`);
+    });
+    if (rows.length > 1) cut += 1;
+  }
+  assert.ok(cut > 50, 'the line is cut at many of the widths tried');
+  // the number in the middle takes room: with it a row holds fewer words than without it, at some width
+  const taken = [...Array(200).keys()].some((k) => {
+    const width = 120 + k * 3;
+    const withNumber = draw([shared], width);
+    const without = draw([{ indent: 2, parts: shared.parts.map((p) => ({ ...p, n: null })) }], width);
+    return flat(withNumber[0]).length < flat(without[0]).length;
+  });
+  assert.ok(taken, 'the number took the room of a word at some width');
+});
+
+check('in every line of poetry of the whole Bible, at 320, 390, 430 and 768 wide and at text sizes 1 and 1.6, no row is wider than the page by the real widths of the font, none breaks a word, and together the rows are the line', () => {
   const file = join(root, 'node_modules', '@expo-google-fonts', 'inter', '400Regular', 'Inter_400Regular.ttf');
   if (!existsSync(file) || !HAVE_TEXT) return;
   const real = advances(file);
@@ -360,6 +459,7 @@ check('in every line of poetry of the whole Bible, at 320, 390, 430 and 768 wide
   }, 0);
   let lines = 0;
   let cut = 0;
+  let shared = 0;
   for (const width of [320, 390, 430, 768]) {
     for (const scale of [1, 1.6]) {
       const page = (width - 2 * 16) / (19 * scale); // em of the body text across the page
@@ -370,22 +470,24 @@ check('in every line of poetry of the whole Bible, at 320, 390, 430 and 768 wide
             const drawn = draw(block.lines, width - 2 * 16, scale); // the page is the screen less its two margins
             let at = 0;
             for (const line of block.lines) {
-              const parts: typeof drawn = [];
-              while (at < drawn.length && (parts.length === 0 || drawn[at].cont)) parts.push(drawn[at++]);
-              assert.ok(parts.length >= 1, `${b.code} ${c.c}: a line is lost`);
-              assert.equal(parts.map((p) => p.text).join(' '), line.text, `${b.code} ${c.c}: the parts are not the line`);
-              assert.equal(parts[0].indent, line.indent);
-              assert.equal(parts[0].n, line.n);
-              assert.ok(parts.slice(1).every((p) => p.indent === line.indent + HANG_EM && p.n === null && p.verse === line.verse), `${b.code} ${c.c}: the parts after the first go in one em further and have no number`);
+              const rows: typeof drawn = [];
+              while (at < drawn.length && (rows.length === 0 || drawn[at].cont)) rows.push(drawn[at++]);
+              assert.ok(rows.length >= 1, `${b.code} ${c.c}: a line is lost`);
+              assert.equal(rows.map(flat).join(' '), flat(line), `${b.code} ${c.c}: the rows are not the line`);
+              assert.equal(rows[0].indent, line.indent);
+              assert.deepEqual(rows.flatMap((r) => r.parts.map((p) => p.n)).filter((n) => n !== null), line.parts.map((p) => p.n).filter((n) => n !== null), `${b.code} ${c.c}: each number of the line is said once`);
+              assert.ok(rows.slice(1).every((r) => r.indent === line.indent + HANG_EM && r.cont), `${b.code} ${c.c}: the rows after the first go in one em further`);
+              assert.ok(rows.every((r) => r.parts.every((p) => line.parts.some((q) => q.verse === p.verse))), `${b.code} ${c.c}: the verses of the rows are the verses of the line`);
               lines += 1;
-              if (parts.length > 1) cut += 1;
-              parts.forEach((p, k) => {
-                const room = page - p.indent - (k === 0 && p.n !== null ? (superscript(p.n).length * 0.6 * 17) / 19 + THIN_SPACE_EM : 0);
-                const alone = p.text.split(' ').length === 1; // a word that is wider than the page cannot be helped
-                assert.ok(alone || realInter(p.text) <= room, `${b.code} ${c.c}:${p.verse} at ${width}/${scale}: "${p.text}" is ${realInter(p.text).toFixed(2)} em in ${room.toFixed(2)}`);
+              if (rows.length > 1) cut += 1;
+              if (line.parts.length > 1) shared += 1;
+              rows.forEach((r) => {
+                const used = realInter(flat(r)) + r.parts.reduce((sum, p) => sum + numberRoom(p.n), 0);
+                const alone = flat(r).split(' ').length === 1; // a word that is wider than the page cannot be helped
+                assert.ok(alone || used <= page - r.indent, `${b.code} ${c.c}:${r.parts[0].verse} at ${width}/${scale}: "${flat(r)}" is ${used.toFixed(2)} em in ${(page - r.indent).toFixed(2)}`);
               });
             }
-            assert.equal(at, drawn.length, `${b.code} ${c.c}: parts left over`);
+            assert.equal(at, drawn.length, `${b.code} ${c.c}: rows left over`);
           }
         }
       }
@@ -393,12 +495,21 @@ check('in every line of poetry of the whole Bible, at 320, 390, 430 and 768 wide
   }
   assert.ok(lines > 100000, `${lines} lines were checked`);
   assert.ok(cut > 10000, `${cut} of them were cut`);
+  assert.ok(shared >= 8 * 10, `${shared} lines that two verses share were checked too (each of the lines at each of the eight page sizes)`);
 });
+
+// The verses that go on in the line of poetry before them, in the text we have (tools/bible/README.md, "How a reader draws it"): a verse with neither `p` nor a tab.
+const SHARED_LINES = [
+  'ACT 15:17', 'ECC 10:3', 'ECC 10:4', 'EZR 10:19', 'EZR 10:32', 'EZR 10:35', 'EZR 10:36', 'EZR 10:37', 'EZR 10:38', 'EZR 10:39', 'EZR 10:40', 'EZR 10:41', 'EZR 10:42',
+  'ISA 31:7', 'JER 2:24', 'JOL 3:10', 'MIC 4:5', 'PSA 55:3', 'PSA 66:14',
+];
 
 check('every chapter of the whole Bible, as the reader draws it: each verse that has words is drawn once with its number, none is lost or doubled, the words are the words, headings are the headings, and the first block has nothing above it', () => {
   if (!HAVE_TEXT) return;
   let chapters = 0;
   let verses = 0;
+  const joined: string[] = [];
+  const empty: string[] = [];
   for (const b of BIBLE_BOOKS) {
     const text = bookText(b.code);
     assert.equal(text.chapters.length, b.chapters, `${b.code}: the chapters of the file are the chapters of the list`);
@@ -413,7 +524,11 @@ check('every chapter of the whole Bible, as the reader draws it: each verse that
       let headings = 0;
       for (const block of blocks) {
         if (block.kind === 'heading') { headings += 1; assert.ok(block.text.length > 0); continue; }
-        const pieces = block.kind === 'prose' ? block.spans : block.lines;
+        if (block.kind === 'poem') {
+          assert.ok(block.lines.every((l) => l.indent >= 1 && l.indent <= 3), `${b.code} ${c.c}: a line of poetry has one to three tabs; a line at the margin is prose`);
+          for (const l of block.lines) for (const p of l.parts.slice(1)) joined.push(`${b.code} ${c.c}:${p.verse}`);
+        }
+        const pieces = block.kind === 'prose' ? block.spans : block.lines.flatMap((l) => l.parts);
         assert.ok(pieces.length > 0, `${b.code} ${c.c}: a block with nothing in it`);
         for (const p of pieces) {
           if (p.n !== null) numbers.push(p.n);
@@ -427,10 +542,57 @@ check('every chapter of the whole Bible, as the reader draws it: each verse that
       assert.deepEqual(verseLabels(c), wanted.map((x) => x.n));
       if (blocks.length > 0 && blocks[0].kind !== 'heading') assert.equal(blocks[0].gap, 'none');
       for (const x of wanted) assert.ok(blocksOfVerse(blocks, x.n).length >= 1 && locateVerse(blocks, x.n) !== null, `${b.code} ${c.c}:${x.n} is somewhere`);
+      for (const x of c.verses.filter((y) => !/\S/.test(y.t))) {
+        // a verse with no words draws nothing, has no number, and cannot be chosen, linked to or bookmarked; a link to it falls back to the start of the chapter
+        empty.push(`${b.code} ${c.c}:${x.n}`);
+        assert.deepEqual(blocksOfVerse(blocks, x.n), [], `${b.code} ${c.c}:${x.n} is drawn`);
+        assert.equal(locateVerse(blocks, x.n), null, `${b.code} ${c.c}:${x.n} has a place`);
+        assert.equal(findVerse(c, x.n), undefined, `${b.code} ${c.c}:${x.n} can be found`);
+        const [lo, hi] = [parseInt(x.n, 10), parseInt(x.n.split('-').pop()!, 10)];
+        for (let k = lo; k <= hi; k++) assert.equal(labelOfNumber(c, k), null, `${b.code} ${c.c}:${k} is a place a link can go to`);
+      }
     }
   }
   assert.equal(chapters, 1328);
   assert.ok(verses > 35000 && verses <= 35408, `${verses} verses have words`);
+  assert.equal(empty.length, 29, `29 verses have no words: ${empty.join(', ')}`);
+  assert.deepEqual([...joined].sort(), [...SHARED_LINES].sort(), 'the verses that go on in the line of poetry before them are the ones the text has: Psalm 55:3 and 66:14 among them');
+});
+
+check('the shapes the text of the Bible has, as the reader draws them: Psalm 55:2-3 and 66:13-14 share a line; John 8:11 and Esther 1:1 (Greek) have paragraphs inside a verse; Song of Songs 6:4 and 8:6 have a space and a heading; Acts 8:38 follows a verse that begins a paragraph and draws nothing', () => {
+  if (!HAVE_TEXT) return;
+  const blocksOf = (code: string, chapterNo: number) => buildBlocks(bookText(code).chapters[chapterNo - 1]);
+  for (const [code, ch, from, to] of [['PSA', 55, '2', '3'], ['PSA', 66, '13', '14']] as const) {
+    const blocks = blocksOf(code, ch);
+    assert.ok(blocks.every((b) => b.kind === 'poem'), `${code} ${ch}: a psalm of poetry only: no paragraph of prose is made in the middle of it`);
+    const lines = blocks.flatMap((b) => (b.kind === 'poem' ? b.lines : []));
+    const at = lines.findIndex((l) => l.parts.length > 1);
+    assert.ok(at > 0, `${code} ${ch} has a line that two verses share`);
+    assert.deepEqual(lines[at].parts.map((p) => p.verse), [from, to], `${code} ${ch}: the line is shared by ${from} and ${to}`);
+    assert.equal(lines[at].parts[0].n, null, 'the line is the last line of the verse before, so it has no number at its start');
+    assert.equal(lines[at].parts[1].n, to, 'the number of the second verse is in the middle of the line');
+    assert.equal(lines.filter((l) => l.parts.length > 1).length, 1, 'and it is the only one');
+  }
+  // paragraphs inside a verse
+  const john = blocksOf('JHN', 8);
+  const eleven = john.filter((b) => b.kind === 'prose' && b.spans.some((s) => s.verse === '11'));
+  assert.ok(eleven.length >= 2, 'John 8:11 is in more than one paragraph');
+  assert.equal(john.flatMap((b) => (b.kind === 'prose' ? b.spans : [])).filter((s) => s.verse === '11' && s.n === '11').length, 1, 'and its number is said once');
+  assert.ok(blocksOf('ESG', 1).filter((b) => b.kind === 'prose').length >= 4, 'the addition at the start of Esther is four paragraphs');
+  // a space and a heading on one verse
+  for (const [code, ch, label] of [['SNG', 6, '4'], ['SNG', 8, '6']] as const) {
+    const blocks = blocksOf(code, ch);
+    const i = blocks.findIndex((b) => b.kind === 'poem' && b.lines.some((l) => l.parts[0].verse === label && l.parts[0].n === label));
+    assert.ok(i > 1 && blocks[i - 1].kind === 'heading', `${code} ${ch}:${label}: the heading is directly above the verse`);
+    assert.equal(blocks[i].kind !== 'heading' && blocks[i].gap, 'none', 'the heading has the space above it, the verse none of its own');
+    assert.ok(blocks[i - 2].kind !== 'heading', 'and something is above the heading');
+  }
+  // Acts 8:37 draws nothing, and Acts 8:38 starts a paragraph in its place
+  const acts = blocksOf('ACT', 8);
+  const at36 = acts.findIndex((b) => b.kind === 'prose' && b.spans.some((s) => s.verse === '36'));
+  const at38 = acts.findIndex((b) => b.kind === 'prose' && b.spans.some((s) => s.verse === '38'));
+  assert.ok(at36 >= 0 && at38 > at36, 'Acts 8:38 is in a paragraph after the one of 8:36');
+  assert.equal(acts[at38].kind === 'prose' && acts[at38].spans[0].verse, '38', 'and it starts it');
 });
 
 /* ================================================================ the order of a straight read and the addresses (order.ts) */
