@@ -257,6 +257,7 @@ check('what floats at the bottom: the three choices of the Bible only on Bible, 
   // choosing another part from deep in the list brings the list back to its first books, and from the top of the screen nothing moves
   assert.match(screen, /if \(offset\.current > listTop\.current\) scroller\.current\?\.scrollTo\(\{ y: Math\.max\(listTop\.current - 8, 0\), animated: false \}\);/);
   assert.match(screen, /onScroll=\{\(e\) => \{ offset\.current = e\.nativeEvent\.contentOffset\.y; \}\}/);
+  assert.match(screen, /useEffect\(\(\) => \{ offset\.current = 0; \}, \[searching, tab\]\);/, 'a scroll view that was left starts again from the top, and so does what is remembered of it');
   assert.match(screen, /onListLayout=\{\(e\) => \{ listTop\.current = e\.nativeEvent\.layout\.y; \}\}/);
   assert.match(read(join('src', 'components', 'Screen.tsx')), /scrollRef\?: Ref<ComponentRef<typeof ScrollView>>/);
   assert.match(read(join('src', 'components', 'Screen.tsx')), /<ScrollView ref=\{scrollRef\} onScroll=\{onScroll\} scrollEventThrottle=\{onScroll \? 16 : undefined\}/);

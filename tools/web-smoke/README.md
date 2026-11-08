@@ -75,7 +75,7 @@ cd mobile && npm ci && npx expo export --platform web --output-dir ../tools/web-
 cd ../tools/web-smoke && npm ci
 npx playwright install chromium    # once; CI uses --with-deps
 npm test                           # the self-test: the harness against an app built to misbehave (about 25 s)
-npm run smoke                      # about 3 minutes: about 340 checks at the time of writing, 4 pages at a time
+npm run smoke                      # about 3 minutes: about 375 checks at the time of writing, 4 pages at a time
 ```
 
 `npm run build:app` runs the export command for you. Use the normal (production) export, as CI does: a development export (`--dev`)

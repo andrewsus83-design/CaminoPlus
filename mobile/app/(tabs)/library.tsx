@@ -1,4 +1,4 @@
-import { ComponentRef, useRef, useState } from 'react';
+import { ComponentRef, useEffect, useRef, useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -51,6 +51,8 @@ export default function Library() {
   const scroller = useRef<ComponentRef<typeof ScrollView>>(null);
   const offset = useRef(0);
   const listTop = useRef(0);
+  // A scroll view that was left (for the Notes host, or for the search results) is a new one when the person comes back: forget how far the old one had gone.
+  useEffect(() => { offset.current = 0; }, [searching, tab]);
   const choose = (t: Testament) => {
     setTestament(t);
     if (offset.current > listTop.current) scroller.current?.scrollTo({ y: Math.max(listTop.current - 8, 0), animated: false });
