@@ -276,6 +276,105 @@ export const SCENARIOS = [
   },
   ...ME_SCENARIOS,
   {
+    name: 'Notes: a page is a draft until it is published. The marks are inside the text box; Read (a third) and Publish (two thirds) are one row at the bottom; Save draft is at the top right and keeps a note with a Draft tag; Publish takes the tag away',
+    persona: 'in',
+    async run(ctx) {
+      const { page, step, go } = ctx;
+      const label = (t) => page.getByText(t, { exact: true }).filter({ visible: true }).first();
+      const box = async (locator, what) => { const b = await locator.boundingBox(); if (!b) throw new Error(`${what} has no box (it is not on the screen)`); return b; };
+      const button = (name) => page.getByRole('button', { name, exact: true });
+      const W = 390;
+      const near = (a, b, what) => assert(Math.abs(a - b) <= 2, `${what}: ${a} and ${b} should be the same`);
+      const inFeed = (text) => page.getByText(text).filter({ visible: true }).first();
+      const tags = () => page.getByText('Draft', { exact: true }).filter({ visible: true }).count();
+      const feedOpen = async () => { await go('/me'); await label('Notes').click(); await page.getByText('Notes stay on this phone.', { exact: true }).waitFor(); };
+
+      step('open Me, choose Notes and tap the pen: a blank page');
+      await feedOpen();
+      await page.getByRole('button', { name: 'Write a note', exact: true }).click();
+      await waitPath(page, '/diary/new', 'the address after the pen');
+      const bodyField = page.getByRole('textbox', { name: 'Page text' });
+      await bodyField.waitFor();
+
+      step('a blank page cannot be published or read, and has no Save draft yet');
+      await eventually(() => button('Publish this note').isDisabled(), (v) => v === true, { what: 'Publish is off on a blank page' });
+      await eventually(() => button('Read this page').isDisabled(), (v) => v === true, { what: 'Read is off on a blank page' });
+      await eventually(() => button('Save draft').count(), (n) => n === 0, { what: 'the number of Save draft buttons on a blank page' });
+
+      step('write a few words: Save draft appears at the top right, and the date says Draft');
+      await bodyField.fill('Rain over the meseta, soup at noon.');
+      await button('Save draft').waitFor();
+      const save = await box(button('Save draft'), 'Save draft');
+      assert(save.y < 150, 'Save draft is in the top bar');
+      assert(save.x + save.width > W / 2, 'Save draft is on the right');
+      await page.getByText(/ · Draft$/).first().waitFor();
+
+      step('the marks (Bold, Italic, Heading, Bulleted list, Quote) are inside the text box, under the text and above the bottom row');
+      const title = await box(page.getByRole('textbox', { name: 'Page title' }), 'the title field');
+      const text = await box(bodyField, 'the text field');
+      const read = await box(button('Read this page'), 'Read');
+      const publish = await box(button('Publish this note'), 'Publish');
+      for (const name of ['Bold', 'Italic', 'Heading', 'Bulleted list', 'Quote']) {
+        const b = await box(button(name), name);
+        assert(b.x >= title.x - 1 && b.x + b.width <= title.x + title.width + 1, `${name} is inside the box, not edge to edge on the screen`);
+        assert(b.y >= text.y + text.height - 2, `${name} is under the text`);
+        assert(b.y + b.height <= read.y, `${name} is above the bottom row`);
+      }
+
+      step('Read is the first third and Publish the other two thirds of one row at the bottom, both big enough to touch');
+      near(read.y, publish.y, 'one row');
+      assert(read.y > 500, 'the row is at the bottom of the screen');
+      assert(read.height >= 48 && publish.height >= 48, 'both are at least 48 high');
+      near(read.x, 16, 'Read starts at the margin');
+      near(publish.x + publish.width, W - 16, 'Publish ends at the margin');
+      assert(publish.x >= read.x + read.width + 8, 'a gap between them');
+      const ratio = publish.width / read.width;
+      assert(ratio > 1.9 && ratio < 2.1, `Publish is twice as wide as Read (${publish.width} against ${read.width})`);
+
+      step('Read shows the page as it will be read; the same place says Edit, and the marks are gone until it is opened again');
+      await button('Read this page').click();
+      await button('Edit this page').waitFor();
+      await eventually(() => button('Bold').count(), (n) => n === 0, { what: 'the number of marks while the page is read' });
+      await eventually(() => button('Save draft').count(), (n) => n === 0, { what: 'Save draft while the page is read' });
+      const edit = await box(button('Edit this page'), 'Edit');
+      near(edit.x, read.x, 'Edit is where Read was');
+      near(edit.width, read.width, 'and as wide');
+      await button('Edit this page').click();
+      await bodyField.waitFor();
+      await button('Save draft').waitFor();
+
+      step('Save draft goes back to the feed, where the note is, with a Draft tag');
+      await button('Save draft').click();
+      await waitPath(page, '/me', 'the address after Save draft');
+      await inFeed('Rain over the meseta, soup at noon.').waitFor();
+      await eventually(tags, (n) => n === 1, { what: 'the Draft tags in the feed' });
+
+      step('open the draft: it is read, with Edit and Publish at the bottom and no Save draft; Publish makes it a note and the tag goes');
+      await inFeed('Rain over the meseta, soup at noon.').click();
+      await eventually(() => pathOf(page), (p) => p.startsWith('/diary/') && p !== '/diary/new', { what: 'the address of the page' });
+      await button('Edit this page').waitFor();
+      await eventually(() => button('Save draft').count(), (n) => n === 0, { what: 'Save draft on a page that is read' });
+      await button('Publish this note').click();
+      await waitPath(page, '/me', 'the address after Publish');
+      await inFeed('Rain over the meseta, soup at noon.').waitFor();
+      await eventually(tags, (n) => n === 0, { what: 'the Draft tags in the feed after Publish' });
+
+      step('a published note that is read has Edit alone, across the whole row; written, it has Read and Done, and no Save draft');
+      await inFeed('Rain over the meseta, soup at noon.').click();
+      await button('Edit this page').waitFor();
+      await eventually(() => button('Publish this note').count(), (n) => n === 0, { what: 'Publish on a note that is published' });
+      const only = await box(button('Edit this page'), 'Edit (alone)');
+      near(only.x, 16, 'Edit starts at the margin');
+      near(only.x + only.width, W - 16, 'and ends at the margin');
+      await button('Edit this page').click();
+      await button('Done').waitFor();
+      await eventually(() => button('Save draft').count(), (n) => n === 0, { what: 'Save draft on a note that is published' });
+      await button('Done').click();
+      await waitPath(page, '/me', 'the address after Done');
+      await eventually(tags, (n) => n === 0, { what: 'the Draft tags after Done: editing a published note keeps it published' });
+    },
+  },
+  {
     name: 'Library: the banner of the Bible tab opens /library/daily, the whole banner and the "Read today" button alike',
     persona: 'in',
     async run({ page, step, go }) {

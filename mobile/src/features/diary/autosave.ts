@@ -10,6 +10,9 @@
 //              so adding files while a save of the text is pending cannot race it (and the text typed so far goes along).
 //   removeMedia() / setPlace()  a file taken off the page, a place put on it or taken off: written at once (a name typed for the
 //              place is written after the usual short wait).
+//   publish() / saveDraft()  the page becomes a published note, or is kept as a draft: written at once, with everything typed. A page
+//              begun in this editor is a draft until it is published, and autosave never changes what a page is: a published page
+//              that is edited stays published. When the write fails the page is what it was, and the answer says why.
 //
 // A page begun in this editor exists only while it has something in it besides spaces and line breaks (a photo, a video or a
 // place counts as something): it is created with the first character, and if the person erases everything again it is taken back,
@@ -17,7 +20,7 @@
 // back: emptied, it stays as an empty page, because nothing is deleted unless the person says so.
 import { mediaOf, type DiaryMedia, type PickedAsset, type Refusal } from './media';
 import { normalizePlace, type DiaryPlace } from './place';
-import type { AttachResult, DiaryEntry, SaveProblem, SaveResult } from './store';
+import { statusOf, type AttachResult, type DiaryEntry, type NoteStatus, type SaveProblem, type SaveResult } from './store';
 
 /** How long after the last keystroke the page is written. */
 export const AUTOSAVE_MS = 600;
@@ -38,6 +41,8 @@ export type SaverView = {
   place: DiaryPlace | null;
   /** Counts the changes of the files and the place, so a screen that compares views sees them. */
   rev: number;
+  /** The page is a draft (every page begun here, until it is published), not a published note. */
+  draft: boolean;
 };
 
 /** What adding files came to: how many were added, why the others were not, or why the page could not be written (then none were added). */
@@ -73,6 +78,10 @@ export type PageSaver = {
   attach: (picked: PickedAsset[]) => Promise<AttachOutcome>;
   removeMedia: (id: string) => void;
   setPlace: (place: DiaryPlace | null, options?: { soon?: boolean }) => void;
+  /** The page becomes a published note, written now. A page that is blank (nothing in it, begun here) is not written at all. */
+  publish: () => Promise<SaveResult>;
+  /** The page is kept as a draft, written now. */
+  saveDraft: () => Promise<SaveResult>;
 };
 
 export function createPageSaver(deps: SaverDeps, initial: DiaryEntry | null = null): PageSaver {
@@ -88,12 +97,13 @@ export function createPageSaver(deps: SaverDeps, initial: DiaryEntry | null = nu
   let body = initial?.body ?? '';
   let media: DiaryMedia[] = mediaOf(initial);
   let place: DiaryPlace | null = normalizePlace(initial?.place);
+  let status: NoteStatus = initial ? statusOf(initial) : 'draft'; // what a page is: a page begun here is a draft until it is published
   let rev = 0;
   let stored = initial != null;
-  // What was handed to the store most recently: the text, and a short signature of the files and the place. After a failed write,
-  // or once the page was taken back, it is null: what is on the phone is not what the screen shows, so the next flush writes it
+  // What was handed to the store most recently: the text, and a short signature of the files, the place and the status. After a failed
+  // write, or once the page was taken back, it is null: what is on the phone is not what the screen shows, so the next flush writes it
   // again even if nothing has changed.
-  const extra = (m: DiaryMedia[] = media, p: DiaryPlace | null = place) => `${m.map((x) => x.id).join(',')}|${p ? `${p.lat},${p.lon},${p.name ?? ''},${p.at}` : ''}`;
+  const extra = (m: DiaryMedia[] = media, p: DiaryPlace | null = place, s: NoteStatus = status) => `${m.map((x) => x.id).join(',')}|${p ? `${p.lat},${p.lon},${p.name ?? ''},${p.at}` : ''}|${s}`;
   let sent: { title: string; body: string; extra: string } | null = initial ? { title, body, extra: extra() } : null;
   let timer: unknown = null;
   let writing = 0;
@@ -104,8 +114,8 @@ export function createPageSaver(deps: SaverDeps, initial: DiaryEntry | null = nu
   let warned = false; // the person has been told, by a leave that stayed, that what is typed could not be written
   let asking: Promise<'leave' | 'stay'> | null = null;
 
-  const view = (): SaverView => ({ status: timer != null || writing > 0 ? 'saving' : problem ? 'failed' : 'saved', stored, problem, media, place, rev });
-  const sig = (v: SaverView) => `${v.status}|${v.stored}|${v.problem}|${v.rev}`;
+  const view = (): SaverView => ({ status: timer != null || writing > 0 ? 'saving' : problem ? 'failed' : 'saved', stored, problem, media, place, rev, draft: status === 'draft' });
+  const sig = (v: SaverView) => `${v.status}|${v.stored}|${v.problem}|${v.rev}|${v.draft}`;
   let told = sig(view());
   const notify = () => {
     const v = view();
@@ -137,7 +147,8 @@ export function createPageSaver(deps: SaverDeps, initial: DiaryEntry | null = nu
   };
 
   // The page as it is now. The files and the place are in it only when there are some: the store takes a page without them to have none.
-  const entryNow = (stamp: string): DiaryEntry => ({ id: id as string, createdAt: createdAt as string, updatedAt: stamp, title, body, ...(media.length > 0 ? { media } : {}), ...(place ? { place } : {}) });
+  // The status is always in it: the store writes a draft as a draft and a published page as one that says nothing.
+  const entryNow = (stamp: string): DiaryEntry => ({ id: id as string, createdAt: createdAt as string, updatedAt: stamp, title, body, status, ...(media.length > 0 ? { media } : {}), ...(place ? { place } : {}) });
 
   const send = () => {
     const snap = { title, body, extra: extra() };
@@ -202,6 +213,7 @@ export function createPageSaver(deps: SaverDeps, initial: DiaryEntry | null = nu
     const snap = { title, body, extra: extra() };
     const before = media;
     const placeThen = place;
+    const statusThen = status;
     let result: AttachResult = { ok: false, reason: 'not-saved' };
     return new Promise<AttachOutcome>((resolve) => {
       run(async () => {
@@ -219,7 +231,7 @@ export function createPageSaver(deps: SaverDeps, initial: DiaryEntry | null = nu
           media = [...media, ...result.added];
           rev += 1;
           // what is on the phone now: the text and the files as they were handed over, plus the new ones
-          sent = { title: snap.title, body: snap.body, extra: extra([...before, ...result.added], placeThen) };
+          sent = { title: snap.title, body: snap.body, extra: extra([...before, ...result.added], placeThen, statusThen) };
         }
         resolve({ added: result.added.length, refused: result.refused, failed: null });
       });
@@ -252,6 +264,22 @@ export function createPageSaver(deps: SaverDeps, initial: DiaryEntry | null = nu
     notify();
   };
 
+  /**
+   * The page is made a draft or a published note, and written now. When the write does not happen the page is what it was (the screen
+   * then still says what the page is, and says why it did not work), so nothing ever reads "published" that is not on the phone.
+   */
+  const become = async (next: NoteStatus): Promise<SaveResult> => {
+    if (closed) return tail;
+    const was = status;
+    status = next;
+    warned = false;
+    const res = await flush();
+    if (!res.ok && status === next && next !== was) { status = was; notify(); }
+    return res;
+  };
+  const publish = () => become('published');
+  const saveDraft = () => become('draft');
+
   const tryLeave = (): Promise<'leave' | 'stay'> => {
     // After the flush has settled, what decides is the state: nothing pending and nothing failed (not the answer of some older write).
     asking ??= flush()
@@ -277,5 +305,5 @@ export function createPageSaver(deps: SaverDeps, initial: DiaryEntry | null = nu
     return ok;
   };
 
-  return { edit, flush, tryLeave, discard, view, attach, removeMedia, setPlace };
+  return { edit, flush, tryLeave, discard, view, attach, removeMedia, setPlace, publish, saveDraft };
 }
