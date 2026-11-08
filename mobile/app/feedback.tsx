@@ -4,7 +4,8 @@ import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '@/components/AppText';
 import { Pill } from '@/components/Pill';
-import { Card, Chip, IconButton } from '@/components/ui';
+import { BackButton } from '@/components/BackButton';
+import { Card, Chip } from '@/components/ui';
 import { FormMessage } from '@/components/auth/Field';
 import { isOfflineError } from '@/lib/net';
 import { FEEDBACK_MAX, KIND_LABEL, FeedbackKind, feedbackProblem, mailSupport, sendFeedback } from '@/lib/support';
@@ -43,7 +44,7 @@ export default function Feedback() {
   return (
     <KeyboardAvoidingView style={{ flex: 1, backgroundColor: role.bg }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingTop: insets.top + layout.screenTop, paddingHorizontal: layout.screenMargin, paddingBottom: insets.bottom + 40, gap: 16 }}>
-        <IconButton name="back" label="Back" onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))} />
+        <BackButton />
         <View style={{ gap: 8 }}>
           <AppText variant="h2">Send feedback</AppText>
           <AppText variant="lead" muted>Tell us what works, what does not, or what you wish the app did on the Way. A person on the team reads every message.</AppText>

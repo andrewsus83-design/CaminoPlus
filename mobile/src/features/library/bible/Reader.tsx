@@ -1,12 +1,12 @@
 import { ComponentRef, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { NativeScrollEvent, NativeSyntheticEvent, Pressable, ScrollView, View, useWindowDimensions } from 'react-native';
+import { NativeScrollEvent, NativeSyntheticEvent, ScrollView, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { AppText } from '@/components/AppText';
-import { Icon } from '@/components/Icon';
+import { BackButton } from '@/components/BackButton';
+import { Pill } from '@/components/Pill';
 import { Screen } from '@/components/Screen';
-import { IconButton } from '@/components/ui';
-import { radius, role } from '@/theme';
+import { role } from '@/theme';
 import { verseKey } from '../search';
 import { useLibraryBookmarks } from '../useLibraryBookmarks';
 import { barCovers, roomUnder, scrollForBar } from './actionBar';
@@ -36,21 +36,6 @@ function chapterOf(place: Place): Chapter | null {
 
 /** How far under the top of the screen a verse that was linked to comes to rest. */
 const SCROLL_MARGIN = 90;
-
-/** The small button next to Back that opens the chapters of the book (the grid). */
-function ChaptersLink({ onPress }: { onPress: () => void }) {
-  return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel="All chapters of this book"
-      onPress={onPress}
-      style={({ pressed }) => ({ minHeight: 48, flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 16, borderRadius: radius.pill, backgroundColor: pressed ? role.sunken : role.surface, borderWidth: 1, borderColor: role.border })}
-    >
-      <AppText variant="label" maxFontSizeMultiplier={1.3} style={{ fontSize: 15, lineHeight: 20 }}>All chapters</AppText>
-      <Icon name="chevron" color={role.action} size={18} />
-    </Pressable>
-  );
-}
 
 /**
  * The reader: one chapter of a book, as a good Bible app shows it. At the top Back and the way to all the chapters of the book, the name of the book, the title
@@ -108,7 +93,6 @@ export function Reader({ place, verse }: { place: Place; verse: number | null })
     const down = scrollForBar(pageY, windowHeight, covered, BODY_LINE);
     if (down > 0) scroller.current?.scrollTo({ y: scrollY.current + down, animated: true });
   }, [windowHeight, covered]);
-  const goBack = () => (router.canGoBack() ? router.back() : router.replace(bookHref(place.code)));
   // Previous and Next replace this screen: Back still goes to where the reader came from (the chapters, the search, a link), not through every chapter read
   const go = (to: Place) => router.replace(readerHref({ code: to.code, chapter: to.chapter }));
 
@@ -122,8 +106,8 @@ export function Reader({ place, verse }: { place: Place; verse: number | null })
     <View style={{ flex: 1, backgroundColor: role.bg }}>
       <Screen tabBar={false} scrollRef={scroller} onScroll={onScroll}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-          <IconButton name="back" label="Back" onPress={goBack} />
-          <ChaptersLink onPress={() => router.push(bookHref(place.code))} />
+          <BackButton fallback={bookHref(place.code)} />
+          <Pill variant="ghost" compact label="All chapters" accessibilityLabel="All chapters of this book" onPress={() => router.push(bookHref(place.code))} />
         </View>
         <View style={{ gap: 2 }}>
           <AppText variant="h4" color={role.accentText} maxFontSizeMultiplier={READER_MAX_FONT_SCALE}>{book.name}</AppText>

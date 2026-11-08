@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { ActivityIndicator, Pressable, Share, View } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Screen } from '@/components/Screen';
 import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
 import { Pill } from '@/components/Pill';
 import { SampleNotice } from '@/components/SampleNotice';
+import { BackButton } from '@/components/BackButton';
 import { Card, IconButton, Photo, SectionLabel } from '@/components/ui';
 import { Badge } from '@/features/business/ui';
 import { OSM_COPYRIGHT_URL, OSM_CREDIT, amenityNames, kmIntoStageText, labelNames, mailtoUrl, offRouteText, openLink, osmObjectUrl, safeWebUrl, savedLine, telUrl, useStageStays, webLabel, type PlaceSource, type StayModel } from '@/features/places';
@@ -18,10 +19,9 @@ const SHARE_APP = 'Walking the Camino? CaminoPlus has offline maps, stays and a 
 type Fav = { on: boolean; toggle: () => void };
 
 function TopRow({ fav }: { fav: Fav }) {
-  const router = useRouter();
   return (
     <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-      <IconButton name="back" label="Back" onPress={() => router.back()} />
+      <BackButton fallback="/stays" />
       <View style={{ flexDirection: 'row', gap: 8 }}>
         <IconButton name="share" label="Share this stay" onPress={() => Share.share({ message: SHARE_APP }).catch(() => {})} />
         <IconButton name="heart" label={fav.on ? 'Remove favourite' : 'Add favourite'} active={fav.on} onPress={fav.toggle} />
@@ -175,7 +175,6 @@ function RealStay({ m, source, savedAt }: { m: StayModel; source: PlaceSource; s
 
 export default function StayDetail() {
   const { id, stage } = useLocalSearchParams<{ id: string; stage?: string }>();
-  const router = useRouter();
   const sample = stays.find((x) => x.id === id);
   // A real stay is read from the list of the stage it was opened from (the Stays tab passes it), which the app already has.
   const { rows, source, loading, savedAt } = useStageStays(sample ? null : stage);
@@ -184,7 +183,7 @@ export default function StayDetail() {
   if (m) return <RealStay m={m} source={source} savedAt={savedAt} />;
   return (
     <Screen>
-      <IconButton name="back" label="Back" onPress={() => router.back()} />
+      <BackButton fallback="/stays" />
       {loading ? <ActivityIndicator accessibilityLabel="Loading the stay" color={role.action} style={{ marginTop: 24 }} /> : <AppText>Stay not found.</AppText>}
     </Screen>
   );

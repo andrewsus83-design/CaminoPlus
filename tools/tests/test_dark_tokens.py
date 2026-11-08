@@ -173,6 +173,86 @@ class Contrast(unittest.TestCase):
             self.assertIn(name, TOKENS["dark"]["role"], f"dark.role.{name}")
 
 
+# The stem of Inter in font units (of 2048 per em): the width of the ink of the glyph "l" (lower case) and "I" (capital) in the static files of
+# @expo-google-fonts/inter that the app loads, by weight. Taken with fontTools and again by drawing the glyphs at 2048 px and counting the ink;
+# themeScheme.test.ts (npm run test:lib) reads them from the font files themselves, and so does the last test of TabWeight when fontTools is installed.
+INTER_UNITS = 2048
+INTER_STEM = {300: (136, 142), 400: (180, 190), 600: (260, 267), 700: (300, 305)}
+INTER_FILE = {300: "300Light/Inter_300Light.ttf", 400: "400Regular/Inter_400Regular.ttf", 600: "600SemiBold/Inter_600SemiBold.ttf", 700: "700Bold/Inter_700Bold.ttf"}
+# What the tab bar draws (mobile/src/components/TabBar.tsx; .cp-tab in design/index.html): a 28 px icon in a 24 unit box and a 14 px label
+TAB_ICON_PX, ICON_BOX, TAB_LABEL_PX = 28, 24, 14
+# The owner saw the inactive icons thicker than the inactive labels (2026-11-08): the stroke and the stem of the label are within this share of each other
+STROKE_OFF_STEM = 0.10
+
+
+class TabWeight(unittest.TestCase):
+    def drawn(self, mode: str):
+        """(the stroke of the inactive icon in px, [the stems of its label in px: lower case, capital])"""
+        tab = TOKENS["tab"]
+        stroke = tab["inactiveStroke"][mode] * TAB_ICON_PX / ICON_BOX
+        return stroke, [units / INTER_UNITS * TAB_LABEL_PX for units in INTER_STEM[tab["inactiveLabelWeight"][mode]]]
+
+    def test_the_inactive_icon_is_as_thin_as_the_stem_of_its_label_in_light_and_in_dark(self):
+        for mode in ("light", "dark"):
+            stroke, stems = self.drawn(mode)
+            for stem, what in zip(stems, ("lower case", "capital")):
+                off = stroke / stem - 1
+                self.assertLessEqual(abs(off), STROKE_OFF_STEM, f"{mode}: the icon is {stroke:.3f} px thick, the {what} stem of its label {stem:.3f} px ({off * 100:+.1f} percent)")
+
+    def test_the_inactive_tabs_stay_thin_and_light(self):
+        # the owner's wish: both thin and Light. A heavier label with a matching stroke would pass the test above and still be a different design.
+        for mode in ("light", "dark"):
+            self.assertEqual(TOKENS["tab"]["inactiveLabelWeight"][mode], 300, mode)
+            self.assertLess(TOKENS["tab"]["inactiveStroke"][mode], 1.0, mode)
+            self.assertGreaterEqual(TOKENS["tab"]["activeStroke"][mode], 1.5 * TOKENS["tab"]["inactiveStroke"][mode], f"{mode}: the active icon is much heavier")
+
+    def test_the_old_stroke_would_fail(self):
+        # 1.3 was drawn until 2026-11-08: 1.517 px against a stem of 0.930 px
+        stroke = 1.3 * TAB_ICON_PX / ICON_BOX
+        self.assertGreater(stroke / self.drawn("light")[1][0], 1.5)
+
+    def test_the_sizes_the_stroke_is_worked_out_for_are_the_sizes_that_are_drawn(self):
+        app = (ROOT / "mobile" / "src" / "components" / "TabBar.tsx").read_text(encoding="utf-8")
+        self.assertRegex(app, rf"<Icon name=\{{route\.name as IconName\}} color=\{{color\}} size=\{{{TAB_ICON_PX}\}}")
+        self.assertRegex(app, rf"fontFamily: weight\.font, fontSize: {TAB_LABEL_PX},")
+        icon = (ROOT / "mobile" / "src" / "components" / "Icon.tsx").read_text(encoding="utf-8")
+        self.assertIn(f'viewBox="0 0 {ICON_BOX} {ICON_BOX}"', icon)
+        page = (ROOT / "design" / "index.html").read_text(encoding="utf-8")
+        self.assertRegex(page, rf"\.cp-tab \{{[^}}]*font-size: {TAB_LABEL_PX}px")
+        self.assertRegex(page, rf"\.cp-tab \.cp-icon \{{[^}}]*width: {TAB_ICON_PX}px; height: {TAB_ICON_PX}px")
+
+    def test_the_design_page_draws_the_tokens(self):
+        tab = TOKENS["tab"]
+        css = (ROOT / "design" / "tokens.css").read_text(encoding="utf-8")
+        self.assertRegex(css, rf"--cp-tab-inactive-stroke:\s*{tab['inactiveStroke']['light']}px;")
+        self.assertRegex(css, rf"--cp-tab-inactive-weight:\s*{tab['inactiveLabelWeight']['light']};")
+        page = (ROOT / "design" / "index.html").read_text(encoding="utf-8")
+        self.assertRegex(page, r"\.cp-tab \{[^}]*font-weight: var\(--cp-tab-inactive-weight\)")
+        self.assertRegex(page, r"\.cp-tab \.cp-icon \{[^}]*stroke-width: var\(--cp-tab-inactive-stroke\)")
+        self.assertIn(f"--cp-tab-inactive-stroke:{tab['inactiveStroke']['dark']}px;--cp-tab-inactive-weight:{tab['inactiveLabelWeight']['dark']};", page, "the dark phones carry the dark values")
+
+    def test_the_stems_are_the_fonts_own(self):
+        try:
+            from fontTools.ttLib import TTFont
+        except ImportError:
+            self.skipTest("fontTools is not installed (the numbers are checked from the font files by themeScheme.test.ts)")
+        base = ROOT / "mobile" / "node_modules" / "@expo-google-fonts" / "inter"
+        if not base.exists():
+            self.skipTest("mobile/node_modules is not installed")
+        for weight, rel in INTER_FILE.items():
+            font = TTFont(base / rel)
+            self.assertEqual(font["head"].unitsPerEm, INTER_UNITS)
+            glyphs = font.getGlyphSet()
+            cmap = font.getBestCmap()
+            from fontTools.pens.boundsPen import BoundsPen
+            got = []
+            for ch in "lI":
+                pen = BoundsPen(glyphs)
+                glyphs[cmap[ord(ch)]].draw(pen)
+                got.append(pen.bounds[2] - pen.bounds[0])
+            self.assertEqual(tuple(got), INTER_STEM[weight], f"Inter {weight}")
+
+
 class Shape(unittest.TestCase):
     def test_every_dark_color_is_a_known_color_with_a_hex_value(self):
         for name, value in TOKENS["dark"]["color"].items():
