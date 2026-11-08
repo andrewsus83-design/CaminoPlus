@@ -80,6 +80,15 @@ check('the bar is ONE button for a screen reader ("Continue reading, Genesis 3")
   assert.match(src['spot.ts'], /spoken: `\$\{CONTINUE_TITLE\}, \$\{book\.title\}\$\{chapter \? `, \$\{chapter\}` : ''\}`/, 'and a book "Continue reading, The Imitation of Christ, Chapter 2"');
 });
 
+check('the X is a close, not a way back: it draws the close glyph and is named "Hide Continue reading"; no file of the bar draws the back chevron, has a control called Back or uses the Back button of the app (navigation.test.ts guards that one component)', () => {
+  for (const f of FILES) {
+    assert.doesNotMatch(src[f], /\b(?:name|icon|direction)=(["'])back\1|\bname: ['"]back['"]|(?:\blabel|accessibilityLabel)=["']Back["']|BackButton|IconButton/, `${f}: nothing of a Back in the bar`);
+  }
+  assert.match(bar, /<Icon name="close" color=\{role\.onInverse\}/, 'the X is the close glyph');
+  assert.match(bar, /accessibilityLabel=\{HIDE_LABEL\}\s+onPress=\{hide\}/, 'and it hides the bar, which says so');
+  assert.doesNotMatch(read('src/features/library/continueBar/spot.ts'), /icon: 'back'|'back'/, 'the glyph of a place is the Bible or an open book, never the back chevron');
+});
+
 check('the close button is at least 44 by 44 (48), the bar at least 64 high, and both icons are in the icon set of the app', () => {
   assert.match(src['barLayout.ts'], /export const CLOSE_SIZE = 48;/);
   assert.match(bar, /width: CLOSE_SIZE, height: CLOSE_SIZE/);
