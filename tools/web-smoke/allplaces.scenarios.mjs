@@ -140,6 +140,11 @@ export const ALL_PLACES_SCENARIOS = [
       assert.equal(labels.find((l) => l.startsWith('Burgos')), 'Burgos, 2 journeys', 'both Burgos posts are under Burgos, once');
       assert.equal(labels.find((l) => l.startsWith('León')), 'León, no journeys yet');
       assert.equal(new Set(labels.map((l) => l.split(',')[0])).size, POINTS, 'no place twice');
+      step('a stamp with journeys carries the number of them, and the name under it; a dashed one carries only its name');
+      const words = async (name) => (await page.getByRole('button', { name, exact: true }).innerText()).replace(/\s+/g, ' ').trim();
+      assert.equal(await words('Zubiri, 2 journeys'), '2 Zubiri');
+      assert.equal(await words('Pamplona, 1 journey'), '1 Pamplona');
+      assert.equal(await words('León, no journeys yet'), 'León');
       step('three in a row, and every stamp is a touch target of 48 or more');
       const boxes = await Promise.all(Array.from({ length: POINTS }, (_, i) => box(all.nth(i), `stamp ${i}`)));
       near(boxes[0].y, boxes[1].y, 2, 'the first two stamps share a row');

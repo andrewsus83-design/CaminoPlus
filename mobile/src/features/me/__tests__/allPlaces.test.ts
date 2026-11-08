@@ -232,6 +232,22 @@ check('the row of destinations opens at the next destination, and keeps clear of
 
 /* ---------------------------------------------------------------- the screen: what the files say */
 
+check('the stamps are the passport\'s: three in a row, a 78 round, filled in gold-soft with the number of posts where there is a journey, dashed where there is none, each one a button', () => {
+  const src = read('src/features/me/AllPlaces.tsx').split('\n').filter((l) => !/^\s*(\/\/|\/?\*)/.test(l)).join('\n');
+  assert.match(src, /const SLOT = 78;/);
+  assert.match(src, /width: '33\.33%'/, 'three in a row');
+  assert.match(src, /backgroundColor: done \? c\.goldSoft : 'transparent', borderWidth: done \? 0 : 2, borderStyle: 'dashed', borderColor: role\.borderStrong/, 'filled where there is a post, dashed where there is none');
+  assert.match(src, /rotate: done \? '-8deg' : '0deg'/, 'a filled stamp is turned a little, as in the passport');
+  assert.match(src, /\{done && \(/, 'the count is on the filled stamps only');
+  assert.match(src, /\{p\.posts\.length\}<\/AppText>/, 'the number of posts is on the stamp');
+  assert.match(src, /backgroundColor: role\.highlight[^}]*borderColor: role\.bg/, 'the count is a gold round on a ring of the page colour');
+  assert.match(src, /color=\{role\.onHighlight\}/, 'its number is the text on gold');
+  assert.match(src, /accessibilityRole="button" accessibilityLabel=\{stampLabel\(p\)\} onPress=\{onPress\}/, 'a stamp is a button with its words');
+  assert.match(src, /<ProgressBar value=\{places\.length \? visited \/ places\.length : 0\} \/>/, 'the progress bar of the passport');
+  assert.match(src, /placesLine\(visited, places\.length\)/, '"5 of 33 places"');
+  assert.doesNotMatch(src, /#[0-9a-fA-F]{3,8}\b|rgba?\(/, 'no colour of its own');
+});
+
 check('the logic files import nothing from React, React Native or the app: plain node can load them', () => {
   for (const f of ['src/features/me/routePoints.ts', 'src/features/me/journeyView.ts']) {
     const imports = [...read(f).matchAll(/^import .* from '([^']+)'/gm)].map((m) => m[1]);
