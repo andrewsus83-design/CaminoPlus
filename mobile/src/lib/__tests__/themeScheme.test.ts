@@ -53,11 +53,12 @@ check('light mode is the light palette of design/tokens.json, color by color and
   assert.equal(role.onInverse, light.parchment);
   assert.equal(role.onInverseAccent, light.goldSoft);
   assert.equal(role.onHighlight, light.blue);
-  // the tab bar has roles of its own now; in light mode they are exactly what it always drew (the action blue and the muted stone)
+  // the tab bar has roles of its own: in light mode the active tab is the action blue it always was, and the inactive tabs are a lighter,
+  // quieter stone than muted text (the owner asked on 2026-11-08 for inactive tabs that are lighter and more transparent)
   assert.equal(role.tabActive, light.blue);
-  assert.equal(role.tabInactive, light.stone600);
+  assert.equal(role.tabInactive, light.stone550);
   assert.equal(role.tabActive, role.action, 'light mode: the active tab is the blue it always was');
-  assert.equal(role.tabInactive, role.muted, 'light mode: the inactive tab is the stone it always was');
+  assert.notEqual(role.tabInactive, role.muted, 'light mode: the inactive tab is lighter than muted text');
 });
 
 check('dark mode is the dark section of design/tokens.json: nothing about it is defined a second time in the app', () => {
@@ -133,17 +134,17 @@ check('the scrim is one value and belongs to the theme', () => {
   assert.match(scrim, /^rgba\(\s*20\s*,\s*54\s*,\s*93\s*,\s*0\.\d+\)$/);
 });
 
-check('on the tab bar the active tab has at least 1.5 times the contrast of an inactive one, in both modes, and in dark mode the inactive ones are not darker than muted text', () => {
-  // In dark mode the active tab used to be the action blue (7.0:1) and the inactive ones muted text (7.4:1): the active
-  // tab was the quieter of the two. A lighter inactive tab must never bring that back.
+check('on the tab bar the active tab has at least 1.5 times the contrast of an inactive one, in both modes, and the inactive ones are quieter than muted text but never below 4.5 : 1', () => {
+  // The owner asked (2026-11-08) for inactive tabs that are lighter and more transparent in light and dark mode, so the active one stands
+  // out. They recede, but they never vanish again (a fixed navy at 42% was 1.1:1 on the dark bar, see the Don't on the design page).
   for (const scheme of ['light', 'dark'] as const) {
     applyScheme(scheme);
     const active = ratio(role.tabActive, role.surface);
     const inactive = ratio(role.tabInactive, role.surface);
     assert.ok(active >= 1.5 * inactive, `${scheme}: the active tab is ${active.toFixed(2)}:1 and an inactive one ${inactive.toFixed(2)}:1 on the bar`);
+    assert.ok(inactive >= 4.5, `${scheme}: the inactive tabs are ${inactive.toFixed(2)}:1 on the bar, they must stay readable`);
+    assert.ok(inactive <= ratio(role.muted, role.surface), `${scheme}: the inactive tabs are quieter than muted text`);
   }
-  applyScheme('dark');
-  assert.ok(ratio(role.tabInactive, role.surface) >= ratio(role.muted, role.surface), 'dark mode: the inactive tabs were lifted because they were hard to see');
   applyScheme('light');
 });
 

@@ -58,7 +58,7 @@ const roleFor = (k: Palette, scheme: Scheme) => ({
   onInverseAccent: pick('textInverseAccent', k, scheme),
   /** The active tab of the bottom tab bar (icon and label): the brand blue in light mode, white in dark mode. Only the tab bar uses it. */
   tabActive: pick('tabActive', k, scheme),
-  /** The inactive tabs (icon and label): stone in light mode, in dark mode a little lighter than muted text so they stay easy to see. Only the tab bar uses it. */
+  /** The inactive tabs (icon and label): a lighter, quieter stone than muted text in both modes, so the active tab stands out; never below 4.5 : 1 on the bar. Only the tab bar uses it. */
   tabInactive: pick('tabInactive', k, scheme),
 });
 

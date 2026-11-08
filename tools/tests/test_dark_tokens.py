@@ -51,7 +51,7 @@ def contrast(a: str, b: str) -> float:
 
 
 TEXT, GRAPHIC, PLACEHOLDER = 4.5, 3.0, 3.0
-# On the tab bar the active tab has at least this many times the contrast of an inactive one (light mode: 2.0, dark mode: 1.7)
+# On the tab bar the active tab has at least this many times the contrast of an inactive one (light mode: 2.6, dark mode: 2.8)
 ACTIVE_OVER_INACTIVE = 1.5
 
 # (foreground role, background role, needed ratio, where it is drawn)
@@ -130,17 +130,21 @@ class Contrast(unittest.TestCase):
             active, inactive = contrast(r["tabActive"], r["surface"]), contrast(r["tabInactive"], r["surface"])
             self.assertGreaterEqual(active, ACTIVE_OVER_INACTIVE * inactive, f"{mode}: active {active:.2f}:1, inactive {inactive:.2f}:1 on the bar")
 
-    def test_the_dark_inactive_tab_is_not_darker_than_muted_text(self):
-        # it was lifted because it was hard to see; it must not slip back below the muted text colour it started from
-        r = roles("dark")
-        self.assertGreaterEqual(contrast(r["tabInactive"], r["surface"]), contrast(r["textMuted"], r["surface"]))
+    def test_the_inactive_tab_is_quieter_than_muted_text_but_readable(self):
+        # the owner asked (2026-11-08) for inactive tabs that are lighter and more transparent in both modes, so the active tab stands
+        # out; they still pass the text floor, so they can never vanish again (a fixed navy at 42% was 1.1:1 on the dark bar)
+        for mode in ("light", "dark"):
+            r = roles(mode)
+            inactive = contrast(r["tabInactive"], r["surface"])
+            self.assertGreaterEqual(inactive, TEXT, f"{mode}: {inactive:.2f}:1")
+            self.assertLessEqual(inactive, contrast(r["textMuted"], r["surface"]), f"{mode}: quieter than muted text")
 
-    def test_light_mode_tab_colours_are_the_ones_the_tab_bar_always_had(self):
-        # the tab bar used to draw the active tab in action (blue) and the inactive ones in textMuted (stone), in both modes
+    def test_light_mode_tab_colours(self):
+        # the active tab is the action blue it always was; the inactive tabs are a lighter stone (stone550) than textMuted
         r = roles("light")
         self.assertEqual(r["tabActive"], r["action"])
-        self.assertEqual(r["tabInactive"], r["textMuted"])
-        self.assertEqual((r["tabActive"], r["tabInactive"]), ("#14365D", "#556274"), "the light tab colours as they were published")
+        self.assertNotEqual(r["tabInactive"], r["textMuted"])
+        self.assertEqual((r["tabActive"], r["tabInactive"]), ("#14365D", "#697584"), "the light tab colours as they are published")
 
     def test_the_tab_roles_have_a_dark_value_of_their_own(self):
         # without one, dark mode would fall back to the light mapping (blue, stone600) and the tab bar would look as before
