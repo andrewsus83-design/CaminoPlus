@@ -4,6 +4,7 @@
 // Only storage keys ("<user id>/posts/...") are kept in the database, never full links.
 import { supabase } from './supabase';
 import { SIGNED_URL_TTL_SECONDS, createUrlMemo } from './media/urlMemo';
+import { stripJpegLocation } from './media/exif';
 
 export const MEDIA_BUCKET = {
   /** Public profile pictures, one per pilgrim. */
@@ -35,6 +36,11 @@ export async function upload(bucket: MediaBucket, path: string, uri: string, con
     body = await (await fetch(uri)).arrayBuffer();
   } catch {
     throw new MediaStorageError('The file is no longer on this phone.', { status: 400, missing: true });
+  }
+  // No photo leaves the phone with its GPS position, also when this build could not save it again (media/exif.ts).
+  if (contentType === 'image/jpeg') {
+    const clean = stripJpegLocation(new Uint8Array(body));
+    if (clean.removed) body = clean.bytes.buffer.slice(clean.bytes.byteOffset, clean.bytes.byteOffset + clean.bytes.byteLength) as ArrayBuffer;
   }
   const up = await supabase.storage.from(bucket).upload(path, body, { contentType, upsert: o.upsert ?? true });
   if (up.error) {

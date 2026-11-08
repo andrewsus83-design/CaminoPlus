@@ -12,7 +12,7 @@ const MB = 1024 * 1024;
 
 /** Free: photos keep at most 1280 px on the long side, enough to fill a phone screen sharply. */
 export const FREE_PHOTO_EDGE = 1280;
-/** Pilgrim Plus: photos keep up to 3840 px on the long side (4K), the "higher resolution" of the plan. */
+/** Pilgrim Plus: photos keep up to 3840 px on the long side, the "higher resolution" of the plan. */
 export const PLUS_PHOTO_EDGE = 3840;
 /** Free: JPEG quality 0.8, where a photo still looks clean and is a fraction of the original size. */
 export const FREE_JPEG_QUALITY = 0.8;
@@ -28,7 +28,7 @@ export const THUMB_EDGE = 480;
 export const THUMB_JPEG_QUALITY = 0.7;
 /** Free: video up to 720p (1280 px on the long side). */
 export const FREE_VIDEO_EDGE = 1280;
-/** Pilgrim Plus: video up to 1080p (1920 px on the long side); 4K video needs server-side work and comes later. */
+/** Pilgrim Plus: video up to 1080p (1920 px on the long side); 4K video is planned and needs work on the server. */
 export const PLUS_VIDEO_EDGE = 1920;
 /** Everybody: a clip is at most 60 seconds (the same limit the post composer always had). */
 export const MAX_VIDEO_SECONDS = 60;

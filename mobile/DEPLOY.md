@@ -13,6 +13,12 @@ What reaches users when you merge to `main`, what does not, and how to check wha
 
 A merge never changes an app that is already installed on a phone. Only a new build or an update does.
 
+## Build 1.2.0: the native additions
+
+Build 1.2.0 brings new native modules in ONE build, so the native fingerprint moves on purpose (other additions of 1.2.0 add their own lines here):
+
+- `expo-image-manipulator` (~58.0.16): photos are made smaller and saved again before upload, which also removes their location data. Fingerprint with this module alone on top of `main`: `968d562ad49070ff56824415a924b066b47613aa`. A build without it keeps working: photos then go up as the picker gives them, within the plan's per-file limit. How to check it on a phone: [docs/MEDIA.md](docs/MEDIA.md).
+
 ## Release 1.1.0: what to build and how to see it
 
 What is in the release: [CHANGELOG.md](../CHANGELOG.md). It changes the app's JavaScript and assets (and, around the app, data, tools and documents), with no new native module, permission or icon, so **the native fingerprint did not move:
