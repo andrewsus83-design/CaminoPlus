@@ -245,6 +245,7 @@ Chromium; a test checks they agree). Bump both on purpose, with the tests looked
 | [scenarios.mjs](scenarios.mjs) | the walks a person does |
 | [me.scenarios.mjs](me.scenarios.mjs) | the walks of Me: the header with the gear alone, the chat button and where it opens, the card of Journey (also in the sample journey), the card of Notes |
 | [pilgrim.scenarios.mjs](pilgrim.scenarios.mjs) | the walks of the profile of another pilgrim: a friend, a stranger, a private one, one that is not there, no signal, the name of a comment author, and that nothing private is on it |
+| [share.scenarios.mjs](share.scenarios.mjs) | the walks of share links: Share plan link on Plan (the question first, Cancel makes nothing, what is sent and what reaches the share sheet), Settings > Shared links and Stop sharing |
 | [allplaces.scenarios.mjs](allplaces.scenarios.mjs) | the walks of the All item of Me: the row, the stamps of the route, the journeys at a place, the way back, Plan and Health, no destination, no places |
 | [bible.scenarios.mjs](bible.scenarios.mjs) | the walks of the Bible tab and the reader (kept apart so the other walks stay short) |
 | [books.scenarios.mjs](books.scenarios.mjs) | the walks of the Books tab: the covers, a book page, the reader, the place kept on the phone, the notice of each kind |

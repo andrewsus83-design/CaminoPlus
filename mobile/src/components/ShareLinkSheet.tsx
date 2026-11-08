@@ -62,6 +62,7 @@ export function ShareLinkSheet({ kind, onClose, make }: { kind: ShareKind; onClo
               <Pressable
                 accessibilityRole="checkbox"
                 accessibilityState={{ checked: stays }}
+                aria-checked={stays}
                 accessibilityLabel={SHEET.plan.staysOption}
                 onPress={() => setStays((v) => !v)}
                 style={{ minHeight: layout.touchPrimary, flexDirection: 'row', alignItems: 'center', gap: space[3], paddingHorizontal: space[3], borderRadius: radius.md, borderWidth: 1, borderColor: stays ? role.action : role.border }}
