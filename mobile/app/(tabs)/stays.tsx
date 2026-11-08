@@ -12,7 +12,7 @@ import { ownerStore, useOwner } from '@/features/business/store';
 import { Pill } from '@/components/Pill';
 import { SampleNotice, SampleTag } from '@/components/SampleNotice';
 import { OSM_COPYRIGHT_URL, OSM_CREDIT, openLink, sampleStaysNotice, savedLine, useMyStage, useStageStays, type StayModel } from '@/features/places';
-import { fonts, layout, radius, role, scrim, space, textStyle } from '@/theme';
+import { fonts, icon, layout, radius, role, scrim, space, textStyle } from '@/theme';
 // Sample content is never shared outside the app: share the invitation instead of an invented place or caption.
 const SHARE_APP = 'Walking the Camino? CaminoPlus has offline maps, stays and a pilgrim passport: https://camino.plus';
 
@@ -35,7 +35,7 @@ function FilterSheet({ open, value, distanceLabel, onClose, onApply }: { open: b
       <View style={{ backgroundColor: role.bg, borderTopLeftRadius: radius.lg, borderTopRightRadius: radius.lg, paddingHorizontal: layout.screenMargin, paddingTop: layout.sheetPadding, paddingBottom: space[10], gap: space[5] }}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
           <AppText variant="h4">Filters</AppText>
-          <Pressable accessibilityLabel="Close" onPress={onClose} hitSlop={12}><Icon name="close" color={role.text} size={28} /></Pressable>
+          <Pressable accessibilityLabel="Close" onPress={onClose} hitSlop={12}><Icon name="close" color={role.text} size={icon.mdPlus} /></Pressable>
         </View>
         <View style={{ gap: space[3] }}>
           <AppText variant="label">Type of stay</AppText>
@@ -81,7 +81,7 @@ function StayCard({ s, stageId, fav, onFav }: { s: StayModel; stageId: string | 
           <AppText variant="h4" style={{ flex: 1 }}>{s.name}</AppText>
           {s.rating != null && (
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: space[1] }}>
-              <Icon name="star" color={role.highlight} size={18} />
+              <Icon name="star" color={role.highlight} size={icon.sm} />
               <AppText variant="label">{s.rating}</AppText>
             </View>
           )}
@@ -122,9 +122,9 @@ export default function Stays() {
     <Screen>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: space[3] }}>
         <View style={{ flex: 1, minWidth: 0, height: 52, borderRadius: radius.pill, backgroundColor: role.surface, borderWidth: 1, borderColor: role.border, flexDirection: 'row', alignItems: 'center', paddingHorizontal: space[4], gap: space[2] }}>
-          <Icon name="search" color={role.text} size={20} />
+          <Icon name="search" color={role.text} size={icon.smPlus} />
           {/* 15, not 17: at 17 the placeholder "Search stays and cafes" (187 px) no longer fits the field on a 390 phone; 15 (the caption size) keeps it whole */}
-          <TextInput value={q} onChangeText={setQ} placeholder="Search stays and cafes" placeholderTextColor={role.muted} style={{ flex: 1, minWidth: 0, height: 48, paddingVertical: 0, fontFamily: fonts.body, fontSize: textStyle('caption').fontSize, color: role.text }} />
+          <TextInput value={q} onChangeText={setQ} placeholder="Search stays and cafes" placeholderTextColor={role.muted} style={{ flex: 1, minWidth: 0, height: layout.touchHard, paddingVertical: 0, fontFamily: fonts.body, fontSize: textStyle('caption').fontSize, color: role.text }} />
         </View>
         <View>
           <IconButton name="filter" label="Filters" size={52} onPress={() => setFilterOpen(true)} badge={activeCount} />
@@ -155,7 +155,7 @@ export default function Stays() {
       {!loading && list.length > shown && <Pill variant="ghost" label={`Show more places (${list.length - shown} more)`} onPress={() => setPaging({ key: pageKey, shown: shown + PAGE })} />}
       {!loading && list.length === 0 && <AppText muted>Nothing matches. Try another search or reset the filters.</AppText>}
       {credit && (
-        <Pressable accessibilityRole="link" accessibilityLabel="OpenStreetMap copyright and licence" onPress={() => { void openLink(OSM_COPYRIGHT_URL); }} hitSlop={8} style={{ minHeight: 48, justifyContent: 'center' }}>
+        <Pressable accessibilityRole="link" accessibilityLabel="OpenStreetMap copyright and licence" onPress={() => { void openLink(OSM_COPYRIGHT_URL); }} hitSlop={8} style={{ minHeight: layout.touchHard, justifyContent: 'center' }}>
           <AppText variant="caption" muted>Place data {OSM_CREDIT}</AppText>
         </Pressable>
       )}

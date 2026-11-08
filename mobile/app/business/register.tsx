@@ -13,7 +13,7 @@ import { ownerStore } from '@/features/business/store';
 import { emailListingDetails } from '@/features/business/contact';
 import { amenityOptions, bookingOptions, businessTypes, Draft, proofKinds } from '@/data/business';
 import { tints } from '@/data/mock';
-import { c, radius, role, space } from '@/theme';
+import { c, icon, layout, radius, role, space } from '@/theme';
 
 const STEPS = ['Type', 'Name and location', 'Photos and details', 'Prices and booking', 'Proof of ownership'] as const;
 
@@ -87,7 +87,7 @@ export default function BusinessRegister() {
           <Field label="Name pilgrims will see" value={d.name} onChangeText={(v) => set('name', v)} placeholder="e.g. Albergue Casa Ana" />
           <Field label="Address" value={d.address} onChangeText={(v) => set('address', v)} placeholder="Street, number, town" />
           <View style={{ height: 160, borderRadius: radius.lg, backgroundColor: role.bg, borderWidth: 1, borderColor: role.border, alignItems: 'center', justifyContent: 'center', gap: space[2] }}>
-            <Icon name="pin" color={role.danger} size={32} />
+            <Icon name="pin" color={role.danger} size={icon.lg} />
             <AppText variant="caption" muted>Map pin preview · drag it to your door (MapLibre in the dev build)</AppText>
           </View>
           <Card style={{ flexDirection: 'row', alignItems: 'center', gap: space[3], backgroundColor: c.blue50 }}>
@@ -139,7 +139,7 @@ export default function BusinessRegister() {
                   <AppText variant="label" style={{ flex: 1 }}>{b.title}</AppText>
                   {b.soon ? <Badge label="Soon" tone="gold" /> : (
                     <View style={{ width: 28, height: 28, borderRadius: radius.pill, backgroundColor: on ? role.action : 'transparent', borderWidth: on ? 0 : 2, borderColor: role.borderStrong, alignItems: 'center', justifyContent: 'center' }}>
-                      {on && <Icon name="check" color={role.onAction} size={18} />}
+                      {on && <Icon name="check" color={role.onAction} size={icon.sm} />}
                     </View>
                   )}
                 </Pressable>
@@ -162,7 +162,7 @@ export default function BusinessRegister() {
               <Pressable key={k} onPress={() => set('proof', on ? null : k)}
                 style={{ flexDirection: 'row', alignItems: 'center', gap: space[4], padding: space[4], borderRadius: radius.lg, borderWidth: 2, borderStyle: on ? 'solid' : 'dashed', borderColor: on ? c.success : role.borderStrong, backgroundColor: on ? c.successWash : 'transparent' }}>
                 <View style={{ width: 44, height: 44, borderRadius: radius.pill, backgroundColor: on ? c.success : role.sunken, alignItems: 'center', justifyContent: 'center' }}>
-                  <Icon name={on ? 'check' : 'camera'} color={on ? role.onDanger : role.text} size={20} />
+                  <Icon name={on ? 'check' : 'camera'} color={on ? role.onDanger : role.text} size={icon.smPlus} />
                 </View>
                 <View style={{ flex: 1 }}>
                   <AppText variant="label">{k}</AppText>
@@ -184,7 +184,7 @@ export default function BusinessRegister() {
         {step > 1 && <View style={{ flex: 1 }}><Pill variant="ghost" label="Back" onPress={back} /></View>}
         <View style={{ flex: 1, opacity: ready ? 1 : 0.45 }}>
           {sending ? (
-            <View style={{ height: 56, borderRadius: radius.pill, backgroundColor: role.highlight, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: space[3] }}>
+            <View style={{ height: layout.touchPrimary, borderRadius: radius.pill, backgroundColor: role.highlight, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: space[3] }}>
               <ActivityIndicator color={role.onHighlight} /><AppText variant="label" color={role.onHighlight}>Sending…</AppText>
             </View>
           ) : (
@@ -194,13 +194,13 @@ export default function BusinessRegister() {
       </View>
     </Screen>
     <Animated.View pointerEvents="none" style={{ position: 'absolute', top: space[16], alignSelf: 'center', opacity: toast, transform: [{ translateY: toast.interpolate({ inputRange: [0, 1], outputRange: [-12, 0] }) }], flexDirection: 'row', alignItems: 'center', gap: space[2], paddingHorizontal: space[4], height: 40, borderRadius: radius.pill, backgroundColor: role.action }}>
-      <Icon name="check" color={role.onAction} size={18} /><AppText variant="label" color={role.onAction}>Draft saved</AppText>
+      <Icon name="check" color={role.onAction} size={icon.sm} /><AppText variant="label" color={role.onAction}>Draft saved</AppText>
     </Animated.View>
     <Sheet visible={exitAsk} onClose={() => setExitAsk(false)}>
       <AppText variant="h3">Save and finish later?</AppText>
       <AppText variant="body" muted>Your draft stays on this phone and in your account. Pick up where you left off from Settings.</AppText>
       <Pill label="Save draft" onPress={() => { ownerStore.saveDraft(d, step - 1); setExitAsk(false); router.back(); }} />
-      <Pressable onPress={() => setExitAsk(false)} style={{ alignItems: 'center', justifyContent: 'center', minHeight: 48 }}><AppText variant="label" muted>Keep going</AppText></Pressable>
+      <Pressable onPress={() => setExitAsk(false)} style={{ alignItems: 'center', justifyContent: 'center', minHeight: layout.touchHard }}><AppText variant="label" muted>Keep going</AppText></Pressable>
     </Sheet>
     </View>
   );

@@ -9,7 +9,7 @@ import { Card, Chip } from '@/components/ui';
 import { useMeData } from '@/lib/useMeData';
 import { useAuth } from '@/lib/auth';
 import { localStore, userKey } from '@/lib/localStore';
-import { c, fonts, layout, radius, role, space, textStyle } from '@/theme';
+import { c, fonts, icon, layout, radius, role, space, textStyle } from '@/theme';
 
 // Task planner for one walking day: a ready-made checklist plus your own tasks.
 // Saved on this phone per day and per account (works offline).
@@ -71,7 +71,7 @@ export default function Planner() {
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
           <BackButton fallback="/me" />
           <AppText variant="h4">Day planner</AppText>
-          <View style={{ width: 48 }} />
+          <View style={{ width: layout.touchHard }} />
         </View>
 
         {list.length > 1 && (
@@ -102,19 +102,19 @@ export default function Planner() {
               {tasks.map((t) => (
                 <Pressable key={t.id} accessibilityRole="checkbox" accessibilityState={{ checked: t.done }} onPress={() => save(tasks.map((x) => (x.id === t.id ? { ...x, done: !x.done } : x)))} style={{ minHeight: 64, flexDirection: 'row', alignItems: 'center', gap: space[4], paddingHorizontal: space[4], paddingVertical: space[3], borderRadius: radius.lg, backgroundColor: role.surface, borderWidth: 1, borderColor: role.border }}>
                   <View style={{ width: 32, height: 32, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center', backgroundColor: t.done ? c.success : 'transparent', borderWidth: t.done ? 0 : 2, borderColor: role.border }}>
-                    {t.done && <Icon name="check" color={role.onDanger} size={20} />}
+                    {t.done && <Icon name="check" color={role.onDanger} size={icon.smPlus} />}
                   </View>
                   <AppText variant="body" style={{ flex: 1, textDecorationLine: t.done ? 'line-through' : 'none', opacity: t.done ? 0.55 : 1 }}>{t.text}</AppText>
                   {!defaults.some((d) => d.id === t.id) && (
-                    <Pressable accessibilityLabel="Delete task" hitSlop={12} onPress={() => save(tasks.filter((x) => x.id !== t.id))}><Icon name="close" color={role.muted} size={24} /></Pressable>
+                    <Pressable accessibilityLabel="Delete task" hitSlop={12} onPress={() => save(tasks.filter((x) => x.id !== t.id))}><Icon name="close" color={role.muted} size={icon.md} /></Pressable>
                   )}
                 </Pressable>
               ))}
             </View>
 
             <View style={{ flexDirection: 'row', alignItems: 'center', height: 64, borderRadius: radius.pill, backgroundColor: role.surface, borderWidth: 1, borderColor: role.border, paddingLeft: space[5], paddingRight: space[2] }}>
-              <TextInput value={draft} onChangeText={setDraft} onSubmitEditing={add} returnKeyType="done" maxLength={80} placeholder="Add your own task" placeholderTextColor={role.muted} style={{ flex: 1, minWidth: 0, height: 48, paddingVertical: 0, fontFamily: fonts.body, fontSize: textStyle('body').fontSize, color: role.text }} />
-              <Pressable accessibilityRole="button" accessibilityLabel="Add task" onPress={add} style={{ width: 48, height: 48, borderRadius: radius.pill, backgroundColor: role.highlight, alignItems: 'center', justifyContent: 'center' }}>
+              <TextInput value={draft} onChangeText={setDraft} onSubmitEditing={add} returnKeyType="done" maxLength={80} placeholder="Add your own task" placeholderTextColor={role.muted} style={{ flex: 1, minWidth: 0, height: layout.touchHard, paddingVertical: 0, fontFamily: fonts.body, fontSize: textStyle('body').fontSize, color: role.text }} />
+              <Pressable accessibilityRole="button" accessibilityLabel="Add task" onPress={add} style={{ width: layout.touchHard, height: layout.touchHard, borderRadius: radius.pill, backgroundColor: role.highlight, alignItems: 'center', justifyContent: 'center' }}>
                 <AppText variant="h4" color={role.onHighlight}>+</AppText>
               </Pressable>
             </View>

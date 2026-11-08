@@ -10,7 +10,7 @@ import { BackButton } from '@/components/BackButton';
 import { Avatar, Card, IconButton, SectionLabel } from '@/components/ui';
 import { Badge } from '@/features/business/ui';
 import { Availability, myListing, statusCopy } from '@/data/business';
-import { c, fonts, radius, role, space, textStyle } from '@/theme';
+import { c, fonts, icon, layout, radius, role, space, textStyle } from '@/theme';
 
 const AVAIL: { id: Availability; label: string }[] = [
   { id: 'available', label: 'Beds free' },
@@ -58,7 +58,7 @@ export default function BusinessDashboard() {
           const bg = on ? (a.id === 'full' ? role.danger : a.id === 'few_left' ? role.highlight : c.success) : role.sunken;
           return (
             <Pressable key={a.id} accessibilityRole="button" accessibilityState={{ selected: on }} onPress={() => setAvail(a.id)}
-              style={{ flex: 1, height: 56, borderRadius: radius.pill, backgroundColor: bg, alignItems: 'center', justifyContent: 'center' }}>
+              style={{ flex: 1, height: layout.touchPrimary, borderRadius: radius.pill, backgroundColor: bg, alignItems: 'center', justifyContent: 'center' }}>
               <AppText variant="label" color={on && a.id !== 'few_left' ? role.onDanger : role.text}>{a.label}</AppText>
             </Pressable>
           );
@@ -81,7 +81,7 @@ export default function BusinessDashboard() {
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: space[3] }}>
               <Avatar size={36} />
               <AppText variant="label" style={{ flex: 1 }}>{r.who}</AppText>
-              <Icon name="star" color={role.highlight} size={18} />
+              <Icon name="star" color={role.highlight} size={icon.sm} />
               <AppText variant="caption" muted>{r.stars} · {r.when}</AppText>
             </View>
             <AppText variant="body">{r.text}</AppText>
@@ -105,7 +105,7 @@ export default function BusinessDashboard() {
 
       <Card style={{ flexDirection: 'row', alignItems: 'center', gap: space[3], backgroundColor: c.goldWash }}>
         <View style={{ width: 44, height: 44, borderRadius: radius.pill, backgroundColor: role.highlight, alignItems: 'center', justifyContent: 'center' }}>
-          <Icon name="star" color={role.onHighlight} size={20} />
+          <Icon name="star" color={role.onHighlight} size={icon.smPlus} />
         </View>
         <View style={{ flex: 1 }}>
           <AppText variant="label">Boost your listing</AppText>

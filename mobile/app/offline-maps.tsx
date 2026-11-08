@@ -12,7 +12,7 @@ import { Card, SectionLabel } from '@/components/ui';
 import { ROUTE_ID, ROUTE_NAME, StageInfo, formatMb, hasMapTiler, packs, stages, timeAgo, useOnline } from '@/features/map';
 import { MapIcon } from '@/features/map/MapIcon';
 import { packErrorText } from '@/features/map/messages';
-import { c, layout, radius, role, scrim, space } from '@/theme';
+import { c, icon, layout, radius, role, scrim, space } from '@/theme';
 
 export default function OfflineMaps() {
   const insets = useSafeAreaInsets();
@@ -120,12 +120,12 @@ function StageRow({ stage, state, onUpgrade }: { stage: StageInfo; state: packs.
       ) : installed ? (
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: space[2] }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: space[2], flex: 1 }}>
-            <Icon name="check" color={c.success} size={18} />
+            <Icon name="check" color={c.success} size={icon.sm} />
             <AppText variant="caption" color={c.success}>Ready offline · updated {timeAgo(installed.downloadedAt)}</AppText>
           </View>
           {update && <Pill variant="gold" label={`Update · ${formatMb(remote!.size_bytes)}`} onPress={() => packs.downloadStage(stage.id)} />}
           <Pressable accessibilityRole="button" accessibilityLabel={`Delete stage ${stage.number} map`} onPress={() => packs.removeStage(stage.id)} hitSlop={10} style={{ padding: space[2] }}>
-            <MapIcon name="trash" color={role.danger} size={20} />
+            <MapIcon name="trash" color={role.danger} size={icon.smPlus} />
           </Pressable>
         </View>
       ) : (
@@ -136,7 +136,7 @@ function StageRow({ stage, state, onUpgrade }: { stage: StageInfo; state: packs.
       )}
 
       {error && !job && (
-        <Pressable onPress={error === 'subscription_required' ? onUpgrade : () => packs.clearError(stage.id)} style={{ minHeight: 48, justifyContent: 'center' }}>
+        <Pressable onPress={error === 'subscription_required' ? onUpgrade : () => packs.clearError(stage.id)} style={{ minHeight: layout.touchHard, justifyContent: 'center' }}>
           <AppText variant="caption" color={error === 'subscription_required' ? role.accentText : c.red700}>
             {packErrorText[error]}{error === 'subscription_required' ? ' See plans ›' : ''}
           </AppText>
@@ -156,7 +156,7 @@ function UpgradePrompt({ visible, onClose, onSeePlans }: { visible: boolean; onC
         <AppText variant="h3">Walk all day without signal</AppText>
         {['Offline maps for every stage', 'Route, albergues, water and churches offline', '5 GB cloud storage for your journey'].map((t) => (
           <View key={t} style={{ flexDirection: 'row', gap: space[2], alignItems: 'center' }}>
-            <Icon name="check" color={c.success} size={18} />
+            <Icon name="check" color={c.success} size={icon.sm} />
             <AppText variant="small">{t}</AppText>
           </View>
         ))}

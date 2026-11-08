@@ -11,7 +11,7 @@ import type { SheetComment } from '@/lib/postComments';
 import { SHARE_APP } from '@/lib/postShare'; // sample content is never shared outside the app: share the invitation instead of an invented place or caption
 import { useLocalReactions } from '@/lib/useLocalReactions';
 import { exploreItems } from '@/data/mock';
-import { fonts, layout, radius, space } from '@/theme';
+import { fonts, icon, layout, radius, space } from '@/theme';
 
 const TABS = ['For you', 'Friends', 'Photos of you', 'Favourites'] as const;
 const FAV_KEY = 'discover.favs';
@@ -67,7 +67,7 @@ export default function Discover() {
             data={itemsFor(t)}
             getItemLayout={(_, index) => ({ length: height, offset: height * index, index })}
             onScrollBeginDrag={dismiss}
-            ListEmptyComponent={<View style={{ width, height, alignItems: 'center', justifyContent: 'center', padding: space[10], gap: space[3] }}><Icon name="heart" color={FIXED.emptyIcon} size={32} /><AppText variant="lead" color={FIXED.white} style={{ textAlign: 'center' }}>Nothing saved yet. Tap the heart or bookmark on a story to keep it here.</AppText></View>}
+            ListEmptyComponent={<View style={{ width, height, alignItems: 'center', justifyContent: 'center', padding: space[10], gap: space[3] }}><Icon name="heart" color={FIXED.emptyIcon} size={icon.lg} /><AppText variant="lead" color={FIXED.white} style={{ textAlign: 'center' }}>Nothing saved yet. Tap the heart or bookmark on a story to keep it here.</AppText></View>}
             keyExtractor={(i) => i.id}
             renderItem={({ item }) => (
           <View style={{ width, height, backgroundColor: item.tint, justifyContent: 'flex-end', paddingLeft: layout.screenMargin, paddingRight: layout.screenMargin + RAIL_CIRCLE + space[3], paddingTop: space[6], paddingBottom: insets.bottom + RAIL_BOTTOM }}>
@@ -85,7 +85,7 @@ export default function Discover() {
       <View style={{ position: 'absolute', top: insets.top + layout.screenTop, left: 0, right: 0 }}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ minWidth: width, justifyContent: 'center', gap: space[6], paddingHorizontal: layout.screenMargin }}>
           {TABS.map((t) => (
-            <Pressable key={t} accessibilityRole="tab" accessibilityState={{ selected: tab === t }} onPress={() => goTab(t)} hitSlop={10} style={{ minHeight: 48, justifyContent: 'center', paddingVertical: space[2], borderBottomWidth: 3, borderBottomColor: tab === t ? FIXED.white : 'transparent' }}>
+            <Pressable key={t} accessibilityRole="tab" accessibilityState={{ selected: tab === t }} onPress={() => goTab(t)} hitSlop={10} style={{ minHeight: layout.touchHard, justifyContent: 'center', paddingVertical: space[2], borderBottomWidth: 3, borderBottomColor: tab === t ? FIXED.white : 'transparent' }}>
               <AppText variant="body" color={tab === t ? FIXED.white : FIXED.tabOff} style={{ fontFamily: fonts.bodyBold, textShadowColor: FIXED.tabShadow, textShadowRadius: 6 }}>{t}</AppText>
             </Pressable>
           ))}

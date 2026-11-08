@@ -7,7 +7,7 @@ import { Pill } from '@/components/Pill';
 import { BackButton } from '@/components/BackButton';
 import { Badge } from '@/features/business/ui';
 import { Card } from '@/components/ui';
-import { c, layout, radius, role, space } from '@/theme';
+import { c, icon, layout, radius, role, space } from '@/theme';
 
 // Watches a pilgrim can link. Connecting needs the watch native modules (next dev build),
 // so for now the buttons explain that instead of pretending to pair.
@@ -33,7 +33,7 @@ export default function Watches() {
         {WATCHES.map((w) => (
           <Card key={w.id} style={{ flexDirection: 'row', alignItems: 'center', gap: space[4] }}>
             <View style={{ width: 60, height: 60, borderRadius: radius.pill, backgroundColor: role.inverse, alignItems: 'center', justifyContent: 'center' }}>
-              <Icon name="watch" color={role.highlight} size={32} />
+              <Icon name="watch" color={role.highlight} size={icon.lg} />
             </View>
             <View style={{ flex: 1, gap: space[1] }}>
               <AppText variant="label">{w.name}</AppText>

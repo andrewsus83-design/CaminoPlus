@@ -2,7 +2,7 @@ import { ReactNode } from 'react';
 import { Pressable, TextInput, TextInputProps, View } from 'react-native';
 import { AppText } from '@/components/AppText';
 import { Icon, IconName } from '@/components/Icon';
-import { c, fonts, layout, radius, role, space, textStyle } from '@/theme';
+import { c, fonts, icon as iconSize, layout, radius, role, space, textStyle } from '@/theme';
 
 // A function, not a constant: the colours follow the light/dark mode.
 const tones = () => ({
@@ -22,7 +22,7 @@ export function Badge({ label, tone = 'neutral', icon }: { label: string; tone?:
   const t = tones()[tone];
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: space[2], alignSelf: 'flex-start', paddingHorizontal: space[3], paddingVertical: space[2], borderRadius: radius.pill, backgroundColor: t.bg }}>
-      {icon && <Icon name={icon} color={t.fg} size={18} />}
+      {icon && <Icon name={icon} color={t.fg} size={iconSize.sm} />}
       <AppText variant="caption" color={t.fg} style={{ fontFamily: fonts.bodyBold }}>{label}</AppText>
     </View>
   );
@@ -43,7 +43,7 @@ export function Field({ label, help, ...props }: TextInputProps & { label: strin
     <View style={{ gap: space[2] }}>
       <AppText variant="label">{label}</AppText>
       <TextInput placeholderTextColor={role.muted} {...props}
-        style={{ height: 56, borderRadius: radius.pill, borderWidth: 1.5, borderColor: role.border, backgroundColor: role.surface, paddingHorizontal: space[6], fontFamily: fonts.body, fontSize: textStyle('small').fontSize, color: role.text }} />
+        style={{ height: layout.touchPrimary, borderRadius: radius.pill, borderWidth: 1.5, borderColor: role.border, backgroundColor: role.surface, paddingHorizontal: space[6], fontFamily: fonts.body, fontSize: textStyle('small').fontSize, color: role.text }} />
       {help && <AppText variant="caption" muted style={{ paddingLeft: space[6] }}>{help}</AppText>}
     </View>
   );
@@ -56,7 +56,7 @@ export function OptionCard({ title, hint, icon, selected, onPress, style }: { ti
       style={[{ padding: layout.cardPadding, gap: space[3], borderRadius: radius.lg, borderWidth: selected ? 2.5 : 1.5, borderColor: selected ? role.action : role.border, backgroundColor: selected ? c.blue50 : role.surface }, style]}>
       {icon && (
         <View style={{ width: 44, height: 44, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center', backgroundColor: selected ? role.action : c.goldWash }}>
-          <Icon name={icon} color={selected ? role.onAction : role.accentText} size={24} />
+          <Icon name={icon} color={selected ? role.onAction : role.accentText} size={iconSize.md} />
         </View>
       )}
       <View>
@@ -75,7 +75,7 @@ export function Highlight({ icon, title, text }: { icon: IconName; title: string
   return (
     <View style={{ flexDirection: 'row', gap: space[4], alignItems: 'center' }}>
       <View style={{ width: 44, height: 44, borderRadius: radius.pill, backgroundColor: c.goldWash, alignItems: 'center', justifyContent: 'center' }}>
-        <Icon name={icon} color={role.accentText} size={24} />
+        <Icon name={icon} color={role.accentText} size={iconSize.md} />
       </View>
       <View style={{ flex: 1 }}>
         <AppText variant="label">{title}</AppText>

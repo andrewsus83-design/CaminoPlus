@@ -12,7 +12,7 @@ import { Card, IconButton, Photo, SectionLabel } from '@/components/ui';
 import { Badge } from '@/features/business/ui';
 import { OSM_COPYRIGHT_URL, OSM_CREDIT, amenityNames, kmIntoStageText, labelNames, mailtoUrl, offRouteText, openLink, osmObjectUrl, safeWebUrl, savedLine, telUrl, useStageStays, webLabel, type PlaceSource, type StayModel } from '@/features/places';
 import { reviews, rooms, stays } from '@/data/mock';
-import { layout, radius, role, space } from '@/theme';
+import { icon, layout, radius, role, space } from '@/theme';
 // Sample content is never shared outside the app: share the invitation instead of an invented place or caption.
 const SHARE_APP = 'Walking the Camino? CaminoPlus has offline maps, stays and a pilgrim passport: https://camino.plus';
 
@@ -50,7 +50,7 @@ function SampleStay({ s }: { s: (typeof stays)[number] }) {
         <SampleNotice title="Sample stay">This place, its rooms, prices and reviews are examples. Real stays are coming soon.</SampleNotice>
         <AppText variant="h2">{s.name}</AppText>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: space[2] }}>
-          <Icon name="star" color={role.highlight} size={18} />
+          <Icon name="star" color={role.highlight} size={icon.sm} />
           <AppText variant="label">{s.rating}</AppText>
           <AppText variant="small" muted>· {s.reviews} reviews · {s.town}</AppText>
         </View>
@@ -94,7 +94,7 @@ function Detail({ label, children, link }: { label: string; children: string; li
   );
   if (!link) return body;
   return (
-    <Pressable accessibilityRole="link" accessibilityLabel={`${label}: ${children}`} onPress={() => { void openLink(link); }} style={{ minHeight: 48, justifyContent: 'center' }}>
+    <Pressable accessibilityRole="link" accessibilityLabel={`${label}: ${children}`} onPress={() => { void openLink(link); }} style={{ minHeight: layout.touchHard, justifyContent: 'center' }}>
       {body}
     </Pressable>
   );
@@ -152,11 +152,11 @@ function RealStay({ m, source, savedAt }: { m: StayModel; source: PlaceSource; s
         {row.source === 'osm' && (
           <View style={{ gap: space[1] }}>
             {osmPage && (
-              <Pressable accessibilityRole="link" accessibilityLabel="See this place on OpenStreetMap" onPress={() => { void openLink(osmPage); }} style={{ minHeight: 48, justifyContent: 'center' }}>
+              <Pressable accessibilityRole="link" accessibilityLabel="See this place on OpenStreetMap" onPress={() => { void openLink(osmPage); }} style={{ minHeight: layout.touchHard, justifyContent: 'center' }}>
                 <AppText variant="small" color={role.action}>See this place on OpenStreetMap, where anyone can correct it</AppText>
               </Pressable>
             )}
-            <Pressable accessibilityRole="link" accessibilityLabel="OpenStreetMap copyright and licence" onPress={() => { void openLink(OSM_COPYRIGHT_URL); }} style={{ minHeight: 48, justifyContent: 'center' }}>
+            <Pressable accessibilityRole="link" accessibilityLabel="OpenStreetMap copyright and licence" onPress={() => { void openLink(OSM_COPYRIGHT_URL); }} style={{ minHeight: layout.touchHard, justifyContent: 'center' }}>
               <AppText variant="caption" muted>{OSM_CREDIT}</AppText>
             </Pressable>
           </View>
