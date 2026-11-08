@@ -13,6 +13,7 @@
   },
   "files": [
     "src/features/library/__tests__/library.test.ts",
-    "src/features/library/__tests__/wiring.test.ts"
+    "src/features/library/__tests__/wiring.test.ts",
+    "src/features/library/__tests__/notes.test.ts"
   ]
 }

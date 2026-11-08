@@ -22,35 +22,40 @@ function useFile(uid: string, m: DiaryMedia): string | null {
   return useMemo(() => device.fileUri(uid, m.name), [uid, m.name]);
 }
 
-function Missing({ small }: { small?: boolean }) {
+function Missing({ small, corner, compact }: { small?: boolean; corner: number; compact?: boolean }) {
   return (
-    <View style={{ flex: 1, backgroundColor: role.sunken, borderWidth: 1, borderColor: role.border, borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center', padding: 6, gap: 4 }}>
+    <View style={{ flex: 1, backgroundColor: role.sunken, borderWidth: 1, borderColor: role.border, borderRadius: corner, alignItems: 'center', justifyContent: 'center', padding: 6, gap: 4 }}>
       <Icon name="image" color={role.muted} size={small ? 22 : 28} />
-      <AppText variant="caption" muted style={{ textAlign: 'center', letterSpacing: 0, fontSize: small ? 13 : 15, lineHeight: small ? 17 : 20 }}>{MISSING_FILE}</AppText>
+      {!compact && <AppText variant="caption" muted style={{ textAlign: 'center', letterSpacing: 0, fontSize: small ? 13 : 15, lineHeight: small ? 17 : 20 }}>{MISSING_FILE}</AppText>}
     </View>
   );
 }
 
-/** The picture, or the play tile of a clip, or the calm tile of a file that is not there. Fills its parent. */
-function Face({ uid, m, small }: { uid: string; m: DiaryMedia; small?: boolean }) {
+/**
+ * The picture, or the play tile of a clip, or the calm tile of a file that is not there. Fills its parent. `corner` is the radius of its
+ * corners (the grid of a note in the Library squares the inner ones), `compact` is for a tile of the Library's feed: a clip shows its length
+ * without its size, and a file that is not here shows only its mark (the tile says the rest to a screen reader).
+ */
+export function Face({ uid, m, small, corner = radius.sm, compact }: { uid: string; m: DiaryMedia; small?: boolean; corner?: number; compact?: boolean }) {
   const uri = useFile(uid, m);
   const [broken, setBroken] = useState(false);
-  if (uri === null || broken) return <Missing small={small} />;
+  if (uri === null || broken) return <Missing small={small} corner={corner} compact={compact} />;
   if (m.kind === 'image') {
-    return <Image source={{ uri }} resizeMode="cover" onError={() => setBroken(true)} accessibilityIgnoresInvertColors style={{ flex: 1, borderRadius: radius.sm, backgroundColor: role.sunken }} />;
+    return <Image source={{ uri }} resizeMode="cover" onError={() => setBroken(true)} accessibilityIgnoresInvertColors style={{ flex: 1, borderRadius: corner, backgroundColor: role.sunken }} />;
   }
+  const label = [m.durationMs ? formatDuration(m.durationMs) : '', compact ? '' : formatBytes(m.bytes)].filter(Boolean).join(' · ');
   return (
-    <View style={{ flex: 1, borderRadius: radius.sm, backgroundColor: FIXED.black, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+    <View style={{ flex: 1, borderRadius: corner, backgroundColor: FIXED.black, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
       <View style={{ width: small ? 44 : 56, height: small ? 44 : 56, borderRadius: radius.pill, backgroundColor: FIXED.photoChip, borderWidth: 2, borderColor: FIXED.onPhoto, alignItems: 'center', justifyContent: 'center' }}>
         <Icon name="play" color={FIXED.onPhoto} size={small ? 20 : 26} filled />
       </View>
-      <View style={{ position: 'absolute', left: 6, bottom: 6, right: 6, flexDirection: 'row' }}>
-        <View style={{ backgroundColor: FIXED.photoChip, borderRadius: radius.xs, paddingHorizontal: 6, paddingVertical: 2 }}>
-          <AppText variant="caption" color={FIXED.onPhoto} style={{ letterSpacing: 0, fontSize: 13, lineHeight: 17 }}>
-            {[m.durationMs ? formatDuration(m.durationMs) : '', formatBytes(m.bytes)].filter(Boolean).join(' · ')}
-          </AppText>
+      {label !== '' && (
+        <View style={{ position: 'absolute', left: 6, bottom: 6, right: 6, flexDirection: 'row' }}>
+          <View style={{ backgroundColor: FIXED.photoChip, borderRadius: radius.xs, paddingHorizontal: 6, paddingVertical: 2 }}>
+            <AppText variant="caption" color={FIXED.onPhoto} style={{ letterSpacing: 0, fontSize: 13, lineHeight: 17 }}>{label}</AppText>
+          </View>
         </View>
-      </View>
+      )}
     </View>
   );
 }
