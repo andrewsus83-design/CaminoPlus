@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { ScrollView, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Screen } from '@/components/Screen';
 import { AppText } from '@/components/AppText';
