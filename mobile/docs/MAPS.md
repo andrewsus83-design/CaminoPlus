@@ -123,7 +123,11 @@ The real number has to be measured on a phone during a walk (see checklist below
   older phones), a bold dotted route with a white halo, a thin gold line for what you already walked, a red pin at
   the end of the stage, a heading arrow with the accuracy disc, and the POI pins (church, albergue, water, café,
   quest, stamp). Tap a pin for its card; "What is near" filters the kinds.
-- Top banner: the next corner ("Bear right in 350 m") or "toward <next town>" with the distance. Bottom card: time
+- Top banner: the next real turn ("Bear right in 350 m") or "toward <next town>" with the distance. Only real turns are named, about one
+  in 1 to 2 km on stages 1 and 2 (the OSM line winds, and a bend every 350 m is noise): a turn is the change of bearing between the route
+  30 m before a point and 30 m after it, at least 40 degrees; turns within 100 m of each other are one (the net turn, at the first: a bend and
+  its counter-bend cancel); a smooth curve, and a bend the path goes back from within 80 m, count for less than a corner of the same angle;
+  a turn behind you is never named again (`nextManeuver` in `nav.ts`, its rules are in the comment above it). Bottom card: time
   left to the end of the stage (your own pace, else 4 km/h), distance and arrival time, the stage, and **Exit**.
   Without a real GPS fix on the route it says so ("Waiting for your position", "You are not on the Camino yet")
   and shows "--" instead of inventing an ETA from the sample position.
@@ -145,6 +149,9 @@ pins are real there).
       switch default off on that class of device. Measure battery for a 1 h walk with the Walk view on.
 - [ ] Night style switches at dusk on its own and the Day / Night button overrides it.
 - [ ] Tap a pin → sheet opens; tap the map → sheet closes.
+- [ ] Walk view, a real walk on stage 1 or 2 (or at least a drive along the road): the banner names the turns you really make ("Turn left in
+      200 m" where the Camino leaves the road) and about one in 1 to 2 km, not every bend; no turn you already made comes back, and a hairpin
+      road is not announced bend by bend. The counts were made on the map data, not on the ground: this needs a pair of boots.
 - [ ] Whole route: the line leaves Saint-Jean on the real path (it winds along the base map's trail, it is not the old straight zigzag), and
       Route details says stages 1 to 3 follow OpenStreetMap, with the credit.
 - [ ] Walk view at Refuge Orisson (km 7.4 of stage 1) and at the Trinidad de Arre albergue (km 15.8 of stage 3): the dotted route runs along the
