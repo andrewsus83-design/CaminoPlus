@@ -45,8 +45,8 @@ Then the **scenarios** ([scenarios.mjs](scenarios.mjs)), each in light and dark,
   for ..." with a way back); the Bookmarks button opens `/library/bookmarks` with the bookmarked rows of both tabs, a verse and the
   bookmarked post (the full account has one bookmarked post); bookmarks kept before the tabs changed (a Music row, the old example rows, `notes:` keys, the
   two Bible rows that were taken out) or kept for a verse that is not in the text are ignored without an error;
-- Bible ([bible.scenarios.mjs](bible.scenarios.mjs), the same walks on the real text): the daily banner is compact (at most 128 high at 390
-  wide, 148 at 320) and is one button; the three parts (Old Testament, Deuterocanon, New Testament) are a segmented control under the banner
+- Bible ([bible.scenarios.mjs](bible.scenarios.mjs), the same walks on the real text): the daily banner is compact (at most 216 high at 390
+  wide, 276 at 320, on the longest day), says the date, the day of the Church and the readings (no handwritten note), is one button, and its pill is in the row of the title at 390 and under the last line at 320; the three parts (Old Testament, Deuterocanon, New Testament) are a segmented control under the banner
   that scrolls with the page, and each shows its books as compact tiles, two in a row (173 by 124 on a phone of 390, 140 by 116 on 320), the words 17 from the outline
   (13 under 352 wide) and the first row clear of the tab bar; all 73 book names fit their tile at 320, 360, 390 and 430, each at a size of the type scale (24, 17 or 15, in Fraunces;
   the 21 short ones the full 24; 17 or more from 390 up) with the count in JetBrains Mono at 15; a Chromium that hints the glyphs (CI's does)
@@ -134,11 +134,14 @@ which never name a date (the browser's clock is the phone's, and "today" is foun
 
 - the header is one row (Back, the title, the Calendar button, the Bookmark button), every button at least 44 by 44 (they are 48); the strip has exactly seven
   days, each at least 44 by 44; a tap on a day picks it and changes the liturgical title, Today brings it back, the arrows move a week; under it
-  the card, the notice, and the readings and the reflection tagged as samples (the Psalm is the only citation, a reading opens and closes);
+  the liturgical card and the readings card (no sample, no notice, no handwritten line); a reading opens and closes, or the day says the readings are not in the app yet;
 - the Calendar button opens the sheet; Escape, Close and a tap outside close it; a day chosen in it closes it and moves the strip to its week; its
   Today picks today;
 - the Bookmark button toggles and is kept; the day is a row of Bookmarks ("Daily reading", the date, the liturgical title) that opens
   `/library/daily?date=YYYY-MM-DD`; taking it off there removes the row;
+- the readings (the one walk that names days, in `?date=`, because it knows their readings): a Sunday has its four references and the source line, the Gospel opens to its words from the Bible in the app, the Psalm
+  opens whole with its note, nothing on the screen is under 15 px and nothing runs out of a phone of 320; a weekday with a memorial has the saint as its title and the day of the calendar under it; a reference with no
+  words is a line, not a button; a day with no readings says so in one line and has no small print;
 - `?date=` opens that day (also one far outside the five years) and anything that is not a day opens today.
 
 The Bible screens are the Bible feature's own, and they run on the real text (Psalm 121, John 1,

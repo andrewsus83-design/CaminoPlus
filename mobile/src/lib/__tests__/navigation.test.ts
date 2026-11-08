@@ -368,7 +368,7 @@ check('the design page shows the same Library: the two tabs Bible and Books, the
   assert.doesNotMatch(bible, /class="nm h(?!4|5|6)/, 'a name is h4, h5 or h6');
   assert.match(bible, /aria-label="1 Samuel, 31 chapters"><span class="nm h4">1<br>Samuel<\/span>/, 'a number stands on a line of its own');
   assert.match(bible, /aria-label="Song of Songs, 8 chapters"><span class="nm h4">Song of<br>Songs<\/span>/);
-  assert.equal(count(bible, /class="hw"/g), 1, 'one handwritten note on the screen');
+  assert.equal(count(bible, /class="hw"/g), 0, 'no handwritten note on the Bible tab: the banner says the day and the readings instead (the brand rule is at most one, not exactly one)');
 
   // Continue: no card in the page (the banner is right under the tabs), and the Continue reading bar floats above the tab bar, drawn over the dock's fade (its z-index is above the dock's) and before the scroll in the markup;
   // the place is drawn in two pieces, the name and the chapter; the New Testament chosen, 27 tiles
@@ -377,7 +377,7 @@ check('the design page shows the same Library: the two tabs Bible and Books, the
   assert.ok(cont.indexOf('class="cp-subtabs"') < cont.indexOf('class="cp-banner cmp dl"'), 'the banner is right under the tabs, with no card between');
   assert.ok(cont.indexOf('class="cont-bar"') < cont.indexOf('class="scroll"'), 'the bar is not inside the scroll: it floats, and the cover grid of a phone ends before anything of it');
   assert.equal(count(cont, /class="cont-bar"/g), 1, 'one bar on the screen');
-  assert.equal(count(cont, /class="hw"/g), 1, 'the bar adds no handwriting: the banner has the one note');
+  assert.equal(count(cont, /class="hw"/g), 0, 'the bar adds no handwriting, and the banner of the Bible tab has none');
   assert.equal(count(cont, /class="lib-tile"/g), 27);
   assert.match(cont, /aria-label="1 Thessalonians, 5 chapters"><span class="nm h5">1<br>Thessalonians<\/span>/, 'the longest word of all comes down to 17 (h5) on a phone of 390: the fit counts every letter rounded up to a pixel, as a browser that hints the glyphs draws it');
   assert.equal(count(bible, /cont-bar|cont-card/g), 0, 'without a chapter read there is no bar and no card');
