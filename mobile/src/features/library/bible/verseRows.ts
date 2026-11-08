@@ -9,6 +9,7 @@ import { bookByCode } from './books';
 import { refLabel } from './order';
 import { parseRefKey, refKey, refOfVerse, verseRange, type Ref } from './ref';
 import { verseText } from './blocks';
+import { verseNoteStart } from './verseActions';
 import type { BookText, VerseHit } from './textTypes';
 
 /** Where the words of the Bible come from: text.ts. Handed in, so that this file can be tested without the files of the text. */
@@ -58,6 +59,13 @@ export function rowOfKey(key: string, source: TextSource): VerseRow | null {
   } catch {
     return null;
   }
+}
+
+/** What a new note starts with for the key of a bookmarked verse ("bible:PSA.121.3", as the new note's address carries it), or null when the key is not a verse, or the verse cannot be found: a blank note then opens. */
+export function noteStartForVerseKey(key: string, source: TextSource): string | null {
+  if (!key.startsWith('bible:')) return null;
+  const row = rowOfKey(key.slice('bible:'.length), source);
+  return row ? verseNoteStart(row.label, row.text) : null;
 }
 
 /** The marks that can be drawn: inside the text, not empty, in order, and not overlapping (what overlaps is joined). Bad ones are dropped, never thrown at. */

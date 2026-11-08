@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, type ComponentRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ComponentRef } from 'react';
 import { Keyboard, KeyboardAvoidingView, Platform, Pressable, ScrollView, TextInput, View } from 'react-native';
 import { useLocalSearchParams, usePreventRemove, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -14,6 +14,7 @@ import { FormatBar, type FormatAction } from '@/features/diary/FormatBar';
 import { MediaGrid, MediaStrip, MediaViewer } from '@/features/diary/MediaTiles';
 import { MEDIA_PER_PAGE_MAX, mediaOf } from '@/features/diary/media';
 import { PageFooter } from '@/features/diary/PageFooter';
+import { noteStartFor } from '@/features/library/noteStart';
 import { PlaceChip, PlaceEditRow, PlacePanel } from '@/features/diary/PlaceParts';
 import { normalizePlace, withName, type DiaryPlace } from '@/features/diary/place';
 import { FEATURES_NEED_NEW_APP, MEDIA_NEEDS_NEW_APP, MEDIA_ON_WEB, SAVE_DRAFT, attachMessage, dateLine, dateWithDraft, metaLine, pageFooter, pageTitle, placeProblemMessage, problemMessage, thousands } from '@/features/diary/present';
@@ -41,15 +42,18 @@ const noOutline = (Platform.OS === 'web' ? { outlineStyle: 'none' } : null) as o
 // while a draft is written, "Save draft" keeps it as a draft and goes back. Publishing makes it a note of the feed; nothing is sent anywhere.
 export default function DiaryPage() {
   const router = useRouter();
-  const params = useLocalSearchParams<{ id?: string | string[] }>();
+  const params = useLocalSearchParams<{ id?: string | string[]; quote?: string | string[] }>();
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
+  const quote = Array.isArray(params.quote) ? params.quote[0] : params.quote;
+  // A new note can start from a passage of a book or a verse of the Bible (/diary/new?quote=<the key>, the Note action of the readers): the passage as a quotation, and the caret under it.
+  const start = useMemo(() => (id === NEW_PAGE && quote ? noteStartFor(quote) : null), [id, quote]);
   const page = useDiaryPage(id);
   const goBack = () => (router.canGoBack() ? router.back() : router.replace('/me'));
 
   if (page.state === 'missing') return <NotHere goBack={goBack} />;
   if (page.state === 'loading') return <Screen tabBar={false}><IconButton name="back" label="Back" onPress={goBack} /></Screen>;
   // Keyed by the person and the page: the saver is made once, for one person, so another account can never reuse an editor.
-  return <PageEditor key={`${page.uid}:${page.entry?.id ?? NEW_PAGE}`} uid={page.uid} initial={page.entry} goBack={goBack} />;
+  return <PageEditor key={`${page.uid}:${page.entry?.id ?? NEW_PAGE}`} uid={page.uid} initial={page.entry} start={start} goBack={goBack} />;
 }
 
 /** A page that is not in this diary: deleted, or a link from another account. Friendly, and a way out. */
@@ -82,11 +86,11 @@ function useKeyboardVisible(): boolean {
 
 const hasContent = (e: Pick<DiaryEntry, 'title' | 'body' | 'media' | 'place'>) => !!e.title.trim() || !!e.body.trim() || mediaOf(e).length > 0 || normalizePlace(e.place) !== null;
 
-function PageEditor({ uid, initial, goBack }: { uid: string; initial: DiaryEntry | null; goBack: () => void }) {
+function PageEditor({ uid, initial, start, goBack }: { uid: string; initial: DiaryEntry | null; start: string | null; goBack: () => void }) {
   const insets = useSafeAreaInsets();
   const bodyRef = useRef<ComponentRef<typeof TextInput>>(null);
   const [title, setTitle] = useState(initial?.title ?? '');
-  const [body, setBody] = useState(initial?.body ?? '');
+  const [body, setBody] = useState(initial?.body ?? start ?? '');
   const [focused, setFocused] = useState(false);
   const [titleFocus, setTitleFocus] = useState(false);
   const [deleteFailed, setDeleteFailed] = useState(false);
@@ -114,8 +118,8 @@ function PageEditor({ uid, initial, goBack }: { uid: string; initial: DiaryEntry
 
   // Where the caret and the selection are, for the formatting bar. A change made by the bar (or the Return key in a list) puts the
   // caret where it belongs one frame after the new text, and only for a moment: a selection that is always forced fights the typing.
-  const [sel, setSel] = useState<Sel>({ start: (initial?.body ?? '').length, end: (initial?.body ?? '').length });
-  const [forced, setForced] = useState<Sel | null>(null);
+  const [sel, setSel] = useState<Sel>({ start: (initial?.body ?? start ?? '').length, end: (initial?.body ?? start ?? '').length });
+  const [forced, setForced] = useState<Sel | null>(() => (!initial && start ? { start: start.length, end: start.length } : null));
   useEffect(() => {
     if (!forced) return undefined;
     const t = setTimeout(() => setForced(null), 500);
@@ -181,6 +185,11 @@ function PageEditor({ uid, initial, goBack }: { uid: string; initial: DiaryEntry
     if (edit) { apply(edit); bodyRef.current?.focus(); } else if (body.length >= BODY_MAX - 4) say({ tone: 'info', text: problemMessage('body-too-long') });
   };
 
+  // A note that starts from a passage has its quotation on the screen before anything is typed. It is kept with the first thing that is saved (a word, which carries the
+  // whole text, or a photo, which needs the quotation put in first), and a page that was only opened is not saved at all.
+  const seeded = useRef(false);
+  const seed = () => { if (start && !initial && !seeded.current) { seeded.current = true; saver.edit({ body }); } };
+
   const addMedia = async () => {
     if (busy !== 'idle') return;
     say(null);
@@ -193,6 +202,7 @@ function PageEditor({ uid, initial, goBack }: { uid: string; initial: DiaryEntry
       else if (picked.status === 'error') say({ tone: 'error', text: 'The photo library could not be opened. Please try again.' });
       else if (picked.status === 'picked') {
         if (alive.current) setBusy('copying');
+        seed();
         say(attachMessage(await saver.attach(picked.assets)));
       }
     } finally {

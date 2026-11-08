@@ -6,7 +6,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useFonts } from 'expo-font';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Fraunces_600SemiBold } from '@expo-google-fonts/fraunces';
-import { Inter_300Light, Inter_400Regular, Inter_500Medium, Inter_600SemiBold } from '@expo-google-fonts/inter';
+import { Inter_300Light, Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 import { JetBrainsMono_400Regular } from '@expo-google-fonts/jetbrains-mono';
 import { Caveat_700Bold } from '@expo-google-fonts/caveat';
 import { AuthProvider, useAuth } from '@/lib/auth';
@@ -22,7 +22,7 @@ SplashScreen.preventAutoHideAsync();
 setMapSession({ getAccessToken: async () => (await supabase.auth.getSession()).data.session?.access_token ?? null });
 
 export default function RootLayout() {
-  const [loaded, error] = useFonts({ Fraunces_600SemiBold, Inter_300Light, Inter_400Regular, Inter_500Medium, Inter_600SemiBold, JetBrainsMono_400Regular, Caveat_700Bold });
+  const [loaded, error] = useFonts({ Fraunces_600SemiBold, Inter_300Light, Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold, JetBrainsMono_400Regular, Caveat_700Bold });
   if (!loaded && !error) return null;
   return (
     <SafeAreaProvider>
@@ -98,6 +98,8 @@ function RootStack() {
         <Stack.Screen name="library/daily" />
         <Stack.Screen name="library/bible/[code]/index" />
         <Stack.Screen name="library/bible/[code]/[chapter]" />
+        <Stack.Screen name="library/book/[id]/index" />
+        <Stack.Screen name="library/book/[id]/read" />
         <Stack.Screen name="stay/[id]" />
         <Stack.Screen name="write" options={{ presentation: 'fullScreenModal', animation: 'slide_from_bottom' }} />
         <Stack.Screen name="inbox" />

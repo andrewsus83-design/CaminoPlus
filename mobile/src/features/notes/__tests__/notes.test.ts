@@ -1,19 +1,21 @@
-// Plain-node checks of the Notes feed of Me: the diary's pages as a feed. The logic is in features/notes/timeline.ts (pure: which notes a
-// filter shows, the time on a row, the grid of photos and videos, the text the share sheet gets, what a screen reader reads, the
+// Plain-node checks of the Notes feed of Me: the diary's pages as a feed, under ONE card that writes a note (there is no filter row any more: the three
+// filter tabs All, Photos and videos and Places were taken out on purpose, with everything only they used). The logic is in features/notes/timeline.ts
+// (pure: what the list shows, the time on a row, the grid of photos and videos, the text the share sheet gets, what a screen reader reads, the
 // words); thousands of random notes go through it with a seed, so a failure can be repeated. Below it, source-level checks of how
 // the screens are wired, in the style of the diary's wiring test: they read the files, nothing is run. No React, no React Native, no
 // network. Run: npm run test:me (it is run from highlights.test.ts, so it cannot be left out).
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
-import type { DiaryMedia } from '../../diary/media';
-import type { DiaryPlace } from '../../diary/place';
+import { mediaOf, type DiaryMedia } from '../../diary/media';
+import { normalizePlace, type DiaryPlace } from '../../diary/place';
 import { AVATAR_TINTS } from '../../social/logic';
 import {
-  BLANK_NOTE, BODY_CLAMP_PX, BODY_LINES, BODY_LINE_PX, COMPOSER_PLACEHOLDER, DELETE_FAILED, EMPTY_BUTTON, FALLBACK_NAME, FEED_CHARS, FILTER_EMPTY, FILTER_LABEL, MAPS_FAILED, MEDIA_GAP, MEDIA_RATIO,
-  MEDIA_SHOWN_MAX, NOTES_PRIVACY, NOTE_FILTERS, SHARE_FAILED, TOUCH_MIN, feedBody, feedState, filterLabel, filterNotes, hasMedia, hasPlace, identity, matchesFilter, mediaPlan,
-  needsMore, noteCounts, noteRow, noteTime, rowLabel, shareText, tileLabel, toggled, type NoteFilter, type NoteLike,
+  BLANK_NOTE, BODY_CLAMP_PX, BODY_LINES, BODY_LINE_PX, DELETE_FAILED, EMPTY_TEXT, EMPTY_TITLE, FALLBACK_NAME, FEED_CHARS, MAPS_FAILED, MEDIA_GAP, MEDIA_RATIO,
+  MEDIA_SHOWN_MAX, NOTES_PRIVACY, SHARE_FAILED, TOUCH_MIN, WRITE_CARD_MIN, WRITE_NOTE, WRITE_NOTE_HINT, feedBody, feedState, identity, mediaPlan,
+  needsMore, noteRow, noteTime, rowLabel, shareText, tileLabel, toggled, type NoteLike,
 } from '../timeline';
+import * as timeline from '../timeline';
 
 let n = 0;
 const check = (name: string, fn: () => void) => { fn(); n += 1; console.log(`ok   ${name}`); };
@@ -77,80 +79,38 @@ const forEachNote = (count: number, fn: (e: ReturnType<typeof note>, r: Rand, no
 
 /* ================================================================ the words */
 
-check('the words the owner asked for are exactly these', () => {
-  assert.equal(COMPOSER_PLACEHOLDER, "What's happening on your Camino?");
-  assert.equal(NOTES_PRIVACY, 'Notes stay on this phone.');
-  assert.equal(EMPTY_BUTTON, 'Write your first note');
-  assert.deepEqual(NOTE_FILTERS, ['all', 'media', 'places']);
-  assert.deepEqual(NOTE_FILTERS.map((f) => FILTER_LABEL[f]), ['All', 'Photos and videos', 'Places']);
+check('the words the owner asked for are exactly these: the card is "Write a note", opens a blank page, and says under its title that notes stay on this phone', () => {
+  assert.equal(WRITE_NOTE, 'Write a note');
+  assert.equal(WRITE_NOTE_HINT, 'Opens a blank page');
+  assert.equal(NOTES_PRIVACY, 'Notes stay on this phone.', 'the quiet line keeps its wording');
+  assert.equal(EMPTY_TITLE, 'No notes yet', 'the empty diary keeps its title and its text, and has no button of its own');
+  assert.equal(EMPTY_TEXT, 'Write a few lines about your day on the Way: what you saw, who you met, how you feel.');
+  assert.ok(WRITE_CARD_MIN >= 64, 'the card is a big thing to touch: at least 64');
   assert.match(DELETE_FAILED.text, /could not be deleted/);
   for (const m of [DELETE_FAILED, SHARE_FAILED, MAPS_FAILED]) assert.ok(m.title.length > 0 && m.text.length > 0 && !/error|exception|failed/i.test(m.title + m.text), 'calm words, no jargon');
 });
 
-check('what a filter that is empty says is its own: it says what goes there, not that the diary is empty', () => {
-  for (const f of ['media', 'places'] as const) {
-    assert.ok(FILTER_EMPTY[f].title.length > 0 && FILTER_EMPTY[f].text.length > 0);
-    assert.doesNotMatch(FILTER_EMPTY[f].title + FILTER_EMPTY[f].text, /diary is empty|no notes yet/i);
-  }
+/* ================================================================ what the list shows */
+
+/** A page whose photo list and place are damaged on purpose: a stored page can hold anything. */
+const junk: NoteLike = { id: 'junkmedia', createdAt: '2026-11-04T09:00:00.000Z', title: 'Junk', body: '', media: [{ junk: true }] as unknown as DiaryMedia[], place: { lat: 'x' } as unknown as DiaryPlace };
+
+check('a photo list or a place that does not read is not a photo or a place: the row of such a note draws neither (only what the diary can really show counts)', () => {
+  const row = noteRow(junk, new Date(2026, 10, 8, 12), { name: 'Ana' });
+  assert.equal(row.media.length, 0);
+  assert.equal(row.place, null);
+  assert.equal(row.placeText, '');
+  assert.equal(mediaOf(junk).length, 0);
+  assert.equal(normalizePlace(junk.place), null);
+  assert.equal(mediaOf({ id: 'x', createdAt: '', title: '', body: '', media: undefined }).length, 0);
 });
 
-/* ================================================================ the filter */
-
-const sample: NoteLike[] = [
-  { id: 'plain', createdAt: '2026-11-08T09:00:00.000Z', title: 'Plain', body: 'words only' },
-  { id: 'photo', createdAt: '2026-11-07T09:00:00.000Z', title: '', body: 'a photo', media: media(rng(7), 2) },
-  { id: 'place', createdAt: '2026-11-06T09:00:00.000Z', title: '', body: 'a place', place: PLACE('Hontanas') },
-  { id: 'both', createdAt: '2026-11-05T09:00:00.000Z', title: 'Both', body: '', media: media(rng(8), 1), place: PLACE() },
-  { id: 'junkmedia', createdAt: '2026-11-04T09:00:00.000Z', title: 'Junk', body: '', media: [{ junk: true }] as unknown as DiaryMedia[], place: { lat: 'x' } as unknown as DiaryPlace },
-];
-
-check('a filter shows the notes that hold what it says, in the same order, and "All" hands back the very list', () => {
-  const ids = (list: readonly NoteLike[]) => list.map((e) => e.id);
-  assert.deepEqual(ids(filterNotes(sample, 'media')), ['photo', 'both']);
-  assert.deepEqual(ids(filterNotes(sample, 'places')), ['place', 'both']);
-  assert.equal(filterNotes(sample, 'all'), sample);
-  assert.deepEqual(noteCounts(sample), { all: 5, media: 2, places: 2 });
-  assert.deepEqual(noteCounts([]), { all: 0, media: 0, places: 0 });
-  assert.deepEqual(ids(filterNotes([], 'media')), []);
-});
-
-check('a photo list or a place that does not read is not a photo or a place: only what the diary can really show counts', () => {
-  assert.equal(hasMedia({ ...sample[4] }), false);
-  assert.equal(hasPlace({ ...sample[4] }), false);
-  assert.equal(hasMedia({ id: 'x', createdAt: '', title: '', body: '', media: undefined }), false);
-  assert.equal(matchesFilter(sample[4], 'all'), true);
-});
-
-check('random notes: every filter keeps the order, shows only what matches, misses nothing, and the counts are the lengths', () => {
-  for (const seed of SEEDS) {
-    const r = rng(seed);
-    const now = Date.UTC(2026, 10, 8, 12);
-    const list = Array.from({ length: 1200 }, (_, i) => note(r, i, now));
-    const counts = noteCounts(list);
-    for (const f of NOTE_FILTERS) {
-      const shown = filterNotes(list, f);
-      assert.equal(shown.length, counts[f], `seed ${seed}: count of ${f}`);
-      assert.ok(shown.every((e) => matchesFilter(e, f)), `seed ${seed}: ${f} shows only what matches`);
-      assert.ok(list.filter((e) => matchesFilter(e, f)).length === shown.length, `seed ${seed}: ${f} misses nothing`);
-      let at = -1;
-      for (const e of shown) { const k = list.indexOf(e); assert.ok(k > at, `seed ${seed}: ${f} keeps the order`); at = k; }
-    }
-    assert.ok(counts.media <= counts.all && counts.places <= counts.all);
-  }
-});
-
-check('what a tab says for a screen reader: its name and how many notes it holds, in the singular when it is one', () => {
-  assert.equal(filterLabel('all', 12), 'All, 12 notes');
-  assert.equal(filterLabel('media', 1), 'Photos and videos, 1 note');
-  assert.equal(filterLabel('places', 0), 'Places, 0 notes');
-});
-
-check('what the list shows: nothing yet while the diary is being read, the empty diary, a filter with nothing in it, or the notes', () => {
-  assert.equal(feedState({ ready: false, total: 0, shown: 0 }), 'loading');
-  assert.equal(feedState({ ready: false, total: 9, shown: 9 }), 'loading', 'never "empty" to someone whose notes are still being read');
-  assert.equal(feedState({ ready: true, total: 0, shown: 0 }), 'empty');
-  assert.equal(feedState({ ready: true, total: 4, shown: 0 }), 'none-for-filter');
-  assert.equal(feedState({ ready: true, total: 4, shown: 2 }), 'list');
+check('what the list shows: nothing yet while the diary is being read, the empty diary, or the notes; there is no third kind of empty (no filter that could hold nothing)', () => {
+  assert.equal(feedState({ ready: false, total: 0 }), 'loading');
+  assert.equal(feedState({ ready: false, total: 9 }), 'loading', 'never "empty" to someone whose notes are still being read');
+  assert.equal(feedState({ ready: true, total: 0 }), 'empty');
+  assert.equal(feedState({ ready: true, total: 1 }), 'list');
+  assert.equal(feedState({ ready: true, total: 4 }), 'list');
 });
 
 /* ================================================================ the time of a row */
@@ -465,13 +425,13 @@ check('a draft says so on its row: the tag, and the sentence a screen reader rea
   assert.equal(rowLabel({ name: 'Ana', time: null, title: '', text: 'Wind!', meta: '', draft: true }), 'Ana. Draft. Wind!');
 });
 
-check('random notes, thousands of them: a row never throws, never says undefined or NaN, and what it draws agrees with what the filters and the grid think of the note', () => {
+check('random notes, thousands of them: a row never throws, never says undefined or NaN, and what it draws agrees with what the diary and the grid think of the note', () => {
   forEachNote(900, (e, _r, now) => {
     const row = noteRow(e, now, { name: 'Ana' });
     assert.equal(row.id, e.id);
     assert.ok(row.media.length <= 12);
-    assert.equal(row.media.length > 0, hasMedia(e));
-    assert.equal(row.place !== null, hasPlace(e));
+    assert.equal(row.media.length > 0, mediaOf(e).length > 0);
+    assert.equal(row.place !== null, normalizePlace(e.place) !== null);
     assert.equal(row.placeText === '', row.place === null);
     assert.ok(row.body.length <= FEED_CHARS && row.full.startsWith(row.body));
     assert.doesNotMatch(row.label, /undefined|NaN|null|\[object/);
@@ -500,12 +460,6 @@ check('a thing to touch is at least 44 pixels', () => {
   assert.ok(TOUCH_MIN >= 44);
 });
 
-const FILTERS_CHECKED: NoteFilter[] = [...NOTE_FILTERS];
-check('every filter is one the tab knows', () => {
-  assert.equal(FILTERS_CHECKED.length, 3);
-  for (const f of FILTERS_CHECKED) assert.ok(FILTER_LABEL[f]);
-});
-
 /* ================================================================ the screens, read as source */
 
 const DIR = 'src/features/notes';
@@ -517,10 +471,10 @@ check('the Notes tab is the files this test expects, so a new one is looked at (
   assert.deepEqual(files, ['NoteMedia.tsx', 'NoteMenu.tsx', 'NoteRow.tsx', 'NotesHeader.tsx', 'NotesTab.tsx', 'timeline.ts']);
 });
 
-check('Me gets what was agreed: a named export NotesTab with one optional prop, `top` (what is above the notes), and no gold pen of its own (Me draws it)', () => {
+check('Me gets what was agreed: a named export NotesTab with one optional prop, `top` (what is above the notes), and no floating button of its own (Me draws the chat button)', () => {
   const src = code('NotesTab.tsx');
   assert.match(src, /export function NotesTab\(\{ top \}: \{ top\?: ReactNode \}\) \{/);
-  for (const f of files) assert.doesNotMatch(code(f), /\bFab\b/, `${f}: the gold pen belongs to Me, which draws one at a time (features/me/tabs.ts)`);
+  for (const f of files) assert.doesNotMatch(code(f), /\bFab\b/, `${f}: the floating button belongs to Me, which draws one, the chat button, on every sub-tab (features/me/tabs.ts)`);
   assert.doesNotMatch(src, /\bScreen\b/, 'the tab does not bring a screen of its own: it fills what Me gives it');
   assert.match(src, /\{top\}\s*<NotesHeader\b/, '`top` is the first thing in the list: it scrolls away with the notes');
 });
@@ -528,7 +482,7 @@ check('Me gets what was agreed: a named export NotesTab with one optional prop, 
 check('the tab owns its scroll, and it is a virtualised list: a FlatList of every note, only the rows on screen drawn, never the notes mapped into a view', () => {
   const src = code('NotesTab.tsx');
   assert.match(src, /<FlatList\b/);
-  assert.match(src, /data=\{shown\}/, 'every note is in the list, and the list draws the ones on screen');
+  assert.match(src, /data=\{entries\}/, 'every note of the diary is in the list (there is no filter that holds some back), and the list draws the ones on screen');
   assert.match(src, /keyExtractor=\{keyOf\}/);
   assert.match(src, /initialNumToRender=\{6\}/);
   assert.match(src, /windowSize=\{7\}/);
@@ -569,16 +523,22 @@ check('Share gives the share sheet the text of the note and nothing else, and co
   assert.match(code('NoteRow.tsx'), /row\.share !== ''/, 'and the button is only there when there is text');
 });
 
-check('a tap on a row opens the page (Read view), the composer and its shortcuts open a new one, Edit opens the page, and nothing in the editor is changed to make that so', () => {
+check('a tap on a row opens the page (Read view), the ONE card opens a new one, Edit opens the page, and nothing in the editor is changed to make that so', () => {
   const tab = code('NotesTab.tsx');
   assert.match(tab, /router\.push\(`\/diary\/\$\{id\}`\)/);
   assert.match(tab, /router\.push\('\/diary\/new'\)/);
+  assert.match(tab, /<NotesHeader onWrite=\{write\} \/>/, 'the card is given the one way to write');
   const header = code('NotesHeader.tsx');
-  assert.equal((header.match(/onPress=\{onWrite\}/g) ?? []).length, 3, 'the prompt and the two shortcuts');
-  assert.match(header, /label="Write a new note, then add a photo"/);
-  assert.match(header, /label="Write a new note, then add a place"/, 'the labels say what really happens: the page opens, the person adds the photo or the place there');
-  assert.match(header, /<AppText[^>]*>\{COMPOSER_PLACEHOLDER\}<\/AppText>/);
-  assert.match(header, /\{NOTES_PRIVACY\}/);
+  assert.equal((header.match(/onPress=\{onWrite\}/g) ?? []).length, 1, 'the card is the only way in: no prompt and no shortcuts next to it');
+  assert.equal((header.match(/<Pressable\b/g) ?? []).length, 1, 'the whole card is ONE button');
+  assert.match(header, /accessibilityRole="button"\s+accessibilityLabel=\{WRITE_NOTE\}\s+accessibilityHint=\{WRITE_NOTE_HINT\}/, 'labelled "Write a note", hint "Opens a blank page"');
+  assert.match(header, /<AppText variant="h4">\{WRITE_NOTE\}<\/AppText>/, 'the title');
+  assert.match(header, /<AppText variant="caption" muted>\{NOTES_PRIVACY\}<\/AppText>/, 'and under it the one quiet line');
+  assert.match(header, /<Icon name="compose" color=\{role\.onHighlight\}/, 'the compose glyph');
+  assert.match(header, /backgroundColor: role\.highlight/, 'on a gold circle');
+  assert.match(header, /minHeight: WRITE_CARD_MIN/, 'a card at least 64 high');
+  assert.doesNotMatch(header, /COMPOSER|Shortcut|then add a photo|then add a place|PilgrimAvatar|Write a new note|numberOfLines/, 'the composer row (the avatar, the prompt, the two shortcuts) is gone');
+  assert.match(tab, /edit: open,/, 'Edit opens the page as well: the editor is not changed, so it is the page that opens, and Edit is on it');
 });
 
 check('a failure is told in the system dialog (like the question before a delete), seen wherever the list is scrolled to, and a tap on a row, and Edit, open the page', () => {
@@ -589,14 +549,29 @@ check('a failure is told in the system dialog (like the question before a delete
   assert.match(tab, /edit: open,/, 'Edit opens the page as well: the editor is not changed, so it is the page that opens, and Edit is on it');
 });
 
-check('the filter row is tabs: a tablist, each one a tab with its selected state and a label that holds the count', () => {
-  const header = code('NotesHeader.tsx');
-  assert.match(header, /accessibilityRole="tablist"/);
-  assert.match(header, /accessibilityRole="tab"/);
-  assert.match(header, /accessibilityState=\{\{ selected: on \}\}/);
-  assert.match(header, /aria-selected=\{on\}/, 'and the web says it too (the browser reads aria-selected, not accessibilityState)');
-  assert.match(header, /accessibilityLabel=\{filterLabel\(f, counts\[f\]\)\}/);
-  assert.match(header, /NOTE_FILTERS\.map\(/);
+check('there is no filter row: no tablist, no tab, no filter words and no counts anywhere in the Notes tab, and the three tabs All, Photos and videos, Places left no code behind', () => {
+  for (const f of files) {
+    const src = code(f);
+    assert.doesNotMatch(src, /accessibilityRole="tab(?:list)?"|aria-selected|NOTE_FILTERS|NoteFilter|FILTER_LABEL|FILTER_EMPTY|filterNotes|noteCounts|filterLabel|matchesFilter|SHOW_ALL|none-for-filter|setFilter|const \[filter|hasMedia|hasPlace/, `${f}: nothing of the filter is left`);
+    assert.doesNotMatch(src, /Photos and videos|Show all notes|No photos or videos yet|No places yet/, `${f}: the words of the tabs are gone`);
+  }
+  for (const gone of ['NOTE_FILTERS', 'FILTER_LABEL', 'FILTER_EMPTY', 'filterNotes', 'noteCounts', 'filterLabel', 'matchesFilter', 'hasMedia', 'hasPlace', 'SHOW_ALL', 'COMPOSER_PLACEHOLDER', 'EMPTY_BUTTON']) {
+    assert.ok(!(gone in timeline), `timeline.ts no longer exports ${gone}`);
+  }
+  const tab = code('NotesTab.tsx');
+  assert.doesNotMatch(tab, /filter|counts/i, 'the tab keeps no state for a filter and counts nothing');
+  assert.match(tab, /const state = feedState\(\{ ready, total: entries\.length \}\);/, 'what the list shows depends on the diary alone');
+});
+
+check('the empty diary says "No notes yet" and has no button of its own: the card above it is the way in; the feed has one place to write and no other', () => {
+  const tab = code('NotesTab.tsx');
+  assert.match(tab, /<Empty title=\{EMPTY_TITLE\} text=\{EMPTY_TEXT\} \/>/);
+  assert.match(tab, /function Empty\(\{ title, text \}: \{ title: string; text: string \}\)/, 'the empty state takes a title and a text and nothing else');
+  assert.doesNotMatch(tab, /<Pill\b|Pill'|EMPTY_BUTTON|Write your first note/, 'no second write button under the card');
+  const empty = tab.slice(tab.indexOf('function Empty('), tab.indexOf('export function NotesTab'));
+  assert.doesNotMatch(empty, /Pressable|onPress|button/i, 'nothing in the empty state can be pressed');
+  assert.equal((tab.match(/<Empty\b/g) ?? []).length, 1, 'one empty state: the diary has no notes (a filter that holds none is gone)');
+  assert.equal((tab.match(/<NotesHeader\b/g) ?? []).length, 1, 'one card');
 });
 
 check('a row is one thing for a screen reader, with the actions of its parts as actions; the buttons in it all have a label', () => {
@@ -610,7 +585,7 @@ check('a row is one thing for a screen reader, with the actions of its parts as 
   assert.match(row, /style=\{\[\{ fontSize: 20, lineHeight: 26, marginTop: 2 \}, breakAnywhere\]\}>\{row\.title\}/, 'a very long word in a title breaks on the web instead of widening the note');
 });
 
-check('every control has a label and is at least 44 big: Pressables, buttons and the filter tabs', () => {
+check('every control has a label and is at least 44 big: Pressables, buttons and the card', () => {
   for (const f of tsx) {
     const src = code(f);
     for (const m of src.matchAll(/<Pressable\b/g)) assert.match(src.slice(m.index, (m.index ?? 0) + 700), /accessibilityLabel=/, `${f}: a Pressable without a label`);
@@ -622,8 +597,8 @@ check('every control has a label and is at least 44 big: Pressables, buttons and
   assert.equal((code('NoteRow.tsx').match(/width: TOUCH_MIN, height: TOUCH_MIN/g) ?? []).length, 2, 'the "…" button and the Share button');
   assert.match(code('NoteRow.tsx'), /minHeight: TOUCH_MIN, justifyContent: 'center', alignSelf: 'flex-start'/, '"Show more"');
   assert.match(code('NoteRow.tsx'), /maxWidth: '100%', minHeight: TOUCH_MIN/, 'the place chip');
-  assert.match(code('NotesHeader.tsx'), /width: TOUCH_MIN, height: TOUCH_MIN/, 'the two shortcuts');
-  assert.equal((code('NotesHeader.tsx').match(/minHeight: TOUCH_MIN/g) ?? []).length, 2, 'the prompt and each tab of the filter');
+  assert.match(code('NotesHeader.tsx'), /minHeight: WRITE_CARD_MIN/, 'the card is at least WRITE_CARD_MIN (64) high, more than a thing to touch needs');
+  assert.ok(WRITE_CARD_MIN >= TOUCH_MIN + 20);
   assert.match(code('NoteMenu.tsx'), /minHeight: layout\.touchMin/, 'the items of the menu are 56');
 });
 
@@ -665,7 +640,7 @@ check('colours come from the theme: none written out, no stylesheet, and no colo
   for (const f of tsx) assert.match(read(`${DIR}/${f}`), /from '@\/theme'/, `${f} takes its colours from the theme`);
 });
 
-check('the pairs the Notes tab draws keep their contrast in light and in dark, read from the tokens the theme is built from: text 4.5 : 1, icons and the line of a selected tab 3 : 1', () => {
+check('the pairs the Notes tab draws keep their contrast in light and in dark, read from the tokens the theme is built from: text 4.5 : 1, icons 3 : 1', () => {
   type Tokens = { color: Record<string, string>; role: Record<string, string>; dark: { color: Record<string, string>; role: Record<string, string> } };
   const tokens = JSON.parse(read('src/theme/tokens.json')) as Tokens;
   const palette = (dark: boolean): Record<string, string> => ({ ...tokens.color, ...(dark ? tokens.dark.color : {}) });
@@ -680,18 +655,21 @@ check('the pairs the Notes tab draws keep their contrast in light and in dark, r
   // [what it is, foreground, background, needed]: a role of tokens.json by its token name, or a colour of the palette written as c:name
   const pairs: [string, string, string, number][] = [
     ['words, name and title on the page', 'text', 'bg', 4.5],
-    ['handle, time, the prompt and the line under the composer (muted) on the page', 'textMuted', 'bg', 4.5],
+    ['handle and time (muted) on the page', 'textMuted', 'bg', 4.5],
     ['"Show more" (accent text) on the page', 'textAccent', 'bg', 4.5],
     ['words on a row while it is pressed (sunken)', 'text', 'surfaceSunken', 4.5],
     ['handle and time on a row while it is pressed', 'textMuted', 'surfaceSunken', 4.5],
     ['"Show more" on a row while it is pressed', 'textAccent', 'surfaceSunken', 4.5],
-    ['the line under the selected tab and the two shortcuts (action) on the page', 'action', 'bg', 3],
+    ['the title of the write card (text on surface)', 'text', 'surface', 4.5],
+    ['the quiet line of the write card (muted on surface)', 'textMuted', 'surface', 4.5],
+    ['the title of the write card while it is pressed (text on sunken)', 'text', 'surfaceSunken', 4.5],
+    ['the quiet line of the write card while it is pressed (muted on sunken)', 'textMuted', 'surfaceSunken', 4.5],
+    ['the arrow of the write card (muted on surface)', 'textMuted', 'surface', 3],
     ['the dots and the share icon (muted) on the page', 'textMuted', 'bg', 3],
     ['the name of a place on its chip (surface)', 'text', 'surface', 4.5],
     ['the pin on the chip (accent text on surface)', 'textAccent', 'surface', 3],
     ['the mark of a file that is not here (muted on sunken)', 'textMuted', 'surfaceSunken', 3],
-    ['the button of the empty state (onAction on action)', 'onAction', 'action', 4.5],
-    ['the pen of the empty state (onHighlight on highlight)', 'onHighlight', 'highlight', 4.5],
+    ['the glyph on the gold circle of the write card and of the empty state (onHighlight on highlight)', 'onHighlight', 'highlight', 4.5],
     ['Delete in the menu (danger on surface)', 'danger', 'surface', 4.5],
     ['Delete in the menu while it is pressed (danger on the page colour)', 'danger', 'bg', 4.5],
     ['Edit in the menu while it is pressed (text on the page colour)', 'text', 'bg', 4.5],
@@ -731,16 +709,19 @@ check('the colours the contrast guard above assumes are the ones the code draws 
   assert.match(row, /borderColor: role\.border, backgroundColor: role\.surface/, 'the place chip is the surface colour');
   assert.match(row, /<Text style=\{\[textStyle\('caption'\), \{ color: role\.muted \}\]\}>/, 'the handle is muted');
   assert.match(row, /<AppText variant="caption" muted style=\{\{ flexShrink: 0 \}\}>/, 'and so is the time');
-  assert.match(header, /borderBottomColor: on \? role\.action : 'transparent'/);
-  assert.match(header, /color=\{on \? role\.text : role\.muted\}/);
-  assert.match(header, /<Icon name=\{icon\} color=\{role\.action\}/);
-  assert.match(header, /<AppText muted numberOfLines=\{2\}>\{COMPOSER_PLACEHOLDER\}<\/AppText>/);
+  assert.match(header, /backgroundColor: pressed \? role\.sunken : role\.surface/, 'the card is the surface colour, and the sunken one while it is pressed');
+  assert.match(header, /borderColor: role\.border/, 'with a hairline');
+  assert.match(header, /<Icon name="compose" color=\{role\.onHighlight\}/);
+  assert.match(header, /backgroundColor: role\.highlight/);
+  assert.match(header, /<AppText variant="h4">\{WRITE_NOTE\}<\/AppText>/, 'the title is the text colour');
+  assert.match(header, /<AppText variant="caption" muted>\{NOTES_PRIVACY\}<\/AppText>/, 'the quiet line is muted');
+  assert.match(header, /<Icon name="chevron" color=\{role\.muted\}/);
   assert.match(menu, /backgroundColor: pressed \? role\.bg : 'transparent'/, 'a pressed menu item is the page colour (the sunken one is 4.50 : 1 with Delete in dark mode)');
   assert.match(menu, /const colour = danger \? role\.danger : role\.text;/);
   assert.match(menu, /backgroundColor: role\.surface, borderTopLeftRadius/);
   assert.match(tab, /backgroundColor: role\.highlight/);
   assert.match(tab, /<Icon name="compose" color=\{role\.onHighlight\}/);
-  assert.match(tab, /<Pill large variant=\{ghost \? 'ghost' : 'primary'\}/);
+  assert.doesNotMatch(tab, /<Pill\b/, 'the empty state has no button: its colours are not in the audit');
 });
 
 check('the photos and videos use the diary\'s own tile (the loader, the "Not on this phone" tile, the play tile) and its full-screen viewer, and say which one of how many', () => {
@@ -775,11 +756,11 @@ check('the text of a note is the diary\'s RichText, clamped to eight lines by it
   assert.match(row, /aria-expanded=\{open\}/);
 });
 
-check('the list leaves room under the last note for the gold pen and the floating tab bar, the same numbers the Fab and the tab bar use', () => {
+check('the list leaves room under the last note for the chat button and the floating tab bar, the same numbers the Fab and the tab bar use', () => {
   const src = code('NotesTab.tsx');
   assert.match(src, /paddingBottom: layout\.tabbarHeight \+ insets\.bottom \+ 96/);
   const fab = read('src/components/Fab.tsx');
-  assert.match(fab, /Math\.max\(insets\.bottom - 14, 10\) \+ 88 \+ 8, width: 60, height: 60/, 'the pen: 8 above the bar, 60 high');
+  assert.match(fab, /Math\.max\(insets\.bottom - 14, 10\) \+ 88 \+ 8, width: 60, height: 60/, 'the chat button: 8 above the bar, 60 high');
   assert.ok(100 + 96 >= 88 + 8 + 60 + 16 + 10, 'the room is more than the bar, the pen and a margin');
   assert.equal((JSON.parse(read('src/theme/tokens.json')) as { layout: { tabbarHeight: number } }).layout.tabbarHeight, 100);
 });
@@ -789,7 +770,6 @@ check('it shows the person who wrote the notes the way a post does (name, handle
   assert.match(tab, /const \{ profile \} = useAuth\(\);/);
   assert.match(tab, /identity\(profile\)/);
   assert.match(code('NoteRow.tsx'), /<PilgrimAvatar\b/);
-  assert.match(code('NotesHeader.tsx'), /<PilgrimAvatar\b/);
   for (const f of files) assert.doesNotMatch(code(f), /SAMPLE_|sample\.ts|from '\.\.\/sample'/, `${f}: no invented notes: the feed only ever shows the pages that are in the diary`);
 });
 

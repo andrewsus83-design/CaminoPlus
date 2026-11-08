@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import tokens from '../../theme/tokens.json';
-import { applyScheme, c, fixed, fonts, role, scrim } from '../../theme';
+import { applyScheme, c, fixed, fonts, role, scrim, tabActiveWeight } from '../../theme';
 
 let n = 0;
 const check = (name: string, fn: () => void) => { fn(); n += 1; console.log(`ok   ${name}`); };
@@ -169,8 +169,8 @@ check('the tab bar draws the active tab in role.tabActive and the inactive ones 
 check('the inactive tabs are thinner and lighter than the active one in weight as well as colour: a thin stroke and a Light label against a thick stroke and a SemiBold label', () => {
   // The owner asked (2026-11-08) for inactive tabs that are lighter and more transparent in light and dark mode; colour alone did not say it all.
   const src = read(join('src', 'components', 'TabBar.tsx'));
-  assert.match(src, /strokeWidth=\{focused \? 2\.6 : 1\.3\}/, 'the active icon is drawn at 2.6, the inactive ones at 1.3');
-  assert.match(src, /fontFamily: focused \? fonts\.bodyBold : fonts\.bodyLight/, 'the active label is SemiBold, the inactive ones Light');
+  assert.match(src, /strokeWidth=\{focused \? tabActiveWeight\.stroke : 1\.3\}/, 'the active icon is drawn as heavy as tokens.tab says, the inactive ones at 1.3');
+  assert.match(src, /fontFamily: focused \? tabActiveWeight\.font : fonts\.bodyLight/, 'the active label is as heavy as tokens.tab says, the inactive ones Light');
   assert.equal(fonts.bodyLight, 'Inter_300Light');
   const layoutSrc = read(join('app', '_layout.tsx'));
   assert.match(layoutSrc, /import \{[^}]*\bInter_300Light\b[^}]*\} from '@expo-google-fonts\/inter'/, 'Inter Light is imported');
@@ -178,7 +178,31 @@ check('the inactive tabs are thinner and lighter than the active one in weight a
   const page = readFileSync(join(root, '..', 'design', 'index.html'), 'utf8');
   assert.match(page, /\.cp-tab \{[^}]*font-weight: 300/, 'the design page draws the inactive label Light');
   assert.match(page, /\.cp-tab \.cp-icon \{[^}]*stroke-width: 1\.3px/, 'and the inactive icon thin');
-  assert.match(page, /\.cp-tab\.on \.ico \.cp-icon \{[^}]*stroke-width: 2\.6px/, 'the active icon thick');
+  assert.match(page, /\.cp-tab\.on \.ico \.cp-icon \{[^}]*stroke-width: var\(--cp-tab-active-stroke\)/, 'the active icon thick (the variable of the mode)');
+});
+
+check('the active tab is drawn a little heavier in light mode than in dark mode: dark on light looks thinner than light on dark with the same stroke (the ink is the same in both modes, the owner saw light mode as thinner)', () => {
+  const t = tokens.tab as { activeStroke: { light: number; dark: number }; activeLabelWeight: { light: number; dark: number } };
+  assert.ok(t.activeStroke.light > t.activeStroke.dark, 'a thicker icon in light mode');
+  assert.ok(t.activeLabelWeight.light > t.activeLabelWeight.dark, 'a heavier label in light mode');
+  for (const s of ['light', 'dark'] as const) assert.ok(t.activeStroke[s] >= 1.3 * 1.5, `${s}: the active icon stays much heavier than the inactive one (1.3)`);
+  assert.ok(t.activeStroke.light <= t.activeStroke.dark * 1.3, 'a compensation, not a different weight: at most 30 percent more');
+  applyScheme('light');
+  assert.equal(tabActiveWeight.stroke, t.activeStroke.light);
+  assert.equal(tabActiveWeight.font, 'Inter_700Bold');
+  applyScheme('dark');
+  assert.equal(tabActiveWeight.stroke, t.activeStroke.dark);
+  assert.equal(tabActiveWeight.font, 'Inter_600SemiBold');
+  applyScheme('light');
+  assert.equal(fonts.bodyStrong, 'Inter_700Bold');
+  const layoutSrc = read(join('app', '_layout.tsx'));
+  assert.match(layoutSrc, /import \{[^}]*\bInter_700Bold\b[^}]*\} from '@expo-google-fonts\/inter'/, 'Inter Bold is imported');
+  assert.match(layoutSrc, /useFonts\(\{[^}]*\bInter_700Bold\b/, 'and loaded with the other fonts, or the active label would fall back to the system font');
+  const css = readFileSync(join(root, '..', 'design', 'tokens.css'), 'utf8');
+  assert.match(css, new RegExp(`--cp-tab-active-stroke:\\s*${t.activeStroke.light}px`), 'tokens.css has the light stroke');
+  assert.match(css, new RegExp(`--cp-tab-active-weight:\\s*${t.activeLabelWeight.light};`), 'tokens.css has the light weight');
+  const page = readFileSync(join(root, '..', 'design', 'index.html'), 'utf8');
+  assert.match(page, new RegExp(`\\.phone\\.dk \\{[^}]*--cp-tab-active-stroke:${t.activeStroke.dark}px;--cp-tab-active-weight:${t.activeLabelWeight.dark};`), 'the dark phones carry the dark values');
 });
 
 check('the tab bar roles exist in both modes of design/tokens.json: the dark section has its own value for each', () => {
@@ -231,6 +255,28 @@ check('nothing blue is drawn on gold: text and icons on gold are role.onHighligh
     });
   }
   assert.deepEqual(offenders, [], 'c.blue on gold is 1.06:1 in dark mode');
+});
+
+check('the day circle of the Plan tracker: the number on the gold circle of the next day is role.onHighlight (never c.blue, which is light blue in dark mode: 1.06 : 1 on gold) and passes 4.5 : 1 in light and dark; the done and later circles are as they were', () => {
+  // The check above reads one line at a time, and the circle's gold is on one line and its number on the next, so this one reads the circle.
+  const me = read(join('app', '(tabs)', 'me.tsx'));
+  const tracker = me.slice(me.indexOf('function PlanTracker'), me.indexOf('function ago('));
+  assert.ok(tracker.length > 500, 'the Plan tracker was not found in me.tsx');
+  const circle = tracker.slice(tracker.indexOf('<View style={{ width: 36, height: 36'), tracker.indexOf('{i < days.length - 1'));
+  assert.match(circle, /backgroundColor: done \? c\.success : isNext \? c\.gold : role\.surface/, 'the next day is the gold circle');
+  assert.match(circle, /<AppText variant="caption" color=\{isNext \? role\.onHighlight : role\.muted\} style=\{\{ fontFamily: 'Inter_600SemiBold' \}\}>\{d\.day_number\}<\/AppText>/, 'its number is role.onHighlight; a later day is role.muted');
+  assert.doesNotMatch(circle, /isNext \? c\.blue|color=\{c\.blue\}/, 'no c.blue on the gold circle');
+  assert.match(circle, /\{done \? <Icon name="check" color=\{c\.white\} size=\{20\} \/>/, 'the done circle keeps its white tick');
+  assert.match(circle, /borderWidth: done \|\| isNext \? 0 : 2, borderColor: c\.sand300/, 'and a later day its ring');
+  // the gold is the palette gold (it never changes with the mode) and the number on it is the role for text on gold
+  for (const scheme of ['light', 'dark'] as const) {
+    applyScheme(scheme);
+    const got = ratio(role.onHighlight, c.gold);
+    assert.ok(got >= 4.5, `${scheme}: the day number on the gold circle is ${got.toFixed(2)}:1, needs 4.5:1`);
+    assert.ok(ratio(role.muted, role.surface) >= 4.5, `${scheme}: the number of a later day (muted on surface) keeps 4.5:1`);
+    assert.ok(ratio(c.white, c.success) >= 3, `${scheme}: the white tick on the green of a done day keeps 3:1 (it is an icon)`);
+  }
+  applyScheme('light');
 });
 
 check('no theme colour is read once when a file loads: it would never follow the light/dark mode', () => {
