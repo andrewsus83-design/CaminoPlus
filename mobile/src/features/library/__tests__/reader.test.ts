@@ -850,11 +850,11 @@ check('the end of a chapter: the credit of the translation, then one plain line 
   assert.ok(READER_NOTE.split(' ').length <= 5 && CHAPTERS_NOTE.split(' ').length <= 5, 'the handwritten notes are a few words');
 });
 
-check('the words of the Bible tab and of the notices: the source line is one quiet line; the notices are honest about what is real (the Bible) and what is an example (the twelve books)', () => {
+check('the words of the Bible tab and of the notices: the source line is one quiet line; the notices are honest about what is real (the Bible, and the books marked Free) and what is not in the app yet (the books marked Soon)', () => {
   assert.equal(BIBLE_SOURCE_LINE, 'World English Bible, Catholic edition · public domain');
   assert.equal(BOOKS_NOTICE, 'Books are not in the app yet. We are checking the editions before we add them.');
-  assert.equal(SEARCH_NOTICE, 'The twelve books are examples: they are not in the app yet. The Bible text is.');
-  assert.match(BOOKMARKS_NOTICE, /^The twelve books are examples/);
+  assert.equal(SEARCH_NOTICE, 'Books marked Soon are not in the app yet: we are still checking their editions. The Bible text and the books marked Free are.');
+  assert.match(BOOKMARKS_NOTICE, /^Books marked Soon are not in the app yet/);
   assert.equal(BOOKMARKS_KEPT, 'Kept only on this phone. Logging out clears them.');
   for (const text of [BIBLE_SOURCE_LINE, BOOKS_NOTICE, SEARCH_NOTICE, BOOKMARKS_NOTICE]) assert.doesNotMatch(text, /verified|official|certified/i, text);
   assert.doesNotMatch(`${BIBLE_SOURCE_LINE} ${SEARCH_NOTICE} ${BOOKMARKS_NOTICE}`, /not in the app yet\. We are choosing a translation/, 'the old "Bible text is not in the app yet" is gone');

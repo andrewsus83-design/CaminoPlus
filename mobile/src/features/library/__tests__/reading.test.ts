@@ -3,6 +3,8 @@
 // phone width from 320 to 430, the title and the author fitted into their covers, and the three states of the banner of the Books tab.
 // No React, no React Native, no network. Run: npm run test:library (library.test.ts runs this file too).
 import assert from 'node:assert/strict';
+import { existsSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { BOOK_CATALOG } from '../books/catalog';
 import {
   CONTINUE_CTA, CONTINUE_NOTE, NONE_LINE, START_CTA, START_NOTE, booksBanner, booksNotice, bookPath, readerPath,
@@ -15,10 +17,11 @@ import {
 } from '../books/readerType';
 import {
   FINISHED_AT, PIECE_MAX, READING_MAX_BOOKS, READING_MAX_READ, READ_AT, blockWords, bookFacts, chapterIndex, chapterNav, countWords, destination, emptyReading, groupThousands,
-  hasParts, isRead, lastRead, markRead, nextLabel, offsetFor, packReading, parseReading, pieces, placeOf, positionLine, previousLabel, readButtonLabel, readButtonSpoken,
-  readSet, readingTime, resumeAt, savePlace, scrollProgress, shortTitle, splitMarker, startAt, tocGroups, type ChapterRef,
+  hasParts, isRead, lastRead, layoutBlocks, markRead, nextLabel, offsetFor, packReading, parseReading, partName, pieces, placeOf, positionLine, previousLabel, readButtonLabel,
+  readButtonSpoken, readSet, readingTime, resumeAt, savePlace, scrollProgress, shortTitle, splitMarker, splitTitle, startAt, tocGroups, type ChapterRef,
 } from '../books/reading';
 import { textWidth, wrap } from '../books/typeMetrics';
+import type { BookBlock, BookText, BookTextIndexEntry } from '../books/bookTextTypes';
 
 let n = 0;
 const check = (name: string, fn: () => void) => { fn(); n += 1; console.log(`ok   ${name}`); };
@@ -116,6 +119,42 @@ check('a short title: "Chapter VII" for a numbered chapter, the title for a shor
   assert.ok(!long.slice(0, -1).endsWith(' '));
   assert.equal(shortTitle('Chapters of the matter that are many'), 'Chapters of the matter that are many'.length <= 28 ? 'Chapters of the matter that are many' : shortTitle('Chapters of the matter that are many'));
   assert.doesNotMatch(shortTitle('Chapter VII. x'), /Chapter VII\./);
+});
+
+check('a long title is split in two: "Chapter XXXVI" and what the chapter is about, a title with no number is only a label, and a part is shortened to its name', () => {
+  const nb = (t: string) => t.replace(/\xa0/g, ' ');
+  const long = 'Chapter XXXVI. The Foundation of the Monastery of St. Joseph. Persecution and Temptations. Great Interior Trial of the Saint, and Her Deliverance.';
+  const split = splitTitle(long);
+  assert.equal(nb(split.label), 'Chapter XXXVI');
+  assert.equal(split.subtitle, 'The Foundation of the Monastery of St. Joseph. Persecution and Temptations. Great Interior Trial of the Saint, and Her Deliverance.');
+  assert.deepEqual(splitTitle('Prologue'), { label: 'Prologue', subtitle: '' });
+  assert.deepEqual(splitTitle('Book X'), { label: 'Book\xa0X', subtitle: '' });
+  assert.equal(nb(splitTitle('Chapter 7: A short one').label), 'Chapter 7');
+  assert.equal(splitTitle('Chapter 7: A short one').subtitle, 'A short one');
+  assert.deepEqual(splitTitle('  Book  Divine   Things '), { label: 'Book Divine Things', subtitle: '' }, 'a word that only starts like a numeral is not one');
+  assert.equal(partName('The First Book. Admonitions Profitable for the Spiritual Life'), 'The First Book');
+  assert.equal(partName('Book One'), 'Book One');
+  assert.equal(partName("St. Joseph's Mansion"), "St. Joseph's Mansion", 'a full stop after St is not the end of a sentence');
+  assert.equal(partName('The Third Mansions. Chapter of St. Peter'), 'The Third Mansions');
+  assert.equal(partName('  The  Fourth   Book.   Of the Altar '), 'The Fourth Book');
+  assert.equal(partName(''), '');
+});
+
+check('the blocks of a chapter become the things to draw: a long paragraph in pieces, every other block whole, a break with no text, and a damaged block is left out and never throws', () => {
+  const long = 'The soul rests in God alone. '.repeat(400).trim();
+  const blocks = [{ k: 'h', t: 'A heading' }, { k: 'p', t: long }, { k: 'q', t: 'one\ntwo' }, { k: 'hr' }, { k: 'li', t: '1. a point' }, { k: 'p', t: 'short' }] as BookBlock[];
+  const items = layoutBlocks(blocks);
+  assert.deepEqual(items.map((i) => i.k), ['h', ...Array(items.filter((i) => i.key.startsWith('1.')).length).fill('p'), 'q', 'hr', 'li', 'p']);
+  const pieces1 = items.filter((i) => i.key.startsWith('1.'));
+  assert.ok(pieces1.length >= 3, 'the long paragraph is in several pieces');
+  assert.equal(pieces1.map((i) => i.t).join(''), long);
+  assert.deepEqual(pieces1.map((i) => [i.cont, i.end]), pieces1.map((_, k) => [k > 0, k === pieces1.length - 1]), 'a piece after the first continues; the last one ends the paragraph');
+  assert.equal(items.find((i) => i.k === 'q')!.t, 'one\ntwo', 'the new line of a poem stays in the text');
+  assert.deepEqual(items.find((i) => i.k === 'hr'), { key: '3', k: 'hr', t: '', cont: false, end: true });
+  assert.equal(new Set(items.map((i) => i.key)).size, items.length, 'every item has a key of its own');
+  const damaged = [{ k: 'p', t: 'fine' }, { k: 'x', t: 'unknown' }, { k: 'p' }, null, 7, { k: 'p', t: 12 }, { k: 'h', t: 'also fine' }] as unknown as BookBlock[];
+  assert.deepEqual(layoutBlocks(damaged).map((i) => i.t), ['fine', 'also fine']);
+  assert.deepEqual(layoutBlocks([]), []);
 });
 
 check('the button of a book page: "Start reading" the first time, "Continue: Chapter 7" after, and the whole title with its part for a screen reader', () => {
@@ -553,6 +592,74 @@ check('the path of a book page and of its reader, with the chapter in the query'
   assert.equal(readerPath('imitation-of-christ'), '/library/book/imitation-of-christ/read');
   assert.equal(readerPath('imitation-of-christ', 'c12'), '/library/book/imitation-of-christ/read?c=c12');
   assert.equal(readerPath('x', 'a b&c'), '/library/book/x/read?c=a%20b%26c');
+});
+
+/* ================================================================ the real texts */
+
+// The books whose text is in the app (mobile/assets/books, made by tools/books): whatever they are, 0 to 12, the logic must work on every one of them.
+const ASSETS = join(process.cwd(), 'assets', 'books');
+const index: BookTextIndexEntry[] = existsSync(join(ASSETS, 'index.json')) ? (JSON.parse(readFileSync(join(ASSETS, 'index.json'), 'utf8')) as BookTextIndexEntry[]) : [];
+const real = (e: BookTextIndexEntry): BookText => JSON.parse(readFileSync(join(ASSETS, `${e.id}.json`), 'utf8')) as BookText;
+
+check('every real text is a book of the catalog, its chapters are c1 to cN in order, no chapter is empty, and every block is one of the five kinds with text', () => {
+  const ids = BOOK_CATALOG.map((b) => b.id);
+  assert.deepEqual(index.map((e) => e.id), ids.filter((id) => index.some((e) => e.id === id)), 'in the order of the catalog');
+  for (const e of index) {
+    const book = real(e);
+    assert.equal(book.id, e.id);
+    assert.ok(book.chapters.length > 0 && book.chapters.length === e.chapters, `${e.id}: ${book.chapters.length} chapters, the index says ${e.chapters}`);
+    assert.ok(book.chapters.length <= READING_MAX_READ, `${e.id}: the marks of read chapters hold ${READING_MAX_READ}`);
+    book.chapters.forEach((c, i) => {
+      assert.equal(c.id, `c${i + 1}`, `${e.id}: chapter ${i + 1}`);
+      assert.ok(c.title.trim().length > 0 && c.blocks.length > 0, `${e.id} ${c.id} has a title and blocks`);
+      for (const b of c.blocks) {
+        assert.ok(['p', 'h', 'q', 'li', 'hr'].includes(b.k), `${e.id} ${c.id}: block kind ${b.k}`);
+        if (b.k !== 'hr') assert.ok(typeof b.t === 'string' && b.t.trim().length > 0, `${e.id} ${c.id}: an empty ${b.k}`);
+      }
+    });
+    assert.ok(book.credit.trim().length > 40, `${e.id}: a credit line`);
+  }
+});
+
+check('on every real text the words and the chapters add up to what the index says, the contents holds each chapter once in order, and Next from the first chapter walks the whole book', () => {
+  for (const e of index) {
+    const book = real(e);
+    assert.equal(book.chapters.reduce((sum, c) => sum + blockWords(c.blocks), 0), e.words, `${e.id}: the words`);
+    const groups = tocGroups(book.chapters);
+    assert.deepEqual(groups.flatMap((g) => g.entries.map((x) => x.id)), book.chapters.map((c) => c.id), `${e.id}: the contents`);
+    let i = 0;
+    let crossings = 0;
+    for (let steps = 0; steps < book.chapters.length - 1; steps += 1) {
+      const nav = chapterNav(book.chapters, i)!;
+      assert.ok(nav.next, `${e.id}: no next at ${i}`);
+      assert.equal(chapterNav(book.chapters, nav.next!.index)!.prev!.index, i, `${e.id}: Previous undoes Next at ${i}`);
+      if (nav.next!.part !== nav.part) crossings += 1;
+      i = nav.next!.index;
+    }
+    assert.equal(i, book.chapters.length - 1, `${e.id}: Next reaches the last chapter`);
+    assert.equal(chapterNav(book.chapters, i)!.next, null);
+    assert.equal(chapterNav(book.chapters, 0)!.prev, null);
+    assert.equal(crossings, groups.length - 1, `${e.id}: Next crosses each part once`);
+  }
+});
+
+check('on every real text a title fits a button, a part has a name, every paragraph can be drawn in pieces, and "Continue" works from every chapter', () => {
+  for (const e of index) {
+    const book = real(e);
+    for (const c of book.chapters) {
+      assert.ok(shortTitle(c.title).length <= 28, `${e.id} ${c.id}: "${shortTitle(c.title)}"`);
+      const { label, subtitle } = splitTitle(c.title);
+      assert.ok(label.length > 0 && label.length <= 28, `${e.id} ${c.id}: label "${label}"`);
+      assert.equal(`${label} ${subtitle}`.trim().replace(/[\s.:;,\-–—]+/g, ' ').length > 0, true);
+      if (c.part) assert.ok(partName(c.part).length > 0 && partName(c.part).length <= c.part.length);
+      for (const b of c.blocks) if (b.k === 'p') assert.equal(pieces(b.t).join(''), b.t, `${e.id} ${c.id}: a paragraph is the same text in pieces`);
+      assert.ok(layoutBlocks(c.blocks).length >= c.blocks.length);
+    }
+    book.chapters.forEach((c, k) => {
+      assert.deepEqual(resumeAt(book.chapters, { c: c.id, y: 0.5 }), { index: k, y: 0.5, fresh: false }, `${e.id}: Continue at ${c.id}`);
+      assert.ok(readButtonLabel(book.chapters, { c: c.id, y: 0.5 }).startsWith('Continue: '));
+    });
+  }
 });
 
 console.log(`${n} of ${n} passed (Reading)`);
