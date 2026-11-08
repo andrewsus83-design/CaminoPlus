@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react';
 import { useFocusEffect } from 'expo-router';
 import { useAuth } from '@/lib/auth';
 import { userKey } from '@/lib/localStore';
-import { hasBookText } from './bookText';
+import { bookById } from './catalog';
 import { loadReading } from './readingStore';
 import { READING_NAME, emptyReading, lastRead, placeOf, readSet, type BookPlace, type StoredReading } from './reading';
 
@@ -18,6 +18,9 @@ export type BooksReading = {
 };
 
 type Read = { key: string; stored: StoredReading };
+
+/** A book that is in the Library: the place in one that was taken out of a later bundle is never offered. */
+const inLibrary = (id: string): boolean => !!bookById(id);
 
 /**
  * Where this person has got to in the books, kept only on this phone under `u.<userId>.library.reading` (see reading.ts). Read again every time the
@@ -43,7 +46,7 @@ export function useBooksReading(): BooksReading {
   const stored = ready ? read!.stored : emptyReading();
   return {
     ready,
-    last: ready ? lastRead(stored, hasBookText) : null,
+    last: ready ? lastRead(stored, inLibrary) : null,
     placeOf: (id) => placeOf(stored, id),
     readSet: (id) => readSet(stored, id),
   };

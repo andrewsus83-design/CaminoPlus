@@ -9,7 +9,7 @@
 //
 // A saved place is never trusted. It can be missing, from an older or newer version of the app, damaged, or about a chapter that the
 // text no longer has: parseReading leaves out what does not read, and resumeAt falls back to the start of the book. Nothing throws.
-import type { BookBlock } from './bookTextTypes';
+import type { Block, BookContent, Span } from './index';
 
 /** What this logic needs to know of a chapter: its id, its title and its part. The blocks are not needed to find a neighbour. */
 export type ChapterRef = { id: string; title: string; part?: string };
@@ -192,38 +192,67 @@ export const isRead = (progress: number): boolean => clamp01(progress) >= READ_A
 
 /* ============================================================ size of a text */
 
-/** What a person reads in an hour, for a calm text. */
-export const WORDS_PER_MINUTE = 200;
+// The rules are the ones of tools/book_kit.py, which counted the words of every book when it built the bundle: the same words and the same minutes, so that the time
+// on a cover and on a book page (the catalog's) and the time at the top of a chapter (worked out here, from its blocks) never disagree. A test compares them for every book.
 
-/** Words in a text: runs of anything that is not a space. */
-export function countWords(text: string): number {
-  let n = 0;
-  let inWord = false;
-  for (let i = 0; i < text.length; i += 1) {
-    const space = /\s/.test(text[i]);
-    if (!space && !inWord) n += 1;
-    inWord = !space;
+/** What a person reads in a minute, for a calm text (tools/book_kit.py WORDS_PER_MINUTE). */
+export const WORDS_PER_MINUTE = 220;
+
+// A word: letters and numbers, with an apostrophe or a hyphen kept inside it ("don't", "well-known"). Written with \p{L} and \p{N} so it is the same on every phone.
+const WORD = /[\p{L}\p{N}]+(?:['’-][\p{L}\p{N}]+)*/gu;
+
+/** Words in a text. */
+export const countWords = (text: string): number => (text.match(WORD) ?? []).length;
+
+/** The words of spans, without any markup. */
+export const plainText = (spans: readonly Span[]): string => spans.map((x) => x.t).join('');
+
+/** All the text of a block, one string (a break has none): what its words are counted from. */
+export function blockText(b: Block): string {
+  switch (b.t) {
+    case 'h':
+    case 'p': return plainText(b.spans);
+    case 'ul':
+    case 'ol': return b.items.map(plainText).join('\n');
+    case 'quote': return [...b.paras.map(plainText), ...(b.cite ? [plainText(b.cite)] : [])].join('\n');
+    default: return '';
   }
-  return n;
 }
 
-/** Words in the blocks of a chapter (a break has none). */
-export const blockWords = (blocks: readonly BookBlock[]): number => blocks.reduce((sum, b) => sum + (b.k === 'hr' ? 0 : countWords(b.t)), 0);
+/** Words in the blocks of a chapter. */
+export const blockWords = (blocks: readonly Block[]): number => blocks.reduce((sum, b) => sum + countWords(blockText(b)), 0);
+
+/** Words in a chapter as the bundle counts them: its title and its blocks. */
+export const chapterWords = (title: string, blocks: readonly Block[]): number => countWords(title) + blockWords(blocks);
 
 /** "55,000": a number with a comma between the thousands, the same on every phone (no locale involved). */
 export const groupThousands = (n: number): string => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
-/** "12 min" or "3 h 40 min": how long a text of this many words takes. Over an hour it is rounded to 5 minutes, so it does not pretend to be exact. */
-export function readingTime(words: number): string {
-  const total = Math.max(1, Math.round(words / WORDS_PER_MINUTE));
-  if (total < 60) return `${total} min`;
-  const rounded = Math.round(total / 5) * 5;
-  const h = Math.floor(rounded / 60);
-  const m = rounded % 60;
-  return m === 0 ? `${h} h` : `${h} h ${m} min`;
+/** Minutes for this many words, rounded up: a text is never "zero minutes" (and no words take none). */
+export const readingMinutes = (words: number): number => (words > 0 ? Math.max(1, Math.ceil(words / WORDS_PER_MINUTE)) : 0);
+
+/** "25 min", "2 h 40 min", "3 h". */
+export function formatMinutes(minutes: number): string {
+  const m = Math.max(0, Math.round(minutes));
+  const h = Math.floor(m / 60);
+  if (h === 0) return `${m} min`;
+  return m % 60 === 0 ? `${h} h` : `${h} h ${m % 60} min`;
 }
 
-/** The line of numbers on a book page: "114 chapters · 55,000 words · 4 h 30 min". */
+/** The same said aloud for a screen reader: "1 minute", "51 minutes", "1 hour 8 minutes", "3 hours". */
+export function spokenMinutes(minutes: number): string {
+  const m = Math.max(0, Math.round(minutes));
+  const h = Math.floor(m / 60);
+  const rest = m % 60;
+  const part = (n: number, unit: string) => `${n} ${unit}${n === 1 ? '' : 's'}`;
+  if (h === 0) return part(rest, 'minute');
+  return rest === 0 ? part(h, 'hour') : `${part(h, 'hour')} ${part(rest, 'minute')}`;
+}
+
+/** How long a text of this many words takes: "6 min", "2 h 29 min". */
+export const readingTime = (words: number): string => formatMinutes(readingMinutes(words));
+
+/** The line of numbers on a book page: "17 chapters · 11,077 words · 51 min". */
 export function bookFacts(chapters: number, words: number): string {
   return `${chapters} ${chapters === 1 ? 'chapter' : 'chapters'} · ${groupThousands(words)} words · ${readingTime(words)}`;
 }
@@ -256,39 +285,149 @@ export function pieces(text: string, max: number = PIECE_MAX): string[] {
   return out;
 }
 
-/** One thing the reader draws: a whole block, or one piece of a long paragraph. */
-export type Item = {
-  /** Stable for a chapter: the index of the block, and of the piece in it. */
-  key: string;
-  k: BookBlock['k'];
-  t: string;
-  /** A piece after the first of a long paragraph: it follows the one above with no space between. */
-  cont: boolean;
-  /** The last piece of its block: the space after a paragraph is under this one. */
-  end: boolean;
-};
-
 /**
- * The blocks of a chapter as the things to draw, in order. A paragraph over PIECE_MAX characters becomes several pieces; every other block is one
- * item. A block that is not a block (an unknown kind, no text: a damaged text) is left out, so the reader never throws on it.
+ * Spans cut into pieces of at most `max` characters, where `pieces` cuts their text: the pieces of spans put together say exactly the same words in the same bold and
+ * italic, so a paragraph that was cut is drawn as one. (A span that straddles a cut is two spans, one on each side.)
  */
-export function layoutBlocks(blocks: readonly BookBlock[], max: number = PIECE_MAX): Item[] {
+export function spanPieces(spans: readonly Span[], max: number = PIECE_MAX): Span[][] {
+  const text = plainText(spans);
+  if (text.length <= max) return [spans.slice()];
+  const out: Span[][] = [];
+  let current: Span[] = [];
+  const lengths = pieces(text, max).map((p) => p.length);
+  let which = 0;
+  let room = lengths[0];
+  for (const span of spans) {
+    let rest = span.t;
+    while (rest.length > room) {
+      if (room > 0) current.push({ ...span, t: rest.slice(0, room) });
+      rest = rest.slice(room);
+      out.push(current);
+      current = [];
+      which += 1;
+      room = lengths[which] ?? Number.MAX_SAFE_INTEGER;
+    }
+    if (rest.length > 0) {
+      current.push({ ...span, t: rest });
+      room -= rest.length;
+    }
+  }
+  if (current.length > 0) out.push(current);
+  return out;
+}
+
+/** One thing the reader draws: a heading, a paragraph (or one piece of a long one), a quotation, a list, or a break. */
+export type Item =
+  | {
+      /** Stable for a chapter: the index of the block, and of the piece in it. */
+      key: string;
+      k: 'p';
+      spans: Span[];
+      /** A piece after the first of a long paragraph: it follows the one above with no space between. */
+      cont: boolean;
+      /** The last piece of its block: the space after a paragraph is under this one. */
+      end: boolean;
+    }
+  | { key: string; k: 'h'; level: number; spans: Span[] }
+  | { key: string; k: 'q'; paras: Span[][]; cite: Span[] | null }
+  | { key: string; k: 'list'; ordered: boolean; items: Span[][] }
+  | { key: string; k: 'hr' };
+
+/** The blocks of a chapter as the things to draw, in order. A paragraph over PIECE_MAX characters becomes several pieces; every other block is one item. */
+export function layoutBlocks(blocks: readonly Block[], max: number = PIECE_MAX): Item[] {
   const out: Item[] = [];
   blocks.forEach((b, i) => {
-    if (!b || typeof b !== 'object') return;
-    if (b.k === 'hr') { out.push({ key: `${i}`, k: 'hr', t: '', cont: false, end: true }); return; }
-    if ((b.k !== 'p' && b.k !== 'h' && b.k !== 'q' && b.k !== 'li') || typeof b.t !== 'string') return;
-    const parts = b.k === 'p' ? pieces(b.t, max) : [b.t];
-    parts.forEach((t, j) => out.push({ key: `${i}.${j}`, k: b.k, t, cont: j > 0, end: j === parts.length - 1 }));
+    switch (b.t) {
+      case 'hr': out.push({ key: `${i}`, k: 'hr' }); break;
+      case 'h': out.push({ key: `${i}`, k: 'h', level: b.level, spans: b.spans }); break;
+      case 'p': {
+        const parts = spanPieces(b.spans, max);
+        parts.forEach((spans, j) => out.push({ key: `${i}.${j}`, k: 'p', spans, cont: j > 0, end: j === parts.length - 1 }));
+        break;
+      }
+      case 'quote': out.push({ key: `${i}`, k: 'q', paras: b.paras, cite: b.cite }); break;
+      case 'ul':
+      case 'ol': out.push({ key: `${i}`, k: 'list', ordered: b.t === 'ol', items: b.items }); break;
+    }
   });
   return out;
 }
 
-/** A numbered or bulleted point: its marker ("12.", "(3)", "4)", "•") and the rest. No marker when the text does not start with one. */
-export function splitMarker(text: string): { marker: string; rest: string } {
-  const m = /^((?:\(?[0-9]{1,3}[.)]|\([0-9]{1,3}\)|[ivxlc]{1,6}[.)]|[a-z][.)]|[•·▪◦–—-])\s+)/i.exec(text);
-  if (!m) return { marker: '', rest: text };
-  return { marker: m[1].trim(), rest: text.slice(m[1].length) };
+/* ============================================================ a book read from its file */
+
+const isObject = (v: unknown): v is Record<string, unknown> => !!v && typeof v === 'object' && !Array.isArray(v);
+
+/** Spans that read: an object with text, and a bold, an italic and a link only when they are what they should be. Anything else is left out. */
+function cleanSpans(raw: unknown): Span[] {
+  if (!Array.isArray(raw)) return [];
+  const out: Span[] = [];
+  for (const x of raw) {
+    if (!isObject(x) || typeof x.t !== 'string') continue;
+    const span: Span = { t: x.t };
+    if (x.b === 1) span.b = 1;
+    if (x.i === 1) span.i = 1;
+    if (typeof x.href === 'string') span.href = x.href;
+    out.push(span);
+  }
+  return out;
+}
+
+const cleanLines = (raw: unknown): Span[][] => (Array.isArray(raw) ? raw.map(cleanSpans).filter((l) => l.length > 0) : []);
+
+/** The blocks that read: an unknown kind, a heading with no text, a list with no item: left out, so the reader never has to ask. */
+export function cleanBlocks(raw: unknown): Block[] {
+  if (!Array.isArray(raw)) return [];
+  const out: Block[] = [];
+  for (const b of raw) {
+    if (!isObject(b)) continue;
+    if (b.t === 'hr') { out.push({ t: 'hr' }); continue; }
+    if (b.t === 'h' || b.t === 'p') {
+      const spans = cleanSpans(b.spans);
+      if (spans.length === 0) continue;
+      if (b.t === 'p') out.push({ t: 'p', spans });
+      else out.push({ t: 'h', level: typeof b.level === 'number' && Number.isFinite(b.level) ? Math.min(Math.max(Math.round(b.level), 2), 6) : 2, spans });
+    } else if (b.t === 'ul' || b.t === 'ol') {
+      const items = cleanLines(b.items);
+      if (items.length > 0) out.push({ t: b.t, items });
+    } else if (b.t === 'quote') {
+      const paras = cleanLines(b.paras);
+      const cite = cleanSpans(b.cite);
+      if (paras.length > 0 || cite.length > 0) out.push({ t: 'quote', paras, cite: cite.length > 0 ? cite : null });
+    }
+  }
+  return out;
+}
+
+/**
+ * A book as it is read from its file, made safe: null when what was read is not a book (nothing, a damaged file, no chapter in it), else the book with only the chapters
+ * and blocks that read. A chapter with no id or title, or an id seen before, is left out. The reader and the page then work with what is there and never throw.
+ */
+export function cleanBook(raw: unknown): BookContent | null {
+  if (!isObject(raw) || typeof raw.id !== 'string' || typeof raw.title !== 'string' || !Array.isArray(raw.chapters)) return null;
+  const seen = new Set<string>();
+  const chapters: BookContent['chapters'] = [];
+  for (const c of raw.chapters) {
+    if (!isObject(c) || typeof c.id !== 'string' || c.id.length === 0 || typeof c.title !== 'string' || seen.has(c.id)) continue;
+    seen.add(c.id);
+    chapters.push({ id: c.id, title: c.title, blocks: cleanBlocks(c.blocks) });
+  }
+  if (chapters.length === 0) return null;
+  const sources = Array.isArray(raw.sources)
+    ? raw.sources.filter(isObject).filter((x) => typeof x.work === 'string' && typeof x.author === 'string' && typeof x.licence === 'string').map((x) => ({
+        work: String(x.work), author: String(x.author), licence: String(x.licence),
+        ...(typeof x.translator === 'string' ? { translator: x.translator } : {}), ...(typeof x.year === 'string' ? { year: x.year } : {}),
+      }))
+    : undefined;
+  return {
+    id: raw.id,
+    kind: typeof raw.kind === 'string' ? (raw.kind as BookContent['kind']) : 'guide',
+    title: raw.title,
+    subtitle: typeof raw.subtitle === 'string' ? raw.subtitle : '',
+    author: typeof raw.author === 'string' ? raw.author : null,
+    chapters,
+    ...(sources ? { sources } : {}),
+    credit: typeof raw.credit === 'string' ? raw.credit : '',
+  };
 }
 
 /* ============================================================ places on the phone */
@@ -310,6 +449,8 @@ export type StoredReading = { v: 1; last: string | null; items: BookPlace[] };
 export const emptyReading = (): StoredReading => ({ v: 1, last: null, items: [] });
 
 const ID = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+/** The longest id of a chapter or of a book that is believed: the longest in the bundle has 50 characters, and a damaged file cannot make a place that is not a line. */
+const ID_MAX = 80;
 
 /**
  * The places in a stored value. null when what was stored is not this shape (nothing stored, a newer or damaged file): the caller then
@@ -326,15 +467,15 @@ export function parseReading(raw: unknown): StoredReading | null {
     if (out.length >= READING_MAX_BOOKS) break;
     if (!item || typeof item !== 'object') continue;
     const { id, c, y, at, read } = item as { id?: unknown; c?: unknown; y?: unknown; at?: unknown; read?: unknown };
-    if (typeof id !== 'string' || id.length > 60 || !ID.test(id) || seen.has(id)) continue;
-    if (typeof c !== 'string' || c.length === 0 || c.length > 40) continue;
+    if (typeof id !== 'string' || id.length > ID_MAX || !ID.test(id) || seen.has(id)) continue;
+    if (typeof c !== 'string' || c.length === 0 || c.length > ID_MAX) continue;
     seen.add(id);
     const marked: string[] = [];
     if (Array.isArray(read)) {
       const once = new Set<string>();
       for (const r of read) {
         if (marked.length >= READING_MAX_READ) break;
-        if (typeof r === 'string' && r.length > 0 && r.length <= 40 && !once.has(r)) { once.add(r); marked.push(r); }
+        if (typeof r === 'string' && r.length > 0 && r.length <= ID_MAX && !once.has(r)) { once.add(r); marked.push(r); }
       }
     }
     out.push({ id, c, y: clamp01(typeof y === 'number' ? y : 0), at: typeof at === 'number' && Number.isFinite(at) ? at : 0, read: marked });

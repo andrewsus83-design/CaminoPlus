@@ -6,8 +6,10 @@
 // 193 by 274. On a tablet or a browser window the covers stop growing at 232 and the pair is centred.
 //
 // A cover has a fixed size, so its text is made to fit before it is drawn (typeMetrics.ts says how wide a text is): the title is set as large
-// as it can be in at most four lines, without ever cutting a word, and the author in at most two. A title that cannot be made to fit at the
-// smallest size is reported (`fits: false`) so that a test fails, instead of a phone cutting it off.
+// as it can be in at most four lines, without ever cutting a word, and the kind of book ("PILGRIM'S GUIDE") in at most two. Under it is how long the book takes, in
+// JetBrains Mono. A title that cannot be made to fit at the smallest size is reported (`fits: false`) so that a test fails, instead of a phone cutting it off.
+import { kindName } from './copy';
+import { formatMinutes, spokenMinutes } from './reading';
 import { textWidth, wrap } from './typeMetrics';
 
 /** A5, in millimetres. */
@@ -72,9 +74,9 @@ export type CoverMetrics = {
   /** The ribbon: its width, the notch at its foot, and its distance from the right edge. It is 44 high, and its button is 44 by 44. */
   ribbon: { width: number; height: number; notch: number; right: number; touch: number };
   title: { max: number; min: number };
-  author: { size: number; lineHeight: number; spacing: number; maxLines: number };
-  era: { size: number; lineHeight: number };
-  chip: { height: number; size: number; padX: number; spacing: number };
+  /** The kind of book, in small capitals (Inter), and the reading time under it (JetBrains Mono, one line). */
+  kind: { size: number; lineHeight: number; spacing: number; maxLines: number };
+  time: { size: number; lineHeight: number };
   /** The height the title may use: what is left between the ring and the lines under it. */
   titleBox: number;
 };
@@ -91,16 +93,14 @@ export function coverMetrics(width: number): CoverMetrics {
   const glyph = Math.round(w * 0.14);
   const medallion = glyph + 12;
   const gapTop = small ? 8 : 10;
-  const authorSize = clamp(Math.round(w * 0.06 * 2) / 2, 9.5, 11);
-  const author = { size: authorSize, lineHeight: Math.round(authorSize * 1.3), spacing: small ? 0.8 : 1, maxLines: 2 };
-  const eraSize = clamp(Math.round(w * 0.064), 10, 12);
-  const era = { size: eraSize, lineHeight: Math.round(eraSize * 1.35) };
-  const chip = { height: small ? 18 : 20, size: small ? 9 : 10, padX: small ? 8 : 10, spacing: 1 };
-  const gapAuthor = small ? 3 : 4;
-  const gapChip = small ? 5 : 6;
+  const kindSize = clamp(Math.round(w * 0.06 * 2) / 2, 9.5, 11);
+  const kind = { size: kindSize, lineHeight: Math.round(kindSize * 1.3), spacing: small ? 0.8 : 1, maxLines: 2 };
+  const timeSize = clamp(Math.round(w * 0.064), 10, 12);
+  const time = { size: timeSize, lineHeight: Math.round(timeSize * 1.35) };
+  const gapKind = small ? 4 : 6;
   const gapTitle = small ? 6 : 8;
   const height = a5Height(w);
-  const bottom = padBottom + chip.height + gapChip + era.lineHeight + gapAuthor + author.maxLines * author.lineHeight;
+  const bottom = padBottom + time.lineHeight + gapKind + kind.maxLines * kind.lineHeight;
   const top = padTop + medallion + gapTop;
   const ribbonWidth = clamp(Math.round(w * 0.16), 22, 30);
   return {
@@ -109,7 +109,7 @@ export function coverMetrics(width: number): CoverMetrics {
     glyph, medallion, gapTop, gapTitle,
     ribbon: { width: ribbonWidth, height: 44, notch: 8, right: edge + 10, touch: 44 },
     title: { max: clamp(Math.round(w * 0.125), 14, 26), min: 11 },
-    author, era, chip,
+    kind, time,
     titleBox: height - top - bottom - gapTitle,
   };
 }
@@ -156,28 +156,29 @@ export function fitTitle(title: string, width: number, height: number, max: numb
   return largest;
 }
 
-export type AuthorFit = { text: string; size: number; lineHeight: number; spacing: number; lines: string[]; fits: boolean };
+export type KindFit = { text: string; size: number; lineHeight: number; spacing: number; lines: string[]; fits: boolean };
 
-/** The author in capitals, as large as the cover's size for it allows, and smaller (to 8.5) if it needs more than two lines. */
-export function fitAuthor(author: string, width: number, m: CoverMetrics): AuthorFit {
-  const text = author.toUpperCase();
-  let last: AuthorFit | null = null;
-  for (let size = m.author.size; size >= 8.5; size -= 0.5) {
-    const { lines, fits } = wrap('inter', text, width, size, m.author.spacing);
-    last = { text, size, lineHeight: Math.round(size * 1.3), spacing: m.author.spacing, lines, fits: fits && lines.length <= m.author.maxLines };
+/** The kind of book in capitals, as large as the cover's size for it allows, and smaller (to 8.5) if it needs more than two lines. */
+export function fitKind(kind: string, width: number, m: CoverMetrics): KindFit {
+  const text = kind.toUpperCase();
+  let last: KindFit | null = null;
+  for (let size = m.kind.size; size >= 8.5; size -= 0.5) {
+    const { lines, fits } = wrap('inter', text, width, size, m.kind.spacing);
+    last = { text, size, lineHeight: Math.round(size * 1.3), spacing: m.kind.spacing, lines, fits: fits && lines.length <= m.kind.maxLines };
     if (last.fits) return last;
   }
-  return last ?? { text, size: 8.5, lineHeight: 11, spacing: m.author.spacing, lines: [text], fits: false };
+  return last ?? { text, size: 8.5, lineHeight: 11, spacing: m.kind.spacing, lines: [text], fits: false };
 }
 
-/** The era line must be one line: "1522 to 1524" in mono at this size is this wide. */
-export const eraWidth = (era: string, m: CoverMetrics): number => textWidth('mono', era, m.era.size);
+/** The time line must be one line: "2 h 29 min" in mono at this size is this wide. */
+export const timeWidth = (time: string, m: CoverMetrics): number => textWidth('mono', time, m.time.size);
 
 /** Everything the text of one cover is drawn with, at this width. */
-export function coverText(book: { title: string; author: string; era: string }, width: number) {
+export function coverText(book: { title: string; kind: string; minutes: number }, width: number) {
   const m = coverMetrics(width);
-  return { m, title: fitTitle(book.title, m.text, m.titleBox, m.title.max, m.title.min), author: fitAuthor(book.author, m.text, m), eraFits: eraWidth(book.era, m) <= m.text };
+  const time = formatMinutes(book.minutes);
+  return { m, title: fitTitle(book.title, m.text, m.titleBox, m.title.max, m.title.min), kind: fitKind(kindName(book.kind), m.text, m), time, timeFits: timeWidth(time, m) <= m.text };
 }
 
-/** What a screen reader says for a cover: "The Way of a Pilgrim, Anonymous, free", or "…, soon" for a book that has no text yet. */
-export const coverLabel = (b: { title: string; author: string }, hasText: boolean): string => `${b.title}, ${b.author}, ${hasText ? 'free' : 'soon'}`;
+/** What a screen reader says for a cover: "The French Way, Pilgrim's guide, 51 minutes". It says all that the cover shows. */
+export const coverLabel = (b: { title: string; kind: string; minutes: number }): string => `${b.title}, ${kindName(b.kind)}, ${spokenMinutes(b.minutes)}`;
