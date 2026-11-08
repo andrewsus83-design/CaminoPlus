@@ -568,7 +568,9 @@ check('the four fonts by role on the Bible side of the Library: Fraunces for nam
   assert.equal(fontOf('mono'), 'mono');
   assert.equal(fontOf('accent'), 'accent');
   assert.deepEqual(Object.keys((tokens as unknown as { font: Record<string, string> }).font).filter((k) => ['title', 'body', 'mono', 'accent'].includes(k)), ['title', 'body', 'mono', 'accent']);
-  assert.match(read(join('app', '_layout.tsx')), /Fraunces_600SemiBold, Inter_400Regular, Inter_500Medium, Inter_600SemiBold, JetBrainsMono_400Regular, Caveat_700Bold/, 'all four are loaded: no new font file, no new package');
+  // all four families are loaded and nothing else: no new family, no new package. Inter is also loaded in Light (Inter_300Light, from the same
+  // package), used only for the labels of the inactive tabs of the tab bar (see themeScheme.test.ts).
+  assert.match(read(join('app', '_layout.tsx')), /Fraunces_600SemiBold, Inter_300Light, Inter_400Regular, Inter_500Medium, Inter_600SemiBold, JetBrainsMono_400Regular, Caveat_700Bold/, 'all four families are loaded (Inter also in Light for the inactive tabs): no new family, no new package');
   // the roles, element by element: [file, what must be there, what it says]
   const L = join('src', 'features', 'library');
   const roles: Array<[string, RegExp, string]> = [
