@@ -1,6 +1,6 @@
 # Day 17. Less rather than more
 
-*What could you give away today, and what would giving free?*
+*What could you give away today, and what would giving set free?*
 
 ## The passage
 
@@ -20,13 +20,13 @@ Lay the four sentences against a long walk. The first is about yielding: letting
 
 The thread through all four is offering. You give something up, a preference, a thing, a place, and in the giving something unexpectedly lightens. A person who offers the lower bunk to someone with bad knees often sleeps well in the upper. A person who gives away half a loaf rarely goes hungry. It is one of the paradoxes of the road that the hands which open are the ones that are filled. A hand cannot receive while it is clenched. Thomas would not have put it so, but the shelf by the door puts it for him.
 
-Where is it hard? Seriously hard, and it needs honesty. "Do another's will rather than thine own", *always*, is a dangerous sentence in some hands. There are people who give way all the time, who have never had the luxury of wanting anything for themselves, and to whom this advice would be one more weight. If you are someone who is already the first to yield, this passage is not aimed at you. For you the beginning of the lesson may be to ask what you want, and to say so. Thomas is writing to people who grasp, and a cloister full of the grasping is a very different place from a kitchen full of the over-giving.
+This is where the passage needs careful handling, and honesty. The advice to "do another's will rather than thine own" is dangerous in some hands, especially with the word *always* attached to it. There are people who give way all the time, who have never had the luxury of wanting anything for themselves, and to whom this advice would be one more weight. If you are someone who is already the first to yield, this passage is not aimed at you. For you the beginning of the lesson may be to ask what you want, and to say so. Thomas is writing to people who grasp, and a cloister full of the grasping is a very different place from a kitchen full of the over-giving.
 
 In the same way, "the lowest place" is a hard phrase for anyone who has never been offered a high one. It is not an instruction to be walked over, and it does not ask you to put up with harm. It is a way of saying that you do not need to win the seat to be at peace.
 
 There is a plain doubt, too. Is "less rather than more" always wise? A tired person who gives up the last of the water is not being holy. The passage asks for a certain freedom from grasping, not for foolishness. Giving that is real begins with enough to give.
 
-What does it ask of an ordinary day? One small yielding. One small lightening. Let somebody go first. Offer the better seat. Look in your pack for a single thing you could do without, and put it on the shelf for the next person.
+Start small: one yielding, one lightening. Let somebody go first. Offer the better seat. Look in your pack for a single thing you could do without, and put it on the shelf for the next person.
 
 ## For the walk
 
@@ -51,7 +51,7 @@ Three questions for tonight:
 - Where did I hold on to my own will, and what was I protecting?
 - What could I leave behind tomorrow, in my pack or in my head?
 
-An honest word about tiredness. Giving takes energy, and tonight you may have very little. You are not obliged to be generous at ten o'clock. A tired person's first and best gift is to be good company in the most ordinary way: a courteous word, a quiet room. Tomorrow will bring other chances. Tonight, it is enough not to take what is not yours. If you want a small gift to give before bed, give the person next to you a quiet room.
+A word on tiredness. Giving takes energy, and tonight you may have very little. You are not obliged to be generous at ten o'clock. A tired person's first and best gift is to be good company in the most ordinary way: a courteous word, a quiet room. Tomorrow will bring other chances. Tonight, it is enough not to take what is not yours. If you want a small gift to give before bed, give the person next to you a quiet room.
 
 ## A short prayer
 

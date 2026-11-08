@@ -10,7 +10,7 @@
 
 ## Reflection
 
-There is a moment, somewhere between your own front door and the first yellow arrow, when you stop being someone who lives somewhere and become someone who is going. The pack is on your back. A shell, if you have one, swings from a strap. In a pocket is the *credencial*, the folded pilgrim passport that will collect a stamp in every town. Nothing has happened yet. You are simply no longer where you were.
+There is a moment, somewhere between your own front door and the first yellow arrow, when you stop being someone who lives somewhere and become someone who is going. The pack is on your back. A shell, if you have one, swings from a strap. In a pocket is the *credencial*, the folded pilgrim passport that will collect a stamp in town after town. Nothing has happened yet. You are simply no longer where you were.
 
 Thomas à Kempis had words for that state, and he did not keep them for people with rucksacks. He thought they described every reader. A stranger and a pilgrim, an exile and a pilgrim: someone away from home who has not yet arrived anywhere that stays.
 
@@ -20,7 +20,7 @@ Read on a road, it is gentler than it sounds. A walker already lives this way. Y
 
 Leaving is its own small labour. On the first morning nearly everyone pats their pockets three times: passport, phone, money, water. The checking is natural, and it is also a tiny rehearsal of the clenched fist, the wish to make the day safe by holding on to everything that might go wrong. Somewhere around the second village the pockets stop being checked. Nothing fell out. The day went on being what it was.
 
-Now the hard part. Thomas wrote for people in a cloister, and "the things of the world do not belong to you" can be heard as coldness, as if the world and the people in it were to be held at arm's length. Most of us have a family, a job, a body that aches. We cannot treat them as scenery, and we should not try. The reading that serves a walker is narrower and kinder. It does not say love nothing. It says hold nothing in a clenched fist. You can love a house, a person, a plan, and still know that the hand holding it should be open. A heart that is free is free to move on because it was never nailed to the last place.
+Now the hard part. Thomas wrote for people in a cloister, and the line about the things of the world not belonging to you can be heard as coldness, as if the world and the people in it were to be held at arm's length. Most of us have a family, a job, a body that aches. We cannot treat them as scenery, and we should not try. The reading that serves a walker is narrower and kinder. It does not say love nothing. It says hold nothing in a clenched fist. You can love a house, a person, a plan, and still know that the hand holding it should be open. A heart that is free is free to move on because it was never nailed to the last place.
 
 There is an honest doubt to set beside this. It is easy to feel like a stranger on the first morning, when home is a day behind you and one phone call away. The real test of "no continuing city" does not come on the first day. It comes on the afternoon when a place feels so good you would stay for ever, and on the evening when a place feels so bad you would give anything to leave. In both, the same sentence holds: this is not where you live. The good place will end, and so will the bad one. That is a comfort and a small grief together, and it is allowed to be both.
 

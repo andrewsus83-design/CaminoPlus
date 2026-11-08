@@ -248,6 +248,34 @@ class Reflection(unittest.TestCase):
             self.assertIn("(aim for 5 min: 850 to 1,350 words)", text)
             self.assertIn("(aim for 3 min: 450 to 800 words)", text)
 
+    def test_an_almost_right_quotation_in_the_prose_is_found_and_the_authors_own_words_are_not(self):
+        with tempfile.TemporaryDirectory() as t:
+            d, src = self.book(t), self.sources(t)
+            f = d / "chapters" / "04-reading-4.md"
+            txt = f.read_text(encoding="utf-8")
+            f.write_text(txt.replace("A reflection that begins with a road", 'As he says, *walketh not in darkness, sayeth the Lord*, and I think "this is today\'s weight for me" is a fair thing to say. A reflection that begins with a road', 1), encoding="utf-8")
+            text = "\n".join(cb.check_book(d, src).warnings)
+            self.assertIn("'walketh not in darkness, sayeth the Lord' is almost, but not exactly, in the source", text)
+            self.assertNotIn("today's weight", text)           # the writer's own words in quotation marks are not quotations of the classic
+            f.write_text(txt.replace("A reflection that begins with a road", "As he says, *walketh not in darkness, saith the Lord*, and a reflection that begins with a road", 1), encoding="utf-8")
+            self.assertNotIn("almost, but not exactly", "\n".join(cb.check_book(d, src).warnings))   # an exact quotation is fine
+
+    def test_a_repeated_formula_is_noticed_and_a_prayer_in_italics_is_not_a_quotation(self):
+        with tempfile.TemporaryDirectory() as t:
+            d, src = self.book(t), self.sources(t)
+            for g in (d / "chapters").glob("[0-9][0-9]-reading-*.md"):
+                g.write_text(g.read_text(encoding="utf-8").replace("A reflection that begins", "Look back over the day and notice. A reflection that begins"), encoding="utf-8")
+            text = "\n".join(cb.check_book(d, src).warnings)
+            self.assertIn("the sentence opening 'look back over the day ...' recurs in 21 chapters", text)
+            f = d / "chapters" / "05-reading-5.md"
+            f.write_text(f.read_text(encoding="utf-8").replace("Give us enough light for the next step.", "*Give us enough light for the next step, and let us rest.*"), encoding="utf-8")
+            self.assertNotIn("almost, but not exactly", "\n".join(cb.check_book(d, src).warnings))
+
+    def test_the_walk_part_has_a_size(self):
+        with tempfile.TemporaryDirectory() as t:
+            text = "\n".join(cb.check_book(self.book(t), self.sources(t)).warnings)
+            self.assertIn("'For the walk' is 2 words", text)
+
     def test_quoted_passages_must_stay_a_minority(self):
         passage = "These are the words of Christ, by which we are admonished how we ought to imitate His life—and manners, if we would be truly enlightened."
         with tempfile.TemporaryDirectory() as t:

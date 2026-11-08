@@ -22,9 +22,9 @@ There is something else in the passage worth noticing: "good actions" are not on
 
 Then Thomas says the thing that gives the passage its patience. Wait, with confidence, until the lightness returns. Bear this dryness of mind, this "drought", he calls it, until you are visited again. That is a picture of the weather of a long walk. There are days when the legs seem not to belong to you, and then, quite without warning, a morning when they come back. It does not always happen on the day you want. But it happens often enough that it becomes a kind of trust.
 
-Where is it hard? In two places. First, the passage promises that you will forget your labours and enjoy a perfect peace. That is a promise about the end, not the afternoon, and Thomas does not pretend otherwise. It may console you or it may sound far away. Both are fair. Second, and more important: ordinary tiredness and something deeper can look alike. Chores will not cure a real depression, and Thomas is not suggesting that they will. If the heaviness does not lift after a few days, or if it frightens you, say so to someone, a friend, a doctor, a person you trust. That is not weakness. It is exactly the kind of humble, practical action the passage is about.
+It is hard to follow in two places. First, the passage promises that you will forget your labours and enjoy a perfect peace. That is a promise about the end, not the afternoon, and Thomas does not pretend otherwise. It may console you or it may sound far away. Both are fair. Second, and more important: ordinary tiredness and something deeper can look alike. Chores will not cure a real depression, and Thomas is not suggesting that they will. If the heaviness does not lift after a few days, or if it frightens you, say so to someone, a friend, a doctor, a person you trust. That is not weakness. It is exactly the kind of humble, practical action the passage is about.
 
-What does it ask of an ordinary day? That when you are low, you reach for the nearest small honest task, and do it well, and do not demand more of yourself than that. An afternoon spent washing a shirt properly is not a wasted afternoon. It may be the thing that gets you to tomorrow.
+The passage asks, in effect, that when you are low you reach for the nearest small honest task, do it well, and demand no more of yourself than that. An afternoon spent washing a shirt properly is not a wasted afternoon. It may be the thing that gets you to tomorrow.
 
 ## For the walk
 
@@ -51,7 +51,7 @@ Three questions for tonight:
 - What small, finishable thing could I do tomorrow when it comes back?
 - If it does not lift, who is the person I would tell?
 
-An honest word about tiredness. A tired body makes everything seem worse than it is, and at night the worst is the loudest. Nothing you decide at ten in the evening is final. If the day felt flat, that is allowed. A flat day is still a day walked, and flatness is something that passes, usually faster than expected, and often during sleep. You do not have to be cheerful about it. You only have to let the night do its part.
+Honestly, about tiredness: a tired body makes everything seem worse than it is, and at night the worst is the loudest. Nothing you decide at ten in the evening is final. If the day felt flat, that is allowed. A flat day is still a day walked, and flatness is something that passes, usually faster than expected, and often during sleep. You do not have to be cheerful about it. You only have to let the night do its part.
 
 ## A short prayer
 

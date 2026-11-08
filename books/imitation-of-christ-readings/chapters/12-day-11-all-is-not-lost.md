@@ -20,11 +20,11 @@ Then comes the line that gives the passage its warmth. When you think you are fa
 
 There is a great deal of ordinary road experience in this. Walkers tell stories, and tell them often, of the day that went wrong and turned out to be the one they remember. The wrong turn that led through a village they would never have seen. The closed door that led to a parish hall, a kind stranger, a pot of soup. Thomas is not promising that this always happens. He says "often", and it is a careful word. But the shape is familiar, and it is worth remembering at four o'clock.
 
-Where is it hard? The passage is easily misread as "everything will work out", and that is not a promise anyone can honestly make. Some losses are real. A death, an injury that ends the walk, a job gone, a friendship broken: none of these is answered by "all is not lost". The sentence here is about something smaller: a day, a plan, a wish that went contrary. It does not say that nothing has been lost. It says that not everything has. In the case of a great loss this book has less to offer, and it says so plainly. A person carrying that should have other people close, and good help.
+A caution first. The passage is easily misread as "everything will work out", and that is not a promise anyone can honestly make. Some losses are real. A death, an injury that ends the walk, a job gone, a friendship broken: none of these is answered by "all is not lost". The sentence here is about something smaller: a day, a plan, a wish that went contrary. It does not say that nothing has been lost. It says that not everything has. In the case of a great loss this book has less to offer, and it says so plainly. A person carrying that should have other people close, and good help.
 
 There is a second difficulty. The passage speaks of feeling far from help, and it hints that feeling is not the same as fact. That is true, and it is also hard to hear. When you are cold and hungry and discouraged, the feeling of being alone is as convincing as any fact. All Thomas suggests is that you hold it a little more loosely, and do not treat today's mood as tomorrow's forecast.
 
-What does it ask of an ordinary day? That at the worst moment you stop, and look around, and count what is still intact. Legs, a little water, some bread, the road ahead, a day that will end. That you leave tomorrow to tomorrow. And that, when the plan collapses, you wait a minute before you decide what the collapse means. The first reading of a bad moment is rarely the right one. The mind's first account of a bad day is usually its worst. Walkers who have had such a day sometimes find, a week on, that they can hardly remember the details. The feeling stays, but the facts have faded.
+At the worst moment, stop, look around and count what is still intact. Legs, a little water, some bread, the road ahead, a day that will end. Leave tomorrow to tomorrow. And when the plan collapses, wait a minute before you decide what the collapse means. The first reading of a bad moment is rarely the right one. The mind's first account of a bad day is usually its worst. Walkers who have had such a day sometimes find, a week on, that they can hardly remember the details. The feeling stays, but the facts have faded.
 
 You do not need to feel consoled. You only need to let the door stay slightly open for something unexpected. It sometimes comes in the shape of a person, and sometimes in the shape of a bench. Sometimes it is just the next kilometre turning out to be easier than the last.
 
@@ -53,7 +53,7 @@ Three questions for tonight:
 - What am I afraid of tomorrow that may never come?
 - What was still intact today that I forgot to count?
 
-An honest word about tiredness. The mind that is tired is a catastrophist. It reads every small thing as a sign and every sign as a warning. If tonight everything seems to be going wrong, remember that you are judging the whole of the road from the lowest point of a long day. Eat, wash, lie down. The sentence about "all is not lost" can wait for you until you are rested enough to believe it.
+Tiredness again, honestly. The mind that is tired is a catastrophist. It reads every small thing as a sign and every sign as a warning. If tonight everything seems to be going wrong, remember that you are judging the whole of the road from the lowest point of a long day. Eat, wash, lie down. The sentence about "all is not lost" can wait for you until you are rested enough to believe it.
 
 ## A short prayer
 

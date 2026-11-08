@@ -20,11 +20,11 @@ The wise path, in practice, is to plan and then loosen your grip. Make the arran
 
 The third part of the passage turns, quite unexpectedly, to desire. A person often strives hard for something, he says, and when he has it, he begins to be of another mind. His affection for the thing is not lasting. It runs on, from one object to the next. Anyone who has wanted a shower for six hours and then barely noticed it knows this. And anyone who has been dreaming of the end of the walk, the cathedral, the certificate, the long sleep, may be quietly preparing for a surprise. The thing we strive for does not always turn out to be what we wanted. The passage does not say this to spoil it. It says it so you will not be caught unawares.
 
-Where is it hard? The word "wait" is a difficult one for people with practical problems. Someone with a sick parent, a bill, a legal matter, a decision with a deadline, cannot simply wait for it to be arranged. Nor should they. Thomas's advice is not an excuse for neglecting what is in your own hands. It is better read as a counsel for the part that is not: do everything within reach, and then do not carry the remainder as if it were all on your own back.
+The word "wait" is a difficult one for people with practical problems. Someone with a sick parent, a bill, a legal matter, a decision with a deadline, cannot simply wait for it to be arranged. Nor should they. Thomas's advice is not an excuse for neglecting what is in your own hands. It is better read as a counsel for the part that is not: do everything within reach, and then do not carry the remainder as if it were all on your own back.
 
 There is also a doubt that deserves to be said out loud. "I will dispose it aright" is a promise, and not every reader will feel that it is kept. People commit their cause and it goes badly. Thomas knows this as well as anyone. The passage does not say that all will be well. It says that the burden of arranging the world is not yours alone, and that is a modest claim, and a lighter one than it sounds.
 
-What does it ask of an ordinary day? Plan once, in the morning, and then stop. Allow the day one change. At the first fork, wait a few seconds before choosing. Leave the stage app in your pocket for an hour. See what the road suggests when you are not busy telling it what to do.
+Try this: plan once, in the morning, and then stop. Allow the day one change. At the first fork, wait a few seconds before choosing. Leave the stage app in your pocket for an hour. See what the road suggests when you are not busy telling it what to do.
 
 ## For the walk
 
@@ -49,7 +49,7 @@ Three questions for tonight:
 - What am I planning tonight that I could leave until morning?
 - What did I want so much that, once I had it, I began wanting something else?
 
-An honest word about tiredness. A tired mind plans badly and worries well. If you find yourself running through tomorrow's difficulties in detail, you are probably not solving anything. You are only rehearsing. Put the plan down. It will be exactly as useful in the morning, and you will be better equipped to make it.
+About tiredness: a tired mind plans badly and worries well. If you find yourself running through tomorrow's difficulties in detail, you are probably not solving anything. You are only rehearsing. Put the plan down. It will be exactly as useful in the morning, and you will be better equipped to make it.
 
 ## A short prayer
 

@@ -14,7 +14,7 @@ so the length is made of many short sittings.
 
 | Chapter | Words | Content |
 |---|---|---|
-| `00-how-to-use-this-book.md` | 500 to 700 | What this is, how a day works (morning reading, walking with a question, evening reflection), how to use it at home, the arc of the days, and which Camino it is made to go with (see `route_slug`). Never state a stage count of the route unless the repository has it (Francés 33, Portugués 11, Inglés 6): say "a road of about two weeks". |
+| `00-how-to-use-this-book.md` | 600 to 800 | What this is, how a day works (morning reading, walking with a question, evening reflection), how to use it at home, the arc of the days, and which Camino it is made to go with (see `route_slug`). Never state a stage count of the route unless the repository has it (Francés 33, Portugués 11, Inglés 6): say "a road of about two weeks". |
 | `01-about-the-book-and-its-author.md` | 600 to 900 | Who wrote the classic, when and why; what the classic is; why it suits a pilgrim; **the translator, the edition and the licence** (public domain, with the source named); what we changed (nothing in the passages; the order and the selection are ours). |
 | `02-day-01-<slug>.md` onwards, one per day | 1,400 to 2,000 each | The days (below). |
 | last chapter `NN-carry-it-with-you.md` | 400 to 700 | A closing: what to keep, how to go on, an invitation to the next reading or to walk again. |
@@ -55,13 +55,34 @@ passage in mind. Name what was hard and what was good. Say an honest word about 
 
 ## A short prayer
 
-Three to six lines. Original. Plain words, for the end of the day. Open enough that a reader who prays differently, or who does not
-pray, can still say it as a wish.
+Three to six short sentences, in one italic paragraph (the books have no line breaks, so "lines" means short sentences). Original. Plain words, for the
+end of the day. Open enough that a reader who prays differently, or who does not pray, can still say it as a wish.
 ```
 
 The five `##` parts appear **once each, in this order**, under these exact headings, in every day: the app and the EPUB show them the same
 way, and the app reads the `At the end of the day` list as the questions. Passage + Reflection + For the walk = the 5-minute morning reading
 (850 to 1,350 words). At the end of the day + A short prayer = the 3-minute evening (450 to 800 words). Vary the shape inside the parts, never the headings.
+
+**Aim for the times, not just the windows.** At 220 words a minute the morning reading is about **1,000 to 1,100 words** (5 minutes) and the evening about **550 to 650
+words** (3 minutes). The checker's windows are wider (850 to 1,350 and 450 to 800) so a good day is never refused, but a book that sits at the bottom of every window
+is short of what was promised. "For the walk" is 60 to 200 words.
+
+## Quoting exactly
+
+- **Never copy a passage by hand.** Use `python3 tools/passage.py <source.txt> --from "first words" --to "last words"` (several pairs make one passage joined by `…`). It
+  copies the exact stretch, turns `_italics_` into `*italics*`, and tells you the nearest book and chapter heading, so the citation is read from the source and not from memory.
+  It warns about what old editions carry inside the text, and so must you: a footnote marker like `(3)` or `[3]`, a paragraph number like `2.`, and a quotation mark
+  that opens in one stretch and closes in the next. End the stretch at the full stop before a marker, start after one, and never leave an opening quotation mark unclosed.
+- **Inside the prose, anything in quotation marks or in italics that reads as the classic's words must be exact too.** A near-miss ("if I only knew" for "if I but knew")
+  is a misquotation, and the checker warns on text that is almost, but not exactly, in the source. Either copy it exactly (put it in the passage), or say it in your own
+  words without quotation marks or italics. The writer's own words in quotation marks ("This is today's weight") are fine: they are not the classic's.
+- **The citation is checked by you.** The checker verifies the words, not the book and chapter named in the attribution line; read them off `tools/passage.py`.
+
+## Keeping it fresh
+
+The template invites the same phrases ("say where it is hard", "an honest word about tiredness", "look back over the day"). Vary the wording of the labels from day to day.
+A short ritual opening for the evening is allowed, because evenings are a ritual, but it should not open the same sentence in more than a handful of days: the checker
+warns when one opening recurs in six or more chapters.
 
 ## Choosing the passages
 

@@ -20,13 +20,13 @@ Then there is the list, which is one of the loveliest in the book. *Write, read,
 
 For a pilgrim there is a gentle echo here of the road itself. A walker's day is a very simple thing: get up, walk, eat, rest, talk, sleep. And yet it had a depth that ordinary days lack. It was not that the tasks were different. It was that they were done with attention, because there was nothing else to do. The passage suggests that this attention is not a gift of the Camino. It is a way of doing things, and it can be done at a sink.
 
-Now the hard places, because this is the last reading and honesty is owed. "Endure adversities manfully" is a phrase of its century. You can hear it as courage, which is its best sense, and set aside the rest. The same goes for the promise of "eternal life" worth all these conflicts. Some readers will find that strengthening, and some will find that it asks too much of them. Take whatever of it is yours. It would also be wrong to hear "let not the labours break thee down" as a simple instruction. Some labours do break people. There are times when what is needed is not more endurance but rest, or help, or a change. "Labour faithfully" does not mean "labour without limit".
+Now the hard places, because this is the last reading and honesty is owed. "Endure adversities manfully" is a phrase of its century. You can hear it as courage, which is its best sense, and set aside the rest. The same goes for the promise of "eternal life" worth all these conflicts. Some readers will find that strengthening, and some will find that it asks too much of them. Take whatever of it is yours. It would also be wrong to hear the opening advice, not to let the labours break you down, as a simple instruction. Some labours do break people. There are times when what is needed is not more endurance but rest, or help, or a change. "Labour faithfully" does not mean "labour without limit".
 
 Notice too how little the passage says about results. It does not promise that the labour will succeed, or that anyone will be impressed. It asks only that the work be done wholeheartedly, and leaves the rest. That is a relief to anyone who has ever been worn out by the outcome of things.
 
 Then the ordinary doubt. Will any of this survive a Monday? Perhaps not all. The practice that was clear on the road may fade, and the passages may sit unread on a shelf. But a person who has once done something earnestly, with their whole attention, knows what it is like, and that is hard to forget entirely. You can find your way back. That is what the end of the road is for.
 
-What does it ask of an ordinary day? Pick the next ordinary thing you will do. Do it as if it mattered, because it does. Then the next. That is all it is.
+Pick the next ordinary thing you will do. Do it as if it mattered, because it does. Then the next. That is all it is.
 
 ## For the walk
 

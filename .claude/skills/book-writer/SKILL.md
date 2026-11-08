@@ -92,7 +92,7 @@ per classic, which is what the checker verifies every quote against:
    (distance, date, name, altitude, history) with where it came from. Use the repo's own data first (see the guide spec), then
    check anything else against a named public source (the Xunta de Galicia, the Confraternity of St James, Wikipedia for history).
    A fact with no line in the ledger does not go in the book. For a reflection book, read the source text itself (the spec says
-   how to fetch it) and choose your passages from it.
+   how to fetch it), choose your passages from it, and copy each one with `tools/passage.py`, never by hand.
 3. **Outline, then write chapter by chapter**, one file each, in the voice. Keep the word budget of the spec in front of you.
 4. **Run the checker** after every few chapters and fix what it reports:
 

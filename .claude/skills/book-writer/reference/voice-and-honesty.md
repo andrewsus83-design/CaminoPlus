@@ -73,7 +73,8 @@ classic, the author, the translator and the year in its front matter and under e
 
 - Do not present a guess as a fact because the sentence reads better.
 - Do not copy sentences from a modern guidebook, a blog or a website. Facts are free; wording is not. Write it fresh.
-- Do not invent a pilgrim, a testimonial or a quotation ("a pilgrim told me..."). If you want a human voice, quote a
-  public-domain source or describe a situation in general terms ("Many pilgrims find...").
+- Do not invent a pilgrim, a testimonial, a remark or a quotation ("a pilgrim told me...", "someone once said..."). If you want a human voice, quote a
+  public-domain source. A general observation about walkers is allowed only if it is plainly possible and hedged ("you may find...", "many walkers say..." only where a
+  source says so), never a claim of fact you cannot source, and never a story.
 - Do not mention competing apps, guidebooks or publishers by name.
 - Do not claim the app does something it does not do yet.

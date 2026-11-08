@@ -20,13 +20,13 @@ The phrase *walk from within* is the heart of it. It describes an inner way of m
 
 The first sentence of the passage gives you something to hold on to when you tell the story. The wise person, it says, knows things as they are, and not as they are said, or as they seem. It is a very good thing to remember when people ask how it was. There will be a story, and it will gather shape as you tell it. It will become a little tidier and a little grander each time. That is natural, and it is not a sin. But it is worth keeping, somewhere in yourself, the plain version: the heat, the boredom, the blisters, the two or three moments that actually changed you. Things as they were.
 
-Now say where it is hard. The claim that a wise person needs no places and no seasons is a very high one. Most of us do need them. A particular bench, a time of day, a quiet corner: these are not weaknesses, but supports. The road helped partly because it was a place, with a rhythm built into it. At home the rhythm has to be made, and it is easy to lose in a fortnight.
+The claim that a wise person needs no places and no seasons is a very high one. Most of us do need them. A particular bench, a time of day, a quiet corner: these are not weaknesses, but supports. The road helped partly because it was a place, with a rhythm built into it. At home the rhythm has to be made, and it is easy to lose in a fortnight.
 
-"No outward labour stands in his way" is also easier said than done. Anyone with small children, a heavy job, a sick relative, knows that labour does stand in the way, and can crowd out the quiet altogether. Nor does "to set little value upon outward things" mean that you should be cool towards your family or your work. You can value people and tasks and still be steady inside them. The two are not opposed.
+"No outward labour and no necessary occupations stand in his way" is also easier said than done. Anyone with small children, a heavy job, a sick relative, knows that labour does stand in the way, and can crowd out the quiet altogether. Nor does "to set little value upon outward things" mean that you should be cool towards your family or your work. You can value people and tasks and still be steady inside them. The two are not opposed.
 
 And there is a doubt it would be dishonest to leave out. Will it last? Not in the form it had. You will not stay as calm as you were on the third week of the walk. Some of it will go. But some of it, if you are lucky, and if you look after it, will not.
 
-What does it ask of an ordinary day? Choose one small anchor, one place and one time, and keep it for a week. Ten minutes on the doorstep with a cup of tea. A short walk with no phone. A moment, before bed, to look back at the day. It does not need to be much. It only needs to be regular, and to be yours.
+Make it modest: choose one small anchor, one place and one time, and keep it for a week. Ten minutes on the doorstep with a cup of tea. A short walk with no phone. A moment, before bed, to look back at the day. It does not need to be much. It only needs to be regular, and to be yours.
 
 ## For the walk
 
@@ -53,7 +53,7 @@ Three questions for tonight:
 - What did I say about the walk, and was it the plain version?
 - Which one small practice will I try to keep this week?
 
-An honest word about tiredness. Coming home is tiring in a way that nobody warns you about. The body is relieved and the mind is overstimulated, and the result can be an odd, heavy fatigue. Do not judge your whole walk by how you feel this evening. Eat something simple, drink some water, and let the first night be a poor night if it has to be. The practice will still be there tomorrow.
+And a word about tiredness. Coming home is tiring in a way that nobody warns you about. The body is relieved and the mind is overstimulated, and the result can be an odd, heavy fatigue. Do not judge your whole walk by how you feel this evening. Eat something simple, drink some water, and let the first night be a poor night if it has to be. The practice will still be there tomorrow.
 
 ## A short prayer
 

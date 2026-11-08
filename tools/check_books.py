@@ -3,7 +3,7 @@
 
     python3 tools/check_books.py                         every book in books/
     python3 tools/check_books.py books/camino-ingles-guide
-    python3 tools/check_books.py books/imitation-of-christ-reflections --sources /tmp/book-sources
+    python3 tools/check_books.py books/imitation-of-christ-readings --sources /tmp/book-sources
     python3 tools/check_books.py --strict                warnings fail too
 
 What it checks (the rules are in .claude/skills/book-writer):
@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import argparse
 import dataclasses
+import difflib
 import pathlib
 import re
 import sys
@@ -40,6 +41,9 @@ READING_PARTS = ("The passage", "Reflection", "For the walk", "At the end of the
 MORNING_PARTS = READING_PARTS[:3]           # about 5 minutes
 EVENING_PARTS = READING_PARTS[3:]           # about 3 minutes
 MORNING_WORDS = (850, 1350)
+WALK_WORDS = (60, 200)                      # '## For the walk': a question and a small practice
+OPENING_WORDS = 5                           # a sentence that opens with the same five words in this many days is a tic
+OPENING_DAYS = 6
 EVENING_WORDS = (450, 800)
 READING_WORDS = (DAY_WORDS_MIN, DAY_WORDS_MAX)      # one whole day
 DESCRIPTION_SHORT_MAX = 200
@@ -290,6 +294,85 @@ def _section(ch: bk.Chapter, name: str) -> list[dict]:
     return out
 
 
+_DQUOTE = re.compile(r"[“\"]([^”\"]{12,}?)[”\"]")
+
+
+_INDEX: dict[int, tuple[list[str], dict]] = {}
+NEAR_QUOTE = 0.75        # a text this close to a stretch of the source, but not equal to it, is a misquotation
+
+
+def _near_quote(text: str, loose: str) -> float:
+    """How close `text` is to some stretch of the source of the same length (1.0 = the same words, 0 = nothing alike). Looks only where a pair of its words
+    occurs side by side in the source, so it is fast. Used to find a quotation that is almost right."""
+    words = _loose(text).split()
+    n = len(words)
+    if n < 4:
+        return 0.0
+    if id(loose) not in _INDEX:
+        src = loose.split()
+        idx: dict[tuple[str, str], list[int]] = {}
+        for i in range(len(src) - 1):
+            idx.setdefault((src[i], src[i + 1]), []).append(i)
+        _INDEX[id(loose)] = (src, idx)
+    src, idx = _INDEX[id(loose)]
+    best, tries = 0.0, 0
+    for j in range(n - 1):
+        pos = idx.get((words[j], words[j + 1]), ())
+        if len(pos) > 40:
+            continue
+        for q in pos:
+            for shift in (-1, 0, 1):
+                start = max(0, q - j + shift)
+                best = max(best, difflib.SequenceMatcher(None, words, src[start:start + n], autojunk=False).ratio())
+                tries += 1
+            if tries > 600:
+                return best
+    return best
+
+
+def _quotation_candidates(ch: bk.Chapter) -> list[str]:
+    """Text of 4 words or more that a reader would take for a quotation: in double quotation marks, or in italics. Not the blockquotes (they are verified on their
+    own), not the theme line under the title, not the prayer (a prayer is set in italics)."""
+    out: list[str] = []
+    section = None
+    for i, b in enumerate(ch.all_blocks):
+        if b["t"] == "h" and b["level"] == 2:
+            section = bk.plain(b["spans"])
+            continue
+        if b["t"] not in ("p", "ul", "ol") or section == "A short prayer":
+            continue
+        if b["t"] == "p" and i == 1 and section is None:        # the italic theme line right under '# Day N'
+            continue
+        groups = [b["spans"]] if b["t"] == "p" else b["items"]
+        for spans in groups:
+            text = bk.plain(spans)
+            out += [m.group(1) for m in _DQUOTE.finditer(text)]
+            run = ""
+            for sp in spans + [{"t": ""}]:
+                if sp.get("i"):
+                    run += sp["t"]
+                else:
+                    if run:
+                        out.append(run)
+                    run = ""
+    return [t.strip(" ,.;:!?") for t in out if bk.count_words(t) >= 4]
+
+
+def _openings(book: bk.Book) -> list[tuple[str, int]]:
+    """The sentence openings (first five words) that recur in OPENING_DAYS or more different chapters, most frequent first."""
+    seen: dict[str, set[str]] = {}
+    for ch in book.chapters:
+        for b in ch.blocks:
+            if b["t"] not in ("p", "ul", "ol"):
+                continue
+            for spans in ([b["spans"]] if b["t"] == "p" else b["items"]):
+                for sentence in re.split(r"(?<=[.!?])\s+", bk.plain(spans)):
+                    words = re.findall(r"[^\W_]+(?:['’\-][^\W_]+)*", sentence.lower())
+                    if len(words) >= OPENING_WORDS:
+                        seen.setdefault(" ".join(words[:OPENING_WORDS]), set()).add(ch.id)
+    return sorted(((k, len(v)) for k, v in seen.items() if len(v) >= OPENING_DAYS), key=lambda kv: -kv[1])
+
+
 def _reflection(book: bk.Book, rep: Report, sources_dir: pathlib.Path | None) -> None:
     w = book.words
     days = book.meta.get("days")
@@ -361,6 +444,9 @@ def _reflection(book: bk.Book, rep: Report, sources_dir: pathlib.Path | None) ->
                 rep.warn(f"{ch.file}: {len(evening_list['items'])} end-of-day questions (aim for 2 or 3)")
             morning = sum(part_words.get(p, 0) for p in MORNING_PARTS)
             evening = sum(part_words.get(p, 0) for p in EVENING_PARTS)
+            walk = part_words.get("For the walk", 0)
+            if not WALK_WORDS[0] <= walk <= WALK_WORDS[1]:
+                rep.warn(f"{ch.file}: 'For the walk' is {walk:,} words (a question and a small practice: {WALK_WORDS[0]} to {WALK_WORDS[1]})")
             if not MORNING_WORDS[0] <= morning <= MORNING_WORDS[1]:
                 rep.warn(f"{ch.file}: the morning reading is {morning:,} words, about {bk.reading_minutes(morning)} min (aim for 5 min: {MORNING_WORDS[0]:,} to {MORNING_WORDS[1]:,} words)")
             if not EVENING_WORDS[0] <= evening <= EVENING_WORDS[1]:
@@ -369,6 +455,15 @@ def _reflection(book: bk.Book, rep: Report, sources_dir: pathlib.Path | None) ->
                 rep.error(f"{ch.file}: no quoted, attributed passage under '## The passage'")
             if not READING_WORDS[0] <= ch.words <= READING_WORDS[1]:
                 rep.warn(f"{ch.file}: {ch.words:,} words (a day is {READING_WORDS[0]:,} to {READING_WORDS[1]:,})")
+    if loaded:
+        for ch in book.chapters:
+            for text in _quotation_candidates(ch):
+                if verify_passage(text, loaded) != "missing":
+                    continue                      # it is in the source: fine
+                if any(_near_quote(text, loose) >= NEAR_QUOTE for _, loose in loaded):
+                    rep.warn(f"{ch.file}: '{text[:60]}' is almost, but not exactly, in the source: a quotation must be exact. Copy it from the source (tools/passage.py), or say it in your own words without quotation marks or italics")
+    for opening, n_days in _openings(book)[:3]:
+        rep.warn(f"the sentence opening '{opening} ...' recurs in {n_days} chapters: vary it, a repeated formula reads like a template")
     if days is not None and readings != days:
         rep.error(f"{readings} day chapters found, book.json says {days} days")
     if readings == 0:

@@ -20,13 +20,13 @@ Walkers sometimes say that the small gifts seem to multiply the longer the road 
 
 There is a moment in the passage that sounds a little transactional: be thankful for little, and you will be worthy to receive more. It can read like a trade, with gratitude as the price. A kinder way to take it is as a description of capacity. People who cannot notice small things cannot take in large ones. A mind that is always reaching for the next thing has no room to receive what is already in its hand. Gratitude is partly a skill of attention, and it grows with use.
 
-Where is it hard? There is a shadow on this subject, and honesty requires that it be named. "Be thankful" can be a cruel thing to say to someone who is in pain or loss. A few lines further on in the same chapter Thomas goes on to ask for thanks even for hardship, and this reading does not follow him there. Nobody should be told to be grateful for suffering. The passage we have here is about something much smaller and safer: noticing the good things that are actually good.
+There is a shadow on this subject, and honesty requires that it be named. "Be thankful" can be a cruel thing to say to someone who is in pain or loss. A few lines further on in the same chapter Thomas goes on to ask for thanks even for hardship, and this reading does not follow him there. Nobody should be told to be grateful for suffering. The passage we have here is about something much smaller and safer: noticing the good things that are actually good.
 
 There is also the ordinary difficulty of attention. Most of the time, gratitude is simply not on the programme. The mind is on the next stage and the next meal. A person can go all day and be handed ten small gifts without noticing one. That is not a moral failing. It is only what happens to a mind that is busy.
 
 And a plain doubt: some days you do not feel grateful, and no amount of looking will bring it on. If that is today, let it be. The practice is about noticing, not about producing a feeling. A feeling that has been forced is worth nothing. A gift noticed without much feeling is still a gift noticed.
 
-What does it ask of an ordinary day? To catch the small gifts in the act. Before each stop, name three that you have been given in the last hour. The temperature of the air. A kind word. The ground, still there under your feet. And once, to say thank you to a person for something small, and to mean it with your whole face.
+The practice is to catch the small gifts in the act. Before each stop, name three that you have been given in the last hour. The temperature of the air. A kind word. The ground, still there under your feet. And once, to say thank you to a person for something small, and to mean it with your whole face.
 
 ## For the walk
 
@@ -53,7 +53,7 @@ Three questions for tonight:
 - Whom did I forget to thank?
 - What did I treat as small that was really large?
 
-An honest word about tiredness. Gratitude is not a duty at ten o'clock at night. If you are too tired to feel anything, you do not have to produce anything. A single thing named is enough, however flat it feels. "The bed" is a perfectly good answer. And if the day was hard, and nothing seems to deserve thanks, you are allowed to leave the question open until tomorrow, when the light will come back and the small things with it.
+A word about tiredness. Gratitude is not a duty at ten o'clock at night. If you are too tired to feel anything, you do not have to produce anything. A single thing named is enough, however flat it feels. "The bed" is a perfectly good answer. And if the day was hard, and nothing seems to deserve thanks, you are allowed to leave the question open until tomorrow, when the light will come back and the small things with it.
 
 ## A short prayer
 

@@ -22,13 +22,13 @@ Then come two short sentences that seem almost too simple. *He doth much who lov
 
 In the passage's last sentence the effect appears. A person who loves in this way, he says, envies nobody, because they long for no selfish joy. Envy is the shadow of ranking. As soon as you stop trying to win, there is no one left to envy. The strong walker ahead of you is not your competitor. They are someone with a different body and a different road.
 
-Here the passage is hard in two places. First, "of no reputation" is a demanding phrase. Almost everyone wants to be seen doing well, and it is odd, and a little painful, to be asked to do something good that no one will ever notice. The old advice to do small things well in secret runs against the grain of a world of photographs and totals. Second, "he doth well" has a perfectionist's shadow. It does not mean that you must do everything flawlessly or not at all. A blister dressed clumsily and kindly is still a kindness.
+Here the passage is hard in two places. First, "of no reputation" is a demanding phrase. Almost everyone wants to be seen doing well, and it is odd, and a little painful, to be asked to do something good that no one will ever notice. The old advice to do small things well in secret runs against the grain of a world of photographs and totals. Second, "doth well" has a perfectionist's shadow. It does not mean that you must do everything flawlessly or not at all. A blister dressed clumsily and kindly is still a kindness.
 
 There is also a plain doubt. Numbers are comforting. They give a day a shape. To walk without them, even for an hour, can feel like losing a handrail. That is a fair feeling, and it is no failure of character. The passage does not ask you to burn your pedometer. It asks only that you notice what is being measured, and by whom, and whether the measure is yours.
 
 "Charity", in Thomas's old English, means love, not donations. It is the thing that gives a small act its weight. If you want a one-line version of the whole passage, it might be this: your effort is measured against your own capacity, and that is the only fair scale.
 
-What does it ask of an ordinary day? That for a stretch you walk without counting, and ask yourself only whether you are walking well. And that you do one small good thing today, without telling anyone.
+For one stretch of today, walk without counting, and ask yourself only whether you are walking well. And do one small good thing without telling anyone.
 
 ## For the walk
 
@@ -53,7 +53,7 @@ Three questions for tonight:
 - What did I do today that nobody saw, and does it matter to me that nobody did?
 - Whom did I envy, and what did they have that I actually wanted?
 
-An honest word about tiredness. Comparing is worst when you are tired. At the end of a hard day, the walker who looks fresh and tells you cheerfully how far they went can seem like a rebuke. They are not. They are another person with another body and another history. The stage you walked is the stage you walked, and it was enough. Let the numbers go quiet for the night, and let the day be only what it was.
+A word about being tired. Comparing is worst when you are tired. At the end of a hard day, the walker who looks fresh and tells you cheerfully how far they went can seem like a rebuke. They are not. They are another person with another body and another history. The stage you walked is the stage you walked, and it was enough. Let the numbers go quiet for the night, and let the day be only what it was.
 
 ## A short prayer
 

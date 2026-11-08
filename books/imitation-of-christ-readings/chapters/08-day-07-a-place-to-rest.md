@@ -18,7 +18,7 @@ The passage is a prayer, the disciple's answer to the voice that has been speaki
 
 A reader who does not pray as Thomas did may still hear what is going on underneath. He is saying that rest is not only a matter of the body. You can lie in the best bed in Spain and not rest. You can sit in a plain church for ten minutes and be quieter inside than you have been all month. The body can be helped by sleep and soup, and they are good things, but the part of us that keeps running after the body has stopped needs a different kind of place.
 
-There is a hard side to that. "Apart from Thee all things are hard and unquiet" is a large claim, and not every reader will accept it as stated. Some find peace in a landscape, a friend, a quiet routine, work well done. Thomas does not forbid those. He is talking about a deeper layer, and he is sure it needs God. We can leave that as it is. Each reader will know whether it fits.
+There is a hard side to that. The line "apart from Thee all things are hard and unquiet" is a large claim, and not every reader will accept it as stated. Some find peace in a landscape, a friend, a quiet routine, work well done. Thomas does not forbid those. He is talking about a deeper layer, and he is sure it needs God. We can leave that as it is. Each reader will know whether it fits.
 
 Often the mind, given nothing to do, begins to review the whole week at speed: every conversation, every small mistake. Let it, if it will, but ask it to be kind. A rest day is a poor time for a trial.
 
@@ -28,7 +28,7 @@ It also happens that the first rest is not chosen. An injury, a storm, a closed 
 
 Many traditions set aside one day in seven for stopping, and it was never meant as an indulgence. It was meant as a way of staying human. A pilgrim who cannot stop is only a very determined traveller.
 
-What does it ask of an ordinary day, then? That for a few hours you do less than you planned. That you let a meal take an hour. That you sit on a bench with nothing in your hands and see what the restlessness does when it is not fed. It rises, it peaks, and, if you wait, it falls. Somewhere beyond it there is a quiet that was waiting to be noticed.
+So what should a rest day hold? For a few hours, less than you planned. A meal that takes an hour. A bench, with nothing in your hands, where you can see what the restlessness does when it is not fed. It rises, it peaks, and, if you wait, it falls. Somewhere beyond it there is a quiet that was waiting to be noticed.
 
 ## For the walk
 

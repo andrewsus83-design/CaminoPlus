@@ -24,7 +24,7 @@ Notice also what he does not say. He does not say that company is bad, or that t
 
 The quiet is not empty, either. A path through fields has more in it than a street does: water in a ditch, wind in a hedge, the tick of a gate, your own steps. You only hear them once you stop talking over them.
 
-What does it ask of an ordinary day? An hour with no input. Not as a discipline or a boast, only as an experiment. Walk without earphones. Let a thought arrive and watch it go by, like a car on a distant road, without climbing in. Listen for the quietest sound you can find, a leaf, a water pipe, your own breath, and stay with it a minute.
+In practice, that means an hour with no input. Not as a discipline or a boast, only as an experiment. Walk without earphones. Let a thought arrive and watch it go by, like a car on a distant road, without climbing in. Listen for the quietest sound you can find, a leaf, a water pipe, your own breath, and stay with it a minute. It may help to choose a landmark ahead, a tree or a bend in the path, and decide that nothing will be added to the air until you reach it.
 
 And a word of doubt, because this book would rather be honest than soothing. Some mornings nothing comes. The quiet is merely quiet, and the mind is merely busy, and the whisper, if there is one, has nothing to say. Thomas knows this day well. His whole book is full of such days, and it keeps going. Perhaps "blessed" does not mean those who hear clearly. Perhaps it means those who keep their ears turned the right way, and stay on the road, and wait.
 
@@ -51,7 +51,7 @@ Three questions for the end of a day:
 - Which voice was loudest in my head, and did I believe it?
 - Is there anything gentle I noticed today and then walked past?
 
-An honest word about tiredness. Evening is a poor time for listening. The body wants food and a flat surface, and the mind plays back the day too fast to follow. Do not force a silence you are too tired to hold. Sometimes the kindest kind of listening is to lie down and let the room be as noisy as it is. If something quiet has to say itself to you, it can wait until the morning, when the road is empty again. If you can manage it, put the phone face down tonight and listen to the room for one minute: the breathing, the pipes, a door, the town beyond the window. That is a very small version of the morning's practice, and it is enough.
+Tiredness, honestly: evening is a poor time for listening. The body wants food and a flat surface, and the mind plays back the day too fast to follow. Do not force a silence you are too tired to hold. Sometimes the kindest kind of listening is to lie down and let the room be as noisy as it is. If something quiet has to say itself to you, it can wait until the morning, when the road is empty again. If you can manage it, put the phone face down tonight and listen to the room for one minute: the breathing, the pipes, a door, the town beyond the window. That is a very small version of the morning's practice, and it is enough.
 
 ## A short prayer
 

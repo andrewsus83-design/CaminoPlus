@@ -16,7 +16,7 @@ Thomas à Kempis was not talking about rucksacks. His word is the Cross, and for
 
 Read the middle sentence slowly. If you bear it unwillingly, you make a burden for yourself and greatly increase your load. Most of us know this from the inside. There is the weight itself, and then there is the argument with the weight: why me, why today, why is it not fair. The argument has no mass you could put on a scale, and it still wears you out faster than the thing it is arguing about. Anyone who has walked uphill muttering knows that the muttering does not shorten the hill.
 
-The first sentence has a lovely promise in it: carried willingly, the load will carry you. Walkers say much the same about a well-fitted pack. Done up properly, with the weight low on the hips, the strongest part of you takes it, and the shoulders are left free. The load becomes part of how you move. And a load can bring you to where you are going. The pack holds the bed, the rain jacket and the water. Without it there is no walk at all. The same is true of a day. A day carried willingly, even a hard one, takes you somewhere. A day carried grudgingly only takes you to the evening.
+The first sentence has a lovely promise in it: carried willingly, the load will carry you. Walkers say much the same about a well-fitted pack. Done up properly, with the weight low on the hips, the strongest part of you takes it, and the shoulders are left free. The load becomes part of how you move. And a load can bring you to where you are going. The pack holds the sleeping bag, the rain jacket and the water. Without it there is no walk at all. The same is true of a day. A day carried willingly, even a hard one, takes you somewhere. A day carried grudgingly only takes you to the evening.
 
 Now say where it is hard, because it is. "Willingly" is the word that snags. Some weights are unjust. Some are too heavy for one person. A person with real grief, or real pain, is not helped by being told to carry it cheerfully, and Thomas is not asking for cheerfulness. Elsewhere in his book he says things about suffering that this reading does not follow. Taken narrowly, the sentence is practical and not pious: what cannot be changed is made heavier by fighting it.
 
@@ -51,7 +51,7 @@ Tonight, three gentle questions:
 - Is there something in my pack, or in my head, that I could post home or leave behind tomorrow?
 - Who offered me help today, and who could I ask tomorrow?
 
-An honest word about tiredness. Weariness makes everything heavier, including thoughts. The worry that looked enormous at four o'clock often looks smaller after food and a wash, and smaller still after sleep. Do not try to settle the big questions of your life in a bunk bed. Put the pack where you can reach it in the morning, and let it be a pack again, and nothing more.
+A word about tiredness, honestly. Weariness makes everything heavier, including thoughts. The worry that looked enormous at four o'clock often looks smaller after food and a wash, and smaller still after sleep. Do not try to settle the big questions of your life in a bunk bed. Put the pack where you can reach it in the morning, and let it be a pack again, and nothing more.
 
 If any weight is too much to carry alone, say it to somebody tomorrow, in a plain sentence. That is not failure. It is how most loads on this road are carried.
 

@@ -28,7 +28,7 @@ Fruit, in this sense, is quite small. It is not a transformation. It is somethin
 
 None of this is a demand. A pilgrimage that ends in a quiet decision to ring someone is not a smaller pilgrimage than one that ends in a vow. Small, definite things tend to last.
 
-What does it ask of an ordinary day? Whichever day you reach the place you were walking to, do not let the noise decide for you. Before you leave, find a quiet corner, a pew, a step, a wall, and sit for a few minutes. Ask what you would like to carry home, and let it be one thing.
+Whichever day you reach the place you were walking to, do not let the noise decide for you. Before you leave, find a quiet corner, a pew, a step, a wall, and sit for a few minutes. Ask what you would like to carry home, and let it be one thing.
 
 ## For the walk
 

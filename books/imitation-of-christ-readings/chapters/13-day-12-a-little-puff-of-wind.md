@@ -20,11 +20,11 @@ Notice two things in the passage. The first is that the matter is "wonderfully s
 
 "Temptation" is a heavy word, and in modern ears it can sound like a list of vices. A plainer way to read it is: anything that pulls you off your own intention. A taxi at the edge of the village. A shortcut along the road. A comment that begs for a clever reply. A decision to quit, made at four in the afternoon. Many of these are not wicked in themselves. Sometimes the taxi is the sensible thing, and to refuse it would be a kind of vanity. What Thomas is pointing at is the moment of being tugged, and the small gap in which you can choose.
 
-Where is it hard? Perhaps in the tone. A confession of "my infirmity" can slide, in the hands of a person who is hard on himself, into self-contempt. Thomas is sometimes that person, and this book does not follow him there. The useful part of the passage is the honesty, not the shame. To say plainly "this is how I am knocked off course" is not a failure. It is the beginning of knowing where to put your guard.
+The hardest part may be the tone. A confession of "my infirmity" can slide, in the hands of a person who is hard on himself, into self-contempt. Thomas is sometimes that person, and this book does not follow him there. The useful part of the passage is the honesty, not the shame. To say plainly "this is how I am knocked off course" is not a failure. It is the beginning of knowing where to put your guard.
 
 There is also a plain honesty about the odds. The man in the passage resolves, falls, resolves again. He does not say that he has stopped falling. He says that this is what he is like, and he says it to the one he trusts most. That is a kind of wisdom: not to expect to become a person who is never moved by a breeze, but to become a person who notices sooner.
 
-What does it ask of an ordinary day? A few small defences. Name the thing when it comes: "This is the puff of wind." A name takes some of the force out of it. Take three breaths before you answer or act. And deal with the actual pebble at once. Stop, sit down, take off the boot, shake it out. It takes thirty seconds, and it turns out to be a surprisingly good picture of the whole practice: do not walk on, out of stubbornness, with a small hard thing rubbing at you.
+A few small defences will help. Name the thing when it comes: "This is the puff of wind." A name takes some of the force out of it. Take three breaths before you answer or act. And deal with the actual pebble at once. Stop, sit down, take off the boot, shake it out. It takes thirty seconds, and it turns out to be a surprisingly good picture of the whole practice: do not walk on, out of stubbornness, with a small hard thing rubbing at you.
 
 ## For the walk
 
@@ -51,7 +51,7 @@ Three questions for tonight:
 - What did I do next, and what would I have liked to do?
 - What pause, word or habit could I put in place tomorrow to meet it better?
 
-An honest word about tiredness. The end of the day is exactly when the guard is lowest, and much of what we regret saying has been said tired. If you were short with someone this evening, it is quite likely that you were simply spent. That is not an excuse, only an explanation, and a reason to be kind to yourself. The point of the passage is not to make you ashamed of your weakness. It is to help you see it coming, and to give you an extra moment before the wind arrives.
+And tiredness. The end of the day is exactly when the guard is lowest, and much of what we regret saying has been said tired. If you were short with someone this evening, it is quite likely that you were simply spent. That is not an excuse, only an explanation, and a reason to be kind to yourself. The point of the passage is not to make you ashamed of your weakness. It is to help you see it coming, and to give you an extra moment before the wind arrives.
 
 ## A short prayer
 

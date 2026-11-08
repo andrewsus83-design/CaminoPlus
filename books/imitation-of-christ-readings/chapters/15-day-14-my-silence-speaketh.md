@@ -20,13 +20,13 @@ Then, in the next sentence, the silence breaks, and what comes out is an honest 
 
 And then, in the reply, the passage turns. *Behold, here I am.* The voice does not argue or explain. It says, I am here, because you called. Your tears and the longing of your soul have drawn me. It is a short, warm answer, and it comes at once.
 
-Where is it hard? Perhaps here. In this book the answer comes within a few lines, and in life it often does not. A great many people sit in a quiet church, or on a wall, or in a bunk, and hear nothing. Some hear a great deal that is not comforting. Thomas knows this too, and a good deal of his book is about the long dry stretches. But in this chapter he offers the moment of answer as a possibility, and we can take it as one without insisting that it has to be ours.
+This may be the hard part. In this book the answer comes within a few lines, and in life it often does not. A great many people sit in a quiet church, or on a wall, or in a bunk, and hear nothing. Some hear a great deal that is not comforting. Thomas knows this too, and a good deal of his book is about the long dry stretches. But in this chapter he offers the moment of answer as a possibility, and we can take it as one without insisting that it has to be ours.
 
 There is a second hard thing. For a person in real grief, silence may be the only honest speech, and it may not feel like a solace at all. It may feel like a room with the furniture taken out. If that is where you are, nothing here asks you to fill it. You are not required to feel consoled, or to feel anything. To sit in the room, and let it be as empty as it is, is already a kind of answer to the question the passage asks.
 
 And there is plain doubt. You may sit in the shade and wonder whether anyone is listening at all. That is a fair thing to wonder, and the passage does not scold you for it. The disciple is wondering too.
 
-What does it ask of an ordinary day? A few minutes with no words. You do not need a church, though a church, where one is open, will often give you the quiet for nothing. Sit, with your hands open on your knees. Let whatever is there be there. If a word comes, let it be a small one.
+For today, a few minutes with no words will do. You do not need a church, though a church, where one is open, will often give you the quiet for nothing. Sit, with your hands open on your knees. Let whatever is there be there. If a word comes, let it be a small one.
 
 ## For the walk
 
@@ -51,7 +51,7 @@ Three questions for tonight:
 - When was I most alone, and did it feel empty or full?
 - Is there something I would like to say to someone, even if I cannot say it yet?
 
-An honest word about tiredness. At night silence is not a discipline, only a mercy. If you are very tired, do not try to make the quiet mean something. Let the room be dark, let your breathing slow, and let the day end without comment. If it is true, as the passage says, that silence speaks, then you have already said all that was needed.
+Honestly, tiredness. At night silence is not a discipline, only a mercy. If you are very tired, do not try to make the quiet mean something. Let the room be dark, let your breathing slow, and let the day end without comment. If it is true, as the passage says, that silence speaks, then you have already said all that was needed.
 
 ## A short prayer
 

@@ -12,7 +12,7 @@
 
 Somewhere in the second week the question arrives, and it rarely arrives at a good moment. It comes on a long uphill, or in the last hour before a stop, or at two in the morning in a strange bed. Will I finish? Will the knee hold? What if the blister turns into something? What if I get there and nothing has changed? What if I stop and everyone knows I stopped? The questions are not stupid. They are only unanswerable, and they are very good at keeping you awake.
 
-Thomas à Kempis tells a short story about a man in this position. It is a story he tells without naming anyone. The man is anxious, tossed between hope and fear, overwhelmed with grief, and one day he falls to his knees in a church and says, in effect, what many of us have said in our own way: *If I only knew that I should still persevere.* If I only knew I would make it.
+Thomas à Kempis tells a short story about a man in this position. It is a story he tells without naming anyone. The man is anxious, tossed between hope and fear, overwhelmed with grief, and one day he falls to his knees in a church and says, in effect, what many of us have said in our own way: *if I but knew that I should still persevere.* If only we knew we would make it.
 
 The answer he receives is short, and it is a question. *And if thou didst know it, what wouldst thou do?* The man does not have to think very long. He would keep going. He would do whatever he is already trying to do, with a little less fear. And so the voice says: *Do now what thou wouldst do then, and thou shalt be very secure.*
 
@@ -22,11 +22,11 @@ Then the story ends with a small, beautiful sentence. The man's disturbance of s
 
 For a walker it translates cleanly. You cannot know whether your knee will last, or whether you will reach the cathedral. You can know whether to drink water now, to stop at the next village, to take the shorter path, to ask a pharmacist about that tendon. The big question is out of reach. The small ones are all within your hands, and they are the ones that decide the big one.
 
-Where is it hard? The passage works best on one kind of doubt, the kind that is about getting through. It is much less helpful on a different kind, the doubt about why you are walking at all. A man who asks "Is this worth doing?" is not answered by "Keep going". For that question there may be no tidy reply. You may walk for days with it unresolved, and the passage does not pretend to settle it. What it may do is suggest that the question can be carried while you walk, and need not be answered before the next step.
+The passage has its limits. It works best on one kind of doubt, the kind that is about getting through. It is much less helpful on a different kind, the doubt about why you are walking at all. A man who asks "Is this worth doing?" is not answered by "Keep going". For that question there may be no tidy reply. You may walk for days with it unresolved, and the passage does not pretend to settle it. What it may do is suggest that the question can be carried while you walk, and need not be answered before the next step.
 
 There is another difficulty. The man in the story receives an answer, a voice, in a church. Many people never do. They kneel, or sit, or walk, and hear only the wind. Thomas does not say this is a failure. He tells the story because it happened to someone, and offers it as a possibility, not a promise. Whether or not you expect a voice, the question it asked is a good one to carry by yourself.
 
-What does it ask of an ordinary day? Each time an "if only" comes up, finish the sentence honestly: *and so today I will...* The knee, the distance, the cathedral and the verdict of other people can wait. Today's walk is enough to be getting on with.
+Here is the practice. Each time an "if only" comes up, finish the sentence honestly: *and so today I will...* The knee, the distance, the cathedral and the verdict of other people can wait. Today's walk is enough to be getting on with.
 
 ## For the walk
 
@@ -51,7 +51,7 @@ Three questions for tonight:
 - Is there a smaller, answerable question hiding inside the large, unanswerable one?
 - What is one thing I can do tomorrow without knowing how it ends?
 
-An honest word about tiredness. Doubt and exhaustion look very alike from the inside, and they often travel together. A worry that sounded like a verdict at midnight may sound much more like a worry after breakfast. If it is still there in the morning, with food inside you, take it seriously then. Tonight, the most useful thing is to lie still and let sleep be the answer for now.
+On tiredness: doubt and exhaustion look very alike from the inside, and they often travel together. A worry that sounded like a verdict at midnight may sound much more like a worry after breakfast. If it is still there in the morning, with food inside you, take it seriously then. Tonight, the most useful thing is to lie still and let sleep be the answer for now.
 
 ## A short prayer
 

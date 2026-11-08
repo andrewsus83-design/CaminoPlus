@@ -24,11 +24,11 @@ Walkers know something about this. The best moments are often not the most comfo
 
 Later in the same chapter Thomas has a phrase for the reader: *a wayfaring man*. It is an old word for someone on the road. Such a person, he says, may have abundance of peace, as much as is possible for someone who is only a wayfarer. That is both realistic and gentle. It does not promise the peace of the destination. It promises the peace of the road, which is real, and partial, and enough to go on with.
 
-Where is it hard? The passage pairs peace with humility, and that pairing can sound like a test you might fail. If you are anxious, are you proud? Plainly not. Anxiety and pride are different things, and many humble people lie awake. The sentence is better read as a description than as a verdict: it tells you where peace tends to be found, and it does not tell you that you have been refused. Nor does it mean that you should stop caring about justice or change. It says only that peace and perfect conditions are two separate things.
+The passage pairs peace with humility, and that pairing can sound like a test you might fail. If you are anxious, are you proud? Plainly not. Anxiety and pride are different things, and many humble people lie awake. The sentence is better read as a description than as a verdict: it tells you where peace tends to be found, and it does not tell you that you have been refused. Nor does it mean that you should stop caring about justice or change. It says only that peace and perfect conditions are two separate things.
 
 Another hard place is the idea that perfect peace is not available here at all. Some readers will find that sobering and some, a relief. If the state of complete rest belongs to another life, what is the point of looking for any now? The answer in the passage is that partial peace is real, and the road is where it lives.
 
-What does it ask of an ordinary day? That you look, once, in the middle of something imperfect, for the small peace that is already there. The sock with the hole. The bed that is a little too hard. A friend who is difficult. Under the minor trouble is often a stillness that was waiting for you to stop waiting for conditions.
+Once today, in the middle of something imperfect, look for the small peace that is already there. The sock with the hole. The bed that is a little too hard. A friend who is difficult. Under the minor trouble is often a stillness that was waiting for you to stop waiting for conditions.
 
 ## For the walk
 

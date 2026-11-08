@@ -22,11 +22,11 @@ The second half of the passage is blunter still. You must still be tried on eart
 
 And yet there is something freeing in it. It tells you that your flatness is not a failure. You are not meant to be perpetually filled. The day after the great thing is an ordinary day, and the ordinary day is part of the road. A person who expects constant fulfilment will be disappointed, over and over. A person who expects consolation from time to time will be pleasantly surprised when it comes.
 
-Where is it hard? Quite openly, in two places. First, the phrases "warfare" and "probation" are heavy words, and belong to the language of a fifteenth-century cloister. You can read them more lightly as "more of life, with its work in it". Second, the passage says that what you long for is God, and that the answer is to wait. For some readers that is the beating heart of the matter. For others it is not what they were longing for at all. The longing may have been for rest, or forgiveness, or company, or a self they had misplaced, and it may have nothing to do with a name. Take the part that fits, and let the rest be.
+It is hard, quite openly, in two places. First, the phrases "warfare" and "probation" are heavy words, and belong to the language of a fifteenth-century cloister. You can read them more lightly as "more of life, with its work in it". Second, the passage says that what you long for is God, and that the answer is to wait. For some readers that is the beating heart of the matter. For others it is not what they were longing for at all. The longing may have been for rest, or forgiveness, or company, or a self they had misplaced, and it may have nothing to do with a name. Take the part that fits, and let the rest be.
 
 There is also a plain, small honesty. Some of the hollow you may feel is only tiredness and the end of a routine. Do not read too much into it. A good breakfast does a great deal. And there is a gentler reading of "not yet": it means that the story is longer than the walk.
 
-What does it ask of an ordinary day? That you let the day after be slow. Do not rush to fill the quiet. Wash your clothes, eat properly, walk a little without a destination, and see what the hollow does when it is not hurried. It may be the first space in weeks that is entirely yours.
+Let the day after be slow. Do not rush to fill the quiet. Wash your clothes, eat properly, walk a little without a destination, and see what the hollow does when it is not hurried. It may be the first space in weeks that is entirely yours.
 
 ## For the walk
 
@@ -51,7 +51,7 @@ Three questions for tonight:
 - What longing is still with me, and can I let it stay unsolved for now?
 - What is one ordinary thing I am looking forward to?
 
-An honest word about tiredness. The tiredness after an arrival is partly physical and partly emotional, and it is sometimes mistaken for sadness. Be gentle with it. Sleep, eat, drink water. If the flatness lasts for many days after you get home, and begins to feel heavy, say so to someone you trust, and ask for help. It is not a failure of the walk. It is a normal and common thing, and it can be eased.
+A word about weariness. The tiredness after an arrival is partly physical and partly emotional, and it is sometimes mistaken for sadness. Be gentle with it. Sleep, eat, drink water. If the flatness lasts for many days after you get home, and begins to feel heavy, say so to someone you trust, and ask for help. It is not a failure of the walk. It is a normal and common thing, and it can be eased.
 
 ## A short prayer
 

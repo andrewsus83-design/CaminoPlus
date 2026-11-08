@@ -24,7 +24,7 @@ The second hard place is the phrase "none sufficient of himself". Pride of self-
 
 And there is a plain, honest doubt. Some days you do not like people. You do not want to bear with them, comfort them or admonish them. You want to be left alone with your bread and your map. The passage does not demand that you like anybody. It only suggests that you will need to be borne with yourself, soon, and that a small courtesy given today will be useful credit tomorrow.
 
-What does it ask of an ordinary day? Two small things. To let one irritation go by without remark. And, once, to give or ask for a bit of help: a spare minute, a bit of tape, a seat made room for, a hand with a strap.
+Two small things would be enough. Let one irritation go by without remark. And, once, give or ask for a bit of help: a spare minute, a bit of tape, a seat made room for, a hand with a strap.
 
 ## For the walk
 
@@ -49,7 +49,7 @@ Three questions for tonight:
 - Who did I find hard to bear, and what might they be carrying that I cannot see?
 - What small help could I offer, or ask for, tomorrow?
 
-An honest word about tiredness. Patience is the first thing to go when you are tired. The person who snapped at five o'clock was not the person you would like to be, but they were tired, and so was everyone else in the room. Do not judge the whole of yourself by the six o'clock version. You can begin again with the people in the morning, when everyone is a little kinder, a little more rested, and a little more ready to be borne with. Many a night's grievance has dissolved over the first coffee.
+Tiredness, honestly. Patience is the first thing to go when you are tired. The person who snapped at five o'clock was not the person you would like to be, but they were tired, and so was everyone else in the room. Do not judge the whole of yourself by the six o'clock version. You can begin again with the people in the morning, when everyone is a little kinder, a little more rested, and a little more ready to be borne with. Many a night's grievance has dissolved over the first coffee.
 
 ## A short prayer
 

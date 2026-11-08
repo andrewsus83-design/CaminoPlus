@@ -12,7 +12,7 @@
 
 The best hour of a walking day is very often the first. The albergue is dark and full of small sounds: a zip, a rustle of plastic bags, someone trying hard not to wake anyone. You find your boots by feel. Outside, the street is cool and empty, and for a few minutes you have not yet done anything late, slow or wrong. The day is a blank sheet and your hand has not touched it.
 
-By the fourth morning that feeling needs some help. The novelty has worn off. The body has opinions. Yesterday's mood is still lying across the bed like a coat. This is exactly where Thomas à Kempis starts: renew your resolutions every day, he says, as if it were the first day of your new life. And then he gives the reader the words to say. *Help me, O God, in my good resolutions, and grant that this day I may make a good beginning, for hitherto I have done nothing!*
+By the fourth morning that feeling needs some help. The novelty has worn off. The body has opinions. Yesterday's mood is still lying across the bed like a coat. This is exactly where Thomas à Kempis starts: renew your resolutions every day, he says, as if it were the first day of your new life. And then he gives the reader the words to say. *Help me, O God, in my good resolutions, and in Thy holy service, and grant that this day I may make a good beginning, for hitherto I have done nothing!*
 
 That last phrase can sound like despair. Four days walked and a long way still to go, and he says, nothing done? But it helps to read it as a kindness. Yesterday's kilometres do not walk today's. The morning owes you nothing and holds nothing against you. You may start without your score. And notice what he asks for: a good beginning, not a good day. Beginning is the part we can actually do. The day will have its own weather and its own blisters, and it will go as it goes. We can choose the first step, and then the next.
 
@@ -20,11 +20,11 @@ Notice too that the little prayer asks for help. A beginning here is not a clenc
 
 The second half of the passage puts a second hinge on the day. Twice at least, he says, at evening and at morning. In the morning make your resolves, and in the evening look back over how the day went in word, deed and thought. That is a very simple structure and it works for walkers: a short beginning, a long walk, and a short look back, like two bookends on a shelf.
 
-Now say where it is hard. The evening part can go sour. A review of "word, deed and thought" can turn into a trial, with the mind as both prosecutor and accused, and a bunk bed for a courtroom. That would defeat the whole purpose, because the morning was meant to lay the score down. The old advice only works if the evening look is as gentle as the morning start. Look at the day as a friend would. Name what went wrong. Then let it sleep with you, not stand over you. If you cannot do it kindly, it is better to leave the review out than to stage it badly.
+There is a difficulty. The evening part can go sour. A review of "word, deed, and thought" can turn into a trial, with the mind as both prosecutor and accused, and a bunk bed for a courtroom. That would defeat the whole purpose, because the morning was meant to lay the score down. The old advice only works if the evening look is as gentle as the morning start. Look at the day as a friend would. Name what went wrong. Then let it sleep with you, not stand over you. If you cannot do it kindly, it is better to leave the review out than to stage it badly.
 
 There is a second difficulty, and it is the common one. Some mornings you will not feel any beginning at all. You will be stiff and a little afraid and wondering why you came. Then a "good beginning" may be nothing more than the act of tying your laces and standing up. That counts. Thomas is asking for a will, not a mood. A mood cannot be summoned, and a will can be small enough to carry out on four hours' bad sleep.
 
-What does it ask of an ordinary day? To start it on purpose. Before the first step, take thirty seconds. Say, in whatever words you like, that you are beginning, and ask for whatever help you think you might need. Then go. It is a small ritual and it changes the feel of the next hour, in the same way that opening a window changes a room.
+The practical part is simple: start the day on purpose. Before the first step, take thirty seconds. Say, in whatever words you like, that you are beginning, and ask for whatever help you think you might need. Then go. It is a small ritual and it changes the feel of the next hour, in the same way that opening a window changes a room.
 
 The passage also works at home. Anyone who has stood in a kitchen at seven on a grey Monday knows how much of life depends on a good beginning, and how much of it is a decision to start again, quietly, without commentary. The road simply makes it easier to see.
 
@@ -53,7 +53,7 @@ Three questions for tonight:
 - Where did I need to begin again, and did I?
 - What would I like to put down before I sleep, so that I can pick up nothing of it tomorrow?
 
-An honest word about tiredness. You are not in a fit state to make resolutions tonight, and you are not obliged to. Tomorrow's beginning will be there at six, and it will ask for no more than laces and a few words. Tonight the work is the opposite: to let the day end, and be finished. Whatever it was, it has been walked. That is enough.
+And about tiredness. You are not in a fit state to make resolutions tonight, and you are not obliged to. Tomorrow's beginning will be there at six, and it will ask for no more than laces and a few words. Tonight the work is the opposite: to let the day end, and be finished. Whatever it was, it has been walked. That is enough.
 
 ## A short prayer
 
