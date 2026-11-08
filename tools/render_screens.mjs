@@ -42,7 +42,8 @@ const SCREENS = {
   'Discover': 'discover',
   'Discover · Photos of you': 'discover-photos',
   'Library': 'library',
-  'Library · Books': 'library-books',
+  // 'Library · Books' is not rendered: its phone still shows the twelve classics of an earlier plan, not the books of the app (see the note of the
+  // group "Library · Books and the reader" in design/index.html). Add it, and its picture in tools/build_web.py, once it is drawn from the bundle.
   'Diary': 'diary',
   'Diary · page': 'diary-page',
   'Diary · read': 'diary-read',
