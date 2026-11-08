@@ -12,7 +12,7 @@ import { confirmDelete } from '@/features/diary/confirm';
 import { PRIVACY_LINE, dateLine, dateWithDraft, mediaUsageLine, metaLine, pagePreview, pageTitle, pagesLabel } from '@/features/diary/present';
 import { isDraft, type DiaryEntry } from '@/features/diary/store';
 import { useDiary } from '@/features/diary/useDiary';
-import { radius, role, space } from '@/theme';
+import { icon, radius, role, space } from '@/theme';
 
 // Me > Notes > My diary: the pages, newest first. They live only on this phone (src/features/diary/store.ts) and the screen says so.
 export default function DiaryList() {
@@ -38,7 +38,7 @@ export default function DiaryList() {
       {ready && entries.length === 0 && (
         <Card style={{ alignItems: 'center', gap: space[3], paddingVertical: space[8] }}>
           <View style={{ width: 64, height: 64, borderRadius: radius.pill, backgroundColor: role.highlight, alignItems: 'center', justifyContent: 'center' }}>
-            <Icon name="compose" color={role.onHighlight} size={32} />
+            <Icon name="compose" color={role.onHighlight} size={icon.lg} />
           </View>
           <AppText variant="h4" style={{ textAlign: 'center' }}>No pages yet</AppText>
           <AppText variant="small" muted style={{ textAlign: 'center' }}>Write a few lines about your day on the Way: what you saw, who you met, how you feel.</AppText>

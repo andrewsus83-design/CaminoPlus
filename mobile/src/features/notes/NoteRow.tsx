@@ -7,7 +7,7 @@ import { DRAFT_TAG } from '@/features/diary/present';
 import { RichText } from '@/features/diary/RichText';
 import type { DiaryEntry } from '@/features/diary/store';
 import { PilgrimAvatar } from '@/features/social/components/primitives';
-import { layout, radius, role, space, textStyle } from '@/theme';
+import { icon, layout, radius, role, space, textStyle } from '@/theme';
 import { NoteMedia } from './NoteMedia';
 import { BODY_CLAMP_PX, BLANK_NOTE, FADE_PX, FADE_STEPS, SHOW_LESS, SHOW_MORE, TOUCH_MIN, needsMore, noteRow } from './timeline';
 
@@ -136,11 +136,11 @@ function NoteRowView({ entry, uid, now, who, open, actions }: { entry: DiaryEntr
                 onPress={() => actions.more(entry)}
                 style={({ pressed: down }) => ({ width: TOUCH_MIN, height: TOUCH_MIN, marginTop: -12, marginBottom: -12, marginRight: -12, alignItems: 'center', justifyContent: 'center', opacity: down ? 0.6 : 1 })}
               >
-                <Icon name="more" color={role.muted} size={24} />
+                <Icon name="more" color={role.muted} size={icon.md} />
               </Pressable>
             </View>
 
-            {row.title !== '' && <AppText variant="h4" style={[{ fontSize: 20, lineHeight: 26, marginTop: 2 }, breakAnywhere]}>{row.title}</AppText>}
+            {row.title !== '' && <AppText variant="h4" style={breakAnywhere}>{row.title}</AppText>}
             {hasWords && <View style={{ marginTop: space[1] }}><Words text={row.body} full={row.full} open={open} behind={pressed ? role.sunken : role.bg} onToggle={() => actions.toggle(entry.id)} /></View>}
             {row.blank && <AppText muted style={{ marginTop: space[1] }}>{BLANK_NOTE}</AppText>}
             {row.media.length > 0 && <View style={{ marginTop: space[3] }}><NoteMedia uid={uid} items={row.media} onOpen={(i) => actions.media(entry.id, i)} /></View>}
@@ -151,7 +151,7 @@ function NoteRowView({ entry, uid, now, who, open, actions }: { entry: DiaryEntr
                 onPress={() => actions.place(row.place as DiaryPlace)}
                 style={({ pressed: down }) => ({ marginTop: space[3], alignSelf: 'flex-start', maxWidth: '100%', minHeight: TOUCH_MIN, flexDirection: 'row', alignItems: 'center', gap: space[2], paddingHorizontal: space[4], borderRadius: radius.pill, borderWidth: 1, borderColor: role.border, backgroundColor: role.surface, opacity: down ? 0.8 : 1 })}
               >
-                <Icon name="pin" color={role.accentText} size={18} strokeWidth={2} />
+                <Icon name="pin" color={role.accentText} size={icon.sm} strokeWidth={2} />
                 <AppText variant="caption" numberOfLines={1} style={{ flexShrink: 1 }}>{row.placeText}</AppText>
               </Pressable>
             )}
@@ -165,7 +165,7 @@ function NoteRowView({ entry, uid, now, who, open, actions }: { entry: DiaryEntr
                   onPress={() => actions.share(row.share)}
                   style={({ pressed: down }) => ({ width: TOUCH_MIN, height: TOUCH_MIN, alignItems: 'center', justifyContent: 'center', opacity: down ? 0.6 : 1 })}
                 >
-                  <Icon name="share" color={role.muted} size={24} />
+                  <Icon name="share" color={role.muted} size={icon.md} />
                 </Pressable>
               </View>
             )}

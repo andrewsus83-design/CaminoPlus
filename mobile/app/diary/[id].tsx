@@ -24,7 +24,7 @@ import { continueList, formatsAt, toggleBlock, toggleInline, type Edit, type Sel
 import { BODY_MAX, TITLE_MAX, type DiaryEntry } from '@/features/diary/store';
 import { usePlaceFlow } from '@/features/diary/usePlace';
 import { NEW_PAGE, useDiaryPage, usePageSaver } from '@/features/diary/useDiary';
-import { layout, radius, role, space, textStyle } from '@/theme';
+import { icon, layout, radius, role, space, textStyle } from '@/theme';
 
 // Browsers draw their own outline inside a text field; the border of the page (gold while writing) shows the focus instead.
 // Web only: native rejects the value.
@@ -351,7 +351,7 @@ function PageEditor({ uid, initial, start, goBack }: { uid: string; initial: Dia
 
           {compact && attached !== '' && (
             <Pressable accessibilityRole="button" accessibilityLabel={`On this page: ${attached}. Shows them`} onPress={() => Keyboard.dismiss()} style={{ minHeight: 48, flexDirection: 'row', alignItems: 'center', gap: space[3] }}>
-              <Icon name="image" color={role.muted} size={20} />
+              <Icon name="image" color={role.muted} size={icon.smPlus} />
               <AppText variant="small" muted numberOfLines={1} style={{ flex: 1 }}>{attached}</AppText>
             </Pressable>
           )}
