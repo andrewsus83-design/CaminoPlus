@@ -20,7 +20,8 @@ export const KIND_LABEL: Record<Exclude<FeedbackKind, 'rating'>, string> = {
 export const RATING_WORDS = ['', 'Not good', 'Could be better', 'It is okay', 'Good', 'Great, Buen Camino!'] as const;
 
 export function appVersion(): string {
-  return Constants.expoConfig?.version ?? '1.0.0';
+  // The fallback is only for a run where Expo gives no config; tools/tests/test_release.py keeps it equal to app.json's version.
+  return Constants.expoConfig?.version ?? '1.1.0';
 }
 
 /** Why a message cannot be sent yet, or null. Kept pure so it is easy to test. */

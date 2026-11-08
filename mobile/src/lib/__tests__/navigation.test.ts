@@ -865,7 +865,7 @@ check('the two readers: the Books reader has the Back button of the app at the t
   const bible = read(join('src', 'features', 'library', 'bible', 'Reader.tsx'));
   assert.match(bible, /<BackButton fallback=\{bookHref\(place\.code\)\} \/>/);
   assert.match(bible, /<Pill variant="ghost" compact label="All chapters" accessibilityLabel="All chapters of this book"/);
-  assert.match(read(join('src', 'components', 'Pill.tsx')), /minHeight: large \? 68 : compact \? 48 : layout\.touchMin/, 'a compact pill is 48 high, like the Back button next to it');
+  assert.match(read(join('src', 'components', 'Pill.tsx')), /minHeight: large \? 68 : compact \? 48 : layout\.touchPrimary/, 'a compact pill is 48 high, like the Back button next to it');
   assert.match(read(join('src', 'features', 'library', 'books', 'ReaderBar.tsx')), /const TITLE = \{ fontSize: textStyle\('body'\)\.fontSize, lineHeight: textStyle\('body'\)\.lineHeight \};/);
 });
 
