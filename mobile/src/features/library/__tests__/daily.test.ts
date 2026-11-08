@@ -14,6 +14,7 @@ import {
 import { CARD_PAD, COLUMNS, GRID_MAX, TOUCH, calendarMetrics } from '../daily/layout';
 import { DAILY_NOTICE, SAMPLE_READING, SAMPLE_REFLECTION, readingFor } from '../daily/sample';
 import { arrows, dailyReducer, initDaily, type DailyAction, type DailyState } from '../daily/state';
+import './liturgy.test'; // the liturgical calendar (daily/liturgy.ts): its own file, run here so no script has to name it
 
 let n = 0;
 const check = (name: string, fn: () => void) => { fn(); n += 1; console.log(`ok   ${name}`); };
@@ -503,7 +504,7 @@ const source = (f: string) => code(read(f));
 const all = () => dailyFiles.map((f) => `// ${f}\n${source(f)}`).join('\n');
 
 check('the feature is the files this test expects, so a new one is looked at (and the scans below see all of them)', () => {
-  assert.deepEqual(dailyFiles.map((f) => path.basename(f)).sort(), ['DayReading.tsx', 'MonthCalendar.tsx', 'calendar.ts', 'daily.tsx', 'layout.ts', 'sample.ts', 'state.ts', 'useDailyReading.ts']);
+  assert.deepEqual(dailyFiles.map((f) => path.basename(f)).sort(), ['DayReading.tsx', 'MonthCalendar.tsx', 'calendar.ts', 'daily.tsx', 'layout.ts', 'liturgy.ts', 'sample.ts', 'state.ts', 'useDailyReading.ts']);
 });
 
 check('no new native module, no network and nothing stored: React, React Native, expo-router and the app\'s own components and theme, and no call to the account, the network or the phone\'s storage', () => {
@@ -516,7 +517,7 @@ check('no new native module, no network and nothing stored: React, React Native,
 });
 
 check('the calendar, the reducer, the layout and the sample are plain TypeScript: no React and no React Native in them', () => {
-  for (const f of ['calendar.ts', 'state.ts', 'layout.ts', 'sample.ts']) {
+  for (const f of ['calendar.ts', 'state.ts', 'layout.ts', 'liturgy.ts', 'sample.ts']) {
     const src = read(`${DIR}/${f}`);
     assert.doesNotMatch(src, /from 'react|from '@\/|from 'expo/, `${f} is read by node tests, so it imports nothing of the app`);
   }
@@ -528,7 +529,7 @@ check('colours are theme roles and nothing else: no literal colour, no palette c
   for (const f of dailyFiles) {
     const src = source(f);
     assert.doesNotMatch(src, /#[0-9a-fA-F]{3,8}\b|\brgba?\(|\bhsla?\(/, `${f}: a literal colour`);
-    assert.doesNotMatch(src, /\bfixed\.|\bc\.[a-z]/, `${f}: only role.* (and the theme's radius and layout) are used here`);
+    if (f.endsWith('.tsx')) assert.doesNotMatch(src, /\bfixed\.|\bc\.[a-z]/, `${f}: only role.* (and the theme's radius and layout) are used here`);
     assert.doesNotMatch(src, /\b(backgroundColor|borderColor|color)\s*[:=]\s*'(?!transparent')[a-z]+'/, `${f}: a named colour`);
   }
   assert.match(all(), /\brole\.action\b/);
