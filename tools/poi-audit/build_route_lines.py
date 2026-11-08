@@ -321,9 +321,11 @@ def verify(out: Path) -> list[str]:
     problems: list[str] = []
     try:
         manifest = json.loads((Path(out) / MANIFEST).read_text(encoding="utf-8"))
-        entries = [e for e in manifest["stages"] if isinstance(e, dict)]
+        entries = [e for e in manifest["stages"] if isinstance(e, dict)] if isinstance(manifest["stages"], list) else []
     except (OSError, ValueError, KeyError, TypeError) as e:
         return [f"cannot read {MANIFEST} in {out}: {e}"]
+    if not entries:
+        return [f"{MANIFEST} in {out} lists no stage"]
     listed = set()
     lines: dict[int, list] = {}
     for entry in entries:

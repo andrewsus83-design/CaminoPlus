@@ -324,6 +324,12 @@ class Stages(unittest.TestCase):
 
         (out / "manifest.json").write_text("{")
         self.assertTrue(brl.verify(out)[0].startswith("cannot read manifest.json"))
+        for empty in ('{"stages": []}', '{"stages": {}}', '{"stages": [5, "x"]}'):
+            (out / "manifest.json").write_text(empty)
+            self.assertEqual(len(brl.verify(out)), 1, empty)
+            self.assertIn("lists no stage", brl.verify(out)[0])
+        (out / "manifest.json").write_text('{"nothing": 1}')
+        self.assertTrue(brl.verify(out)[0].startswith("cannot read manifest.json"))
         (out / "manifest.json").unlink()
         self.assertTrue(brl.verify(out)[0].startswith("cannot read manifest.json"))
 

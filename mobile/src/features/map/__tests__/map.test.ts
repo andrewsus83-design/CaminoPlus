@@ -3,7 +3,7 @@ import './lineShim'; // first: it lets the compiled sampleRoute find the OSM lin
 import assert from 'node:assert/strict';
 import { distanceM, lineLengthM, nearestOnLine, pointAlong, splitLine, type LngLat } from '../geo';
 import { buildStyle } from '../style';
-import { pois, routeBounds, routeLine, samplePosition, stageEndAlongM, stageForAlong, stageForPoint, stages } from '../sampleRoute';
+import { makeRoute, pois, routeBounds, routeLine, samplePosition, stageEndAlongM, stageForAlong, stageForPoint, stages } from '../sampleRoute';
 import { formatMb, timeAgo } from '../timeAgo';
 
 let n = 0;
@@ -36,6 +36,47 @@ test('a point 1 km off the route snaps back with ~1 km distance', () => {
   const off: LngLat = [on[0] + 0.0123, on[1]]; // ~1 km east at lat 43
   const near = nearestOnLine(routeLine, off);
   assert.ok(near.distanceM < 1100, String(near.distanceM));
+});
+
+test('nearestOnLine gives the answer of measuring every segment exactly (it only measures the winner now, for the speed of the 800-point OSM route): to a millimetre within 5 km of the line', () => {
+  // the function as it was: the exact (haversine) distance to every segment's nearest point, the first of equals wins
+  const everySegment = (line: LngLat[], p: LngLat) => {
+    const k = Math.cos((p[1] * Math.PI) / 180);
+    let best = { point: line[0], index: 0, distanceM: Infinity };
+    for (let i = 1; i < line.length; i++) {
+      const a = line[i - 1];
+      const b = line[i];
+      const ax = (a[0] - p[0]) * k, ay = a[1] - p[1];
+      const bx = (b[0] - p[0]) * k, by = b[1] - p[1];
+      const dx = bx - ax, dy = by - ay;
+      const len2 = dx * dx + dy * dy;
+      const t = len2 === 0 ? 0 : Math.max(0, Math.min(1, -(ax * dx + ay * dy) / len2));
+      const q: LngLat = [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+      const d = distanceM(q, p);
+      if (d < best.distanceM) best = { point: q, index: i - 1, distanceM: d };
+    }
+    return best;
+  };
+  let seed = 7;
+  const rnd = () => ((seed = (seed * 1664525 + 1013904223) % 4294967296) / 4294967296);
+  for (const line of [routeLine, stages[0].line, makeRoute(() => null).routeLine]) {
+    for (let i = 0; i < 400; i++) {
+      const on = pointAlong(line, rnd() * lineLengthM(line));
+      const reach = [0, 30, 400, 3000, 40_000][i % 5]; // on the line, near it, and far from it
+      const p: LngLat = [on[0] + ((rnd() - 0.5) * 2 * reach) / 81_000, on[1] + ((rnd() - 0.5) * 2 * reach) / 111_000];
+      const want = everySegment(line, p);
+      const got = nearestOnLine(line, p);
+      // far from the line (where the walker is just "not on the Camino") the two can pick another one of two nearly equal segments
+      const tol = want.distanceM < 5000 ? 1e-3 : want.distanceM * 1e-3;
+      assert.ok(Math.abs(got.distanceM - want.distanceM) < tol, `${got.distanceM} against ${want.distanceM}`);
+      if (got.index !== want.index) assert.ok(Math.abs(everySegment(line.slice(got.index, got.index + 2), p).distanceM - want.distanceM) < tol, 'another segment is the nearest only when it is as near');
+      else assert.ok(distanceM(got.point, want.point) < 1e-3);
+    }
+  }
+  assert.equal(nearestOnLine([], [0, 0]).distanceM, Infinity);
+  assert.equal(nearestOnLine([[1, 1]], [0, 0]).distanceM, Infinity);
+  assert.equal(nearestOnLine([[0, 0], [0, 0]], [0, 0.001]).index, 0, 'a segment of no length is a point');
+  assert.ok(Math.abs(nearestOnLine([[0, 0], [0, 0]], [0, 0.001]).distanceM - distanceM([0, 0], [0, 0.001])) < 1e-9);
 });
 
 test('stageForPoint finds stage 1 near Orisson and stage 3 near Pamplona', () => {
