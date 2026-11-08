@@ -47,8 +47,9 @@ Then the **scenarios** ([scenarios.mjs](scenarios.mjs)), each in light and dark,
   two Bible rows that were taken out) or kept for a verse that is not in the text are ignored without an error;
 - Bible ([bible.scenarios.mjs](bible.scenarios.mjs), the same walks on the real text): the daily banner is compact (at most 120 high at 390
   wide, 140 at 320) and is one button; the three parts (Old Testament, Deuterocanon, New Testament) are a segmented control under the banner
-  that scrolls with the page, and each shows its books as three square tiles in a row; all 73 book names fit their tile at 320, 390 and 430, the
-  short ones at 22 or more on a phone of 390 and every one at 15 or more from 390 up (the two Thessalonians 14); a Chromium that hints the glyphs (CI's does)
+  that scrolls with the page, and each shows its books as compact tiles, two in a row (173 by 124 on a phone of 390, 140 by 116 on 320), the words 17 from the outline
+  (13 under 352 wide) and the first row clear of the tab bar; all 73 book names fit their tile at 320, 360, 390 and 430, each at a size of the type scale (24, 17 or 15, in Fraunces;
+  the 21 short ones the full 24; 17 or more from 390 up) with the count in JetBrains Mono at 15; a Chromium that hints the glyphs (CI's does)
   lays a name wider than one that does not, so the fit counts every letter rounded up to a pixel (tried with --font-render-hinting set to none, slight, medium and full);
   a tile opens the numbers of the chapters, a number opens the words, and Previous and Next name where they go, cross the books and the
   parts (Malachi 4 to Tobit 1) and are disabled at Genesis 1 and Revelation 22; prose is paragraphs, a psalm is stanzas, and the end of a
@@ -61,7 +62,8 @@ Then the **scenarios** ([scenarios.mjs](scenarios.mjs)), each in light and dark,
 - Books ([books.scenarios.mjs](books.scenarios.mjs)): the Books tab is a compact banner and the covers, A5 (148 by 210) in two columns, 16 from the edge and 12 apart (173 by
   245 on a 390 phone, 138 by 196 on 320, 193 by 274 on 430, never wider than the screen), on a shelf for each kind of book (Pilgrim's guides, Readings for the Way) with its
   heading, each ONE button named "title, kind of book, time" with its own ribbon, a 44 by 44 button that bookmarks the book, in the four fonts of the brand (Fraunces,
-  Inter, JetBrains Mono, and at most one handwritten Caveat note on the screen); no cover says Soon or Free; a cover opens the book page (the cover, the title, the subtitle,
+  Inter, JetBrains Mono, and at most one handwritten Caveat note on the screen); a cover prints its title and its time (JetBrains Mono at 15, on one line, 12 clear of the
+  sides) and no kind of book (the label still says it); no cover says Soon or Free; a cover opens the book page (the cover, the title, the subtitle,
   the kind, the facts, THE NOTICE OF ITS KIND above the button, "Start reading", the contents with the minutes of each chapter, the credit) and Back returns to the tab; the
   first and the last book of each kind show the wording of `notices.ts`; the reader opens at chapter 1, Next and Previous (named by where they go, in the bar at the bottom)
   go through the chapters, are off at the first and at the last chapter, the browser's Back goes to the page and not through the chapters, and the Back button of the reader (the round 48 one of every screen, in a row with the two round 48 size buttons, 16 from the edge; there is no "Contents" pill) goes to the contents; the title of the book in the bar is one line of 19 px in Inter SemiBold (the longest titles whole on 390 and 430, cut with an ellipsis on 320, the bar as tall for every book); the reader keeps
