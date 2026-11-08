@@ -250,7 +250,7 @@ check('Me filters the Journey grid to the picked destination, with a bar that cl
   assert.match(me, /<JourneyGrid posts=\{posts\} media=\{media\} only=\{onlyIds\} \/>/, 'the grid gets the same pictures and the filter');
   // Updated on purpose with the All item (the stamps of the route): the filter is one JourneyView (features/me/journeyView.ts), not a key, and the bar has two ways back.
   assert.match(me, /<ShowAllBar name=\{shown\.name\} onPress=\{\(\) => setView\(stepBack\)\} \/>/, 'a destination of the row: the bar clears the filter');
-  assert.match(me, /<ShowAllBar name=\{shown\.name\} to="all" onPress=\{\(\) => setView\(stepBack\)\} \/>/, 'a place of the All view: the bar goes back to the stamps');
+  assert.match(me, /<PlaceHeader name=\{shown\.name\} onBack=\{\(\) => setView\(stepBack\)\} \/>/, 'a place of the All view: the Back button of the app goes back to the stamps');
   assert.match(me, /setTab\('Journey'\);\n\s*setView\(\(v\) => tapDestination\(v, h\.key, onJourney\)\);/, 'from another tab it brings you to the grid; the same highlight again clears the filter (tapDestination)');
   assert.match(me, /days && posts \? buildHighlights\(days, posts\) : \[\]/, 'nothing is drawn as "not visited" before the posts are known');
   assert.match(me, /posts \? buildRoutePlaces\(stages, posts\) : \[\]/, 'and the stamps of the All view are the whole route\'s stages with the posts, once the posts are known');
@@ -311,13 +311,19 @@ check('every highlight is a button with a label, an ahead one opens that day in 
   const src = code(read('src/features/me/Highlights.tsx'));
   assert.match(src, /accessibilityRole="button" accessibilityLabel=\{highlightLabel\(h, active\)\}/);
   assert.match(src, /router\.push\(\{ pathname: '\/planner', params: \{ day: h\.dayId \} \}\)/);
-  // Updated on purpose with the All view: the bar has two ways back, "Show all posts" (from a destination) and "Back to all places" (from a place of the stamps)
-  assert.match(src, /accessibilityRole="button" accessibilityLabel=\{toAll \? 'Back to all places' : 'Show all posts'\}/);
+  // Updated on purpose with the All view: the bar is for a destination of the row only; a place of the stamps has the Back button of the app (PlaceHeader, AllPlaces.tsx)
+  assert.match(src, /accessibilityRole="button" accessibilityLabel="Show all posts"/);
   assert.match(src, /minHeight: 48/, 'a touch target of 48');
   assert.match(src, /<AppText variant="label" numberOfLines=\{1\} style=\{\{ flexShrink: 1 \}\}>\{name\}<\/AppText>/, 'a long name gives way ...');
   assert.match(src, /numberOfLines=\{1\} style=\{\{ flexShrink: 0 \}\}>· Show all<\/AppText>/, '... and "Show all" never wraps onto a second line');
-  assert.match(src, /numberOfLines=\{1\} style=\{\{ flexShrink: 0 \}\}>All places<\/AppText>/, '"All places" neither');
-  assert.match(src, /<AppText variant="label" numberOfLines=\{1\} style=\{\{ flexShrink: 1 \}\}>· \{name\}<\/AppText>/, 'the name of the place gives way there too');
+  assert.doesNotMatch(src, /name="back"/, 'the row draws no Back chevron: the Back button of a screen is components/BackButton.tsx');
+  // the head of a place of the All view: the Back button of the app, a step back inside the screen (its onPress), and the name with "All places" under it
+  const stamps = code(read('src/features/me/AllPlaces.tsx'));
+  assert.match(stamps, /import \{ BackButton \} from '@\/components\/BackButton';/);
+  assert.match(stamps, /<BackButton onPress=\{onBack\} hint="Back to all places" \/>/, 'the standard Back: it keeps the screen, a hint says where it goes');
+  assert.match(stamps, /<AppText variant="h4" numberOfLines=\{1\}>\{name\}<\/AppText>/, 'a long name gives way');
+  assert.match(stamps, /numberOfLines=\{1\}>All places<\/AppText>/, 'and says where Back goes');
+  assert.doesNotMatch(stamps, /name="back"/, 'no chevron of its own');
 });
 
 check('what was opened is kept per person under u.<id>., so signing out clears it, and the row asks the network for nothing', () => {

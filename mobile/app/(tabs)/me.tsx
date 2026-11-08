@@ -20,7 +20,7 @@ import { planProgress } from '@/features/me/plan';
 import { JourneyGrid } from '@/features/me/JourneyGrid';
 import { SampleJourney } from '@/features/me/SampleJourney';
 import { Highlights, ShowAllBar } from '@/features/me/Highlights';
-import { AllPlaces } from '@/features/me/AllPlaces';
+import { AllPlaces, PlaceHeader } from '@/features/me/AllPlaces';
 import { buildHighlights } from '@/features/me/highlights';
 import { buildRoutePlaces, emptyPlaceLine, visitedCount } from '@/features/me/routePoints';
 import { POSTS_VIEW, resolveJourney, stepBack, tapAll, tapDestination, tapPlace, type JourneyView } from '@/features/me/journeyView';
@@ -301,9 +301,9 @@ export default function Me() {
           {(offline || stale) && <FormMessage tone="info">You are offline. Showing what is saved on this phone.</FormMessage>}
           {!!error && <FormMessage>{`Could not load your data. ${error}`}</FormMessage>}
 
-          {/* One bar over the grid while it shows one place, and the way back: from a destination of the row to all the posts, from a place of the All view to the stamps. */}
+          {/* Over the grid while it shows one place, the way back: from a destination of the row (the bar) to all the posts, from a place of the All view (Back) to the stamps. */}
           {tab === 'Journey' && shown.kind === 'destination' && <ShowAllBar name={shown.name} onPress={() => setView(stepBack)} />}
-          {tab === 'Journey' && shown.kind === 'place' && <ShowAllBar name={shown.name} to="all" onPress={() => setView(stepBack)} />}
+          {tab === 'Journey' && shown.kind === 'place' && <PlaceHeader name={shown.name} onBack={() => setView(stepBack)} />}
           {tab === 'Journey' && shown.kind === 'place' && shown.empty && <Empty text={emptyPlaceLine(shown.name)} />}
           {tab === 'Journey' && shown.kind === 'stamps' && <AllPlaces places={places} onPick={(p) => setView(tapPlace(p.key))} />}
           {tab === 'Journey' && shown.kind !== 'stamps' && (!posts ? (offline ? <Empty text="You are offline. Your journey posts will show up when you are back online." /> : loading) : posts.length === 0 && shown.kind === 'grid'

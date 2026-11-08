@@ -1,5 +1,6 @@
 import { Pressable, View } from 'react-native';
 import { AppText } from '@/components/AppText';
+import { BackButton } from '@/components/BackButton';
 import { Icon } from '@/components/Icon';
 import { Card } from '@/components/ui';
 import type { Post } from '@/lib/api';
@@ -48,6 +49,22 @@ export function AllPlaces({ places, onPick }: { places: readonly RoutePoint<Post
       </Card>
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', rowGap: 20 }}>
         {places.map((p) => <Stamp key={p.key} p={p} onPress={() => onPick(p)} />)}
+      </View>
+    </View>
+  );
+}
+
+/**
+ * The head of the Journey grid while it shows one place of the All view: the Back button of the app (components/BackButton.tsx, the round 48, with its own onPress: a
+ * step back inside the screen, to the stamps, not out of it) and the name of the place, with "All places" under it to say where Back goes.
+ */
+export function PlaceHeader({ name, onBack }: { name: string; onBack: () => void }) {
+  return (
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+      <BackButton onPress={onBack} hint="Back to all places" />
+      <View style={{ flex: 1 }}>
+        <AppText variant="h4" numberOfLines={1}>{name}</AppText>
+        <AppText variant="caption" muted numberOfLines={1}>All places</AppText>
       </View>
     </View>
   );

@@ -520,10 +520,10 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
 .allp .sl .ct { position: absolute; top: -4px; right: -4px; min-width: 28px; height: 28px; box-sizing: border-box; padding: 0 8px; border-radius: 14px; background: var(--cp-highlight); color: var(--cp-on-highlight); border: 2px solid var(--cp-bg); font-size: 12px; line-height: 24px; font-weight: 600; text-align: center; }
 .allp .sl .nm { font-size: 15px; line-height: 21px; letter-spacing: .4px; font-weight: 500; color: var(--cp-text-muted); text-align: center; }
 .allp .sl.done .nm { font-weight: 600; color: var(--cp-text); }
-.place-bar { min-height: 48px; display: flex; align-items: center; gap: 8px; padding: 0 16px 0 12px; border-radius: var(--cp-radius-pill); background: var(--cp-surface); border: 1px solid var(--cp-border); font-size: 17px; line-height: 22px; font-weight: 600; margin-bottom: 16px; }
-.place-bar .back { color: var(--cp-text-accent); display: inline-flex; align-items: center; gap: 8px; flex: none; }
-.place-bar .back .cp-icon { width: 18px; height: 18px; }
-.place-bar .nm { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.place-head { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+.place-head .t { flex: 1; min-width: 0; }
+.place-head .h { font-family: var(--cp-font-title); font-weight: 600; font-size: 24px; line-height: 30px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.place-head .s { font-size: 15px; line-height: 21px; letter-spacing: .4px; font-weight: 500; color: var(--cp-text-muted); }
 .cp-post { background: var(--cp-surface); border-radius: var(--cp-radius-lg); box-shadow: var(--cp-shadow-sm); overflow: hidden; }
 .cp-post .hd { display: flex; align-items: center; gap: 12px; padding: 16px 16px 12px; }
 .cp-post .hd .cp-avatar { width: 40px; height: 40px; border: 0; }
@@ -2313,7 +2313,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     </div>
 
     <div class="phone-wrap">
-      <p class="phone-label"><b>Me · a place</b>A stamp opened · the bar goes back to All places · the grid shows only your journeys there, and its first tile is still the card that writes a post · a place with none says No journeys at … yet</p>
+      <p class="phone-label"><b>Me · a place</b>A stamp opened · the app's round Back button goes back to All places, with the name of the place beside it · the grid shows only your journeys there, and its first tile is still the card that writes a post · a place with none says No journeys at … yet</p>
       <div class="phone">
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
         <div class="scroll" data-scroll-strip="1">
@@ -2345,7 +2345,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
             <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Hornillos</div>
             <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Castrojeriz</div>
           </div></div><div class="cp-subtabs" style="margin:22px -24px 20px;padding:0 12px"><span>Notes</span><span class="on">Journey</span><span>Plan</span><span>Health</span></div>
-          <div class="place-bar" role="button" aria-label="Back to all places"><span class="back"><svg class="cp-icon"><use href="#i-back"/></svg>All places</span><span class="nm">· Zubiri</span></div>
+          <div class="place-head"><button class="cp-icon-btn flat" aria-label="Back" title="Back to all places"><svg class="cp-icon"><use href="#i-back"/></svg></button><div class="t"><div class="h">Zubiri</div><div class="s">All places</div></div></div>
           <div class="jg">
             <button class="jt write" aria-label="Write a journey post"><span class="ico"><svg class="cp-icon"><use href="#i-pen"/></svg></span>Write a journey post</button>
             <div class="jt"><div class="cp-img v2"></div><span class="cap">Zubiri</span></div>

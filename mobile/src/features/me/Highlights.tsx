@@ -163,33 +163,16 @@ export function Highlights({ items, days, media, activeKey, userId, onPick, all 
   );
 }
 
-/**
- * The slim bar above the Journey grid while it shows one place. Two ways in, two ways back:
- *   to="posts"  a destination of the row: "Hontanas · Show all", the cross clears the filter (all the posts)
- *   to="all"    a stamp of the All view: "‹ All places · Hontanas", it goes back to the stamps
- * Both are one button, at least 48 high.
- */
-export function ShowAllBar({ name, onPress, to = 'posts' }: { name: string; onPress: () => void; to?: 'posts' | 'all' }) {
-  const toAll = to === 'all';
+/** The slim bar above the Journey grid while it shows one destination of the row: "Hontanas · Show all", the cross clears the filter. One button, at least 48 high. */
+export function ShowAllBar({ name, onPress }: { name: string; onPress: () => void }) {
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={toAll ? 'Back to all places' : 'Show all posts'} accessibilityHint={`Now showing ${name}`} onPress={onPress} style={{ minHeight: 48, flexDirection: 'row', alignItems: 'center', gap: 8, paddingLeft: toAll ? 12 : 16, paddingRight: 14, borderRadius: radius.pill, backgroundColor: role.surface, borderWidth: 1, borderColor: role.border }}>
-      {toAll ? (
-        <>
-          <Icon name="back" color={role.accentText} size={18} />
-          <AppText variant="label" color={role.accentText} numberOfLines={1} style={{ flexShrink: 0 }}>All places</AppText>
-          {/* a long name gives way (…), never the words "All places" */}
-          <AppText variant="label" numberOfLines={1} style={{ flexShrink: 1 }}>· {name}</AppText>
-        </>
-      ) : (
-        <>
-          {/* a long name gives way (…), never the words "Show all" */}
-          <AppText variant="label" numberOfLines={1} style={{ flexShrink: 1 }}>{name}</AppText>
-          <AppText variant="label" color={role.accentText} numberOfLines={1} style={{ flexShrink: 0 }}>· Show all</AppText>
-          <View style={{ marginLeft: 'auto' }}>
-            <Icon name="close" color={role.muted} size={18} />
-          </View>
-        </>
-      )}
+    <Pressable accessibilityRole="button" accessibilityLabel="Show all posts" accessibilityHint={`Now showing ${name}`} onPress={onPress} style={{ minHeight: 48, flexDirection: 'row', alignItems: 'center', gap: 8, paddingLeft: 16, paddingRight: 14, borderRadius: radius.pill, backgroundColor: role.surface, borderWidth: 1, borderColor: role.border }}>
+      {/* a long name gives way (…), never the words "Show all" */}
+      <AppText variant="label" numberOfLines={1} style={{ flexShrink: 1 }}>{name}</AppText>
+      <AppText variant="label" color={role.accentText} numberOfLines={1} style={{ flexShrink: 0 }}>· Show all</AppText>
+      <View style={{ marginLeft: 'auto' }}>
+        <Icon name="close" color={role.muted} size={18} />
+      </View>
     </Pressable>
   );
 }

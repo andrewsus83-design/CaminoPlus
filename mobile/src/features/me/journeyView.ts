@@ -29,7 +29,7 @@ export function tapDestination(v: JourneyView, key: string, onJourney: boolean):
 /** A tap on a stamp: the posts at that place. */
 export const tapPlace = (key: string): JourneyView => ({ view: 'all', place: key });
 
-/** The bar above the grid, one step back: from a place to the stamps, from a destination to all the posts. */
+/** One step back: Back over the grid of a place goes to the stamps, the bar over a destination's grid to all the posts. */
 export const stepBack = (v: JourneyView): JourneyView => (v.view === 'all' ? ALL_PLACES : POSTS_VIEW);
 
 /**
@@ -37,7 +37,7 @@ export const stepBack = (v: JourneyView): JourneyView => (v.view === 'all' ? ALL
  *   grid         every post (or the sample journey while there are none)
  *   destination  the grid with the posts of one destination, and the bar "<name> · Show all"
  *   stamps       the stamp for every point of the route
- *   place        the grid with the posts at one point, and the bar "All places · <name>"; `empty` when there are none: the line "No journeys at ..." goes over the grid,
+ *   place        the grid with the posts at one point, and the head with Back (the name of the place, "All places" under it); `empty` when there are none: the line "No journeys at ..." goes over the grid,
  *                which is then the card that writes a post alone
  * A key that does not name anything any more (the data was reloaded, another Camino was chosen) is no filter: a destination falls back to `grid`, a place to `stamps`,
  * and the stamps with no point at all (no stages) to `grid`.

@@ -4,9 +4,9 @@
 //   the row           starts with "All" (the shell, pinned at the left, the leftmost button of the row), then the destinations of the plan
 //   All               opens the stamps: one for each place of the route (33 stages are 34 places: where the first starts and where each ends), three in a row, each a
 //                     button of at least 48, "<place>, N journeys" or "<place>, no journeys yet", and the line "3 of 34 places"
-//   a stamp           shows exactly the posts at that place (the pilgrim's own), the card that writes a post once, and the bar "Back to all places"
+//   a stamp           shows exactly the posts at that place (the pilgrim's own), the card that writes a post once, and the Back button of the app (a step back to the stamps)
 //   no post there     says "No journeys at <place> yet" over the grid, which is the card alone
-//   the way back      the bar goes back to the stamps, not to all the posts; All again closes the stamps
+//   the way back      Back (the app's one Back button, over the grid of a place) goes to the stamps, not to all the posts; All again closes the stamps
 //   other sub-tabs    from Plan and Health, All opens the stamps of Journey, and a destination still shows its posts there
 //   no destinations   a plan with none still has the All item, alone in the row; an account whose route has no places has no All item
 //
@@ -70,7 +70,7 @@ const stamps = (page) => page.getByRole('button', { name: /, (\d+ journeys?|no j
 const visitedStamps = (page) => page.getByRole('button', { name: /, \d+ journeys?$/ });
 const tiles = (page) => page.getByRole('button', { name: /^Open post from / });
 const card = (page) => page.getByRole('button', { name: 'Write a journey post', exact: true });
-const backBar = (page) => page.getByRole('button', { name: 'Back to all places', exact: true });
+const backBar = (page) => page.getByRole('button', { name: 'Back', exact: true }); // the Back button of the app: Me has no other
 const showAllBar = (page) => page.getByRole('button', { name: 'Show all posts', exact: true });
 const count = (locator) => () => locator.count();
 
@@ -164,7 +164,8 @@ export const ALL_PLACES_SCENARIOS = [
       await eventually(count(tiles(page)), (n) => n === 2, { what: 'the number of posts at Burgos' });
       assert.deepEqual((await tiles(page).evaluateAll((els) => els.map((e) => e.getAttribute('aria-label')))).sort(), ['Open post from Burgos', 'Open post from Burgos Cathedral']);
       await eventually(count(card(page)), (n) => n === 1, { what: 'the number of cards that write a post (one, the first tile)' });
-      await eventually(count(backBar(page)), (n) => n === 1, { what: 'the number of bars that go back to all places' });
+      await eventually(count(backBar(page)), (n) => n === 1, { what: 'the number of Back buttons (the one over the grid of a place)' });
+      await page.getByText('All places', { exact: true }).waitFor(); // under the name of the place: where Back goes
       await eventually(count(stamps(page)), (n) => n === 0, { what: 'the number of stamps while a place is open' });
       await eventually(count(showAllBar(page)), (n) => n === 0, { what: 'the number of "Show all posts" bars (that one is for a destination of the row)' });
       assert.equal(await page.getByText(/^No journeys at /).count(), 0, 'a place with posts has no empty line');
@@ -173,10 +174,10 @@ export const ALL_PLACES_SCENARIOS = [
       const first = await box(tiles(page).first(), 'the first post');
       near(first.y, c.y, 2, 'the first post is on the row of the card');
       assert(first.x > c.x, 'and to its right');
-      step('the bar goes back to the stamps (not to all the posts), and the All item is still selected');
+      step('Back goes to the stamps (not to all the posts), and the All item is still selected');
       await backBar(page).click();
-      await eventually(count(stamps(page)), (n) => n === POINTS, { what: 'the number of stamps after the bar' });
-      await eventually(count(tiles(page)), (n) => n === 0, { what: 'the number of post tiles after the bar' });
+      await eventually(count(stamps(page)), (n) => n === POINTS, { what: 'the number of stamps after Back' });
+      await eventually(count(tiles(page)), (n) => n === 0, { what: 'the number of post tiles after Back' });
       assert.equal(await allItem(page).getAttribute('aria-selected'), 'true');
       step('tap Zubiri: two posts; then All closes the whole view: all six posts and no stamps');
       await page.getByRole('button', { name: 'Zubiri, 2 journeys', exact: true }).click();
@@ -185,7 +186,7 @@ export const ALL_PLACES_SCENARIOS = [
       await allItem(page).click();
       await eventually(count(tiles(page)), (n) => n === POSTS.length, { what: 'the number of posts after All was tapped again' });
       await eventually(count(stamps(page)), (n) => n === 0, { what: 'the number of stamps after All was tapped again' });
-      await eventually(count(backBar(page)), (n) => n === 0, { what: 'the number of bars after All was tapped again' });
+      await eventually(count(backBar(page)), (n) => n === 0, { what: 'the number of Back buttons after All was tapped again' });
       assert.notEqual(await allItem(page).getAttribute('aria-selected'), 'true');
     },
   },
@@ -202,7 +203,7 @@ export const ALL_PLACES_SCENARIOS = [
       await eventually(count(tiles(page)), (n) => n === 0, { what: 'the number of posts at León' });
       await eventually(count(card(page)), (n) => n === 1, { what: 'the number of cards that write a post (the card of the grid, no second button)' });
       await eventually(() => page.getByRole('button', { name: /^Write a / }).count(), (n) => n === 1, { what: 'the number of buttons that write something' });
-      await eventually(count(backBar(page)), (n) => n === 1, { what: 'the bar back to the places' });
+      await eventually(count(backBar(page)), (n) => n === 1, { what: 'the Back button' });
       const line = await box(page.getByText('No journeys at León yet', { exact: true }), 'the line');
       const c = await box(card(page), 'the card');
       assert(line.y < c.y, 'the line is over the card');
