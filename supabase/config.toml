@@ -46,10 +46,15 @@ secret = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET)"
 # Native Google Sign-In on iOS (signInWithIdToken) does not pass a nonce.
 skip_nonce_check = true
 
-# Edge functions (supabase/functions/<name>). Both act on behalf of a signed-in pilgrim, so the
+# Edge functions (supabase/functions/<name>). All act on behalf of a signed-in pilgrim, so the
 # gateway rejects calls without a valid JWT; each function also validates the token itself.
 [functions.offline-pack-url]
 verify_jwt = true
 
 [functions.delete-account]
+verify_jwt = true
+
+# Sign in with Apple: keeps the Apple refresh token so delete-account can revoke it (mobile/docs/APPLE-SIGN-IN.md).
+# The Apple provider itself is set in the hosted project's dashboard (Client IDs = plus.camino.app).
+[functions.apple-link]
 verify_jwt = true

@@ -37,7 +37,8 @@ supabase/
     ..._camino_frances_stages.sql   stages 4 to 33 of the Camino Francés (hidden, no distance)
     ..._camino_portugues_stages.sql the 11 stages of the Camino Portugués Central (hidden, no distance)
     ..._camino_ingles_stages.sql    the 6 stages of the Camino Inglés from Ferrol (hidden, no distance)
-  functions/               Deno edge functions: offline-pack-url (signed pack links), delete-account
+  functions/               Deno edge functions: offline-pack-url (signed pack links), delete-account,
+                           apple-link (Sign in with Apple refresh token), _shared/apple.ts (Apple client secret and calls)
   seed.sql                 reference data + a small Camino Frances sample
   dev/validate.sh          applies everything to a throwaway local Postgres, runs every dev/*smoke*.sql
                            and the client contract check (see "Running it")
@@ -45,7 +46,7 @@ supabase/
                            uses exists in the schema
 ```
 
-## Auth: email and Google
+## Auth: email, Google and Apple
 
 Supabase Auth handles both. A trigger on `auth.users` creates `profiles`, `user_settings`,
 `storage_usage` and an empty `subscriptions` row for every new user, whichever way they signed up.
@@ -61,7 +62,11 @@ Setup in the hosted project:
    "Authorized Client IDs". The app currently signs in with Google through the system browser
    (`signInWithOAuth`, PKCE), which needs only the Web client. Native Google Sign-In with
    `signInWithIdToken` can be added later ("Skip nonce check" on for iOS). See `mobile/AUTH.md`.
-3. **Redirect URLs**: `https://camino.plus/auth/callback`, `caminoplus://auth-callback`,
+3. **Apple** (iOS only in v1): Auth > Providers > Apple on, Client IDs = `plus.camino.app`. The app signs in with
+   `signInWithIdToken` and a nonce. The trigger gets no name from Apple; the app saves Apple's name on the first sign-in.
+   The edge function secrets `APPLE_TEAM_ID`, `APPLE_KEY_ID`, `APPLE_PRIVATE_KEY`, `APPLE_BUNDLE_ID` let `apple-link` keep
+   a refresh token in `apple_sign_in_tokens` and `delete-account` revoke it. Every step: `mobile/docs/APPLE-SIGN-IN.md`.
+4. **Redirect URLs**: `https://camino.plus/auth/callback`, `caminoplus://auth-callback`,
    `caminoplus://**` and (Expo Go testing only) `exp://**`.
 
 Local: set `SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID` and `SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET`
@@ -428,7 +433,10 @@ Found by an audit; every point has an attack test in `dev/platform_hardening_smo
 - **Operations.** `private.housekeeping()` is scheduled every 15 minutes (pg_cron, where installed), recounts storage for
   people who uploaded recently (plus a daily slice for deletions) and prunes the dashboard de-duplication log. Every foreign key
   has an index. `route_places`, `stage_pois`, `stage_stays` and `stay_labels` have a touch trigger and `deleted_at`.
-- **Edge functions** (`functions/`): `offline-pack-url` and `delete-account`, `verify_jwt = true` in `config.toml`. Tests:
+- **Edge functions** (`functions/`): `offline-pack-url`, `delete-account` and `apple-link`, `verify_jwt = true` in `config.toml`.
+  `apple_sign_in_tokens` (Sign in with Apple refresh tokens) is service role only: RLS on, no policy, no grant to `anon` /
+  `authenticated`. Without the Apple secrets `apple-link` answers 503 `not_configured` and `delete-account` skips Apple.
+  Tests:
   `deno test --allow-net --allow-env --allow-run --allow-read supabase/functions/` (fake Supabase on ephemeral ports).
 
 ## Running it

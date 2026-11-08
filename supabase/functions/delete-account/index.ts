@@ -15,15 +15,20 @@
 //      that has no owner or manager left once this pilgrim is gone (the database closes exactly
 //      those businesses, see the platform hardening migration). Businesses that live on keep their files.
 //      This step is best effort: a failure is logged and does not stop the deletion.
-//   3. auth.admin.deleteUser(uid). The profile and everything that references it is removed by the
-//      database (ON DELETE CASCADE / SET NULL; no foreign key blocks it).
+//   3. Sign in with Apple (App Store 5.1.1(v)): when the Apple secrets are set and apple-link stored a refresh token
+//      for this pilgrim, it is revoked at Apple. Best effort like the files: a failure is logged (never the token) and
+//      the account is still deleted. Without the secrets this step does nothing at all.
+//   4. auth.admin.deleteUser(uid). The profile and everything that references it is removed by the
+//      database (ON DELETE CASCADE / SET NULL; no foreign key blocks it; the stored Apple token goes with it).
 // Files go first and the user last: if the last step fails the pilgrim just tries again, whereas the
 // files of an account that is already gone could never be found again.
 //
-// Env: SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY are provided by Supabase.
+// Env: SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY are provided by Supabase. The optional Apple
+// secrets (APPLE_TEAM_ID, APPLE_KEY_ID, APPLE_PRIVATE_KEY, APPLE_BUNDLE_ID) are described in ../_shared/apple.ts.
 // DELETE_ACCOUNT_STORAGE_BUDGET_MS (default 90000) caps the time spent on files so the user is always
 // deleted before the function times out.
 import { createClient, type SupabaseClient } from 'npm:@supabase/supabase-js@2';
+import { AppleError, appleConfig, revokeToken } from '../_shared/apple.ts';
 
 const USER_BUCKETS = ['user-media', 'avatars'];
 const BUSINESS_BUCKETS = ['business-docs', 'business-media'];
@@ -112,6 +117,21 @@ async function businessesLeftWithoutTeam(admin: SupabaseClient, uid: string): Pr
   return ids.filter((id) => !kept.has(id));
 }
 
+// Revoke the pilgrim's Sign in with Apple token, if there is one. Never throws; logs only a reason, never the token.
+async function revokeAtApple(admin: SupabaseClient, uid: string): Promise<void> {
+  const cfg = appleConfig();
+  if (!cfg) return; // not configured: nothing was ever stored either
+  try {
+    const { data, error } = await admin.from('apple_sign_in_tokens').select('refresh_token').eq('user_id', uid).maybeSingle();
+    if (error) throw error;
+    const token = (data as { refresh_token?: unknown } | null)?.refresh_token;
+    if (typeof token !== 'string' || !token) return; // not an Apple account, or signed in before apple-link worked
+    await revokeToken(cfg, token);
+  } catch (e) {
+    console.error('delete-account: Apple revoke failed:', e instanceof AppleError ? e.reason : message(e));
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
   if (req.method !== 'POST') return json(405, { error: 'method_not_allowed' });
@@ -167,7 +187,10 @@ Deno.serve(async (req) => {
     for (const bucket of BUSINESS_BUCKETS) await removeFolder(admin, bucket, businessId, deadline);
   }
 
-  // 3. the account. A second request that finds the user already gone (Auth answers 404) is a success too.
+  // 3. Sign in with Apple (best effort)
+  await revokeAtApple(admin, uid);
+
+  // 4. the account. A second request that finds the user already gone (Auth answers 404) is a success too.
   try {
     const { error } = await admin.auth.admin.deleteUser(uid);
     if (error && error.status !== 404) throw error;

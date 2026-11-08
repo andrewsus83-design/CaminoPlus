@@ -190,6 +190,12 @@ check('every screen with the Google button has the Apple button right above it, 
   assert.equal(screens, 3, 'welcome, sign in and sign up');
 });
 
+check('Apple\'s name reaches onboarding even when it is saved after the screen opened (and never over what the pilgrim typed)', () => {
+  assert.match(read(BUTTON), /if \(res\.ok && res\.nameSaved\) void refresh\(\);/);
+  const t = read(join('app', 'onboarding.tsx'));
+  assert.match(t, /setName\(\(typed\) => \(typed === shownName \? fresh : typed\)\);/);
+});
+
 check('app.json has the plugin that adds the Sign in with Apple entitlement', () => {
   const app = JSON.parse(read('app.json'));
   assert.ok(app.expo.plugins.includes('expo-apple-authentication'));
