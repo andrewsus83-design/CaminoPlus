@@ -4,8 +4,9 @@
 // They wait for what the person would wait for (an address, a button, a line of text), never for a fixed time.
 //
 // The diary screens and the Notes feed (mobile/app/diary, mobile/src/features/diary, mobile/src/features/notes) belong to the diary: the route
-// sweep checks that they load without errors, and the Me scenarios below only check that Notes is the first sub-tab, WHERE its pen goes and that one
-// note written there shows up in the feed, never what the notes look like. The daily reading (/library/daily) has its own scenarios, in
+// sweep checks that they load without errors, and the Me scenarios below only check that Notes is the first sub-tab, that its feed starts with ONE card, WHERE
+// that card goes (and that there are no filter tabs) and that one note written there shows up in the feed, never what the notes look like. The header of Me, the
+// chat button, and the card that writes a journey post are in me.scenarios.mjs. The daily reading (/library/daily) has its own scenarios, in
 // daily.scenarios.mjs (the header, the week strip, the calendar sheet, the bookmark, the date of the address); the Library scenarios below only
 // check that the banner leads there.
 // The Bible side of the Library (the grid of books, the chapters, the reader, the search of verses, Continue reading) is in bible.scenarios.mjs,
@@ -16,6 +17,7 @@ import { UID } from './fixtures.mjs';
 import { domQuiet, eventually, pathOf } from './harness.mjs';
 import { BIBLE_SCENARIOS } from './bible.scenarios.mjs';
 import { BOOKS_SCENARIOS, CATALOG, COVER_LABEL } from './books.scenarios.mjs';
+import { ME_SCENARIOS } from './me.scenarios.mjs';
 
 const TABS = ['Me', 'Stays', 'Maps', 'Discover', 'Library'];
 const TAB_PATH = { Me: '/me', Stays: '/stays', Maps: '/maps', Discover: '/explore', Library: '/library' };
@@ -142,18 +144,18 @@ export const SCENARIOS = [
     },
   },
   {
-    name: 'Me: the strip is Notes, Journey, Plan, Health in that order and Me opens on Journey with one gold pen, "Write a journey post"; at 320 px wide the four labels are one row, each on one line',
+    name: 'Me: the strip is Notes, Journey, Plan, Health in that order and Me opens on Journey, with its card "Write a journey post" and not the card of Notes; at 320 px wide the four labels are one row, each on one line',
     persona: 'in',
     async run({ page, step, go }) {
       const label = (t) => page.getByText(t, { exact: true }).filter({ visible: true }).first();
       const box = async (locator, what) => { const b = await locator.boundingBox(); if (!b) throw new Error(`${what} has no box (it is not on the screen)`); return b; };
       const NAMES = ['Notes', 'Journey', 'Plan', 'Health'];
-      const penNote = page.getByRole('button', { name: 'Write a note', exact: true });
-      const penPost = page.getByRole('button', { name: 'Write a journey post', exact: true });
-      step('open Me: it opens on Journey, with its pen and not the pen of Notes');
+      const cardNote = page.getByRole('button', { name: 'Write a note', exact: true });
+      const cardPost = page.getByRole('button', { name: 'Write a journey post', exact: true });
+      step('open Me: it opens on Journey, with the card of the journey and not the card of Notes');
       await go('/me');
-      await penPost.waitFor();
-      await eventually(() => penNote.count(), (n) => n === 0, { what: 'the number of "Write a note" pens on Journey' });
+      await cardPost.waitFor();
+      await eventually(() => cardNote.count(), (n) => n === 0, { what: 'the number of "Write a note" cards on Journey' });
       await eventually(() => page.getByText('Notes stay on this phone.', { exact: true }).count(), (n) => n === 0, { what: 'the number of Notes feeds while Journey is on' });
       step('the four labels sit in one row, left to right: Notes, Journey, Plan, Health');
       const row = [];
@@ -179,45 +181,61 @@ export const SCENARIOS = [
     },
   },
   {
-    name: 'Me: Notes is the first sub-tab and shows the feed with one gold pen, "Write a note", that opens /diary/new and writes a note that is in the feed after Back; Plan and Health have no pen; Journey has its own',
+    name: 'Me: Notes is the first sub-tab and its feed starts with ONE card, "Write a note", under the strip: no filter tabs (All, Photos and videos, Places), no second write button; the card opens /diary/new and writes a note that is in the feed after Back; Plan and Health have no card; Journey has its own',
     persona: 'in',
     async run(ctx) {
       const { page, step, go } = ctx;
       const label = (t) => page.getByText(t, { exact: true }).filter({ visible: true }).first();
-      const penNote = page.getByRole('button', { name: 'Write a note', exact: true });
-      const penPost = page.getByRole('button', { name: 'Write a journey post', exact: true });
-      const pens = async () => [await penNote.count(), await penPost.count()].join('+');
+      const box = async (locator, what) => { const b = await locator.boundingBox(); if (!b) throw new Error(`${what} has no box (it is not on the screen)`); return b; };
+      const cardNote = page.getByRole('button', { name: 'Write a note', exact: true });
+      const cardPost = page.getByRole('button', { name: 'Write a journey post', exact: true });
+      const cards = async () => [await cardNote.count(), await cardPost.count()].join('+');
       step('open Me and choose Notes');
       await go('/me');
-      await penPost.waitFor();
+      await cardPost.waitFor();
       await label('Notes').click();
-      step('the feed is there ("Notes stay on this phone."), with ONE pen: the note pen, and not the journey pen');
-      await page.getByText('Notes stay on this phone.', { exact: true }).waitFor();
-      await penNote.waitFor();
-      await eventually(pens, (v) => v === '1+0', { what: 'the pens on Notes (note + journey)' });
+      step('the feed is there, and it starts with ONE card: "Write a note", a button under the strip, and not the card of the journey');
+      await cardNote.waitFor();
+      await eventually(cards, (v) => v === '1+0', { what: 'the cards on Notes (note + journey)' });
       await page.getByText('No notes yet', { exact: true }).waitFor();
       await eventually(() => page.getByText(/You are offline|Could not load your data/).count(), (n) => n === 0, { what: 'the messages about Me\'s data over the notes' });
-      step('Plan and Health have no pen at all');
+      step('the card is full width, at least 64 high, right under the strip, and says under its title that the notes stay on this phone');
+      const [strip, c] = [await box(label('Journey'), 'the strip'), await box(cardNote, 'the card')];
+      assert(c.y > strip.y + strip.height, `the card is under the strip (${JSON.stringify({ strip, card: c })})`);
+      assert(c.width >= 390 - 2 * 16 - 2, `the card is as wide as the page (${c.width})`);
+      assert(c.height >= 64, `the card is at least 64 high (${c.height})`);
+      assert((await cardNote.innerText()).replace(/\s+/g, ' ').trim() === 'Write a note Notes stay on this phone.', `the card says "Write a note" and, under it, "Notes stay on this phone." (${await cardNote.innerText()})`);
+      await eventually(() => page.getByText('Notes stay on this phone.', { exact: true }).count(), (n) => n === 1, { what: 'the number of lines "Notes stay on this phone." (it is in the card)' });
+      step('there is no filter row: no tab named All, Photos and videos or Places, and none of those words on the screen');
+      for (const name of ['All', 'Photos and videos', 'Places']) {
+        await eventually(() => page.getByRole('tab', { name: new RegExp(`^${name}`) }).count(), (n) => n === 0, { what: `the number of tabs named "${name}"` });
+        await eventually(() => page.getByText(name, { exact: true }).filter({ visible: true }).count(), (n) => n === 0, { what: `the number of "${name}" labels on Notes` });
+      }
+      await eventually(() => page.getByRole('tablist').count(), (n) => n === 0, { what: 'the number of tab lists on Notes (there is no filter row)' });
+      step('the empty diary has no second write button: the card is the way in');
+      await eventually(() => page.getByRole('button', { name: /Write your first note|Write a new note/ }).count(), (n) => n === 0, { what: 'the number of second write buttons' });
+      step('Plan and Health have no card');
       await label('Plan').click();
-      await eventually(pens, (v) => v === '0+0', { what: 'the pens on Plan' });
+      await eventually(cards, (v) => v === '0+0', { what: 'the cards on Plan' });
       await label('Health').click();
-      await eventually(pens, (v) => v === '0+0', { what: 'the pens on Health' });
-      step('Journey has its own pen again, and not the note pen');
+      await eventually(cards, (v) => v === '0+0', { what: 'the cards on Health' });
+      step('Journey has its own card again, and not the card of Notes');
       await label('Journey').click();
-      await penPost.waitFor();
-      await eventually(pens, (v) => v === '0+1', { what: 'the pens on Journey' });
-      step('back on Notes, the pen opens a blank page, and what is written there is in the feed after Back');
+      await cardPost.waitFor();
+      await eventually(cards, (v) => v === '0+1', { what: 'the cards on Journey' });
+      step('back on Notes, the card opens a blank page, and what is written there is in the feed after Back');
       await label('Notes').click();
-      await penNote.click();
-      await waitPath(page, '/diary/new', 'the address after the pen');
+      await cardNote.click();
+      await waitPath(page, '/diary/new', 'the address after the card');
       await page.getByRole('textbox', { name: 'Page text' }).fill('Walked to Hontanas, wind in my face.');
       await back(ctx);
       await waitPath(page, '/me', 'the address after Back');
       await page.getByText('Walked to Hontanas, wind in my face.').filter({ visible: true }).first().waitFor();
       await eventually(() => page.getByText('No notes yet', { exact: true }).filter({ visible: true }).count(), (n) => n === 0, { what: 'the number of "No notes yet" once a note is written' });
-      await eventually(pens, (v) => v === '1+0', { what: 'the pens on Notes after the note' });
+      await eventually(cards, (v) => v === '1+0', { what: 'the cards on Notes after the note: still the one card' });
     },
   },
+  ...ME_SCENARIOS,
   {
     name: 'Library: the banner of the Bible tab opens /library/daily, the whole banner and the "Read today" button alike',
     persona: 'in',
