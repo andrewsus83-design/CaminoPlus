@@ -533,7 +533,8 @@ function groupNotes(): string {
   <p class="note" style="margin:-4px 0 20px;max-width:760px">The Books tab shows its books as <b>covers</b> on one <b>shelf</b> for each kind of book (Pilgrim's guides, then Readings for the Way), each shelf with its heading, the number of its books and one quiet line.
   A cover is an A5 page, portrait (148 by 210 mm, so as high as 210/148 of its width), two in a row, 16 from the edge and 12 apart (${cover390.tile} by ${cover390.height} on a 390 phone, ${cover320.tile} by ${cover320.height} on 320, ${cover430.tile} by ${cover430.height} on 430).
   Each is drawn like a book: a spine with a groove and the shade of the hinge, the edges of the pages on the right, a small radius, a soft shadow, the glyph of the book in a ring, the title set like a cover in Fraunces
-  (as large as fits, never a word cut: "${esc(first.title.lines.join(' '))}" is set at ${first.title.size}), the kind of book in small spaced capitals (Inter) and how long it takes in JetBrains Mono. There is no mark of free or soon: every book is in the app.
+  (as large as fits, at a size of the type scale and never a word cut: "${esc(first.title.lines.join(' '))}" is set at ${first.title.size}) and how long it takes in JetBrains Mono at the mono token (${first.m.time.size}). Inside a cover the space is 12 at the sides and at the bottom and 16 at the top.
+  The cover does not print the kind of book: the book page shows it and the label below says it. There is no mark of free or soon: every book is in the app.
   The paper does not change with light and dark, nor does the navy printed on it. A cover is <b>one button</b> ("${esc(coverLabel(GUIDE!))}") and the ribbon at its top right is <b>another</b>, 44 by 44, that bookmarks the book (the key is <code>books:id</code>).
   The banner is the compact one of the Bible tab: a label (the first book, or the one read last), a title, one short handwritten note and a gold pill: <b>Start reading</b> or, once something was read, <b>Continue reading</b>, which goes on at the line where you stopped.
   A cover opens the <b>book page</b>: a larger cover, the title, the subtitle, the kind, the chapters, the words and the time, the description, <b>the notice of its kind</b> (what was written with AI assistance and what has not been checked: <code>notices.ts</code>) above the gold button
@@ -550,7 +551,7 @@ function groupPhones(): string {
   const second = shelves(BOOK_CATALOG)[1];
   const place = placeIn(guide);
   const out: string[] = [
-    booksTabPhone({ title: 'Books · second shelf', sub: `The tab scrolled down to ${esc(second.title)}: ${second.books.length} books, every cover with its kind and its time`, only: 'second' }),
+    booksTabPhone({ title: 'Books · second shelf', sub: `The tab scrolled down to ${esc(second.title)}: ${second.books.length} books, every cover with its title and its time`, only: 'second' }),
     booksTabPhone({ title: 'Books · dark', sub: 'Continue reading · the covers are paper: they do not change', dark: true, last: GUIDE!.id, limit: 6 }),
     booksTabPhone({ title: 'Books · 320 wide', sub: `The smallest phone: ${cover320.tile} by ${cover320.height} covers, titles fitted`, width: 320, limit: 6 }),
     bookPagePhone(GUIDE!, { title: 'Book page · guide', sub: 'Cover and ribbon · the notice of a guide above the button · Start reading · the minutes of each chapter', marked: true }),
