@@ -355,19 +355,21 @@ check('the design page shows the same Library: the two tabs Bible and Books, the
   assert.deepEqual(radios(deutero), ['Old Testament:false', 'Deuterocanon:true', 'New Testament:false']);
   assert.deepEqual(radios(cont), ['Old Testament:false', 'Deuterocanon:false', 'New Testament:true']);
   assert.equal(count(bible, /class="lib-tile"/g), 39, 'the 39 books of the Old Testament, as tiles');
-  assert.match(bible, /aria-label="Genesis, 50 chapters"><span class="nm" style="font-size:24px;line-height:29px;letter-spacing:-0\.48px">Genesis<\/span><span class="ct" style="font-size:12px;line-height:17px">50&nbsp;chapters<\/span>/, 'the name is the hero of the tile: 24 where it fits, set a little closer');
-  assert.match(bible, /aria-label="Deuteronomy, 34 chapters"><span class="nm" style="font-size:15px/, 'a long name is drawn smaller to fit the tile, and never under 15 on a phone of 390');
-  assert.match(design, /\.lib-tile \{ width: 111px; height: 111px; padding: 7px 4px;/, 'the padding of a tile is the app\'s: 3 across and 6 down, and the border of 1');
-  assert.doesNotMatch(bible, /font-size:(1[0-4](\.5)?|[0-9](\.5)?)px;line-height:\d+px;letter-spacing:-0\.\d+px">/, 'no name on a tile of the Bible is drawn under 15 on a phone of 390');
-  assert.match(bible, /aria-label="1 Samuel, 31 chapters"><span class="nm" style="[^"]*">1<br>Samuel<\/span>/, 'a number stands on a line of its own');
-  assert.match(bible, /aria-label="Song of Songs, 8 chapters"><span class="nm" style="[^"]*">Song of<br>Songs<\/span>/);
+  assert.match(bible, /aria-label="Genesis, 50 chapters"><span class="nm h4">Genesis<\/span><span class="ct">50&nbsp;chapters<\/span>/, 'the name is the hero of the tile: 24 (h4) where it fits, the count is the mono token');
+  assert.match(bible, /aria-label="Deuteronomy, 34 chapters"><span class="nm h5">Deuteronomy<\/span>/, 'a long name comes down to 17 (h5) to fit the tile, never under the scale: no 11, no 14');
+  assert.match(design, /\.lib-grid \{ --tp: var\(--cp-space-4\); --tg: var\(--cp-space-3\); display: grid; grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/, 'two tiles in a row, the padding space.4 and the gap space.3: tokens, not numbers');
+  assert.match(design, /\.lib-tile \{ height: calc\(2 \* var\(--cp-text-h4-lh\) \+ var\(--cp-space-2\) \+ var\(--cp-text-mono-lh\) \+ 2 \* \(var\(--tp\) \+ var\(--cp-border-width\)\)\); padding: calc\(var\(--tp\) \+ var\(--cp-border-width\)\);/, 'the padding of a tile is the app\'s: space.4 and the border of 1, 17 from the outline; the height is that of its words');
+  assert.doesNotMatch(bible, /class="nm"|font-size:\d|style="font/, 'no tile of the Bible has a size of its own: the class is the variant (h4, h5, h6)');
+  assert.doesNotMatch(bible, /class="nm h(?!4|5|6)/, 'a name is h4, h5 or h6');
+  assert.match(bible, /aria-label="1 Samuel, 31 chapters"><span class="nm h4">1<br>Samuel<\/span>/, 'a number stands on a line of its own');
+  assert.match(bible, /aria-label="Song of Songs, 8 chapters"><span class="nm h4">Song of<br>Songs<\/span>/);
   assert.equal(count(bible, /class="hw"/g), 1, 'one handwritten note on the screen');
 
   // Continue: the card above the banner, with the chapter in JetBrains Mono; the New Testament chosen, 27 tiles
   assert.match(cont, /<div class="cont-card" role="button" aria-label="Continue reading, Psalm 121">\s*<span class="ic">[^]*?<div class="k">Continue reading<\/div><div class="r">Psalm 121<\/div>/);
   assert.ok(cont.indexOf('class="cont-card"') > cont.indexOf('class="cp-subtabs"') && cont.indexOf('class="cont-card"') < cont.indexOf('class="cp-banner cmp"'), 'the card is under the tabs and above the banner');
   assert.equal(count(cont, /class="lib-tile"/g), 27);
-  assert.match(cont, /aria-label="1 Thessalonians, 5 chapters"><span class="nm" style="font-size:14px;/, 'the longest word of all comes down to 14 on a phone of 390: the fit counts every letter rounded up to a pixel, as a browser that hints the glyphs draws it');
+  assert.match(cont, /aria-label="1 Thessalonians, 5 chapters"><span class="nm h5">1<br>Thessalonians<\/span>/, 'the longest word of all comes down to 17 (h5) on a phone of 390: the fit counts every letter rounded up to a pixel, as a browser that hints the glyphs draws it');
   assert.equal(count(bible, /cont-card/g), 0, 'without a chapter read there is no card');
   // Dark: the same screen in the dark palette
   assert.match(dark, /^[^]*?<div class="phone dk">/);
@@ -376,7 +378,7 @@ check('the design page shows the same Library: the two tabs Bible and Books, the
   assert.match(deutero, /<span class="cnt" aria-label="Deuterocanon, 7 books">7 books<\/span>/);
   assert.equal(count(deutero, /class="lib-tile"/g), 7);
   assert.match(deutero, /aria-label="Baruch, 6 chapters"/);
-  assert.match(deutero, /aria-label="2 Maccabees, 15 chapters"><span class="nm" style="[^"]*">2<br>Maccabees<\/span>/);
+  assert.match(deutero, /aria-label="2 Maccabees, 15 chapters"><span class="nm h[456]">2<br>Maccabees<\/span>/);
   assert.match(deutero, /<p class="lib-note">Esther and Daniel, in the Old Testament, include their Greek additions: Daniel 3 holds the Prayer of Azariah and the Song of the Three, 13 is Susanna and 14 is Bel and the Dragon\.<\/p>\s*<p class="lib-note">Orthodox Bibles include a few more books\.<\/p>/);
   assert.doesNotMatch(deutero, /Additions to|Added passages/);
 
@@ -468,8 +470,8 @@ check('the design page shows the same Library: the two tabs Bible and Books, the
   assert.doesNotMatch(all, /music|playlist/i, 'Music is gone from the Library phones');
   assert.doesNotMatch(all, /aria-label="My diary"|>My diary</);
   assert.doesNotMatch(all, /<span>Notes<\/span>|<span class="on">Notes<\/span>/, 'no phone of the Library has a Notes tab: the diary is the first sub-tab of Me');
-  assert.equal(count(all, /class="cp-subtabs"/g), 5, 'five Library phones have the tab strip (Library, Continue, Dark, Deuterocanon, Books), and each of them has the two tabs Bible and Books');
-  assert.equal(count(all, /<div class="cp-subtabs"[^>]*>(?:<span class="on">Bible<\/span><span>Books<\/span>|<span>Bible<\/span><span class="on">Books<\/span>)<\/div>/g), 5);
+  assert.equal(count(all, /class="cp-subtabs"/g), 6, 'six Library phones have the tab strip (Library, Continue, Dark, Deuterocanon, 320 wide, Books), and each of them has the two tabs Bible and Books');
+  assert.equal(count(all, /<div class="cp-subtabs"[^>]*>(?:<span class="on">Bible<\/span><span>Books<\/span>|<span>Bible<\/span><span class="on">Books<\/span>)<\/div>/g), 6);
   assert.doesNotMatch(all, /verified|official/i, 'nothing says verified or official');
   // the gold pen is on Me (the Me · Notes phones are checked below); the Fab note on the design page says where it is
   assert.match(design, /Me: one pen at a time, and it follows the sub-tab: on Notes the note icon writes a note, on Journey the pen writes a journey post, on Plan and Health there is none\./);
@@ -634,7 +636,7 @@ check('the four fonts by role on the Bible side of the Library: Fraunces for nam
   assert.match(theme, /mono: 'JetBrainsMono_400Regular'/);
   assert.match(theme, /accent: 'Caveat_700Bold'/);
   const fontOf = (variant: string) => (tokens as unknown as { text: Record<string, { font: string }> }).text[variant].font;
-  for (const v of ['display', 'h1', 'h2', 'h3', 'h4']) assert.equal(fontOf(v), 'title', `${v} is the title font`);
+  for (const v of ['display', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6']) assert.equal(fontOf(v), 'title', `${v} is the title font`);
   for (const v of ['lead', 'body', 'small', 'label', 'caption']) assert.equal(fontOf(v), 'body', `${v} is the body font`);
   assert.equal(fontOf('mono'), 'mono');
   assert.equal(fontOf('accent'), 'accent');
@@ -645,7 +647,7 @@ check('the four fonts by role on the Bible side of the Library: Fraunces for nam
   // the roles, element by element: [file, what must be there, what it says]
   const L = join('src', 'features', 'library');
   const roles: Array<[string, RegExp, string]> = [
-    [join(L, 'bible', 'BookGrid.tsx'), /<AppText\s+variant="h4"[^>]*numberOfLines=\{name\.lines\.length\}/, 'the name of a book on a tile is Fraunces (h4)'],
+    [join(L, 'bible', 'BookGrid.tsx'), /<AppText\s+variant=\{name\.variant\}[^>]*numberOfLines=\{name\.lines\.length\}/, 'the name of a book on a tile is Fraunces (h4, h5 or h6: the variant the fit chose)'],
     [join(L, 'bible', 'BookGrid.tsx'), /<AppText\s+variant="mono"\s+muted[^>]*numberOfLines=\{1\}/, 'the count on a tile is JetBrains Mono'],
     [join(L, 'bible', 'ChapterGrid.tsx'), /<AppText variant="mono" maxFontSizeMultiplier=\{1\.3\}[^>]*>\{n\}<\/AppText>/, 'a chapter number is JetBrains Mono'],
     [join(L, 'LibraryTabs.tsx'), /<AppText variant="h4" accessibilityRole="header">Books of the Bible<\/AppText>/, 'the heading of the Bible tab is Fraunces'],

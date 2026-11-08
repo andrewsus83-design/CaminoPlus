@@ -6,7 +6,9 @@ design/tokens.css and design/tokens.json are the single source of truth. This sc
   1. writes web/assets/tokens.css from design/tokens.css (the website's copy),
   2. checks that design/tokens.json and mobile/src/theme/tokens.json are the same file,
   3. checks that tokens.css and tokens.json agree on the values they both carry
-     (colours, type sizes and line heights, spacing, radius, layout).
+     (colours, type sizes, line heights and letter spacing, spacing, radius, layout).
+     The type-scale table of the design page is checked against tokens.json by
+     tools/tests/test_type_scale.py.
 
 Usage:
   python3 tools/sync_tokens.py            write web/assets/tokens.css, then run the checks
@@ -86,6 +88,11 @@ def compare_css_json(css: dict[str, str], data: dict) -> list[str]:
     for name, t in data["text"].items():
         check(f"--cp-text-{name}-size", t["size"], "px")
         check(f"--cp-text-{name}-lh", t["lineHeight"], "px")
+        ls_var = f"--cp-text-{name}-ls"
+        if "letterSpacing" in t:
+            check(ls_var, t["letterSpacing"], "px")
+        elif ls_var in css and px(css[ls_var]) != 0.0:
+            problems.append(f"{ls_var}: css {css[ls_var]}, json has no letterSpacing for {name}")
     for k, v in data["space"].items():
         check(f"--cp-space-{k}", v, "px")
     for k, v in data["radius"].items():
