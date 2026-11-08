@@ -28,7 +28,11 @@ check('Me opens on Journey, not on the first label: the highlights of Plan, Heal
   assert.equal(DEFAULT_ME_TAB, 'Journey');
   assert.ok((ME_TABS as readonly string[]).includes(DEFAULT_ME_TAB));
   assert.match(me, /const \[tab, setTab\] = useState<MeTab>\(DEFAULT_ME_TAB\);/);
-  assert.match(me, /if \(tab !== 'Journey'\) \{ setTab\('Journey'\); setFilterKey\(h\.key\); return; \}/, 'from any other tab, Notes included, a highlight brings you to the grid with that destination');
+  // Updated on purpose with the All item: the sub-tab is always Journey after a tap on a highlight or on All, and what the grid shows is decided by features/me/journeyView.ts
+  // (tapDestination, tapAll: from another sub-tab they always open the destination / the stamps; on Journey the same one again closes it).
+  assert.match(me, /const pickHighlight = \(h: \{ key: string \}\) => \{\n(?:\s*\/\/[^\n]*\n)*\s*setTab\('Journey'\);\n\s*setView\(\(v\) => tapDestination\(v, h\.key, onJourney\)\);/, 'from any other tab, Notes included, a highlight brings you to the grid with that destination');
+  assert.match(me, /const pickAll = \(\) => \{\n(?:\s*\/\/[^\n]*\n)*\s*setTab\('Journey'\);\n\s*setView\(\(v\) => tapAll\(v, onJourney\)\);/, 'from Plan, Health and Notes the All item brings you to the stamps of the Journey area');
+  assert.match(me, /const onJourney = tab === 'Journey';/);
 });
 
 /* ================================================================ the chat button */
@@ -173,7 +177,8 @@ check('the write card of Journey is cell 0 of the grid and nothing else changes 
   assert.doesNotMatch(grid, /gridRows\(/, 'no row maths of its own: the cells come from gridCellRows');
   assert.equal((grid.match(/<WriteCard\b/g) ?? []).length, 1, 'one card per grid');
   assert.match(code(read('src/features/me/SampleJourney.tsx')), /<JourneyGrid posts=\{SAMPLE\.posts\} sample=\{SAMPLE\.media\} \/>/, 'the sample journey is the same grid, so a pilgrim with no post yet has the card');
-  assert.match(me, /posts\.length === 0\s*\? <SampleJourney \/>\s*: <JourneyGrid posts=\{posts\} media=\{media\} only=\{onlyIds\} \/>/, 'a destination filter is still the same grid, with the card in front');
+  // Updated on purpose with the All view: the sample journey is only for the plain grid (no filter, no post); a destination or a place, empty or not, is the same grid with the card in front
+  assert.match(me, /posts\.length === 0 && shown\.kind === 'grid'\s*\? <SampleJourney \/>\s*: <JourneyGrid posts=\{posts\} media=\{media\} only=\{onlyIds\} \/>/, 'a destination filter, and a place of the All view, is still the same grid, with the card in front');
 });
 
 check('the card keeps its contrast in light and in dark: the words on the card and while it is pressed, the pen on the gold, the red badge, the quiet line and the arrow of the Notes card', () => {

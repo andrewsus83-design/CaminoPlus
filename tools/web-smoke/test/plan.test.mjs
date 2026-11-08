@@ -55,7 +55,7 @@ test('the real plan: all routes, all modes, and the scenarios the owner asked fo
     /Library: the chat button and the cards are Me's/,
     /three choices under the banner/, /banner of the Bible tab opens \/library\/daily/, /bookmarks kept before the tabs changed/,
     // the Bible: the grid of books, the chapters, the reader, Next and Previous across a boundary, a verse bookmarked, a link to a verse, the search of verses
-    /daily reading banner is compact/, /73 book names fits its square tile/, /a tile opens the numbers of the chapters/, /Next and Previous cross the books/, /touching a verse chooses it/,
+    /daily reading banner is compact/, /73 book names fits its tile/, /a tile opens the numbers of the chapters/, /Next and Previous cross the books/, /touching a verse chooses it/,
     /a link to a verse/, /verses are found after the keystroke/, /leads nowhere/,
     // the Continue reading bar above the tab bar: where it sits and what it opens, closing it and bringing it back, the most recent place of the Bible and the books (a long title is cut, the chapter is not),
     // a stored mark that does not read, a book that is not in the Library

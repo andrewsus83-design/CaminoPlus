@@ -47,6 +47,9 @@ const hasPhrase = (long: string[], short: string[]) => {
 };
 const letterCount = (ws: string[]) => (ws.join('').match(/\p{L}/gu) ?? []).length;
 
+/** A place as one comparable id: its words, lower case and without accents, joined by one space ("Puente-la-Reina" and "puente la reina" are the same id). */
+export const placeKey = (t: string | null | undefined): string => words(t).join(' ');
+
 export type Match = 0 | 1 | 2 | 3;
 
 /**
@@ -77,6 +80,25 @@ const timeOf = (p: PostLike) => {
 const newestFirst = (a: PostLike, b: PostLike) => { const x = timeOf(a), y = timeOf(b); return x < y ? 1 : x > y ? -1 : 0; };
 
 /**
+ * Which place each post belongs to: for every name in `names` the posts whose place matches it best (placeMatch), newest first. A post goes to ONE
+ * place only, the one it matches best; on a tie the earlier name wins; a post that matches no name is in none. The same rule serves the row of
+ * destinations (buildHighlights) and the stamps of the All view (routePoints.ts), so a post is never under two names and "Hontanas, Burgos" is Hontanas.
+ */
+export function assignPosts<P extends PostLike>(names: readonly string[], posts: readonly P[]): P[][] {
+  const out: P[][] = names.map(() => []);
+  for (const post of [...posts].sort(newestFirst)) {
+    let at = -1;
+    let rank = 0;
+    names.forEach((n, i) => {
+      const r = placeMatch(post.place_name, n);
+      if (r > rank) { at = i; rank = r; }
+    });
+    if (at >= 0) out[at].push(post);
+  }
+  return out;
+}
+
+/**
  * The row: one highlight for each destination of the plan, in the plan's order, at most MAX_HIGHLIGHTS.
  *  - Two days that end in the same place (a rest day) are one highlight, at the first of them: the same name and the same
  *    pictures twice would only be noise.
@@ -90,23 +112,17 @@ export function buildHighlights<P extends PostLike>(days: readonly DayLike[], po
   const known = new Set<string>();
   for (const day of days) {
     const name = destinationName(day);
-    const id = name ? words(name).join(' ') : '';
+    const id = placeKey(name);
     if (!name || !id || known.has(id)) continue;
     known.add(id);
     out.push({ key: day.id, dayId: day.id, name, posts: [], state: 'ahead' });
     if (out.length === MAX_HIGHLIGHTS) break;
   }
-  const names = out.map((h) => h.name);
-  for (const post of [...posts].sort(newestFirst)) {
-    let at = -1;
-    let rank = 0;
-    names.forEach((n, i) => {
-      const r = placeMatch(post.place_name, n);
-      if (r > rank) { at = i; rank = r; }
-    });
-    if (at >= 0) out[at].posts.push(post);
-  }
-  for (const h of out) if (h.posts.length > 0) h.state = 'visited';
+  const byPlace = assignPosts(out.map((h) => h.name), posts);
+  out.forEach((h, i) => {
+    h.posts = byPlace[i];
+    if (h.posts.length > 0) h.state = 'visited';
+  });
   return out;
 }
 
@@ -124,6 +140,20 @@ export function nextHighlightIndex(days: readonly DayLike[], items: readonly { n
     if (at >= 0) return at;
   }
   return -1;
+}
+
+/**
+ * Where the row of destinations opens, as the x it is scrolled to (0 = at its start). On a long plan it opens at the next destination, with half of the one
+ * before it showing so it can be seen that the row goes on to the left; if the next destination is already on the first screen the row stays at its start.
+ * `pinned`: the All item sits at the left, outside the scrolling part, so the destinations have less room and no margin of their own on the left.
+ */
+export function rowStartOffset(o: { nextAt: number; width: number; pinned: boolean; item: number; gap: number; margin: number }): number {
+  if (!(o.nextAt > 0)) return 0;
+  const stride = o.item + o.gap;
+  const pad = o.pinned ? 0 : o.margin; // the room before the first destination, inside the scrolling part
+  const room = o.pinned ? o.width - o.margin - stride : o.width; // the width of the scrolling part
+  const onFirstScreen = pad + o.nextAt * stride + o.item <= room - o.margin;
+  return onFirstScreen ? 0 : pad + o.nextAt * stride - (o.item / 2 + o.gap);
 }
 
 /**

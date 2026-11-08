@@ -14,9 +14,9 @@ import {
   ACTION_GAP, ACTION_ICON, ACTION_LABEL, ACTION_LABEL_LINE, ACTION_MIN_HEIGHT, ACTION_MIN_WIDTH, ANCHOR, BAR_BORDER, BAR_BOTTOM, BAR_HEADER, BAR_HEIGHT, BAR_PAD_Y, BAR_ROW_GAP, BAR_SIDE,
   PLACE_LINE, PLACE_SIZE, ZONE_LINES, actionWidth, barCovers, roomUnder, scrollForBar,
 } from '../bible/actionBar';
-import { BIBLE_BOOKS, bookByCode } from '../bible/books';
+import { BIBLE_BOOKS, bookByCode, chaptersLabel } from '../bible/books';
 import { CHAPTERS_NOTE, NOT_AT_MASS, READER_NOTE, creditLines } from '../bible/credit';
-import { CHAPTER_GAP, CHAPTER_TILE_MIN, NARROW_UNDER, SIDE, bookGrid, chapterGrid } from '../bible/gridMath';
+import { BORDER, CHAPTER_GAP, CHAPTER_TILE_MIN, NARROW_UNDER, SIDE, WORDS_HEIGHT, bookGrid, chapterGrid } from '../bible/gridMath';
 import { LAST_READ_NAME, CONTINUE_TITLE, continueLabel, packLastRead, parseLastRead, samePlace } from '../bible/lastRead';
 import {
   bookHref, chapterTitle, isPlace, nextLabel, nextPlace, placeFromParams, placeKey, placeLabel, previousLabel, previousPlace, readerHref, refLabel, type Place,
@@ -24,8 +24,10 @@ import {
 import { INTER_400, THIN_SPACE_EM, HANG_EM, MONO_ADVANCE as NUMBER_ADVANCE, WRAP_SAFETY, textWidth, wrapPoem, wrapWords } from '../bible/wrap';
 import { bookOfTyped, formatRef, labelHolds, parseRef, parseRefKey, refKey, refName, refOfVerse, verseRange, type Ref } from '../bible/ref';
 import {
-  COUNT_FLOOR, COUNT_MAX, FIT_SAFETY, FRAUNCES_600, MONO_ADVANCE, NAME_FLOOR, NAME_MAX, NAME_TRACKING, NAME_WANTED, TABLE_TOLERANCE, TEXT_SCALE_CAP, fitCount, fitName, inkPx, inkWidth, lineWidth, nameLines,
+  COUNT_LINE, COUNT_SIZE, FIT_SAFETY, FRAUNCES_600, MONO_ADVANCE, NAME_MAX, NAME_MIN, NAME_SIZES, NAME_VARIANTS, TABLE_TOLERANCE, countFits, countPx, fitName, inkPx, lineWidth, nameLines,
 } from '../bible/tileFit';
+import tokens from '../../../theme/tokens.json';
+import { DESIGN_PATH, TILES, applyTiles, tileHtml } from './designBible';
 import type { BookText, Verse } from '../bible/textTypes';
 import { COPIED, SHARE_TRANSLATION, chosenAnnouncement, verseNoteHref, verseNoteStart, verseShareText } from '../bible/verseActions';
 import {
@@ -745,10 +747,8 @@ const FRAUNCES_FILE = join(root, 'node_modules', '@expo-google-fonts', 'fraunces
 const MONO_FILE = join(root, 'node_modules', '@expo-google-fonts', 'jetbrains-mono', '400Regular', 'JetBrainsMono_400Regular.ttf');
 const REAL_FRAUNCES = existsSync(FRAUNCES_FILE) ? advances(FRAUNCES_FILE) : null; // a partial checkout without node_modules cannot check the table
 const realWidth = (line: string): number => [...line].reduce((sum, ch) => sum + (REAL_FRAUNCES!(ch) ?? 0.8), 0);
-/** The ink of a line of a name as the font file has it, with the letters set closer (NAME_TRACKING) between them. */
-const realInk = (line: string): number => realWidth(line) + ([...line].length - 1) * NAME_TRACKING;
-/** The width in px of a line drawn at `size` as a browser that hints the glyphs lays it out, from the font file: every letter rounded up to a whole pixel, the tracking between them. */
-const realInkHinted = (line: string, size: number): number => [...line].reduce((sum, ch) => sum + Math.ceil((REAL_FRAUNCES!(ch) ?? 0.8) * size - 1e-9), 0) + ([...line].length - 1) * NAME_TRACKING * size;
+/** The width in px of a line drawn at `size` as a browser that hints the glyphs lays it out, from the font file: every letter rounded up to a whole pixel (the title tokens have no letter spacing). */
+const realInkHinted = (line: string, size: number): number => [...line].reduce((sum, ch) => sum + Math.ceil((REAL_FRAUNCES!(ch) ?? 0.8) * size - 1e-9), 0);
 
 check('the table of letter widths is the font file: every letter of every book name, the digits and the space, read again from Fraunces SemiBold, to 0.0003 em (the tolerance inkPx counts in before it rounds a letter up); and JetBrains Mono is 0.6 wide', () => {
   const chars = new Set(BIBLE_BOOKS.flatMap((b) => [...b.name]));
@@ -776,123 +776,188 @@ check('names are broken into lines the same way in every book: a number stands o
   }
 });
 
-const WIDTHS = [320, 340, 360, 375, 390, 412, 430, 600, 768]; // from the narrowest phone the app is made for (320) to a tablet
-const SCALES = [0.85, 1, 1.15, 1.3, 1.6, 2];
-/** The names the owner named as the ones that have to be large (22 or more at 390): every one of them fits the tile at that size. */
+const WIDTHS = [320, 340, 352, 360, 375, 390, 412, 430, 600, 768]; // from the narrowest phone the app is made for (320) to a tablet
+/** The names that are the hero of a tile: every one of them is the full 24 of h4 from the narrowest phone up (the short ones: Genesis, Exodus ... Judith). */
 const SHORT_NAMES = ['Genesis', 'Exodus', 'Numbers', 'Joshua', 'Judges', 'Ruth', 'Job', 'Psalms', 'Isaiah', 'Amos', 'Jonah', 'Micah', 'Mark', 'Luke', 'John', 'Acts', 'Romans', 'James', 'Jude', 'Tobit', 'Judith'];
+const nameSize = (width: number, name: string): number => fitName(name, bookGrid(width).innerWidth).size;
+/** How many of the 73 names are drawn at 24, at 17 and at 15 on a phone `width` wide. */
+const tally = (width: number): Record<number, number> => {
+  const out: Record<number, number> = { 24: 0, 17: 0, 15: 0 };
+  for (const b of BIBLE_BOOKS) out[nameSize(width, b.name)] += 1;
+  return out;
+};
+const atSize = (width: number, size: number): string[] => BIBLE_BOOKS.filter((b) => nameSize(width, b.name) === size).map((b) => b.name);
 
-check('all 73 names fit their tile without being cut at every phone width from 320 to 768 and at every text size, never drawn under 11, the largest 24: lines at most two, in the layout of the font file AND in the layout of a browser that hints the glyphs (every letter a whole number of pixels, rounded up), the tracking in both', () => {
+check('every number of a book tile is a token of the design file, read from it and not typed again: the side margin is layout.screenMargin, the gap and the padding are steps of the space scale (12 and 16; 8 and 12 under 352), the hairline is border.width, the height is that of the words (two lines of h4, space.2, the mono line), the name sizes are the title tokens h4, h5 and h6, the count is the mono token', () => {
+  const spaceScale = Object.values(tokens.space);
+  const typeScale = Object.values(tokens.text).map((t) => t.size);
+  assert.equal(SIDE, tokens.layout.screenMargin, 'the side margin of the grid is the one of every screen');
+  assert.equal(BORDER, tokens.border.width);
+  assert.equal(NARROW_UNDER, 352, 'the narrow rule is the one of the search field and the rest of the Library');
+  assert.equal(WORDS_HEIGHT, 2 * tokens.text.h4.lineHeight + tokens.space['2'] + tokens.text.mono.lineHeight, 'two lines of h4, space.2 and the line of the count');
+  for (let width = 280; width <= 1100; width += 1) {
+    const g = bookGrid(width);
+    const narrow = width < NARROW_UNDER;
+    assert.ok(spaceScale.includes(g.gap), `${width}: the gap ${g.gap} is a step of the space scale`);
+    assert.ok(spaceScale.includes(g.pad), `${width}: the padding ${g.pad} is a step of the space scale`);
+    assert.equal(g.gap, narrow ? tokens.space['2'] : tokens.space['3'], `${width}: space.2 under 352, space.3 from 352`);
+    assert.equal(g.pad, narrow ? tokens.space['3'] : tokens.space['4'], `${width}: space.3 under 352, space.4 from 352`);
+    assert.ok(g.pad >= tokens.space['3'], `${width}: never under space.3 (12)`);
+    assert.equal(g.border, tokens.border.width);
+    assert.equal(g.innerHeight, WORDS_HEIGHT);
+    assert.equal(g.height, WORDS_HEIGHT + 2 * (g.pad + tokens.border.width), `${width}: the tile is as high as its words and its padding`);
+  }
+  // the three sizes of a name are the three title tokens of the type scale, largest first, in Fraunces SemiBold; the count is the mono token
+  assert.deepEqual([...NAME_VARIANTS], ['h4', 'h5', 'h6']);
+  assert.deepEqual(NAME_SIZES.map((s) => s.size), [24, 17, 15]);
+  assert.equal(NAME_MAX, 24);
+  assert.equal(NAME_MIN, 15);
+  for (const s of NAME_SIZES) {
+    const t = tokens.text[s.variant];
+    assert.deepEqual([s.size, s.lineHeight, s.letterSpacing], [t.size, t.lineHeight, t.letterSpacing], `${s.variant}: the size, the line height and the letter spacing are the token's`);
+    assert.deepEqual([t.font, t.weight], ['title', '600'], `${s.variant} is Fraunces SemiBold`);
+    assert.ok(typeScale.includes(s.size), `${s.variant}: ${s.size} is a size of the type scale`);
+  }
+  assert.ok(NAME_SIZES.every((s, i) => i === 0 || s.size < NAME_SIZES[i - 1].size), 'largest first');
+  assert.deepEqual([COUNT_SIZE, COUNT_LINE, tokens.text.mono.font], [tokens.text.mono.size, tokens.text.mono.lineHeight, 'mono'], 'the count is the mono token');
+  assert.equal(COUNT_SIZE, 15);
+  assert.equal(MONO_ADVANCE, 0.6);
+  assert.equal(FIT_SAFETY, 1.01);
+});
+
+check('the book grid: two compact tiles between the 16 side margins, 12 apart (8 under 352), 124 high (116 under 352), the words 16 from the hairline (12 under 352), so about 17 from the outline on a phone of 390 and 13 on 320; what fits in a row never exceeds the width', () => {
+  assert.deepEqual(bookGrid(320), { columns: 2, gap: 8, tile: 140, height: 116, pad: 12, border: 1, innerWidth: 114, innerHeight: 90 });
+  assert.deepEqual(bookGrid(351), { columns: 2, gap: 8, tile: 155, height: 116, pad: 12, border: 1, innerWidth: 129, innerHeight: 90 });
+  assert.deepEqual(bookGrid(352), { columns: 2, gap: 12, tile: 154, height: 124, pad: 16, border: 1, innerWidth: 120, innerHeight: 90 });
+  assert.deepEqual(bookGrid(360), { columns: 2, gap: 12, tile: 158, height: 124, pad: 16, border: 1, innerWidth: 124, innerHeight: 90 });
+  assert.deepEqual(bookGrid(390), { columns: 2, gap: 12, tile: 173, height: 124, pad: 16, border: 1, innerWidth: 139, innerHeight: 90 });
+  assert.deepEqual(bookGrid(430), { columns: 2, gap: 12, tile: 193, height: 124, pad: 16, border: 1, innerWidth: 159, innerHeight: 90 });
+  // the owner's complaint was that the words touched the outline (4 px from it, 3 across and 6 down plus the hairline): now 17, and 13 on a phone of 320
+  assert.equal(bookGrid(390).pad + bookGrid(390).border, 17);
+  assert.equal(bookGrid(430).pad + bookGrid(430).border, 17);
+  assert.equal(bookGrid(320).pad + bookGrid(320).border, 13);
+  // how long the Old Testament is (39 books, 20 rows): it was 1587 at 390 and 1266 at 320 as square tiles, three in a row
+  const length = (width: number, books: number): number => { const g = bookGrid(width); const rows = Math.ceil(books / g.columns); return rows * g.height + (rows - 1) * g.gap; };
+  assert.equal(length(390, 39), 2708);
+  assert.equal(length(320, 39), 2472);
+  assert.equal(length(430, 39), 2708);
+  assert.equal(length(390, 73), 5020);
+  for (let width = 280; width <= 1100; width += 1) {
+    const g = bookGrid(width);
+    assert.equal(g.columns, 2);
+    assert.ok(g.tile >= 44, `${width}: tile ${g.tile}`);
+    assert.ok(2 * g.tile + g.gap <= width - 2 * SIDE, `${width}: two tiles and the gap fit between the margins`);
+    assert.ok(width - 2 * SIDE - (2 * g.tile + g.gap) <= 1, `${width}: at most one pixel is left over`);
+    assert.equal(g.innerWidth, g.tile - 2 * (g.pad + g.border));
+    assert.equal(g.innerHeight, g.height - 2 * (g.pad + g.border));
+    assert.ok(g.height === 116 || g.height === 124, `${width}: ${g.height} high`);
+  }
+});
+
+check('all 73 names fit their tile without being cut at every phone width from 320 to 768: lines at most two, the largest of 24, 17 and 15 that fits (a name is never under 15), in the layout of the font file AND in the layout of a browser that hints the glyphs (every letter a whole number of pixels, rounded up); the count fits too, and the words fit the height of the tile', () => {
   if (!REAL_FRAUNCES) return;
   for (const width of WIDTHS) {
     const grid = bookGrid(width);
-    for (const scale of SCALES) {
-      const m = Math.min(Math.max(scale, 1), TEXT_SCALE_CAP);
-      for (const b of BIBLE_BOOKS) {
-        const fit = fitName(b.name, grid.innerWidth, scale);
-        const where = `${b.name} at ${width} wide, text ${scale}`;
-        const drawn = fit.size * m;
-        assert.equal(fit.fits, true, where);
-        assert.ok(fit.lines.length <= 2, where);
-        const widest = Math.max(...fit.lines.map(realInk));
-        assert.ok(widest * drawn <= grid.innerWidth, `${where}: ${(widest * drawn).toFixed(1)} px in ${grid.innerWidth} (the font file)`);
-        const hinted = Math.max(...fit.lines.map((line) => realInkHinted(line, drawn)));
-        assert.ok(hinted <= grid.innerWidth, `${where}: ${hinted.toFixed(1)} px in ${grid.innerWidth} (every letter rounded up)`);
-        assert.ok(Math.abs(fit.tracking - NAME_TRACKING * fit.size) < 1e-9, `${where}: the letters are set ${NAME_TRACKING} em closer`);
-        assert.ok(drawn >= NAME_FLOOR - 1e-9, `${where}: drawn at ${drawn}`);
-        assert.ok(drawn <= NAME_MAX + 1e-9, `${where}: drawn at ${drawn}`);
-        const label = `${b.chapters} ${b.chapters === 1 ? 'chapter' : 'chapters'}`;
-        const count = fitCount(label, grid.innerWidth, scale);
-        assert.equal(count.fits, true, `${where}: the count`);
-        assert.ok(count.size * m >= COUNT_FLOOR - 1e-9 && count.size * m <= COUNT_MAX + 1e-9, `${where}: the count is drawn at ${count.size * m}`);
-        assert.ok([...label].length * 0.6 * count.size * m <= grid.innerWidth, `${where}: the count in the layout of the font file`);
-        assert.ok([...label].length * Math.ceil(0.6 * count.size * m - 1e-9) <= grid.innerWidth, `${where}: the count with every letter rounded up to a pixel`);
-        const high = fit.lines.length * fit.lineHeight * m + count.lineHeight * m;
-        assert.ok(high <= grid.innerHeight, `${where}: ${high.toFixed(1)} high in ${grid.innerHeight}`);
-        // from a phone of 390 up no name is drawn under 14: the two Thessalonians are the only ones that come down to it
-        if (width >= 390) assert.ok(drawn >= NAME_WANTED - 1e-9, `${where}: drawn at ${drawn}, under ${NAME_WANTED}`);
+    for (const b of BIBLE_BOOKS) {
+      const fit = fitName(b.name, grid.innerWidth);
+      const where = `${b.name} at ${width} wide`;
+      assert.equal(fit.fits, true, where);
+      assert.ok(fit.lines.length <= 2, where);
+      assert.ok([24, 17, 15].includes(fit.size), `${where}: drawn at ${fit.size}, which is no size of the title tokens`);
+      assert.equal(fit.size, tokens.text[fit.variant].size, `${where}: the size is the one of ${fit.variant}`);
+      assert.equal(fit.lineHeight, tokens.text[fit.variant].lineHeight, `${where}: the line height is the one of ${fit.variant}`);
+      const widest = Math.max(...fit.lines.map(realWidth));
+      assert.ok(widest * fit.size <= grid.innerWidth, `${where}: ${(widest * fit.size).toFixed(1)} px in ${grid.innerWidth} (the font file)`);
+      const hinted = Math.max(...fit.lines.map((line) => realInkHinted(line, fit.size)));
+      assert.ok(hinted <= grid.innerWidth, `${where}: ${hinted.toFixed(1)} px in ${grid.innerWidth} (every letter rounded up)`);
+      // the largest size that fits: the next larger one does not
+      for (const bigger of NAME_SIZES.filter((s) => s.size > fit.size)) {
+        const wider = Math.max(...fit.lines.map((line) => inkPx(line, bigger.size, bigger.letterSpacing))) * FIT_SAFETY;
+        assert.ok(wider > grid.innerWidth, `${where}: it would have fit at ${bigger.size} (${wider.toFixed(1)} in ${grid.innerWidth})`);
       }
+      // the count: JetBrains Mono at the mono token, never smaller, and it fits
+      const label = chaptersLabel(b.chapters);
+      assert.equal(countFits(label, grid.innerWidth), true, `${where}: the count`);
+      assert.ok([...label].length * MONO_ADVANCE * COUNT_SIZE <= grid.innerWidth, `${where}: the count in the layout of the font file`);
+      assert.ok([...label].length * Math.ceil(MONO_ADVANCE * COUNT_SIZE - 1e-9) <= grid.innerWidth, `${where}: the count with every letter rounded up to a pixel`);
+      // the words fit the height of the tile, and a name of two lines at h4 fills it exactly: no gap under space.2 between the name and the count
+      const high = fit.lines.length * fit.lineHeight + tokens.space['2'] + COUNT_LINE;
+      assert.ok(high <= grid.innerHeight, `${where}: ${high} high in ${grid.innerHeight}`);
     }
   }
 });
 
-check('a browser that hints the glyphs lays a line wider than the font file says, and the fit counts for it: "Thessalonians" at 18 is 3.7 px wider (5.7 as counted), a letter of the count is 7 where 6.6 is drawn; nothing is wider than every letter rounded up', () => {
+check('a browser that hints the glyphs lays a line wider than the font file says, and the fit counts for it: "Thessalonians" at 18 is 3.7 px wider (5.7 as counted), a letter of the count is 9 where 9 is drawn; nothing is wider than every letter rounded up', () => {
   if (!REAL_FRAUNCES) return;
   // measured in Chromium with --font-render-hinting=full (the layout of the runners of CI): Thessalonians at 18 px is 3.67 px wider than the font file; Corinthians broke into two lines at 18
-  const file = realInk('Thessalonians') * 18;
+  const file = realWidth('Thessalonians') * 18;
   const hinted = realInkHinted('Thessalonians', 18);
   assert.ok(hinted - file >= 3.67 && hinted - file <= 13, `Thessalonians at 18: ${file.toFixed(2)} px in the font file, ${hinted.toFixed(2)} with every letter rounded up (the browser measured 3.67 more than the file, never more than this)`);
-  assert.ok(inkPx('Corinthians', 18) > inkWidth('Corinthians') * 18 + 2, 'Corinthians at 18 is counted at least 2 px wider than the font file says');
-  for (const b of BIBLE_BOOKS) for (const line of nameLines(b.name)) for (let size = 11; size <= 24; size += 0.5) {
-    assert.ok(inkPx(line, size) >= inkWidth(line) * size - 1e-9, `${line} at ${size}: the rounded-up width is never under the width of the font file`);
+  assert.ok(inkPx('Corinthians', 18) > lineWidth('Corinthians') * 18 + 2, 'Corinthians at 18 is counted at least 2 px wider than the font file says');
+  for (const b of BIBLE_BOOKS) for (const line of nameLines(b.name)) for (const { size } of NAME_SIZES) {
+    assert.ok(inkPx(line, size) >= lineWidth(line) * size - 1e-9, `${line} at ${size}: the rounded-up width is never under the width of the font file`);
     assert.ok(inkPx(line, size) >= realInkHinted(line, size) - 1e-9, `${line} at ${size}: inkPx is never under the width from the font file with every letter rounded up`);
     assert.ok(inkPx(line, size) - realInkHinted(line, size) <= [...line].length, `${line} at ${size}: and not a pixel more for a letter`);
   }
-  assert.equal(FIT_SAFETY, 1.01);
+  // a letter of the count is whole pixels wide: 0.6 of 15 is 9
+  assert.equal(countPx('150 chapters'), 12 * 9 * FIT_SAFETY);
+  assert.equal(inkPx('ab', 20, 1) - inkPx('ab', 20), 1, 'tracking is counted between the letters, not after the last');
 });
 
-check('the name is the hero of its tile: at 390 every name that fits on one or two lines at 22 is drawn at 22 or more (the 21 short ones the owner named are 22.5 and up), 24 where it fits, and the long words come down just enough: 15 or more, the two Thessalonians 14', () => {
-  const grid = bookGrid(390);
-  const size = (name: string) => fitName(name, grid.innerWidth, 1).size;
-  for (const name of SHORT_NAMES) assert.ok(size(name) >= 22, `${name} is ${size(name)} at 390`);
-  for (const name of ['Genesis', 'Exodus', 'Job', 'Ruth', 'Psalms', 'Mark', 'Luke', 'John', 'Acts', 'Judges']) assert.equal(size(name), NAME_MAX, `${name} is the full ${NAME_MAX}`);
-  let large = 0;
-  for (const b of BIBLE_BOOKS) {
-    const widest = Math.max(...nameLines(b.name).map((line) => inkPx(line, 22)));
-    const fitsAt22 = widest * FIT_SAFETY <= grid.innerWidth;
-    if (fitsAt22) { assert.ok(size(b.name) >= 22, `${b.name} fits at 22 and is ${size(b.name)}`); large += 1; }
-    assert.ok(size(b.name) >= NAME_WANTED, `${b.name} is ${size(b.name)}`);
+check('the name is the hero of its tile: from the narrowest phone up the short names (the 21 the owner named) are the full 24, the long words come down only as far as the tile makes them (17 or 15), and the numbers of each size are pinned: 52 / 17 / 4 at 320, 56 / 15 / 2 at 360, 65 / 8 / 0 at 390, 69 / 4 / 0 at 430', () => {
+  for (const width of WIDTHS) for (const name of SHORT_NAMES) assert.equal(nameSize(width, name), 24, `${name} is the full 24 at ${width}`);
+  assert.deepEqual(tally(320), { 24: 52, 17: 17, 15: 4 });
+  assert.deepEqual(tally(360), { 24: 56, 17: 15, 15: 2 });
+  assert.deepEqual(tally(390), { 24: 65, 17: 8, 15: 0 });
+  assert.deepEqual(tally(430), { 24: 69, 17: 4, 15: 0 });
+  assert.deepEqual(tally(768), { 24: 73, 17: 0, 15: 0 }, 'a tablet has room for every name at 24');
+  // the names that are not 24 are the long single words and the long numbered ones, and nothing else
+  assert.deepEqual(atSize(320, 15), ['Deuteronomy', 'Lamentations', '1 Thessalonians', '2 Thessalonians']);
+  assert.deepEqual(atSize(360, 15), ['1 Thessalonians', '2 Thessalonians']);
+  assert.deepEqual(atSize(390, 17), ['Deuteronomy', 'Ecclesiastes', 'Lamentations', '1 Corinthians', '2 Corinthians', 'Philippians', '1 Thessalonians', '2 Thessalonians']);
+  assert.deepEqual(atSize(430, 17), ['Deuteronomy', 'Lamentations', '1 Thessalonians', '2 Thessalonians']);
+  for (let width = 390; width <= 768; width += 1) assert.equal(atSize(width, 15).length, 0, `from 390 up no name is 15: ${width}`);
+  for (const width of [320, 390, 430]) {
+    assert.equal(nameSize(width, 'Genesis'), 24);
+    assert.deepEqual(nameLines('1 Thessalonians'), ['1', 'Thessalonians'], 'the number is a line of its own');
   }
-  assert.ok(large >= 45, `${large} of the names are 22 or more`);
-  // the long single words are drawn as large as the tile lets them, never broken inside the word
-  for (const name of ['Deuteronomy', 'Ecclesiastes', 'Lamentations', 'Philippians', 'Colossians', '1 Thessalonians', '2 Thessalonians', 'Habakkuk', 'Zephaniah']) {
-    assert.ok(size(name) >= NAME_WANTED && size(name) < 22, `${name} is ${size(name)}`);
-    assert.equal(nameLines(name).join(' '), name, 'no word is broken');
-    assert.ok(nameLines(name).every((line) => !line.includes('-')));
-  }
-  assert.equal(size('1 Thessalonians'), 14);
-  assert.deepEqual(BIBLE_BOOKS.filter((b) => size(b.name) < 15).map((b) => b.name), ['1 Thessalonians', '2 Thessalonians'], 'the only names under 15 at 390');
-});
-
-check('the smallest name on each width is pinned: "Thessalonians" is 11 at 320 (a tile is only 90 wide there), 14 at 390 and 16 at 430, and a short name ("Job") is the full 24 from 390 up', () => {
-  const size = (width: number, name: string) => fitName(name, bookGrid(width).innerWidth, 1).size;
-  assert.equal(size(320, '1 Thessalonians'), 11);
-  assert.equal(size(390, '1 Thessalonians'), 14);
-  assert.equal(size(430, '1 Thessalonians'), 16);
-  assert.equal(size(320, 'Job'), 24);
-  assert.equal(size(390, 'Job'), 24);
-  const smallest = (width: number) => Math.min(...BIBLE_BOOKS.map((b) => fitName(b.name, bookGrid(width).innerWidth, 1).size));
-  assert.equal(smallest(320), 11);
-  assert.equal(smallest(390), 14);
-  assert.equal(smallest(430), 16);
-  assert.equal(FIT_SAFETY, 1.01);
-  assert.equal(NAME_FLOOR, 11);
-  assert.equal(NAME_MAX, 24);
-  assert.equal(NAME_WANTED, 14);
-  assert.equal(NAME_TRACKING, -0.02);
+  assert.equal(nameSize(320, '1 Thessalonians'), 15);
+  assert.equal(nameSize(390, '1 Thessalonians'), 17);
+  assert.equal(nameSize(430, '1 Thessalonians'), 17);
+  assert.equal(nameSize(320, 'Philippians'), 17);
+  assert.equal(nameSize(390, 'Revelation'), 24);
+  // a long word is never broken inside: every line of every name is whole words
+  for (const b of BIBLE_BOOKS) assert.equal(nameLines(b.name).join(' '), b.name, `${b.name}: nothing is lost`);
   assert.ok(lineWidth('Thessalonians') > 6.9 && lineWidth('Thessalonians') < 7.0);
-  assert.ok(Math.abs(inkWidth('Thessalonians') - (lineWidth('Thessalonians') - 12 * 0.02)) < 1e-9, 'twelve gaps between thirteen letters');
-  // on 320 the names that cannot be 15 are these, and no others (a tile of 90 is what it is)
-  const under = BIBLE_BOOKS.filter((b) => fitName(b.name, bookGrid(320).innerWidth, 1).size < 15).map((b) => b.name);
-  assert.deepEqual(under, ['Deuteronomy', 'Ecclesiastes', 'Lamentations', '1 Corinthians', '2 Corinthians', 'Philippians', '1 Thessalonians', '2 Thessalonians']);
+  // the widest count ("150 chapters", 12 letters) fits the narrowest tile with room to spare
+  assert.ok(countPx('150 chapters') <= bookGrid(320).innerWidth && countPx('150 chapters') > 100);
 });
 
-check('the book grid: three square tiles between the 16 side margins, 12 apart (8 under 352), the tile edge at least 44 from 280 up, padding 3 across and 6 down (2 and 5 narrow), and what fits in a row never exceeds the width', () => {
-  assert.equal(SIDE, 16);
-  assert.equal(NARROW_UNDER, 352);
-  assert.deepEqual(bookGrid(320), { columns: 3, gap: 8, tile: 90, padX: 2, padY: 5, innerWidth: 84, innerHeight: 78 });
-  assert.deepEqual(bookGrid(390), { columns: 3, gap: 12, tile: 111, padX: 3, padY: 6, innerWidth: 103, innerHeight: 97 });
-  assert.deepEqual(bookGrid(430), { columns: 3, gap: 12, tile: 124, padX: 3, padY: 6, innerWidth: 116, innerHeight: 110 });
-  for (let width = 280; width <= 1100; width += 3) {
-    const g = bookGrid(width);
-    assert.ok(g.tile >= 44, `${width}: tile ${g.tile}`);
-    assert.ok(3 * g.tile + 2 * g.gap <= width - 2 * SIDE, `${width}: three tiles and two gaps fit between the margins`);
-    assert.ok(width - 2 * SIDE - (3 * g.tile + 2 * g.gap) <= 2, `${width}: at most two pixels are left over`);
-    assert.equal(g.innerWidth, g.tile - 2 * (g.padX + 1));
-    assert.equal(g.innerHeight, g.tile - 2 * (g.padY + 1));
-    assert.ok(g.padY >= g.padX, `${width}: the corners are round, so there is more room down than across`);
-  }
-  const tokens = JSON.parse(read('src/theme/tokens.json')) as { layout: { screenMargin: number } };
-  assert.equal(SIDE, tokens.layout.screenMargin, 'the side margin of the grid is the one of every screen');
+check('the Bible tiles of the design page are what the app draws: five grids (the Old Testament, the New Testament with the card that continues, the dark phone, the Deuterocanon, the New Testament on a phone 320 wide), each tile with the variant and the lines tileFit.ts chose for the width of its phone; and the look of a tile is variables of tokens.css, not numbers', () => {
+  const page = readFileSync(DESIGN_PATH, 'utf8');
+  assert.equal(applyTiles(page), page, 'design/index.html has not the tiles the app draws: from mobile/, npx tsc -p tsconfig.librarytest.json && node node_modules/.cache/library-test/features/library/__tests__/designBible.js --write');
+  assert.equal((page.match(/class="lib-tile"/g) ?? []).length, 39 + 27 + 39 + 7 + 27, 'a tile for every book of every grid');
+  assert.deepEqual(Object.values(TILES).map((t) => `${t.part}@${t.width}`), ['old@390', 'new@390', 'old@390', 'deutero@390', 'new@320']);
+  // a name that does not fit at 24 is h5 or h6 on the page too, and "1 Thessalonians" is 17 at 390 and 15 at 320, as the app has it
+  const thess = BIBLE_BOOKS.find((b) => b.name === '1 Thessalonians')!;
+  assert.match(tileHtml(thess, 390), /<span class="nm h5">1<br>Thessalonians<\/span><span class="ct">5&nbsp;chapters<\/span>/);
+  assert.match(tileHtml(thess, 320), /<span class="nm h6">1<br>Thessalonians<\/span>/);
+  assert.match(tileHtml(BIBLE_BOOKS.find((b) => b.name === 'Genesis')!, 390), /^<button class="lib-tile" aria-label="Genesis, 50 chapters"><span class="nm h4">Genesis<\/span><span class="ct">50&nbsp;chapters<\/span><\/button>$/);
+  assert.match(tileHtml(BIBLE_BOOKS.find((b) => b.name === 'Song of Songs')!, 390), /<span class="nm h4">Song of<br>Songs<\/span>/);
+  // the style of a tile: the padding, the gap, the radius, the type and the height are tokens (var(--cp-*)) and nothing typed
+  const styleStart = page.indexOf('.lib-grid {');
+  const style = page.slice(styleStart, page.indexOf('\n', page.indexOf('.lib-tile .ct {', styleStart)));
+  assert.ok(style.includes('.lib-tile {') && style.includes('.lib-tile .ct {') && style.includes('.lib-grid.narrow {'), 'the rules of the grid and of a tile are where they were');
+  assert.doesNotMatch(style, /\d(?:\.\d+)?px|\d(?:\.\d+)?rem|\d(?:\.\d+)?em\b/, 'no number of pixels in the rules of a tile: every one is a token');
+  assert.match(style, /\.lib-grid \{ --tp: var\(--cp-space-4\); --tg: var\(--cp-space-3\);/, 'padding space.4 and gap space.3');
+  assert.match(style, /\.lib-grid\.narrow \{ --tp: var\(--cp-space-3\); --tg: var\(--cp-space-2\); \}/, 'under 352: space.3 and space.2');
+  assert.match(style, /height: calc\(2 \* var\(--cp-text-h4-lh\) \+ var\(--cp-space-2\) \+ var\(--cp-text-mono-lh\) \+ 2 \* \(var\(--tp\) \+ var\(--cp-border-width\)\)\); padding: calc\(var\(--tp\) \+ var\(--cp-border-width\)\);/);
+  assert.match(style, /border-radius: var\(--cp-radius-md\);/);
+  for (const v of ['h4', 'h5', 'h6']) assert.match(style, new RegExp(`\\.lib-tile \\.nm\\.${v} \\{ font-size: var\\(--cp-text-${v}-size\\); line-height: var\\(--cp-text-${v}-lh\\); letter-spacing: var\\(--cp-text-${v}-ls\\); \\}`), `${v} is the token`);
+  assert.match(style, /\.lib-tile \.ct \{ font-family: var\(--cp-font-mono\); font-weight: 400; font-size: var\(--cp-text-mono-size\); line-height: var\(--cp-text-mono-lh\);/, 'the count is the mono token');
+  // the narrow grid is the one in the phone that is 320 wide, and only that one
+  assert.equal((page.match(/class="lib-grid narrow"/g) ?? []).length, 1);
+  assert.match(page, /<div class="phone" style="width:320px">(?:(?!<div class="phone)[^])*?class="lib-grid narrow"/, 'the narrow grid is in a phone of 320');
 });
 
 check('the chapter grid: 4 tiles in a row on 320, 5 on 390, 6 on 430, as many as keep each at 56 or more, filling the row, never under 44 and never wider than the screen', () => {
