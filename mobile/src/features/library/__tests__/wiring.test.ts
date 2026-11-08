@@ -14,6 +14,7 @@ const check = (name: string, fn: () => void) => { fn(); n += 1; console.log(`ok 
 const root = process.cwd(); // npm test runs from mobile/
 const read = (p: string) => fs.readFileSync(path.join(root, p), 'utf8');
 const code = (src: string) => src.split('\n').filter((l) => !/^\s*(\/\/|\/?\*)/.test(l)).join('\n'); // without comment lines
+import './notes.test'; // the Notes tab (src/features/library/notes): its logic and its wiring, run here so no script has to name it
 
 const DIR = 'src/features/library';
 // The files of this feature: the folder itself, the Bible and Books folders, and the screens of app/library. Not notes/ and daily/, nor
