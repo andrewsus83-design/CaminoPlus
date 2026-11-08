@@ -356,11 +356,32 @@ check('the design page shows the same Library: the compact banner, the three par
   assert.match(bible, /aria-label="Song of Songs, 8 chapters"><span class="nm" style="[^"]*">Song of<br>Songs<\/span>/);
   assert.equal(count(bible, /class="hw"/g), 1, 'one handwritten note on the screen');
 
-  // Continue: the card above the banner, with the chapter in JetBrains Mono; the New Testament chosen, 27 tiles
-  assert.match(cont, /<div class="cont-card" role="button" aria-label="Continue reading, Psalm 121">\s*<span class="ic">[^]*?<div class="k">Continue reading<\/div><div class="r">Psalm 121<\/div>/);
-  assert.ok(cont.indexOf('class="cont-card"') > cont.indexOf('class="cp-subtabs"') && cont.indexOf('class="cont-card"') < cont.indexOf('class="cp-banner cmp"'), 'the card is under the tabs and above the banner');
+  // Continue: no card in the page (the banner is right under the tabs), and the Continue reading bar floats above the tab bar, drawn over the dock's fade (its z-index is above the dock's) and before the scroll in the markup;
+  // the New Testament chosen, 27 tiles
+  assert.doesNotMatch(cont, /cont-card/, 'the card is gone from the page');
+  assert.match(cont, /<div class="cont-bar">\s*<div class="main" role="button" aria-label="Continue reading, Psalm 121"><svg class="cp-icon ic"><use href="#i-book"\/><\/svg><div class="t"><div class="k">Continue reading<\/div><div class="r">Psalm 121<\/div><\/div><\/div>\s*<button class="x" aria-label="Hide Continue reading"><svg class="cp-icon"><use href="#i-x"\/><\/svg><\/button>\s*<\/div>/);
+  assert.ok(cont.indexOf('class="cp-subtabs"') < cont.indexOf('class="cp-banner cmp"'), 'the banner is right under the tabs, with no card between');
+  assert.ok(cont.indexOf('class="cont-bar"') < cont.indexOf('class="scroll"'), 'the bar is not inside the scroll: it floats, and the cover grid of a phone ends before anything of it');
+  assert.equal(count(cont, /class="cont-bar"/g), 1, 'one bar on the screen');
+  assert.equal(count(cont, /class="hw"/g), 1, 'the bar adds no handwriting: the banner has the one note');
+  assert.equal(count(cont, /<div class="scroll" style="padding-bottom:202px">/g), 1, 'the list keeps the bar\'s room at its end: 130 for the tab bar and 72 for the bar');
   assert.equal(count(cont, /class="lib-tile"/g), 27);
-  assert.equal(count(bible, /cont-card/g), 0, 'without a chapter read there is no card');
+  assert.equal(count(bible, /cont-bar|cont-card/g), 0, 'without a chapter read there is no bar and no card');
+  // the bar's numbers are the tab dock's: the pill is 26 above the bottom and 88 high, so the bar is 26 + 88 + 8 = 122 up, with the pill's side margins, 64 high, a pill, the hero card colours and the tab bar's shadow
+  const css = (selector: string) => new RegExp(`${selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')} \\{([^}]*)\\}`).exec(design)?.[1] ?? '';
+  const dock = css('.phone .tabdock'), pill = css('.cp-tabbar'), barCss = css('.cont-bar');
+  const px = (rule: string, prop: string) => Number(new RegExp(`(?:^|[; ])${prop}: (\\d+)px`).exec(rule)?.[1]);
+  assert.equal(px(barCss, 'bottom'), px(dock, 'padding-bottom') + px(pill, 'height') + 8, 'the bar is 8 above the pill');
+  assert.equal(px(barCss, 'min-height'), 64);
+  assert.ok(Number(/z-index: (\d+)/.exec(barCss)?.[1]) > Number(/z-index: (\d+)/.exec(dock)?.[1]), 'drawn over the fade of the tab dock');
+  assert.match(pill, /margin: 0 (\d+)px/);
+  assert.equal(px(barCss, 'left'), Number(/margin: 0 (\d+)px/.exec(pill)?.[1]), 'the pill\'s side margin');
+  assert.equal(px(barCss, 'right'), px(barCss, 'left'));
+  assert.match(barCss, /border-radius: var\(--cp-radius-pill\)/);
+  assert.match(barCss, /background: var\(--cp-surface-inverse\); color: var\(--cp-text-inverse\); box-shadow: var\(--cp-shadow-lg\)/);
+  assert.match(css('.cont-bar .x'), /width: 48px; height: 48px/, 'the X is at least 44 by 44');
+  assert.match(css('.cont-bar .ic'), /color: var\(--cp-highlight\)/, 'a gold glyph');
+  assert.match(css('.cont-bar .r'), /font-family: var\(--cp-font-title\)/, 'the place is Fraunces');
   // Dark: the same screen in the dark palette
   assert.match(dark, /^[^]*?<div class="phone dk">/);
   assert.equal(count(dark, /class="lib-tile"/g), 39);

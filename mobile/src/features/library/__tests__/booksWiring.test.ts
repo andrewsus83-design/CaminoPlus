@@ -520,7 +520,7 @@ check('the design page shows the Books screens as the app draws them: the twelve
   assert.match(phones['Books · no texts yet'], /<div class="h">Preview<\/div><div class="p">Books are not in the app yet\. We are checking the editions before we add them\.<\/div>/);
 
   // the banner of a phone with books: one button for a screen reader that opens a book which the same phone shows as Free
-  for (const [label, cta, note] of [['Library · Books', 'Start reading', 'No rush'], ['Books · dark', 'Continue reading', 'Onward!'], ['Books · 320 wide', 'Start reading', 'No rush']]) {
+  for (const [label, cta, note] of [['Library · Books', 'Start reading', 'No rush'], ['Books · dark', 'Start reading', 'No rush'], ['Books · 320 wide', 'Start reading', 'No rush']]) {
     const phone = phones[label];
     const m = /<div class="cp-banner cmp" role="button" aria-label="([^"]+)"><div class="ey">([^<]+)<\/div><h4>Books for the road<\/h4><div class="row"><span class="hw">([^<]+)<\/span><span class="pill">([^<]+)<\/span><\/div><\/div>/.exec(phone);
     assert.ok(m, `${label}: the compact banner with a note and a pill`);
@@ -531,6 +531,15 @@ check('the design page shows the Books screens as the app draws them: the twelve
     assert.ok(phone.includes(`aria-label="${esc(coverLabel(book, true))}"`), `${label}: the book the banner opens says Free on its cover`);
   }
   assert.match(phones['Books · dark'], /<div class="phone dk"/);
+  // the Continue reading bar of the dark phone names a book that the same phone shows as Free, and its chapter, and has its own close button; the banner above no longer continues a book
+  const barOf = /<div class="cont-bar">\s*<div class="main" role="button" aria-label="Continue reading, ([^"]+), Chapter (\d+)"><svg class="cp-icon ic"><use href="#i-library"\/><\/svg><div class="t"><div class="k">Continue reading<\/div><div class="r">([^<]+) · Chapter (\d+)<\/div><\/div><\/div>\s*<button class="x" aria-label="Hide Continue reading">/.exec(phones['Books · dark']);
+  assert.ok(barOf, 'Books · dark: the bar above the tab bar');
+  assert.equal(barOf[1], barOf[3], 'what a screen reader says names the book the bar draws');
+  assert.equal(barOf[2], barOf[4]);
+  const barBook = BOOK_CATALOG.find((b) => esc(b.title) === barOf[1]);
+  assert.ok(barBook, 'the bar names a book of the catalog');
+  assert.ok(phones['Books · dark'].includes(`aria-label="${esc(coverLabel(barBook, true))}"`), 'the book of the bar says Free on its cover in the same phone');
+  assert.doesNotMatch(phones['Books · dark'], /Onward!|aria-label="Continue reading\. /, 'the banner of the Books tab does not continue a book any more');
   assert.match(phones['Books · 320 wide'], /<div class="phone" style="width:320px">/);
 
   // the paper of a cover is the pale colours of the LIGHT palette, which dark mode does not swap
