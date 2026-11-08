@@ -179,10 +179,13 @@ Every one of these is an error that names the book and the line, and nothing is 
 
 ## Sizes and speed
 
-Measured in plain node on a laptop (a phone is slower, and nothing was run on one):
+Measured on 8 November 2026, in plain node on a laptop (a phone is slower, and nothing was run on one):
 
-- The 73 books are 5,389,017 bytes of JSON, with `index.json` and `manifest.json` 5,424,200 bytes (5.4 MB); gzip makes that 1.59 MB. The Android Hermes bundle and the
-  web export are measured in the pull request.
+- The 73 books are 5,389,017 bytes of JSON, with `index.json` and `manifest.json` 5,424,200 bytes (5.4 MB); gzip makes that 1.59 MB.
+- In the bundle (`npx expo export`): nothing is added until a screen imports `text.ts`; the files are not reachable from anything else. Once a screen does, the Android
+  Hermes bundle goes from 4,969,699 to 12,479,368 bytes (+7.5 MB, +2.1 MB when compressed: the bytecode of a JSON module is bigger than its text), and the web export
+  grows by 5.3 MB, all in the chunk of the route that imports it. Metro does not split a `require` that is inside a function, so the whole Bible comes with that chunk (a
+  book is evaluated only when it is opened). Keep the import in the reading screens; a web route that is shared by several screens may be hoisted into the common chunk.
 - `JSON.parse` of the largest book, Psalms: 1.6 ms. Of all 73 books: 17 ms.
 - The first search reads the 73 books and folds the words of 35,408 verses: about 100 to 135 ms. Every search after it scans folded words: 0.1 to 15 ms for 100 hits,
   70 ms to build 30,000 hits ("the"). `prepareSearch()` does the first part ahead of time.
