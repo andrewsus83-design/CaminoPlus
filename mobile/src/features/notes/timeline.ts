@@ -1,15 +1,15 @@
-// The Notes tab of the Library: the pages of the diary as a feed, like a timeline. This file is the logic of it and nothing else: no
-// React, no React Native, so plain node can import it (npm run test:library). It decides which notes a filter shows, what time a row
+// The Notes feed of Me: the pages of the diary as a feed, like a timeline. This file is the logic of it and nothing else: no
+// React, no React Native, so plain node can import it (npm run test:me). It decides which notes a filter shows, what time a row
 // says ("now", "5m", "2h", "Yesterday", "6 Nov", "6 Nov 2025"), how the photos and videos of a note are laid out in the grid, what the
 // share sheet is given, what a screen reader says for a row, and the words of the tab.
 //
 // Notes are the pages of the diary (features/diary), private and only on this phone. Nothing here reads or writes the store: the
 // screen gets the pages from useDiary and hands them in. Nothing here touches the network.
-import { mediaOf, type DiaryMedia } from '../../diary/media';
-import { normalizePlace, placeLabel, type DiaryPlace } from '../../diary/place';
-import { clip, metaLine } from '../../diary/present';
-import { parseRich, plainText } from '../../diary/richtext';
-import type { DiaryEntry } from '../../diary/store';
+import { mediaOf, type DiaryMedia } from '../diary/media';
+import { normalizePlace, placeLabel, type DiaryPlace } from '../diary/place';
+import { clip, metaLine } from '../diary/present';
+import { parseRich, plainText } from '../diary/richtext';
+import type { DiaryEntry } from '../diary/store';
 
 /** What a note needs from a page. A page of the diary is one; so is a smaller thing a test builds. */
 export type NoteLike = Pick<DiaryEntry, 'id' | 'createdAt' | 'title' | 'body'> & Partial<Pick<DiaryEntry, 'media' | 'place'>>;

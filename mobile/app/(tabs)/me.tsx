@@ -21,13 +21,13 @@ import { JourneyGrid } from '@/features/me/JourneyGrid';
 import { SampleJourney } from '@/features/me/SampleJourney';
 import { Highlights, ShowAllBar } from '@/features/me/Highlights';
 import { buildHighlights } from '@/features/me/highlights';
+import { DEFAULT_ME_TAB, ME_FAB, ME_TABS, type MeTab } from '@/features/me/tabs';
 import { usePostMedia } from '@/features/me/usePostMedia';
+import { NotesTab } from '@/features/notes/NotesTab';
 import { updateProfile } from '@/lib/api';
 import { copyText } from '@/lib/clipboard';
 import { PickerUnavailable, pickAndUploadAvatar } from '@/lib/avatar';
 import { c, fonts, layout, radius, role, scrim, shadowStyle } from '@/theme';
-
-const TABS = ['Journey', 'Plan', 'Health'] as const;
 
 type StampT = NonNullable<ReturnType<typeof useMeData>['stamps']>[number];
 type StageT = ReturnType<typeof useMeData>['stages'][number];
@@ -104,7 +104,7 @@ function ago(iso: string | null) {
 }
 
 export default function Me() {
-  const [tab, setTab] = useState<(typeof TABS)[number]>('Journey');
+  const [tab, setTab] = useState<MeTab>(DEFAULT_ME_TAB);
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { profile, journey, session, refresh, stale } = useAuth();
@@ -190,96 +190,114 @@ export default function Me() {
   };
   const loading = <ActivityIndicator color={role.action} style={{ marginTop: 24 }} />;
 
-  return (
-    <View style={{ flex: 1 }}>
-      <Screen>
-        {/* Header follows the design system: handle pill + bell, avatar with stats, name and bio. */}
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 52 }}>
-          <AppText variant="h4" numberOfLines={1} style={{ flexShrink: 1 }}>{profile?.username ?? name}</AppText>
-          {!!profile?.username && (
-            <Pressable accessibilityRole="button" accessibilityLabel={copied ? 'Username copied' : 'Copy username'} hitSlop={10} onPress={copyUsername} style={{ width: 26, height: 26, alignItems: 'center', justifyContent: 'center' }}>
-              <Icon name={copied ? 'check' : 'copy'} color={copied ? c.success : role.muted} size={16} />
-            </Pressable>
-          )}
-          {/* Top right: the inbox, and Settings last, in the corner. Settings is a screen of its own, no longer a tab. */}
-          <View style={{ marginLeft: 'auto', flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-            <IconButton name="bell" label={unread.total ? `Inbox, ${unread.total} unread` : 'Inbox'} badge={Math.min(unread.total, 99)} onPress={() => router.push('/inbox')} size={52} />
-            <IconButton name="settings" label="Settings" onPress={() => router.push('/settings')} size={52} />
-          </View>
+  const onNotes = tab === 'Notes';
+  // The one floating button follows the sub-tab (features/me/tabs.ts): a note on Notes, a journey post on Journey, none on Plan and Health.
+  const fab = ME_FAB[tab];
+  // Everything above the content of a sub-tab: the header (handle, bell and gear, avatar and stats, name and bio, the My Camino card, the highlights) and the strip
+  // of sub-tabs. Both hosts below draw it, so it looks the same on every sub-tab.
+  const top = (
+    <>
+      {/* Header follows the design system: handle pill + bell, avatar with stats, name and bio. */}
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 52 }}>
+        <AppText variant="h4" numberOfLines={1} style={{ flexShrink: 1 }}>{profile?.username ?? name}</AppText>
+        {!!profile?.username && (
+          <Pressable accessibilityRole="button" accessibilityLabel={copied ? 'Username copied' : 'Copy username'} hitSlop={10} onPress={copyUsername} style={{ width: 26, height: 26, alignItems: 'center', justifyContent: 'center' }}>
+            <Icon name={copied ? 'check' : 'copy'} color={copied ? c.success : role.muted} size={16} />
+          </Pressable>
+        )}
+        {/* Top right: the inbox, and Settings last, in the corner. Settings is a screen of its own, no longer a tab. */}
+        <View style={{ marginLeft: 'auto', flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          <IconButton name="bell" label={unread.total ? `Inbox, ${unread.total} unread` : 'Inbox'} badge={Math.min(unread.total, 99)} onPress={() => router.push('/inbox')} size={52} />
+          <IconButton name="settings" label="Settings" onPress={() => router.push('/settings')} size={52} />
         </View>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 20 }}>
-          <Pressable accessibilityRole="button" accessibilityLabel="Change profile picture" onPress={changePhoto} disabled={uploading}>
-            {profile?.avatar_url
-              ? <Image source={{ uri: profile.avatar_url }} style={{ width: 92, height: 92, borderRadius: radius.pill, borderWidth: 3, borderColor: c.gold }} />
-              : <Avatar size={92} ring />}
-            <View style={{ position: 'absolute', right: -2, bottom: -2, width: 26, height: 26, borderRadius: 13, backgroundColor: c.gold, borderWidth: 2, borderColor: role.bg, alignItems: 'center', justifyContent: 'center' }}>
-              {uploading ? <ActivityIndicator size="small" color={role.onHighlight} /> : <Icon name="camera" color={role.onHighlight} size={13} />}
+      </View>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 20 }}>
+        <Pressable accessibilityRole="button" accessibilityLabel="Change profile picture" onPress={changePhoto} disabled={uploading}>
+          {profile?.avatar_url
+            ? <Image source={{ uri: profile.avatar_url }} style={{ width: 92, height: 92, borderRadius: radius.pill, borderWidth: 3, borderColor: c.gold }} />
+            : <Avatar size={92} ring />}
+          <View style={{ position: 'absolute', right: -2, bottom: -2, width: 26, height: 26, borderRadius: 13, backgroundColor: c.gold, borderWidth: 2, borderColor: role.bg, alignItems: 'center', justifyContent: 'center' }}>
+            {uploading ? <ActivityIndicator size="small" color={role.onHighlight} /> : <Icon name="camera" color={role.onHighlight} size={13} />}
+          </View>
+        </Pressable>
+        <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-around' }}>
+          {[[String(Math.round(Number(profile?.km_walked ?? 0))), 'km'], [String(profile?.stamps_count ?? 0), 'stamps'], [String(profile?.friends_count ?? 0), 'friends']].map(([n, l]) => (
+            <Pressable key={l} accessibilityRole="button" onPress={() => router.push(l === 'km' ? '/journey' : l === 'stamps' ? '/passport' : '/friends')} style={{ alignItems: 'center' }}>
+              <AppText variant="h3">{n}</AppText>
+              <AppText variant="small" muted style={{ textDecorationLine: 'underline' }}>{l}</AppText>
+            </Pressable>
+          ))}
+        </View>
+      </View>
+      {/* The Screen stacks with a 16 gap. The name text sits centred in a 34 high row (3 px lower than the row top), so -11 leaves exactly 8 between the profile picture and the name. */}
+      <View style={{ gap: 4, marginTop: -11 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+          <AppText variant="body" numberOfLines={1} style={{ fontFamily: 'Inter_600SemiBold', flexShrink: 1 }}>{name}</AppText>
+          <Pressable accessibilityRole="button" accessibilityLabel="Edit description" hitSlop={8} onPress={() => { setBioDraft(profile?.bio ?? ''); setEditBio(true); }} style={{ width: 34, height: 34, borderRadius: radius.pill, backgroundColor: role.surface, borderWidth: 1, borderColor: role.border, alignItems: 'center', justifyContent: 'center', marginRight: -6 }}>
+            <Icon name="pen" color={c.blue} size={16} />
+          </Pressable>
+          <Pressable accessibilityRole="button" accessibilityLabel={isPrivate ? 'Private profile, tap to change' : 'Public profile, tap to change'} onPress={askVisibility} style={{ flexDirection: 'row', alignItems: 'center', gap: 6, height: 34, paddingHorizontal: 12, borderRadius: radius.pill, backgroundColor: isPrivate ? c.sand200 : c.successWash }}>
+            <Icon name={isPrivate ? 'shield' : 'pin'} color={isPrivate ? role.text : c.success} size={16} />
+            <AppText variant="caption" color={isPrivate ? role.text : c.success} style={{ fontFamily: 'Inter_600SemiBold' }}>{isPrivate ? 'Private' : 'Public'}</AppText>
+          </Pressable>
+        </View>
+        {/* Smaller text, 4 lines, then "Read more". The invisible copy measures the full length. */}
+        <View>
+          <AppText variant="small" muted={!profile?.bio} numberOfLines={bioOpen ? undefined : 4}>{profile?.bio || 'Add a short description about you'}</AppText>
+          {!!profile?.bio && (
+            <AppText variant="small" accessibilityElementsHidden importantForAccessibility="no-hide-descendants" onTextLayout={(e) => setBioLines(e.nativeEvent.lines.length)} style={{ position: 'absolute', left: 0, right: 0, opacity: 0 }} pointerEvents="none">{profile.bio}</AppText>
+          )}
+        </View>
+        {bioLines > 4 && (
+          <Pressable accessibilityRole="button" onPress={() => setBioOpen((v) => !v)} hitSlop={8} style={{ alignSelf: 'flex-start' }}>
+            <AppText variant="small" color={role.accentText} style={{ fontFamily: 'Inter_600SemiBold' }}>{bioOpen ? 'Show less' : 'Read more'}</AppText>
+          </Pressable>
+        )}
+        {journey?.route ? (
+          <Pressable accessibilityRole="button" accessibilityLabel="Change Camino" onPress={() => router.push('/change-camino')} style={{ marginTop: 8, flexDirection: 'row', alignItems: 'center', gap: 14, padding: 14, borderRadius: radius.lg, backgroundColor: role.inverse, ...shadowStyle('md') }}>
+            <View style={{ width: 52, height: 52, borderRadius: radius.pill, borderWidth: 1.5, borderColor: 'rgba(217,162,27,0.55)', alignItems: 'center', justifyContent: 'center' }}>
+              <ShellMark size={48} />
+            </View>
+            <View style={{ flex: 1, gap: 2 }}>
+              <AppText variant="accent" color={c.gold} style={{ fontSize: 24, lineHeight: 28 }}>Buen Camino!</AppText>
+              <AppText variant="h4" color={role.onInverseAccent} style={{ fontSize: 17, lineHeight: 21 }}>My Camino</AppText>
+              <AppText variant="label" color={role.onInverse} numberOfLines={1}>{journey.route.name}</AppText>
+              <AppText variant="caption" color={role.onInverse} style={{ opacity: 0.85 }} numberOfLines={1}>{journey.start_stage ? `From stage ${journey.start_stage.stage_number} · ` : ''}{stagesDone} stages done</AppText>
+            </View>
+            <View style={{ height: 40, paddingHorizontal: 16, borderRadius: radius.pill, backgroundColor: c.gold, justifyContent: 'center' }}>
+              <AppText variant="label" color={role.onHighlight}>Change</AppText>
             </View>
           </Pressable>
-          <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-around' }}>
-            {[[String(Math.round(Number(profile?.km_walked ?? 0))), 'km'], [String(profile?.stamps_count ?? 0), 'stamps'], [String(profile?.friends_count ?? 0), 'friends']].map(([n, l]) => (
-              <Pressable key={l} accessibilityRole="button" onPress={() => router.push(l === 'km' ? '/journey' : l === 'stamps' ? '/passport' : '/friends')} style={{ alignItems: 'center' }}>
-                <AppText variant="h3">{n}</AppText>
-                <AppText variant="small" muted style={{ textDecorationLine: 'underline' }}>{l}</AppText>
-              </Pressable>
-            ))}
-          </View>
-        </View>
-        {/* The Screen stacks with a 16 gap. The name text sits centred in a 34 high row (3 px lower than the row top), so -11 leaves exactly 8 between the profile picture and the name. */}
-        <View style={{ gap: 4, marginTop: -11 }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-            <AppText variant="body" numberOfLines={1} style={{ fontFamily: 'Inter_600SemiBold', flexShrink: 1 }}>{name}</AppText>
-            <Pressable accessibilityRole="button" accessibilityLabel="Edit description" hitSlop={8} onPress={() => { setBioDraft(profile?.bio ?? ''); setEditBio(true); }} style={{ width: 34, height: 34, borderRadius: radius.pill, backgroundColor: role.surface, borderWidth: 1, borderColor: role.border, alignItems: 'center', justifyContent: 'center', marginRight: -6 }}>
-              <Icon name="pen" color={c.blue} size={16} />
-            </Pressable>
-            <Pressable accessibilityRole="button" accessibilityLabel={isPrivate ? 'Private profile, tap to change' : 'Public profile, tap to change'} onPress={askVisibility} style={{ flexDirection: 'row', alignItems: 'center', gap: 6, height: 34, paddingHorizontal: 12, borderRadius: radius.pill, backgroundColor: isPrivate ? c.sand200 : c.successWash }}>
-              <Icon name={isPrivate ? 'shield' : 'pin'} color={isPrivate ? role.text : c.success} size={16} />
-              <AppText variant="caption" color={isPrivate ? role.text : c.success} style={{ fontFamily: 'Inter_600SemiBold' }}>{isPrivate ? 'Private' : 'Public'}</AppText>
-            </Pressable>
-          </View>
-          {/* Smaller text, 4 lines, then "Read more". The invisible copy measures the full length. */}
-          <View>
-            <AppText variant="small" muted={!profile?.bio} numberOfLines={bioOpen ? undefined : 4}>{profile?.bio || 'Add a short description about you'}</AppText>
-            {!!profile?.bio && (
-              <AppText variant="small" accessibilityElementsHidden importantForAccessibility="no-hide-descendants" onTextLayout={(e) => setBioLines(e.nativeEvent.lines.length)} style={{ position: 'absolute', left: 0, right: 0, opacity: 0 }} pointerEvents="none">{profile.bio}</AppText>
-            )}
-          </View>
-          {bioLines > 4 && (
-            <Pressable accessibilityRole="button" onPress={() => setBioOpen((v) => !v)} hitSlop={8} style={{ alignSelf: 'flex-start' }}>
-              <AppText variant="small" color={role.accentText} style={{ fontFamily: 'Inter_600SemiBold' }}>{bioOpen ? 'Show less' : 'Read more'}</AppText>
-            </Pressable>
-          )}
-          {journey?.route ? (
-            <Pressable accessibilityRole="button" accessibilityLabel="Change Camino" onPress={() => router.push('/change-camino')} style={{ marginTop: 8, flexDirection: 'row', alignItems: 'center', gap: 14, padding: 14, borderRadius: radius.lg, backgroundColor: role.inverse, ...shadowStyle('md') }}>
-              <View style={{ width: 52, height: 52, borderRadius: radius.pill, borderWidth: 1.5, borderColor: 'rgba(217,162,27,0.55)', alignItems: 'center', justifyContent: 'center' }}>
-                <ShellMark size={48} />
-              </View>
-              <View style={{ flex: 1, gap: 2 }}>
-                <AppText variant="accent" color={c.gold} style={{ fontSize: 24, lineHeight: 28 }}>Buen Camino!</AppText>
-                <AppText variant="h4" color={role.onInverseAccent} style={{ fontSize: 17, lineHeight: 21 }}>My Camino</AppText>
-                <AppText variant="label" color={role.onInverse} numberOfLines={1}>{journey.route.name}</AppText>
-                <AppText variant="caption" color={role.onInverse} style={{ opacity: 0.85 }} numberOfLines={1}>{journey.start_stage ? `From stage ${journey.start_stage.stage_number} · ` : ''}{stagesDone} stages done</AppText>
-              </View>
-              <View style={{ height: 40, paddingHorizontal: 16, borderRadius: radius.pill, backgroundColor: c.gold, justifyContent: 'center' }}>
-                <AppText variant="label" color={role.onHighlight}>Change</AppText>
-              </View>
-            </Pressable>
-          ) : <AppText variant="accent" color={role.accentText}>Buen Camino!</AppText>}
-          <Highlights key={session?.user.id ?? 'none'} items={highlights} days={days ?? []} media={media} activeKey={active?.key ?? null} userId={session?.user.id} onPick={pickHighlight} />
-        </View>
-        <SubTabs tabs={TABS} value={tab} onChange={setTab} />
-        {(offline || stale) && <FormMessage tone="info">You are offline. Showing what is saved on this phone.</FormMessage>}
-        {!!error && <FormMessage>{`Could not load your data. ${error}`}</FormMessage>}
+        ) : <AppText variant="accent" color={role.accentText}>Buen Camino!</AppText>}
+        <Highlights key={session?.user.id ?? 'none'} items={highlights} days={days ?? []} media={media} activeKey={active?.key ?? null} userId={session?.user.id} onPick={pickHighlight} />
+      </View>
+      <SubTabs tabs={ME_TABS} value={tab} onChange={setTab} />
+    </>
+  );
 
-        {tab === 'Journey' && !!active && <ShowAllBar name={active.name} onPress={() => setFilterKey(null)} />}
-        {tab === 'Journey' && (!posts ? (offline ? <Empty text="You are offline. Your journey posts will show up when you are back online." /> : loading) : posts.length === 0
-          ? <SampleJourney />
-          : <JourneyGrid posts={posts} media={media} only={onlyIds} />)}
+  return (
+    <View style={{ flex: 1 }}>
+      {onNotes ? (
+        // The Notes feed owns the scroll of the screen (a virtualised list, features/notes): the header and the strip are the first thing in it, drawn with the
+        // margins and the gap that Screen gives them, so they scroll away with the notes. No message about Me's data (offline, could not load) is drawn here:
+        // the notes are on this phone and need no signal.
+        <NotesTab top={<View style={{ paddingTop: insets.top + layout.screenTop, paddingHorizontal: layout.screenMargin, paddingBottom: 16, gap: 16 }}>{top}</View>} />
+      ) : (
+        <Screen>
+          {top}
+          {(offline || stale) && <FormMessage tone="info">You are offline. Showing what is saved on this phone.</FormMessage>}
+          {!!error && <FormMessage>{`Could not load your data. ${error}`}</FormMessage>}
 
-        {tab === 'Plan' && (!days ? (offline ? <Empty text="You are offline and your plan is not saved on this phone yet. Open it once with a connection." /> : loading) : <PlanTracker days={days} />)}
+          {tab === 'Journey' && !!active && <ShowAllBar name={active.name} onPress={() => setFilterKey(null)} />}
+          {tab === 'Journey' && (!posts ? (offline ? <Empty text="You are offline. Your journey posts will show up when you are back online." /> : loading) : posts.length === 0
+            ? <SampleJourney />
+            : <JourneyGrid posts={posts} media={media} only={onlyIds} />)}
 
-        {tab === 'Health' && <Health />}
-      </Screen>
+          {tab === 'Plan' && (!days ? (offline ? <Empty text="You are offline and your plan is not saved on this phone yet. Open it once with a connection." /> : loading) : <PlanTracker days={days} />)}
+
+          {tab === 'Health' && <Health />}
+        </Screen>
+      )}
       <Modal visible={editBio} transparent animationType="slide" onRequestClose={() => setEditBio(false)}>
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: scrim }}>
           <View style={{ backgroundColor: role.bg, borderTopLeftRadius: radius.lg, borderTopRightRadius: radius.lg, paddingHorizontal: layout.screenMargin, paddingTop: 24, paddingBottom: insets.bottom + 24, gap: 16 }}>
@@ -293,7 +311,7 @@ export default function Me() {
           </View>
         </KeyboardAvoidingView>
       </Modal>
-      <Fab label="Write a journey post" onPress={() => router.push('/write')} />
+      {fab && <Fab label={fab.label} icon={fab.icon} onPress={() => router.push(fab.href)} />}
     </View>
   );
 }

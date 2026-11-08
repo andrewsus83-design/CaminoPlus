@@ -263,8 +263,8 @@ check('the search of verses never stands between a keystroke and the screen: it 
   assert.match(code(read('src/features/library/bible/verseRows.ts')), /export const VERSE_RESULTS_MAX = 100;/);
   const screen = code(read('app/(tabs)/library.tsx'));
   assert.match(screen, /const openBook = \(code: string\) => router\.push\(bookHref\(code\)\);\s+const openVerse = \(ref: Ref\) => router\.push\(readerHref\(ref\)\);/, 'a book of the results opens its chapters, a verse opens the reader at it');
-  assert.equal((screen.match(/<SearchResults\b[^]*?onOpenBook=\{openBook\} onOpenVerse=\{openVerse\} \/>/g) ?? []).length, 2, 'the results are drawn in both hosts (Notes keeps its own host while something is typed) and open the same places in both');
-  assert.equal((screen.match(/<SearchResults\b/g) ?? []).length, 2);
+  assert.equal((screen.match(/<SearchResults\b[^]*?onOpenBook=\{openBook\} onOpenVerse=\{openVerse\} \/>/g) ?? []).length, 1, 'the results are drawn once, in the screen\'s own scroll, and a book opens its chapters and a verse the reader');
+  assert.equal((screen.match(/<SearchResults\b/g) ?? []).length, 1);
   // the verse rows: ONE button for the row and the bookmark beside it, the place in JetBrains Mono, the words in Inter, the match marked by a ground and an underline
   const rows = code(read(`${BIBLE}/VerseRows.tsx`));
   assert.match(rows, /accessibilityRole="button" accessibilityLabel=\{verseRowLabel\(row\)\} accessibilityHint="Opens the chapter at this verse" onPress=\{\(\) => onOpen\(row\.ref\)\}/);

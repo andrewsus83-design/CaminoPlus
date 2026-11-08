@@ -15,7 +15,7 @@ export const BAR_DRAWN: Record<Testament, string> = { old: 'Old\nTestament', deu
 /**
  * The three choices of the Bible tab: Old Testament, Deuterocanon, New Testament. One is on at a time (the filled one); the grid of books under it
  * shows the books of that part. It sits in the page, directly under the daily reading banner and above the books, and scrolls with them: it is a
- * segmented pill (a sunken track and a filled choice), not the underline of the Bible, Books and Notes strip at the very top of the screen.
+ * segmented pill (a sunken track and a filled choice), not the underline of the Bible and Books strip at the very top of the screen.
  *
  * A group of radio choices for a screen reader ("Old Testament, radio button, checked"), not tabs: the real tab bar below is the only thing on the
  * screen that is a "tab" to it. (`aria-checked` is there as well as `accessibilityState`, because the web build only reads the first.) The labels are

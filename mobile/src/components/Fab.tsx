@@ -4,8 +4,9 @@ import { Icon, IconName } from './Icon';
 import { c, layout, radius, role, shadowStyle } from '@/theme';
 
 /**
- * The gold round button that floats at the bottom right, just above the tab bar: "Write a journey post" on Me,
- * "Write a note" on the Notes tab of Library. One component so every FAB looks and sits the same.
+ * The gold round button that floats at the bottom right, just above the tab bar: on Me it follows the sub-tab ("Write a note" on
+ * Notes, "Write a journey post" on Journey, none on Plan and Health: features/me/tabs.ts). One component so every FAB looks and
+ * sits the same, and one button at a time.
  *
  * 60 px round with a 26 px icon, as the design page says (.cp-fab-write), above the 56 px touch minimum. It sits 8 px
  * above the floating tab bar. The two numbers (14 and 88) are the tab bar's own, see TabBar.tsx;

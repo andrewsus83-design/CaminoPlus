@@ -1,18 +1,27 @@
 // What is real in the Library and what is still an example.
 //
+// The Library has two tabs, Bible and Books, and no more: the diary is not in the Library. It is the Notes sub-tab of Me (features/notes,
+// features/diary), where the pilgrim's own writing sits next to the journey.
+//
 // The Bible is real: the World English Bible, Catholic edition (eBible.org, public domain), 73 books, all in the app, so it works with no signal. The
 // Bible tab lists its books as tiles, a book opens its chapters, a chapter opens its words (features/library/bible), and a search finds its verses.
 // The Books tab is still a preview: it lists twelve free classics, but none of them opens (we are checking the editions first), every row says "Soon",
 // and the tab and the search say so (SampleNotice). The daily reading is a sample as well (features/library/daily): which readings we may print is
-// not decided, and the text of the Bible here is not the one read at Mass. Nothing here is fetched.
-//
-// Notes, the third tab, is the diary: real, written on this phone (features/library/notes, features/diary), so it has no notice, no bookmarks and no
-// part in the search. `RowTab` is the two tabs that hold rows a pilgrim can bookmark and search.
+// not decided, and the text of the Bible here is not the one read at Mass. Nothing here is fetched. `RowTab` is the two tabs that hold rows a
+// pilgrim can bookmark and search.
 //
 // Plain data on purpose: no theme colours are read here (a colour read at import would never follow light/dark).
 
-export const LIBRARY_TABS = ['Bible', 'Books', 'Notes'] as const;
+export const LIBRARY_TABS = ['Bible', 'Books'] as const;
 export type LibraryTab = (typeof LIBRARY_TABS)[number];
+
+/**
+ * The tab to show for a value that may not be one of the tabs: a name kept by an older version of the app (when there was a third tab, Notes),
+ * something typed in a link, nothing at all. Anything that is not exactly the name of a tab is the first tab, so the screen never shows no tab.
+ */
+export function asLibraryTab(value: unknown): LibraryTab {
+  return (LIBRARY_TABS as readonly unknown[]).includes(value) ? (value as LibraryTab) : LIBRARY_TABS[0];
+}
 
 /** The tabs that hold rows: the ones that can be searched and bookmarked, and show up in the Bookmarks screen. */
 export const ROW_TABS = ['Bible', 'Books'] as const;

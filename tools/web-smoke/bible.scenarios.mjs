@@ -135,13 +135,11 @@ export const BIBLE_SCENARIOS = [
       assert.equal(nt[0].name, 'Matthew');
       assert.equal(nt[26].name, 'Revelation');
       await eventually(() => shown(page, 'Orthodox Bibles include a few more books.').count(), (n) => n === 0, { what: 'the number of Orthodox notes on the New Testament' });
-      step('the choices belong to the Bible tab: gone on Books and on Notes, back on Bible with the choice kept, and gone while something is typed in the search');
+      step('the choices belong to the Bible tab: gone on Books, back on Bible with the choice kept, and gone while something is typed in the search (the Library has no Notes tab: the diary is on Me)');
       await shown(page, 'Books').click();
       await shown(page, 'Twelve free companions for the road').waitFor();
       await eventually(() => page.getByRole('radio').count(), (n) => n === 0, { what: 'the number of choices on Books' });
-      await shown(page, 'Notes').click();
-      await page.getByRole('button', { name: 'Write a note', exact: true }).waitFor();
-      await eventually(() => page.getByRole('radio').count(), (n) => n === 0, { what: 'the number of choices on Notes' });
+      await eventually(() => page.getByText('Notes', { exact: true }).filter({ visible: true }).count(), (n) => n === 0, { what: 'the number of Notes tabs on the Library' });
       await shown(page, 'Bible').click();
       await group.waitFor();
       await eventually(() => checked('New Testament'), (v) => v === 'true', { what: 'the choice made before is still the choice' });

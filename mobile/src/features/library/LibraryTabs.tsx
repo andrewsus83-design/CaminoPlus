@@ -18,7 +18,7 @@ import type { LibraryMarks } from './useLibraryBookmarks';
 
 // The two Library tabs that hold rows: Bible (the books of the Bible, one part at a time, as a grid of square tiles) and Books (twelve free classics).
 // The Bible is real: its text is in the app (see sample.ts). The Books tab is a preview and starts with an honest notice, and its rows say "Soon". The
-// third tab, Notes, is the diary and lives in features/library/notes. Colours are read while drawing, never at import.
+// diary is not a Library tab: it is the Notes sub-tab of Me (features/notes). Colours are read while drawing, never at import.
 //
 // A row can carry a bookmark button (when `marks` is given): the button is its own component. The rows of a book of the Bible are also what a search
 // result and the Bookmarks screen draw (LibraryGroups), where a tap opens the book; the rows of the twelve books are pictures of what will be there.
