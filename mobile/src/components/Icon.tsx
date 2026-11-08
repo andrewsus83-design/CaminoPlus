@@ -62,7 +62,7 @@ const PATHS = {
   moon: ['M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5a8.5 8.5 0 1 0 10.7 10.7Z'],
   navigation: ['M3 11 22 2l-9 19-2-8-8-2Z'],
   building: ['M5 21V4.5A1.5 1.5 0 0 1 6.5 3h7A1.5 1.5 0 0 1 15 4.5V21', 'M15 9.5h2.5A1.5 1.5 0 0 1 19 11v10', 'M3 21h18', 'M8.5 7h2M8.5 11h2M8.5 15h2'],
-  // Library tab: an open book (the tab), a closed book with a cross (the Bible), a music note, a spiral notebook (the diary, whose tab on Library is
+  // Library tab: an open book (the tab), a closed book with a cross (the Bible), a music note, a spiral notebook (the diary, whose sub-tab on Me is
   // called Notes; not the Bible, which is what the closed book with a cross says). The design page sprite has the same one, symbol i-diary.
   library: ['M12 7.5C10.7 6.3 8.7 5.5 6.2 5.5H3.5v12h2.7c2.5 0 4.5.8 5.8 2 1.3-1.2 3.3-2 5.8-2h2.7v-12h-2.7c-2.5 0-4.5.8-5.8 2Z', 'M12 7.5v12'],
   book: ['M7 3.5h10.5A1.5 1.5 0 0 1 19 5v14.5a1 1 0 0 1-1 1H7.5A2 2 0 0 1 5.5 18.5V5A1.5 1.5 0 0 1 7 3.5Z', 'M5.5 18.5A2 2 0 0 1 7.5 16.5H19', 'M12.25 6.5v6.5M9.5 8.9h5.5'],

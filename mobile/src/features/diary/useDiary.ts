@@ -1,6 +1,6 @@
 // The hooks of the diary screens. Nothing here uses the network, and nothing throws: the store answers, it does not raise.
 //
-//   useDiary()          the signed-in person's pages, newest first, for the list and the Notes tab of the Library. Read again
+//   useDiary()          the signed-in person's pages, newest first, for the list and the Notes feed of Me. Read again
 //                       each time the screen comes back into view (so a page written a moment ago shows after Back).
 //   useDiaryPage(id)    one page for the editor, read once. `new` is a blank page. A page that is not there (deleted, or
 //                       another account's) or no session at all is "missing", never an error.
@@ -53,7 +53,7 @@ export function useDiary() {
     return ok;
   }, [uid]);
 
-  // Read the phone again now (pull to refresh in the Library's Notes tab). Never throws: the store answers, and a list that cannot be read is empty.
+  // Read the phone again now (pull to refresh in the Notes feed of Me). Never throws: the store answers, and a list that cannot be read is empty.
   const reload = useCallback(async (): Promise<void> => {
     if (!uid) return;
     const entries = await loadEntries(uid);

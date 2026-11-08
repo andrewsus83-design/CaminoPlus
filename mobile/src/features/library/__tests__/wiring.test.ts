@@ -2,8 +2,9 @@
 // they read the files, nothing is run. What the pure parts do is checked in library.test.ts, bible.test.ts and books.test.ts; here it is
 // that the screens use them the way they must (a row keeps its key, a bookmark is cleared when the person logs out, a post is bookmarked
 // only through the calls the journey viewer makes, the rows cannot be pressed and the few things that can have a label and a state,
-// nothing needs a new native module). The Notes tab (features/library/notes) and the daily reading (features/library/daily,
-// app/library/daily.tsx) belong to their own features and their own tests: only the way they are plugged in is checked here.
+// nothing needs a new native module). The daily reading (features/library/daily, app/library/daily.tsx) belongs to its own feature and its
+// own tests: only the way it is plugged in is checked here. The diary is not part of the Library any more: it is the Notes sub-tab of Me
+// (features/notes, tested with Me); this test only checks that nothing of it is left in the Library.
 // Run: npm run test:library
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -14,11 +15,11 @@ const check = (name: string, fn: () => void) => { fn(); n += 1; console.log(`ok 
 const root = process.cwd(); // npm test runs from mobile/
 const read = (p: string) => fs.readFileSync(path.join(root, p), 'utf8');
 const code = (src: string) => src.split('\n').filter((l) => !/^\s*(\/\/|\/?\*)/.test(l)).join('\n'); // without comment lines
-import './notes.test'; // the Notes tab (src/features/library/notes): its logic and its wiring, run here so no script has to name it
+import { LIBRARY_TABS } from '../sample';
 
 const DIR = 'src/features/library';
-// The files of this feature: the folder itself, the Bible and Books folders, and the screens of app/library. Not notes/ and daily/, nor
-// app/library/daily.tsx: the Notes tab and the daily reading are other features with their own tests.
+// The files of this feature: the folder itself, the Bible and Books folders, and the screens of app/library. Not daily/, nor
+// app/library/daily.tsx: the daily reading is another feature with its own tests.
 const OWN_FOLDERS = ['', 'bible/', 'books/'];
 const featureFiles = [
   ...OWN_FOLDERS.flatMap((sub) => fs.readdirSync(path.join(root, DIR, sub), { withFileTypes: true }).filter((f) => f.isFile() && /\.tsx?$/.test(f.name)).map((f) => `${DIR}/${sub}${f.name}`)),
@@ -227,19 +228,17 @@ check('the feature uses no console, no interval and no StyleSheet.create (colour
   assert.deepEqual(offenders, []);
 });
 
-check('the Notes tab and the daily reading are plugged in here and built elsewhere: the screen draws NotesTab as the third tab, with no banner, and the banner opens /library/daily', () => {
+check('the Library is the two tabs Bible and Books and nothing else: no Notes tab, no feed, no gold pen, no second host; the daily reading is plugged in here and built elsewhere, the banner opens /library/daily', () => {
   const screen = code(read('app/(tabs)/library.tsx'));
-  assert.match(screen, /import \{ NotesTab \} from '@\/features\/library\/notes\/NotesTab';/);
-  assert.match(screen, /<View style=\{\{ flex: 1 \}\}><NotesTab \/><\/View>/, 'no props, in a box of its own that fills what is under the tabs: the notes start right under them');
-  assert.doesNotMatch(screen, /<NotesTab\s[^>]*\w+=/, 'NotesTab takes no props');
-  const notesHost = screen.slice(screen.indexOf("if (tab === 'Notes') {"), screen.indexOf('<Screen keyboard'));
-  assert.ok(notesHost.includes('<NotesTab />'), 'the host of the Notes tab is found');
-  assert.doesNotMatch(notesHost.slice(notesHost.indexOf(') : (')), /Banner|<Screen\b|ScrollView/, 'Notes has no banner and no scroll view around it: the feed scrolls by itself');
+  assert.deepEqual([...LIBRARY_TABS], ['Bible', 'Books']);
+  assert.doesNotMatch(screen, /Notes|NotesTab|<Fab\b|Write a note|\/diary|features\/notes/, 'the diary is on Me now: nothing of it is in the Library screen');
+  assert.equal((screen.match(/<Screen\b/g) ?? []).length, 1, 'one host for every tab and for the results: the screen\'s own scroll');
+  assert.doesNotMatch(screen, /<ScrollView\b|<FlatList\b/, 'no scroll view of its own next to the screen\'s (the second host was only there for the Notes feed)');
   assert.match(screen, /<DailyBanner onOpen=\{\(\) => router\.push\('\/library\/daily'\)\} \/>/);
-  assert.ok(fs.existsSync(path.join(root, 'src/features/library/notes/NotesTab.tsx')), 'the file of the Notes tab is there (a placeholder until the real one is merged)');
-  assert.match(read('src/features/library/notes/NotesTab.tsx'), /export function NotesTab\(\)/);
-  assert.ok(fs.existsSync(path.join(root, 'app/library/daily.tsx')), 'the route /library/daily is a file (a placeholder until the real screen is merged)');
+  assert.ok(fs.existsSync(path.join(root, 'app/library/daily.tsx')), 'the route /library/daily is a file');
   assert.match(read('app/library/daily.tsx'), /export default function /);
+  assert.ok(!fs.existsSync(path.join(root, 'src/features/library/notes')), 'the folder of the Notes feed is gone from the Library (it is src/features/notes)');
+  assert.ok(fs.existsSync(path.join(root, 'src/features/notes/NotesTab.tsx')), 'and it is where Me imports it from');
 });
 
 check('there is no Music left: not a tab, not a notice, not a group of the search or of Bookmarks, not a playlist row', () => {

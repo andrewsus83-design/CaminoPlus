@@ -7,6 +7,10 @@ import {
   MAX_HIGHLIGHTS, buildHighlights, coverUrl, destinationName, firstLetter, highlightLabel, nextHighlightIndex, parseSeen, placeMatch,
   type DayLike, type PostLike,
 } from '../highlights';
+// The sub-tabs of Me and the Notes feed have their own files. They run from here, so the package's test script (which names the five files
+// of this suite) runs them without being edited.
+import './tabs.test';
+import '../../notes/__tests__/notes.test';
 
 let n = 0;
 const check = (name: string, fn: () => void) => { fn(); n += 1; console.log(`ok   ${name}`); };
@@ -225,7 +229,7 @@ check('Me still has the My Camino card, as it was: shell mark in its ring, the t
   assert.match(me, /\{journey\.start_stage \? `From stage \$\{journey\.start_stage\.stage_number\} · ` : ''\}\{stagesDone\} stages done/);
 });
 
-check('the highlights sit directly under the card: after it, before the Journey / Plan / Health tabs, once', () => {
+check('the highlights sit directly under the card: after it, before the strip of sub-tabs (Notes, Journey, Plan, Health), once', () => {
   const me = read('app/(tabs)/me.tsx');
   const card = me.indexOf('accessibilityLabel="Change Camino"');
   const row = me.indexOf('<Highlights');

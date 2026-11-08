@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { ActivityIndicator, Alert, AppState, FlatList, Platform, RefreshControl, Share, View, type ListRenderItemInfo } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -24,16 +24,16 @@ import {
   feedState, filterNotes, identity, noteCounts, toggled, type NoteFilter, type Telling,
 } from './timeline';
 
-// The Library's Notes tab: the pages of the diary as a feed, like a timeline. They are the same pages as My diary (features/diary), private,
+// The Notes feed of Me: the pages of the diary as a feed, like a timeline. They are the same pages as My diary (features/diary), private,
 // only on this phone: this tab reads them through useDiary and deletes through the same call; it writes nothing and sends nothing anywhere.
 // The only thing that can leave is the words of a note, when the person taps Share and chooses where in the system's share sheet.
 //
-// HOW THE SHELL HOSTS IT: <NotesTab /> owns the scroll of the screen. It is a virtualised list, so a diary of 2,000 notes draws only the rows that
-// are on screen, and pull to refresh belongs to it. Mount it in a box that has a height of its own (flex: 1 under the search row and the tab
-// strip, never inside a ScrollView) and that is as wide as the screen: the rows run from edge to edge and are parted by a hairline. It leaves
-// room at the bottom for the floating tab bar and for the gold pen, which the shell draws (this tab draws no pen of its own).
-// A drag on the list puts the keyboard of the search field away on a phone. On the web it does not: there is no keyboard to put away, and the
-// browser reports scrolls that nobody made (a list that is taken out of the page, say) as drags, which took the focus from the field being typed in.
+// HOW ME HOSTS IT: while the Notes sub-tab is on, <NotesTab top={...} /> is the scroll of the screen. It is a virtualised list, so a diary of
+// 2,000 notes draws only the rows that are on screen, and pull to refresh belongs to it. Mount it in a box that has a height of its own (flex: 1,
+// never inside a ScrollView) and that is as wide as the screen: the rows run from edge to edge and are parted by a hairline. Everything that sits
+// above the notes on Me (the profile, the highlights, the strip of sub-tabs) is `top`: the first thing in the list, so it scrolls away with the
+// notes, and it brings its own margins. The tab leaves room at the bottom for the floating tab bar and for the gold pen, which Me draws (this
+// tab draws no pen of its own).
 
 const keyOf = (e: DiaryEntry) => e.id;
 
@@ -82,7 +82,7 @@ function Empty({ title, text, button, ghost, onPress }: { title: string; text: s
   );
 }
 
-export function NotesTab() {
+export function NotesTab({ top }: { top?: ReactNode }) {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { profile } = useAuth();
@@ -156,7 +156,10 @@ export function NotesTab() {
   ), [owner, now, who, opened, actions]);
 
   const header = (
-    <NotesHeader name={who.name} photo={who.photo} seed={who.seed} onWrite={write} filter={filter} counts={counts} onFilter={setFilter} />
+    <>
+      {top}
+      <NotesHeader name={who.name} photo={who.photo} seed={who.seed} onWrite={write} filter={filter} counts={counts} onFilter={setFilter} />
+    </>
   );
   const empty = state === 'loading' ? (
     <ActivityIndicator accessibilityLabel={LOADING_LABEL} color={role.action} style={{ marginTop: 40 }} />
@@ -185,8 +188,6 @@ export function NotesTab() {
         initialNumToRender={6}
         maxToRenderPerBatch={6}
         windowSize={7}
-        keyboardShouldPersistTaps="handled"
-        keyboardDismissMode={Platform.OS === 'web' ? 'none' : 'on-drag'}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} tintColor={role.action} colors={[role.action]} progressBackgroundColor={role.surface} />}
         contentContainerStyle={{ paddingBottom: layout.tabbarHeight + insets.bottom + 96 }}
         style={{ flex: 1 }}

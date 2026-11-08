@@ -16,7 +16,6 @@
     "src/features/library/__tests__/wiring.test.ts",
     "src/features/library/__tests__/daily.test.ts",
     "src/features/library/__tests__/liturgy.test.ts",
-    "src/features/library/__tests__/weekstrip.test.ts",
-    "src/features/library/__tests__/notes.test.ts"
+    "src/features/library/__tests__/weekstrip.test.ts"
   ]
 }
