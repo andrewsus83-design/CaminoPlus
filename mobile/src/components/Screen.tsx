@@ -10,8 +10,8 @@ import { layout, role } from '@/theme';
 // A screen pushed over the tabs (Settings) has no tab bar under it: `tabBar={false}` drops the room kept for the bar.
 // A screen with a text field at the top (the Library search) sets `keyboard`: a tap on a button still works while the keyboard is up
 // (without it the first tap only closes the keyboard), and scrolling the list closes the keyboard.
-// A screen that has to move or read its own scroll position (the Library, which brings a list back to its top when another part of it is
-// chosen) passes `scrollRef` and `onScroll`; nothing else uses them.
+// A screen that has to move or read its own scroll position (the Bible reader, which scrolls to the verse a link names) passes `scrollRef` and
+// `onScroll`; nothing else uses them.
 export function Screen({ children, scroll = true, margin = layout.screenMargin, tabBar = true, keyboard = false, scrollRef, onScroll }: { children: ReactNode; scroll?: boolean; margin?: number; tabBar?: boolean; keyboard?: boolean; scrollRef?: Ref<ComponentRef<typeof ScrollView>>; onScroll?: (e: NativeSyntheticEvent<NativeScrollEvent>) => void }) {
   const insets = useSafeAreaInsets();
   const pad = { paddingTop: insets.top + layout.screenTop, paddingHorizontal: margin };

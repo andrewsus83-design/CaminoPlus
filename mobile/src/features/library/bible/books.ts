@@ -152,7 +152,7 @@ export function countLine(t: Testament): string {
   return `${books} ${books === 1 ? 'book' : 'books'}`;
 }
 
-const NO_BREAK_SPACE = ' ';
+const NO_BREAK_SPACE = '\u00a0';
 
 /** "50 chapters", "1 chapter". The space is a no-break space: a line that has to wrap does it before "50 chapters", not between 50 and "chapters". */
 export const chaptersLabel = (chapters: number): string => `${chapters}${NO_BREAK_SPACE}${chapters === 1 ? 'chapter' : 'chapters'}`;

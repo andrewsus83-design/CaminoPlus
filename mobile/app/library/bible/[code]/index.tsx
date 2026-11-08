@@ -29,7 +29,7 @@ export default function BibleBook() {
     <Screen tabBar={false}>
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
         <IconButton name="back" label="Back" onPress={goBack} />
-        <BookmarkToggle on={marks.ready && marks.has(key)} title={book.name} toggle={() => marks.toggle(key)} />
+        <BookmarkToggle on={marks.has(key)} title={book.name} toggle={() => marks.toggle(key)} />
       </View>
       <View style={{ gap: 2 }}>
         <AppText variant="h2" accessibilityRole="header">{book.name}</AppText>

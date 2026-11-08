@@ -11,8 +11,11 @@ export const READER_MAX_FONT_SCALE = 1.6;
 export const BODY_SIZE = 19;
 export const BODY_LINE = 32;
 
+/** The number of a verse is drawn at this size: the raised digits of JetBrains Mono are 0.43 of it high (7.3 here), as small as a number can be and still be read. */
+export const NUMBER_SIZE = 17;
+
 /** A line of poetry goes in by an em space for each tab at its start (Inter has one: 19 wide at this size). */
-export const INDENT = ' ';
+export const INDENT = '\u2003';
 
 /** The space above a block of each kind of gap. A heading keeps 28 above it (none at the top of the chapter) and 6 under it. */
 export const GAP: Record<Gap, number> = { none: 0, paragraph: 16, stanza: 26 };
@@ -30,8 +33,8 @@ const chosen = () => ({ backgroundColor: c.goldSoft, textDecorationLine: 'underl
 function VerseNumber({ label, on }: { label: string; on: boolean }) {
   return (
     <>
-      <AppText variant="mono" maxFontSizeMultiplier={READER_MAX_FONT_SCALE} color={on ? role.text : role.muted} style={{ fontSize: 15, lineHeight: BODY_LINE }}>{superscript(label)}</AppText>
-      {' '}
+      <AppText variant="mono" maxFontSizeMultiplier={READER_MAX_FONT_SCALE} color={on ? role.text : role.muted} style={{ fontSize: NUMBER_SIZE, lineHeight: BODY_LINE }}>{superscript(label)}</AppText>
+      {'\u2009'}
     </>
   );
 }
