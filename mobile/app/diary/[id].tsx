@@ -13,9 +13,10 @@ import { device } from '@/features/diary/device';
 import { FormatBar, type FormatAction } from '@/features/diary/FormatBar';
 import { MediaGrid, MediaStrip, MediaViewer } from '@/features/diary/MediaTiles';
 import { MEDIA_PER_PAGE_MAX, mediaOf } from '@/features/diary/media';
+import { PageFooter } from '@/features/diary/PageFooter';
 import { PlaceChip, PlaceEditRow, PlacePanel } from '@/features/diary/PlaceParts';
 import { normalizePlace, withName, type DiaryPlace } from '@/features/diary/place';
-import { FEATURES_NEED_NEW_APP, MEDIA_NEEDS_NEW_APP, MEDIA_ON_WEB, attachMessage, dateLine, metaLine, pageTitle, placeProblemMessage, problemMessage, thousands } from '@/features/diary/present';
+import { FEATURES_NEED_NEW_APP, MEDIA_NEEDS_NEW_APP, MEDIA_ON_WEB, SAVE_DRAFT, attachMessage, dateLine, dateWithDraft, metaLine, pageFooter, pageTitle, placeProblemMessage, problemMessage, thousands } from '@/features/diary/present';
 import { RichText } from '@/features/diary/RichText';
 import { continueList, formatsAt, toggleBlock, toggleInline, type Edit, type Sel } from '@/features/diary/richtext';
 import { BODY_MAX, TITLE_MAX, type DiaryEntry } from '@/features/diary/store';
@@ -28,12 +29,16 @@ import { c, radius, role, textStyle } from '@/theme';
 const noOutline = (Platform.OS === 'web' ? { outlineStyle: 'none' } : null) as object | null;
 
 // One diary page. [id] is a saved page's id, or "new" for a blank page. The text is written as it is typed
-// (src/features/diary/autosave.ts) and again whenever the person leaves, so there is no Save button.
+// (src/features/diary/autosave.ts) and again whenever the person leaves, so nothing has to be saved by hand: Save draft and Publish only say what the page is.
 //
-// The page can be formatted (a bar above the keyboard: bold, italic, heading, bullets, quote; the text keeps the marks, richtext.ts),
-// can hold photos and videos from the phone's library (copied into the app, shown as tiles, a tap shows one full screen) and the
-// place the pilgrim is at. A page that has something in it opens READ, drawn the way it will be remembered; "Edit" opens it for
-// writing. Everything is written by the same saver, so a photo added while a save of the text is pending cannot race it.
+// The page can be formatted (a bar at the bottom of the text box: bold, italic, heading, bullets, quote, and the photo and the pin; the text
+// keeps the marks, richtext.ts), can hold photos and videos from the phone's library (copied into the app, shown as tiles, a tap shows one
+// full screen) and the place the pilgrim is at. A page that has something in it opens READ, drawn the way it will be remembered; "Edit" opens
+// it for writing. Everything is written by the same saver, so a photo added while a save of the text is pending cannot race it.
+//
+// A page begun here is a DRAFT (it shows in Notes with a "Draft" tag) until it is published. At the bottom there is one row: Read (Edit
+// while reading), a third of the width, and Publish, two thirds (a published page has "Done" there, which only goes back). At the top right,
+// while a draft is written, "Save draft" keeps it as a draft and goes back. Publishing makes it a note of the feed; nothing is sent anywhere.
 export default function DiaryPage() {
   const router = useRouter();
   const params = useLocalSearchParams<{ id?: string | string[] }>();
@@ -88,6 +93,7 @@ function PageEditor({ uid, initial, goBack }: { uid: string; initial: DiaryEntry
   const [date] = useState(() => dateLine(initial?.createdAt ?? new Date().toISOString()));
   const { saver, view } = usePageSaver(uid, initial);
   const [leaving, setLeaving] = useState(false);
+  const [working, setWorking] = useState<'publish' | 'draft' | null>(null);
   const left = useRef(false);
   const alive = useRef(true);
   useEffect(() => { alive.current = true; return () => { alive.current = false; }; }, []);
@@ -135,6 +141,21 @@ function PageEditor({ uid, initial, goBack }: { uid: string; initial: DiaryEntry
     if (await saver.discard()) { setLeaving(true); disablePrevention(); goBack(); }
     else setDeleteFailed(true);
   }, attached !== '');
+
+  // Publish and Save draft: written now, with everything typed, and then back. If it cannot be written the page stays, with the reason on screen
+  // (and the page is what it was: a draft that failed to publish is still shown as a draft).
+  const finish = async (kind: 'publish' | 'draft') => {
+    if (working !== null) return;
+    say(null);
+    Keyboard.dismiss();
+    setWorking(kind);
+    try {
+      const res = await (kind === 'publish' ? saver.publish() : saver.saveDraft());
+      if (res.ok && alive.current) { setLeaving(true); disablePrevention(); goBack(); }
+    } finally {
+      if (alive.current) setWorking(null);
+    }
+  };
 
   const apply = (e: Edit) => {
     setBody(e.text);
@@ -199,25 +220,34 @@ function PageEditor({ uid, initial, goBack }: { uid: string; initial: DiaryEntry
   // What this device cannot do, said once and honestly: the web preview has none of it, an older app lacks one or both.
   const lines = !canMedia && !canPlace ? [Platform.OS === 'web' ? MEDIA_ON_WEB : FEATURES_NEED_NEW_APP] : [!canMedia ? MEDIA_NEEDS_NEW_APP : '', !canPlace ? placeProblemMessage('unsupported') : ''].filter(Boolean);
 
+  // What the buttons are: Publish for a draft (still a draft while it is being published), Done for a published page.
+  const footer = pageFooter({ draft: view.draft || working === 'publish', reading, hasContent: hasAny });
+  const onPrimary = () => { if (footer.primary === 'Publish') void finish('publish'); else { say(null); Keyboard.dismiss(); goBack(); } };
+
   const topBar = (
     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
       <IconButton name="back" label="Back" onPress={goBack} />
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-        {(hasAny || reading) && (
+        {footer.saveDraft && (
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel={reading ? 'Edit this page' : 'Read this page'}
-            accessibilityHint={reading ? 'Opens the page for writing' : 'Shows the page as it will be read'}
-            onPress={toggleMode}
-            style={({ pressed }) => ({ minHeight: 48, paddingHorizontal: 20, borderRadius: radius.pill, borderWidth: 1, borderColor: role.border, backgroundColor: role.surface, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.8 : 1 })}
+            accessibilityLabel={SAVE_DRAFT}
+            accessibilityHint="Keeps this note as a draft in your Notes and goes back"
+            accessibilityState={{ disabled: working !== null, busy: working === 'draft' }}
+            disabled={working !== null}
+            onPress={() => void finish('draft')}
+            style={({ pressed }) => ({ minHeight: 48, paddingHorizontal: 20, borderRadius: radius.pill, borderWidth: 1, borderColor: role.border, backgroundColor: role.surface, alignItems: 'center', justifyContent: 'center', opacity: working !== null ? 0.5 : pressed ? 0.8 : 1 })}
           >
-            <AppText variant="label">{reading ? 'Edit' : 'Read'}</AppText>
+            <AppText variant="label">{SAVE_DRAFT}</AppText>
           </Pressable>
         )}
         {view.stored && <IconButton name="trash" label="Delete this page" onPress={askDelete} />}
       </View>
     </View>
   );
+
+  const dateRow = <AppText variant="small" muted>{dateWithDraft(date, view.draft)}</AppText>;
+  const footerRow = <PageFooter footer={footer} busy={working === 'publish'} onToggle={toggleMode} onPrimary={onPrimary} bottom={keyboard ? 0 : insets.bottom} />;
 
   const messages = (
     <>
@@ -241,7 +271,7 @@ function PageEditor({ uid, initial, goBack }: { uid: string; initial: DiaryEntry
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1, backgroundColor: role.bg }}>
         <Screen tabBar={false}>
           {topBar}
-          <AppText variant="small" muted>{date}</AppText>
+          {dateRow}
           {!!title.trim() && <AppText variant="h3" accessibilityRole="header">{title.trim()}</AppText>}
           {/* A tap on the words opens the page for writing. The Edit button above is the way in for a screen reader: this wrapper is not a
               labelled button of its own, so it cannot hide the words from one. */}
@@ -253,6 +283,7 @@ function PageEditor({ uid, initial, goBack }: { uid: string; initial: DiaryEntry
           {messages}
           {captionRow}
         </Screen>
+        {footerRow}
         {viewer}
       </KeyboardAvoidingView>
     );
@@ -265,7 +296,7 @@ function PageEditor({ uid, initial, goBack }: { uid: string; initial: DiaryEntry
       <Screen tabBar={false} scroll={false}>
         <View style={{ flex: 1, gap: 12, paddingBottom: 8 }}>
           {topBar}
-          <AppText variant="small" muted>{date}</AppText>
+          {dateRow}
 
           <View style={{ flex: 1, minHeight: keyboard ? 96 : 140, backgroundColor: role.surface, borderRadius: radius.lg, borderWidth: 2, borderColor: focused ? c.gold : role.border, overflow: 'hidden' }}>
             <TextInput
@@ -303,6 +334,8 @@ function PageEditor({ uid, initial, goBack }: { uid: string; initial: DiaryEntry
               accessibilityLabel="Page text"
               style={[textStyle('body'), { flex: 1, color: role.text, paddingHorizontal: 18, paddingTop: 14, paddingBottom: 18, textAlignVertical: 'top' }, noOutline]}
             />
+            {/* The marks and the photo and the pin are inside the text box, at the bottom of it, not on a bar of their own above the keyboard. */}
+            <FormatBar formats={formats} formatsOff={titleFocus} onFormat={format} onMedia={canMedia ? () => void addMedia() : undefined} onPlace={canPlace ? addPlace : undefined} mediaBusy={busy !== 'idle'} hasPlace={view.place !== null} />
           </View>
 
           {compact && attached !== '' && (
@@ -328,9 +361,7 @@ function PageEditor({ uid, initial, goBack }: { uid: string; initial: DiaryEntry
           {captionRow}
         </View>
       </Screen>
-      <View style={{ paddingBottom: keyboard ? 0 : Math.max(insets.bottom, 0), backgroundColor: role.surface }}>
-        <FormatBar formats={formats} formatsOff={titleFocus} onFormat={format} onMedia={canMedia ? () => void addMedia() : undefined} onPlace={canPlace ? addPlace : undefined} mediaBusy={busy !== 'idle'} hasPlace={view.place !== null} />
-      </View>
+      {footerRow}
       {viewer}
     </KeyboardAvoidingView>
   );

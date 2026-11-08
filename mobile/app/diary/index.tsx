@@ -8,8 +8,8 @@ import { Pill } from '@/components/Pill';
 import { Card, IconButton } from '@/components/ui';
 import { FormMessage } from '@/components/auth/Field';
 import { confirmDelete } from '@/features/diary/confirm';
-import { PRIVACY_LINE, dateLine, mediaUsageLine, metaLine, pagePreview, pageTitle, pagesLabel } from '@/features/diary/present';
-import type { DiaryEntry } from '@/features/diary/store';
+import { PRIVACY_LINE, dateLine, dateWithDraft, mediaUsageLine, metaLine, pagePreview, pageTitle, pagesLabel } from '@/features/diary/present';
+import { isDraft, type DiaryEntry } from '@/features/diary/store';
 import { useDiary } from '@/features/diary/useDiary';
 import { radius, role } from '@/theme';
 
@@ -55,7 +55,8 @@ export default function DiaryList() {
             {entries.map((e) => {
               const name = pageTitle(e);
               const preview = pagePreview(e);
-              const date = dateLine(e.createdAt);
+              const draft = isDraft(e);
+              const date = dateWithDraft(dateLine(e.createdAt), draft);
               const attached = metaLine(e);
               return (
                 <Card key={e.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingRight: 8 }}>

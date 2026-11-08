@@ -63,6 +63,11 @@ Then the **scenarios** ([scenarios.mjs](scenarios.mjs)), each in light and dark,
   wide the four labels are one row, each on one line, none clipped; Notes is the first sub-tab: it shows the feed ("Notes stay on this phone.",
   "No notes yet" for the new account) with one gold pen, "Write a note", and not the journey pen; Plan and Health have no pen; Journey has its
   own again; the note pen opens `/diary/new`, and a note written there is in the feed after Back;
+- Notes, a page is a draft until it is published: on a blank page Read and Publish are off and there is no Save draft; with words in it Save draft is at the
+  top right and the date says Draft; the marks (Bold, Italic, Heading, Bulleted list, Quote) sit inside the text box, under the text and above the bottom
+  row; Read is a third and Publish two thirds of one row at the bottom (margin to margin, at least 48 high); Read turns into Edit in the same place; Save draft
+  goes back to the feed with a Draft tag on the note; opened again the draft is read, with Edit and Publish; Publish takes the tag away; a published note that
+  is read has Edit alone across the row, and written it has Read and Done and no Save draft;
 - Stays lists the stays of the stage and one opens with its details;
 - logging out from Settings lands on Welcome;
 - launching the app lands on Welcome (signed out), Onboarding (signed in, no journey) or Me;
@@ -70,8 +75,8 @@ Then the **scenarios** ([scenarios.mjs](scenarios.mjs)), each in light and dark,
   and with an expired login (also with nothing saved: "No signal right now") the app does not wait for the network.
 
 The diary screens and the Notes feed (the first sub-tab of Me) belong to their own features: they are swept (they must load without errors),
-and the scenarios only check where the pen leads, that Notes is the first sub-tab and that a note written there shows up, never what those
-screens contain. The Bible screens are the Bible feature's own, and they run on the real text (Psalm 121, John 1, Psalm 119, Malachi 4, Tobit 1),
+and the scenarios only check where the pen leads, that Notes is the first sub-tab, that a note written there shows up, and the draft/publish row of the
+editor (above), never what the notes themselves contain. The Bible screens are the Bible feature's own, and they run on the real text (Psalm 121, John 1, Psalm 119, Malachi 4, Tobit 1),
 so those walks fail when the text is missing or the import is wrong. The daily reading has scenarios of its own ([daily.scenarios.mjs](daily.scenarios.mjs)),
 which never name a date (the browser's clock is the phone's, and "today" is found as a person finds it, by the day that says "today"):
 

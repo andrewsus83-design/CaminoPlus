@@ -107,7 +107,7 @@ check('the two pushed screens use the shared Screen without room for a tab bar, 
     for (const m of src.matchAll(/<Pressable\b/g)) assert.match(src.slice(m.index, (m.index ?? 0) + 400), /accessibilityLabel=|accessible=\{false\}/, `${f}: a Pressable without a label`);
   }
   // the parts the editor is made of: every Pressable says what it does, every field has a label
-  for (const f of ['FormatBar.tsx', 'MediaTiles.tsx', 'PlaceParts.tsx']) {
+  for (const f of ['FormatBar.tsx', 'MediaTiles.tsx', 'PlaceParts.tsx', 'PageFooter.tsx']) {
     const src = read(`src/features/diary/${f}`);
     for (const m of src.matchAll(/<Pressable\b/g)) assert.match(src.slice(m.index, (m.index ?? 0) + 520), /accessibilityLabel=/, `${f}: a Pressable without a label`);
     for (const m of src.matchAll(/<TextInput\b/g)) assert.match(src.slice(m.index, (m.index ?? 0) + 700), /accessibilityLabel=/, `${f}: a field without a label`);
@@ -271,6 +271,49 @@ check('the editor adds files and the place through the saver (the one queue), fo
   const flow = code('src/features/diary/usePlace.ts');
   assert.match(flow, /step: 'explain'/, 'the explanation comes before the phone asks');
   assert.ok(flow.indexOf("set({ step: 'explain' })") < flow.indexOf('device.findPlace()') || flow.indexOf('const locate') < flow.indexOf('const start'), 'asking is a step the person takes');
+});
+
+check('the editor: the marks are inside the text box, Read and Publish are one row at the bottom (a third and two thirds) in both views, and Save draft replaces Read at the top right', () => {
+  const src = read('app/diary/[id].tsx');
+  const editor = src.slice(src.indexOf('function PageEditor'));
+  // the bar is inside the box: after the body field and before the box closes, and no longer on a docked wrapper after the Screen
+  const body = editor.indexOf('accessibilityLabel="Page text"');
+  const bar = editor.indexOf('<FormatBar ');
+  const boxEnds = editor.lastIndexOf('</Screen>'); // the writing view's
+  assert.ok(body > 0 && bar > body && bar < boxEnds, 'FormatBar comes after the text field and before the end of the screen content');
+  assert.equal([...editor.matchAll(/<FormatBar\b/g)].length, 1, 'one bar');
+  assert.match(editor.slice(body, bar), /\/>\s*\{\/\*[^*]*inside the text box[^*]*\*\/\}\s*$/, 'directly under the text field, in the same box');
+  assert.doesNotMatch(editor.slice(boxEnds), /<FormatBar\b/, 'not docked after the screen any more');
+  // the row at the bottom comes after the Screen, in the reading view and in the writing view
+  assert.equal([...editor.matchAll(/\{footerRow\}/g)].length, 2, 'both views have the row');
+  for (const m of editor.matchAll(/\{footerRow\}/g)) assert.ok((m.index ?? 0) > editor.lastIndexOf('</Screen>', m.index), 'the row is under the Screen, not inside its scroll');
+  const footer = read('src/features/diary/PageFooter.tsx');
+  assert.match(footer, /flex: 1, minHeight: FOOTER_BUTTON/, 'the first button is one part');
+  assert.match(footer, /flex: 2, minHeight: FOOTER_BUTTON/, 'the second button is two parts');
+  assert.match(footer, /accessibilityLabel=\{footer\.toggle === 'Edit' \? 'Edit this page' : 'Read this page'\}/);
+  assert.match(footer, /\{primary !== null && \(/, 'a published page that is read has one button only');
+  assert.doesNotMatch(editor, /Read this page|Edit this page/, 'the old button of the top bar is gone');
+  // the top right
+  assert.match(editor, /\{footer\.saveDraft && \(/);
+  assert.match(editor, /accessibilityLabel=\{SAVE_DRAFT\}/);
+  assert.match(editor, /<AppText variant="label">\{SAVE_DRAFT\}<\/AppText>/);
+  assert.match(editor, /const footer = pageFooter\(\{ draft: view\.draft \|\| working === 'publish', reading, hasContent: hasAny \}\);/);
+});
+
+check('Publish and Save draft write first and only then go back, through the saver; a write that fails keeps the page and its reason on screen', () => {
+  const src = read('app/diary/[id].tsx');
+  const editor = src.slice(src.indexOf('function PageEditor'));
+  assert.match(editor, /const res = await \(kind === 'publish' \? saver\.publish\(\) : saver\.saveDraft\(\)\);\s*if \(res\.ok && alive\.current\) \{ setLeaving\(true\); disablePrevention\(\); goBack\(\); \}/);
+  assert.match(editor, /if \(working !== null\) return;/, 'a second tap while it is written does nothing');
+  assert.match(editor, /void finish\('publish'\)/);
+  assert.match(editor, /void finish\('draft'\)/);
+  assert.doesNotMatch(editor, /await saver\.flush\(\)/);
+  const saver = read('src/features/diary/autosave.ts');
+  assert.match(saver, /const publish = \(\) => become\('published'\);/);
+  assert.match(saver, /const saveDraft = \(\) => become\('draft'\);/);
+  assert.match(saver, /let status: NoteStatus = initial \? statusOf\(initial\) : 'draft';/, 'a page begun here is a draft');
+  // nothing is sent anywhere: a published note is only a note of the diary on this phone
+  for (const f of ['src/features/diary/PageFooter.tsx', 'src/features/diary/autosave.ts']) assert.doesNotMatch(code(f), /\bfetch\(|supabase|lib\/api/, f);
 });
 
 check('the list says what is on each page, clean (never a mark), and asks before deleting a page that has photos, videos or a place', () => {

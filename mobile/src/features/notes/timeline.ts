@@ -7,12 +7,12 @@
 // screen gets the pages from useDiary and hands them in. Nothing here touches the network.
 import { mediaOf, type DiaryMedia } from '../diary/media';
 import { normalizePlace, placeLabel, type DiaryPlace } from '../diary/place';
-import { clip, metaLine } from '../diary/present';
+import { DRAFT_TAG, clip, metaLine } from '../diary/present';
 import { parseRich, plainText } from '../diary/richtext';
-import type { DiaryEntry } from '../diary/store';
+import { isDraft, type DiaryEntry } from '../diary/store';
 
 /** What a note needs from a page. A page of the diary is one; so is a smaller thing a test builds. */
-export type NoteLike = Pick<DiaryEntry, 'id' | 'createdAt' | 'title' | 'body'> & Partial<Pick<DiaryEntry, 'media' | 'place'>>;
+export type NoteLike = Pick<DiaryEntry, 'id' | 'createdAt' | 'title' | 'body'> & Partial<Pick<DiaryEntry, 'media' | 'place' | 'status'>>;
 
 /* ------------------------------------------------------------------------------------------------ the words */
 
@@ -255,6 +255,8 @@ export type NoteRow = {
   share: string;
   /** Nothing in it at all. */
   blank: boolean;
+  /** Still a draft: the row carries a "Draft" tag, and a screen reader says so. */
+  draft: boolean;
   /** What a screen reader reads for the whole row. */
   label: string;
 };
@@ -262,8 +264,8 @@ export type NoteRow = {
 const stop = (s: string) => (/[.!?…]$/.test(s) ? s : `${s}.`);
 
 /** The sentence a screen reader reads for a row: who, when, the title, the first words, and what is attached (photos, videos, the place). */
-export function rowLabel(o: { name: string; time: TimeParts | null; title: string; text: string; meta: string }): string {
-  return [o.name, o.time?.spoken ?? '', o.title, o.text, o.meta].filter((p) => p !== '').map(stop).join(' ');
+export function rowLabel(o: { name: string; time: TimeParts | null; title: string; text: string; meta: string; draft?: boolean }): string {
+  return [o.name, o.time?.spoken ?? '', o.draft ? DRAFT_TAG : '', o.title, o.text, o.meta].filter((p) => p !== '').map(stop).join(' ');
 }
 
 /** Everything a row draws, from a page. `now` and the person are given; nothing is read from anywhere else. */
@@ -276,6 +278,7 @@ export function noteRow(e: NoteLike, now: Date, who: { name: string }): NoteRow 
   const time = noteTime(e.createdAt, now);
   const blank = title === '' && words === '' && media.length === 0 && place === null;
   const meta = metaLine({ media: e.media, place: e.place });
+  const draft = isDraft(e);
   return {
     id: e.id,
     title,
@@ -287,7 +290,8 @@ export function noteRow(e: NoteLike, now: Date, who: { name: string }): NoteRow 
     time,
     share: shareText(e),
     blank,
-    label: rowLabel({ name: who.name, time, title, text: blank ? BLANK_NOTE : clip(words, 160), meta }),
+    draft,
+    label: rowLabel({ name: who.name, time, title, text: blank ? BLANK_NOTE : clip(words, 160), meta, draft }),
   };
 }
 

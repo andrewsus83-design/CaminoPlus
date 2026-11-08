@@ -452,6 +452,19 @@ check('what a screen reader reads has no double stops and leaves out what is not
   assert.equal(rowLabel({ name: 'Ana', time: null, title: '', text: '', meta: '1 photo' }), 'Ana. 1 photo.');
 });
 
+check('a draft says so on its row: the tag, and the sentence a screen reader reads; a note that is published, or one of an earlier build, does not', () => {
+  const at = local(2026, 11, 8, 10).toISOString();
+  const draft = noteRow({ id: 'd', createdAt: at, title: 'Hontanas', body: 'Half a thought', status: 'draft' }, NOW, { name: 'Ana' });
+  assert.equal(draft.draft, true);
+  assert.match(draft.label, /^Ana\. 2 hours ago\. Draft\. Hontanas\. Half a thought\.$/);
+  for (const status of [undefined, 'published' as const]) {
+    const row = noteRow({ id: 'p', createdAt: at, title: 'Hontanas', body: 'Done', ...(status ? { status } : {}) }, NOW, { name: 'Ana' });
+    assert.equal(row.draft, false);
+    assert.doesNotMatch(row.label, /Draft/);
+  }
+  assert.equal(rowLabel({ name: 'Ana', time: null, title: '', text: 'Wind!', meta: '', draft: true }), 'Ana. Draft. Wind!');
+});
+
 check('random notes, thousands of them: a row never throws, never says undefined or NaN, and what it draws agrees with what the filters and the grid think of the note', () => {
   forEachNote(900, (e, _r, now) => {
     const row = noteRow(e, now, { name: 'Ana' });
@@ -778,6 +791,11 @@ check('it shows the person who wrote the notes the way a post does (name, handle
   assert.match(code('NoteRow.tsx'), /<PilgrimAvatar\b/);
   assert.match(code('NotesHeader.tsx'), /<PilgrimAvatar\b/);
   for (const f of files) assert.doesNotMatch(code(f), /SAMPLE_|sample\.ts|from '\.\.\/sample'/, `${f}: no invented notes: the feed only ever shows the pages that are in the diary`);
+});
+
+check('the row draws the tag only for a draft, and a screen reader gets it once, from the sentence of the row', () => {
+  assert.match(code('NoteRow.tsx'), /\{row\.draft && \(/, 'the row draws the tag only for a draft');
+  assert.match(code('NoteRow.tsx'), /importantForAccessibility="no-hide-descendants"[^>]*>\s*<AppText variant="caption" color=\{role\.accentText\}>\{DRAFT_TAG\}/, 'and a screen reader gets it once, from the sentence of the row');
 });
 
 check('this test runs: highlights.test.ts runs it (npm run test:me names that one), and the test config of Me compiles it', () => {

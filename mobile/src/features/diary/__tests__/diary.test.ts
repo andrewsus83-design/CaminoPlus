@@ -9,8 +9,8 @@ import { AUTOSAVE_MS, createPageSaver, type SaverDeps, type SaverView } from '..
 // names only this file and wiring.test.ts) runs them without being edited.
 import './richtext.test';
 import { finished as mediaTests } from './media.test';
-import { EMPTY_CARD_LINE, PRIVACY_LINE, UNTITLED, clip, dateLine, firstLine, pagePreview, pageTitle, pagesLabel, problemMessage, thousands } from '../present';
-import { BODY_MAX, ENTRIES_MAX, TITLE_MAX, TOTAL_MAX, createDiaryStore, isEntry, newId, oldKey, pagesOf, slotKey, type DiaryEntry, type DiaryStorage, type SaveResult } from '../store';
+import { DONE, DRAFT_TAG, EMPTY_CARD_LINE, PRIVACY_LINE, PUBLISH, SAVE_DRAFT, UNTITLED, clip, dateLine, dateWithDraft, firstLine, pageFooter, pagePreview, pageTitle, pagesLabel, problemMessage, thousands } from '../present';
+import { BODY_MAX, ENTRIES_MAX, TITLE_MAX, TOTAL_MAX, createDiaryStore, isDraft, isEntry, newId, oldKey, pagesOf, slotKey, statusOf, type DiaryEntry, type DiaryStorage, type SaveResult } from '../store';
 
 let n = 0;
 // A test that never finishes must fail, not end the process quietly (node exits when nothing is pending, with code 0).
@@ -795,7 +795,7 @@ const GOOD = page('g1', day(1), { title: 'Roncesvalles', body: 'Cold and clear.'
     await h.clk.advance(1);
     assert.equal(h.saved.length, 1);
     assert.equal(AUTOSAVE_MS, 600);
-    assert.deepEqual({ ...h.saved[0], createdAt: '', updatedAt: '' }, { id: 'page-1', createdAt: '', updatedAt: '', title: '', body: 'Hello' });
+    assert.deepEqual({ ...h.saved[0], createdAt: '', updatedAt: '' }, { id: 'page-1', createdAt: '', updatedAt: '', title: '', body: 'Hello', status: 'draft' }, 'a page begun here is a draft');
     assert.equal(h.saver.view().status, 'saved');
     assert.equal(h.saver.view().stored, true);
   });
@@ -1114,6 +1114,156 @@ const GOOD = page('g1', day(1), { title: 'Roncesvalles', body: 'Cold and clear.'
     false_start.edit({ body: '' });
     void false_start.flush(); // leaving, not awaited
     assert.deepEqual(await store.loadEntries(UID), [], 'typed and erased: no page in the diary');
+  });
+
+  /* ------------------------------------------------------------------ drafts and published notes */
+
+  await test('a page is a draft only when it says so: nothing, or a word this build does not know, is published, and only a draft keeps the word', () => {
+    assert.equal(statusOf(page('a', day(1))), 'published');
+    assert.equal(statusOf({ status: 'draft' }), 'draft');
+    assert.equal(statusOf({ status: 'published' }), 'published');
+    for (const odd of ['archived', '', 'DRAFT', 3, null, {}, ['draft']]) assert.equal(statusOf({ status: odd }), 'published', String(odd));
+    assert.equal(isDraft({ status: 'draft' }), true);
+    assert.equal(isDraft(page('a', day(1))), false);
+    const read = pagesOf([page('d', day(3), { status: 'draft' }), page('p', day(2), { status: 'published' }), page('o', day(1), { status: 'archived' as never }), page('e', day(0))]);
+    assert.deepEqual(read.map((e) => [e.id, 'status' in e ? e.status : 'none']), [['d', 'draft'], ['p', 'none'], ['o', 'none'], ['e', 'none']], 'screens read one thing: the word is there for a draft and nowhere else');
+  });
+
+  await test('the store keeps what a page is: a draft stays a draft, publishing it removes the word, a save that does not say leaves it as it is, and a page of an earlier build is published', async () => {
+    const f = fake();
+    const store = createDiaryStore(f.storage);
+    assert.deepEqual(await store.saveEntry(UID, page('a', day(1), { status: 'draft' })), { ok: true });
+    assert.deepEqual((await store.loadEntries(UID)).map((e) => isDraft(e)), [true]);
+    assert.deepEqual(await store.saveEntry(UID, page('a', day(1), { body: 'edited, status not said' })), { ok: true });
+    assert.deepEqual((await store.loadEntries(UID)).map((e) => [e.body, isDraft(e)]), [['edited, status not said', true]], 'a caller that does not know of drafts does not change one');
+    assert.deepEqual(await store.saveEntry(UID, page('a', day(1), { status: 'published' })), { ok: true });
+    assert.deepEqual((await store.loadEntries(UID)).map((e) => [e.id, isDraft(e)]), [['a', false]]);
+    const lastSlot = f.stored(f.files.has(A()) && f.files.has(B()) ? (seqOf(f.stored(A())) as number) > (seqOf(f.stored(B())) as number) ? A() : B() : A());
+    assert.ok(!('status' in (entriesOf(lastSlot)[0] as object)), 'a published page says nothing, like every page written before drafts');
+    // a word of a newer app, and a status that this build does not know, are never written over a page that is saved without one
+    const g = fake();
+    g.seed(A(), slot(1, [{ ...page('x', day(1)), status: 'draft', mood: 'grateful' }]));
+    const s2 = createDiaryStore(g.storage);
+    assert.deepEqual(await s2.saveEntry(UID, { ...page('x', day(1)), body: 'more' }), { ok: true });
+    const kept = entriesOf(g.stored(B()))[0] as Record<string, unknown>;
+    assert.deepEqual([kept.status, kept.mood, kept.body], ['draft', 'grateful', 'more']);
+  });
+
+  await test('a page begun in the editor is a draft: the first write says so, autosave keeps it so, and the screen is told', async () => {
+    const h = harness();
+    assert.equal(h.saver.view().draft, true, 'a draft from the first moment');
+    h.saver.edit({ body: 'Hello' });
+    await h.clk.advance(AUTOSAVE_MS);
+    h.saver.edit({ body: 'Hello again' });
+    await h.clk.advance(AUTOSAVE_MS);
+    assert.deepEqual(h.saved.map((e) => e.status), ['draft', 'draft']);
+    assert.equal(h.saver.view().draft, true);
+  });
+
+  await test('publish writes the page at once, with everything typed, as published; the wait of the autosave is over; and the screen is told it is no longer a draft', async () => {
+    const h = harness();
+    h.saver.edit({ title: 'Hontanas', body: 'Arrived at noon.' });
+    assert.equal(h.clk.pending(), 1);
+    assert.deepEqual(await h.saver.publish(), { ok: true });
+    assert.equal(h.clk.pending(), 0, 'nothing left to wait for');
+    assert.deepEqual(h.saved.map((e) => [e.title, e.body, e.status]), [['Hontanas', 'Arrived at noon.', 'published']], 'one write: the words and the new status together');
+    assert.deepEqual([h.saver.view().draft, h.saver.view().status, h.saver.view().stored], [false, 'saved', true]);
+    assert.ok(h.views.some((v) => v.draft === false), 'the screen was told');
+    h.saver.edit({ body: 'Arrived at noon. Soup.' });
+    await h.clk.advance(AUTOSAVE_MS);
+    assert.deepEqual(h.saved.map((e) => e.status), ['published', 'published'], 'editing a published note never turns it back into a draft');
+  });
+
+  await test('publish with nothing to write is quiet: a page begun here with nothing in it is not written and not published, and a draft that is already saved is written once more only because its status changed', async () => {
+    const blank = harness();
+    assert.deepEqual(await blank.saver.publish(), { ok: true });
+    assert.equal(blank.saved.length, 0, 'a blank page is never written');
+    assert.equal(blank.saver.view().stored, false);
+    const h = harness({ initial: { id: 'p1', createdAt: day(1), updatedAt: day(1), title: 'T', body: 'saved words', status: 'draft' } });
+    assert.deepEqual(await h.saver.flush(), { ok: true });
+    assert.equal(h.saved.length, 0, 'nothing changed: nothing written');
+    assert.deepEqual(await h.saver.publish(), { ok: true });
+    assert.deepEqual(h.saved.map((e) => [e.id, e.status, e.createdAt]), [['p1', 'published', day(1)]], 'the same page, the day it was begun kept');
+    assert.deepEqual(await h.saver.publish(), { ok: true });
+    assert.equal(h.saved.length, 1, 'published twice is written once');
+  });
+
+  await test('save draft writes what is typed now and keeps the page a draft; on a published page it is a way to move it back, and the editor does not offer it there', async () => {
+    const h = harness();
+    h.saver.edit({ body: 'half a thought' });
+    assert.deepEqual(await h.saver.saveDraft(), { ok: true });
+    assert.deepEqual(h.saved.map((e) => [e.body, e.status]), [['half a thought', 'draft']]);
+    assert.equal(h.clk.pending(), 0);
+    const p = harness({ initial: { id: 'p', createdAt: day(1), updatedAt: day(1), title: '', body: 'a note', status: 'published' } });
+    assert.equal(p.saver.view().draft, false, 'a page of the list that is published opens as published');
+    p.saver.edit({ body: 'a note, edited' });
+    await p.clk.advance(AUTOSAVE_MS);
+    assert.deepEqual(p.saved.map((e) => e.status), ['published']);
+    assert.deepEqual(await p.saver.saveDraft(), { ok: true });
+    assert.deepEqual(p.saved.map((e) => e.status), ['published', 'draft']);
+    assert.equal(p.saver.view().draft, true);
+  });
+
+  await test('a publish that cannot be written leaves the page what it was: still a draft on screen, the reason on screen, nothing published that is not on the phone, and the next write is a draft again', async () => {
+    const h = harness({ answers: [{ ok: true }, { ok: false, reason: 'not-saved' }, { ok: true }] });
+    h.saver.edit({ body: 'words' });
+    await h.clk.advance(AUTOSAVE_MS);
+    assert.deepEqual(await h.saver.publish(), { ok: false, reason: 'not-saved' });
+    assert.deepEqual([h.saver.view().draft, h.saver.view().status, h.saver.view().problem], [true, 'failed', 'not-saved']);
+    assert.deepEqual(await h.saver.flush(), { ok: true }, 'the next try writes the page again');
+    assert.deepEqual(h.saved.map((e) => e.status), ['draft', 'published', 'draft'], 'as a draft: the page is not published until it is on the phone as published');
+    assert.deepEqual([h.saver.view().draft, h.saver.view().status, h.saver.view().problem], [true, 'saved', null]);
+    assert.deepEqual(await h.saver.publish(), { ok: true });
+    assert.deepEqual([h.saved.at(-1)?.status, h.saver.view().draft], ['published', false]);
+  });
+
+  await test('a deleted page cannot be published or kept: nothing is written after discard', async () => {
+    const h = harness();
+    h.saver.edit({ body: 'gone' });
+    await h.saver.flush();
+    assert.equal(await h.saver.discard(), true);
+    const before = h.saved.length;
+    await h.saver.publish();
+    await h.saver.saveDraft();
+    assert.equal(h.saved.length, before);
+  });
+
+  await test('typing, saving, publishing and coming back through the real store: a draft in the list, then a note without the word, in the same place and with the same day', async () => {
+    const f = fake();
+    const store = createDiaryStore(f.storage);
+    const clk = clock();
+    const saver = createPageSaver({ save: (e) => store.saveEntry(UID, e), remove: (id) => store.deleteEntry(UID, id), newId, setTimer: clk.setTimer, clearTimer: clk.clearTimer });
+    saver.edit({ title: 'Day 3', body: 'Rain all morning.' });
+    assert.deepEqual(await saver.flush(), { ok: true });
+    const draft = await store.loadEntries(UID);
+    assert.deepEqual(draft.map((e) => [e.title, isDraft(e)]), [['Day 3', true]]);
+    const reopened = createPageSaver({ save: (e) => store.saveEntry(UID, e), remove: (id) => store.deleteEntry(UID, id), newId, setTimer: clk.setTimer, clearTimer: clk.clearTimer }, draft[0]);
+    assert.equal(reopened.view().draft, true, 'a draft opened from the list is still a draft');
+    assert.deepEqual(await reopened.publish(), { ok: true });
+    const done = await store.loadEntries(UID);
+    assert.deepEqual(done.map((e) => [e.id, e.createdAt, isDraft(e), 'status' in e]), [[draft[0].id, draft[0].createdAt, false, false]]);
+    assert.ok(Date.parse(done[0].updatedAt) >= Date.parse(draft[0].updatedAt), 'the page was written again, never earlier');
+  });
+
+  await test('the buttons under a page: Read a third and Publish two thirds for a draft; Done for a published page that is written; Edit alone for one that is read; Save draft only while a draft with something in it is written', () => {
+    assert.deepEqual(pageFooter({ draft: true, reading: false, hasContent: true }), { toggle: 'Read', toggleOff: false, primary: PUBLISH, primaryOff: false, saveDraft: true });
+    assert.deepEqual(pageFooter({ draft: true, reading: true, hasContent: true }), { toggle: 'Edit', toggleOff: false, primary: PUBLISH, primaryOff: false, saveDraft: false });
+    assert.deepEqual(pageFooter({ draft: true, reading: false, hasContent: false }), { toggle: 'Read', toggleOff: true, primary: PUBLISH, primaryOff: true, saveDraft: false }, 'a blank page: nothing to read, publish or keep');
+    assert.deepEqual(pageFooter({ draft: false, reading: false, hasContent: true }), { toggle: 'Read', toggleOff: false, primary: DONE, primaryOff: false, saveDraft: false });
+    assert.deepEqual(pageFooter({ draft: false, reading: true, hasContent: true }), { toggle: 'Edit', toggleOff: false, primary: null, primaryOff: false, saveDraft: false });
+    assert.deepEqual([PUBLISH, DONE, SAVE_DRAFT, DRAFT_TAG], ['Publish', 'Done', 'Save draft', 'Draft']);
+    for (const draft of [true, false]) for (const reading of [true, false]) for (const hasContent of [true, false]) {
+      const f = pageFooter({ draft, reading, hasContent });
+      assert.ok(f.toggle === 'Read' || f.toggle === 'Edit');
+      assert.equal(f.toggle === 'Edit', reading, 'the first button is the other of the two views');
+      if (f.saveDraft) assert.ok(draft && !reading && hasContent);
+    }
+  });
+
+  await test('the date under the top bar says Draft for a draft, and nothing more for a note', () => {
+    assert.equal(dateWithDraft('Tuesday 4 November', true), 'Tuesday 4 November · Draft');
+    assert.equal(dateWithDraft('Tuesday 4 November', false), 'Tuesday 4 November');
+    assert.equal(dateWithDraft('', true), 'Draft');
   });
 
   console.log(`${n} of ${n} passed`);

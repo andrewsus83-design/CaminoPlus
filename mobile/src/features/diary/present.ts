@@ -179,3 +179,36 @@ export const MEDIA_ON_WEB = 'Photos, videos and places are added in the phone ap
 export const MEDIA_NEEDS_NEW_APP = 'Adding photos and videos needs the newest version of the app.';
 export const FEATURES_NEED_NEW_APP = 'Adding photos, videos and places needs the newest version of the app.';
 export const MISSING_FILE = 'Not on this phone';
+
+/* ------------------------------------------------------------------------------------------------ drafts and the buttons under a page */
+
+/** The tag a draft carries in the Notes feed, in the list of pages and under the date of the page itself. */
+export const DRAFT_TAG = 'Draft';
+/** The button at the top right of the page while a draft is written: it keeps the page as a draft and goes back. */
+export const SAVE_DRAFT = 'Save draft';
+/** The big button under the page: it makes the draft a note of the feed. */
+export const PUBLISH = 'Publish';
+/** The big button under a page that is already published: its words are saved as they are typed, so this only goes back. */
+export const DONE = 'Done';
+
+/** "Tuesday 4 November · Draft": the date of the page, and when it is a draft, that it is. */
+export const dateWithDraft = (date: string, draft: boolean): string => (draft ? (date ? `${date} · ${DRAFT_TAG}` : DRAFT_TAG) : date);
+
+/**
+ * What the row of buttons under a page is made of. The first is the small one (a third of the row): "Read" while writing, "Edit" while
+ * reading. The second is the big one (two thirds): "Publish" for a draft, "Done" for a published page that is being written, and none
+ * for a published page that is being read (then the first one takes the whole row). A draft with nothing in it cannot be published
+ * or kept, and there is nothing to read yet. `saveDraft` says whether the button at the top right is there: only while a draft that
+ * has something in it is written (a page being read has not changed, and Back already keeps it).
+ */
+export type PageFooter = { toggle: 'Read' | 'Edit'; toggleOff: boolean; primary: typeof PUBLISH | typeof DONE | null; primaryOff: boolean; saveDraft: boolean };
+
+export function pageFooter(o: { draft: boolean; reading: boolean; hasContent: boolean }): PageFooter {
+  return {
+    toggle: o.reading ? 'Edit' : 'Read',
+    toggleOff: !o.reading && !o.hasContent,
+    primary: o.draft ? PUBLISH : o.reading ? null : DONE,
+    primaryOff: o.draft && !o.hasContent,
+    saveDraft: o.draft && !o.reading && o.hasContent,
+  };
+}
