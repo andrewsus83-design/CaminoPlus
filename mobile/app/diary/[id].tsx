@@ -39,7 +39,7 @@ export default function DiaryPage() {
   const params = useLocalSearchParams<{ id?: string | string[] }>();
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
   const page = useDiaryPage(id);
-  const goBack = () => (router.canGoBack() ? router.back() : router.replace('/library'));
+  const goBack = () => (router.canGoBack() ? router.back() : router.replace('/me'));
 
   if (page.state === 'missing') return <NotHere goBack={goBack} />;
   if (page.state === 'loading') return <Screen tabBar={false}><IconButton name="back" label="Back" onPress={goBack} /></Screen>;

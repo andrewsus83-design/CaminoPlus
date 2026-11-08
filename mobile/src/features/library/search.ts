@@ -4,7 +4,8 @@
 // The Library holds example rows only (see sample.ts), so this searches them: for a book of the Bible its name, its part (Old
 // Testament, Deuterocanon, New Testament) and its line; for one of the twelve books its title, its author, its era and its blurb;
 // and the name of the tab itself, so "bible" lists all the Bible rows and "books" the twelve. It looks at both tabs at once and
-// answers with the rows grouped by tab: one list, nothing to switch to. Notes (the diary) are not searched here.
+// answers with the rows grouped by tab: one list, nothing to switch to. The diary is not searched here: it is not in the Library (it is the Notes
+// sub-tab of Me).
 //
 // How a row matches. Case, accents and punctuation do not matter ("Ávila" is "avila", "Kempis." is "kempis"). The query is
 // cut into words; every word has to be the start of a word of the row, so "teres" finds "Teresa of Ávila" and "john cross" finds
@@ -83,8 +84,9 @@ export function resultsLine(s: LibrarySearch): string {
 /**
  * The rows of these bookmark keys (newest first, as they are kept), grouped by tab. A key that is no row of the Library any more
  * is left out: it stays in the saved list, it just shows nothing. That is what happens to a bookmark kept before the tabs were
- * Bible, Books and Notes (a Music row such as "music:morning", an example shelf such as "bible:psalms"): nothing breaks, and
- * nothing shows. A Bookmarks screen with only such keys says "Nothing bookmarked in the Library yet", which is true.
+ * Bible and Books (a Music row such as "music:morning", an example shelf such as "bible:psalms", or a key of a tab that is not in the
+ * Library any more, such as "notes:..."): nothing breaks, and nothing shows. A Bookmarks screen with only such keys says "Nothing
+ * bookmarked in the Library yet", which is true.
  */
 export function hitsForKeys(keys: readonly string[]): Hits {
   const rank = new Map<string, number>();

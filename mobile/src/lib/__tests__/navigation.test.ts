@@ -3,16 +3,17 @@
 //
 // The tab bar is Me, Stays, Maps, Discover, Library. Settings is not a tab: it is a screen of its own, opened from the
 // gear at the top right of Me. Library has no title: its top row is a search field and the round Bookmarks button in the corner
-// (the size of Me's bell and gear); directly under it the tabs Bible, Books and Notes, then the banner of the tab (Bible and Books
-// have one, Notes, the diary, has none). On Bible three choices float above the tab bar (Old Testament, Deuterocanon, New
-// Testament); on Notes a gold pen writes a note. These checks fail when someone brings a tab back without its icon (the tab bar would
-// crash on it), when a route file and the tab list disagree, when a link still points at the old Settings tab, or when the Library
-// drifts from the design page.
+// (the size of Me's bell and gear); directly under it the two tabs Bible and Books, then the banner of the tab. On Bible three choices
+// float above the tab bar (Old Testament, Deuterocanon, New Testament). The diary is not in the Library: it is the first sub-tab of Me
+// (Notes, Journey, Plan, Health), and the one gold pen of Me follows the sub-tab. These checks fail when someone brings a tab back
+// without its icon (the tab bar would crash on it), when a route file and the tab list disagree, when a link still points at the old
+// Settings tab, or when the Library or Me drift from the design page.
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { BOOK_CATALOG } from '../../features/library/books/catalog';
 import { LIBRARY_TABS, PREVIEW_NOTICE, SAMPLE_TABS, SEARCH_NOTICE } from '../../features/library/sample';
+import { ME_FAB, ME_TABS } from '../../features/me/tabs';
 
 let n = 0;
 const check = (name: string, fn: () => void) => { fn(); n += 1; console.log(`ok   ${name}`); };
@@ -149,11 +150,20 @@ check('after a light/dark switch the app returns to Settings with Me underneath,
   assert.match(layout, /consumeReturnToSettings\(\)\) return;\n\s+setTimeout\(\(\) => \{ try \{ router\.replace\('\/me'\); router\.push\('\/settings'\); \} catch/);
 });
 
-check('one Fab for every floating gold button: Me writes a post, the Notes tab of Library writes a note, both sit just above the tab bar', () => {
+check('one Fab for every floating gold button, and Me draws exactly one at a time: a note on Notes, a journey post on Journey, none on Plan and Health; the Library has none; both sit just above the tab bar', () => {
   const fab = read(join('src', 'components', 'Fab.tsx'));
   const bar = read(join('src', 'components', 'TabBar.tsx'));
-  assert.match(read(join('app', '(tabs)', 'me.tsx')), /<Fab label="Write a journey post" onPress=\{\(\) => router\.push\('\/write'\)\} \/>/);
-  assert.match(read(join('app', '(tabs)', 'library.tsx')), /<Fab label="Write a note" icon="compose" onPress=\{\(\) => router\.push\('\/diary\/new'\)\} \/>/);
+  const me = read(join('app', '(tabs)', 'me.tsx'));
+  assert.equal((me.match(/<Fab\b/g) ?? []).length, 1, 'one Fab element in the whole of Me: never two at once');
+  assert.match(me, /const fab = ME_FAB\[tab\];/);
+  assert.match(me, /\{fab && <Fab label=\{fab\.label\} icon=\{fab\.icon\} onPress=\{\(\) => router\.push\(fab\.href\)\} \/>\}/, 'the label, the icon and the route come from the table of the sub-tabs');
+  assert.deepEqual(ME_FAB.Notes, { label: 'Write a note', icon: 'compose', href: '/diary/new' });
+  assert.deepEqual(ME_FAB.Journey, { label: 'Write a journey post', icon: 'pen', href: '/write' });
+  assert.equal(ME_FAB.Plan, null);
+  assert.equal(ME_FAB.Health, null);
+  assert.deepEqual(Object.keys(ME_FAB), [...ME_TABS], 'every sub-tab has an entry, so none is forgotten');
+  assert.equal(Object.values(ME_FAB).filter(Boolean).length, 2, 'two sub-tabs have a button and each has one');
+  assert.doesNotMatch(read(join('app', '(tabs)', 'library.tsx')), /<Fab\b|\bFab\b/, 'the Library has no gold pen: writing is on Me');
   // the FAB's offset is the tab bar's own numbers: bottom Math.max(inset - 14, 10), height 88, and 8 above it
   assert.match(bar, /Math\.max\(insets\.bottom - 14, 10\)/);
   assert.match(bar, /height: 88/);
@@ -169,7 +179,7 @@ check('Library has no title and no diary button: its first row is the search fie
   assert.doesNotMatch(screen, /DiaryCard/, 'the diary card is back');
   assert.ok(!exists(join('src', 'features', 'diary', 'DiaryCard.tsx')), 'the DiaryCard component is meant to be gone');
   assert.deepEqual(files.filter((f) => /DiaryCard/.test(read(f))), [], 'something still refers to the DiaryCard');
-  assert.doesNotMatch(screen, /onDiary|router\.push\('\/diary'\)/, 'the diary button is gone from the top right: the diary is the Notes tab, directly under the search row');
+  assert.doesNotMatch(screen, /onDiary|router\.push\('\/diary'\)/, 'the diary button is gone from the top right: the diary is the Notes sub-tab of Me');
   // a screen reader still gets the heading of the screen: hidden (1 x 1, clipped, see-through letters: not opacity 0 or hidden, which a
   // screen reader leaves out) and first in the screen
   assert.match(screen, /const VISUALLY_HIDDEN = \{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', color: 'transparent' \} as const;/);
@@ -192,29 +202,36 @@ check('Library has no title and no diary button: its first row is the search fie
   assert.match(me.slice(me.indexOf('<IconButton name="bell"')), /size=\{52\}/, 'Me\'s buttons are 52 too');
   assert.match(read(join('src', 'components', 'ui.tsx')), /accessibilityHint=\{hint\}/);
   // the glyphs stay: the diary's spiral notebook is its own drawing, not the Bible's closed book with a cross, not the open book of the tab,
-  // and not the bookmark next to it (the Notes tab, or anything else, may use it)
+  // and not the bookmark next to it (the Notes feed of Me, or anything else, may use it)
   assert.ok(iconPaths('diary').length >= 2);
   assert.notDeepEqual(iconPaths('diary'), iconPaths('book'));
   assert.notDeepEqual(iconPaths('diary'), iconPaths('library'));
   assert.notDeepEqual(iconPaths('bookmark'), iconPaths('diary'));
 });
 
-check('Library: directly under the search row the tabs Bible, Books, Notes, and only then the banner of the tab; Notes has no banner; a search takes the place of all of it, and says its results are examples', () => {
-  assert.deepEqual([...LIBRARY_TABS], ['Bible', 'Books', 'Notes']);
+check('Library: directly under the search row the two tabs Bible and Books, and only then the banner of the tab; a search takes the place of all of it, and says its results are examples; there is no Notes tab, no Notes host and no second scroll view', () => {
+  assert.deepEqual([...LIBRARY_TABS], ['Bible', 'Books']);
   assert.deepEqual([...SAMPLE_TABS], ['Bible', 'Books']);
-  assert.deepEqual(Object.keys(PREVIEW_NOTICE), ['Bible', 'Books'], 'the tabs that hold example rows have a notice; Notes is real and has none');
+  assert.deepEqual(Object.keys(PREVIEW_NOTICE), ['Bible', 'Books'], 'the tabs that hold example rows have a notice, and those are all the tabs');
   for (const t of SAMPLE_TABS) assert.ok(PREVIEW_NOTICE[t].length > 40, `${t} has no notice`);
   assert.equal(SEARCH_NOTICE, 'These results are examples. The Bible text and books are not in the app yet.');
   const screen = read(join('app', '(tabs)', 'library.tsx'));
   assert.match(screen, /<Screen keyboard scrollRef=\{scroller\}/, 'a button can be tapped while the keyboard is up');
   assert.doesNotMatch(screen, /PromoBanner/, 'the carousel with dots is gone from Library: one banner for each of two tabs');
   assert.doesNotMatch(screen, /MusicTab|'Music'/);
-  // the top of the screen is one piece, `top`, drawn by both hosts: the heading, the search row, the message, and then the tab strip (not while searching)
+  // the Notes tab is gone from the screen for good: no tab, no feed, no host, no pen, no keyboard special case
+  assert.doesNotMatch(screen.split('\n').filter((l) => !/^\s*\/\//.test(l)).join('\n'), /Notes|NotesTab|<Fab\b/, 'nothing of the Notes tab is left in the Library screen');
+  assert.doesNotMatch(screen, /if \(tab === '/, 'one return: no tab has a host of its own');
+  assert.equal((screen.match(/\breturn \(/g) ?? []).length, 1, 'the screen has one layout, for every tab and for the results');
+  assert.doesNotMatch(screen, /<ScrollView\b/, 'the screen\'s own scroll (Screen) is the only one');
+  assert.match(screen, /import \{ LIBRARY_TABS, asLibraryTab \} from '@\/features\/library\/sample';/);
+  assert.match(screen, /const \[picked, setTab\] = useState<string>\(LIBRARY_TABS\[0\]\);\s*const tab = asLibraryTab\(picked\);/, 'a stale tab name is the first tab');
+  // the top of the screen is one piece, `top`: the heading, the search row, the message, and then the tab strip (not while searching)
   const at = (needle: string, from = 0) => { const i = screen.indexOf(needle, from); assert.ok(i > 0, `library.tsx has no ${needle}`); return i; };
   const top = at('const top = ('), header = at('<LibraryHeader ', top), strip = at('<SubTabs tabs={LIBRARY_TABS}', top);
   assert.ok(header < strip, 'the search row comes first, the tab strip directly after it');
   assert.match(screen, /\{!searching && <SubTabs tabs=\{LIBRARY_TABS\} value=\{tab\} onChange=\{setTab\} \/>\}/, 'the tab strip is drawn unless something is typed, and it is drawn before any banner or content');
-  assert.equal((screen.match(/\{top\}/g) ?? []).length, 2, 'both hosts draw the same top');
+  assert.equal((screen.match(/\{top\}/g) ?? []).length, 1, 'the top is drawn once, in the screen\'s own scroll');
   // Bible and Books and the results: rows in the screen's own scroll, after the top
   const screenAt = at('<Screen keyboard');
   const daily = at('<DailyBanner', screenAt), bible = at('<BibleTab', screenAt), books = at('<BooksBanner />', screenAt), booksTab = at('<BooksTab', screenAt);
@@ -224,15 +241,7 @@ check('Library: directly under the search row the tabs Bible, Books, Notes, and 
   // each banner is shown under its own tab only
   assert.match(screen, /\{tab === 'Bible' && <DailyBanner onOpen=\{\(\) => router\.push\('\/library\/daily'\)\} \/>\}/);
   assert.match(screen, /\{tab === 'Books' && <BooksBanner \/>\}/);
-  assert.equal((screen.match(/<DailyBanner/g) ?? []).length + (screen.match(/<BooksBanner/g) ?? []).length, 2, 'two banners, one for each tab that has one');
-  // Notes, the third tab: no banner, no Screen (the feed owns its scroll), the top pinned above it, NotesTab filling the box under it
-  const notesHost = screen.slice(at("if (tab === 'Notes') {"), screenAt);
-  assert.match(notesHost, /paddingTop: insets\.top \+ layout\.screenTop, paddingHorizontal: layout\.screenMargin, paddingBottom: 16, gap: 16 \}\}>\{top\}<\/View>/, 'the same top, in the same place and the same size as in the other host');
-  assert.match(notesHost, /<View style=\{\{ flex: 1 \}\}><NotesTab \/><\/View>/, 'NotesTab fills the box under the tabs: a height of its own, as wide as the screen');
-  assert.doesNotMatch(notesHost, /<Screen\b|Banner|SubTabs/, 'no banner, not in the scroll of the screen, and the strip comes from `top`');
-  assert.doesNotMatch(notesHost.slice(notesHost.indexOf(') : (')), /ScrollView/, 'no scroll view around the feed: it scrolls by itself');
-  assert.match(notesHost, /\{searching \? \(\s*<ScrollView\b[^>]*keyboardShouldPersistTaps="handled"[^>]*>\s*<SearchResults\b[\s\S]*?\/>\s*<\/ScrollView>\s*\) : \(/, 'a search on Notes keeps this host: the top, and the search field in it, is not made again when the first letter is typed (a field that is made again loses the keyboard); the results take the place of the feed');
-  assert.ok(notesHost.indexOf('{top}') < notesHost.indexOf('<NotesTab'), 'the notes start right under the tabs');
+  assert.equal((screen.match(/<DailyBanner/g) ?? []).length + (screen.match(/<BooksBanner/g) ?? []).length, 2, 'two banners, one for each tab');
   // each tab with example rows starts with its notice
   const tabsSrc = read(join('src', 'features', 'library', 'LibraryTabs.tsx'));
   for (const t of SAMPLE_TABS) assert.match(tabsSrc, new RegExp(`<Notice tab="${t}" />`), `the ${t} tab does not start with its notice`);
@@ -240,17 +249,14 @@ check('Library: directly under the search row the tabs Bible, Books, Notes, and 
   const results = read(join('src', 'features', 'library', 'SearchResults.tsx'));
   assert.match(results, /<SampleNotice title="Preview">\{SEARCH_NOTICE\}<\/SampleNotice>/, 'the search keeps the Preview notice, also when nothing is found');
   assert.match(results, /Clear search/);
+  assert.doesNotMatch(results, /Notes|diary/i, 'the search shows no notes: it never did');
   assert.match(read(join('src', 'components', 'Screen.tsx')), /keyboardShouldPersistTaps=\{keyboard \? 'handled' : 'never'\}/);
 });
 
-check('what floats at the bottom: the three choices of the Bible only on Bible, the gold pen only on Notes, nothing on Books, and neither while search results show; room is kept for the choices', () => {
+check('what floats at the bottom of the Library: the three choices of the Bible only on Bible, nothing on Books, no gold pen anywhere, and nothing while search results show; room is kept for the choices', () => {
   const screen = read(join('app', '(tabs)', 'library.tsx'));
   assert.equal((screen.match(/<TestamentBar\b/g) ?? []).length, 1);
-  assert.equal((screen.match(/<Fab\b/g) ?? []).length, 1);
-  // the gold pen is in the Notes host, and it is not drawn over the search results that take the place of the feed there
-  const notesHost = screen.slice(screen.indexOf("if (tab === 'Notes') {"), screen.indexOf('<Screen keyboard'));
-  assert.match(notesHost, /\{!searching && <Fab label="Write a note" icon="compose" onPress=\{\(\) => router\.push\('\/diary\/new'\)\} \/>\}/);
-  assert.ok(notesHost.includes('<Fab') && !screen.slice(screen.indexOf('<Screen keyboard')).includes('<Fab'), 'the pen is not in the other host');
+  assert.equal((screen.match(/<Fab\b/g) ?? []).length, 0, 'the gold pen moved to Me: one pen there, following the sub-tab');
   // the bar is drawn outside the scroll view, after it (so it floats over the list), only on Bible and not while searching, and the list ends with its room
   assert.match(screen, /<\/Screen>\s*\{!searching && tab === 'Bible' && <TestamentBar value=\{testament\} onChange=\{choose\} \/>\}/);
   assert.match(screen, /\{tab === 'Bible' && <View style=\{\{ height: BAR_ROOM \}\} \/>\}/, 'room under the last book for the bar');
@@ -259,7 +265,7 @@ check('what floats at the bottom: the three choices of the Bible only on Bible, 
   // choosing another part from deep in the list brings the list back to its first books, and from the top of the screen nothing moves
   assert.match(screen, /if \(offset\.current > listTop\.current\) scroller\.current\?\.scrollTo\(\{ y: Math\.max\(listTop\.current - 8, 0\), animated: false \}\);/);
   assert.match(screen, /onScroll=\{\(e\) => \{ offset\.current = e\.nativeEvent\.contentOffset\.y; \}\}/);
-  assert.match(screen, /useEffect\(\(\) => \{ offset\.current = 0; \}, \[searching, tab\]\);/, 'a scroll view that was left starts again from the top, and so does what is remembered of it');
+  assert.doesNotMatch(screen, /useEffect/, 'there is one scroll view for every tab and for the results (the second one was the Notes feed\'s), so what is remembered of its offset is never about another scroll view');
   assert.match(screen, /onListLayout=\{\(e\) => \{ listTop\.current = e\.nativeEvent\.layout\.y; \}\}/);
   assert.match(read(join('src', 'components', 'Screen.tsx')), /scrollRef\?: Ref<ComponentRef<typeof ScrollView>>/);
   assert.match(read(join('src', 'components', 'Screen.tsx')), /<ScrollView ref=\{scrollRef\} onScroll=\{onScroll\} scrollEventThrottle=\{onScroll \? 16 : undefined\}/);
@@ -294,7 +300,7 @@ check('the search field: placeholder and label, the "search" key, no autocorrect
   for (const b of BOOK_CATALOG) assert.ok(contrast(tokens.color.blue, tokens.color[b.cover]) >= 4.5, `the navy on the ${b.cover} cover (covers do not change with dark)`);
 });
 
-check('the design page shows the same Library: a search pill and one Bookmarks button, the tabs Bible, Books, Notes right under them and before the banner, the three choices at the bottom of Bible only, no gold pen outside Notes, no Music, no diary button', () => {
+check('the design page shows the same Library: a search pill and one Bookmarks button, the two tabs Bible and Books right under them and before the banner, the three choices at the bottom of Bible only, no gold pen, no Music, no diary button', () => {
   const design = readFileSync(join(root, '..', 'design', 'index.html'), 'utf8');
   /** The phone with this label, as the text between its label and the label of the next phone. */
   const phoneOf = (label: string): string => {
@@ -327,12 +333,12 @@ check('the design page shows the same Library: a search pill and one Bookmarks b
   // Bible: the tab strip comes directly after the row and before the banner; the banner is one card with no dots and one button; then the notice, the heading, the rows
   const order = ['class="lib-head"', 'class="cp-subtabs"', 'class="cp-banner lib"', 'class="lib-notice"', 'class="lib-hrow"', 'class="lib-row"', 'class="lib-bar"', 'class="tabdock"'].map((needle) => bible.indexOf(needle));
   assert.ok(order.every((i) => i > 0) && order.every((i, k) => k === 0 || i > order[k - 1]), `Bible: head, tabs, banner, notice, heading, rows, the three choices, the tab bar (${order})`);
-  assert.match(bible, /<div class="cp-subtabs"[^>]*><span class="on">Bible<\/span><span>Books<\/span><span>Notes<\/span><\/div>/);
+  assert.match(bible, /<div class="cp-subtabs"[^>]*><span class="on">Bible<\/span><span>Books<\/span><\/div>/, 'two tabs: there is no Notes tab in the Library');
   assert.match(bible, /<div class="ey">Today · Daily reading<\/div>\s*<h4>Today's reading and a short reflection<\/h4>\s*<p class="line">Sunday 8 November<\/p>\s*<span class="cp-btn sm">Read today<\/span>/);
   assert.doesNotMatch(bible, /cp-dots/, 'the banner is one card: no dots');
   assert.match(bible, /<h4 class="lib-h">Books of the Bible<\/h4><span class="cnt" aria-label="Old Testament, 39 books">39 books<\/span>/);
   assert.match(bible, /<div class="p">The Bible text is not in the app yet\. We are choosing a translation we are allowed to include\.<\/div>/);
-  assert.doesNotMatch(bible, /fab-slot|cp-fab-write|Write a note|Write in your diary/, 'the gold pen is on Notes only');
+  assert.doesNotMatch(bible, /fab-slot|cp-fab-write|Write a note|Write in your diary/, 'the gold pen is not on the Library: writing is on Me');
   // the three choices: a radio group, in the order of the parts, the Old Testament on
   const radios = (phone: string) => [...phone.matchAll(/<button role="radio" aria-checked="(true|false)" aria-label="([^"]+)"/g)].map((m) => `${m[2]}:${m[1]}`);
   assert.match(bible, /<div class="lib-bar" role="radiogroup" aria-label="Part of the Bible">/);
@@ -349,7 +355,7 @@ check('the design page shows the same Library: a search pill and one Bookmarks b
   assert.match(deutero, /Orthodox Bibles include a few more books\./);
 
   // Books: Books on, a banner with no button, the notice, rows with a cover, title, author and era, the blurb, and the chips Free and Soon; no choices at the bottom, no gold pen
-  assert.match(books, /<div class="cp-subtabs"[^>]*><span>Bible<\/span><span class="on">Books<\/span><span>Notes<\/span><\/div>/);
+  assert.match(books, /<div class="cp-subtabs"[^>]*><span>Bible<\/span><span class="on">Books<\/span><\/div>/);
   const banner = books.slice(books.indexOf('class="cp-banner lib"'), books.indexOf('class="lib-notice"'));
   assert.match(banner, /<div class="ey">Preview · Books<\/div>\s*<h4>Twelve free companions for the road<\/h4>\s*<p class="line">Classics to read on the way\. Free to read\.<\/p>/);
   assert.doesNotMatch(banner, /cp-btn|<button|role="button"/, 'the Books banner has no button');
@@ -375,8 +381,9 @@ check('the design page shows the same Library: a search pill and one Bookmarks b
   assert.ok(all.length > 20000);
   assert.doesNotMatch(all, /music|playlist/i, 'Music is gone from the Library phones');
   assert.doesNotMatch(all, /aria-label="My diary"|>My diary</);
-  // the gold pen of Library is on Notes (its phone is the Notes section's, not checked here); the Fab note on the design page says where it is
-  assert.match(design, /Library: on the Notes tab the note icon writes a note\./);
+  // the gold pen is on Me (the Me · Notes phones are checked below); the Fab note on the design page says where it is
+  assert.match(design, /Me: one pen at a time, and it follows the sub-tab: on Notes the note icon writes a note, on Journey the pen writes a journey post, on Plan and Health there is none\./);
+  assert.doesNotMatch(design, /Library: on the Notes tab/, 'the design page no longer sends the pen to the Library');
   const sprite = /<symbol id="i-diary"[^>]*>(.*?)<\/symbol>/.exec(design);
   assert.ok(sprite, 'the sprite of the design page has no i-diary');
   assert.deepEqual([...sprite![1].matchAll(/ d="([^"]+)"/g)].map((m) => m[1]), iconPaths('diary'), 'the diary glyph of the design page and of the app are the same drawing');
@@ -394,21 +401,28 @@ check('the sample content never claims to be real: no price, no rating, no "avai
   assert.match(read(join('src', 'features', 'library', 'LibraryBanner.tsx')), /export const DAILY_CTA = 'Read today';/);
 });
 
-check('the diary is reachable: its routes exist and are registered, and the gold pen on the Notes tab opens a blank page', () => {
+check('the diary is reachable: its routes exist and are registered, the Notes sub-tab of Me is where it is, and the one pen of Me on that sub-tab opens a blank page', () => {
   assert.ok(exists(join('app', 'diary', 'index.tsx')));
   assert.ok(exists(join('app', 'diary', '[id].tsx')));
   const layout = read(join('app', '_layout.tsx'));
   assert.match(layout, /<Stack\.Screen name="diary\/index" \/>/);
   assert.match(layout, /<Stack\.Screen name="diary\/\[id\]" \/>/);
+  const me = read(join('app', '(tabs)', 'me.tsx'));
+  assert.equal(ME_FAB.Notes?.href, '/diary/new', 'the pen of the Notes sub-tab opens a blank page');
+  assert.match(me, /import \{ NotesTab \} from '@\/features\/notes\/NotesTab';/, 'the diary\'s feed is the Notes sub-tab of Me');
+  assert.match(me, /\{onNotes \? \(/);
+  assert.doesNotMatch(me, /router\.push\('\/diary'\)/, 'no button of Me opens the list of pages: that list is the Notes sub-tab');
   const screen = read(join('app', '(tabs)', 'library.tsx'));
-  assert.match(screen, /<Fab label="Write a note" icon="compose" onPress=\{\(\) => router\.push\('\/diary\/new'\)\} \/>/, 'the pen opens a blank page');
-  assert.doesNotMatch(screen, /\/diary'/, 'no button of Library opens the list of pages any more: that list is the Notes tab');
+  assert.doesNotMatch(screen, /\/diary/, 'nothing of the Library opens the diary');
 });
 
-check('the words that point at the diary say it is in the Notes tab: Help does not send anyone to a button that is gone', () => {
+check('the words that point at the diary say it is in the Notes tab of Me: Help sends no one to the Library, or to a button that is gone', () => {
   const help = read(join('app', 'help.tsx'));
-  assert.match(help, /Open Library and tap the Notes tab: your diary lives there\./);
+  assert.match(help, /Open Me and tap the Notes tab: your diary lives there\./);
+  assert.doesNotMatch(help, /Library and tap the Notes tab|Library > Notes|Library, Notes/);
   assert.doesNotMatch(help, /diary button/i);
+  const pointing = files.filter((f) => /(?:Library|library)\s*(?:>|→|›|,)\s*Notes|Notes tab of (?:the )?Library|Library's Notes|Library > My diary|three tabs/.test(read(f).split('\n').filter((l) => !/^\s*(\/\/|\/?\*)/.test(l)).join('\n')));
+  assert.deepEqual(pointing, [], 'a screen or a help text that still sends someone to Notes in the Library');
   const stale = files.filter((f) => /diary button|diary card|My diary button/i.test(read(f).split('\n').filter((l) => !/^\s*(\/\/|\/?\*)/.test(l)).join('\n')));
   assert.deepEqual(stale, [], 'text that still says "the diary button" or "diary card"');
   assert.doesNotMatch(read(join('src', 'features', 'diary', 'present.ts')), /diary card/i);

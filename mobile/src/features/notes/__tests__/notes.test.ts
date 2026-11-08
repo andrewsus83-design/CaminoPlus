@@ -1,8 +1,8 @@
-// Plain-node checks of the Notes tab of the Library: the diary's pages as a feed. The logic is in notes/timeline.ts (pure: which notes a
+// Plain-node checks of the Notes feed of Me: the diary's pages as a feed. The logic is in features/notes/timeline.ts (pure: which notes a
 // filter shows, the time on a row, the grid of photos and videos, the text the share sheet gets, what a screen reader reads, the
 // words); thousands of random notes go through it with a seed, so a failure can be repeated. Below it, source-level checks of how
 // the screens are wired, in the style of the diary's wiring test: they read the files, nothing is run. No React, no React Native, no
-// network. Run: npm run test:library (it is run from wiring.test.ts, so it cannot be left out).
+// network. Run: npm run test:me (it is run from highlights.test.ts, so it cannot be left out).
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
@@ -13,7 +13,7 @@ import {
   BLANK_NOTE, BODY_CLAMP_PX, BODY_LINES, BODY_LINE_PX, COMPOSER_PLACEHOLDER, DELETE_FAILED, EMPTY_BUTTON, FALLBACK_NAME, FEED_CHARS, FILTER_EMPTY, FILTER_LABEL, MAPS_FAILED, MEDIA_GAP, MEDIA_RATIO,
   MEDIA_SHOWN_MAX, NOTES_PRIVACY, NOTE_FILTERS, SHARE_FAILED, TOUCH_MIN, feedBody, feedState, filterLabel, filterNotes, hasMedia, hasPlace, identity, matchesFilter, mediaPlan,
   needsMore, noteCounts, noteRow, noteTime, rowLabel, shareText, tileLabel, toggled, type NoteFilter, type NoteLike,
-} from '../notes/timeline';
+} from '../timeline';
 
 let n = 0;
 const check = (name: string, fn: () => void) => { fn(); n += 1; console.log(`ok   ${name}`); };
@@ -495,7 +495,7 @@ check('every filter is one the tab knows', () => {
 
 /* ================================================================ the screens, read as source */
 
-const DIR = 'src/features/library/notes';
+const DIR = 'src/features/notes';
 const files = readdirSync(join(root, DIR)).filter((f) => /\.tsx?$/.test(f)).sort();
 const code = (f: string) => read(`${DIR}/${f}`).split('\n').map((line) => line.replace(/(^|\s)\/\/.*$/, '')).filter((l) => !/^\s*(\*|\/\*)/.test(l)).join('\n');
 const tsx = files.filter((f) => f.endsWith('.tsx'));
@@ -504,11 +504,12 @@ check('the Notes tab is the files this test expects, so a new one is looked at (
   assert.deepEqual(files, ['NoteMedia.tsx', 'NoteMenu.tsx', 'NoteRow.tsx', 'NotesHeader.tsx', 'NotesTab.tsx', 'timeline.ts']);
 });
 
-check('the shell gets what was agreed: a named export NotesTab, with no props, and no gold pen of its own (the shell draws it)', () => {
+check('Me gets what was agreed: a named export NotesTab with one optional prop, `top` (what is above the notes), and no gold pen of its own (Me draws it)', () => {
   const src = code('NotesTab.tsx');
-  assert.match(src, /export function NotesTab\(\) \{/);
-  for (const f of files) assert.doesNotMatch(code(f), /\bFab\b/, `${f}: the gold pen belongs to the shell`);
-  assert.doesNotMatch(src, /\bScreen\b/, 'the tab does not bring a screen of its own: it fills what the shell gives it');
+  assert.match(src, /export function NotesTab\(\{ top \}: \{ top\?: ReactNode \}\) \{/);
+  for (const f of files) assert.doesNotMatch(code(f), /\bFab\b/, `${f}: the gold pen belongs to Me, which draws one at a time (features/me/tabs.ts)`);
+  assert.doesNotMatch(src, /\bScreen\b/, 'the tab does not bring a screen of its own: it fills what Me gives it');
+  assert.match(src, /\{top\}\s*<NotesHeader\b/, '`top` is the first thing in the list: it scrolls away with the notes');
 });
 
 check('the tab owns its scroll, and it is a virtualised list: a FlatList of every note, only the rows on screen drawn, never the notes mapped into a view', () => {
@@ -519,8 +520,7 @@ check('the tab owns its scroll, and it is a virtualised list: a FlatList of ever
   assert.match(src, /initialNumToRender=\{6\}/);
   assert.match(src, /windowSize=\{7\}/);
   assert.doesNotMatch(src, /entries\.map\(|data\.map\(|shown\.map\(|\.slice\(/, 'no row is drawn by mapping over the notes');
-  assert.match(src, /keyboardShouldPersistTaps="handled"/, 'a tap on a note works while the keyboard of the search field is up');
-  assert.match(src, /keyboardDismissMode=\{Platform\.OS === 'web' \? 'none' : 'on-drag'\}/, 'a drag puts the keyboard away on a phone; on the web a scroll nobody made must not take the focus from the search field');
+  assert.doesNotMatch(src, /keyboardShouldPersistTaps|keyboardDismissMode/, 'there is no text field above the notes on Me any more (the Library\'s search field was it): nothing to put the keyboard away from');
   assert.match(src, /<RefreshControl\b[^>]*refreshing=\{refreshing\}[^>]*onRefresh=\{refresh\}/, 'pull to refresh');
   assert.doesNotMatch(src, /ownScroll/, 'the tab has one way of being hosted: it is the scroller');
 });
@@ -637,7 +637,7 @@ check('it needs nothing that is not in the app already: React, React Native, exp
   }
   assert.deepEqual(offenders, []);
   for (const l of read(`${DIR}/timeline.ts`).split('\n').filter((line) => /^import /.test(line))) assert.doesNotMatch(l, /from '(react|react-native|expo|@\/)/, `timeline.ts is pure: ${l}`);
-  assert.match(read('tsconfig.librarytest.json'), /notes\.test\.ts/, 'the tests are compiled');
+  assert.match(read('tsconfig.metest.json'), /notes\.test\.ts/, 'the tests are compiled');
 });
 
 check('colours come from the theme: none written out, no stylesheet, and no colour read once when a file loads', () => {
@@ -780,10 +780,12 @@ check('it shows the person who wrote the notes the way a post does (name, handle
   for (const f of files) assert.doesNotMatch(code(f), /SAMPLE_|sample\.ts|from '\.\.\/sample'/, `${f}: no invented notes: the feed only ever shows the pages that are in the diary`);
 });
 
-check('this test runs: wiring.test.ts runs it, and the test config compiles it', () => {
-  const wiring = read('src/features/library/__tests__/wiring.test.ts');
-  assert.match(wiring, /^import '\.\/notes\.test';/m, 'a line that is code, not a comment');
-  assert.match(read('tsconfig.librarytest.json'), /"src\/features\/library\/__tests__\/notes\.test\.ts"/);
+check('this test runs: highlights.test.ts runs it (npm run test:me names that one), and the test config of Me compiles it', () => {
+  const runner = read('src/features/me/__tests__/highlights.test.ts');
+  assert.match(runner, /^import '\.\.\/\.\.\/notes\/__tests__\/notes\.test';/m, 'a line that is code, not a comment');
+  assert.match(read('tsconfig.metest.json'), /"src\/features\/notes\/__tests__\/notes\.test\.ts"/);
+  assert.doesNotMatch(read('tsconfig.librarytest.json'), /notes\.test/, 'the Library no longer has Notes, so its test config does not compile the Notes test');
+  assert.doesNotMatch(read('src/features/library/__tests__/wiring.test.ts').split('\n').filter((l) => !/^\s*\/\//.test(l)).join('\n'), /notes\.test/, 'and the Library\'s wiring test does not run it');
 });
 
 console.log(`${n} of ${n} passed (Notes)`);
