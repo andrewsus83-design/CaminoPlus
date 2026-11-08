@@ -191,7 +191,7 @@ export const ME_SCENARIOS = [
       near(second.width, c.width, 1, 'as wide as the card');
       const size = await card.evaluate((el) => Math.min(...[...el.querySelectorAll('*')].filter((n) => n.childElementCount === 0 && n.textContent.trim()).map((n) => parseFloat(getComputedStyle(n).fontSize))));
       assert(size >= 16, `the words of the card are at least 16 px (they are ${size})`);
-      assert.equal((await card.innerText()).replace(/\s+/g, ' ').trim(), 'Write a journey post', 'the card says what it does, and nothing else');
+      assert.equal((await card.innerText()).replace(/\s+/g, ' ').trim(), 'What did you see today? Write a journey post', 'the card says what it does, and nothing else: its question and the action, no count and no place');
       step('the posts keep their own indexes: the second post opens the viewer at the second post, the first at the first (the page that is on the screen, not one above or below it)');
       // the viewer is a column of pages as high as the screen; the page of the post that was opened is the one whose words are on the screen
       const onScreen = async (words) => {

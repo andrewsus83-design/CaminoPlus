@@ -540,7 +540,8 @@ check('the design page shows Me with the strip Notes, Journey, Plan, Health (Not
   // Journey: the card is the first tile of the grid, the chat button floats with its badge, the header is the gear alone
   for (const [label, phone] of [['Me · Journey', journey], ['Me · Journey, grid', grid]] as const) {
     assert.equal((phone.match(/<div class="jg">/g) ?? []).length, 1, `${label}: one grid`);
-    assert.match(phone, /<div class="jg">\s*<button class="jt write" aria-label="Write a journey post"><span class="ico"><svg class="cp-icon"><use href="#i-pen"\/><\/svg><\/span>Write a journey post<\/button>\s*<div class="jt">/, `${label}: the card that writes a post is the first tile of the grid, and the posts follow`);
+    // updated on purpose with the warmer card (2026-11-08): the shell art (the app's shell, aria-hidden), the pen, the invitation, the gold rule, the action
+    assert.match(phone, /<div class="jg">\s*<button class="jt write" aria-label="Write a journey post"><span class="art" aria-hidden="true"><svg viewBox="0 0 24 24">(<path d="[^"]+"\/>){2}<\/svg><\/span><span class="ico"><svg class="cp-icon"><use href="#i-pen"\/><\/svg><\/span><span class="q">What did you see today\?<\/span><span class="rule"><\/span>Write a journey post<\/button>\s*<div class="jt">/, `${label}: the card that writes a post is the first tile of the grid, and the posts follow`);
     assert.equal((phone.match(/aria-label="Write a journey post"/g) ?? []).length, 1, `${label}: one card, and no second way to write on the screen`);
     assert.equal((phone.match(/cp-fab-write/g) ?? []).length, 1, `${label}: one gold button`);
     assert.ok(phone.includes(CHAT('Inbox, 3 unread', '3')), `${label}: the chat button floats with its badge`);
