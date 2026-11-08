@@ -47,7 +47,7 @@ check('the feature is the files this test expects, so a new one is looked at (an
     `${DIR}/bible/searchCore.ts`, `${DIR}/bible/searchText.ts`,
     `${DIR}/bible/text.ts`, `${DIR}/bible/textCore.ts`, `${DIR}/bible/textTypes.ts`, `${DIR}/bible/webc.generated.ts`,
     `${DIR}/books/BookCover.tsx`, `${DIR}/books/BookPage.tsx`, `${DIR}/books/BookRows.tsx`, `${DIR}/books/BookUi.tsx`, `${DIR}/books/BooksBanner.tsx`, `${DIR}/books/BooksGrid.tsx`,
-    `${DIR}/books/ChapterFooter.tsx`, `${DIR}/books/Reader.tsx`, `${DIR}/books/ReaderBlocks.tsx`, `${DIR}/books/ReaderHeader.tsx`,
+    `${DIR}/books/ChapterFooter.tsx`, `${DIR}/books/Reader.tsx`, `${DIR}/books/ReaderBar.tsx`, `${DIR}/books/ReaderBlocks.tsx`, `${DIR}/books/ReaderHeader.tsx`,
     `${DIR}/books/catalog.ts`, `${DIR}/books/copy.ts`, `${DIR}/books/cover.ts`, `${DIR}/books/index.ts`, `${DIR}/books/notices.ts`, `${DIR}/books/readerType.ts`, `${DIR}/books/reading.ts`,
     `${DIR}/books/readingStore.ts`, `${DIR}/books/safeText.ts`, `${DIR}/books/sources.ts`, `${DIR}/books/typeMetrics.ts`,
     `${DIR}/books/useBooksReading.ts`, `${DIR}/books/useReaderSize.ts`, `${DIR}/books/useReadingWriter.ts`,

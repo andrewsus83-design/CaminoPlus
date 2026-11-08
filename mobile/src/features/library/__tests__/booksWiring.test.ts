@@ -23,7 +23,7 @@ const B = (f: string) => `${DIR}/${f}`;
 const count = (src: string, re: RegExp) => (src.match(re) ?? []).length;
 
 /** The files of this feature that are mine: the screens and what they use. (catalog.ts reads the bundle that tools/build_books.py makes, and index.ts, sources.ts and notices.ts are plain data.) */
-const SCREENS = ['BookCover.tsx', 'BookPage.tsx', 'BookRows.tsx', 'BookUi.tsx', 'BooksBanner.tsx', 'BooksGrid.tsx', 'ChapterFooter.tsx', 'Reader.tsx', 'ReaderBlocks.tsx', 'ReaderHeader.tsx'];
+const SCREENS = ['BookCover.tsx', 'BookPage.tsx', 'BookRows.tsx', 'BookUi.tsx', 'BooksBanner.tsx', 'BooksGrid.tsx', 'ChapterFooter.tsx', 'Reader.tsx', 'ReaderBar.tsx', 'ReaderBlocks.tsx', 'ReaderHeader.tsx'];
 const LOGIC = ['copy.ts', 'cover.ts', 'index.ts', 'notices.ts', 'readerType.ts', 'reading.ts', 'sources.ts', 'typeMetrics.ts'];
 const HOOKS = ['readingStore.ts', 'safeText.ts', 'useBooksReading.ts', 'useReaderSize.ts', 'useReadingWriter.ts'];
 const MINE = [...SCREENS, ...LOGIC, ...HOOKS];
@@ -77,7 +77,7 @@ check('no colour of its own: no hex, no rgb(a) of numbers, no named colour but "
   assert.match(cover, /const paper = fixed\[book\.cover\.colour\]/, 'the colour of a cover is the one the book names, one of the six');
   assert.doesNotMatch(cover, /\brole\.|\bc\.(?!\w*Bright)/, 'a cover does not change with light and dark: no role, no flipping palette colour');
   assert.match(cover, /fixed\.goldBright/, 'the ribbon of a bookmarked book is the bright gold');
-  for (const f of ['BookPage.tsx', 'BookRows.tsx', 'BookUi.tsx', 'ChapterFooter.tsx', 'ReaderBlocks.tsx', 'ReaderHeader.tsx', 'Reader.tsx']) {
+  for (const f of ['BookPage.tsx', 'BookRows.tsx', 'BookUi.tsx', 'ChapterFooter.tsx', 'ReaderBar.tsx', 'ReaderBlocks.tsx', 'ReaderHeader.tsx', 'Reader.tsx']) {
     assert.match(src[f], /\brole\./, `${f} draws with the roles of the theme`);
   }
 });
@@ -129,9 +129,9 @@ check('each text is in its role: titles and headings are the Fraunces variants (
   }
   assert.doesNotMatch(blocks, /variant="(?:mono|accent)"/, 'no mono and no handwriting in the words of a chapter');
   assert.match(blocks, /<AppText variant="h4" accessibilityRole="header"/, 'a heading inside a chapter is Fraunces and a heading for a screen reader');
-  const header = src['ReaderHeader.tsx'];
-  assert.match(header, /<AppText variant="mono" muted numberOfLines=\{1\}[^>]*>\{positionLine\(nav\)\}<\/AppText>/, '"Chapter 7 of 40" is mono');
-  assert.match(header, /<AppText variant="label" numberOfLines=\{1\}[^>]*>\{bookTitle\}<\/AppText>/, 'the title of the book in the header is Inter');
+  const bar = src['ReaderBar.tsx'];
+  assert.match(bar, /<AppText variant="mono" muted numberOfLines=\{1\}[^>]*>\{positionLine\(nav\)\}<\/AppText>/, '"Chapter 7 of 40" is mono');
+  assert.match(bar, /<AppText variant="label" numberOfLines=\{1\}[^>]*>\{bookTitle\}<\/AppText>/, 'the title of the book in the bar at the bottom is Inter');
   const footer = src['ChapterFooter.tsx'];
   assert.match(footer, /<AppText variant="mono"[^>]*textTransform: 'uppercase'/, 'NEXT and PREVIOUS are mono');
 });
@@ -146,7 +146,7 @@ check('the handwritten font, Caveat Bold, is one short note on a screen, max one
   // the book page and the reader: one each
   assert.equal(accent('BookPage.tsx'), 1);
   assert.equal(accent('ChapterFooter.tsx'), 1);
-  for (const f of ['Reader.tsx', 'ReaderBlocks.tsx', 'ReaderHeader.tsx']) assert.equal(accent(f), 0, `${f}: the reader's one note is at the end of the chapter`);
+  for (const f of ['Reader.tsx', 'ReaderBar.tsx', 'ReaderBlocks.tsx', 'ReaderHeader.tsx']) assert.equal(accent(f), 0, `${f}: the reader's one note is at the end of the chapter`);
   // and it is a few words, drawn alone, outside every button
   for (const f of ['BookPage.tsx', 'ChapterFooter.tsx']) {
     const at = src[f].indexOf('variant="accent"');
@@ -357,28 +357,55 @@ check('the reader keeps the place well: nothing is saved before the person was p
   assert.match(reader, /<ReaderBlocks items=\{items\} t=\{type\} \/>/);
   assert.match(reader, /<View accessible accessibilityRole="header" accessibilityLabel=\{chapter\.title\}/, 'one heading with the whole title, however it is split for the eye');
   assert.match(reader, /maxWidth: type\.measure/, 'a line is about 70 characters on a wide window');
-  assert.match(reader, /paddingBottom: insets\.bottom \+ 48/);
+  assert.match(reader, /paddingBottom: 48,/, 'the bar under the chapter has the home indicator\'s room, so the chapter needs none of its own');
+  assert.doesNotMatch(code(reader), /useSafeAreaInsets|insets\./, 'the reader leaves the insets to the header at the top and the bar at the bottom');
   const blocks = src['ReaderBlocks.tsx'];
   assert.ok(count(blocks, /= memo\(function /g) >= 7, 'every block, and the chapter, is memoised: a scroll draws only the thin line');
   assert.match(blocks, /export const ReaderBlocks = memo\(function ReaderBlocks/);
 });
 
-check('the header of the reader: Contents, Smaller and Larger text, Previous and Next named by where they go and dimmed and disabled at the ends, the title of the book with "Chapter 7 of 40", and a thin line that is only a picture', () => {
+check('the header of the reader has one row, as the top of a Kindle has: Contents, and Smaller and Larger text; the title of the book, Previous, Next and the line are not at the top', () => {
   const header = src['ReaderHeader.tsx'];
   assert.match(header, /accessibilityLabel="Contents"\s+accessibilityHint="Back to the table of contents of this book"/);
   assert.match(header, /minHeight: 44, flexDirection: 'row', alignItems: 'center'/);
   assert.match(header, /<SizeTap larger=\{false\} disabled=\{!canShrink\} onPress=\{onSmaller\} \/>/);
   assert.match(header, /<SizeTap larger disabled=\{!canGrow\} onPress=\{onLarger\} \/>/);
-  assert.match(header, /<IconTap icon="back" label=\{previousLabel\(nav\)\} disabled=\{!nav\.prev\} onPress=\{onPrevious\} \/>/);
-  assert.match(header, /<IconTap icon="chevron" label=\{nextLabel\(nav\)\} disabled=\{!nav\.next\} onPress=\{onNext\} \/>/);
   assert.match(header, /<AppText accessibilityLiveRegion="polite" style=\{VISUALLY_HIDDEN\}>\{sizeLine\(step\)\}<\/AppText>/, '"Text size 4 of 5" is said when the size changes');
-  assert.match(header, /<View aria-hidden accessibilityElementsHidden importantForAccessibility="no-hide-descendants" style=\{\{ height: 3, backgroundColor: role\.border \}\}>/, 'the line is a picture: the position is said in words');
-  assert.match(header, /width: `\$\{Math\.round\(fraction \* 100\)\}%`, backgroundColor: role\.action/);
   assert.match(header, /paddingTop: insets\.top \+ layout\.screenTop/, 'under the camera, like every screen');
   assert.match(header, /maxFontSizeMultiplier=\{HEADER_FONT_LIMIT\}/, 'the header never takes the page when the text is large');
   assert.match(header, /const HEADER_FONT_LIMIT = 1\.3;/);
+  assert.doesNotMatch(code(header), /bookTitle|IconTap|positionLine|previousLabel|nextLabel|ReadingProgress|onPrevious|onNext/, 'the title of the book, Previous, Next and the line are at the bottom only');
+  assert.equal(count(code(header), /<Pressable\b/g), 1, 'the way back to the contents is the one button of the header besides the two sizes');
+  const reader = src['Reader.tsx'];
+  assert.match(reader, /<ReaderHeader\s+step=\{size\.step\}\s+canShrink=\{size\.canShrink\}\s+canGrow=\{size\.canGrow\}\s+onSmaller=\{size\.smaller\}\s+onLarger=\{size\.larger\}\s+onContents=\{contents\}\s+\/>/, 'the header is given the way back and the size, and nothing else');
+});
+
+check('the bar at the bottom of the reader, as on a Kindle: the thin line that is only a picture, Previous and Next named by where they go and dimmed and disabled at the ends, the title of the book with "Chapter 7 of 40" between them, above the home indicator, under the chapter', () => {
+  const bar = src['ReaderBar.tsx'];
+  assert.match(bar, /<IconTap icon="back" label=\{previousLabel\(nav\)\} disabled=\{!nav\.prev\} size=\{BAR_BUTTON\} onPress=\{onPrevious\} \/>/);
+  assert.match(bar, /<IconTap icon="chevron" label=\{nextLabel\(nav\)\} disabled=\{!nav\.next\} size=\{BAR_BUTTON\} onPress=\{onNext\} \/>/);
+  assert.ok(bar.indexOf('previousLabel(nav)') < bar.indexOf('{bookTitle}') && bar.indexOf('{bookTitle}') < bar.indexOf('{positionLine(nav)}') && bar.indexOf('{positionLine(nav)}') < bar.indexOf('nextLabel(nav)'), 'Previous, the title, "Chapter 7 of 40", Next: from left to right');
+  assert.match(bar, /<View aria-hidden accessibilityElementsHidden importantForAccessibility="no-hide-descendants" style=\{\{ height: 4, backgroundColor: role\.border \}\}>/, 'the line is a picture: the position is said in words');
+  assert.match(bar, /width: `\$\{Math\.round\(fraction \* 100\)\}%`, backgroundColor: role\.action/);
+  assert.match(bar, /backgroundColor: role\.bg, paddingBottom: insets\.bottom/, 'above the home indicator of the phone');
+  assert.ok(bar.indexOf('<ReadingProgress api={progress} />') < bar.indexOf('<IconTap icon="back"'), 'the line is on top of the row');
+  assert.match(bar, /maxFontSizeMultiplier=\{BAR_FONT_LIMIT\}/, 'the bar never takes the page when the text is large');
+  assert.match(bar, /const BAR_FONT_LIMIT = 1\.3;/);
+  // the bar is the part the thumb rests on, so it is large: the buttons are 56 (never under 44), the title is 18 and the place 14
+  assert.match(bar, /const BAR_BUTTON = 56;/);
+  assert.equal(count(bar, /size=\{BAR_BUTTON\}/g), 2, 'Previous and Next are both 56');
+  assert.match(bar, /style=\{\{ fontSize: 18, lineHeight: 24, textAlign: 'center' \}\}>\{bookTitle\}/, 'the title of the book is 18');
+  assert.match(bar, /style=\{\{ fontSize: 14, lineHeight: 20, textAlign: 'center' \}\}>\{positionLine\(nav\)\}/, '"Chapter 7 of 40" is 14');
+  const reader = src['Reader.tsx'];
+  assert.match(reader, /<\/ScrollView>\s*<ReaderBar\s+bookTitle=\{text\.title\}\s+nav=\{nav\}\s+onPrevious=\{\(\) => nav\.prev && goTo\(nav\.prev\.id\)\}\s+onNext=\{\(\) => nav\.next && goTo\(nav\.next\.id\)\}\s+progress=\{progress\}\s+\/>/, 'the bar is under the chapter, not inside the scroll: it stays');
+  assert.match(reader, /import \{ ReaderBar, type ProgressApi \} from '\.\/ReaderBar';/);
+});
+
+check('the round buttons of the reader are 44 by 44 and named, a dimmed button is disabled for a screen reader too, and the buttons at the end of a chapter name where they go', () => {
   const ui = src['BookUi.tsx'];
-  assert.equal(count(ui, /width: 44, height: 44/g), 2, 'the round buttons are 44 by 44');
+  assert.equal(count(ui, /width: 44, height: 44/g), 1, 'the size buttons are 44 by 44');
+  assert.match(ui, /size = 44/, 'a round button of the reader is 44 by 44 unless it is asked to be larger');
+  assert.match(ui, /width: size, height: size/);
   assert.match(ui, /accessibilityLabel=\{larger \? 'Larger text' : 'Smaller text'\}/);
   assert.match(ui, /accessibilityState=\{\{ disabled: !!disabled \}\}/);
   assert.equal(count(ui, /accessibilityState=\{\{ disabled: !!disabled \}\}/g), 2, 'a dimmed button is disabled for a screen reader too');
@@ -519,7 +546,8 @@ check('every button of the Books screens has a role, a label for a screen reader
 });
 
 check('text sizes grow with the phone, up to a cap: the running text of the reader and the contents have no fixed size, the header, the cover and the banner are held at their own limits', () => {
-  assert.equal(count(src['ReaderHeader.tsx'], /maxFontSizeMultiplier=\{HEADER_FONT_LIMIT\}/g), 3);
+  assert.equal(count(src['ReaderHeader.tsx'], /maxFontSizeMultiplier=\{HEADER_FONT_LIMIT\}/g), 1, 'the header has one text: Contents');
+  assert.equal(count(src['ReaderBar.tsx'], /maxFontSizeMultiplier=\{BAR_FONT_LIMIT\}/g), 2, 'the bar has two: the title of the book and "Chapter 7 of 40"');
   assert.match(src['ChapterFooter.tsx'], /maxFontSizeMultiplier=\{1\.3\}/);
   const page = src['BookPage.tsx'];
   assert.doesNotMatch(page, /maxFontSizeMultiplier/, 'the book page grows with the phone without a limit');

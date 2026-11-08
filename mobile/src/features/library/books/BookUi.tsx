@@ -33,7 +33,7 @@ export function BookNotice({ text }: { text: string }) {
 }
 
 /** A round 44 button with an icon. `disabled` dims it and tells a screen reader; it is still drawn, so that nothing moves. */
-export function IconTap({ icon, label, hint, disabled, onPress }: { icon: IconName; label: string; hint?: string; disabled?: boolean; onPress: () => void }) {
+export function IconTap({ icon, label, hint, disabled, size = 44, onPress }: { icon: IconName; label: string; hint?: string; disabled?: boolean; size?: number; onPress: () => void }) {
   return (
     <Pressable
       accessibilityRole="button"
@@ -43,9 +43,9 @@ export function IconTap({ icon, label, hint, disabled, onPress }: { icon: IconNa
       disabled={disabled}
       onPress={onPress}
       hitSlop={2}
-      style={({ pressed }) => ({ width: 44, height: 44, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center', backgroundColor: pressed ? role.sunken : 'transparent', opacity: disabled ? 0.35 : 1 })}
+      style={({ pressed }) => ({ width: size, height: size, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center', backgroundColor: pressed ? role.sunken : 'transparent', opacity: disabled ? 0.35 : 1 })}
     >
-      <Icon name={icon} color={role.text} size={24} />
+      <Icon name={icon} color={role.text} size={Math.round((size / 44) * 24)} />
     </Pressable>
   );
 }

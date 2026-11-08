@@ -4049,8 +4049,8 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
   The banner is the compact one of the Bible tab: a label, a title, one short handwritten note and a gold pill; the pill says <b>Start reading</b> (the first book that has a text) or <b>Continue reading</b> (the book read last, at the line where you stopped),
   and with no text in any book there is no pill and the banner says plainly that the texts are being checked. A cover opens the <b>book page</b>: a larger cover, the title, the author, the era, how long it is,
   the blurb, the gold button (<b>Start reading</b> or <b>Continue: Chapter 7</b>), the table of contents under its parts with the chapters read ticked and the place where you stopped marked, and the credit of the edition.
-  A book with no text says <b>Not in the app yet</b> and why, and has no button. The <b>reader</b> keeps a header while the chapter scrolls under it: the way back to the contents, two buttons for smaller and larger text
-  (five steps, kept on the phone), Previous and Next named by where they go (they cross the parts and are off at the first and the last chapter), the title of the book with "Chapter 7 of 40" and a thin line that shows how far down you are.
+  A book with no text says <b>Not in the app yet</b> and why, and has no button. The <b>reader</b> keeps a header at the top while the chapter scrolls under it, with one row as on a Kindle: the way back to the contents and two buttons for smaller and larger text
+  (five steps, kept on the phone). At the bottom it keeps a bar: a thin line that shows how far down you are, and under it Previous and Next named by where they go (they cross the parts and are off at the first and the last chapter) with the title of the book (18) and "Chapter 7 of 40" (14) between them, on round buttons of 56. The title of the book is there and only there.
   The chapter is Fraunces for its title, Inter for the words (a line 1.6 times the letter, about 70 characters across on a wide window), JetBrains Mono for the numbers; at the end Next and Previous again, and one handwritten note.
   Where you stopped, the chapters you read and the size of the text stay on the phone and nothing is fetched: the books work with no signal.</p>
   <style>
@@ -4122,9 +4122,11 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
   .bk-soon { display: flex; flex-direction: column; gap: 8px; padding: 20px; }
   .bk-soon h4 { margin: 0; font-family: var(--cp-font-title); font-weight: 600; font-size: 24px; line-height: 30px; }
   .bk-soon p { margin: 0; font-size: 17px; line-height: 25px; }
-  /* the reader: a header that stays (two rows and a thin line), and the chapter under it */
+  /* the reader: a header at the top that stays (one row: the way back and the size of the text), the chapter under it, and a bar at the bottom that stays (the thin line, Previous, the title of the book with the place, Next) */
   .bk-rhead { position: absolute; top: 54px; left: 0; right: 0; z-index: 4; background: var(--cp-bg); padding-top: 8px; }
-  .bk-rhead .r1, .bk-rhead .r2 { display: flex; align-items: center; justify-content: space-between; padding: 0 8px; }
+  .bk-rhead .r1 { display: flex; align-items: center; justify-content: space-between; padding: 0 8px; }
+  .bk-rbar .r2 { display: flex; align-items: center; justify-content: space-between; padding: 4px 8px; }
+  .bk-rbar { position: absolute; left: 0; right: 0; bottom: 0; z-index: 4; background: var(--cp-bg); padding-bottom: 34px; }
   .bk-back { min-height: 44px; display: inline-flex; align-items: center; gap: 4px; padding: 0 14px 0 6px; font-weight: 600; font-size: 16px; line-height: 22px; }
   .bk-back .cp-icon { width: 24px; height: 24px; }
   .bk-rhead .sz { display: flex; gap: 8px; }
@@ -4132,15 +4134,15 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
   .bk-rhead .a i { font-style: normal; }
   .bk-rhead .a.s i { font-size: 15px; line-height: 20px; }
   .bk-rhead .a.l i { font-size: 24px; line-height: 28px; }
-  .bk-rhead .off { opacity: .35; }
-  .bk-ic { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; flex: none; }
-  .bk-ic .cp-icon { width: 24px; height: 24px; }
-  .bk-rhead .mid { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; padding: 0 4px; }
-  .bk-rhead .bt { max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; font-size: 15px; line-height: 20px; }
-  .bk-rhead .ps { font-family: var(--cp-font-mono); font-size: 12px; line-height: 16px; color: var(--cp-text-muted); }
-  .bk-prog { height: 3px; background: var(--cp-border); }
-  .bk-prog i { display: block; height: 3px; background: var(--cp-action); }
-  .phone .scroll.bk-rscroll { top: 145px; padding: 20px 20px 48px; }
+  .bk-rhead .off, .bk-rbar .off { opacity: .35; }
+  .bk-ic { width: 56px; height: 56px; display: grid; place-items: center; border-radius: 50%; flex: none; }
+  .bk-ic .cp-icon { width: 31px; height: 31px; }
+  .bk-rbar .mid { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; padding: 0 4px; }
+  .bk-rbar .bt { max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; font-size: 18px; line-height: 24px; }
+  .bk-rbar .ps { font-family: var(--cp-font-mono); font-size: 14px; line-height: 20px; color: var(--cp-text-muted); }
+  .bk-prog { height: 4px; background: var(--cp-border); }
+  .bk-prog i { display: block; height: 4px; background: var(--cp-action); }
+  .phone .scroll.bk-rscroll { top: 106px; bottom: 102px; padding: 20px 20px 48px; }
   .bk-rtx { margin: 0 auto; }
   .bk-rtx .chead { display: flex; flex-direction: column; gap: 6px; margin-bottom: 18px; }
   .bk-rtx .chead .part, .bk-rtx .chead .me { font-family: var(--cp-font-mono); color: var(--cp-text-muted); }
@@ -4307,13 +4309,11 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     </div>
 
     <div class="phone-wrap">
-      <p class="phone-label"><b>Reader</b>Chapter 1 · the header stays · the line shows how far you are</p>
+      <p class="phone-label"><b>Reader</b>Chapter 1 · one row at the top, and at the bottom the title of the book with Previous and Next · the line shows how far you are</p>
       <div class="phone">
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
         <div class="bk-rhead">
           <div class="r1"><span class="bk-back" role="button" aria-label="Contents"><svg class="cp-icon"><use href="#i-back"/></svg><span>Contents</span></span><span class="sz"><span class="a s" role="button" aria-label="Smaller text"><i>A</i></span><span class="a l" role="button" aria-label="Larger text"><i>A</i></span></span></div>
-          <div class="r2"><span class="bk-ic off" role="button" aria-label="Previous chapter. This is the first chapter"><svg class="cp-icon"><use href="#i-back"/></svg></span><span class="mid"><span class="bt">The Imitation of Christ</span><span class="ps">Chapter 1 of 114</span></span><span class="bk-ic" role="button" aria-label="Next: Chapter II. Of thinking humbly of oneself"><svg class="cp-icon"><use href="#i-chev"/></svg></span></div>
-          <div class="bk-prog" aria-hidden="true"><i style="width:8%"></i></div>
         </div>
         <div class="scroll bk-rscroll">
           <div class="bk-rtx" style="max-width:684px">
@@ -4326,6 +4326,10 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
             <p style="font-size:19px;line-height:30px;margin:0 0 15px">4. It is vanity then to seek after, and to trust in, the riches that shall perish. It is vanity, too, to covet honours, and to lift up ourselves on high. It is vanity to follow the desires of the flesh and be led by them, for this shall bring misery at the last. It is vanity to desire a long life, and to have little care for a good life. It is vanity to take thought only for the life which now is, and not to look forward to the things which shall be hereafter. It is vanity to love that which quickly passeth away, and not to hasten where eternal joy abideth.</p>
           </div>
         </div>
+        <div class="bk-rbar">
+          <div class="bk-prog" aria-hidden="true"><i style="width:8%"></i></div>
+          <div class="r2"><span class="bk-ic off" role="button" aria-label="Previous chapter. This is the first chapter"><svg class="cp-icon"><use href="#i-back"/></svg></span><span class="mid"><span class="bt">The Imitation of Christ</span><span class="ps">Chapter 1 of 114</span></span><span class="bk-ic" role="button" aria-label="Next: Chapter II. Of thinking humbly of oneself"><svg class="cp-icon"><use href="#i-chev"/></svg></span></div>
+        </div>
         <span class="home-ind"></span>
       </div>
     </div>
@@ -4336,8 +4340,6 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
         <div class="bk-rhead">
           <div class="r1"><span class="bk-back" role="button" aria-label="Contents"><svg class="cp-icon"><use href="#i-back"/></svg><span>Contents</span></span><span class="sz"><span class="a s" role="button" aria-label="Smaller text"><i>A</i></span><span class="a l" role="button" aria-label="Larger text"><i>A</i></span></span></div>
-          <div class="r2"><span class="bk-ic" role="button" aria-label="Previous: The First Book, Chapter XXV. Of the zealous amendment of our whole life"><svg class="cp-icon"><use href="#i-back"/></svg></span><span class="mid"><span class="bt">The Imitation of Christ</span><span class="ps">Chapter 26 of 114</span></span><span class="bk-ic" role="button" aria-label="Next: Chapter II. Of lowly submission"><svg class="cp-icon"><use href="#i-chev"/></svg></span></div>
-          <div class="bk-prog" aria-hidden="true"><i style="width:31%"></i></div>
         </div>
         <div class="scroll bk-rscroll">
           <div class="bk-rtx" style="max-width:684px">
@@ -4350,6 +4352,10 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
             <p style="font-size:19px;line-height:30px;margin:0 0 15px">4. Why dost thou cast thine eyes hither and thither, since this is not the place of thy rest? In heaven ought thy habitation to be, and all earthly things should be looked upon as it were in the passing by. All things pass away and thou equally with them. Look that thou cleave not to them lest thou be taken with them and perish. Let thy contemplation be on the Most High, and let thy supplication be directed unto Christ without ceasing. If thou canst not behold high and heavenly things, rest thou in the passion of Christ and dwell willingly in His sacred wounds. For if thou devoutly fly to the wounds of Jesus, and the precious marks of the nails and the spear, thou shalt find great comfort in tribulation, nor will the slights of men trouble thee much, and thou wilt easily bear their unkind words.</p>
           </div>
         </div>
+        <div class="bk-rbar">
+          <div class="bk-prog" aria-hidden="true"><i style="width:31%"></i></div>
+          <div class="r2"><span class="bk-ic" role="button" aria-label="Previous: The First Book, Chapter XXV. Of the zealous amendment of our whole life"><svg class="cp-icon"><use href="#i-back"/></svg></span><span class="mid"><span class="bt">The Imitation of Christ</span><span class="ps">Chapter 26 of 114</span></span><span class="bk-ic" role="button" aria-label="Next: Chapter II. Of lowly submission"><svg class="cp-icon"><use href="#i-chev"/></svg></span></div>
+        </div>
         <span class="home-ind"></span>
       </div>
     </div>
@@ -4360,8 +4366,6 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
         <div class="bk-rhead">
           <div class="r1"><span class="bk-back" role="button" aria-label="Contents"><svg class="cp-icon"><use href="#i-back"/></svg><span>Contents</span></span><span class="sz"><span class="a s" role="button" aria-label="Smaller text"><i>A</i></span><span class="a l off" role="button" aria-label="Larger text"><i>A</i></span></span></div>
-          <div class="r2"><span class="bk-ic off" role="button" aria-label="Previous chapter. This is the first chapter"><svg class="cp-icon"><use href="#i-back"/></svg></span><span class="mid"><span class="bt">The Imitation of Christ</span><span class="ps">Chapter 1 of 114</span></span><span class="bk-ic" role="button" aria-label="Next: Chapter II. Of thinking humbly of oneself"><svg class="cp-icon"><use href="#i-chev"/></svg></span></div>
-          <div class="bk-prog" aria-hidden="true"><i style="width:12%"></i></div>
         </div>
         <div class="scroll bk-rscroll">
           <div class="bk-rtx" style="max-width:1008px">
@@ -4373,6 +4377,10 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
             <p style="font-size:28px;line-height:45px;margin:0 0 22px">3. What doth it profit thee to enter into deep discussion concerning the Holy Trinity, if thou lack humility, and be thus displeasing to the Trinity? For verily it is not deep words that make a man holy and upright; it is a good life which maketh a man dear to God. I had rather feel contrition than be skilful in the definition thereof. If thou knewest the whole Bible, and the sayings of all the philosophers, what should all this profit thee without the love and grace of God? Vanity of vanities, all is vanity, save to love God, and Him only to serve. That is the highest wisdom, to cast the world behind us, and to reach forward to the heavenly kingdom.</p>
           </div>
         </div>
+        <div class="bk-rbar">
+          <div class="bk-prog" aria-hidden="true"><i style="width:12%"></i></div>
+          <div class="r2"><span class="bk-ic off" role="button" aria-label="Previous chapter. This is the first chapter"><svg class="cp-icon"><use href="#i-back"/></svg></span><span class="mid"><span class="bt">The Imitation of Christ</span><span class="ps">Chapter 1 of 114</span></span><span class="bk-ic" role="button" aria-label="Next: Chapter II. Of thinking humbly of oneself"><svg class="cp-icon"><use href="#i-chev"/></svg></span></div>
+        </div>
         <span class="home-ind"></span>
       </div>
     </div>
@@ -4383,8 +4391,6 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
         <div class="bk-rhead">
           <div class="r1"><span class="bk-back" role="button" aria-label="Contents"><svg class="cp-icon"><use href="#i-back"/></svg><span>Contents</span></span><span class="sz"><span class="a s" role="button" aria-label="Smaller text"><i>A</i></span><span class="a l" role="button" aria-label="Larger text"><i>A</i></span></span></div>
-          <div class="r2"><span class="bk-ic off" role="button" aria-label="Previous chapter. This is the first chapter"><svg class="cp-icon"><use href="#i-back"/></svg></span><span class="mid"><span class="bt">The Imitation of Christ</span><span class="ps">Chapter 1 of 114</span></span><span class="bk-ic" role="button" aria-label="Next: Chapter II. Of thinking humbly of oneself"><svg class="cp-icon"><use href="#i-chev"/></svg></span></div>
-          <div class="bk-prog" aria-hidden="true"><i style="width:96%"></i></div>
         </div>
         <div class="scroll bk-rscroll" data-bk-end>
           <div class="bk-rtx">
@@ -4396,6 +4402,10 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
               <div class="hw" style="text-align:center">Rest a little</div>
             </div>
           </div>
+        </div>
+        <div class="bk-rbar">
+          <div class="bk-prog" aria-hidden="true"><i style="width:96%"></i></div>
+          <div class="r2"><span class="bk-ic off" role="button" aria-label="Previous chapter. This is the first chapter"><svg class="cp-icon"><use href="#i-back"/></svg></span><span class="mid"><span class="bt">The Imitation of Christ</span><span class="ps">Chapter 1 of 114</span></span><span class="bk-ic" role="button" aria-label="Next: Chapter II. Of thinking humbly of oneself"><svg class="cp-icon"><use href="#i-chev"/></svg></span></div>
         </div>
         <span class="home-ind"></span>
       </div>
