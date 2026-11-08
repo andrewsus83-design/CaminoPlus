@@ -188,9 +188,15 @@ check('closing is kept only on this phone, under a per-person key, in the way th
   assert.doesNotMatch(hook, /localStore\.remove|removeByPrefix|saveReading|packLastRead|packReading/, 'the places are the readers\'; the bar only reads them');
   assert.match(hook, /useFocusEffect\(/, 'read again whenever the screen comes into view, because the readers change the places under it');
   assert.match(hook, /const uid = session\?\.user\.id \?\? null;/);
-  assert.match(hook, /const bookView = book \? describeBook\(book, textOf\(book\.id\)\?\.chapters \?\? null\) : null;/, 'a book is named from its text (the one the reader opens), counted the way the reader counts');
-  assert.match(hook, /const book = bookSpotOf\(reading, \(id\) => textOf\(id\) !== null\);/, 'a book that cannot be opened is never offered: the bar, like the banner it replaced, does not offer what cannot open');
+  assert.match(hook, /return \{ uid, found: pickPlace\(bibleRaw, reading, textOf\), hidden: parseHidden\(hiddenRaw\) \};/, 'the place is picked by spot.ts (checked in continueBar.test.ts), from the three things the phone holds');
+  assert.match(hook, /\} catch \{\s+return \{ uid, found: null, hidden: null \};\s+\}/, 'nothing throws: a store that cannot be read is no place and hides nothing');
+  assert.match(hook, /return \{ view: viewToDraw\(loaded, uid\), hide \};/, 'what is drawn is decided by hidden.ts (checked in continueBar.test.ts): not another person\'s place, not a place that was closed');
+  assert.match(hook, /mine\.current = \{ uid: cur\.uid, mark \};/, 'the tap on X is remembered in memory at once, so a read that began before it cannot bring the bar back');
+  assert.match(hook, /latest\.current = \{ \.\.\.cur, hidden: mark \};\s+setLoaded\(latest\.current\);/, 'and the bar goes at the tap, before the mark is written');
   assert.match(hook, /if \(!texts\.has\(id\)\) texts\.set\(id, bookById\(id\) \? safeText\(id\) : null\);/, 'a book that is not in the Library has no text to open, and a text is read once for each load');
+  assert.match(src['spot.ts'], /const book = bookSpotOf\(reading, \(id\) => textOf\(id\) !== null\);/, 'a book that cannot be opened is never offered: the bar, like the banner it replaced, does not offer what cannot open');
+  assert.match(src['spot.ts'], /const bookView = book \? describeBook\(book, textOf\(book\.id\)\?\.chapters \?\? null\) : null;/, 'a book is named from its text (the one the reader opens), counted the way the reader counts');
+  assert.match(src['spot.ts'], /const spot = latestSpot\(bibleSpotOf\(bibleRaw\), bookView \? book : null\);/, 'a book that cannot be named is not compared with the Bible');
   assert.match(hook, /import \{ bookById \} from '\.\.\/books\/catalog';/, 'the Library\'s own list of books');
   assert.doesNotMatch(hook, /hasBookText|bookText|BOOK_TEXT/, 'the books are the catalog of the bundle, nothing is kept by hand: no second list of which books have a text');
   assert.match(hook, /const closed = mine\.current && mine\.current\.uid === uid \? mine\.current\.mark : null;/, 'a tap on X is not undone by a read that began a moment before');

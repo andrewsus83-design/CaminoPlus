@@ -99,6 +99,23 @@ export function describeBook(spot: BookSpot, chapters: readonly ChapterRef[] | n
   };
 }
 
+/** A place to continue from and the way to say it. */
+export type Found = { spot: Spot; view: SpotView };
+
+/**
+ * The place to continue from, given what the phone holds: the Bible's stored value (judged by bible/lastRead.ts), the places of the books, and a way to get the text of a book
+ * (`textOf`: null for a book that cannot be opened, because it is not in the Library or its text does not read). A book is offered only if its text opens, and its chapter is told
+ * from that text; the one read most recently of the Bible and the book wins (latestSpot); a book that cannot be named (describeBook gives none) is not compared with the Bible at
+ * all, so it can never take the Bible's place away. null when there is nothing to continue from.
+ */
+export function pickPlace(bibleRaw: unknown, reading: StoredReading, textOf: (id: string) => { chapters: readonly ChapterRef[] } | null): Found | null {
+  const book = bookSpotOf(reading, (id) => textOf(id) !== null);
+  const bookView = book ? describeBook(book, textOf(book.id)?.chapters ?? null) : null;
+  const spot = latestSpot(bibleSpotOf(bibleRaw), bookView ? book : null);
+  const view = !spot ? null : spot.kind === 'bible' ? describeBible(spot) : bookView;
+  return spot && view ? { spot, view } : null;
+}
+
 /** The word on the first line of the bar, the same words the Bible card used. */
 export { CONTINUE_TITLE };
 

@@ -1,5 +1,5 @@
-// Source-level checks of the Bible screens: the grid of books on the Bible tab, the chapters of a book, the reader, the card that continues the chapter read
-// last, the actions on a verse, the search of verses. They read the files, nothing is run: what the pure parts do is checked in reader.test.ts and bible.test.ts;
+// Source-level checks of the Bible screens: the grid of books on the Bible tab, the chapters of a book, the reader, the place that is kept for the Continue reading bar
+// (the bar itself is checked in continueBarWiring.test.ts), the actions on a verse, the search of verses. They read the files, nothing is run: what the pure parts do is checked in reader.test.ts and bible.test.ts;
 // here it is that the screens use them the way they must (the routes are registered next to the other screens of the Library with the same guard, an address that
 // leads nowhere is a calm "not found", a tile is one button with a name, nothing in the reader needs the network or a new native module, Copy asks for the
 // clipboard before it shows, Previous and Next replace the screen and name where they go, the last place is kept only on the phone). Run from wiring.test.ts.
@@ -284,7 +284,7 @@ check('the text of the Bible is imported only by the screens that read it and by
   const files = [...walk('app'), ...walk('src')];
   const resolve = (file: string, spec: string): string | null => (spec.startsWith('@/') ? `src/${spec.slice(2)}` : spec.startsWith('.') ? path.posix.normalize(path.posix.join(path.posix.dirname(file), spec)) : null);
   const importers = (target: string): string[] => files.filter((f) => [...read(f).matchAll(/from '([^']+)'/g)].some((m) => resolve(f, m[1]) === target)).sort();
-  assert.deepEqual(importers(`${BIBLE}/text`), [`${BIBLE}/Reader.tsx`, `${BIBLE}/searchText.ts`, 'app/library/bookmarks.tsx', 'src/features/library/noteStart.ts'].sort(), 'the reader, the search, Bookmarks (which shows the words of a verse) and the start of a note (which quotes a verse) read the text; nothing else does: not the Licences screen, not the tiles, not the Continue card');
+  assert.deepEqual(importers(`${BIBLE}/text`), [`${BIBLE}/Reader.tsx`, `${BIBLE}/searchText.ts`, 'app/library/bookmarks.tsx', 'src/features/library/noteStart.ts'].sort(), 'the reader, the search, Bookmarks (which shows the words of a verse) and the start of a note (which quotes a verse) read the text; nothing else does: not the Licences screen, not the tiles, not the Continue reading bar');
   assert.deepEqual(importers(`${BIBLE}/searchText`), [`${BIBLE}/useVerseSearch.ts`, 'app/(tabs)/library.tsx'].sort(), 'the search of verses, and the Library screen that makes it ready');
   assert.deepEqual(importers(`${BIBLE}/webc.generated`), [`${BIBLE}/text.ts`], 'the files of the text are reached through text.ts only');
   // the search is made ready when its field is touched, a beat before the first letter (the first search reads and folds the words of 35,408 verses: 100 to 135 ms on a laptop)

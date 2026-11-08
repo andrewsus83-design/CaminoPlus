@@ -10,7 +10,7 @@
 //
 // A stored value is never trusted. It can be missing, from a newer version of the app, or damaged: parseHidden then gives null, which means "nothing is hidden", so the
 // worst a bad file can do is show the bar once more. Nothing throws.
-import type { Spot } from './spot';
+import type { Found, Spot, SpotView } from './spot';
 
 /** The name after `u.<userId>.`. */
 export const HIDDEN_NAME = 'library.continueHidden';
@@ -59,4 +59,17 @@ export function isHidden(mark: HiddenMark | null, spot: Spot | null): boolean {
   return mark.kind === 'bible' && spot.kind === 'bible'
     ? mark.code === spot.code && mark.chapter === spot.chapter
     : mark.kind === 'book' && spot.kind === 'book' && mark.id === spot.id && mark.c === spot.c;
+}
+
+/** What was read from the phone for one person (`uid`): the place to continue from, if any (spot.ts pickPlace), and the mark of what that person closed, if any. */
+export type Loaded = { uid: string; found: Found | null; hidden: HiddenMark | null };
+
+/**
+ * What the bar draws for what was loaded, for the person who is signed in now (`uid`): nothing while nothing was loaded, nothing for what was loaded for somebody else (a person
+ * who signed out and another who signed in on the same phone must never be shown each other's place), nothing when there is no place, and nothing when the person closed this very
+ * place (isHidden). Otherwise the way to say the place.
+ */
+export function viewToDraw(loaded: Loaded | null, uid: string | null): SpotView | null {
+  const now = loaded && loaded.uid === uid ? loaded : null;
+  return now && now.found && !isHidden(now.hidden, now.found.spot) ? now.found.view : null;
 }

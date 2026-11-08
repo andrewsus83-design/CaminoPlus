@@ -8,11 +8,8 @@ import type { BookContent } from '../books';
 import { READING_NAME } from '../books/reading';
 import { loadReading } from '../books/readingStore';
 import { safeText } from '../books/safeText';
-import { HIDDEN_NAME, isHidden, markOf, packHidden, parseHidden, type HiddenMark } from './hidden';
-import { bibleSpotOf, bookSpotOf, describeBible, describeBook, latestSpot, type Spot, type SpotView } from './spot';
-
-/** What the bar needs: the place to continue and how to say it, or none, and the place that was closed, if one was. */
-type Loaded = { uid: string; found: { spot: Spot; view: SpotView } | null; hidden: HiddenMark | null };
+import { HIDDEN_NAME, markOf, packHidden, parseHidden, viewToDraw, type HiddenMark, type Loaded } from './hidden';
+import { pickPlace, type SpotView } from './spot';
 
 /** The bar's view of the phone: what to draw (null when there is nothing to continue from, or the person closed this very place) and the way to close it. */
 export type ContinueBarModel = {
@@ -39,11 +36,7 @@ async function loadContinue(uid: string): Promise<Loaded> {
       if (!texts.has(id)) texts.set(id, bookById(id) ? safeText(id) : null);
       return texts.get(id) ?? null;
     };
-    const book = bookSpotOf(reading, (id) => textOf(id) !== null);
-    const bookView = book ? describeBook(book, textOf(book.id)?.chapters ?? null) : null;
-    const spot = latestSpot(bibleSpotOf(bibleRaw), bookView ? book : null);
-    const view = !spot ? null : spot.kind === 'bible' ? describeBible(spot) : bookView;
-    return { uid, found: spot && view ? { spot, view } : null, hidden: parseHidden(hiddenRaw) };
+    return { uid, found: pickPlace(bibleRaw, reading, textOf), hidden: parseHidden(hiddenRaw) };
   } catch {
     return { uid, found: null, hidden: null };
   }
@@ -85,7 +78,5 @@ export function useContinueBar(): ContinueBarModel {
     void localStore.setJSON(userKey(cur.uid, HIDDEN_NAME), packHidden(mark));
   }, []);
 
-  const now = loaded && loaded.uid === uid ? loaded : null;
-  const view = now && now.found && !isHidden(now.hidden, now.found.spot) ? now.found.view : null;
-  return { view, hide };
+  return { view: viewToDraw(loaded, uid), hide };
 }

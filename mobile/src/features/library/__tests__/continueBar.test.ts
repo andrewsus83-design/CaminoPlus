@@ -12,9 +12,9 @@ import { bookById, BOOK_CATALOG } from '../books/catalog';
 import { READING_NAME, chapterNav, emptyReading, positionLine, savePlace, type ChapterRef } from '../books/reading';
 import { safeText } from '../books/safeText';
 import { BAR_GAP, BAR_HEIGHT, BAR_ROOM, CLOSE_SIZE, TAB_BAR_HEIGHT, barBottom, tabBarBottom } from '../continueBar/barLayout';
-import { HIDDEN_NAME, isHidden, markOf, packHidden, parseHidden } from '../continueBar/hidden';
+import { HIDDEN_NAME, isHidden, markOf, packHidden, parseHidden, viewToDraw, type Loaded } from '../continueBar/hidden';
 import {
-  HIDE_LABEL, OPEN_HINT, barVisible, bibleSpotOf, bookSpotOf, describeBible, describeBook, latestSpot, stampOf, type BibleSpot, type BookSpot, type Spot, type SpotView,
+  HIDE_LABEL, OPEN_HINT, barVisible, bibleSpotOf, bookSpotOf, describeBible, describeBook, latestSpot, pickPlace, stampOf, type BibleSpot, type BookSpot, type Spot, type SpotView,
 } from '../continueBar/spot';
 
 let n = 0;
@@ -79,6 +79,60 @@ check('the book is the one read last that can be opened (the caller says which c
   assert.deepEqual(bookSpotOf(r, (id) => id === HEART), book(HEART, 'c4', 0.5, 100), 'the newest book cannot be opened: the next newest is offered');
   assert.equal(bookSpotOf(r, () => false), null);
   assert.equal(bookSpotOf(emptyReading(), () => true), null, 'nothing read');
+});
+
+/* ================================================================ the place the bar continues, from what the phone holds */
+
+/** The text of a book as the bar asks for it: the chapters of the books given (with this many chapters), none for any other (a book that cannot be opened). */
+const texts = (...ids: string[]) => (id: string) => (ids.includes(id) ? { chapters: chapters(24) } : null);
+const stamped = (code: string, chapter: number, at: number) => ({ v: 1, code, chapter, at });
+const readingOf = (...places: Array<[id: string, c: string, y: number, at: number]>) => places.reduce((r, [id, c, y, at]) => savePlace(r, id, c, y, at), emptyReading());
+
+check('pickPlace: the Bible alone, a book alone, both (the more recent wins), and nothing', () => {
+  const g = pickPlace(stamped('GEN', 3, 100), emptyReading(), texts())!;
+  assert.deepEqual([g.spot.kind, g.view.label, g.view.href], ['bible', 'Genesis 3', '/library/bible/GEN/3']);
+  const b = pickPlace(null, readingOf([QUIET, 'c5', 0.3, 100]), texts(QUIET))!;
+  assert.deepEqual([b.spot.kind, b.view.label], ['book', 'The Quiet Road · Chapter 5']);
+  assert.equal(pickPlace(stamped('GEN', 3, 100), readingOf([QUIET, 'c5', 0.3, 200]), texts(QUIET))!.view.label, 'The Quiet Road · Chapter 5', 'the book was read later');
+  assert.equal(pickPlace(stamped('GEN', 3, 300), readingOf([QUIET, 'c5', 0.3, 200]), texts(QUIET))!.view.label, 'Genesis 3', 'the Bible was read later');
+  assert.equal(pickPlace(stamped('GEN', 3, 200), readingOf([QUIET, 'c5', 0.3, 200]), texts(QUIET))!.view.label, 'Genesis 3', 'the same millisecond: the Bible');
+  assert.equal(pickPlace(null, emptyReading(), texts()), null, 'nothing was read');
+  assert.equal(pickPlace('damaged', emptyReading(), texts()), null, 'a value that is not a place is no place');
+});
+
+check('pickPlace: a book that cannot be opened is passed over, for the next book, or for the Bible, however recent it is: the bar never offers what cannot open', () => {
+  const reading = readingOf([HEART, 'c2', 0.1, 100], [QUIET, 'c5', 0.3, 200]); // the Quiet Road was read last
+  assert.equal(pickPlace(null, reading, texts(HEART))!.view.label, 'The Restless Heart · Chapter 2', 'the newest book has no text: the next newest is offered');
+  assert.equal(pickPlace(stamped('GEN', 3, 50), reading, texts())!.view.label, 'Genesis 3', 'no book opens: the Bible, though it is the oldest place');
+  assert.equal(pickPlace(null, reading, texts()), null, 'no book opens and no Bible place: nothing');
+  // a text that opens for an id that is not in the catalog cannot be named: it is not compared with the Bible, so it cannot take the Bible's place away (it is newer here)
+  const gone = readingOf(['a-book-of-an-earlier-list', 'c1', 0.2, 900]);
+  const found = pickPlace(stamped('GEN', 3, 100), gone, texts('a-book-of-an-earlier-list'))!;
+  assert.deepEqual([found.spot.kind, found.view.label], ['bible', 'Genesis 3'], 'the Bible is still offered');
+  assert.equal(pickPlace(null, gone, texts('a-book-of-an-earlier-list')), null, 'and with no Bible place there is nothing, not a bar with no words');
+});
+
+check('pickPlace: the chapter of a book is the one the reader opens, told from the text it is given (a text that is empty gives the title alone)', () => {
+  assert.equal(pickPlace(null, readingOf([QUIET, 'c24', 0.99, 5]), texts(QUIET))!.view.label, 'The Quiet Road · Chapter 24', 'the last chapter, finished: it stays on the last');
+  assert.equal(pickPlace(null, readingOf([QUIET, 'c3', 0.99, 5]), texts(QUIET))!.view.label, 'The Quiet Road · Chapter 4', 'a finished chapter goes on to the next');
+  const empty = (id: string) => (id === QUIET ? { chapters: [] as ChapterRef[] } : null);
+  const v = pickPlace(null, readingOf([QUIET, 'c3', 0.2, 5]), empty)!.view;
+  assert.deepEqual([v.label, v.head, v.tail], ['The Quiet Road', 'The Quiet Road', '']);
+});
+
+/* ================================================================ what is drawn for what was loaded */
+
+check('viewToDraw: what was loaded for this person and not closed is drawn; nothing loaded, another person\'s, no place, or this very place closed is not', () => {
+  const found = pickPlace(stamped('PSA', 121, 1731068400000), emptyReading(), texts())!;
+  const loaded = (o: Partial<Loaded> = {}): Loaded => ({ uid: 'ana', found, hidden: null, ...o });
+  assert.equal(viewToDraw(loaded(), 'ana'), found.view, 'the place of this person');
+  assert.equal(viewToDraw(null, 'ana'), null, 'nothing loaded yet');
+  assert.equal(viewToDraw(loaded(), 'ben'), null, 'what was loaded for Ana is not drawn for Ben, who signed in on the same phone');
+  assert.equal(viewToDraw(loaded(), null), null, 'nobody is signed in');
+  assert.equal(viewToDraw(loaded({ found: null }), 'ana'), null, 'no place to continue from');
+  assert.equal(viewToDraw(loaded({ hidden: markOf(found.spot) }), 'ana'), null, 'this very place was closed');
+  assert.equal(viewToDraw(loaded({ hidden: markOf({ ...found.spot, at: found.spot.at - 1 }) }), 'ana'), found.view, 'the place was saved again after it was closed: it is back');
+  assert.equal(viewToDraw(loaded({ hidden: markOf(bible('PSA', 122, found.spot.at)) }), 'ana'), found.view, 'another chapter was closed');
 });
 
 /* ================================================================ what the bar says and where it goes */

@@ -930,7 +930,7 @@ check('the chapter read last is kept as a small value and read back as the place
   assert.equal(samePlace(null, null), false);
 });
 
-check('the card on the Bible tab says "Continue reading" and the chapter, and a screen reader hears them together', () => {
+check('the Continue reading bar says "Continue reading" and the chapter of the Bible, and a screen reader hears them together', () => {
   assert.equal(CONTINUE_TITLE, 'Continue reading');
   assert.equal(continueLabel(at('PSA', 121)), 'Continue reading, Psalm 121');
   assert.equal(continueLabel(at('1CO', 13)), 'Continue reading, 1 Corinthians 13');
