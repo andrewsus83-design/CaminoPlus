@@ -17,7 +17,7 @@ never "CaminoPlus plan".
 | `design/` | The design system: `tokens.css` and `tokens.json` are the single source of truth for colour, type, spacing; `index.html` shows the screens | open `design/index.html` |
 | `web/` | The camino.plus site: plain HTML and CSS, **generated** by `tools/build_web.py` | [`web/README.md`](web/README.md) |
 | `brand/` | Brand guideline, SVG logo and icon pack, the social content factory (plans, templates, QA checklist) | [`brand/README.md`](brand/README.md) |
-| `books/` | The CaminoPlus Library: 12 books (route guidebooks and reflection books on public-domain classics), written and published with the two skills in `.claude/skills/` (`book-writer`, `book-publisher`) | [`books/series.md`](books/series.md) |
+| `books/` | The CaminoPlus Library: 20 books (8 route guidebooks and 12 reflection books on famous public-domain books), written and published with the two skills in `.claude/skills/` (`book-writer`, `book-publisher`) | [`books/series.md`](books/series.md) |
 | `tools/` | `offline-maps/` builds, tests and publishes the offline map packs; `poi-audit/` cross-checks places from open data; scripts for the site, tokens, screenshots and brand SVGs | [`tools/offline-maps/README.md`](tools/offline-maps/README.md), [`tools/poi-audit/README.md`](tools/poi-audit/README.md) |
 | `.github/` | CI, the two pipelines (offline maps, POI audit), Dependabot | [`.github/workflows/ci.yml`](.github/workflows/ci.yml) |
 

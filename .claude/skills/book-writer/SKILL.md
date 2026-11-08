@@ -1,6 +1,6 @@
 ---
 name: book-writer
-description: Write a book for the CaminoPlus Library, either a route guidebook (up to 12,000 words) or a reflection book built on a public-domain classic (about 2 to 3 hours of reading). Use whenever someone asks to write, draft, extend or revise a CaminoPlus book, a guidebook for a Camino route, or a set of readings from a classic. Covers voice, structure, honesty rules (no invented facts, no unlicensed text) and the checks a book must pass before it goes to the book-publisher skill.
+description: Write a book for the CaminoPlus Library, either a route guidebook (up to 12,000 words) or a reflection book built on a famous public-domain book (3 to 21 days, up to 3 hours of reading). Use whenever someone asks to write, draft, extend or revise a CaminoPlus book, a guidebook for a Camino route, or a set of readings from a classic. Covers voice, structure, honesty rules (no invented facts, no unlicensed text) and the checks a book must pass before it goes to the book-publisher skill.
 ---
 
 # Book writer
@@ -11,7 +11,7 @@ You write books that pilgrims read on a phone, often offline, at the end of a wa
 | Kind | Length | What it is | Spec |
 |---|---|---|---|
 | `guide` | 9,000 to 12,000 words (hard maximum 12,000) | A practical and human guidebook to one Camino route | [`reference/guidebook.md`](reference/guidebook.md) |
-| `reflection` | 26,000 to 36,000 words, never more than 3 hours of reading (39,000 words) | 30 short readings: a verbatim passage from a public-domain classic, an original reflection, a prompt for the walk, a short prayer | [`reference/reflection.md`](reference/reflection.md) |
+| `reflection` | 3 to 21 days, each a 5-minute morning reading and a 3-minute end-of-day reflection; never more than 3 hours (39,000 words) | A famous public-domain book walked in short days, for a Camino of fitting length: a verbatim passage, an original reflection, a prompt for the walk, an evening reflection with its questions, a short prayer | [`reference/reflection.md`](reference/reflection.md) |
 
 Read the spec of the kind you are writing **before** you write a word. Read [`reference/voice-and-honesty.md`](reference/voice-and-honesty.md)
 for both kinds: it holds the rules that matter most here.
@@ -34,7 +34,7 @@ you do not know. That is also the best service to the person who will walk with 
 ```
 books/
   series.json               shared publisher facts (publisher, rights, AI disclosure)
-  series.md                 the plan: all 12 books, order, sources, word targets
+  series.md                 the plan: all 20 books, order, days, Camino pairing, sources
   <book-id>/
     book.json               metadata (schema below)
     chapters/
@@ -66,7 +66,8 @@ chapter title), `##` and `###` sections, paragraphs, `-` and `1.` lists, `>` quo
 }
 ```
 
-Reflection books add `"sources"`, one entry per classic, which is what the checker verifies every quote against:
+Reflection books add `"days"` (3 to 21, the number of day chapters), `"route_slug"` (the Camino it goes with, from `books/series.md`) and `"sources"`, one entry
+per classic, which is what the checker verifies every quote against:
 
 ```json
 "sources": [{
@@ -106,6 +107,6 @@ Reflection books add `"sources"`, one entry per classic, which is what the check
 
 - The checker passes with no errors (warnings are read and either fixed or explained in a line of your report).
 - `book.json` is complete. Every chapter file is numbered and in order.
-- A guide has its `facts.md`. A reflection book has every passage verified against its source by the checker.
+- A guide has its `facts.md`. A reflection book has every passage verified against its source by the checker, `days` equal to its day chapters, and its end-of-day questions as lists.
 - Your report to the person says: the word count and reading time, what you could not verify and left out, and anything they
   must decide (for example a claim you could not source).

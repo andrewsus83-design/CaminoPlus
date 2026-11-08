@@ -58,6 +58,24 @@ outputs from the same chapter blocks, so the app, the EPUB and the PDF cannot di
 6. **Report.** For each book: title, kind, words, reading time, PDF pages, what the checker warned about, and the open
    decisions below.
 
+## In the app: bookmarks, side notes and reflections
+
+The bundle is built so the app can attach a pilgrim's own writing to the books. The design (decided with the owner; details of the screens belong to the app work):
+
+- **Side notes, not a feed.** A note is **anchored** to the thing it is about and shown beside it, like a note in the margin: a small mark next to the paragraph, a side sheet to read and
+  write it. There is no timeline, no likes, no comments, no followers. Notes are **private and on the phone** (like the Diary: same local store, wiped on log-out, same plain privacy line) unless the
+  pilgrim presses an explicit Share, which is never automatic. Notes are listed in one quiet **Notebook**, organised by anchor (Books, Bible, Daily reading, Camino stages) and searchable.
+- **Anchors** (one scheme for everything, so the same notes can sit on books today and on the Bible, the daily reading and the Camino's stages and places later):
+  `book:<bookId>/<chapterId>#<blockIndex>` (a paragraph; `chapterId` is the chapter's file name without `.md`, `blockIndex` the index of the block in the chapter's `blocks`),
+  `book:<bookId>/<chapterId>` (a whole chapter or day), `book:<bookId>` (a book); later `bible:<translation>/<book>/<chapter>:<verse>`, `daily:<date>`, `stage:<routeSlug>/<n>`, `place:<id>`.
+  A note stores the anchor, the **quoted text** it was made on (so it can be found again if a book is revised: chapter ids and the text are stable, block indexes are not guaranteed to be), its own
+  text, and the **context** added automatically: date and, when known, the Camino and the stage the pilgrim is on. That context is how a note on a reading joins the Camino experience.
+- **Bookmarks** are markers on the same anchors (a book, a chapter or day, a paragraph) and "continue reading" remembers the last place in each book.
+- **Reflections**: each day of a reflection book ends with its questions as a list (`## At the end of the day`, a `-` list; the checker requires it). The app shows those questions as the prompt,
+  and the pilgrim's answer is a note of type *reflection* on that day. A side note can be grown into a Diary page.
+- **Never** in the bundle: a pilgrim's notes. The bundle is the book; notes are the pilgrim's, and live only on the phone (any later backup through the paid plan's cloud storage is a separate,
+  explicit decision, and must be part of the data export and the account deletion).
+
 ## Decisions that belong to the owner (never decide these silently)
 
 - **Rights holder and licence** of the original text (`books/series.json` → `rights`). Public-domain passages stay public domain.
@@ -89,5 +107,5 @@ outputs from the same chapter blocks, so the app, the EPUB and the PDF cannot di
 - `tools/book_kit.py`: the Markdown subset parser and the word and reading-time rules (220 words a minute).
 - `tools/check_books.py`: the quality gate. `tools/build_books.py`: the build. `tools/render_books.mjs`: the browser step.
 - `tools/tests/test_books.py`: the tests (`python3 -m unittest discover -s tools/tests -v`).
-- `books/series.json`: shared publisher facts. `books/series.md`: the plan for the 12 books. `books/sources/SOURCES.md`: where the
+- `books/series.json`: shared publisher facts. `books/series.md`: the plan for the 20 books. `books/sources/SOURCES.md`: where the
   classics come from.

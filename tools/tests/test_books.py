@@ -52,6 +52,7 @@ def guide_meta(**over):
 def reflection_meta(**over):
     m = guide_meta(id="demo-reflection", kind="reflection", title="Readings", subtitle="Thirty Readings")
     del m["route_slug"]
+    m["days"] = 21
     m["sources"] = [{"id": "gutenberg-9999", "work": "The Imitation of Christ", "author": "Thomas à Kempis", "translator": "William Benham",
                      "year": "1886", "licence": "Public domain", "url": "https://example.org"}]
     m.update(over)
@@ -76,9 +77,9 @@ FACTS = "| Fact | Value | Source | Checked |\n|---|---|---|---|\n" + "\n".join(f
 
 def reading(n: int, passage: str = "He who follows Me, walketh not in darkness, saith the Lord.") -> str:
     body = "A reflection that begins with a road and a bell and a tired afternoon. " * 12
-    return (f"# {n}. Reading {n}\n\n*A theme.*\n\n## The passage\n\n> {passage}\n>\n> — Thomas à Kempis, *The Imitation of Christ*, "
+    return (f"# Day {n}. Reading {n}\n\n*A theme.*\n\n## The passage\n\n> {passage}\n>\n> — Thomas à Kempis, *The Imitation of Christ*, "
             f"Book 1, chapter 1 (tr. William Benham, 1886)\n\n## Reflection\n\n{body}\n\n## For the walk\n\n- One question.\n\n"
-            f"## A short prayer\n\nGive us enough light for the next step.\n")
+            f"## At the end of the day\n\nThe day is done and the feet are tired.\n\n- What was hard?\n\n## A short prayer\n\nGive us enough light for the next step.\n")
 
 
 class Parser(unittest.TestCase):
@@ -155,7 +156,7 @@ class Reflection(unittest.TestCase):
         (folder / "pg9999.txt").write_text(SOURCE_TEXT, encoding="utf-8")
         return folder
 
-    def book(self, t, n=30, passage=None):
+    def book(self, t, n=21, passage=None):
         chapters = {"00-how.md": "# How\n\nx\n"}
         for i in range(1, n + 1):
             chapters[f"{i:02d}-reading-{i}.md"] = reading(i, passage) if passage else reading(i)
@@ -188,16 +189,52 @@ class Reflection(unittest.TestCase):
             pair = cb.Sources(folder).get(src)
             self.assertEqual(cb.verify_passage("I will lift up my eyes to the hills. Where does my help come from? My help comes from Yahweh", [pair]), "exact")
 
-    def test_the_count_the_parts_and_the_length(self):
+    def test_the_count_the_parts_and_their_order(self):
         with tempfile.TemporaryDirectory() as t:
-            rep = cb.check_book(self.book(t, n=29), self.sources(t))
-            self.assertIn("29 readings found", "\n".join(rep.errors))
+            rep = cb.check_book(self.book(t, n=20), self.sources(t))
+            self.assertIn("20 day chapters found, book.json says 21 days", "\n".join(rep.errors))
         with tempfile.TemporaryDirectory() as t:
             d = self.book(t)
             f = d / "chapters" / "05-reading-5.md"
             f.write_text(f.read_text(encoding="utf-8").replace("## For the walk", "## Something else"), encoding="utf-8")
             rep = cb.check_book(d, self.sources(t))
             self.assertIn("exactly one '## For the walk'", "\n".join(rep.errors))
+        with tempfile.TemporaryDirectory() as t:      # the five parts are all there but not in order
+            d = self.book(t)
+            f = d / "chapters" / "07-reading-7.md"
+            txt = f.read_text(encoding="utf-8")
+            f.write_text(txt.replace("## For the walk", "## TMP").replace("## Reflection", "## For the walk").replace("## TMP", "## Reflection"), encoding="utf-8")
+            self.assertIn("the parts of a day come in this order", "\n".join(cb.check_book(d, self.sources(t)).errors))
+
+    def test_days_are_declared_and_can_differ_from_book_to_book(self):
+        with tempfile.TemporaryDirectory() as t:
+            d, src = self.book(t, n=6), self.sources(t)
+            meta = json.loads((d / "book.json").read_text(encoding="utf-8"))
+            meta["days"] = 6
+            (d / "book.json").write_text(json.dumps(meta), encoding="utf-8")
+            self.assertEqual(cb.check_book(d, src).errors, [])           # a short book for a short Camino is fine
+            meta["days"] = 22
+            (d / "book.json").write_text(json.dumps(meta), encoding="utf-8")
+            self.assertIn("'days' must be a whole number from 3 to 21", "\n".join(cb.check_book(d, src).errors))
+            del meta["days"]
+            (d / "book.json").write_text(json.dumps(meta), encoding="utf-8")
+            self.assertIn("'days' must be a whole number", "\n".join(cb.check_book(d, src).errors))
+
+    def test_the_end_of_day_questions_are_a_list_the_app_can_show(self):
+        with tempfile.TemporaryDirectory() as t:
+            d = self.book(t)
+            f = d / "chapters" / "03-reading-3.md"
+            f.write_text(f.read_text(encoding="utf-8").replace("- What was hard?\n", "Just a paragraph here.\n"), encoding="utf-8")
+            self.assertIn("needs its questions as a '-' list", "\n".join(cb.check_book(d, self.sources(t)).errors))
+
+    def test_a_day_is_a_five_minute_morning_and_a_three_minute_evening(self):
+        with tempfile.TemporaryDirectory() as t:
+            rep = cb.check_book(self.book(t), self.sources(t))
+            text = "\n".join(rep.warnings)
+            self.assertIn("the morning reading is", text)          # the fixture's days are far shorter than 5 and 3 minutes
+            self.assertIn("the end-of-day reflection is", text)
+            self.assertIn("(aim for 5 min: 850 to 1,350 words)", text)
+            self.assertIn("(aim for 3 min: 450 to 800 words)", text)
 
     def test_quoted_passages_must_stay_a_minority(self):
         passage = "These are the words of Christ, by which we are admonished how we ought to imitate His life—and manners, if we would be truly enlightened."

@@ -9,9 +9,10 @@
 What it checks (the rules are in .claude/skills/book-writer):
   * book.json is complete (kind, title, description lengths, keywords, cover, sources of a reflection book);
   * chapters are numbered, start with one `#` title, and use only the Markdown subset (no tables, images, HTML, emoji);
-  * length: a guide is at most 12,000 words; a reflection book is 26,000 to 36,000 words and never over 3 hours of reading;
+  * length: a guide is at most 12,000 words; a reflection book is about 1,400 to 2,000 words a day and never over 3 hours of reading;
   * a guide has its fact ledger and states no price, phone number, coordinate or web address outside "Sources";
-  * a reflection book has 30 readings with the four parts, and **every quoted passage is found, word for word, in the
+  * a reflection book has the number of days its book.json says (3 to 21), each with its five parts (passage, reflection, for the walk, end of the day, prayer) in order, a 5-minute
+    morning and a 3-minute evening, and **every quoted passage is found, word for word, in the
     public-domain source named in book.json** (the source files are given with --sources; they are not in the repository).
 
 Exit status 1 when there is any error (or any warning with --strict).
@@ -30,13 +31,17 @@ import book_kit as bk  # noqa: E402
 
 GUIDE_MAX_WORDS = 12_000
 GUIDE_MIN_WORDS = 9_000
-REFLECTION_MIN_WORDS = 26_000
-REFLECTION_MAX_WORDS = 36_000
 REFLECTION_HARD_MAX_WORDS = 39_000          # 3 hours at 220 words a minute is 39,600
-READINGS = 30
+DAYS = (3, 21)                              # a reflection book has as many days as suits its classic and its Camino, never more than three weeks
+DAY_WORDS_MIN, DAY_WORDS_MAX = 1400, 2000   # one day: a 5-minute morning reading and a 3-minute evening reflection
+FRONT_BACK_WORDS_MAX = 3500                 # how to use the book, about the author, carry it with you
 MAX_QUOTED_SHARE = 0.30                     # the classic is the guest: quoted passages are a minority of the book
-READING_PARTS = ("The passage", "Reflection", "For the walk", "A short prayer")
-READING_WORDS = (850, 1300)
+READING_PARTS = ("The passage", "Reflection", "For the walk", "At the end of the day", "A short prayer")
+MORNING_PARTS = READING_PARTS[:3]           # about 5 minutes
+EVENING_PARTS = READING_PARTS[3:]           # about 3 minutes
+MORNING_WORDS = (850, 1350)
+EVENING_WORDS = (450, 800)
+READING_WORDS = (DAY_WORDS_MIN, DAY_WORDS_MAX)      # one whole day
 DESCRIPTION_SHORT_MAX = 200
 DESCRIPTION_LONG = (600, 2500)
 KEYWORDS_MAX = 7
@@ -164,7 +169,7 @@ def _meta(book: bk.Book, rep: Report, series: dict) -> None:
         rep.error(f"book.json: cover.colour must be one of {bk.COVER_COLOURS}")
     if cover.get("icon") not in bk.COVER_ICONS:
         rep.error(f"book.json: cover.icon must be one of {bk.COVER_ICONS}")
-    if m.get("kind") == "guide":
+    if m.get("kind") == "guide" or (m.get("kind") == "reflection" and m.get("route_slug")):
         slug = m.get("route_slug")
         if not slug:
             rep.error("book.json: a guide needs route_slug (the app's route, for example camino-ingles)")
@@ -268,12 +273,29 @@ def _guide(book: bk.Book, rep: Report) -> None:
         rep.warn(f"{len(km_hits)} distance(s) without '~' (approximate figures are marked with ~), e.g. " + "; ".join(km_hits[:4]))
 
 
+def _section(ch: bk.Chapter, name: str) -> list[dict]:
+    """The blocks under the '## name' heading of a chapter, up to the next '##'."""
+    out, inside = [], False
+    for b in ch.all_blocks:
+        if b["t"] == "h" and b["level"] == 2:
+            inside = bk.plain(b["spans"]) == name
+        elif inside:
+            out.append(b)
+    return out
+
+
 def _reflection(book: bk.Book, rep: Report, sources_dir: pathlib.Path | None) -> None:
     w = book.words
+    days = book.meta.get("days")
+    if not isinstance(days, int) or not DAYS[0] <= days <= DAYS[1]:
+        rep.error(f"book.json: 'days' must be a whole number from {DAYS[0]} to {DAYS[1]} (the number of days of the book)")
+        days = None
     if w > REFLECTION_HARD_MAX_WORDS:
         rep.error(f"{w:,} words is {bk.format_minutes(book.minutes)} of reading: the ceiling is 3 hours ({REFLECTION_HARD_MAX_WORDS:,} words)")
-    elif not REFLECTION_MIN_WORDS <= w <= REFLECTION_MAX_WORDS:
-        rep.warn(f"{w:,} words: a reflection book is {REFLECTION_MIN_WORDS:,} to {REFLECTION_MAX_WORDS:,}")
+    elif days:
+        lo, hi = days * DAY_WORDS_MIN, days * DAY_WORDS_MAX + FRONT_BACK_WORDS_MAX
+        if not lo <= w <= hi:
+            rep.warn(f"{w:,} words for {days} days: expect {lo:,} to {hi:,} (a day is {DAY_WORDS_MIN:,} to {DAY_WORDS_MAX:,} words)")
     srcs = Sources(sources_dir)
     loaded: list[tuple[str, str]] = []
     for s in book.meta.get("sources", []):
@@ -315,13 +337,36 @@ def _reflection(book: bk.Book, rep: Report, sources_dir: pathlib.Path | None) ->
             readings += 1
             for part in READING_PARTS:
                 if sections.get(part) != 1:
-                    rep.error(f"{ch.file}: a reading has exactly one '## {part}' (found {sections.get(part, 0)})")
+                    rep.error(f"{ch.file}: a day has exactly one '## {part}' (found {sections.get(part, 0)})")
+            order = [bk.plain(b["spans"]) for b in ch.all_blocks if b["t"] == "h" and b["level"] == 2 and bk.plain(b["spans"]) in READING_PARTS]
+            if order != list(READING_PARTS) and all(sections.get(p) == 1 for p in READING_PARTS):
+                rep.error(f"{ch.file}: the parts of a day come in this order: {', '.join(READING_PARTS)}")
+            part_words: dict[str, int] = {}
+            cur = None
+            for b in ch.all_blocks:
+                if b["t"] == "h" and b["level"] == 2:
+                    cur = bk.plain(b["spans"])
+                elif cur:
+                    part_words[cur] = part_words.get(cur, 0) + bk.count_words(bk.block_text(b))
+            evening_list = next((b for b in _section(ch, "At the end of the day") if b["t"] == "ul"), None)
+            if evening_list is None:
+                rep.error(f"{ch.file}: '## At the end of the day' needs its questions as a '-' list: the app shows them as the reflection prompt")
+            elif not 2 <= len(evening_list["items"]) <= 4:
+                rep.warn(f"{ch.file}: {len(evening_list['items'])} end-of-day questions (aim for 2 or 3)")
+            morning = sum(part_words.get(p, 0) for p in MORNING_PARTS)
+            evening = sum(part_words.get(p, 0) for p in EVENING_PARTS)
+            if not MORNING_WORDS[0] <= morning <= MORNING_WORDS[1]:
+                rep.warn(f"{ch.file}: the morning reading is {morning:,} words, about {bk.reading_minutes(morning)} min (aim for 5 min: {MORNING_WORDS[0]:,} to {MORNING_WORDS[1]:,} words)")
+            if not EVENING_WORDS[0] <= evening <= EVENING_WORDS[1]:
+                rep.warn(f"{ch.file}: the end-of-day reflection is {evening:,} words, about {bk.reading_minutes(evening)} min (aim for 3 min: {EVENING_WORDS[0]:,} to {EVENING_WORDS[1]:,} words)")
             if not has_cite:
                 rep.error(f"{ch.file}: no quoted, attributed passage under '## The passage'")
             if not READING_WORDS[0] <= ch.words <= READING_WORDS[1]:
-                rep.warn(f"{ch.file}: {ch.words:,} words (a reading is {READING_WORDS[0]:,} to {READING_WORDS[1]:,})")
-    if readings != READINGS:
-        rep.error(f"{readings} readings found, a reflection book has {READINGS}")
+                rep.warn(f"{ch.file}: {ch.words:,} words (a day is {READING_WORDS[0]:,} to {READING_WORDS[1]:,})")
+    if days is not None and readings != days:
+        rep.error(f"{readings} day chapters found, book.json says {days} days")
+    if readings == 0:
+        rep.error("no day chapters found (a day has a '## The passage' section)")
     quoted = sum(bk.count_words(" ".join(bk.plain(p) for p in b["paras"])) for ch in book.chapters for b in ch.all_blocks if b["t"] == "quote")
     if book.words and quoted / book.words > MAX_QUOTED_SHARE:
         rep.warn(f"quoted passages are {quoted / book.words:.0%} of the words: the reflections are the book, keep the quotes under {MAX_QUOTED_SHARE:.0%}")
