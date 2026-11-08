@@ -79,9 +79,21 @@ Then the **scenarios** ([scenarios.mjs](scenarios.mjs)), each in light and dark,
 - with an expired login the session is renewed online; offline the account saved on the phone opens on Me and says it is offline,
   and with an expired login (also with nothing saved: "No signal right now") the app does not wait for the network.
 
-The diary screens, the Notes feed (the first sub-tab of Me) and the daily reading belong to their own features: they are swept (they must load
-without errors), and the scenarios only check where the pen and the banner lead, that Notes is the first sub-tab and that a note written there
-shows up, never what those screens contain. The Bible screens are the Bible feature's own, and they run on the real text (Psalm 121, John 1,
+The diary screens and the Notes feed (the first sub-tab of Me) belong to their own features: they are swept (they must load without errors),
+and the scenarios only check where the pen leads, that Notes is the first sub-tab and that a note written there shows up, never what those
+screens contain. The daily reading has scenarios of its own ([daily.scenarios.mjs](daily.scenarios.mjs)), which never name a date (the browser's
+clock is the phone's, and "today" is found as a person finds it, by the day that says "today"):
+
+- the header is one row (Back, the title, the Calendar button, the Bookmark button), every button at least 44 by 44; the strip has exactly seven
+  days, each at least 44 by 44; a tap on a day picks it and changes the liturgical title, Today brings it back, the arrows move a week; under it
+  the card, the notice, and the readings and the reflection tagged as samples (the Psalm is the only citation, a reading opens and closes);
+- the Calendar button opens the sheet; Escape, Close and a tap outside close it; a day chosen in it closes it and moves the strip to its week; its
+  Today picks today;
+- the Bookmark button toggles and is kept; the day is a row of Bookmarks ("Daily reading", the date, the liturgical title) that opens
+  `/library/daily?date=YYYY-MM-DD`; taking it off there removes the row;
+- `?date=` opens that day (also one far outside the five years) and anything that is not a day opens today.
+
+The Bible screens are the Bible feature's own, and they run on the real text (Psalm 121, John 1,
 Psalm 119, Malachi 4, Tobit 1), so those walks fail when the text is missing or the import is wrong.
 
 ### Routes and account states come from the source
