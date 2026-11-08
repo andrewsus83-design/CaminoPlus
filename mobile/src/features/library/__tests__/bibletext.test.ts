@@ -9,12 +9,12 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
-import { dirname, join, resolve } from 'node:path';
-import ts from 'typescript';
+import { join, resolve } from 'node:path';
 import { BIBLE_BOOKS } from '../bible/books';
 import { makeBibleText, type BookLoaders, type TextIndex } from '../bible/textCore';
 import type { BookText } from '../bible/textTypes';
 import { SAMPLE_READING } from '../daily/sample';
+import { run } from './runTs';
 
 let n = 0;
 const check = (name: string, fn: () => void) => { fn(); n += 1; console.log(`ok   ${name}`); };
@@ -206,7 +206,7 @@ check('every file is JSON in the compact form the importer writes: sorted keys, 
     const text = readFileSync(join(ASSETS, f), 'utf8');
     if (f === 'manifest.json') continue; // people read this one: it has one value to a line
     assert.ok(text.endsWith('}\n') && text.indexOf('\n') === text.length - 1, `${f}: one line, one newline at the end`);
-    assert.equal(JSON.stringify(JSON.parse(text)), text.slice(0, -1).replace(/\\u00a0/g, ' '), `${f}: compact`);
+    assert.equal(JSON.stringify(JSON.parse(text)), text.slice(0, -1).replace(/\\u00a0/g, '\u00a0'), `${f}: compact`);
   }
 });
 
@@ -219,11 +219,11 @@ check('no marker of the source is left in anything the screens print: no backsla
 });
 
 check('the text uses only the characters this edition uses: printable ASCII, the curly quotes, the two dashes and the no-break space (so the search can fold it letter by letter)', () => {
-  const allowed = /^[ -~\t\n‘’“”–— ]*$/;
+  const allowed = /^[ -~\t\n‘’“”–—\u00a0]*$/;
   const odd: string[] = [];
   for (const { where, text } of everyText()) if (!allowed.test(text)) odd.push(`${where}: ${[...text].filter((c) => !allowed.test(c)).join('')}`);
   assert.deepEqual(odd, []);
-  const nbsp = [...everyVerse()].filter((v) => v.verse.t.includes(' ')).map((v) => `${v.code} ${v.chapter.c}:${v.verse.n}`);
+  const nbsp = [...everyVerse()].filter((v) => v.verse.t.includes('\u00a0')).map((v) => `${v.code} ${v.chapter.c}:${v.verse.n}`);
   assert.deepEqual(nbsp, ['JHN 5:11', 'ACT 20:35', 'ACT 22:21'], 'the three verses that keep a no-break space between a closing single and a closing double quote');
 });
 
@@ -459,23 +459,6 @@ check('webc.generated.ts has one lazy require for each of the 73 codes of the in
     assert.equal((JSON.parse(readFileSync(path, 'utf8')) as BookText).code, code);
   }
 });
-
-/** Runs a TypeScript file of the app with a `require` that resolves relative paths against the real files (.ts transpiled, .json parsed). */
-function run(file: string): Record<string, any> {
-  const cache = new Map<string, Record<string, any>>();
-  const load = (path: string): Record<string, any> => {
-    if (path.endsWith('.json')) return JSON.parse(readFileSync(path, 'utf8'));
-    const ts_ = existsSync(path) ? path : `${path}.ts`;
-    const hit = cache.get(ts_);
-    if (hit) return hit;
-    const out = ts.transpileModule(readFileSync(ts_, 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText;
-    const module = { exports: {} as Record<string, any> };
-    cache.set(ts_, module.exports);
-    new Function('require', 'module', 'exports', out)((spec: string) => load(resolve(dirname(ts_), spec)), module, module.exports);
-    return module.exports;
-  };
-  return load(file);
-}
 
 check('text.ts, run for real: the translation, the 73 books of the index in order, hasBook and loadBook through the generated map', () => {
   const text = run(join(BIBLE_DIR, 'text.ts'));

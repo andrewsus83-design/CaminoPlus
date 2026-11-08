@@ -7,6 +7,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import './bible.test';
 import './bibletext.test';
+import './searchtext.test';
 import './books.test';
 import {
   BOOKMARKS_MAX, bookmarkKeys, hasBookmark, packBookmarks, parseBookmarks, toggleBookmark, type Bookmark,
