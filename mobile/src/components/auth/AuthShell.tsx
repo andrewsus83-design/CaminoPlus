@@ -1,16 +1,14 @@
 import { ReactNode } from 'react';
 import { Image, KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
-import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '../AppText';
-import { IconButton } from '../ui';
+import { BackButton } from '../BackButton';
 import { layout, role } from '@/theme';
 
 /** Spacious form screen with optional back button, title and lead text. */
 export function AuthShell({ title, lead, back = true, hero, children, footer }: { title: string; lead?: string; back?: boolean; hero?: boolean; children: ReactNode; footer?: ReactNode }) {
   const insets = useSafeAreaInsets();
-  const router = useRouter();
   return (
     <KeyboardAvoidingView style={{ flex: 1, backgroundColor: role.bg }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       {hero && (
@@ -30,7 +28,7 @@ export function AuthShell({ title, lead, back = true, hero, children, footer }: 
         </View>
       )}
       <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ flexGrow: 1, paddingTop: insets.top + layout.screenTop, paddingBottom: insets.bottom + 24, paddingHorizontal: layout.screenMargin, gap: 24 }}>
-        {back && <IconButton name="back" label="Back" onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))} />}
+        {back && <BackButton />}
         {/* Only the hero title is pushed down (it sits below the photo). Without a back button the title is the first
             element and starts at the same distance from the camera as everything else: no margin of its own. */}
         <View style={{ gap: 8, marginTop: hero ? 90 : 0 }}>

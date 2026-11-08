@@ -5,7 +5,8 @@ import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
 import { Pill } from '@/components/Pill';
 import { Screen } from '@/components/Screen';
-import { Card, IconButton } from '@/components/ui';
+import { BackButton } from '@/components/BackButton';
+import { Card } from '@/components/ui';
 import { FormMessage } from '@/components/auth/Field';
 import { c, radius, role } from '@/theme';
 import { BOOKMARK_NOT_SAVED } from '../bookmarks';
@@ -77,7 +78,7 @@ function Missing() {
   const router = useRouter();
   return (
     <Screen tabBar={false}>
-      <IconButton name="back" label="Back" onPress={() => (router.canGoBack() ? router.back() : router.replace('/library'))} />
+      <BackButton fallback="/library" />
       <AppText variant="h2" accessibilityRole="header">Not found</AppText>
       <Card style={{ gap: 12 }}>
         <AppText variant="h4" accessibilityRole="header">{UNKNOWN_TITLE}</AppText>
@@ -110,14 +111,13 @@ function Page({ book, notice }: { book: CatalogBook; notice?: string }) {
   const resume = resumeAt(chapters, place);
   const target = chapters[resume.index];
   const nav = target ? chapterNav(chapters, resume.index) : null;
-  const goBack = () => (router.canGoBack() ? router.back() : router.replace('/library'));
   const open = useCallback((chapterId: string) => router.push(readerPath(book.id, chapterId)), [router, book.id]);
   const toggle = useCallback(() => marks.toggle(key), [marks, key]);
   const coverWidth = coverWidthOf(width);
 
   return (
     <Screen tabBar={false}>
-      <IconButton name="back" label="Back" onPress={goBack} />
+      <BackButton fallback="/library" />
       {!!notice && <FormMessage tone="info">{notice}</FormMessage>}
       {marks.failed && <FormMessage>{BOOKMARK_NOT_SAVED}</FormMessage>}
       <View style={{ alignItems: 'center', gap: 12 }}>

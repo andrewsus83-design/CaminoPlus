@@ -5,7 +5,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
 import { Pill } from '@/components/Pill';
-import { Card, IconButton } from '@/components/ui';
+import { BackButton } from '@/components/BackButton';
+import { Card } from '@/components/ui';
 import { FormMessage } from '@/components/auth/Field';
 import { clearDiary } from '@/features/diary/storage';
 import { useAuth } from '@/lib/auth';
@@ -61,7 +62,7 @@ export default function DeleteAccount() {
   return (
     <KeyboardAvoidingView style={{ flex: 1, backgroundColor: role.bg }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingTop: insets.top + layout.screenTop, paddingHorizontal: layout.screenMargin, paddingBottom: insets.bottom + 40, gap: 16 }}>
-        <IconButton name="back" label="Back" onPress={() => router.back()} />
+        <BackButton fallback="/settings" />
         <View style={{ gap: 8 }}>
           <AppText variant="h2">Delete account</AppText>
           <AppText variant="lead" muted>This removes your CaminoPlus account and what is in it. It cannot be undone.</AppText>
