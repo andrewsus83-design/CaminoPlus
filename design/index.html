@@ -716,11 +716,16 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
 .cp-thumbs .th .rm { position: absolute; top: 6px; right: 6px; width: 22px; height: 22px; border-radius: 50%; background: rgba(12,35,64,.7); color: #fff; display: grid; place-items: center; }
 .cp-thumbs .th .rm .cp-icon { width: 12px; height: 12px; stroke-width: 3px; }
 .cp-thumbs .add { width: 84px; height: 104px; border-radius: var(--cp-radius-md); border: 2px dashed var(--cp-border-strong); display: grid; place-items: center; color: var(--cp-text-muted); flex: none; }
-/* Diary: the bar above the keyboard, the tiles of a page's photos and videos, its place, and the page as it is read (the diary phones) */
+/* Diary: the marks bar inside the text box, the row Read + Publish under the page, the tiles of a page's photos and videos, its place, and the page as it is read (the diary phones) */
 .dy-prev { margin: 3px 0 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .dy-meta { margin: 3px 0 0; font-size: 14px; line-height: 20px; font-weight: 500; letter-spacing: 0.4px; color: var(--cp-text-accent); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .dy-sel { background: var(--cp-color-blue-100); border-radius: 3px; }
-.dy-bar { position: absolute; left: 0; right: 0; bottom: 0; z-index: 6; display: flex; align-items: center; background: var(--cp-surface); border-top: 1px solid var(--cp-border); padding: 0 0 30px; }
+.dy-bar { display: flex; align-items: center; background: var(--cp-surface); border-top: 1px solid var(--cp-border); }
+.dy-foot { position: absolute; left: 0; right: 0; bottom: 0; z-index: 6; display: flex; gap: 12px; padding: 8px 16px 34px; background: var(--cp-bg); }
+.dy-foot button { height: 56px; border-radius: var(--cp-radius-pill); font-size: 17px; font-weight: 600; display: grid; place-items: center; padding: 0; border: 0; }
+.dy-foot .read { flex: 1; background: var(--cp-surface); color: var(--cp-text); box-shadow: inset 0 0 0 1px var(--cp-border); }
+.dy-foot .publish { flex: 2; background: var(--cp-action); color: var(--cp-on-action); }
+.dy-draft { flex: none; margin-left: 8px; padding: 1px 8px; border-radius: var(--cp-radius-pill); box-shadow: inset 0 0 0 1px var(--cp-border); background: var(--cp-sunken); color: var(--cp-text-accent); font-size: 14px; line-height: 20px; font-weight: 500; letter-spacing: .4px; }
 .dy-bar .t { flex: 1; height: 56px; border: 0; background: transparent; color: var(--cp-text); display: grid; place-items: center; padding: 0; }
 .dy-bar .t i { width: 44px; height: 40px; border-radius: var(--cp-radius-md); display: grid; place-items: center; }
 .dy-bar .t.on i { background: var(--cp-highlight); color: var(--cp-on-highlight); }
@@ -1905,7 +1910,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     <div class="panel" style="padding:12px 24px 0"><div class="cp-subtabs" style="margin:0"><span>Notes</span><span class="on">Journey</span><span>Plan</span><span>Health</span></div><p class="spec" style="margin:16px 0 20px">.cp-subtabs · 17/600 · 3px blue underline · Me: Notes, Journey, Plan, Health, and it opens on Journey</p></div>
   </div>
   <p class="spec" style="margin-top:16px">.cp-tabbar · height 88 · radius pill · shadow-lg · icon 28 · label 14 · inactive: stroke 0.8 (0.93 px) and Inter Light, the stem of the label · active: stroke 3 and Bold in light mode, 2.6 and SemiBold in dark mode (tokens.tab)</p>
-  <p class="note" style="margin-top:12px;max-width:760px"><b>Settings is not a tab.</b> It opens from the gear at the top right of Me, the only button there, as a screen of its own: a back button on the left, light/dark and log out on the right, and no tab bar under it. <b>Library</b> is the fifth tab. It has no title: the row on top is a search field and the round Bookmarks button in the corner (the same size as the bell and the gear on Me), and directly under it the two tabs Bible and Books, then the banner of the tab. The Bible tab is real: the World English Bible, Catholic edition, all 73 books, in the app. It starts with a compact daily reading banner (one handwritten note and a gold pill), then a segmented pill that chooses the part (Old Testament, Deuterocanon, New Testament; it is in the page and scrolls with it), then the books of that part as square tiles, three in a row. A tile opens the numbers of the chapters of the book, a number opens the words, and Previous and Next name where they go and carry on across the books. The Books tab is real too: the books written for the app, with their text in it (Library · Books and the reader, below). There is no gold button on the Library. <b>Me</b> has four sub-tabs under the highlights, left to right Notes, Journey, Plan and Health, and it opens on Journey. One gold button floats over all four, the chat button at the bottom right: it opens the inbox (notifications, messages and groups) and carries the unread badge, so the header keeps only the gear. Writing is a card, not a button that floats: the first tile of Journey is the card Write a journey post, and the card at the top of Notes is Write a note. <b>The diary</b> (Me, Notes) keeps its pages only on the phone: the list says so, nothing is uploaded, logging out keeps the pages, deleting the account deletes them, and a page is saved as it is typed, so there is no Save button.</p>
+  <p class="note" style="margin-top:12px;max-width:760px"><b>Settings is not a tab.</b> It opens from the gear at the top right of Me, the only button there, as a screen of its own: a back button on the left, light/dark and log out on the right, and no tab bar under it. <b>Library</b> is the fifth tab. It has no title: the row on top is a search field and the round Bookmarks button in the corner (the same size as the bell and the gear on Me), and directly under it the two tabs Bible and Books, then the banner of the tab. The Bible tab is real: the World English Bible, Catholic edition, all 73 books, in the app. It starts with a compact daily reading banner (one handwritten note and a gold pill), then a segmented pill that chooses the part (Old Testament, Deuterocanon, New Testament; it is in the page and scrolls with it), then the books of that part as square tiles, three in a row. A tile opens the numbers of the chapters of the book, a number opens the words, and Previous and Next name where they go and carry on across the books. The Books tab is real too: the books written for the app, with their text in it (Library · Books and the reader, below). There is no gold button on the Library. <b>Me</b> has four sub-tabs under the highlights, left to right Notes, Journey, Plan and Health, and it opens on Journey. One gold button floats over all four, the chat button at the bottom right: it opens the inbox (notifications, messages and groups) and carries the unread badge, so the header keeps only the gear. Writing is a card, not a button that floats: the first tile of Journey is the card Write a journey post, and the card at the top of Notes is Write a note. <b>The diary</b> (Me, Notes) keeps its pages only on the phone: the list says so, nothing is uploaded, logging out keeps the pages, deleting the account deletes them, and a page is saved as it is typed and starts as a draft (Notes shows it with a Draft tag): <b>Publish</b>, the big button at the bottom, makes it a note, and <b>Save draft</b>, at the top right, keeps it as a draft and goes back. Read is the small button beside Publish, and the marks (bold, italic, heading, bullets, quote, photo, pin) sit inside the text box. All of it stays on the phone.</p>
   <p class="note" style="margin-top:12px;max-width:760px"><b>Library search</b> looks through the Bible and Books tabs at once, as you type (every book of the Bible and every book of the Library; the diary is not searched here, it is the Notes sub-tab of Me), and lists what it finds grouped by tab (Bible, Books) and then the verses. A word counts when it starts a word of a row (a name or title, the subtitle or the description of a book, a chapter title, the part of the Bible, the kind of book, or the name of the tab), so "new testament" lists the 27 books of the New Testament. With nothing found it says "Nothing found for ..." and offers Clear search; clearing the field brings the tabs and the banner back. <b>Bookmarks</b> is a screen of its own, opened from the round button in the corner: a back button, no tab bar, then two parts. Library lists the rows bookmarked from the tabs (books of the Bible, books of the Library, verses, and the passages of a book, which open the reader at them); they stay only on the phone and logging out clears them. Posts lists the posts bookmarked in the journey viewer; they stay with the account, and with no signal the list from the last visit is shown, with a line that says so. A row that is taken off stays in place, with an empty bookmark, until the screen is left, so a slip can be put back with one tap.</p>
 </section>
 
@@ -3662,19 +3667,30 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     </div>
 
     <div class="phone-wrap">
-      <p class="phone-label"><b>Diary · page</b>Saved as you type · the bar sits above the keyboard</p>
+      <p class="phone-label"><b>Diary · page</b>A draft, saved as you type · the marks are inside the text box · Read (a third) and Publish (two thirds) at the bottom · Save draft at the top right</p>
       <div class="phone">
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
         <div class="scroll" style="display:flex;flex-direction:column;padding-bottom:104px">
-          <div class="biz-top" style="justify-content:space-between"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon "><use href="#i-back"/></svg></button><span style="display:flex;align-items:center;gap:8px"><button class="cp-btn md" style="height:48px;padding:0 20px;font-size:17px;background:var(--cp-surface);color:var(--cp-text);box-shadow:inset 0 0 0 1px var(--cp-border)">Read</button><button class="cp-icon-btn flat" aria-label="Delete this page"><svg class="cp-icon "><use href="#i-trash"/></svg></button></span></div>
-          <p class="note" style="margin:12px 0 10px">Friday 6 November</p>
-          <div class="cp-card" style="padding:0;flex:1;min-height:236px;box-shadow:inset 0 0 0 2px var(--cp-color-gold)">
+          <div class="biz-top" style="justify-content:space-between"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon "><use href="#i-back"/></svg></button><span style="display:flex;align-items:center;gap:8px"><button class="cp-btn md" style="height:48px;padding:0 20px;font-size:17px;background:var(--cp-surface);color:var(--cp-text);box-shadow:inset 0 0 0 1px var(--cp-border)">Save draft</button><button class="cp-icon-btn flat" aria-label="Delete this page"><svg class="cp-icon "><use href="#i-trash"/></svg></button></span></div>
+          <p class="note" style="margin:12px 0 10px">Friday 6 November · Draft</p>
+          <div class="cp-card" style="padding:0;flex:1;min-height:236px;box-shadow:inset 0 0 0 2px var(--cp-color-gold);display:flex;flex-direction:column;overflow:hidden">
             <div style="font-family:var(--cp-font-title);font-weight:600;font-size:24px;line-height:30px;padding:14px 18px 10px">Hontanas</div>
             <div style="height:1px;margin:0 18px;background:var(--cp-border)"></div>
             <div style="font-size:19px;line-height:28px;padding:14px 18px;white-space:pre-wrap">A long, flat day across the meseta. **<span class="dy-sel">Wind in my face</span>** from the first step and _no shade_ at all.
 
 - lentil soup
 - bread and a **very** cold beer</div>
+            <div style="flex:1"></div>
+            <div class="dy-bar">
+              <button class="t on" aria-label="Bold, on"><i><svg class="cp-icon"><use href="#i-bold"/></svg></i></button>
+              <button class="t" aria-label="Italic"><i><svg class="cp-icon"><use href="#i-italic"/></svg></i></button>
+              <button class="t" aria-label="Heading"><i><svg class="cp-icon"><use href="#i-heading"/></svg></i></button>
+              <button class="t" aria-label="Bulleted list"><i><svg class="cp-icon"><use href="#i-list"/></svg></i></button>
+              <button class="t" aria-label="Quote"><i><svg class="cp-icon"><use href="#i-quote"/></svg></i></button>
+              <span class="sep"></span>
+              <button class="t" aria-label="Add photos or videos"><i><svg class="cp-icon"><use href="#i-image"/></svg></i></button>
+              <button class="t" aria-label="Change place"><i><svg class="cp-icon"><use href="#i-pin"/></svg></i></button>
+            </div>
           </div>
           <div class="dy-tiles" style="margin-top:12px">
             <div class="dy-tile"><div class="cp-img"></div><span class="rm"><svg class="cp-icon"><use href="#i-x"/></svg></span></div>
@@ -3686,15 +3702,9 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           <p class="note" style="margin:6px 0 0 16px;font-size:14px">42.4172° N, 4.2477° W</p>
           <p class="note" style="margin:10px 0 0;font-size:14px">Saved on this phone</p>
         </div>
-        <div class="dy-bar">
-          <button class="t on" aria-label="Bold, on"><i><svg class="cp-icon"><use href="#i-bold"/></svg></i></button>
-          <button class="t" aria-label="Italic"><i><svg class="cp-icon"><use href="#i-italic"/></svg></i></button>
-          <button class="t" aria-label="Heading"><i><svg class="cp-icon"><use href="#i-heading"/></svg></i></button>
-          <button class="t" aria-label="Bulleted list"><i><svg class="cp-icon"><use href="#i-list"/></svg></i></button>
-          <button class="t" aria-label="Quote"><i><svg class="cp-icon"><use href="#i-quote"/></svg></i></button>
-          <span class="sep"></span>
-          <button class="t" aria-label="Add photos or videos"><i><svg class="cp-icon"><use href="#i-image"/></svg></i></button>
-          <button class="t" aria-label="Change place"><i><svg class="cp-icon"><use href="#i-pin"/></svg></i></button>
+        <div class="dy-foot" role="toolbar" aria-label="Page actions">
+          <button class="read" aria-label="Read this page">Read</button>
+          <button class="publish" aria-label="Publish this note">Publish</button>
         </div>
         <span class="home-ind"></span>
       </div>
@@ -3731,12 +3741,12 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     <!-- Diary: note about a passage (end) -->
 
     <div class="phone-wrap">
-      <p class="phone-label"><b>Diary · read</b>A page as it will be remembered · tap Edit to write</p>
+      <p class="phone-label"><b>Diary · read</b>A draft as it will be remembered · Edit (a third) and Publish (two thirds) at the bottom · a published note has Edit alone</p>
       <div class="phone">
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
         <div class="scroll">
-          <div class="biz-top" style="justify-content:space-between"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon "><use href="#i-back"/></svg></button><span style="display:flex;align-items:center;gap:8px"><button class="cp-btn md" style="height:48px;padding:0 20px;font-size:17px;background:var(--cp-surface);color:var(--cp-text);box-shadow:inset 0 0 0 1px var(--cp-border)">Edit</button><button class="cp-icon-btn flat" aria-label="Delete this page"><svg class="cp-icon "><use href="#i-trash"/></svg></button></span></div>
-          <p class="note" style="margin:12px 0 8px">Friday 6 November</p>
+          <div class="biz-top" style="justify-content:space-between"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon "><use href="#i-back"/></svg></button><span style="display:flex;align-items:center;gap:8px"><button class="cp-icon-btn flat" aria-label="Delete this page"><svg class="cp-icon "><use href="#i-trash"/></svg></button></span></div>
+          <p class="note" style="margin:12px 0 8px">Friday 6 November · Draft</p>
           <h1 style="font-family:var(--cp-font-title);font-weight:600;font-size:28px;line-height:34px;margin:0 0 14px">Hontanas</h1>
           <div class="dy-read">
             <p>A long, flat day across the meseta. <b>Wind in my face</b> from the first step and <i>no shade</i> at all until the little village appeared.</p>
@@ -3754,6 +3764,10 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           </div>
           <div class="dy-place" style="margin-top:14px;display:inline-flex;padding:0 18px 0 4px"><span class="pin"><svg class="cp-icon"><use href="#i-pin"/></svg></span><b>Hontanas, Castilla y León</b></div>
           <p class="note" style="margin:12px 0 0;font-size:14px">Saved on this phone</p>
+        </div>
+        <div class="dy-foot" role="toolbar" aria-label="Page actions">
+          <button class="read" aria-label="Edit this page">Edit</button>
+          <button class="publish" aria-label="Publish this note">Publish</button>
         </div>
         <span class="home-ind"></span>
       </div>
@@ -3805,7 +3819,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           <article class="nt-row">
             <span class="nt-av" aria-hidden="true">AG</span>
             <div class="nt-main">
-              <div class="nt-hd"><span class="who">Ana García <i>@ana.camina</i></span><span class="tm"> · 3m</span><span class="more" aria-label="More: edit or delete this note"><svg class="cp-icon"><use href="#i-dots"/></svg></span></div>
+              <div class="nt-hd"><span class="who">Ana García <i>@ana.camina</i></span><span class="tm"> · 3m</span><span class="dy-draft" aria-hidden="true">Draft</span><span class="more" aria-label="More: edit or delete this note"><svg class="cp-icon"><use href="#i-dots"/></svg></span></div>
               <h4 class="nt-title">Hontanas</h4><div class="dy-read nt-words"><p>A long, flat day across the meseta. <b>Wind in my face</b> from the first step and <i>no shade</i> at all.</p></div><div class="nt-place"><svg class="cp-icon"><use href="#i-pin"/></svg>Hontanas, Castilla y León</div><div class="nt-acts"><span aria-label="Share the words of this note"><svg class="cp-icon"><use href="#i-share"/></svg></span></div>
             </div>
           </article>
@@ -3875,7 +3889,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           <article class="nt-row">
             <span class="nt-av" aria-hidden="true">AG</span>
             <div class="nt-main">
-              <div class="nt-hd"><span class="who">Ana García <i>@ana.camina</i></span><span class="tm"> · 3m</span><span class="more" aria-label="More: edit or delete this note"><svg class="cp-icon"><use href="#i-dots"/></svg></span></div>
+              <div class="nt-hd"><span class="who">Ana García <i>@ana.camina</i></span><span class="tm"> · 3m</span><span class="dy-draft" aria-hidden="true">Draft</span><span class="more" aria-label="More: edit or delete this note"><svg class="cp-icon"><use href="#i-dots"/></svg></span></div>
               <h4 class="nt-title">Hontanas</h4><div class="dy-read nt-words"><p>A long, flat day across the meseta. <b>Wind in my face</b> from the first step and <i>no shade</i> at all.</p></div><div class="nt-place"><svg class="cp-icon"><use href="#i-pin"/></svg>Hontanas, Castilla y León</div><div class="nt-acts"><span aria-label="Share the words of this note"><svg class="cp-icon"><use href="#i-share"/></svg></span></div>
             </div>
           </article>
@@ -4146,7 +4160,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           <article class="nt-row">
             <span class="nt-av" aria-hidden="true">AG</span>
             <div class="nt-main">
-              <div class="nt-hd"><span class="who">Ana García <i>@ana.camina</i></span><span class="tm"> · 3m</span><span class="more" aria-label="More: edit or delete this note"><svg class="cp-icon"><use href="#i-dots"/></svg></span></div>
+              <div class="nt-hd"><span class="who">Ana García <i>@ana.camina</i></span><span class="tm"> · 3m</span><span class="dy-draft" aria-hidden="true">Draft</span><span class="more" aria-label="More: edit or delete this note"><svg class="cp-icon"><use href="#i-dots"/></svg></span></div>
               <h4 class="nt-title">Hontanas</h4><div class="dy-read nt-words"><p>A long, flat day across the meseta. <b>Wind in my face</b> from the first step and <i>no shade</i> at all.</p></div><div class="nt-place"><svg class="cp-icon"><use href="#i-pin"/></svg>Hontanas, Castilla y León</div><div class="nt-acts"><span aria-label="Share the words of this note"><svg class="cp-icon"><use href="#i-share"/></svg></span></div>
             </div>
           </article>
