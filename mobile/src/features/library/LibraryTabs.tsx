@@ -132,10 +132,10 @@ export function BibleTab({ marks, testament, onListLayout }: { marks?: LibraryMa
     <>
       <Notice tab="Bible" />
       <View onLayout={onListLayout} style={{ gap: 16 }}>
-        <View style={{ gap: 4 }}>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'baseline', justifyContent: 'space-between', columnGap: 12, rowGap: 2 }}>
           <AppText variant="h4" accessibilityRole="header">Books of the Bible</AppText>
-          {/* A polite live region: a screen reader says the new part and count when a choice at the bottom is made. */}
-          <AppText variant="small" muted accessibilityLiveRegion="polite">{`${TESTAMENT_LABEL[testament]} · ${countLine(testament)}`}</AppText>
+          {/* How many the chosen part holds, on the same line (under the heading when it is long). A polite live region that says the part with it: a screen reader answers a choice at the bottom with "Old Testament, 39 books". */}
+          <AppText variant="small" muted accessibilityLiveRegion="polite" accessibilityLabel={`${TESTAMENT_LABEL[testament]}, ${countLine(testament)}`}>{countLine(testament)}</AppText>
         </View>
         <BibleBookRows items={booksOf(testament)} marks={marks} />
         {testament === 'deutero' && <AppText variant="caption" muted>{DEUTERO_NOTE}</AppText>}

@@ -17,8 +17,8 @@ export type SampleTab = (typeof SAMPLE_TABS)[number];
 
 /** Why each of those tabs has no text today, in the words the person reads. */
 export const PREVIEW_NOTICE: Record<SampleTab, string> = {
-  Bible: 'The Bible text is not in the app yet. We are choosing a translation we are allowed to include. This tab shows how reading will look.',
-  Books: 'Books are not in the app yet. We are checking the editions before we add them, so none of these twelve opens today.',
+  Bible: 'The Bible text is not in the app yet. We are choosing a translation we are allowed to include.',
+  Books: 'Books are not in the app yet. We are checking the editions before we add them.',
 };
 
 /**
