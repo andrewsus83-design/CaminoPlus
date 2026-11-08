@@ -16,6 +16,7 @@ const GUARDED: Record<string, string> = {
   'expo-clipboard': 'ExpoClipboard',
   'expo-image-picker': 'ExponentImagePicker',
   'expo-video': 'ExpoVideo',
+  'expo-apple-authentication': 'ExpoAppleAuthentication',
 };
 
 function sources(dir: string): string[] {
@@ -57,7 +58,7 @@ check('every require of such a package comes after a hasNativeModule() question 
       assert.ok(/from '(@\/lib|\.)\/optionalNative'/.test(text), `${f} does not import the helper`);
     }
   }
-  assert.ok(seen >= 6, `expected the known dynamic requires (updates, clipboard, image picker x3, video x2), found ${seen}`);
+  assert.ok(seen >= 7, `expected the known dynamic requires (updates, clipboard, image picker x3, video x2, apple authentication), found ${seen}`);
 });
 
 check('the question names the right package in each file', () => {
@@ -69,6 +70,7 @@ check('the question names the right package in each file', () => {
     [join('app', 'write.tsx'), 'expo-image-picker', 'NativeName.imagePicker'],
     [join('app', 'write.tsx'), 'expo-video', 'NativeName.video'],
     [join('src', 'features', 'me', 'JourneyGrid.tsx'), 'expo-video', 'NativeName.video'],
+    [join('src', 'lib', 'authApple.ts'), 'expo-apple-authentication', 'NativeName.appleAuthentication'],
   ];
   for (const [f, pkg, name] of expectations) {
     const text = read(f);

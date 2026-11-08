@@ -23,6 +23,7 @@ export const NativeName = {
   video: 'ExpoVideo',
   imagePicker: 'ExponentImagePicker',
   location: 'ExpoLocation',
+  appleAuthentication: 'ExpoAppleAuthentication',
 } as const;
 
 export function hasNativeModule(name: string): boolean {

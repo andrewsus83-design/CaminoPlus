@@ -26,6 +26,7 @@
     "src/lib/__tests__/postActions.test.ts",
     "src/lib/__tests__/railStandard.test.ts",
     "src/lib/__tests__/navigation.test.ts",
-    "src/lib/__tests__/optionalNative.test.ts"
+    "src/lib/__tests__/optionalNative.test.ts",
+    "src/lib/__tests__/authApple.test.ts"
   ]
 }

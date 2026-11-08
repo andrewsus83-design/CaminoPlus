@@ -45,6 +45,7 @@
         "@maplibre/maplibre-react-native",
         {}
       ],
+      "expo-apple-authentication",
       "expo-dev-client"
     ],
     "experiments": {
