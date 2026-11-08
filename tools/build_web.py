@@ -871,6 +871,9 @@ LICENCES_DATA = [
  ("Wikimedia Commons", "Photos of places, where we use them", "Each file has its own licence (CC0, CC BY, CC BY-SA ...); the author and licence are credited where a photo is shown", "https://commons.wikimedia.org/wiki/Commons:Licensing"),
  ("AI-generated sample pictures and clips", "The sample journey in the app, shown before you have posts of your own", "Made by CaminoPlus with Google Nano Banana 2 and Veo 3.1 through OpenArt. AI-generated, not photographs of real places or people", "https://openart.ai/"),
 ]
+LICENCES_TEXT = [
+ ("World English Bible, Catholic edition", "The text of the Bible in the Library: 73 books, kept in the app, so it reads without a signal. Strong’s numbers, footnotes and cross references are not included", "Public domain. The name “World English Bible” is a trademark of eBible.org", "https://ebible.org/eng-web-c/"),
+]
 LICENCES_SOFTWARE = [
  ("Noto Sans", "Map label glyphs, bundled in the app so labels work offline", "SIL Open Font License 1.1", "https://openfontlicense.org/"),
  ("Fraunces", "Headlines in the app and on this website", "SIL Open Font License 1.1", "/assets/fonts/OFL-Fraunces.txt"),
@@ -898,6 +901,10 @@ def licences():
 <h2>Map and place data</h2>
 </div>
 {table(LICENCES_DATA)}
+<div class="prose">
+<h2>The Bible text</h2>
+</div>
+{table(LICENCES_TEXT)}
 <div class="prose">
 <h2>Software and fonts</h2>
 </div>

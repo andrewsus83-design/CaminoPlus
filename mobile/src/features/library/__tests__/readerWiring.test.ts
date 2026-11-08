@@ -173,6 +173,7 @@ check('the words of the reader: prose is paragraphs and poetry is stanzas, each 
   assert.match(src, /selected=\{holding\.has\(i\) \? selected : null\}/, 'a block that does not hold the chosen verse gets nothing new and is not drawn again');
   assert.match(src, /export const INDENT = '\\u2003';/, 'an em space of Inter for each tab');
   assert.match(src, /\{INDENT\.repeat\(l\.indent\)\}/);
+  assert.match(src, /\{l\.parts\.map\(\(p, j\) => \(\s*<Text key=\{j\}>\s*\{j > 0 \? ' ' : ''\}\s*<Words verse=\{p\.verse\} number=\{p\.n\} text=\{p\.text\} on=\{p\.verse === selected\} onSelect=\{onSelect\} \/>\s*<\/Text>\s*\)\)\}/, 'a line that two verses share has a text for each verse, a space between them, and a touch chooses its own verse');
   assert.match(src, /\{k < lines\.length - 1 \? '\\n' : ''\}/, 'a stanza is one text, a line after the other');
   assert.match(src, /const lines = useMemo\(\(\) => wrapPoem\(block\.lines, \{ width: width - 2 \* SIDE, size: BODY_SIZE, scale, numberSize: NUMBER_SIZE, numberOf: superscript \}\), \[block, width, scale\]\);/, 'a long line is cut by the reader, to the width of the page, and the rest hangs');
   assert.match(src, /const scale = Math\.min\(fontScale, READER_MAX_FONT_SCALE\);/, 'at the text size the phone has, held to what the text is held to');
@@ -264,6 +265,26 @@ check('the search of verses never stands between a keystroke and the screen: it 
   assert.match(rows, /numberOfLines=\{ROW_TEXT_LINES\}/);
   assert.match(rows, /excerpt\(row\.text, row\.marks\)/, 'a long verse is cut around the match');
   assert.doesNotMatch(rows, /#[0-9a-fA-F]{3,8}\b|\bfixed\.|fontFamily/);
+});
+
+check('the text of the Bible is imported only by the screens that read it and by the search (the files are bundled as JavaScript: 7.5 MB in the Hermes bundle; a screen that only needs counts uses books.ts), and the search is made ready when its field is touched', () => {
+  const walk = (dir: string): string[] => fs.readdirSync(path.join(root, dir), { withFileTypes: true }).flatMap((e) => {
+    if (e.name === '__tests__' || e.name === 'node_modules') return [];
+    const rel = `${dir}/${e.name}`;
+    return e.isDirectory() ? walk(rel) : /\.tsx?$/.test(e.name) ? [rel] : [];
+  });
+  const files = [...walk('app'), ...walk('src')];
+  const resolve = (file: string, spec: string): string | null => (spec.startsWith('@/') ? `src/${spec.slice(2)}` : spec.startsWith('.') ? path.posix.normalize(path.posix.join(path.posix.dirname(file), spec)) : null);
+  const importers = (target: string): string[] => files.filter((f) => [...read(f).matchAll(/from '([^']+)'/g)].some((m) => resolve(f, m[1]) === target)).sort();
+  assert.deepEqual(importers(`${BIBLE}/text`), [`${BIBLE}/Reader.tsx`, `${BIBLE}/searchText.ts`, 'app/library/bookmarks.tsx'].sort(), 'the reader, the search and Bookmarks (which shows the words of a verse) read the text; nothing else does: not the Licences screen, not the tiles, not the Continue card');
+  assert.deepEqual(importers(`${BIBLE}/searchText`), [`${BIBLE}/useVerseSearch.ts`, 'app/(tabs)/library.tsx'].sort(), 'the search of verses, and the Library screen that makes it ready');
+  assert.deepEqual(importers(`${BIBLE}/webc.generated`), [`${BIBLE}/text.ts`], 'the files of the text are reached through text.ts only');
+  // the search is made ready when its field is touched, a beat before the first letter (the first search reads and folds the words of 35,408 verses: 100 to 135 ms on a laptop)
+  const screen = code(read('app/(tabs)/library.tsx'));
+  assert.match(screen, /import \{ prepareSearch \} from '@\/features\/library\/bible\/searchText';/);
+  assert.match(screen, /<LibraryHeader [^]*? onSearchFocus=\{prepareSearch\} \/>/);
+  assert.match(code(read('src/features/library/LibraryHeader.tsx')), /<SearchBar value=\{query\} onChangeText=\{onQuery\} onFocus=\{onSearchFocus\} \/>/);
+  assert.match(code(read('src/features/library/SearchBar.tsx')), /onFocus=\{\(\) => \{ setFocus\(true\); onFocus\?\.\(\); \}\}/);
 });
 
 check('the Bible side draws no colour of its own and no font of its own: every colour is a theme role (or the gold wash of a marked verse), every font a variant of AppText', () => {
