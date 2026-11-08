@@ -14,6 +14,8 @@ If you are only dreaming, read "Is this Camino for you?", then "The inner Way". 
 
 ## What this book is not
 
+This book was written with AI assistance, from public sources, and its author has not walked the road. So it gives you sources instead of memories, and it says plainly when the sources disagree.
+
 It is not a live map, a timetable or a booking service. It names no hostels, cafes or shops, and it gives no prices, opening hours or bed counts, because they change from season to season and a wrong one costs a tired person dearly. For those, use the CaminoPlus app and ask locally.
 
 Every distance carries a tilde, **~**, because it is approximate. Published stage lengths differ from one source to the next, by a kilometre or two and sometimes more, and the book says so where it matters. Where something depends on the season (a closure, a diversion, snow, heat), it says *check before you go*, and means it.

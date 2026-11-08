@@ -25,3 +25,5 @@ The report adds something worth knowing before you leave. Most of the medieval a
 ## A road with its own rules
 
 This is not a Compostela route. The Compostela is the certificate of the Pilgrim's Office for the walk that arrives at the cathedral, and this walk begins where that one ends. The Office's pages read for this book say nothing about Fisterra or Muxía. The certificates of the coast, the Fisterrana and the Muxiana, are another matter, and the chapter on arriving says where the official sources place them.
+
+A word on what the Compostela is for, so that it is not mistaken for the certificates of the coast. The Office awards the Compostela to those who walk for religious or spiritual reasons, and it describes the pilgrimage it has in mind as one made "with a Christian sentiment, even if it is only with an attitude of search". If that does not describe your reason for walking, ask the Pilgrim's Office what it can give you: it also offers a Certificate of Distance, which records the kilometres you walked from wherever you started.

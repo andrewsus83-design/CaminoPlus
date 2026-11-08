@@ -1,0 +1,29 @@
+{
+  "id": "camino-portugues-lisboa-guide",
+  "kind": "guide",
+  "order": 14,
+  "title": "The Long Portuguese Way",
+  "subtitle": "A Pilgrim's Guide to the Camino Portugués from Lisbon",
+  "route_slug": "camino-portugues-lisboa",
+  "description_short": "An honest guide to the long Camino Portugués from Lisbon: about four weeks along the Tagus, through Tomar and Coimbra to Porto, then on to Santiago, with its sources, its doubts and what to check.",
+  "description_long": "The long Portuguese Way is the road from the cathedral of Lisbon to the cathedral of Santiago de Compostela: about 620 km in the CaminoPlus catalog, walked in about four weeks. It follows the Tagus upstream across the Ribatejo, climbs to the Templar town of Tomar, passes the university city of Coimbra and the vineyards of the Bairrada, and reaches Porto after sixteen days. From Porto it joins the road that The Portuguese Way describes, through Barcelos and Ponte de Lima, across the Minho at Tui, and by Pontevedra and Padrón to Santiago.\n\nThis guide is written for the Planner first and the Walker's evenings second. It helps you decide whether four weeks on this road are your Camino, shape the walk, pack, and know what to check locally. No official page gives a stage list for the whole way, so the book follows published stage tables, says where they disagree, and checks the stage towns against the regional tourism board of Central Portugal. It says plainly that the first days are long, flat and hot, that the road before Porto has less pilgrim infrastructure than the road after it, and where the sources cannot agree on a distance.\n\nYou will find the sixteen days from Lisbon to Porto in three regional chapters, with the Roman roads, the Templar convent and the university you pass, and a short chapter on the eleven days beyond Porto, which the book does not repeat. There are chapters on when to go, on the credencial and the way there, on other ways to split the days and the roads that branch from this one, on sleeping, eating and resting, on body, weather and safety, on the inner side of walking, and on arriving and going home. It sets out the rule for the Compostela in the words of the Pilgrim's Office.\n\nEvery distance is marked approximate. The book names no hostels, cafes or prices, because they change, and it sends you to the CaminoPlus app and to local information for the live answer. It was written with AI assistance from public sources, which it credits, by an author who has not walked the road.",
+  "keywords": [
+    "Camino Portugués from Lisbon",
+    "Long Portuguese Way",
+    "Camino de Santiago",
+    "Lisbon to Santiago",
+    "pilgrim guidebook",
+    "Caminho Português",
+    "Compostela"
+  ],
+  "categories": [
+    "Travel / Special Interest / Pilgrimages",
+    "Travel / Europe / Portugal"
+  ],
+  "cover": {
+    "colour": "goldSoft",
+    "icon": "library"
+  },
+  "version": "1.0.0",
+  "date": "2026-11"
+}
