@@ -301,10 +301,14 @@ check('the licences screen has one entry for every book that has text: it is mad
   const code = src.split('\n').filter((l) => !/^\s*\/\//.test(l)).join('\n');
   assert.match(code, /type ManifestBook = \{ title: string; author: string; translator: string \| null; firstPublished: number; source: string \};/);
   assert.match(code, /const BOOKS: Item\[\] = \(require\('\.\.\/assets\/books\/manifest\.json'\) as \{ books: ManifestBook\[\] \}\)\.books\.map\(\(b\) => \(\{/);
-  assert.match(code, /name: b\.title,/);
-  assert.match(code, /what: `\$\{b\.author\}, \$\{b\.translator \? `translated by \$\{b\.translator\}` : 'translator not named'\} \(\$\{b\.firstPublished\}\)\. The full text of the book, to read offline`,/);
-  assert.match(code, /licence: 'Public domain',/);
-  assert.match(code, /url: b\.source,/);
+  // the four fields are looked for inside the BOOKS list itself: other lists of the screen have a "licence: 'Public domain'" of their own
+  const from = code.indexOf('const BOOKS: Item[]');
+  const list = code.slice(from, code.indexOf('}));', from) + 4);
+  assert.ok(from >= 0 && list.length > 100, 'the BOOKS list is found');
+  assert.match(list, /\n  name: b\.title,\n/);
+  assert.match(list, /\n  what: `\$\{b\.author\}, \$\{b\.translator \? `translated by \$\{b\.translator\}` : 'translator not named'\} \(\$\{b\.firstPublished\}\)\. The full text of the book, to read offline`,\n/);
+  assert.match(list, /\n  licence: 'Public domain',\n/);
+  assert.match(list, /\n  url: b\.source,\n\}\)\);$/);
   assert.match(code, /\{BOOKS\.length > 0 && <Group title="BOOKS IN THE LIBRARY" items=\{BOOKS\} \/>\}/, 'drawn only when there is a book');
   assert.equal(existsSync(join(root, 'assets/books/manifest.json')), true, 'the file the screen requires is there');
   // what the screen will print for each book of the manifest is complete: no "undefined" and no "null" can reach it
