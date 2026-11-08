@@ -20,11 +20,11 @@ After eight days and fifteen songs of distress, of hills, of narrow places, of t
 
 *Praise Yahweh!* The collection that began with *In my distress, I cried to Yahweh* ends with praise. Notice that nothing has been solved. The lying lips of Psalm 120 are still out there. The furrows are still on the back from Psalm 129. The poet did not get an answer to every question, and the songs make no pretence that they did. Praise is not offered as a reward for fixing things. It is what comes next, after everything else has been said honestly. If the call to praise sounds too quick for you tonight, you do not have to force it. You can simply stay in the song.
 
-Then the blessing, and a small change of voice. Until now the calls have been to a crowd, *all you servants*. But the blessing is for one person: *May Yahweh bless you from Zion; even he who made heaven and earth.* The singular matters. After the long company of the road, the one who is leaving hears a word said over them alone.
+Then the blessing, and a small change of voice. In the Hebrew, the first two verses are addressed to a crowd, *all you servants*, and the blessing turns to one person: *May Yahweh bless you from Zion; even he who made heaven and earth.* English cannot show it, since *you* does for one or for many. But the singular matters. After the long company of the road, the one who is leaving hears a word said over them alone.
 
 A blessing is a word, and it cannot promise anything. A tired walker may feel foolish receiving one. It is not a guarantee, and the psalms in this book have been clear enough that nobody is guaranteed anything. What a blessing does is send someone after their journey with good will. It is like a cup handed through a window. You take it, and you drink, and you go on.
 
-Now see what has come round. The line about the one who made heaven and earth is the third time we have met it in these eight days. It was the answer on the first day, to the question of the hills: help comes from *who made heaven and earth*. It came again at the end of the narrow escape. And now it ends the book. Whoever made the hills that frightened or called you on Day 1 is named, at the end, as the one who sends you off. And the blessing *from Zion* gathers up a line we met on the fifth day, *May Yahweh bless you out of Zion*, which was said over the table. The same hand blesses the table and the road.
+Now see what has come round. The line about the one who made heaven and earth is the third time we have met it in these eight days. It was the answer on the first day, to the question of the hills: help comes from the one *who made heaven and earth*. It came again at the end of the narrow escape. And now it ends the book. Whoever made the hills that frightened or called you on Day 1 is named, at the end, as the one who sends you off. And the blessing *from Zion* gathers up a line we met on the fifth day, *May Yahweh bless you out of Zion*, which was said over the table. The same hand blesses the table and the road.
 
 There is a kind of circle in this. The first day gave us the going out and the coming in: *your going out and your coming in*. The last psalm is a going out again. The pilgrims set off from the house, with a blessing behind them.
 
@@ -39,7 +39,7 @@ What might it ask of an ordinary day? Thank somebody who keeps the night. Lift y
 
 ## At the end of the day
 
-This may be the last evening of the book, and perhaps of the walk. Last evenings are strangely tiring. The body has been told that it can stop, and it takes that rather literally. If you feel elated and flat at once, that is common, and it is not a sign that something has gone wrong.
+This may be the last evening of the book, and perhaps of the walk. Last evenings are strangely tiring. The body has been told that it can stop, and it takes that rather literally. If you feel elated and flat at once, that is understandable, and it is not a sign that something has gone wrong.
 
 Look back over today, and over the days before it, as you would look at a road from the top of a pass. It began with a cry and a question about hills. There was gladness at a gate, a narrow place, some tears and a long day of work, an old furrow, a night with no sleep, a roof and a room full of strangers. None of it has to become a lesson. It happened, and you were there.
 

@@ -56,6 +56,11 @@ class Extract(unittest.TestCase):
         self.assertEqual(e.where, ["THE SECOND BOOK", "CHAPTER I"])      # the nearest book and the nearest chapter, not the chapter of the book before
         self.assertEqual(e.text, "Let us rest here, in the *quiet* of the evening.")                      # _italic_ became *italic*
 
+    def test_conversations_and_letters_are_chapter_level_headings(self):
+        src = "*** START OF THE PROJECT GUTENBERG EBOOK X ***\nFIRST CONVERSATION.\n\nHe walked a long way.\n\nSEVENTH LETTER.\n\nYou ask how to begin, and so I say: begin.\n*** END OF THE PROJECT GUTENBERG EBOOK X ***\n"
+        self.assertEqual(passage.extract(src, "You ask how", "begin.").where, ["SEVENTH LETTER."])
+        self.assertEqual(passage.extract(src, "He walked", "long way.").where, ["FIRST CONVERSATION."])
+
     def test_what_a_copied_stretch_can_carry_that_is_not_text_is_reported(self):
         e = passage.extract(SOURCE, "Every man naturally", "proud philosopher.")
         text = " ".join(e.warnings)
@@ -77,6 +82,17 @@ class Extract(unittest.TestCase):
     def test_the_bible_text_loses_its_verse_numbers_and_headings(self):
         e = passage.extract(WEB, "I will lift up my eyes", "heaven and earth.", web=True)
         self.assertEqual(e.text, "I will lift up my eyes to the hills. Where does my help come from? My help comes from Yahweh, who made heaven and earth.")
+
+    def test_the_bible_stretch_says_which_verses_it_covers(self):
+        self.assertEqual(passage.extract(WEB, "I will lift up my eyes", "heaven and earth.", web=True).where, ["121:1 to 2"])
+        self.assertEqual(passage.extract(WEB, "My help comes from Yahweh", "heaven and earth.", web=True).where, ["121:2"])
+        self.assertEqual(passage.extract(WEB, "Where does my help come from?", "who made heaven", web=True).where, ["121:1 to 2"])
+
+    def test_straight_quotation_marks_are_counted_too(self):
+        src = '*** START OF THE PROJECT GUTENBERG EBOOK X ***\nHe said, "Come here and rest, and I will give you peace." Then he left.\n*** END OF THE PROJECT GUTENBERG EBOOK X ***\n'
+        self.assertTrue(any("quotation mark" in w for w in passage.extract(src, "Come here and rest", 'peace." Then').warnings))   # the opening mark is outside, the closing one inside
+        self.assertEqual(passage.extract(src, "Come here and rest", "give you peace.").warnings, [])    # neither mark inside: a balanced stretch
+        self.assertEqual(passage.extract(src, '"Come here', 'peace."').warnings, [])                    # both inside: balanced
 
     def test_the_command_line_joins_stretches_and_its_output_passes_the_checker(self):
         with tempfile.TemporaryDirectory() as t:

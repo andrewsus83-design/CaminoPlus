@@ -12,7 +12,7 @@
 
 There are days on the road when the legs finish before the day does. A fever, a wet afternoon, a rest day taken because the body insisted. You find yourself indoors with nothing to do, and the one thing still moving is your mind.
 
-That was Ignatius's situation for months, with a broken leg, and the edition is plain about what he read. He wanted romances, stories of adventure, to pass the time, and the house had none. They gave him instead *The Life of Christ*, by Rudolph the Carthusian, and a book about the saints, both in Spanish. He did not choose them. They were what the house had. By reading them often, the account says, he began to get some love for spiritual things.
+That was Ignatius's situation for a long while, with a broken leg, and the edition is plain about what he read. He wanted romances, stories of adventure, to pass the time, and the house had none. They gave him instead *The Life of Christ*, by Rudolph the Carthusian, and a book about the saints, both in Spanish. He did not choose them. They were what the house had. By reading them often, the account says, he began to get some love for spiritual things.
 
 The account is more interested in what went on in his head. One daydream, above all the others, held him for hours at a time: what he would do in honour of a certain lady, the journey to her city, the words he would say, the exploits that would please her. The edition adds, plainly, that he never noticed how far above his reach she was. Then came the other daydream. “What if I should do what St. Francis did?” he asked himself, and then the same of St. Dominic. The two kept taking turns, and for a long while he was carried along by both.
 
@@ -31,21 +31,23 @@ In practice the whole of it is small. Notice. Give the aftertaste a word. That i
 ## For the walk
 
 - After the last hour of thinking, am I lighter or drier?
-- Choose one thought that keeps coming back today: a worry, a plan, a scene you keep replaying. The next time you sit down, notice what it leaves behind, and give it one word: lighter, flatter, or no change. Do not argue with the word, and do not try to fix anything. Keep a quiet tally until tonight, with marks in your head or three pebbles moved from one pocket to the other. And if the word is flatter, check the body before you blame the thought: have you eaten, and have you had a drink?
+- Choose one thought that keeps coming back today: a worry, a plan, a scene you keep replaying. The next time you sit down, notice what it leaves behind, and give it one word: lighter, flatter, or no change. Do not argue with the word, and do not try to fix anything. Keep a quiet tally until tonight, with marks in your head or three pebbles moved from one pocket to the other. And if the word is flatter, check the body before you blame the thought: have you eaten, and have you had water?
 
 ## At the end of the day
 
 Supper is over, and the hour between supper and sleep begins, when thoughts run longest. It is a good hour for the tally.
 
-Think back to the thought you chose this morning. How many times did it come, and how did it leave you each time? Perhaps it was always the same. Perhaps it changed with the weather, or with what you had eaten, or with whom you were walking beside. Be curious about that, and do not be hard on yourself. Nobody has only one kind of thought, and the account does not pretend that Ignatius did. His two kinds took turns for a long time before he saw the pattern.
+Think back to the thought you chose this morning, if you chose one. How many times did it come, and how did it leave you each time? Perhaps it was always the same. Perhaps it changed with the weather, or with what you had eaten, or with whom you were walking beside. Be curious about that, and do not be hard on yourself. Nobody has only one kind of thought, and the account does not pretend that Ignatius did. His two kinds took turns for a long time before he saw the pattern.
 
-A word about the sad ones. Before you decide that a dry, flat thought is telling you something, check the body. Hunger, thirst, a skipped rest and a long climb can all make a mind go grey, and a drink and an early night are a better answer than any amount of examining. The account's patient lay in bed with time on his hands. You may be sitting up with cold feet.
+Think, too, about what you fed your mind today. The edition says that he began to love what he read often, and in the end it changed him. What did you read, hear or watch today, and what did you keep going back to: the news, a song, a conversation, silence? You are not asked to judge it. It is only worth knowing what has been going in.
 
-Thoughts of people count in the tally, too. The friend at home whom you miss, the quarrel you carry, the face you keep seeing. Some memories leave a person warmer, and some leave them harder. There is nothing to fix tonight. It is enough to know which is which.
+A word about the sad ones. Before you decide that a dry, flat thought is telling you something, check the body. Hunger, thirst, a skipped rest and a long climb can all make a mind go grey, and a glass of water and an early night are a better answer than any amount of examining. The account's patient lay in bed with time on his hands. You may be sitting up with cold feet.
 
-And a word about the glad ones. Was there a gladness today that wanted you to do something more, to walk further than you should, to give up sleep, to take on a hardship for its own sake? Take such a gladness seriously, and put it beside what your legs and your friends would say. Joy that is real can wait for the morning, and usually it is still there.
+Thoughts of people count in the tally, too. The friend you miss, the quarrel you carry. Some memories leave a person warmer, and some leave them harder. There is nothing to fix tonight. It is enough to know which is which.
 
-It took Ignatius a long time to see his pattern, and he saw it only because he had time and nothing else to do. If you saw nothing today, nothing has gone wrong. The attention comes back, and so does the question. If your mind is quiet tonight, that is a good day's work too, and there is nothing to examine.
+And a word about the glad ones. Was there a gladness today that wanted you to do something more, to walk further than you should, to give up sleep, to take on a hardship for its own sake? Take such a gladness seriously, and put it beside what your legs and your friends would say. Joy that is real can wait for the morning, and it is often still there.
+
+If you saw nothing today, nothing has gone wrong. The attention comes back, and so does the question. If your mind is quiet tonight, that is a good day's work too, and there is nothing to examine.
 
 Before you sleep, pick out the lightest thing of the day, the thought or the moment that left you better than it found you, and keep it in mind for a minute. Not to prove anything. It is a small kindness to give a tired mind something light to fall asleep on, and it costs nothing. The loops will still be there in the morning, if they want you.
 

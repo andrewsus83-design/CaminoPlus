@@ -16,11 +16,11 @@ Ignatius puts down more. In this passage he gets leave from his confessor to giv
 
 The lines just before the passage show where the idea came from. He had read stories of knights who kept watch before an altar all night on the eve of being knighted, and he was, the edition says, *filled with these chivalric fancies*. So he meant to keep his vigil in the same manner, neither sitting nor lying down, and to lay aside his worldly dignities in order to take up *the arms of Christ*. There is something tender in that. The man is leaving the world of soldiers, and he does it in the costume and the manner of a soldier's story. He cannot yet imagine a new life except in the clothes of the old one. Most of us begin that way. We set out on a pilgrimage as the sort of person we already are, with the same hopes in different boots, and the road sorts the rest out slowly.
 
-Then comes the dawn, and a small catastrophe. A man rides after him, about a league from Montserrat, and asks whether he gave certain clothes to a poor man, because the poor man has said so. Ignatius says that he did. The beggar, it turns out, has been badly treated on suspicion of having stolen the clothes, and the eyes of Ignatius fill with tears, *in pity for the poor man*. The passage stops there. It does not tell us whether the beggar was freed, or what Ignatius did next.
+Then comes the dawn, and a hard discovery. A man rides after him, about a league from Montserrat, and asks whether he gave certain clothes to a poor man, because the poor man has said so. Ignatius says that he did. The beggar, it turns out, has been badly treated on suspicion of having stolen the clothes, and the eyes of Ignatius fill with tears, *in pity for the poor man*. The passage stops there. It does not tell us whether the beggar was freed, or what Ignatius did next.
 
 It is a small, true thing about giving. A gift made in secret can land on someone with less power than the giver to explain it. The gesture was generous, and the cost fell on the person it was meant for. Nothing in the account says that Ignatius was wrong to give. It says only that the generosity was not the end of the matter, and that he wept.
 
-Three things here are not for imitation. A night on your feet before a day on your feet is not advice. Sleep. The page before this one describes a rough sackcloth robe and a cord tied below one knee, for penance, and we have left that page out. And giving away the clothes you need to a stranger is not a practice for the road, either.
+Three things here are not for imitation. A night on your feet before a day on your feet is not advice. Sleep. The lines before the passage describe a rough sackcloth robe and a cord tied below one knee, for penance, and we have left them out. And giving away the clothes you need to a stranger is not a practice for the road, either.
 
 The simpler question the passage leaves is what you are ready to put down. Not a sword. Perhaps a role, a title, the habit of being the competent one, the need to look as though you know where you are going. You can hang it on a hook for a day. It will probably still be there at the end, and you will know it better for having been without it. And, as the passage shows without quite saying so, you can watch who else is touched by a putting-down. Leaving a habit behind can land on a travelling companion, on someone at home, or on the person who always relied on you to decide.
 
@@ -39,9 +39,11 @@ Then think about the other half of the passage. Did anything you did today, mean
 
 The tears are worth a thought as well. The passage ends on pity, which is neither a plan nor a principle. Was there someone today for whom you felt that plain, unprofessional pity: a stranger limping, a walker who looked lost, an animal by the road? What did you do with the feeling? There is no right answer. Sometimes the most we can do is to feel it, and let it make us a little gentler with the next person.
 
+There is one more person in the passage, and he has no name and no voice. Who on today's road had neither? Whoever served your breakfast, cleaned the room, stood behind the counter or opened the gate. You need not do anything grand. A name asked, and a thank-you given with a look in the eyes, is enough.
+
 And think about the costume. What old story about yourself did you walk in today: the capable one, the quiet one, the funny one, the one who never needs anything? We all have a favourite suit, and the first days of a walk are when it fits least. Perhaps there was a moment today when it pinched. You do not have to take it off yet.
 
-If you did hang something up today, look in the morning to see whether you want it back. Often you will find that you do not, and sometimes you will. Either is information.
+If you did hang something up today, look in the morning to see whether you want it back. Either answer is information.
 
 Be as tired as you are tonight. Nothing about the road requires you to lie awake trying to improve. The day has already done what it can.
 

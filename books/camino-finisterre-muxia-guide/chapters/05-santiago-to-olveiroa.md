@@ -2,7 +2,7 @@
 
 ## The character of these days
 
-The first two days go west through country that has changed little in its outline: oak groves, stone bridges over the Sarela and the Tambre, hamlets of granaries and small fields. There is no sea, and the first day begins with a city to leave behind. The second is the long one.
+The first two days go west through oak groves, over stone bridges on the Sarela and the Tambre, and past hamlets of granaries and small fields. The sea is not in sight. The first day begins with a city to leave behind, and the second is the long one.
 
 The lengths in this book follow the Xunta's stage pages. Other sources differ by a kilometre or two, and the chapter on ways to split the days lists them. Treat each figure as a good guide, not a measurement.
 

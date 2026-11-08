@@ -2,7 +2,7 @@
 
 ## The character of these days
 
-The Meseta is the high plateau of central Spain, and the Camino crosses it at about 800 to 900 m, from Burgos to León, mostly through farmland. The days are not steep. What they ask is patience, a hat, water and a plan for the long stretches between villages. Burgos, at the start, and León, at the end, are the cities that bracket it.
+The Meseta is the high plateau of central Spain, and the Camino crosses it at ~800 to ~900 m, from Burgos to León, mostly through farmland. The days are not steep. What they ask is patience, a hat, water and a plan for the long stretches between villages. Burgos, at the start, and León, at the end, are the cities that bracket it.
 
 Distances are rounded, from Wikipedia's example itinerary and the table in Spanish Wikipedia. Where they differ by more than a couple of kilometres, the day says so.
 
@@ -26,7 +26,7 @@ A short first day on the plateau. You leave Burgos by Villalbilla de Burgos and 
 
 By way of San Bol and Hontanas to the ruins of the Convent of San Antón, where an arch still stands. Alfonso VII founded the convent in 1146 for the Order of St Anthony, whose brothers cared for pilgrims suffering from St Anthony's fire.
 
-Castrojeriz is a single long street: the Camino runs through the town for more than 1,500 m, past the ruins of a castle and the church of San Juan.
+Castrojeriz is a single long street: the Camino runs through the town for more than ~1,500 m, past the ruins of a castle and the church of San Juan.
 
 ### Day 15: Castrojeriz to Frómista (~23 km)
 

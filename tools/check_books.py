@@ -59,7 +59,10 @@ PRICE = re.compile(r"[€$£]\s?\d|\b\d[\d.,]*\s?(?:€|euros?|EUR|USD|dollars?|
 PHONE = re.compile(r"(?<!\d)(?<!\d\.)\+?\d(?:[\d ().-]{7,})\d(?!\d|\.\d)")   # a full stop after the number is a sentence end, not a decimal
 COORD = re.compile(r"(?<!\d)-?\d{1,3}\.\d{4,}(?!\d)")
 URL = re.compile(r"https?://|www\.", re.I)
-KM_NO_TILDE = re.compile(r"(?<![~\d.,])\b\d+(?:[.,]\d+)?\s?(?:km|kilometres|kilometers)\b", re.I)
+KM_NO_TILDE = re.compile(r"(?<![~\d.,])\b\d+(?:[.,]\d+)?\s?(?:km|kilometres|kilometers|metres|meters|m|°C)(?![\w])", re.I)   # distances, altitudes and temperatures
+BUSINESS = re.compile(r"\b(?:Hostal|Hotel|Pensión|Pension|Parador|Restaurante|Restaurant|Cafetería|Taberna|Albergue (?:de|del|La|El|Os|As|San|Santa)\b)\s+[A-Z]")
+FIRST_PERSON = re.compile(r"\bI\b|\bI['’](?:m|ve|ll|d)\b|\b(?:my|myself)\b")
+GUIDE_CHAPTER_MAX_WORDS = 1_800
 HOURS = re.compile(r"\b(?:opens?|closes?|closed|open)\b[^.;\n]{0,40}?\b\d{1,2}(?:[:.]\d{2})?\s?(?:am|pm|h)\b", re.I)
 SOURCES_CHAPTER = re.compile(r"source|thanks|credit", re.I)
 
@@ -241,6 +244,15 @@ def _chapters(book: bk.Book, rep: Report) -> None:
             rep.warn(f"{cid}: say 'pilgrim', not 'user' or 'customer'")
 
 
+def _first_person(text: str) -> str | None:
+    """The first "I", "I'm", "my" or "myself" of a text, not counting a regnal or part numeral ("Manuel I", "Part I": an I that follows a capitalised word)."""
+    for m in FIRST_PERSON.finditer(text):
+        if m.group(0) == "I" and re.search(r"[A-Z][\w'’-]*\s$", text[:m.start()]):
+            continue
+        return m.group(0)
+    return None
+
+
 def _guide(book: bk.Book, rep: Report) -> None:
     w = book.words
     if w > GUIDE_MAX_WORDS:
@@ -263,9 +275,15 @@ def _guide(book: bk.Book, rep: Report) -> None:
     km_hits: list[str] = []
     for ch in book.chapters:
         in_sources = bool(SOURCES_CHAPTER.search(ch.title))
+        if ch.words > GUIDE_CHAPTER_MAX_WORDS:
+            rep.warn(f"{ch.file}: {ch.words:,} words (a chapter is at most {GUIDE_CHAPTER_MAX_WORDS:,}: split it, or cut)")
         for b in ch.blocks:
             t = bk.block_text(b)
+            if b["t"] != "quote" and (fp := _first_person(t)):
+                rep.error(f"{ch.file}: first person ('{fp}'): the author did not walk the road, so the book never says I or my: '{t[:50]}'")
             for line in t.splitlines():
+                if BUSINESS.search(line):
+                    rep.warn(f"{ch.file}: '{BUSINESS.search(line).group(0)}...' looks like a business name: books name none, not even a famous hotel (name the building by its historic name, or leave it out)")
                 if PRICE.search(line):
                     rep.error(f"{ch.file}: a price ('{PRICE.search(line).group(0)}'): books state no prices, send the reader to the app")
                 if COORD.search(line):
@@ -278,9 +296,11 @@ def _guide(book: bk.Book, rep: Report) -> None:
                 if HOURS.search(line):
                     rep.warn(f"{ch.file}: an opening time ('{HOURS.search(line).group(0)[:40]}'): hours change, send the reader to the app")
                 for km in KM_NO_TILDE.finditer(line):
+                    if re.search(r"(?:about|around|roughly|nearly|almost)\s+[−\-]?$", line[:km.start()], re.I) or re.search(r"[−\-]$", line[:km.start()]) and re.search(r"(?:about|around|roughly|nearly|almost)\s+[−\-]$", line[:km.start()], re.I):
+                        continue           # "about 25 km" and "about −6 °C" are marked as approximate in words
                     km_hits.append(f"{ch.file}: '{km.group(0)}'")
     if km_hits:
-        rep.warn(f"{len(km_hits)} distance(s) without '~' (approximate figures are marked with ~), e.g. " + "; ".join(km_hits[:4]))
+        rep.warn(f"{len(km_hits)} figure(s) without '~' (distances, altitudes and temperatures are approximate and are marked with ~), e.g. " + "; ".join(km_hits[:4]))
 
 
 def _section(ch: bk.Chapter, name: str) -> list[dict]:
@@ -425,7 +445,7 @@ def _reflection(book: bk.Book, rep: Report, sources_dir: pathlib.Path | None) ->
                         rep.error(f"{ch.file}: the passage has no attribution line (a last quote paragraph starting with an em dash)")
                     else:
                         cite = bk.plain(b["cite"]).lower()
-                        if not any(s["work"].lower() in cite or s["author"].split()[-1].lower() in cite for s in book.meta.get("sources", [])):
+                        if not any(any(w in cite for w in re.findall(r"[a-zà-ÿ]{5,}", (src["work"] + " " + src["author"]).lower())) for src in book.meta.get("sources", [])):
                             rep.warn(f"{ch.file}: the attribution does not name the work or the author of a source in book.json")
                     if not 25 <= n <= 300:
                         rep.warn(f"{ch.file}: the passage is {n} words (aim for 40 to 250)")

@@ -16,14 +16,14 @@ Santiago has its own airport, Santiago-Rosalía de Castro, ~12 km from the city,
 
 ## Training
 
-The Confraternity of St James suggests that, if you are not an experienced walker, you walk regularly, add longer distances and hills as you improve, and aim to be able to cover 20 km or more a day on varied ground. It also advises:
+The Confraternity of St James suggests that, if you are not an experienced walker, you walk regularly, add longer distances and hills as you improve, and aim to be able to cover ~20 km or more a day on varied ground. It also advises:
 
 - Break in new boots or shoes and socks before you go.
 - Practise with your loaded rucksack, because a pack changes the way your feet strike the ground, and with poles, if you will use them.
 - Train for the downhill too. This matters on the Francés: the descent from the Cruz de Ferro, ~850 m in ~19 km, is one of the biggest of the walk.
 - Take rest days in your training, and stretch before and after.
 
-The Xunta de Galicia says to start training some months ahead, with walks that grow gradually longer, up to training walks of 23 to 30 km. If you have a medical condition or any worry, speak to a doctor or physiotherapist first.
+The Xunta de Galicia says to start training some months ahead, with walks that grow gradually longer, up to training walks of ~23 to ~30 km. If you have a medical condition or any worry, speak to a doctor or physiotherapist first.
 
 ## Packing
 

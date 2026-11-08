@@ -34,7 +34,10 @@ BOOK_HEADING = re.compile(
     r"^\s*(?:THE (?:FIRST|SECOND|THIRD|FOURTH|FIFTH|SIXTH|SEVENTH|EIGHTH|NINTH|TENTH) BOOK.*|BOOK [IVXLC\d]+\b.*|PART [IVXLC\d]+\b.*|"
     r"(?:First|Second|Third|Fourth|Fifth|Sixth|Seventh|Eighth|Ninth|Tenth) (?:Book|Part).*)\s*$"
 )
-CHAPTER_HEADING = re.compile(r"^\s*(?:CHAPTER [IVXLC\d]+\b.*|CANTO [IVXLC]+\b.*|PSALM \d+.*|[IVXLC]+\.\s*$)\s*$")
+ORDINAL = r"(?:FIRST|SECOND|THIRD|FOURTH|FIFTH|SIXTH|SEVENTH|EIGHTH|NINTH|TENTH|ELEVENTH|TWELFTH|THIRTEENTH|FOURTEENTH|FIFTEENTH)"
+CHAPTER_HEADING = re.compile(
+    r"^\s*(?:CHAPTER [IVXLC\d]+\b.*|CANTO [IVXLC]+\b.*|PSALM \d+.*|[IVXLC]+\.\s*$|" + ORDINAL + r" (?:CONVERSATION|LETTER|SECTION|MEDITATION)\.?\s*)\s*$"
+)
 FOOTNOTE = re.compile(r"\(\d+\)|\[\d+\]")
 PARAGRAPH_NUMBER = re.compile(r"(?<=\s)\d{1,2}\. (?=[A-Z“‘\"'])")
 
@@ -62,6 +65,34 @@ def _pattern(phrase: str) -> re.Pattern[str]:
     return re.compile(r"\s+".join(re.escape(p) for p in parts))
 
 
+VERSE = re.compile(r"(?<![\d:])(\d{1,3}):(\d{3})(?!\d)")
+
+
+def _verses(source: str, start: str, end: str) -> str | None:
+    """For the World English Bible: the chapter and verses a stretch covers, "121:1 to 4" or "120:1 to 121:2". The chapter is the Psalm number in the Psalms.
+    The verse numbers sit between the words in the raw file, so the stretch is looked for allowing them."""
+    gap = r"(?:\s+|\s+\d{1,3}:\d{3}\s+(?:<<[^>]*>>\s*)?)"
+    def find(phrase: str, pos: int = 0):
+        words = phrase.split()
+        return re.compile(gap.join(re.escape(w) for w in words)).search(source, pos) if words else None
+    a = find(start)
+    if not a:
+        return None
+    b = find(end, a.start())
+    if not b:
+        return None
+    before = list(VERSE.finditer(source[:a.start() + 1]))
+    inside = list(VERSE.finditer(source[a.start():b.end()]))
+    refs = ([before[-1]] if before else []) + inside
+    if not refs:
+        return None
+    first, last = refs[0], refs[-1]
+    f, l = (int(first.group(1)), int(first.group(2))), (int(last.group(1)), int(last.group(2)))
+    if f == l:
+        return f"{f[0]}:{f[1]}"
+    return f"{f[0]}:{f[1]} to {l[1]}" if f[0] == l[0] else f"{f[0]}:{f[1]} to {l[0]}:{l[1]}"
+
+
 def extract(source: str, start: str, end: str, web: bool = False) -> Extract:
     """The stretch of `source` from `start` to the end of `end`, as one line of its own words."""
     body = cb._clean_source(source, web)
@@ -78,7 +109,7 @@ def extract(source: str, start: str, end: str, web: bool = False) -> Extract:
         warnings.append(f"a footnote marker inside the stretch ({FOOTNOTE.search(text).group(0)}): end the stretch before it or start after it")
     if PARAGRAPH_NUMBER.search(text):
         warnings.append(f"a paragraph number inside the stretch ({PARAGRAPH_NUMBER.search(text).group(0).strip()!r}): end the stretch before it or start after it")
-    if text.count("“") != text.count("”"):
+    if text.count("“") != text.count("”") or text.count('"') % 2:
         warnings.append("a quotation mark is opened and not closed in the stretch (or the reverse): end the stretch where the quotation ends, or start before it opens")
     text = re.sub(r"(?<![\w])_([^_]+)_(?![\w])", r"*\1*", text)
     book = chapter = None                # the nearest book-level and chapter-level headings above the stretch
@@ -90,6 +121,10 @@ def extract(source: str, start: str, end: str, web: bool = False) -> Extract:
         if book and chapter:
             break
     where = [h for h in (book, chapter) if h]
+    if web:
+        ref = _verses(source, start, end)
+        if ref:
+            where = [ref]
     return Extract(text, where, warnings)
 
 

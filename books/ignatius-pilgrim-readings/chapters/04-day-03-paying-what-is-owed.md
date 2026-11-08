@@ -14,11 +14,11 @@ The evening before a long walk is full of small errands. A key to leave with a n
 
 Ignatius does the same, on a larger scale. He starts from his father's house on horseback. His brother goes with him as far as a place the edition calls Ogna, and agrees, at Ignatius's urging, to spend a night of watching at a shrine on the way. There Ignatius prays *for new strength for his journey*. So the first stage of leaving is not a hurry. It is a night in a quiet place, in a brother's company, asking to be strong enough.
 
-The edition is brisk about the partings. He leaves his brother at the house of their sister, pays her a short visit, and goes on. There is no scene. Some people leave like that, with a practical briskness that is a form of tenderness, and some with a briskness that is a way of not feeling it. The passage does not tell us which this was. You might notice, tomorrow or at the next farewell, which kind of leaver you are.
+The edition is brisk about the partings. He leaves his brother at the house of their sister, pays her a short visit, and goes on. There is no scene. Some people leave like that, with a practical briskness that is a form of tenderness, and some with a briskness that is a way of not feeling it. The passage does not tell us which this was.
 
 Then the accounts. He remembers that an official in the Duke's palace owes him money, and he gets it back by sending a written statement to the treasurer. He does not pretend to be above such things. Next he gives the money away, to the people to whom he felt indebted, and puts a part of it toward the restoration of a picture. The passage names no sums and no reasons beyond that one word, *indebted*. What it shows is a man leaving tidily, collecting what is his and paying what is owed, in both directions, so that nothing hangs behind him.
 
-Last, he dismisses his two remaining servants and rides on *alone*. The passage does not say where the servants went. A servant dismissed is a life rearranged, and the edition passes over it. It is that kind of account: one man's story, from inside, with everyone else at the edge. If today's walking is in Navarre, you are in the region that this passage crosses, though the edition does not say which roads he took.
+Last, he dismisses his two remaining servants and rides on *alone*. The passage does not say where the servants went. A servant dismissed is a life rearranged, and the edition passes over it. If today's walking is in Navarre, you are in the region that this passage crosses, though the edition does not say which roads he took.
 
 There are things here that no walker should copy. Ignatius leaves with almost no money. A pilgrim today needs enough for a bed and a meal, a charged phone and a way to call for help, and in Spain and France the number is 112. The passage is not a lesson in packing. Nor should we slide past the sentence we have left out. The edition says that at about this time he began *the discipline* every night, which was a bodily penance. We have not quoted it, and we ask nobody to imitate it.
 
@@ -39,7 +39,7 @@ What did the day take from you? Some of it was effort, and some was patience, an
 
 Was there something you were given today that has not been thanked? Not a gift, perhaps, but a courtesy: a door held, an answer to a question, a bit of shade, a shared seat. A thank-you can still be said tomorrow, to the person if you meet them, and otherwise to the air.
 
-Do not forget the one creditor who is always in the room, which is the body. It is owed water, a meal, a stretch, an early night. It sends no reminders. It sends pain instead. And if someone at home is wondering how your day went, a short message tonight is another way of paying what is owed. Three lines will do, and they need not be eloquent.
+Do not forget the one creditor who is always in the room, which is the body. It is owed water, a meal, a stretch, an early night. It sends no reminders. It sends pain instead. And if you are walking with someone, they belong in the ledger too: an hour of patience given, a share of the cost, a silence respected.
 
 Perhaps something was owed to you today that did not arrive: a courtesy, a word of thanks, a bed you had counted on. You may feel it as a small grievance. The passage shows a man who asked for what was his, plainly, and then let the matter go. You can do the first part tonight in your head, and leave the second part to the night.
 

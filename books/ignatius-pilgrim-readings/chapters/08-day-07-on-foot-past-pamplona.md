@@ -20,7 +20,7 @@ Pamplona is only a name in the passage. He *set out for Pampeluna*, and from the
 
 In every one of those cities, the edition adds, he would receive nothing from the parents and relatives of his companions, though they offered him a great deal and begged him to accept it. On Day 6 we met the same man learning to ask for bread. Here he refuses what kind people press on him. The two do not obviously fit. It may have been strength, or stubbornness, or both, and it may have cost some generous people the pleasure of giving. If someone begs you to accept something, you are allowed to say yes.
 
-Nor does the account make the road dignified. A little further on, it has him crawling on hands and feet along a narrow path above a river, in fear, for a long time. He calls it *the greatest of all the bodily labors that he ever experienced*. Then, entering Bologna, he falls from a little bridge into mud, to the amusement of a crowd, and begs through the whole city without receiving *so much as a farthing*. He rests there, because he is ill, and then goes on toward Venice. That is what the way on looks like in the book: fear, mud, laughter, nothing in the hand, a rest, and then the next town.
+Nor does the account make the road dignified. A little further on, it has him crawling on hands and feet along a narrow path above a river, in fear, for a long time. The account calls it *the greatest of all the bodily labors that he ever experienced*. Then, entering Bologna, he falls from a little bridge into mud, to the amusement of a crowd, and begs through the whole city without receiving *so much as a farthing*. He rests there, because he is ill, and then goes on toward Venice. That is what the way on looks like in the book: fear, mud, laughter, nothing in the hand, a rest, and then the next town.
 
 For today, the lesson is not to wait. You do not need to know what the whole road means before you walk the next stretch. You need only the stretch, and some patience with a body that has had enough. If your road ends today, there is still the walk to the station, or home, and that is a way on too.
 
@@ -37,15 +37,15 @@ If you have come to the end of the Baztanes today, you might sit for a while som
 
 Look back at the day through the passage. Where did you go on without waiting to feel ready? And where did you bend, a little, for someone's sake, and was that the right place to bend? A point worth yielding is often small, and a point worth holding is often the one that is quietly yours. It is not always easy to tell them apart in the moment, and a day's end is a kind way to look.
 
-Did anything happen today that made you look foolish? A wrong turning, a stumble, a coffee on your sleeve. Perhaps people laughed, or only noticed. The account tells of Ignatius in the mud at Bologna without any embarrassment, and without any attempt to make it into a lesson. Some of our foolish moments are better left plain. With a little time, they may become the parts of the story we like best.
+Did anything happen today that made you look foolish? A wrong turning, a stumble, a coffee on your sleeve. Perhaps people laughed, or only noticed. The account tells of Ignatius in the mud at Bologna plainly, and makes no lesson of it. Some of our foolish moments are better left plain. With a little time, they may become the parts of the story we like best.
+
+If today was hard, the account has some company for you. The way on is allowed to be ugly. It does not have to be graceful, or well timed, or admired by anyone who sees it.
 
 The road also runs through other people's villages, fields and kitchens. Before you go on, you might thank, in your head or in person, whoever gave you water, a bed or a direction. A village is a home, and you have been a guest in it.
 
 If someone is waiting to hear how it went, give them one true sentence tonight, and keep the long story for another day. The long story takes weeks to find its shape, and a tired person tells it badly. The legs have earned the evening, and so have you.
 
-Before you sleep, decide only the first step of tomorrow, the one that gets you out of the door. Not the whole plan. If your walk is not over, nothing has to be settled tonight.
-
-Seven evenings are enough to make a small habit. If one of these questions has helped you, you could keep it, one a night, long after the seven days are done. Nothing here is a course to finish.
+Before you sleep, decide only the first step of tomorrow, the one that gets you out of the door. Not the whole plan. If your walk is not over, nothing has to be settled tonight. And if one of these seven questions helped you, you could keep it, one a night, long after the days are done.
 
 - Where today did I go on without waiting to feel ready?
 - What small point did I yield today, and was that the right one?

@@ -10,7 +10,7 @@
 
 ## Reflection
 
-At the start of a long walk the road is too big to think about. You know the number, about 260 km, and the number does nothing for you. It stands in the mind like a wall. The only way through is to stop looking at the whole of it and look at the next bend, the next waymark, the ground under your boots.
+At the start of a long walk the road is too big to think about. You know the number, ~260 km, and the number does nothing for you. It stands in the mind like a wall. The only way through is to stop looking at the whole of it and look at the next bend, the next waymark, the ground under your boots.
 
 Julian of Norwich was shown a different kind of smallness. She was gravely ill and believed she was dying when she saw it: lying in the palm of her hand, a little thing the size of a hazelnut, round as a ball. She looked at it and asked what it could be. The answer was that it is all that is made. The whole of creation, small enough to hold.
 
@@ -18,13 +18,13 @@ Her next thought is the one that matters. She marvelled that it could last at al
 
 Then she names three things she saw in it, short enough to carry in a pocket. God made it. God loves it. God keeps it. Made, loved, kept.
 
-Notice what she does not say. She does not say that the world is nothing, or that it does not matter. She says it is small, and held, and the two belong together. A little later she explains why it looked so small to her: she was seeing it in the presence of its Maker, and *all that is made seemeth full little* to a soul that sees that. It is a matter of where you are standing.
+Notice what she does not say. She does not say that the world is nothing, or that it does not matter. She says it is small, and held, and the two belong together. A little later she explains why it looked so small to her: she was seeing it in the presence of its Maker, and, in her words, *all that is made seemeth full little* to a soul that sees the Maker of all. It is a matter of where you are standing.
 
 Anyone who has climbed a hill on the way will know the effect. The village you left an hour ago, which seemed to fill the whole of yesterday evening, becomes a few roofs in a fold of land. The valley you were dreading is a pale stripe on the ground. Nothing has changed except your height.
 
 So much for the gentle part. Here is the hard one. In the same chapter Julian says that we need to hold all that is made as nought, her word, if we are to love God, and that we are never at ease because we look for rest in things too small to give it. Read cold, that sounds like contempt for the world: for houses, for people, for a good lunch. It cannot mean that, if what she has just been shown is true. The small thing lasts because it is loved. Her "nought" has to do with where you put your weight. Walkers know something about weight. A pack is full of good things, and none of them is a place to lean.
 
-Read generously, she is saying that nothing made is big enough to be the place where the heart finally rests. That is not an insult to the things. It is a description of the heart. The passage names the cure for restlessness as *the Very Rest*, and it says that everything below that falls short of us. You may or may not take the name she gives it. The restlessness itself is hard to deny, and a road is a good place to notice it: the wish to be there already, wherever there is.
+Read generously, she is saying that nothing made is big enough to be the place where the heart finally rests. That is not an insult to the things. It is a description of the heart. The passage names the cure for restlessness as *the Very Rest*, and it says that everything beneath that does not satisfy us. You may or may not take the name she gives it. The restlessness itself is hard to deny, and a road is a good place to notice it: the wish to be there already, wherever there is.
 
 Set an honest doubt beside this. It is easy to say that all is small and held on a morning when your legs are fresh. The things that really trouble you do not feel the size of a nut. A worry about home, a knee, a decision waiting at work: it fills the sky. Julian does not argue with that, and nor should this page. She does not say that your worry is small. She says that what holds it is not.
 
@@ -32,8 +32,8 @@ What does it ask of an ordinary day? Something small, in keeping. To look, once,
 
 ## For the walk
 
-- What looks enormous to me this morning, and what is it like to see it from a little higher up?
-- Find one small thing on the path, a pebble or a leaf or a fallen nut, and hold it in your open palm for a minute. Feel its weight and say, in your own words, made, loved, kept. Then put it back where you found it, and walk on a little lighter.
+- What looks enormous to me this morning, and what would it look like from a little higher up? If the answer is a whole life rather than a single worry, take the smallest part of it that you can name.
+- Find one small thing on the path, a pebble or a leaf or a fallen nut, and hold it in your open palm for a minute. Feel its weight and say, in your own words, made, loved, kept. Then put it back where you found it, and walk on a little lighter. A seed head, a button or a coin will do if the path offers nothing.
 
 ## At the end of the day
 
@@ -41,7 +41,7 @@ The boots are off. Your feet are somewhere between sore and grateful, and the da
 
 Look at what seemed huge at breakfast. Some of it will have shrunk without your noticing. The long climb is behind you, and it was a climb, and it took what it took. Some of it will not have shrunk. A worry can follow you for twenty kilometres and be exactly as big at six as it was at seven. That is allowed too. Nothing in Julian asks you to pretend that it dwindled.
 
-Think of the small things that may have been good. A drink of water that tasted of something. A cat on a wall. A gate that opened easily. The hour when the weather made up its mind. On a quiet road there may have been long stretches with no one at all, and if so, the quiet was a day-sized thing too, to be taken as it came. If the table tonight is laid for one, that is also a size.
+Think of the small things that may have been good. A drink of water that tasted of something. A cat on a wall. A gate that opened easily. The hour when the weather made up its mind. On a quiet road there may have been long stretches with no one at all, and if so, the quiet was a day-sized thing too, to be taken as it came. If the table tonight is laid for one, that is also a size. If you keep a notebook, three lines will do: one thing that was big, one that was small, and one that was neither.
 
 Take stock of what you have with you now: boots by the door, a sock on a radiator, the phone on its charger, a water bottle, the one thing you like to keep within reach of the bed. All of it fits in one room, and most of it fits in one hand. It is the whole inventory of your day, and it is smaller than it felt at seven this morning.
 
@@ -57,4 +57,4 @@ If you are too tired for any of this, that is the most natural thing in the worl
 
 ## A short prayer
 
-*Tonight the world is the size of this room. Thank you for what was made, and for whatever keeps it. Let the day be as long as it was and no longer. Hold what I cannot carry. Let me sleep like something small and safe.*
+*Tonight the world is the size of this room. Thank you for what was made, and for whatever keeps it. Let the day be as long as it was and no longer. Hold what I cannot carry. Let the road ahead be only tomorrow's length. Let me sleep like something small and safe.*

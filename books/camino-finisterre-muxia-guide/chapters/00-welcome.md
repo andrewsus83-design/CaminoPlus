@@ -16,6 +16,8 @@ If you are on the road tonight, go to your stage. If you are only dreaming, read
 
 It is not a live map, a timetable or a booking service. It names no hostels, cafes or shops, and gives no prices, opening hours or bed counts. They change, and a wrong one costs a tired person dearly. For those, use the CaminoPlus app and ask locally.
 
+This book was written with AI assistance, from public sources, and its author has not walked the road. So it gives you sources instead of memories, and it says plainly when the sources disagree.
+
 It is also **not a Compostela book**. The Compostela, the certificate of the Pilgrim's Office in Santiago, belongs to the walk that arrives at the cathedral. This walk begins where that one ends.
 
 Every distance carries a tilde, **~**, because it is approximate. The official sources give different figures for the same stage, and the book says so where it matters. Where something depends on the season (a closure, a fire warning, the state of the sea), it says *check before you go*, and means it.

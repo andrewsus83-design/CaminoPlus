@@ -30,7 +30,7 @@ Psalm 131 is the quiet after. *Yahweh, my heart isn't haughty, nor my eyes lofty
 
 And then the picture of a quiet heart: *Surely I have stilled and quieted my soul, like a weaned child with his mother.* A weaned child is not a baby crying for milk. It is a child who has stopped demanding and rests against its mother's side, not for what it can get, only to be there. Notice the verbs: *I have stilled and quieted my soul.* The quiet is something made, with some effort, and not only given.
 
-Some honest doubt belongs here. There will be days when the soul will not be stilled, and shouting at it makes it worse. The psalm says that it has stilled its soul. It does not say how, or for how long, or what to do on the day it will not work. The nearest it comes to an answer is the child at the mother's side: be near what holds you, and stop asking for more.
+Some honest doubt belongs here. There will be days when the soul will not be stilled, and shouting at it makes it worse. The poet says the soul has been stilled. The psalm does not say how, or for how long, or what to do on the day it will not work. The nearest it comes to an answer is the child at the mother's side: be near what holds you, and stop asking for more.
 
 For today, then, two things. Wait without pushing at the morning. And for one hour, set the great questions on a shelf, to be taken down later in daylight.
 

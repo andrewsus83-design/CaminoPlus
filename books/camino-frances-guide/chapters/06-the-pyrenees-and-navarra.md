@@ -2,7 +2,7 @@
 
 ## The character of these days
 
-The first week begins with the steepest day of the walk and settles into green hills, Pamplona and the rolling country beyond. Navarre is a land of two languages: Roncesvalles is also Orreaga in Basque, and Pamplona is Iruña. Its Romanesque churches are among the best on the road.
+The first week begins with the biggest climb of the walk and settles into green hills, Pamplona and the rolling country beyond. Navarre is a land of two languages: Roncesvalles is also Orreaga in Basque, and Pamplona is Iruña. It has fine Romanesque churches, at Eunate and Torres del Río among other places.
 
 The distances in this book are rounded. For days 1 to 3 they come from the CaminoPlus stage data, and from day 4 on from public tables, chiefly Wikipedia's example itinerary and the Xunta de Galicia (see "Sources"). Tables differ by a kilometre or two, and the days say so where the gap is bigger. Many pilgrims split days differently; this book follows the usual stage towns.
 
@@ -20,7 +20,7 @@ In the app: stage 1.
 
 A gentler day, mostly downhill, with a pass or two in the middle. You pass through Burguete and Espinal, over the Mezkiritz pass at ~925 m and the Erro pass at ~800 m, and drop to Zubiri, at ~530 m.
 
-The thing to watch is the end. The last ~6 km fall ~270 m, steep and stony enough to find out how your knees feel. Poles help, and so does taking it slowly.
+The thing to watch is the end. The last ~6 km fall ~270 m, steep enough to find out how your knees feel. Poles help, and so does taking it slowly.
 
 In the app: stage 2.
 
@@ -34,7 +34,7 @@ In the app: stage 3.
 
 ### Day 4: Pamplona to Puente la Reina (~24 km)
 
-The day's climb is the Alto del Perdón, at about ~765 m, on the Sierra del Perdón ridge, where a sculpture of iron pilgrims by Vicente Galbete, put up in 1996, stands against the sky. The descent is steep: ~285 m in ~4 km down to Uterga.
+The day's climb is the Alto del Perdón, at ~765 m, on the Sierra del Perdón ridge, where a sculpture of iron pilgrims by Vicente Galbete, put up in 1996, stands against the sky. The descent is steep: ~285 m in ~4 km down to Uterga.
 
 If you have energy, a detour of ~2 km from Muruzábal leads to Santa María de Eunate, an octagonal 12th-century Romanesque church standing alone in open country. Puente la Reina, "the Queen's bridge", is where the Aragonese Way joins.
 

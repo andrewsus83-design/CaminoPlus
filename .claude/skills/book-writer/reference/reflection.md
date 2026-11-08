@@ -36,7 +36,7 @@ File names: `00-how-to-use-this-book.md`, `01-about-the-book-and-its-author.md`,
 
 ## Reflection
 
-600 to 750 words in your own voice. Start from something concrete (a road, a blister, a bell, a bench, an early start, a stranger's
+600 to 900 words in your own voice (longer when the passage is short, so that the morning still comes to about 1,000 to 1,100 words). Start from something concrete (a road, a blister, a bell, a bench, an early start, a stranger's
 kindness, a long flat afternoon) and let the passage open it. Say what the passage says, plainly. Say where it is hard. Say
 what it asks of an ordinary day. One or two sentences of honest doubt are worth more than a page of reassurance.
 

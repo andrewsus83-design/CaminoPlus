@@ -43,7 +43,7 @@ If you walked alone today, the passage may sound different tonight from the way 
 
 If asking comes easily to you, turn the question round. Did you let anyone help you today, or did you do the helping and keep your hands clear of owing? Giving can be a way of staying in charge, and it is worth knowing if that was your way today.
 
-Before you sleep, think for a moment about tomorrow's bread. A roll saved from supper, a piece of fruit, the stops you mean to make. It is a small act of trust in tomorrow and in your own good sense, and it is not a failure of faith to look ahead.
+Before you sleep, think of tomorrow's bread: a roll saved from supper, the stops you mean to make. Looking ahead is not a failure of faith, and the person who sold or cooked your food has already helped you more than you may have noticed.
 
 Asking is harder when you are tired, and so is accepting. If you could do neither today, forgive it, and try again after breakfast, when most things are easier to ask for.
 

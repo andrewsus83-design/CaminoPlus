@@ -2,11 +2,11 @@
 
 ## The man
 
-Ignatius of Loyola was born in 1491 at the château of Loyola, in the north of Spain, and died on 31 July 1556. Those two dates are the ones the appendix of our edition gives, and we keep to them. He was a soldier and then a student, and in the end the founder of the Society of Jesus, whose members are called Jesuits. Catholics honour him as a saint, and the title of the edition calls him St. Ignatius. He also wrote a book called the *Spiritual Exercises*. This book does not use it and does not explain it.
+Ignatius of Loyola was born in 1491 at the château of Loyola, in the north of Spain, and died on 31 July 1556. Those two dates are the ones the appendix of our edition gives, and we keep to them. He was a soldier and then a student, and in the end the founder of the Society of Jesus, whose members are called Jesuits. Catholics honour him as a saint, and the title of the edition calls him St. Ignatius. He also wrote a book called the *Spiritual Exercises*, which this book does not use.
 
 ## The book
 
-The account of his life was not written by Ignatius's own hand. In the preface of the scribe, Father Louis Gonzalez, we read that friends in the Society had often asked Ignatius for the story of his life, and that he had put them off. In 1553 he agreed, and began to tell it that September. He was in very feeble health by then, and it went on in pieces, between other business, until 1555. The scribe says that his custom was to dictate while walking. He also says that he wrote down nothing he had not heard from Ignatius, and kept so close to his words that afterwards he could not always explain them.
+The account of his life was not written by Ignatius's own hand. In the preface of the scribe, Father Louis Gonzalez, we read that members of the Society had often asked Ignatius for the story of his life, and that he had put them off. In 1553 he agreed, and began to tell it that September. He was in very feeble health by then, and it went on in pieces, between other business, until 1555. The scribe says that his custom was to dictate while walking. He also says that he wrote down nothing he had not heard from Ignatius, and kept so close to his words that afterwards he could not always explain them.
 
 Ignatius spoke of himself in the third person, and this edition writes *Ignatius* most of the time and *the pilgrim* now and then. The pages are not always a pure voice, either. Someone else can be heard in them, the scribe or the editor, as in the phrase "we dare not state it". That is why this book says "the account" or "the edition" where a plain "Ignatius said" would claim too much.
 

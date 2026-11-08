@@ -14,7 +14,7 @@ Three routes across France (from Tours, Vézelay and Le Puy-en-Velay) meet at Sa
 
 ## A short history
 
-The Xunta de Galicia, the regional government, tells the story in its own words. Around the year 820 the tomb of St James the Elder was found in a wood called Libredón, and King Alfonso II of Asturias ordered a church built there. That church was the seed of the cathedral and the city. Asturian kings were among the first known pilgrims, and by the 11th to 13th centuries people were arriving from France, Italy, Germany, England and beyond, on foot, on horseback and by ship. A network of hospitals founded by kings, nobles and townspeople took them in, and in the small medieval ones it was customary to keep twelve beds, in memory of the twelve apostles.
+The Xunta de Galicia, the regional government, gives this account on its official portal. Around the year 820 the tomb of St James the Elder was found in a wood called Libredón, and King Alfonso II of Asturias ordered a church built there. That church was the seed of the cathedral and the city. Asturian kings were among the first known pilgrims, and by the 11th to 13th centuries people were arriving from France, Italy, Germany, England and beyond, on foot, on horseback and by ship. A network of hospitals founded by kings, nobles and townspeople took them in, and in the small medieval ones it was customary to keep twelve beds, in memory of the twelve apostles.
 
 The road got its name from the settlers. German Wikipedia says the name *Camino Francés* is first recorded in the 12th century, at Astorga, and refers to the French settlers whom the kings of northern Spain invited to build market towns along it.
 
@@ -31,9 +31,9 @@ In 2024 the Pilgrim's Office issued 499,239 Compostelas, and 47 per cent of them
 The road changes character five times, and this book is built on that.
 
 - **The Pyrenees and Navarra.** A steep start, then green hills, Pamplona and the rolling country beyond.
-- **La Rioja.** Vineyards and small stone towns.
-- **Burgos and the Meseta.** A great cathedral, then the high plateau, at about 800 to 900 m, for days.
+- **La Rioja.** Vineyards and small towns.
+- **Burgos and the Meseta.** A great cathedral, then the high plateau, at ~800 to ~900 m, for days.
 - **León and the mountains.** A great city, then the mountains: the road passes ~1,500 m at the Cruz de Ferro, its highest point.
 - **Galicia.** O Cebreiro, at ~1,300 m, is the gateway. From there to Santiago the Xunta measures ~155 km through a greener, wetter country.
 
-Pilgrims have always walked this road for many reasons. It is long enough to ask something of you, and the villages along it have been receiving pilgrims for more than a thousand years.
+People walk this road for many reasons. It is long enough to ask something of you, and the villages along it have been receiving pilgrims for more than a thousand years.

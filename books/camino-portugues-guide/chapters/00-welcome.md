@@ -16,7 +16,7 @@ If you are only dreaming, start with "Is this Camino for you?" and finish with "
 
 It is not a live map, a timetable or a booking service. It names no hostels, cafes or shops, and it gives no prices, opening hours or bed counts. They change from season to season, and a wrong one costs a tired person dearly. For those, use the CaminoPlus app and ask locally.
 
-It is also not a walker's memoir. The book was written with AI assistance, from public sources, and its author has not walked the road. So it gives you sources instead of memories, and it says plainly when the sources disagree, which on this road they often do.
+It is also not a walker's memoir. This book was written with AI assistance, from public sources, and its author has not walked the road. So it gives you sources instead of memories, and it says plainly when the sources disagree.
 
 Every distance carries a tilde, **~**, because it is approximate. Where something depends on the season (a diversion, heat, a river after rain), the book says *check before you go*, and means it.
 

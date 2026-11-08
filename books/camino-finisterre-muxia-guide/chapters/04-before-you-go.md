@@ -10,7 +10,7 @@ On this road the credencial matters for one reason. The Concello de Fisterra say
 
 The road starts in the Praza do Obradoiro, in front of the cathedral, as the Xunta says. The airport, Santiago-Rosalía de Castro, is ~12 km east of the city, according to Wikipedia.
 
-Getting back needs thought. Fisterra and Muxía are small towns, and this book names no timetables, because they change. The Xunta runs a public transport website, bus.gal, where it says passengers can look up the times of its bus lines, and an older item in its news archive announces a line between Santiago, Cee and Fisterra. No source read for this book gives a current timetable for Fisterra or Muxía. Check before you leave Santiago, ask at your hostel or the tourist office the evening before you travel, and use the app. Do not plan your flight home for the afternoon of your last walking day.
+Getting back needs thought. This book names no timetables, because they change. The Xunta runs a public transport website, bus.gal, where it says passengers can look up the times of its bus lines, and an older item in its news archive announces a line between Santiago, Cee and Fisterra. No source read for this book gives a current timetable for Fisterra or Muxía. Check before you leave Santiago, ask at your hostel or the tourist office the evening before you travel, and use the app. Do not plan your flight home for the afternoon of your last walking day.
 
 ## Training and packing
 
@@ -28,6 +28,6 @@ The Xunta is clear that footwear must be comfortable and already broken in, beca
 
 ## Money and language
 
-The Xunta advises carrying your documents and cards rather than a lot of cash. The villages on this road are small, so carry a little cash for places that do not take cards.
+The Xunta advises carrying your documents and cards rather than a lot of cash. Much of the road runs through hamlets, so carry a little cash for places that do not take cards.
 
 Galicia has two official languages, Galician and Spanish. The Xunta's texts use the Galician forms of names, and so do the town councils' pages: Fisterra for Finisterre, Muxía for Mugía. You will also meet Galician words such as *rúa* (street), *praza* (square), *ponte* (bridge), *camiño* (path, way) and *hórreo* (the granary on stone legs). This book uses the Galician names and gives the Spanish ones where they help.

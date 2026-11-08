@@ -2,9 +2,7 @@
 
 ## What this walk is not
 
-Start with what the official pages do not say. The Pilgrim's Office in Santiago issues the Compostela to those who come to the tomb of the Apostle for religious and/or spiritual reasons and follow the routes of the Way on foot, by bicycle or on horseback. On foot or on horseback, the Office asks for at least a hundred continuous kilometres on the same route to Santiago that it recognises, and says that the final stage must include at least the last one leading into the Cathedral. Your credencial, stamped along the way, is the proof. That is a walk that arrives at Santiago. This one begins there, and leaves.
-
-The Office's pages read for this book say nothing about Fisterra or Muxía. This book therefore says nothing about what the Office does or does not record for this walk. If you want to know whether it would note your journey, in any form, ask it directly.
+The Compostela is the certificate of the Pilgrim's Office in Santiago for the walk that arrives at the cathedral. This walk begins where that one ends, and it is not a Compostela route. The Office's pages read for this book say nothing about Fisterra or Muxía, so this book says nothing about what the Office does or does not record for this walk. If you want to know whether it would note your journey, in any form, ask it directly.
 
 ## The Fisterrana
 

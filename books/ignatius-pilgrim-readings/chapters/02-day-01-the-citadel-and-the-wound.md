@@ -41,7 +41,7 @@ There may also have been a moment when you wanted to be seen: to arrive before s
 
 Then look for what came the other way. In the story, the French physicians were kind to a man who had held out against them. Was anyone kind to you today for no reason you had earned? Someone who held a gate, pointed out a turning, or made room on a bench? That kindness is as much a part of the day as your pace.
 
-Name one thing that was good, too, and let it be small. The hour when the legs warmed up and the pack stopped being something you carried and became something you wore. A hot drink. The first stretch when you stopped checking and simply walked. A first day is mostly effort, and it is easy to go to bed with only the effort in mind. If other walkers were about, you may also have measured yourself against them without meaning to. That is natural, and it can be set down with the boots.
+Name one thing that was good, too, and let it be small. The hour when the legs warmed up and the pack stopped being something you carried and became something you wore. A hot drink. The first stretch when you stopped checking and simply walked. A first day is mostly effort, and it is easy to go to bed with only the effort in mind. If other walkers were about, you may have measured yourself against them without meaning to. Let that go with the boots.
 
 The passage leaves one question open, and it can be asked quietly tonight. What would have happened if the soldiers had been allowed to surrender? You might ask the same of a stubbornness of your own: a quarrel, a plan, an old refusal. You need not give it up. Only look, once, at what it has cost, and who paid.
 

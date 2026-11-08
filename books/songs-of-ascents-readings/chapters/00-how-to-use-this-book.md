@@ -1,12 +1,12 @@
 # How to use this book
 
-This is a small book for eight slow days. It is made to go with the Camino Aragonés, the road that runs from Somport, in the Pyrenees, to Puente la Reina, ~160 km. The app's own notes on this route describe a mountain start and then rolling hills, a quiet road, and services that are sparse in places. A quiet road leaves room for a few short poems.
+This is a small book for eight slow days. It is made to go with the Camino Aragonés, the road that runs from Somport, in the Pyrenees, to Puente la Reina, ~160 km. The app's own notes on this route describe a mountain start and then rolling hills, a quiet road, and services that are sparse in places.
 
-You read one day at a time, whether you are walking or at home. If your road takes more days than the book, repeat a favourite or rest. If it takes fewer, read the day that fits the day you are having.
+You read one day at a time, whether you are walking or at home. At home, the morning part wants five quiet minutes and the evening part the last three before the light goes out. If your road takes more days than the book, repeat a favourite or rest. If it takes fewer, read the day that fits the day you are having.
 
 ## The songs
 
-The book is built on fifteen psalms, Psalms 120 to 134. Their headings call them songs of ascents. They are traditionally understood as the songs pilgrims sang as they went up to Jerusalem, a city on high ground, where one always goes up. Scholars differ on how they were really used, and the next chapter says what is known and what is not. What nobody doubts is what is in them: a road, hills, a gate, danger, tears, tiredness, waiting for morning, and a house at the end. That is why they travel well.
+The book is built on fifteen psalms, Psalms 120 to 134. Their headings call them songs of ascents, and they are traditionally understood as the songs pilgrims sang as they went up to Jerusalem, a city on high ground; the Bible speaks of travelling to it as going up. Scholars differ on how they were really used, and the next chapter says what is known and what is not. What is plain is what is in them: a road, hills, a gate, danger, tears, tiredness, waiting for morning, and a house at the end. That is why they travel well.
 
 The psalms keep their own order, two by two, with the last one on its own on the eighth day. The order happens to be a road.
 

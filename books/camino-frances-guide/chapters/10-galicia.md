@@ -8,7 +8,7 @@ From Sarria on you walk with many other people: about 65 per cent of those who w
 
 ### Day 27: O Cebreiro to Triacastela (~22 km)
 
-The Xunta rates this stage "Medium-High" and gives 22.2 km. From ~1,300 m the Way passes Liñares, Hospital da Condesa, the Alto do Poio, at ~1,330 m, Fonfría and O Biduedo, and drops to Triacastela, at ~665 m, a descent of ~635 m. It is mostly downhill and still hard on knees, so go slowly.
+The Xunta rates this stage "Medium-High" and gives ~22.2 km. From ~1,300 m the Way passes Liñares, Hospital da Condesa, the Alto do Poio, at ~1,330 m, Fonfría and O Biduedo, and drops to Triacastela, at ~665 m, a descent of ~635 m. It is mostly downhill and still hard on knees, so go slowly.
 
 ### Day 28: Triacastela to Sarria (~18 km)
 
@@ -28,18 +28,18 @@ You cross the reservoir by a footbridge and climb steeply to Gonzar, ~8 km on. T
 
 ### Day 31: Palas de Rei to Arzúa (~29 km)
 
-The longest day of the last week. The Xunta gives 14.6 km to Melide and 14.5 km on to Arzúa, while Wikipedia's example itinerary has the whole day as ~25 km. From Palas the Way goes through leafy woods by San Xiao do Camiño and O Leboreiro to Melide, where the Camino Primitivo joins. Melide is known for *polbo á feira*, Galician octopus.
+The longest day of the last week. The Xunta gives ~14.6 km to Melide and ~14.5 km on to Arzúa, while Wikipedia's example itinerary has the whole day as ~25 km. From Palas the Way goes through leafy woods by San Xiao do Camiño and O Leboreiro to Melide, where the Camino Primitivo joins. Melide is known for *polbo á feira*, Galician octopus.
 
 From Melide the path is "easy to walk on", says the Xunta, with gradual climbs and descents, through Boente and Castañeda to Arzúa, where the Camino del Norte joins. Arzúa gives its name to a cheese with protected designation of origin.
 
 ### Day 32: Arzúa to O Pedrouzo (~18 km)
 
-A gentle day. The Xunta rates it "Low", and gives 18.4 km, through meadows and woods of oak and eucalyptus, with hamlets such as A Calzada, A Salceda, A Brea and Santa Irene. The warning is the road: in the first half the Way follows stretches of the N-547 highway and crosses it several times, so watch for vehicles.
+A gentle day. The Xunta rates it "Low", and gives ~18.4 km, through meadows and woods of oak and eucalyptus, with hamlets such as A Calzada, A Salceda, A Brea and Santa Irene. The warning is the road: in the first half the Way follows stretches of the N-547 highway and crosses it several times, so watch for vehicles.
 
 O Pedrouzo, also written Arca, is in the municipality of O Pino, the last before Santiago. It is tempting to push on tonight. Stay, and arrive fresh tomorrow.
 
 ### Day 33: O Pedrouzo to Santiago de Compostela (~20 km)
 
-The last day: ~20 km by the Xunta's figure of 20.2 km, which Wikipedia's example itinerary gives as ~16.5 km. After Santo Antón you climb to the municipality of Santiago, by O Amenal and San Paio, with Lavacolla about halfway.
+The last day: ~20 km by the Xunta's figure of ~20.2 km, which Wikipedia's example itinerary gives as ~16.5 km. After Santo Antón you climb to the municipality of Santiago, by O Amenal and San Paio, with Lavacolla about halfway.
 
 Monte do Gozo, the Hill of Joy, at ~370 m and ~4.5 km from the centre, is where pilgrims traditionally cheered at the first sight of the cathedral's spires. Then the old town, and the cathedral. The chapter on arriving says what to do next.

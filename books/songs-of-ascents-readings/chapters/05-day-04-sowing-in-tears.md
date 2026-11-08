@@ -18,7 +18,7 @@ Every long walk has a stretch that feels, afterwards, like a dream. A morning yo
 
 Psalm 126 begins with that feeling, on a very large scale: the singers say *we were like those who dream*. The usual reading is that the singers are the people who came home from exile in Babylon, about the sixth century BC, though scholars differ on whether the song looks back at one event or many. Either way, it is the dazed joy of people who have got back what they thought was lost. Their mouths were full of laughter, and other nations noticed. Joy that large is visible from outside.
 
-Then comes the turn that makes this a true song and not a greeting card. In the middle, the verbs go into the present: *Restore our fortunes again, Yahweh, like the streams in the Negev.* They have come back, and they still ask for restoring. The Negev is the dry south of the land, where a riverbed can lie empty for months and then run with water after rain. The plea sits right beside the gladness, in the same song, with no embarrassment. Joy and unfinished business are neighbours. You reach the top of the pass and the other side is more road.
+Then comes the turn that makes this a true song and not a greeting card. In the middle, the song turns from looking back to asking: *Restore our fortunes again, Yahweh, like the streams in the Negev.* They have come back, and they still ask for restoring. The Negev is the dry south of the land, where a riverbed can lie empty for months and then run with water after rain. The plea sits right beside the gladness, in the same song, with no embarrassment. Joy and unfinished business are neighbours. You reach the top of the pass and the other side is more road.
 
 Then the best-known lines: *Those who sow in tears will reap in joy.* Commentators often point out that, in a poor year, sowing means putting into the ground the grain you might have eaten. The sower goes out because the field needs it, and weeps while he does it. The psalm does not tell him to stop weeping, or ask him to feel better first. He *goes out weeping, carrying seed*, the tears and the work carried together, one in each hand. For anyone who has set out on a walk because of a grief, this is the most honest sentence of the week so far. Nobody has to be finished with the crying before they walk.
 
@@ -55,7 +55,7 @@ Did anyone notice you today? In the first song, the other nations saw the joy an
 
 The gift of the psalm is sleep, so make the end of the evening short. Wash, put your feet up for a few minutes, and let the body have the small things it has been waiting for all day. The mind builds a great many houses at two in the morning and they are almost always out of proportion. Do not plan tomorrow tonight beyond a start time and a bottle of water.
 
-You may feel that today was not enough. Almost no one does when tired. There are always more kilometres, more words, more care that you could have given. The psalm answers that gently: it is not all on you.
+You may feel that today was not enough. Almost everyone does when tired. There are always more kilometres, more words, more care that you could have given. The psalm answers that gently: it is not all on you.
 
 - What did I put into the ground today, however small, that I will not see grow?
 - Where did something happen today that I could hardly believe?

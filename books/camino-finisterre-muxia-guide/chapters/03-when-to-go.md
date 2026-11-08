@@ -2,14 +2,14 @@
 
 ## The weather, in patterns
 
-Galicia is green because it is wet. No official coastal climate table was read for this book, so these figures are for Santiago, where the road begins. Wikipedia gives them from the Spanish state weather agency, AEMET, for 1991 to 2020. The sea will be windier than the city, and no table here says by how much.
+Galicia is green because it is wet. No official coastal climate table was read for this book, so these figures are for Santiago, where the road begins. Wikipedia gives them from the Spanish state weather agency, AEMET, for 1991 to 2020. Expect the coast to be windier than the city; no table here says by how much.
 
 - **Winter.** In January the average daily high in Santiago is ~12 °C and the low ~5 °C. The wettest months are October (~214 mm of rain), January (~196 mm), November (~194 mm) and December (~184 mm).
 - **Spring.** April averages a high of ~17 °C and ~130 mm of rain, May ~20 °C and ~109 mm. The rain eases month by month.
 - **Summer.** July is the driest month (~31 mm), with an average high of ~25 °C and a low of ~14 °C. June (~44 mm) and August (~45 mm) are nearly as dry. Hot spells can run well above the average.
 - **Autumn.** September is mild (~23 °C by day, ~89 mm), and the rain returns hard in October.
 
-The CaminoPlus route guide in the app suggests April to October for this road. That fits the table: it is the dry half of the year, and the half with the long evenings.
+The CaminoPlus route guide in the app suggests April to October for this road. That is a wide window, and the table shows why: the driest months, June to August, sit inside it, and so does October, the wettest month.
 
 For the coast itself, ask the people who watch it. AEMET publishes a forecast for the municipality of Fisterra, the Galician weather service MeteoGalicia forecasts for all of Galicia, and the Concello de Fisterra's website keeps pages for the weather and the tides. Read them the evening before, and again at breakfast.
 
@@ -25,11 +25,11 @@ The best moment of this walk is at a fixed time of day, so light matters here mo
 - Late September: sunset ~20:40.
 - Mid-October: sunset ~19:55.
 
-In summer you can walk a long day and still reach the lighthouse for sunset. In winter, a late start puts you on the cliff road in the dusk. Plan to arrive with at least an hour of light, and carry a head torch.
+In summer you can walk a long day and still reach the lighthouse for sunset. In winter, a late start puts you on the road to the lighthouse in the dusk. Plan to arrive with at least an hour of light, and carry a head torch.
 
 ## Crowds and quiet
 
-No count of pilgrims on this road was found in a source that could be checked. The Pilgrim's Office's statistics page is built by script and could not be read, and its other pages do not mention this walk. In winter the days are short, the weather is rough, and some places are shut for the season, which is a question for the app and a phone call, not for this book.
+No count of pilgrims on this road was found in a source that could be checked. The Pilgrim's Office's statistics page is built by script and could not be read, and its other pages do not mention this walk. In winter the days are short and the weather is wetter. Whether places are open for the season is a question for the app and a phone call, not for this book.
 
 **The Holy Year.** A Jacobean Holy Year falls when 25 July is a Sunday, and the next is 2027. The Pilgrim's Office says that 272,703 pilgrims qualified for the Compostela in the Holy Year of 2010, against 1,245 who arrived in 1985, and it warns that in times of great influx it cannot promise to issue the Compostela on the day you ask. Santiago will be busy in 2027. Whether the road to the coast will be busier too is not something any source read for this book says.
 

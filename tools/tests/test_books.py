@@ -136,7 +136,7 @@ class Guide(unittest.TestCase):
                           "01-sources-and-thanks.md": "# Sources and thanks\n\nSee https://example.org.\n"})
         self.assertEqual(rep.errors, [])
         text = "\n".join(rep.warnings)
-        self.assertIn("1 distance(s) without '~'", text)
+        self.assertIn("1 figure(s) without '~'", text)
         self.assertIn("00-a.md: a web address outside the sources chapter", text)
         self.assertNotIn("01-sources", text)
 
@@ -151,6 +151,28 @@ class Guide(unittest.TestCase):
         self.assertIn("2 row(s) are not marked checked", "\n".join(self.check({"00-a.md": "# A\n\nx\n"}, facts=bad).warnings))
         removed = two.replace("| a0 | v | s | yes |", "| a0 | v | s | removed |")
         self.assertNotIn("not marked checked", "\n".join(self.check({"00-a.md": "# A\n\nx\n"}, facts=removed).warnings))
+
+    def test_the_author_never_says_i_but_a_numeral_is_not_the_author(self):
+        rep = self.check({"00-a.md": "# A\n\nI walked this road in May. Manuel I and Pope John Paul I came to it. Part I of the book. My feet hurt.\n"})
+        errors = "\n".join(rep.errors)
+        self.assertIn("first person ('I')", errors)
+        clean = self.check({"00-a.md": "# A\n\nManuel I of Portugal came here, and so did Alfonso II. See Part I of the book.\n"})
+        self.assertNotIn("first person", "\n".join(clean.errors))
+
+    def test_altitudes_and_temperatures_need_a_tilde_and_business_names_are_noticed(self):
+        rep = self.check({"00-a.md": "# A\n\nThe pass is 1,100 m high and it can be 35°C. A day of ~25 km. Sleep at the Hostal Don Pedro tonight.\n"})
+        text = "\n".join(rep.warnings)
+        self.assertIn("2 figure(s) without '~'", text)
+        self.assertIn("'Hostal D...' looks like a business name", text)
+        self.assertEqual(self.check({"00-a.md": "# A\n\nThe pass is ~1,100 m high and ~35°C. ~25 km.\n"}).warnings, [w for w in self.check({"00-a.md": "# A\n\nThe pass is ~1,100 m high and ~35°C. ~25 km.\n"}).warnings if "figure" not in w])
+
+    def test_about_marks_an_approximation_like_a_tilde(self):
+        rep = self.check({"00-a.md": "# A\n\nThe record low is about \u22126 °C, a pass of about 1,100 m, and roughly 25 km. But 30 km is bare.\n"})
+        self.assertIn("1 figure(s) without '~'", "\n".join(rep.warnings))
+
+    def test_a_chapter_that_is_too_long_is_noticed(self):
+        rep = self.check({"00-a.md": "# A\n\n" + ("word " * 1900) + "\n"})
+        self.assertIn("a chapter is at most 1,800", "\n".join(rep.warnings))
 
     def test_metadata_is_checked(self):
         rep = self.check({"00-a.md": "# A\n\nx\n"}, meta=guide_meta(id="demo-guide", description_short="x" * 201, keywords=["k"] * 8,
@@ -377,6 +399,25 @@ class Build(unittest.TestCase):
             self.assertEqual(bb.check_app_bundle([b], out, index), [])
             index.write_text("// edited by hand\n", encoding="utf-8")
             self.assertEqual(bb.check_app_bundle([b], out, index), ["differs: bookBundle.ts"])
+
+    def test_the_credit_of_a_source_reads_well_whatever_the_translator_field_holds(self):
+        base = {"work": "The Work", "author": "An Author", "year": "1900", "licence": "Public domain"}
+        self.assertEqual(bb.source_credit({**base, "translator": "William Benham", "year": "1886"}), "The Work, An Author. Translated by William Benham (1886). Public domain.")
+        self.assertEqual(bb.source_credit({**base, "translator": "none (English original)", "year": "1862"}), "The Work, An Author. English original, 1862. Public domain.")
+        self.assertEqual(bb.source_credit({**base, "translator": "anonymous translation from the French, Fleming H. Revell Company edition", "year": "undated old print edition"}),
+                         "The Work, An Author. Anonymous translation from the French, Fleming H. Revell Company edition, undated old print edition. Public domain.")
+        self.assertEqual(bb.source_credit({**base, "translator": "World English Bible contributors", "year": "public domain, modern translation"}),
+                         "The Work, An Author. World English Bible contributors, public domain, modern translation. Public domain.")
+
+    def test_the_app_book_carries_its_credit_line(self):
+        with tempfile.TemporaryDirectory() as t:
+            root = pathlib.Path(t) / "books"
+            meta = reflection_meta(id="demo-reflection")
+            d = write_book(root, meta, {"00-a.md": "# A\n\nx\n"})
+            book = bk.load_book(d)
+            self.assertEqual(bb.app_book(book)["credit"], "The Imitation of Christ, Thomas à Kempis. Translated by William Benham (1886). Public domain.")
+            g = write_book(root, guide_meta(), {"00-a.md": "# A\n\nx\n"}, FACTS)
+            self.assertEqual(bb.app_book(bk.load_book(g))["credit"], "By Test Author.")
 
     def test_store_json_leaves_isbn_and_price_to_the_publisher(self):
         with tempfile.TemporaryDirectory() as t:

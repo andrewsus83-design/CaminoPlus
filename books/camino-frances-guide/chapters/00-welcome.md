@@ -1,6 +1,6 @@
 # Welcome
 
-The French Way is the Camino most people mean when they say "the Camino". It begins in Saint-Jean-Pied-de-Port, a small town in the French Pyrenees, and ends at the cathedral of Santiago de Compostela, in Galicia. The CaminoPlus catalog gives it as ~773 km, walked in 33 usual stages. That is a month of days, and big enough to change the way you look at a month.
+The French Way is the most walked of the Caminos. It begins in Saint-Jean-Pied-de-Port, a small town in the French Pyrenees, and ends at the cathedral of Santiago de Compostela, in Galicia. The CaminoPlus catalog gives it as ~773 km, walked in 33 usual stages. That is about a month of walking, and more with rest days.
 
 **The promise of this book is simple.** By the last page you will know whether this is your Camino, where to start and how long to give it, when to go, what to carry, and what each of the 33 days asks of you.
 

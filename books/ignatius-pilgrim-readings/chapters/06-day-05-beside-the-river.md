@@ -24,7 +24,7 @@ If you carry thoughts like that, please do not carry them alone. Tell someone yo
 
 The river did not repay those months. It came afterwards, sideways, in a place he had not chosen, while he was doing nothing. Some of the changes the account names are more practical than any light. He decided that he had given enough of his time to prayer, and chose *to give sufficient time to sleep*. After a time he gave up his harshest penances and trimmed his nails and hair. So one of the things a man does after the worst of it is to start looking after his body. It is not the smallest lesson at Manresa, and a walker can borrow it without any theology.
 
-We should be honest about the size of the claim. A man seems to himself to become another man by a stream, and the edition tells it as fact, in the voice of a story told many years afterwards. We cannot see inside him, and the account does not argue for itself. We quote it because its shape is familiar. It often seems that the answer, when one comes, arrives sideways, after the effort, in a place you did not pick. It is not a promise about your river.
+We should be honest about the size of the claim. A man seems to himself to become another man by a stream, and the edition tells it as fact, in the voice of a story told many years afterwards. We quote it because its shape is familiar. It often seems that the answer, when one comes, arrives sideways, after the effort, in a place you did not pick. It is not a promise about your river.
 
 For an ordinary day it comes down to a stop. You do not need a stream, and you do not need an insight. Ten minutes with nothing to produce is enough. Nothing may happen, and that is not a failure. The only thing owed to a stop is that you let it be a stop, and do not turn it into a task. Ignatius found his clearing when he sat down. It came after, and not instead of, learning to take care of himself.
 
@@ -43,7 +43,7 @@ One practical change the account names after the dark months was to give more ti
 
 A river goes on flowing whether or not you watch it. That can be taken as a mercy. The world does not need your attention in order to continue, so you can give it freely. If you notice that you are more tired than usual tonight, it may be that sort of tiredness, which comes from having been still and a little exposed for a while, and not from the kilometres.
 
-If you saw something today, say it aloud to someone at the table, in a single sentence. A thing seen is a little more real once it has been said.
+If you saw something today, say it aloud to someone at the table, in a single sentence. A thing seen is a little more real once it has been said. And if rain came, as the route notes say it often does, it counts as water too. A wet hour with the hood up is also a way of watching the world go by.
 
 If you sat by the water and nothing came, nothing has gone wrong. Insight is not owed to anyone, and it is not a measure of the day. A day on which you drank, ate, rested and looked at a stream has done a good deal.
 

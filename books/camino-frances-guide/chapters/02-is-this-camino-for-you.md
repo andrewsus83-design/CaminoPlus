@@ -4,7 +4,7 @@
 
 The French Way asks for time and stamina more than skill. It is a walking path, and most of the distance is on tracks, field edges and village streets. The Xunta de Galicia rates the Galician section "Medium", and its stages run from "Low" to "Medium-High". The days in this book run from ~18 to ~30 km. What makes the Francés demanding is the number of them: 33 in a row, with a rest day or two on top.
 
-A fair test comes from the Confraternity of St James: aim to be able to walk 20 km or more a day, over varied ground, with your pack on. If you can do that on a training weekend, you are ready to start slowly. The Confraternity adds that you will get fitter by walking the Camino itself.
+A fair test comes from the Confraternity of St James: aim to be able to walk ~20 km or more a day, over varied ground, with your pack on. If you can do that on a training weekend, you are ready to start slowly. The Confraternity adds that you will get fitter by walking the Camino itself.
 
 ## The days that ask the most
 

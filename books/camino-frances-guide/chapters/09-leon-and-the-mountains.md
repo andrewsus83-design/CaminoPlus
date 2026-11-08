@@ -2,7 +2,7 @@
 
 ## The character of these days
 
-This is the part of the road with the biggest swing. It starts in the city of León, at ~840 m, crosses the plain to Astorga, climbs to the Cruz de Ferro, at about ~1,500 m the highest point of the whole Camino Francés, and drops into El Bierzo, a country that Wikipedia says is surrounded by mountains on all sides and so remarkably isolated. Then it climbs again, to O Cebreiro, where Galicia begins.
+This is the part of the road with the biggest swing. It starts in the city of León, at ~840 m, crosses the plain to Astorga, climbs to the Cruz de Ferro, at ~1,500 m the highest point of the whole Camino Francés, and drops into El Bierzo, a country that Wikipedia says is surrounded by mountains on all sides and so remarkably isolated. Then it climbs again, to O Cebreiro, where Galicia begins.
 
 Distances are rounded, from Wikipedia's example itinerary and Spanish Wikipedia's table. The days say where they differ by more than a couple of kilometres.
 
@@ -32,7 +32,7 @@ Foncebadón flourished in the Middle Ages as a place of shelter for pilgrims. By
 
 Early on you reach the Cruz de Ferro, an iron cross on a tall wooden pole, at ~1,500 m. Many pilgrims leave a stone carried from home at its foot; accounts of the tradition's origin vary, and it is better treated as a custom than as history. Manjarín, El Acebo and Riego de Ambrós follow, then Molinaseca, at ~580 m, whose name comes from old mills on the Meruelo river.
 
-The thing to watch is the descent: ~850 m in ~19 km to Molinaseca, steep and stony. Poles help, and so does time. Ponferrada is the capital of El Bierzo. Its castle dates from the Knights Templar, to whom the king gave the town in the 12th century (the year usually given is 1178), to protect pilgrims on the road.
+The thing to watch is the descent: ~850 m in ~19 km to Molinaseca, steep and long. Poles help, and so does time. Ponferrada is the capital of El Bierzo. Its castle dates from the Knights Templar, to whom the king gave the town in the 12th century (the year usually given is 1178), to protect pilgrims on the road.
 
 ### Day 25: Ponferrada to Villafranca del Bierzo (~23 km)
 

@@ -8,7 +8,7 @@ So the only question left is what to keep. Not everything. Three small things wi
 - **For the hands: one small settling.** Pay what you owe, or ask for what you need. A thank-you sent, a bill closed, a glass of water requested. A day with one of these in it is a tidier day.
 - **For the feet: a stop, and a next step.** Ten minutes beside something that moves, with nothing to produce. And, when the road is too long to think about, only the next stretch.
 
-If you keep all three for a month, you will have kept more than most people keep from a book.
+If you keep all three for a month, you will have kept a good deal from a small book.
 
 ## How to go on
 

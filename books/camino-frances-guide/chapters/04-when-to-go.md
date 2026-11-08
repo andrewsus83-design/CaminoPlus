@@ -6,7 +6,7 @@ The French Way crosses mountains, a high plateau and a wet green coast of hills,
 
 Most pilgrims finish between May and September, says Wikipedia. Its chart of the Pilgrim's Office figures for 2024 shows how steep the seasons are on this road:
 
-- **December to February:** about ~1,000 to ~1,500 a month.
+- **December to February:** ~1,000 to ~1,500 a month.
 - **March:** ~11,000. **April:** ~19,000.
 - **May and June:** ~32,500 and ~31,000.
 - **July:** ~26,500. **August:** ~32,000.

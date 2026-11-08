@@ -137,14 +137,23 @@ def title_page(book: bk.Book) -> str:
     return "\n".join(lines)
 
 
+def source_credit(src: dict) -> str:
+    """One sentence crediting a source, whatever its translator field holds: a name, "none (English original)", "anonymous translation from the French...", an
+    edition or an editor. The EPUB, the PDF and the app all use this one sentence."""
+    work, author, tr, year = src["work"], src["author"], src["translator"].strip(), src["year"].strip()
+    head = f"{work}, {author}."
+    if tr.lower().startswith("none"):
+        return f"{head} English original, {year}. {src['licence']}."
+    if re.search(r"\b(translation|edition|edited|editor|contributors|modernised)\b", tr, re.I):
+        return f"{head} {tr[0].upper() + tr[1:]}, {year}. {src['licence']}."
+    return f"{head} Translated by {tr} ({year}). {src['licence']}."
+
+
 def rights_page(book: bk.Book) -> str:
     m, s = book.meta, book.series
     parts = [f"<h1>About this edition</h1>", f"<p>{esc(s.get('rights', ''))}</p>"]
     for src in m.get("sources", []):
-        parts.append(
-            f"<p>{esc(src['work'])} by {esc(src['author'])}, translated by {esc(src['translator'])} ({esc(src['year'])}). "
-            f"{esc(src['licence'])}.</p>"
-        )
+        parts.append(f"<p>{esc(source_credit(src))}</p>")
     parts.append(f"<p>{esc(s.get('ai_disclosure', ''))}</p>")
     parts.append(f'<p class="meta">Version {esc(m.get("version", "1.0.0"))} · {esc(m.get("date", ""))} · '
                  f'{book.words:,} words · about {esc(bk.format_minutes(book.minutes))} to read.</p>')
@@ -373,6 +382,7 @@ def app_book(book: bk.Book) -> dict:
     }
     if m.get("sources"):
         out["sources"] = [{k: v for k, v in src.items() if k in ("work", "author", "translator", "year", "licence")} for src in m["sources"]]
+    out["credit"] = source_credit(m["sources"][0]) if m.get("sources") else f"By {s.get('author')}."
     return out
 
 

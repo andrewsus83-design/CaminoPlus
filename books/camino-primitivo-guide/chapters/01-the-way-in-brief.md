@@ -28,7 +28,7 @@ In 2015 UNESCO listed the route as a World Heritage Site, together with the Cami
 
 ## Who walks it now
 
-Wikipedia, reporting the Pilgrim's Office statistics, says about 24,400 pilgrims finished the Primitivo in 2024, making it the fifth most walked route. About 58 per cent of them started in Oviedo and about 33 per cent in Lugo, and most finished in August.
+Wikipedia, reporting the Pilgrim's Office statistics, says about 24,400 pilgrims finished the Primitivo in 2024, making it the fifth most walked route. About 58 per cent of them started in Oviedo, and most finished in August.
 
 ## What it feels like
 

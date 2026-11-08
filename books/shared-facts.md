@@ -24,3 +24,19 @@ How a guide writes it:
 - Route lengths next to it are estimates, with `~` and with the note that sources differ.
 - If a start is near the limit, the guide gives the arithmetic with its sources and says: "ask the Pilgrim's Office". It never says that a start "works".
 - It does not repeat advice from blogs or forums, and it does not state a rule that is not in this list.
+
+## The standard sentence of a guide's welcome
+
+Every guide says, once, in its welcome chapter, what it is and is not, in these words (the rest of the welcome is the book's own):
+
+> This book was written with AI assistance, from public sources, and its author has not walked the road. So it gives you sources instead of memories, and it says plainly when the sources disagree.
+
+The full disclosure of the series (`ai_disclosure` in `books/series.json`) is on the "About this edition" page of every book and in the app.
+
+## Notes on the Pilgrim's Office pages (verified 8 November 2026)
+
+- The Compostela is described on <https://oficinadelperegrino.com/en/the-compostela/> and also under <https://oficinadelperegrino.com/en/pilgrimage/the-compostela/>: both load. Use the first as the citation.
+  One page may word the purpose differently from the other ("Christian purposes" against "religious and/or spiritual reasons", as one writer found): quote only the wording of the page cited, and do not elaborate.
+- The Office's pages do **not** mention the Fisterrana or the Muxiana (the certificates for the walk from Santiago to the sea). The Concello de Fisterra says its own certificate is obtained at the
+  municipal pilgrims' hostel and at the tourist office, and the Xunta and spain.info place the Muxiana at the tourist office in Muxía. A guide says only that, and tells the reader to ask.
+- The Office's statistics page is rendered by script and shows nothing to a plain fetch: a statistic comes through a secondary source and is attributed ("Wikipedia reports...").

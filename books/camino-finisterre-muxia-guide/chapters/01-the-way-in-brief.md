@@ -24,4 +24,4 @@ The report adds something worth knowing before you leave. Most of the medieval a
 
 ## A road with its own rules
 
-This is not a Compostela route. In the Pilgrim's Office's wording, the final stage of the walk that earns the Compostela must include the last stretch leading into the cathedral, and this walk leaves the cathedral behind. The Office's pages read for this book say nothing about Fisterra or Muxía. The certificates of the coast, the Fisterrana and the Muxiana, are another matter, and the chapter on arriving says where the official sources place them.
+This is not a Compostela route. The Compostela is the certificate of the Pilgrim's Office for the walk that arrives at the cathedral, and this walk begins where that one ends. The Office's pages read for this book say nothing about Fisterra or Muxía. The certificates of the coast, the Fisterrana and the Muxiana, are another matter, and the chapter on arriving says where the official sources place them.
