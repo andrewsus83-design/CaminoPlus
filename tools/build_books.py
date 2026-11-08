@@ -314,7 +314,8 @@ def cover_html(book: bk.Book) -> str:
         foot = "Camino de Santiago"
     else:
         src = (m.get("sources") or [{}])[0]
-        foot = f"From {src.get('author', '')}" if src else ""
+        author = re.sub(r"\s*\([^)]*\)", "", src.get("author", "")).strip()    # the name only: a note in brackets belongs in the credits
+        foot = f"From {author}" if src else ""
     title = esc(m["title"])
     size = 220 if len(m["title"]) <= 14 else 180 if len(m["title"]) <= 24 else 150
     fonts = font_face(FONTS.as_uri() + "/").replace("fraunces-normal.woff2", "fraunces-latin-opsz-normal.woff2").replace(

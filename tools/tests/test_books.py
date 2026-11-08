@@ -426,6 +426,16 @@ class Build(unittest.TestCase):
             index.write_text("// edited by hand\n", encoding="utf-8")
             self.assertEqual(bb.check_app_bundle([b], out, index), ["differs: bookBundle.ts"])
 
+    def test_the_cover_of_a_reflection_book_names_the_author_without_the_note_in_brackets(self):
+        with tempfile.TemporaryDirectory() as t:
+            root = pathlib.Path(t) / "books"
+            meta = reflection_meta(id="demo-reflection")
+            meta["sources"][0]["author"] = "The psalmists (the headings name David and Solomon for some)"
+            d = write_book(root, meta, {"00-a.md": "# A\n\nx\n"})
+            html = bb.cover_html(bk.load_book(d))
+            self.assertIn("FROM THE PSALMISTS", html.upper())
+            self.assertNotIn("HEADINGS NAME", html.upper())
+
     def test_the_credit_of_a_source_reads_well_whatever_the_translator_field_holds(self):
         base = {"work": "The Work", "author": "An Author", "year": "1900", "licence": "Public domain"}
         self.assertEqual(bb.source_credit({**base, "translator": "William Benham", "year": "1886"}), "The Work, An Author. Translated by William Benham (1886). Public domain.")
