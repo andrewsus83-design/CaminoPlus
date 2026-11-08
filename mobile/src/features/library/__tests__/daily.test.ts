@@ -491,7 +491,282 @@ check('the reflection is short (3 to 5 sentences), labelled "Sample reflection",
   assert.ok(SAMPLE_REFLECTION.text.length < 420, 'short enough to read on a rest by the road');
 });
 
-// ------------------------------------------------------------------------------------------------------------------
-// The checks of the wiring of the screen are added below, after the screen's own files exist.
+/* ==================================================================================================================
+   From here on the source is read, nothing is run: how the screen is wired into the app, and that the design page shows the same screen.
+   ================================================================================================================== */
+
+const DIR = 'src/features/library/daily';
+const ROUTE = 'app/library/daily.tsx';
+const dailyFiles = [...fs.readdirSync(path.join(root, DIR)).filter((f) => /\.tsx?$/.test(f)).map((f) => `${DIR}/${f}`), ROUTE];
+const source = (f: string) => code(read(f));
+/** The text of a file of the feature, comments out. */
+const all = () => dailyFiles.map((f) => `// ${f}\n${source(f)}`).join('\n');
+
+check('the feature is the files this test expects, so a new one is looked at (and the scans below see all of them)', () => {
+  assert.deepEqual(dailyFiles.map((f) => path.basename(f)).sort(), ['DayReading.tsx', 'MonthCalendar.tsx', 'calendar.ts', 'daily.tsx', 'layout.ts', 'sample.ts', 'state.ts', 'useDailyReading.ts']);
+});
+
+check('no new native module, no network and nothing stored: React, React Native, expo-router and the app\'s own components and theme, and no call to the account, the network or the phone\'s storage', () => {
+  const allowed = /^(react|react-native|expo-router)$|^\.{1,2}\/|^@\/(components\/|theme$|features\/library\/daily\/)/;
+  const offenders: string[] = [];
+  for (const f of dailyFiles) for (const m of read(f).matchAll(/^import [^;]*? from '([^']+)';/gm)) if (!allowed.test(m[1])) offenders.push(`${f}: ${m[1]}`);
+  assert.deepEqual(offenders, []);
+  const text = all();
+  assert.doesNotMatch(text, /supabase|@\/lib\/|localStore|secureStorage|AsyncStorage|expo-file-system|\bfetch\(|XMLHttpRequest|WebSocket|NetInfo|navigator\.onLine/i, 'the screen works offline: it asks for nothing and keeps nothing');
+});
+
+check('the calendar, the reducer, the layout and the sample are plain TypeScript: no React and no React Native in them', () => {
+  for (const f of ['calendar.ts', 'state.ts', 'layout.ts', 'sample.ts']) {
+    const src = read(`${DIR}/${f}`);
+    assert.doesNotMatch(src, /from 'react|from '@\/|from 'expo/, `${f} is read by node tests, so it imports nothing of the app`);
+  }
+  assert.doesNotMatch(source(`${DIR}/calendar.ts`), /\bIntl\b|toLocale|\.toDateString|\.getDay\(|Date\.UTC|\.getTimezoneOffset/, 'no Date or Intl arithmetic: the tables and the day counting are the calendar');
+  assert.equal((source(`${DIR}/calendar.ts`).match(/new Date\(/g) ?? []).length, 0, 'calendar.ts only reads the fields of a Date it is given');
+});
+
+check('colours are theme roles and nothing else: no literal colour, no palette colour, no fixed colour, and none read when the file loads', () => {
+  for (const f of dailyFiles) {
+    const src = source(f);
+    assert.doesNotMatch(src, /#[0-9a-fA-F]{3,8}\b|\brgba?\(|\bhsla?\(/, `${f}: a literal colour`);
+    assert.doesNotMatch(src, /\bfixed\.|\bc\.[a-z]/, `${f}: only role.* (and the theme's radius and layout) are used here`);
+    assert.doesNotMatch(src, /\b(backgroundColor|borderColor|color)\s*[:=]\s*'(?!transparent')[a-z]+'/, `${f}: a named colour`);
+  }
+  assert.match(all(), /\brole\.action\b/);
+  // a role is read while drawing: nothing of the theme is read at the top level of a file
+  for (const f of dailyFiles.filter((p) => p.endsWith('.tsx'))) {
+    for (const line of source(f).split('\n')) assert.ok(!/^(export )?const \w+ = .*\brole\./.test(line), `${f}: a role read when the file loads would never follow light and dark: ${line.trim()}`);
+  }
+  assert.doesNotMatch(all(), /StyleSheet\.create/);
+});
+
+check('every control has a label for a screen reader, says it is a button, and is at least 44 px: the days, the arrows, Today and Back', () => {
+  const cal = source(`${DIR}/MonthCalendar.tsx`);
+  const pressables = [...cal.matchAll(/<Pressable\b/g)];
+  assert.equal(pressables.length, 3, 'Arrow, Day and Today are the three things that can be pressed in the calendar');
+  for (const m of pressables) {
+    const tag = cal.slice(m.index, (m.index ?? 0) + 760);
+    assert.match(tag, /accessibilityRole="button"/);
+    assert.match(tag, /accessibilityLabel=/);
+    assert.match(tag, /\bTOUCH\b/, 'its size is the 44 of layout.ts');
+  }
+  assert.match(cal, /accessibilityLabel=\{dayLabel\(day, \{ today, selected \}\)\}/, 'a day says its whole date, "today" and "selected"');
+  assert.match(cal, /label=\{previousMonthLabel\(shown, range\)\}/);
+  assert.match(cal, /label=\{nextMonthLabel\(shown, range\)\}/);
+  assert.match(cal, /accessibilityLabel="Today"/);
+  assert.match(cal, /width: TOUCH, height: TOUCH/, 'the arrows are 44 by 44');
+  assert.match(cal, /\{ flex: 1, height: TOUCH,/, 'a day is as wide as its seventh of the card and 44 high');
+  assert.match(cal, /minHeight: TOUCH, justifyContent: 'center'/, 'Today is 44 high');
+  assert.match(cal, /accessibilityState=\{\{ disabled: !enabled \}\}\s+disabled=\{!enabled\}/, 'an arrow at the limit is off, and says so');
+  assert.match(source(ROUTE), /<IconButton name="back" label="Back" onPress=\{goBack\} \/>/);
+  assert.match(read('src/components/ui.tsx'), /size = 48/, 'the shared round button is 48');
+  assert.equal(TOUCH, 44);
+  assert.match(read(`${DIR}/layout.ts`), /export const TOUCH = 44;/);
+});
+
+check('the calendar: ring for today, fill for the chosen day, a ring inside the fill for both; weekday row hidden from a screen reader; six rows from monthGrid; the text of the days stops growing at 1.3', () => {
+  const cal = source(`${DIR}/MonthCalendar.tsx`);
+  assert.match(cal, /borderWidth: today \? 2 : 0, borderColor: role\.action, backgroundColor: selected \? role\.action : 'transparent'/);
+  assert.match(cal, /\{selected && today && <View pointerEvents="none" style=\{\{ position: 'absolute', top: 3, left: 3, right: 3, bottom: 3, borderRadius: radius\.pill, borderWidth: 2, borderColor: role\.onAction \}\} \/>\}/);
+  assert.match(cal, /color=\{selected \? role\.onAction : role\.text\}/);
+  assert.match(cal, /<View aria-hidden style=\{\{ flexDirection: 'row', height: 28, alignItems: 'center' \}\}>\s*\{WEEKDAYS_SHORT\.map/);
+  assert.match(cal, /monthGrid\(shown\)\.map\(\(row, r\) => \(/);
+  assert.equal((cal.match(/maxFontSizeMultiplier=\{FONT_LIMIT\}/g) ?? []).length, 2, 'the numbers of the days and the weekday names');
+  assert.match(cal, /const FONT_LIMIT = 1\.3;/);
+  assert.match(cal, /sameDay\(cell, today\)/);
+  assert.match(cal, /sameDay\(cell, selected\)/);
+  assert.match(cal, /: <View key=\{c\} style=\{\{ flex: 1, height: TOUCH \}\} \/>/, 'a place outside the month is empty and keeps its size: the height never changes');
+  assert.match(cal, /accessibilityRole="header" accessibilityLiveRegion="polite"/, 'the month is a heading, said again when it changes (Android and the web)');
+  assert.match(cal, /<Card style=\{\{ paddingHorizontal: metrics\.pad, paddingVertical: 8 \}\}>/);
+  assert.match(cal, /const metrics = calendarMetrics\(width, layout\.screenMargin\);/);
+  assert.match(cal, /<View style=\{\{ marginHorizontal: -metrics\.bleed \}\}>/, 'on a 320 phone the card reaches into the margins so that every day is 44 wide');
+  assert.match(cal, /useWindowDimensions\(\)/);
+  assert.match(cal, /maxWidth: GRID_MAX, alignSelf: 'center'/, 'a tablet or a browser window does not get days of 150 px');
+});
+
+check('the screen is a stack screen like Bookmarks: Back, the title "Daily reading", no room for a tab bar, the calendar, then the reading of the chosen day', () => {
+  const src = source(ROUTE);
+  assert.match(src, /<Screen tabBar=\{false\}>/);
+  assert.match(src, /router\.canGoBack\(\) \? router\.back\(\) : router\.replace\('\/library'\)/);
+  assert.match(src, /<AppText variant="h2" accessibilityRole="header">Daily reading<\/AppText>/);
+  assert.match(src, /const daily = useDailyReading\(\);/, 'the clock is the phone\'s unless a caller hands one in');
+  assert.ok(src.indexOf('<IconButton') < src.indexOf('<AppText variant="h2"') && src.indexOf('<AppText variant="h2"') < src.indexOf('<MonthCalendar') && src.indexOf('<MonthCalendar') < src.indexOf('<DayReading'), 'order: Back, title, calendar, reading');
+  assert.match(src, /<DayReading day=\{daily\.selected\} isToday=\{sameDay\(daily\.selected, daily\.today\)\} \/>/);
+  for (const prop of ['shown={daily.shown}', 'today={daily.today}', 'selected={daily.selected}', 'range={daily.range}', 'canGoBack={daily.canGoBack}', 'canGoForward={daily.canGoForward}', 'onSelect={daily.select}', 'onPrevious={daily.previousMonth}', 'onNext={daily.nextMonth}', 'onToday={daily.goToday}']) assert.ok(src.includes(prop), prop);
+  assert.match(src, /export default function DailyReading\(\)/);
+  const bookmarks = source('app/library/bookmarks.tsx');
+  for (const shared of [/<Screen tabBar=\{false\}>/, /router\.canGoBack\(\) \? router\.back\(\) : router\.replace\('\/library'\)/, /<IconButton name="back" label="Back" onPress=\{goBack\} \/>/]) assert.match(bookmarks, shared, 'Bookmarks still has what this screen copies');
+});
+
+check('the route is registered once, in the block for someone with a journey, right after library/bookmarks and with the same (no) options', () => {
+  const layout = read('app/_layout.tsx');
+  const daily = [...layout.matchAll(/<Stack\.Screen name="library\/daily"([^>]*)\/>/g)];
+  const bookmarks = [...layout.matchAll(/<Stack\.Screen name="library\/bookmarks"([^>]*)\/>/g)];
+  assert.equal(daily.length, 1, 'registered exactly once');
+  assert.equal(bookmarks.length, 1);
+  assert.equal(daily[0][1].trim(), bookmarks[0][1].trim(), 'the options of Bookmarks, which are none');
+  assert.equal(daily[0][1].trim(), '');
+  assert.match(layout, /<Stack\.Screen name="library\/bookmarks" \/>\n\s+<Stack\.Screen name="library\/daily" \/>/);
+  const guard = layout.indexOf('<Stack.Protected guard={onboarded}>');
+  const at = layout.indexOf('<Stack.Screen name="library/daily" />');
+  const end = layout.indexOf('</Stack.Protected>', guard);
+  assert.ok(guard > 0 && at > guard && at < end && layout.indexOf('<Stack.Screen name="library/bookmarks" />') > guard, 'in the same guard as Bookmarks');
+  assert.ok(fs.existsSync(path.join(root, ROUTE)));
+  assert.ok(!fs.existsSync(path.join(root, 'app/library/_layout.tsx')), 'no layout of its own for the Library screens: the root one is the only place they are registered');
+  const layouts: string[] = [];
+  const walk = (dir: string) => { for (const name of fs.readdirSync(path.join(root, dir))) { const rel = `${dir}/${name}`; if (fs.statSync(path.join(root, rel)).isDirectory()) walk(rel); else if (name === '_layout.tsx') layouts.push(rel); } };
+  walk('app');
+  assert.deepEqual(layouts.filter((f) => /name="library\/daily"/.test(read(f))), ['app/_layout.tsx'], 'no other layout registers it');
+});
+
+check('the reading under the calendar: heading of the day, the Preview notice, one sample reading and one sample reflection, each marked as a sample', () => {
+  const src = source(`${DIR}/DayReading.tsx`);
+  assert.match(src, /<SampleNotice title="Preview">\{DAILY_NOTICE\}<\/SampleNotice>/);
+  assert.match(src, /<CardTop label="Sample reading" \/>/);
+  assert.match(src, /<CardTop label=\{reflection\.label\} \/>/);
+  assert.match(src, /<SampleTag \/>/);
+  assert.equal((src.match(/<ReadingCard /g) ?? []).length, 1, 'ONE sample reading');
+  assert.equal((src.match(/<ReflectionCard /g) ?? []).length, 1);
+  assert.match(src, /const \{ reading, reflection \} = readingFor\(day\);/);
+  assert.match(src, /<View accessible accessibilityRole="header" accessibilityLabel=\{heading\.label\} accessibilityLiveRegion="polite"/, 'one heading for a screen reader, said again when another day is picked');
+  assert.ok(src.indexOf('accessibilityLabel={heading.label}') < src.indexOf('<SampleNotice') && src.indexOf('<SampleNotice') < src.indexOf('<ReadingCard reading') && src.indexOf('<ReadingCard reading') < src.indexOf('<ReflectionCard reflection'), 'order: heading, notice, reading, reflection');
+  assert.match(src, /\{reading\.reference\}/);
+  assert.match(src, /reading\.translation/);
+  assert.match(src, /reading\.verses\.map\(\(v\) => \(/);
+  assert.match(src, /<AppText variant="caption" muted>\{`\$\{v\.n\} `\}<\/AppText>\{v\.text\}/, 'the verse numbers are small and muted');
+  assert.match(src, /\.replace\(\/ \/g, NO_BREAK\)/, '"public domain" is not broken between its words');
+  assert.match(src, /const NO_BREAK = '\\u00A0';/);
+  const data = read(`${DIR}/sample.ts`) + src;
+  assert.doesNotMatch(data, /\$\d|€\d|\brating\b|★|available now|download|onPress/i, 'a sample never claims to be real');
+  assert.doesNotMatch(src, /onPress|Pressable/, 'the cards show what a reading will look like: nothing on them can be pressed');
+});
+
+check('the clock is handed in once and read in one place: the phone\'s own is the default, today is read again when the screen draws and when the app comes back, and Today goes to the clock\'s day', () => {
+  const hook = source(`${DIR}/useDailyReading.ts`);
+  assert.match(hook, /const systemNow = \(\): Date => new Date\(\);/);
+  assert.match(hook, /export function useDailyReading\(now: \(\) => Date = systemNow\): DailyReading/);
+  assert.equal((all().match(/new Date\(|Date\.now\(/g) ?? []).length, 1, 'the clock is read in exactly one place: the default of the hook');
+  assert.match(hook, /useReducer\(dailyReducer, undefined, \(\) => initDaily\(todayOf\(now\(\)\)\)\)/);
+  assert.match(hook, /const today = todayOf\(now\(\)\);/);
+  assert.match(hook, /AppState\.addEventListener\('change', \(s\) => \{ if \(s === 'active'\) redraw\(\); \}\)/);
+  assert.match(hook, /return \(\) => sub\.remove\(\);/);
+  assert.match(hook, /dispatch\(\{ type: 'today', today: t \}\)/);
+  assert.match(hook, /Platform\.OS === 'ios'/, 'iOS says the new month and the picked day out loud; Android and the web have the live regions');
+  assert.match(hook, /AccessibilityInfo\.announceForAccessibility\(text\)/);
+  assert.match(hook, /dispatch\(\{ type: 'month', by \}\)/);
+  assert.doesNotMatch(hook, /setInterval|setTimeout/, 'no timer: nothing to clean up');
+  assert.match(all(), /accessibilityLiveRegion="polite"/);
+});
+
+check('the feature uses no console, no interval and no timer', () => {
+  const offenders: string[] = [];
+  for (const f of dailyFiles) source(f).split('\n').forEach((line, i) => { if (/\bconsole\.|\bsetInterval\(|\bsetTimeout\(/.test(line)) offenders.push(`${f}:${i + 1}  ${line.trim().slice(0, 100)}`); });
+  assert.deepEqual(offenders, []);
+});
+
+check('this test is run by npm test: its file is in tsconfig.librarytest.json, test:library runs it, and npm test runs test:library', () => {
+  assert.match(read('tsconfig.librarytest.json'), /"src\/features\/library\/__tests__\/daily\.test\.ts"/);
+  const scripts = (JSON.parse(read('package.json')) as { scripts: Record<string, string> }).scripts;
+  assert.ok(scripts['test:library'].includes('library-test/features/library/__tests__/daily.test.js'), 'test:library does not run daily.test.js');
+  assert.ok(/npm run test:library\b/.test(scripts.test), 'npm test does not run test:library');
+});
+
+/* ================================================================================ the design page shows the same screen */
+
+const design = fs.readFileSync(path.join(root, '..', 'design', 'index.html'), 'utf8');
+const group = design.slice(design.indexOf('id="daily-reading"'), design.indexOf('<!-- =================================================================== ICONS -->'));
+const phones = group.split('<div class="phone-wrap">').slice(1);
+const labelOf = (p: string) => /<p class="phone-label"><b>([^<]+)<\/b>/.exec(p)?.[1] ?? '';
+const plain = (s: string) => s.replace(/&nbsp;/g, '\u00A0').replace(/&amp;/g, '&');
+const PHONE_LABELS = ['Daily reading', 'Daily reading · Another day', 'Daily reading · The reading', 'Daily reading · Dark', 'Daily reading · Dark, the reading', 'Daily reading · 320 wide'];
+
+check('the design page has the Daily reading phones, in a group of their own at the end of the Screens section: light, dark, the reading, and the 320 phone', () => {
+  assert.ok(group.length > 20000, 'the group was not found in design/index.html');
+  assert.deepEqual(phones.map(labelOf), PHONE_LABELS);
+  assert.equal(design.split('id="daily-reading"').length, 2, 'the group is there once');
+  assert.ok(design.indexOf('id="daily-reading"') > design.indexOf('<b>Business · Dashboard</b>') && design.indexOf('id="daily-reading"') < design.indexOf('id="icons"'), 'after the last phone of Screens, before Icons');
+  assert.equal((phones.filter((p) => /class="phone dk"/.test(p))).length, 2, 'two dark phones');
+  assert.equal((phones.filter((p) => /style="width:320px"/.test(p))).length, 1, 'one 320 phone');
+  const labels = [...design.matchAll(/<p class="phone-label"><b>([^<]+)<\/b>/g)].map((m) => m[1]);
+  assert.equal(new Set(labels).size, labels.length, 'no two phones of the page have the same label (render_screens.mjs finds a picture by its label)');
+});
+
+check('each phone draws the calendar of the app: the title, Today, the arrows with their labels, the weekdays, and the days with the labels the app says, in the places the app draws them', () => {
+  const today = day(2026, 11, 8);
+  const range = rangeAround(today);
+  const grid = monthGrid({ y: 2026, m: 11 }).flat();
+  phones.forEach((p, i) => {
+    const where = `phone ${i + 1} (${labelOf(p)})`;
+    const selected = Number(/aria-level="2" aria-label="(?:Today, )?\w+ (\d+) November 2026"/.exec(p)?.[1]);
+    assert.ok(selected >= 1 && selected <= 30, `${where}: the day of the heading`);
+    assert.match(p, /<span class="m" role="heading" aria-level="3">November 2026<\/span>/, where);
+    assert.match(p, /<button class="dr-today" aria-label="Today">Today<\/button>/, where);
+    assert.ok(p.includes(`aria-label="${previousMonthLabel({ y: 2026, m: 11 }, range)}"`) && p.includes(`aria-label="${nextMonthLabel({ y: 2026, m: 11 }, range)}"`), `${where}: the arrows say where they go`);
+    assert.match(p, /<div class="dr-week" aria-hidden="true"><span>Mo<\/span><span>Tu<\/span><span>We<\/span><span>Th<\/span><span>Fr<\/span><span>Sa<\/span><span>Su<\/span><\/div>/, where);
+    // the 42 places, in order: an empty one or a day with the label, the ring and the fill that the app gives it
+    const places = [...p.matchAll(/<(?:button class="dr-d([^"]*)" aria-label="([^"]+)"><span class="k">(\d+)<\/span><\/button>|span class="dr-d"><\/span>)/g)];
+    assert.equal(places.length, 42, `${where}: six rows of seven`);
+    places.forEach((m, k) => {
+      const cell = grid[k];
+      if (!cell) { assert.equal(m[2], undefined, `${where}: place ${k} is empty`); return; }
+      const isToday = cell.d === 8, isSelected = cell.d === selected;
+      assert.equal(m[2], dayLabel(cell, { today: isToday, selected: isSelected }), `${where}: place ${k}`);
+      assert.equal(m[3], String(cell.d));
+      assert.equal(/\bsel\b/.test(m[1]), isSelected, `${where}: the fill of ${cell.d}`);
+      assert.equal(/\btoday\b/.test(m[1]), isToday, `${where}: the ring of ${cell.d}`);
+    });
+    const head = readingHeading(day(2026, 11, selected), selected === 8);
+    assert.ok(p.includes(`aria-label="${head.label}"><div class="dr-eyebrow">${head.eyebrow}</div><div class="dr-title">${head.title}</div>`), `${where}: the heading of the day`);
+  });
+  assert.deepEqual(phones.map((p) => Number(/aria-level="2" aria-label="(?:Today, )?\w+ (\d+) November/.exec(p)?.[1])), [8, 14, 14, 14, 14, 30], 'today selected on the first, another day on the others');
+});
+
+check('each phone has the same sample as the app, word for word: the notice, the passage, the reflection and the labels', () => {
+  for (const p of phones) {
+    assert.ok(p.includes(`<div class="p">${DAILY_NOTICE}</div>`), 'the Preview notice');
+    assert.ok(p.includes('<div class="h">Preview</div>'));
+    assert.ok(p.includes(`>${SAMPLE_READING.reference}</div>`), 'the reference');
+    assert.ok(p.includes(`${SAMPLE_READING.translation} · ${SAMPLE_READING.licence.replace(/ /g, '&nbsp;')}`), 'the translation, named');
+    assert.ok(p.includes(`<div class="note">${SAMPLE_READING.title}</div>`));
+    const verses = [...p.matchAll(/<p class="dr-v"><i>(\d+)<\/i> ([^<]+)<\/p>/g)].map((m) => ({ n: Number(m[1]), text: plain(m[2]) }));
+    assert.deepEqual(verses, SAMPLE_READING.verses.map((v) => ({ ...v })), 'the verses');
+    assert.ok(p.includes(`<p class="dr-text">${SAMPLE_REFLECTION.text}</p>`), 'the reflection');
+    assert.ok(p.includes('<span class="dr-eyebrow">Sample reading</span><span class="lib-chip sample">Sample</span>'));
+    assert.ok(p.includes(`<span class="dr-eyebrow">${SAMPLE_REFLECTION.label}</span><span class="lib-chip sample">Sample</span>`));
+    assert.ok(p.includes(`aria-level="3">${SAMPLE_REFLECTION.title}</div>`));
+  }
+});
+
+check('the dark phones are the dark palette of tokens.json, role by role (the page has no second copy of it that could drift)', () => {
+  type Tokens = { color: Record<string, string>; role: Record<string, string>; dark: { color: Record<string, string>; role: Record<string, string> } };
+  const tokens = JSON.parse(read('src/theme/tokens.json')) as Tokens;
+  const dark = { ...tokens.color, ...tokens.dark.color };
+  const roleDark = (name: string) => { const lit = tokens.dark.role[name]; return (lit ? (lit.startsWith('#') ? lit : dark[lit]) : dark[tokens.role[name]]).toUpperCase(); };
+  const rule = /\.phone\.dk \{([^}]*)\}/.exec(group)?.[1] ?? '';
+  assert.ok(rule.length > 100, 'the .phone.dk rule');
+  const props = Object.fromEntries([...rule.matchAll(/(--cp-[\w-]+):\s*(#[0-9A-Fa-f]{6})/g)].map((m) => [m[1], m[2].toUpperCase()]));
+  const expected: Record<string, string> = {
+    '--cp-bg': roleDark('bg'), '--cp-surface': roleDark('surface'), '--cp-surface-sunken': roleDark('surfaceSunken'), '--cp-surface-inverse': roleDark('surfaceInverse'),
+    '--cp-border': roleDark('border'), '--cp-border-strong': roleDark('borderStrong'), '--cp-text': roleDark('text'), '--cp-text-muted': roleDark('textMuted'),
+    '--cp-text-placeholder': roleDark('textPlaceholder'), '--cp-text-inverse': roleDark('textInverse'), '--cp-text-accent': roleDark('textAccent'), '--cp-action': roleDark('action'),
+    '--cp-on-action': roleDark('onAction'), '--cp-highlight': roleDark('highlight'), '--cp-on-highlight': roleDark('onHighlight'), '--cp-danger': roleDark('danger'), '--cp-on-danger': roleDark('onDanger'),
+    '--cp-color-gold-ink': dark.goldInk.toUpperCase(), '--cp-color-gold-soft': dark.goldSoft.toUpperCase(), '--cp-color-gold-wash': dark.goldWash.toUpperCase(),
+  };
+  assert.deepEqual(props, expected);
+});
+
+check('the 320 phone is drawn as the app draws it there: the card reaches 10 px into each margin, the phone is 320 wide, and the same screen in 390 does not', () => {
+  const small = phones[5];
+  assert.match(small, /<div class="phone" style="width:320px">/);
+  assert.match(small, /<div class="dr-cal fit">/);
+  assert.ok(phones.slice(0, 5).every((p) => /<div class="dr-cal">/.test(p)), 'the others are inside the margins');
+  const bleed = calendarMetrics(320, 16).bleed;
+  assert.equal(bleed, 10);
+  assert.match(group, new RegExp(`\\.dr-cal\\.fit \\{ margin: 0 -${bleed}px; padding: 8px 0; \\}`), 'the margin of the page is the bleed of layout.ts');
+  assert.match(group, /\.dr-d \{ flex: 1; height: 44px;/, 'a day is 44 high in the page too');
+  assert.match(group, /\.dr-arrow \{ width: 44px; height: 44px;/);
+  assert.match(group, /\.dr-head \{ display: flex; align-items: center; min-height: 44px; \}/);
+  assert.match(group, /\.dr-d\.sel \.k \{ background: var\(--cp-action\); color: var\(--cp-on-action\);/);
+  assert.match(group, /\.dr-d\.today \.k \{ box-shadow: inset 0 0 0 2px var\(--cp-action\);/);
+});
 
 console.log(`${n} of ${n} passed`);

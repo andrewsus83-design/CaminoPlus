@@ -11,6 +11,8 @@ import { DAILY_NOTICE, readingFor, type SampleReading, type SampleReflection } f
 /** The small line over a heading: mono, capitals, muted, like the label of the Bible tab's "Today's reading" card. */
 const EYEBROW = { textTransform: 'uppercase', letterSpacing: 1.2, fontSize: 12 } as const;
 
+const NO_BREAK = '\u00A0';
+
 function CardTop({ label }: { label: string }) {
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -27,7 +29,8 @@ function ReadingCard({ reading }: { reading: SampleReading }) {
       <CardTop label="Sample reading" />
       <View style={{ gap: 2 }}>
         <AppText variant="h4" accessibilityRole="header">{reading.reference}</AppText>
-        <AppText variant="caption" muted>{`${reading.translation} · ${reading.licence}`}</AppText>
+        {/* "public domain" is kept together (no-break space), so on a small phone the line breaks after the dot, never between its two words. */}
+        <AppText variant="caption" muted>{`${reading.translation} · ${reading.licence.replace(/ /g, NO_BREAK)}`}</AppText>
       </View>
       <AppText variant="small" muted>{reading.title}</AppText>
       <View style={{ gap: 8 }}>

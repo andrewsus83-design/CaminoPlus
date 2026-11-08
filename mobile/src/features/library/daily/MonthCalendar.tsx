@@ -70,15 +70,15 @@ export function MonthCalendar({ shown, today, selected, range, canGoBack, canGoF
       <Card style={{ paddingHorizontal: metrics.pad, paddingVertical: 8 }}>
         <View style={{ width: '100%', maxWidth: GRID_MAX, alignSelf: 'center' }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', minHeight: TOUCH }}>
-            <AppText variant="label" accessibilityRole="header" accessibilityLiveRegion="polite" style={{ flex: 1, paddingLeft: 12, paddingRight: 4 }}>{monthTitle(shown)}</AppText>
+            <AppText variant="label" accessibilityRole="header" accessibilityLiveRegion="polite" style={{ flex: 1, paddingLeft: 8 }}>{monthTitle(shown)}</AppText>
             <Pressable
               accessibilityRole="button"
               accessibilityLabel="Today"
               accessibilityHint="Goes back to today"
               onPress={onToday}
-              style={({ pressed }) => ({ minHeight: TOUCH, justifyContent: 'center', paddingHorizontal: 4, opacity: pressed ? 0.6 : 1 })}
+              style={({ pressed }) => ({ minHeight: TOUCH, justifyContent: 'center', opacity: pressed ? 0.6 : 1 })}
             >
-              <View style={{ height: 36, paddingHorizontal: 12, justifyContent: 'center', borderRadius: radius.pill, borderWidth: 1, borderColor: role.border }}>
+              <View style={{ height: 36, paddingHorizontal: 10, justifyContent: 'center', borderRadius: radius.pill, borderWidth: 1, borderColor: role.border }}>
                 <AppText variant="label" color={role.action}>Today</AppText>
               </View>
             </Pressable>
@@ -87,7 +87,7 @@ export function MonthCalendar({ shown, today, selected, range, canGoBack, canGoF
           </View>
 
           {/* The weekdays: Monday first. Hidden from a screen reader, which reads the weekday in every day's label. */}
-          <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants" style={{ flexDirection: 'row', height: 28, alignItems: 'center' }}>
+          <View aria-hidden style={{ flexDirection: 'row', height: 28, alignItems: 'center' }}>
             {WEEKDAYS_SHORT.map((w) => (
               <View key={w} style={{ flex: 1, alignItems: 'center' }}>
                 <AppText variant="caption" muted maxFontSizeMultiplier={FONT_LIMIT}>{w}</AppText>
