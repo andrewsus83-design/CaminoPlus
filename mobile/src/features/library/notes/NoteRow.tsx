@@ -1,5 +1,5 @@
 import { memo, useMemo, useState } from 'react';
-import { Pressable, Text, View, type AccessibilityActionEvent } from 'react-native';
+import { Platform, Pressable, Text, View, type AccessibilityActionEvent } from 'react-native';
 import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
 import type { DiaryPlace } from '@/features/diary/place';
@@ -17,6 +17,9 @@ import { BODY_CLAMP_PX, BLANK_NOTE, FADE_PX, FADE_STEPS, SHOW_LESS, SHOW_MORE, T
 // For a screen reader the row is ONE thing that reads like a sentence (who, when, the title, the first words, what is attached), and what its
 // parts do (share, edit, delete, see the photos, open the place) are actions of that one thing, so a person is not asked to swipe through
 // eight small controls to get past a note.
+
+// A very long word in a title (an address) must break rather than push the note wider than the screen. Web only: native rejects the value.
+const breakAnywhere = (Platform.OS === 'web' ? { overflowWrap: 'anywhere' } : null) as object | null;
 
 export type NoteActions = {
   open: (id: string) => void;
@@ -129,7 +132,7 @@ function NoteRowView({ entry, uid, now, who, open, actions }: { entry: DiaryEntr
               </Pressable>
             </View>
 
-            {row.title !== '' && <AppText variant="h4" style={{ fontSize: 20, lineHeight: 26, marginTop: 2 }}>{row.title}</AppText>}
+            {row.title !== '' && <AppText variant="h4" style={[{ fontSize: 20, lineHeight: 26, marginTop: 2 }, breakAnywhere]}>{row.title}</AppText>}
             {hasWords && <View style={{ marginTop: 4 }}><Words text={row.body} full={row.full} open={open} behind={pressed ? role.sunken : role.bg} onToggle={() => actions.toggle(entry.id)} /></View>}
             {row.blank && <AppText muted style={{ marginTop: 4 }}>{BLANK_NOTE}</AppText>}
             {row.media.length > 0 && <View style={{ marginTop: 10 }}><NoteMedia uid={uid} items={row.media} onOpen={(i) => actions.media(entry.id, i)} /></View>}
