@@ -8,14 +8,16 @@
 // note written there shows up in the feed, never what the notes look like. The daily reading (/library/daily) has its own scenarios, in
 // daily.scenarios.mjs (the header, the week strip, the calendar sheet, the bookmark, the date of the address); the Library scenarios below only
 // check that the banner leads there.
-// The Bible side of the Library (the grid of books, the chapters, the reader, the search of verses, Continue reading) is in bible.scenarios.mjs,
-// and the Books side (the covers, the book page, the reader of a book) in books.scenarios.mjs.
+// The Bible side of the Library (the grid of books, the chapters, the reader, the search of verses) is in bible.scenarios.mjs, the Books side (the covers, the book page, the
+// reader of a book) in books.scenarios.mjs, and the Continue reading bar that floats above the tab bar of the Library (one bar for the Bible and the books, with a close
+// button) in continue.scenarios.mjs.
 import assert from 'node:assert/strict';
 import { DAILY_SCENARIOS } from './daily.scenarios.mjs';
 import { UID } from './fixtures.mjs';
 import { domQuiet, eventually, pathOf } from './harness.mjs';
 import { BIBLE_SCENARIOS } from './bible.scenarios.mjs';
 import { BOOKS_SCENARIOS, CATALOG, COVER_LABEL } from './books.scenarios.mjs';
+import { CONTINUE_SCENARIOS } from './continue.scenarios.mjs';
 
 const TABS = ['Me', 'Stays', 'Maps', 'Discover', 'Library'];
 const TAB_PATH = { Me: '/me', Stays: '/stays', Maps: '/maps', Discover: '/explore', Library: '/library' };
@@ -355,6 +357,7 @@ export const SCENARIOS = [
   },
   ...BIBLE_SCENARIOS,
   ...BOOKS_SCENARIOS,
+  ...CONTINUE_SCENARIOS,
   {
     name: 'Stays: the stays of the stage are listed, and one opens with its details',
     persona: 'in',
