@@ -31,11 +31,11 @@ export default function Watches() {
           <AppText variant="lead" muted>Connect a watch to add steps, heart rate and distance to your journey posts.</AppText>
         </View>
         {WATCHES.map((w) => (
-          <Card key={w.id} style={{ flexDirection: 'row', alignItems: 'center', gap: space[4] }}>
+          <Card key={w.id} style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: space[4] }}>
             <View style={{ width: 60, height: 60, borderRadius: radius.pill, backgroundColor: role.inverse, alignItems: 'center', justifyContent: 'center' }}>
               <Icon name="watch" color={role.highlight} size={icon.lg} />
             </View>
-            <View style={{ flex: 1, gap: space[1] }}>
+            <View style={{ flex: 1, minWidth: 120, gap: space[1] }}>
               <AppText variant="label">{w.name}</AppText>
               <AppText variant="caption" muted>{w.note}</AppText>
             </View>

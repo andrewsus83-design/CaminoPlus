@@ -48,9 +48,9 @@ export default function OfflineMaps() {
         </AppText>
 
         <Card style={{ gap: space[2] }}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: space[3] }}>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', columnGap: space[3], rowGap: space[1] }}>
             <AppText variant="label">On this phone</AppText>
-            <AppText variant="mono" muted style={{ flexShrink: 1, textAlign: 'right' }}>{formatMb(usedBytes)} · {Object.keys(state.installed).length} stages</AppText>
+            <AppText variant="mono" muted>{formatMb(usedBytes)} · {Object.keys(state.installed).length} stages</AppText>
           </View>
           <AppText variant="caption" muted>
             {online === false ? 'Offline now. Downloaded stages keep working.' : state.catalogAt ? `Checked for updates ${timeAgo(state.catalogAt)}` : 'Checking for map updates…'}
