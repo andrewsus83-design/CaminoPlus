@@ -378,7 +378,7 @@ def app_book(book: bk.Book) -> dict:
     m, s = book.meta, book.series
     out = {
         "id": book.id, "kind": m["kind"], "title": m["title"], "subtitle": m["subtitle"], "author": s.get("author"),
-        "rights": s.get("rights"), "ai_disclosure": s.get("ai_disclosure"),
+        "rights": s.get("rights"),
         "chapters": [{"id": ch.id, "title": ch.title, "blocks": ch.blocks} for ch in book.chapters],
     }
     if m.get("sources"):

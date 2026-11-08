@@ -550,6 +550,20 @@ check('data only: the screens of the books never print the rights, the disclosur
   }
 });
 
+check('the bundle names no model: no file of the app bundle (the catalog and a file for each book) and no file of the Books feature says which tool helped to write the books, and a book of the bundle has no ai_disclosure (the notice of each kind says that AI helped, in notices.ts, and nothing more)', () => {
+  const bundle = path.join('assets', 'library');
+  const files = [path.join(bundle, 'catalog.json'), ...fs.readdirSync(path.join(root, bundle, 'books')).sort().map((f) => path.join(bundle, 'books', f))];
+  assert.equal(files.length, BOOK_CATALOG.length + 1, 'the catalog and one file for each book');
+  const MODEL = /\b(?:claude|anthropic|sonnet|opus|haiku|gpt|chatgpt|openai|gemini|llama|mistral|copilot)\b/i;
+  for (const f of files) {
+    const text = read(f);
+    assert.doesNotMatch(text, MODEL, `${f} names a model`);
+    assert.doesNotMatch(text, /"ai_disclosure"/, `${f} carries the disclosure of the series: the app never reads it, and its words can name the tool`);
+  }
+  for (const f of [...MINE.map(B), ...ROUTES, 'src/features/library/bookBundle.ts']) assert.doesNotMatch(read(f), MODEL, `${f} names a model`);
+  assert.match(read(B('notices.ts')), /AI assistance/, 'the notices do say that AI helped');
+});
+
 check('the Licences screen lists every source of every book of readings, as books/*/book.json says it (the id, the work, the author, the translator, the year, the licence and the page), and the original text with no licence claimed', () => {
   const root2 = path.join(root, '..', 'books');
   const dirs = fs.readdirSync(root2).filter((d) => fs.existsSync(path.join(root2, d, 'book.json')));

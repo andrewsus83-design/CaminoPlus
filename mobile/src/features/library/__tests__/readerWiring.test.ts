@@ -169,7 +169,8 @@ check('the words of the reader: prose is paragraphs and poetry is stanzas, each 
   assert.match(src, /<AppText variant="h4" accessibilityRole="header" maxFontSizeMultiplier=\{READER_MAX_FONT_SCALE\} style=\{\{ fontSize: 22, lineHeight: 28 \}\}>\{block\.text\}<\/AppText>/);
   assert.match(src, /<Text accessibilityRole="link" onPress=\{\(e\) => onSelect\(verse, e\.nativeEvent\.pageY\)\} style=\{on \? chosen\(\) : undefined\}>/, 'a touch says which verse and how far down the screen it was');
   assert.match(src, /const chosen = \(\) => \(\{ backgroundColor: c\.goldSoft, textDecorationLine: 'underline' as const \}\);/, 'not the colour alone: an underline too');
-  assert.match(src, /<AppText variant="mono" maxFontSizeMultiplier=\{READER_MAX_FONT_SCALE\} color=\{on \? role\.text : role\.muted\} style=\{\{ fontSize: NUMBER_SIZE, lineHeight: BODY_LINE, letterSpacing: NUMBER_TRACKING \}\}>\{superscript\(label\)\}<\/AppText>/);
+  assert.match(src, /<AppText variant="mono" maxFontSizeMultiplier=\{READER_MAX_FONT_SCALE\} color=\{on \? role\.text : role\.muted\} style=\{\{ fontSize: NUMBER_SIZE, lineHeight: BODY_LINE \}\}>\s+\{digits\.length > 0 && <Text style=\{\{ letterSpacing: NUMBER_TRACKING \}\}>\{digits\.join\(''\)\}<\/Text>\}\s+\{last\}\s+<\/AppText>/);
+  assert.match(src, /const digits = \[\.\.\.superscript\(label\)\];\s+const last = digits\.pop\(\);/, 'the first digits are close together and the last keeps its space');
   assert.match(src, /export const NUMBER_TRACKING = -3;/, 'the raised digits of a number of two or three figures are drawn close together: JetBrains Mono is monospaced');
   assert.match(src, /export const NUMBER_SIZE = 17;/);
   assert.match(src, /const BlockView = memo\(function BlockView/);
