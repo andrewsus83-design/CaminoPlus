@@ -7,7 +7,7 @@ import { DRAFT_TAG } from '@/features/diary/present';
 import { RichText } from '@/features/diary/RichText';
 import type { DiaryEntry } from '@/features/diary/store';
 import { PilgrimAvatar } from '@/features/social/components/primitives';
-import { radius, role, textStyle } from '@/theme';
+import { layout, radius, role, space, textStyle } from '@/theme';
 import { NoteMedia } from './NoteMedia';
 import { BODY_CLAMP_PX, BLANK_NOTE, FADE_PX, FADE_STEPS, SHOW_LESS, SHOW_MORE, TOUCH_MIN, needsMore, noteRow } from './timeline';
 
@@ -105,7 +105,7 @@ function NoteRowView({ entry, uid, now, who, open, actions }: { entry: DiaryEntr
       accessibilityActions={available}
       onAccessibilityAction={onAction}
       onPress={() => actions.open(entry.id)}
-      style={({ pressed }) => ({ flexDirection: 'row', gap: 12, paddingHorizontal: 16, paddingTop: 12, paddingBottom: row.share !== '' ? 4 : 14, backgroundColor: pressed ? role.sunken : 'transparent' })}
+      style={({ pressed }) => ({ flexDirection: 'row', gap: space[3], paddingHorizontal: layout.screenMargin, paddingTop: space[3], paddingBottom: row.share !== '' ? space[1] : space[4], backgroundColor: pressed ? role.sunken : 'transparent' })}
     >
       {({ pressed }) => (
         <>
@@ -122,40 +122,42 @@ function NoteRowView({ entry, uid, now, who, open, actions }: { entry: DiaryEntr
                 {time !== null && <AppText variant="caption" muted style={{ flexShrink: 0 }}>{` · ${time.short}`}</AppText>}
                 {/* A draft is a note still being written: the tag says so. A screen reader gets it in the sentence of the row, not twice. */}
                 {row.draft && (
-                  <View aria-hidden accessibilityElementsHidden importantForAccessibility="no-hide-descendants" style={{ flexShrink: 0, marginLeft: 8, alignSelf: 'center', paddingHorizontal: 8, paddingVertical: 1, borderRadius: radius.pill, borderWidth: 1, borderColor: role.border, backgroundColor: role.sunken }}>
+                  // design-lint-ignore: inset a tag is one short word in a pill, so the 8 px of a card would make it a button (39 high): 4 above and below the line of text, 8 at the sides, is a pill 31 high that still leaves the name its width at 320
+                  <View aria-hidden accessibilityElementsHidden importantForAccessibility="no-hide-descendants" style={{ flexShrink: 0, marginLeft: space[2], alignSelf: 'center', paddingHorizontal: space[2], paddingVertical: space[1], borderRadius: radius.pill, borderWidth: 1, borderColor: role.border, backgroundColor: role.sunken }}>
                     <AppText variant="caption" color={role.accentText}>{DRAFT_TAG}</AppText>
                   </View>
                 )}
               </View>
-              {/* 44 by 44 to touch; the negative margins keep the line as low as its text, and the dots on the edge of the column */}
+              {/* 48 by 48 to touch, for a 24 high line and a 24 glyph: the negative margins (half of the difference) keep the line as low as its text, and the dots on the edge of the column */}
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel="More: edit or delete this note"
                 accessibilityHint="Opens a menu"
                 onPress={() => actions.more(entry)}
-                style={({ pressed: down }) => ({ width: TOUCH_MIN, height: TOUCH_MIN, marginTop: -10, marginBottom: -10, marginRight: -12, alignItems: 'center', justifyContent: 'center', opacity: down ? 0.6 : 1 })}
+                style={({ pressed: down }) => ({ width: TOUCH_MIN, height: TOUCH_MIN, marginTop: -12, marginBottom: -12, marginRight: -12, alignItems: 'center', justifyContent: 'center', opacity: down ? 0.6 : 1 })}
               >
-                <Icon name="more" color={role.muted} size={22} />
+                <Icon name="more" color={role.muted} size={24} />
               </Pressable>
             </View>
 
             {row.title !== '' && <AppText variant="h4" style={[{ fontSize: 20, lineHeight: 26, marginTop: 2 }, breakAnywhere]}>{row.title}</AppText>}
-            {hasWords && <View style={{ marginTop: 4 }}><Words text={row.body} full={row.full} open={open} behind={pressed ? role.sunken : role.bg} onToggle={() => actions.toggle(entry.id)} /></View>}
-            {row.blank && <AppText muted style={{ marginTop: 4 }}>{BLANK_NOTE}</AppText>}
-            {row.media.length > 0 && <View style={{ marginTop: 10 }}><NoteMedia uid={uid} items={row.media} onOpen={(i) => actions.media(entry.id, i)} /></View>}
+            {hasWords && <View style={{ marginTop: space[1] }}><Words text={row.body} full={row.full} open={open} behind={pressed ? role.sunken : role.bg} onToggle={() => actions.toggle(entry.id)} /></View>}
+            {row.blank && <AppText muted style={{ marginTop: space[1] }}>{BLANK_NOTE}</AppText>}
+            {row.media.length > 0 && <View style={{ marginTop: space[3] }}><NoteMedia uid={uid} items={row.media} onOpen={(i) => actions.media(entry.id, i)} /></View>}
             {row.place !== null && (
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel={`Place: ${row.placeText}. Opens it in your maps app`}
                 onPress={() => actions.place(row.place as DiaryPlace)}
-                style={({ pressed: down }) => ({ marginTop: 10, alignSelf: 'flex-start', maxWidth: '100%', minHeight: TOUCH_MIN, flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 14, borderRadius: radius.pill, borderWidth: 1, borderColor: role.border, backgroundColor: role.surface, opacity: down ? 0.8 : 1 })}
+                style={({ pressed: down }) => ({ marginTop: space[3], alignSelf: 'flex-start', maxWidth: '100%', minHeight: TOUCH_MIN, flexDirection: 'row', alignItems: 'center', gap: space[2], paddingHorizontal: space[4], borderRadius: radius.pill, borderWidth: 1, borderColor: role.border, backgroundColor: role.surface, opacity: down ? 0.8 : 1 })}
               >
                 <Icon name="pin" color={role.accentText} size={18} strokeWidth={2} />
                 <AppText variant="caption" numberOfLines={1} style={{ flexShrink: 1 }}>{row.placeText}</AppText>
               </Pressable>
             )}
             {row.share !== '' && (
-              <View style={{ flexDirection: 'row', marginTop: 4, marginLeft: -11 }}>
+              // the glyph is 24 in a button of 48: the margin pulls the glyph, not the button, to the left edge of the column
+              <View style={{ flexDirection: 'row', marginTop: space[1], marginLeft: -12 }}>
                 <Pressable
                   accessibilityRole="button"
                   accessibilityLabel="Share the words of this note"
@@ -163,7 +165,7 @@ function NoteRowView({ entry, uid, now, who, open, actions }: { entry: DiaryEntr
                   onPress={() => actions.share(row.share)}
                   style={({ pressed: down }) => ({ width: TOUCH_MIN, height: TOUCH_MIN, alignItems: 'center', justifyContent: 'center', opacity: down ? 0.6 : 1 })}
                 >
-                  <Icon name="share" color={role.muted} size={22} />
+                  <Icon name="share" color={role.muted} size={24} />
                 </Pressable>
               </View>
             )}

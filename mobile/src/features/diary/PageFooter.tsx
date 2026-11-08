@@ -1,6 +1,6 @@
 import { ActivityIndicator, Pressable, View } from 'react-native';
 import { AppText } from '@/components/AppText';
-import { layout, radius, role } from '@/theme';
+import { layout, radius, role, space } from '@/theme';
 import type { PageFooter as Footer } from './present';
 
 /** The height of both buttons: well over the 48 that is the least, because this is where the thumb rests. */
@@ -14,7 +14,7 @@ export const FOOTER_BUTTON = 56;
 export function PageFooter({ footer, busy, onToggle, onPrimary, bottom }: { footer: Footer; busy: boolean; onToggle: () => void; onPrimary: () => void; bottom: number }) {
   const { primary } = footer;
   return (
-    <View accessibilityRole="toolbar" accessibilityLabel="Page actions" style={{ flexDirection: 'row', gap: 12, paddingHorizontal: layout.screenMargin, paddingTop: 8, paddingBottom: Math.max(bottom, 8), backgroundColor: role.bg }}>
+    <View accessibilityRole="toolbar" accessibilityLabel="Page actions" style={{ flexDirection: 'row', gap: space[3], paddingHorizontal: layout.screenMargin, paddingTop: space[2], paddingBottom: Math.max(bottom, space[2]), backgroundColor: role.bg }}>
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={footer.toggle === 'Edit' ? 'Edit this page' : 'Read this page'}

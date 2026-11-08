@@ -24,7 +24,7 @@ import { continueList, formatsAt, toggleBlock, toggleInline, type Edit, type Sel
 import { BODY_MAX, TITLE_MAX, type DiaryEntry } from '@/features/diary/store';
 import { usePlaceFlow } from '@/features/diary/usePlace';
 import { NEW_PAGE, useDiaryPage, usePageSaver } from '@/features/diary/useDiary';
-import { c, radius, role, textStyle } from '@/theme';
+import { layout, radius, role, space, textStyle } from '@/theme';
 
 // Browsers draw their own outline inside a text field; the border of the page (gold while writing) shows the focus instead.
 // Web only: native rejects the value.
@@ -62,7 +62,7 @@ function NotHere({ goBack }: { goBack: () => void }) {
   return (
     <Screen tabBar={false}>
       <BackButton onPress={goBack} />
-      <View style={{ gap: 8 }}>
+      <View style={{ gap: space[2] }}>
         <AppText variant="h2" accessibilityRole="header">This page is not here</AppText>
         <AppText variant="lead" muted>It may have been deleted. Your other pages are still in your diary.</AppText>
       </View>
@@ -238,7 +238,7 @@ function PageEditor({ uid, initial, start, goBack }: { uid: string; initial: Dia
   const topBar = (
     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
       <BackButton onPress={goBack} />
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: space[2] }}>
         {footer.saveDraft && (
           <Pressable
             accessibilityRole="button"
@@ -247,7 +247,7 @@ function PageEditor({ uid, initial, start, goBack }: { uid: string; initial: Dia
             accessibilityState={{ disabled: working !== null, busy: working === 'draft' }}
             disabled={working !== null}
             onPress={() => void finish('draft')}
-            style={({ pressed }) => ({ minHeight: 48, paddingHorizontal: 20, borderRadius: radius.pill, borderWidth: 1, borderColor: role.border, backgroundColor: role.surface, alignItems: 'center', justifyContent: 'center', opacity: working !== null ? 0.5 : pressed ? 0.8 : 1 })}
+            style={({ pressed }) => ({ minHeight: 48, paddingHorizontal: space[5], borderRadius: radius.pill, borderWidth: 1, borderColor: role.border, backgroundColor: role.surface, alignItems: 'center', justifyContent: 'center', opacity: working !== null ? 0.5 : pressed ? 0.8 : 1 })}
           >
             <AppText variant="label">{SAVE_DRAFT}</AppText>
           </Pressable>
@@ -305,11 +305,11 @@ function PageEditor({ uid, initial, start, goBack }: { uid: string; initial: Dia
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1, backgroundColor: role.bg }}>
       <Screen tabBar={false} scroll={false}>
-        <View style={{ flex: 1, gap: 12, paddingBottom: 8 }}>
+        <View style={{ flex: 1, gap: space[3], paddingBottom: space[2] }}>
           {topBar}
           {dateRow}
 
-          <View style={{ flex: 1, minHeight: keyboard ? 96 : 140, backgroundColor: role.surface, borderRadius: radius.lg, borderWidth: 2, borderColor: focused ? c.gold : role.border, overflow: 'hidden' }}>
+          <View style={{ flex: 1, minHeight: keyboard ? 96 : 140, backgroundColor: role.surface, borderRadius: radius.lg, borderWidth: 2, borderColor: focused ? role.highlight : role.border, overflow: 'hidden' }}>
             <TextInput
               value={title}
               onChangeText={(t) => { setTitle(t); saver.edit({ title: t }); }}
@@ -322,9 +322,9 @@ function PageEditor({ uid, initial, start, goBack }: { uid: string; initial: Dia
               placeholder="Title (optional)"
               placeholderTextColor={role.muted}
               accessibilityLabel="Page title"
-              style={[textStyle('h4'), { color: role.text, minHeight: 64, paddingHorizontal: 18, paddingTop: 14, paddingBottom: 10 }, noOutline]}
+              style={[textStyle('h4'), { color: role.text, minHeight: 64, paddingHorizontal: layout.cardPadding, paddingTop: space[4], paddingBottom: space[3] }, noOutline]}
             />
-            <View style={{ height: 1, marginHorizontal: 18, backgroundColor: role.border }} />
+            <View style={{ height: 1, marginHorizontal: layout.cardPadding, backgroundColor: role.border }} />
             <TextInput
               ref={bodyRef}
               value={body}
@@ -343,14 +343,14 @@ function PageEditor({ uid, initial, start, goBack }: { uid: string; initial: Dia
               placeholder="Write about your day"
               placeholderTextColor={role.muted}
               accessibilityLabel="Page text"
-              style={[textStyle('body'), { flex: 1, color: role.text, paddingHorizontal: 18, paddingTop: 14, paddingBottom: 18, textAlignVertical: 'top' }, noOutline]}
+              style={[textStyle('body'), { flex: 1, color: role.text, paddingHorizontal: layout.cardPadding, paddingTop: space[4], paddingBottom: layout.cardPadding, textAlignVertical: 'top' }, noOutline]}
             />
             {/* The marks and the photo and the pin are inside the text box, at the bottom of it, not on a bar of their own above the keyboard. */}
             <FormatBar formats={formats} formatsOff={titleFocus} onFormat={format} onMedia={canMedia ? () => void addMedia() : undefined} onPlace={canPlace ? addPlace : undefined} mediaBusy={busy !== 'idle'} hasPlace={view.place !== null} />
           </View>
 
           {compact && attached !== '' && (
-            <Pressable accessibilityRole="button" accessibilityLabel={`On this page: ${attached}. Shows them`} onPress={() => Keyboard.dismiss()} style={{ minHeight: 48, flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+            <Pressable accessibilityRole="button" accessibilityLabel={`On this page: ${attached}. Shows them`} onPress={() => Keyboard.dismiss()} style={{ minHeight: 48, flexDirection: 'row', alignItems: 'center', gap: space[3] }}>
               <Icon name="image" color={role.muted} size={20} />
               <AppText variant="small" muted numberOfLines={1} style={{ flex: 1 }}>{attached}</AppText>
             </Pressable>
@@ -358,7 +358,7 @@ function PageEditor({ uid, initial, start, goBack }: { uid: string; initial: Dia
           {!compact && (
             // Under the text: the files, the place, the steps of adding one. When the screen is short this part shrinks and scrolls,
             // so the text keeps its room and the messages and the caption below it are never pushed off the screen.
-            <ScrollView style={{ flexGrow: 0, flexShrink: 1 }} contentContainerStyle={{ gap: 12 }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+            <ScrollView style={{ flexGrow: 0, flexShrink: 1 }} contentContainerStyle={{ gap: space[3] }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
               <MediaStrip uid={uid} items={view.media} adding={busy === 'copying'} onOpen={setViewing} onRemove={(mid) => saver.removeMedia(mid)} />
               {view.place !== null && (
                 <PlaceEditRow key={`${view.place.lat},${view.place.lon},${view.place.at}`} place={view.place} onOpen={() => void openMaps(view.place as DiaryPlace)} onRemove={() => saver.setPlace(null)} onFocusChange={setNameFocus} onName={(name) => saver.setPlace(withName(view.place as DiaryPlace, name), { soon: true })} />
