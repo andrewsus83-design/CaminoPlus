@@ -20,7 +20,10 @@ import { planProgress } from '@/features/me/plan';
 import { JourneyGrid } from '@/features/me/JourneyGrid';
 import { SampleJourney } from '@/features/me/SampleJourney';
 import { Highlights, ShowAllBar } from '@/features/me/Highlights';
+import { AllPlaces } from '@/features/me/AllPlaces';
 import { buildHighlights } from '@/features/me/highlights';
+import { buildRoutePlaces, emptyPlaceLine, visitedCount } from '@/features/me/routePoints';
+import { POSTS_VIEW, resolveJourney, stepBack, tapAll, tapDestination, tapPlace, type JourneyView } from '@/features/me/journeyView';
 import { DEFAULT_ME_TAB, ME_FAB, ME_TABS, badgeText, inboxLabel, inboxTab, type MeTab } from '@/features/me/tabs';
 import { usePostMedia } from '@/features/me/usePostMedia';
 import { NotesTab } from '@/features/notes/NotesTab';
@@ -123,14 +126,24 @@ export default function Me() {
   // every place would look "not visited yet". The pictures are read once (usePostMedia) and shared by the row and the grid.
   const media = usePostMedia(posts);
   const highlights = useMemo(() => (days && posts ? buildHighlights(days, posts) : []), [days, posts]);
-  const [filterKey, setFilterKey] = useState<string | null>(null);
-  // The destination the Journey grid is showing. A key that is no longer a visited destination (the data was reloaded) is no filter.
-  const active = filterKey ? highlights.find((h) => h.key === filterKey && h.state === 'visited') ?? null : null;
-  const onlyIds = useMemo(() => (active ? new Set(active.posts.map((p) => p.id)) : null), [active]);
+  // The places of the whole route (not only the plan) with the posts at each: the stamps of the All view, the first item of the row. Also only once the posts are known.
+  const places = useMemo(() => (posts ? buildRoutePlaces(stages, posts) : []), [stages, posts]);
+  // What the Journey area shows: all the posts, one destination of the row, the stamps of the All view, or one place of them (features/me/journeyView.ts). A key that
+  // names nothing any more (the data was reloaded) is no filter.
+  const [view, setView] = useState<JourneyView>(POSTS_VIEW);
+  const shown = useMemo(() => resolveJourney(view, highlights, places), [view, highlights, places]);
+  const onlyIds = shown.kind === 'destination' || shown.kind === 'place' ? shown.ids : null;
+  const activeKey = shown.kind === 'destination' && view.view === 'posts' ? view.destination : null; // the highlight whose posts the grid shows
+  const onJourney = tab === 'Journey';
   const pickHighlight = (h: { key: string }) => {
-    // From the Plan or Health tab it brings you to the Journey grid with that destination; on the grid the same one again clears it.
-    if (tab !== 'Journey') { setTab('Journey'); setFilterKey(h.key); return; }
-    setFilterKey((k) => (k === h.key ? null : h.key));
+    // From the Plan, Health or Notes tab it brings you to the Journey grid with that destination; on the grid the same one again clears it.
+    setTab('Journey');
+    setView((v) => tapDestination(v, h.key, onJourney));
+  };
+  // The All item: from another tab it brings you to the stamps; on the grid it opens them, and on the stamps it closes them.
+  const pickAll = () => {
+    setTab('Journey');
+    setView((v) => tapAll(v, onJourney));
   };
   const changePhoto = async () => {
     if (!session) return;
@@ -269,7 +282,7 @@ export default function Me() {
             </View>
           </Pressable>
         ) : <AppText variant="accent" color={role.accentText}>Buen Camino!</AppText>}
-        <Highlights key={session?.user.id ?? 'none'} items={highlights} days={days ?? []} media={media} activeKey={active?.key ?? null} userId={session?.user.id} onPick={pickHighlight} />
+        <Highlights key={session?.user.id ?? 'none'} items={highlights} days={days ?? []} media={media} activeKey={activeKey} userId={session?.user.id} onPick={pickHighlight} all={places.length > 0 ? { visited: visitedCount(places), total: places.length, on: shown.kind === 'stamps' || shown.kind === 'place', onPress: pickAll } : null} />
       </View>
       <SubTabs tabs={ME_TABS} value={tab} onChange={setTab} />
     </>
@@ -288,8 +301,12 @@ export default function Me() {
           {(offline || stale) && <FormMessage tone="info">You are offline. Showing what is saved on this phone.</FormMessage>}
           {!!error && <FormMessage>{`Could not load your data. ${error}`}</FormMessage>}
 
-          {tab === 'Journey' && !!active && <ShowAllBar name={active.name} onPress={() => setFilterKey(null)} />}
-          {tab === 'Journey' && (!posts ? (offline ? <Empty text="You are offline. Your journey posts will show up when you are back online." /> : loading) : posts.length === 0
+          {/* One bar over the grid while it shows one place, and the way back: from a destination of the row to all the posts, from a place of the All view to the stamps. */}
+          {tab === 'Journey' && shown.kind === 'destination' && <ShowAllBar name={shown.name} onPress={() => setView(stepBack)} />}
+          {tab === 'Journey' && shown.kind === 'place' && <ShowAllBar name={shown.name} to="all" onPress={() => setView(stepBack)} />}
+          {tab === 'Journey' && shown.kind === 'place' && shown.empty && <Empty text={emptyPlaceLine(shown.name)} />}
+          {tab === 'Journey' && shown.kind === 'stamps' && <AllPlaces places={places} onPick={(p) => setView(tapPlace(p.key))} />}
+          {tab === 'Journey' && shown.kind !== 'stamps' && (!posts ? (offline ? <Empty text="You are offline. Your journey posts will show up when you are back online." /> : loading) : posts.length === 0 && shown.kind === 'grid'
             ? <SampleJourney />
             : <JourneyGrid posts={posts} media={media} only={onlyIds} />)}
 

@@ -10,6 +10,7 @@ import {
 // The sub-tabs of Me and the Notes feed have their own files. They run from here, so the package's test script (which names the five files
 // of this suite) runs them without being edited.
 import './tabs.test';
+import './allPlaces.test';
 import '../../notes/__tests__/notes.test';
 
 let n = 0;
@@ -247,10 +248,16 @@ check('Me filters the Journey grid to the picked destination, with a bar that cl
   const me = read('app/(tabs)/me.tsx');
   assert.match(me, /<Highlights key=\{session\?\.user\.id \?\? 'none'\} items=\{highlights\} days=\{days \?\? \[\]\} media=\{media\}/);
   assert.match(me, /<JourneyGrid posts=\{posts\} media=\{media\} only=\{onlyIds\} \/>/, 'the grid gets the same pictures and the filter');
-  assert.match(me, /<ShowAllBar name=\{active\.name\} onPress=\{\(\) => setFilterKey\(null\)\} \/>/);
-  assert.match(me, /if \(tab !== 'Journey'\) \{ setTab\('Journey'\); setFilterKey\(h\.key\); return; \}/, 'from another tab it brings you to the grid');
-  assert.match(me, /setFilterKey\(\(k\) => \(k === h\.key \? null : h\.key\)\)/, 'the same highlight again clears the filter');
+  // Updated on purpose with the All item (the stamps of the route): the filter is one JourneyView (features/me/journeyView.ts), not a key, and the bar has two ways back.
+  assert.match(me, /<ShowAllBar name=\{shown\.name\} onPress=\{\(\) => setView\(stepBack\)\} \/>/, 'a destination of the row: the bar clears the filter');
+  assert.match(me, /<ShowAllBar name=\{shown\.name\} to="all" onPress=\{\(\) => setView\(stepBack\)\} \/>/, 'a place of the All view: the bar goes back to the stamps');
+  assert.match(me, /setTab\('Journey'\);\n\s*setView\(\(v\) => tapDestination\(v, h\.key, onJourney\)\);/, 'from another tab it brings you to the grid; the same highlight again clears the filter (tapDestination)');
   assert.match(me, /days && posts \? buildHighlights\(days, posts\) : \[\]/, 'nothing is drawn as "not visited" before the posts are known');
+  assert.match(me, /posts \? buildRoutePlaces\(stages, posts\) : \[\]/, 'and the stamps of the All view are the whole route\'s stages with the posts, once the posts are known');
+  assert.match(me, /shown\.kind === 'stamps' && <AllPlaces places=\{places\} onPick=\{\(p\) => setView\(tapPlace\(p\.key\)\)\} \/>/, 'a stamp opens that place');
+  assert.match(me, /shown\.kind === 'place' && shown\.empty && <Empty text=\{emptyPlaceLine\(shown\.name\)\} \/>/, 'a place with no post says so, over the grid (the card that writes a post is the first tile of the grid: no second button)');
+  assert.equal((me.match(/<JourneyGrid\b/g) ?? []).length, 1, 'one grid, filtered, for a destination, a place and all the posts');
+  assert.doesNotMatch(me, /JOURNEY_WRITE|router\.push\('\/write'\)/, 'Me draws no write button of its own: the card of the grid is the one');
   const grid = code(read('src/features/me/JourneyGrid.tsx'));
   assert.match(grid, /usePostRail\(\{ posts, sample: !!sample \}\)/, 'the rail still works on all the posts, so a filter reads nothing from the network');
   assert.match(grid, /if \(sample \|\| given\) return;/, 'the grid does not fetch the pictures when it was given them');
@@ -265,9 +272,27 @@ check('the row: 60 px pictures in a 66 px ring, 72 px wide items 16 apart, names
   assert.match(src, /const GAP = 16;/);
   assert.match(src, /fontSize: 12, lineHeight: 16/);
   assert.match(src, /marginHorizontal: -layout\.screenMargin/, 'it reaches the screen edges');
-  assert.match(src, /paddingHorizontal: layout\.screenMargin/);
+  // Updated on purpose with the All item: the margins are the screen's on both sides, but on the left they belong to the All item when it is there
+  assert.match(src, /paddingLeft: pinned \? layout\.screenMargin : 0/, 'the All item has the margin on the left ...');
+  assert.match(src, /paddingLeft: pinned \? 0 : layout\.screenMargin, paddingRight: layout\.screenMargin/, '... and the destinations have it when there is none');
   assert.match(src, /showsHorizontalScrollIndicator=\{false\}/);
-  assert.match(src, /if \(items\.length === 0\) return null;/, 'no destinations: nothing is drawn, not even the space');
+  assert.match(src, /if \(items\.length === 0 && !pinned\) return null;/, 'no destinations and no All item: nothing is drawn, not even the space (with places and no destination the All item is drawn alone)');
+});
+
+check('the All item: the first item of the row, pinned at its left (outside the scrolling part), the shell in a round of the card\'s surface with a hairline, a gold ring and a bold label while its view is on', () => {
+  const src = code(read('src/features/me/Highlights.tsx'));
+  const all = src.indexOf('{pinned && <AllItem');
+  const scroller = src.indexOf('<ScrollView');
+  assert.ok(all > 0 && scroller > all, 'the All item comes before the scrolling destinations and is not inside the ScrollView');
+  assert.match(src, /const pinned = !!all && all\.total > 0;/, 'drawn whenever the route has places, with or without destinations');
+  assert.match(src, /<Icon name="shell" color=\{role\.action\} size=\{28\} \/>/);
+  assert.match(src, /borderWidth: 1, borderColor: role\.border, backgroundColor: role\.surface/, 'a hairline ring and the surface fill');
+  assert.match(src, /padding: 3, backgroundColor: c\.gold/, 'the gold ring of an opened highlight while its view is on');
+  assert.match(src, /fontFamily: on \? fonts\.bodyBold : fonts\.bodyMedium \}\}>All<\/AppText>/, 'the label is "All", bold while its view is on');
+  assert.match(src, /accessibilityLabel=\{allLabel\(visited, total\)\} accessibilityHint=\{allHint\(on\)\} accessibilityState=\{\{ selected: on \}\}/, '"All places, N of M with journeys", selected while its view is on');
+  const item = src.slice(src.indexOf('function AllItem'), src.indexOf('function Item('));
+  assert.doesNotMatch(item, /seen|mark\(/, 'it is never seen or unseen');
+  assert.match(item, /width: ITEM_W/, 'as wide as the other items');
 });
 
 check('the row\'s colours are theme roles: gold ring until it is opened, then the strong border; dashed circle and pin when ahead', () => {
@@ -286,9 +311,13 @@ check('every highlight is a button with a label, an ahead one opens that day in 
   const src = code(read('src/features/me/Highlights.tsx'));
   assert.match(src, /accessibilityRole="button" accessibilityLabel=\{highlightLabel\(h, active\)\}/);
   assert.match(src, /router\.push\(\{ pathname: '\/planner', params: \{ day: h\.dayId \} \}\)/);
-  assert.match(src, /accessibilityRole="button" accessibilityLabel="Show all posts"/);
+  // Updated on purpose with the All view: the bar has two ways back, "Show all posts" (from a destination) and "Back to all places" (from a place of the stamps)
+  assert.match(src, /accessibilityRole="button" accessibilityLabel=\{toAll \? 'Back to all places' : 'Show all posts'\}/);
+  assert.match(src, /minHeight: 48/, 'a touch target of 48');
   assert.match(src, /<AppText variant="label" numberOfLines=\{1\} style=\{\{ flexShrink: 1 \}\}>\{name\}<\/AppText>/, 'a long name gives way ...');
   assert.match(src, /numberOfLines=\{1\} style=\{\{ flexShrink: 0 \}\}>· Show all<\/AppText>/, '... and "Show all" never wraps onto a second line');
+  assert.match(src, /numberOfLines=\{1\} style=\{\{ flexShrink: 0 \}\}>All places<\/AppText>/, '"All places" neither');
+  assert.match(src, /<AppText variant="label" numberOfLines=\{1\} style=\{\{ flexShrink: 1 \}\}>· \{name\}<\/AppText>/, 'the name of the place gives way there too');
 });
 
 check('what was opened is kept per person under u.<id>., so signing out clears it, and the row asks the network for nothing', () => {
