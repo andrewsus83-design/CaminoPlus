@@ -8,6 +8,9 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import { BOOK_CATALOG } from '../books/catalog';
+import { a5Height, coverGrid, coverLabel, coverMetrics } from '../books/cover';
+import { DEFAULT_STEP, LAST_STEP, readerType } from '../books/readerType';
 
 let n = 0;
 const check = (name: string, fn: () => void) => { fn(); n += 1; console.log(`ok   ${name}`); };
@@ -467,6 +470,103 @@ check('text sizes grow with the phone, up to a cap: the running text of the read
   assert.doesNotMatch(page, /maxFontSizeMultiplier/, 'the book page grows with the phone without a limit');
   assert.doesNotMatch(page, /numberOfLines=\{1\}/, 'and cuts nothing to one line');
   assert.match(page, /numberOfLines=\{3\}/, 'except the line under a chapter in the contents, which is cut at three lines');
+});
+
+check('the design page shows the Books screens as the app draws them: the twelve covers at the size the grid works out, Free or Soon as their label says, the paper of the tokens, one handwritten note a phone, and the group stays before the daily reading', () => {
+  const design = fs.readFileSync(path.join(root, '..', 'design', 'index.html'), 'utf8');
+  const tokens = JSON.parse(read('src/theme/tokens.json')) as { color: Record<string, string> };
+  const esc = (t: string) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  /** The phone with this label: the text from its label to the next phone (or the script or the heading that follows the last of the group). */
+  const phoneOf = (label: string): string => {
+    const open = `<p class="phone-label"><b>${label}</b>`;
+    assert.equal(design.split(open).length - 1, 1, `the design page has exactly one phone "${label}"`);
+    const start = design.indexOf(open);
+    const ends = ['<p class="phone-label">', '<script>', '<h3 '].map((x) => design.indexOf(x, start + 10)).filter((i) => i > 0);
+    return design.slice(start, Math.min(...ends));
+  };
+  const GROUP = ['Library · Books', 'Books · dark', 'Books · 320 wide', 'Books · no texts yet', 'Book page', 'Book page · Continue', 'Book page · Soon', 'Reader', 'Reader · dark', 'Reader · large text', 'Reader · end of a chapter'];
+  const phones = Object.fromEntries(GROUP.map((l) => [l, phoneOf(l)] as const));
+
+  // the group stands before the daily reading (which stays the last of the screens), once, between its markers
+  const at = (needle: string) => design.indexOf(needle);
+  assert.ok(at('<h3 id="books-reader">') > 0 && at('<h3 id="books-reader">') < at('<h3 id="daily-reading">'), 'the Books group is before the Daily reading group');
+  assert.equal(count(design, /<h3 id="books-reader">/g), 1);
+  assert.ok(at('<!-- Library · Books phone (start) -->') > 0 && at('<!-- Library · Books phone (start) -->') < at('<!-- Library · Books phone (end) -->'));
+  assert.doesNotMatch(design, /class="lib-book"|Preview · Books|Twelve free companions for the road/, 'the old Books rows and banner are gone from the phones');
+
+  // the grid: twelve covers of the size the grid works out, A5 portrait, in the order of the catalog, each ONE button whose label says what the mark says
+  const grids: Array<[string, number]> = [['Library · Books', 390], ['Books · dark', 390], ['Books · 320 wide', 320], ['Books · no texts yet', 390]];
+  for (const [label, width] of grids) {
+    const phone = phones[label];
+    const g = coverGrid(width, 16);
+    const m = coverMetrics(g.tile);
+    assert.equal(m.height, a5Height(g.tile), `${label}: the cover is an A5 page`);
+    const covers = phone.split('<div class="bk-cover"').slice(1);
+    assert.equal(covers.length, 12, `${label}: twelve covers`);
+    covers.forEach((seg, i) => {
+      const book = BOOK_CATALOG[i];
+      assert.match(seg, new RegExp(`^ style="width:${g.tile}px;height:${m.height}px;border-radius:${m.radius}px;--paper:var\\(--bk-paper-${book.cover}\\)"`), `${label}: ${book.title} is ${g.tile} by ${m.height}`);
+      const spoken = /role="button" aria-label="([^"]+)"/.exec(seg)?.[1];
+      const mark = /class="bk-mark (free|soon)"/.exec(seg)?.[1];
+      assert.ok(spoken && mark, `${label}: ${book.title} is one button with a mark`);
+      assert.equal(spoken, esc(coverLabel(book, mark === 'free')), `${label}: the label of ${book.title} says what its mark says`);
+      assert.match(seg, new RegExp(`class="bk-ribbon[^"]*" aria-label="(Remove bookmark|Bookmark): ${esc(book.title)}"`), `${label}: the ribbon of ${book.title} is a button of its own`);
+      assert.equal(count(seg, /role="button"/g), 1, `${label}: ${book.title} has one button inside its cover`);
+    });
+    assert.match(phone, new RegExp(`grid-template-columns:repeat\\(2,${g.tile}px\\)`), `${label}: two columns`);
+  }
+  assert.doesNotMatch(phones['Books · no texts yet'], /class="bk-mark free"/, 'with no text in any book every cover says Soon');
+  assert.match(phones['Books · no texts yet'], /<div class="cp-banner cmp"><div class="ey">Books · Soon<\/div><h4>Books for the road<\/h4><div class="row"><span class="ln">The texts are being checked\.<\/span><\/div><\/div>/, 'and the banner has no button and says why');
+  assert.match(phones['Books · no texts yet'], /<div class="h">Preview<\/div><div class="p">Books are not in the app yet\. We are checking the editions before we add them\.<\/div>/);
+
+  // the banner of a phone with books: one button for a screen reader that opens a book which the same phone shows as Free
+  for (const [label, cta, note] of [['Library · Books', 'Start reading', 'No rush'], ['Books · dark', 'Continue reading', 'Onward!'], ['Books · 320 wide', 'Start reading', 'No rush']]) {
+    const phone = phones[label];
+    const m = /<div class="cp-banner cmp" role="button" aria-label="([^"]+)"><div class="ey">([^<]+)<\/div><h4>Books for the road<\/h4><div class="row"><span class="hw">([^<]+)<\/span><span class="pill">([^<]+)<\/span><\/div><\/div>/.exec(phone);
+    assert.ok(m, `${label}: the compact banner with a note and a pill`);
+    assert.deepEqual([m[3], m[4]], [note, cta], `${label}: the words of the banner`);
+    assert.equal(m[1], `${cta}. Books for the road. ${m[2]}`, `${label}: what a screen reader says`);
+    const book = BOOK_CATALOG.find((b) => esc(b.title) === m[2]);
+    assert.ok(book, `${label}: the label of the banner is the title of a book`);
+    assert.ok(phone.includes(`aria-label="${esc(coverLabel(book, true))}"`), `${label}: the book the banner opens says Free on its cover`);
+  }
+  assert.match(phones['Books · dark'], /<div class="phone dk"/);
+  assert.match(phones['Books · 320 wide'], /<div class="phone" style="width:320px">/);
+
+  // the paper of a cover is the pale colours of the LIGHT palette, which dark mode does not swap
+  const grid = /\.bk-cover, \.bk-pg, \.bk-grid \{([^}]*)\}/.exec(design)?.[1] ?? '';
+  for (const colour of new Set(BOOK_CATALOG.map((b) => b.cover))) {
+    assert.match(grid, new RegExp(`--bk-paper-${colour}:\\s*${tokens.color[colour]}\\b`, 'i'), `the paper ${colour} is ${tokens.color[colour]}`);
+  }
+  assert.match(grid, new RegExp(`--bk-ink:\\s*${tokens.color.blue}`, 'i'), 'the ink on a cover is the navy of the light palette');
+
+  // one handwritten note on a screen, at most: the banner, the page of a book, the end of a chapter
+  for (const label of GROUP) assert.ok(count(phones[label], /class="hw"/g) <= 1, `${label}: at most one handwritten note`);
+  assert.equal(count(phones['Book page'], /class="hw"/g), 1);
+  assert.equal(count(phones['Book page · Soon'], /class="hw"/g), 0, 'a book without a text has no note and no button');
+  assert.equal(count(phones['Reader · end of a chapter'], /class="hw"/g), 1);
+
+  // the book page: a book with a text has the gold button and the contents, one without says Not in the app yet and has neither
+  assert.match(phones['Book page'], /<div class="btn" role="button" aria-label="Start reading">Start reading<\/div>[^]*<h4>Contents<\/h4>/);
+  assert.match(phones['Book page · Continue'], /aria-label="Continue: [^"]+">Continue: [^<]+<\/div>/);
+  assert.match(phones['Book page · Continue'], /LAST READ/);
+  assert.match(phones['Book page · Continue'], /<div class="phone dk">/);
+  assert.match(phones['Book page · Soon'], /<h4>Not in the app yet<\/h4><p>We are checking the edition of this book before we add it\.<\/p>/);
+  assert.doesNotMatch(phones['Book page · Soon'], /class="btn"|bk-contents|class="bk-toc"/);
+
+  // the reader: the sizes are the ones readerType works out for the step, the header is the one of the app
+  const body = (step: number) => readerType(step).body;
+  assert.match(phones['Reader'], new RegExp(`<p style="font-size:${body(DEFAULT_STEP).size}px;line-height:${body(DEFAULT_STEP).lineHeight}px;`));
+  assert.match(phones['Reader · large text'], new RegExp(`<p style="font-size:${body(LAST_STEP).size}px;line-height:${body(LAST_STEP).lineHeight}px;`));
+  assert.match(phones['Reader · large text'], /aria-label="Larger text"/);
+  assert.match(phones['Reader · large text'], /class="a l off"/, 'at the largest step the larger button is dimmed');
+  for (const label of ['Reader', 'Reader · dark', 'Reader · large text', 'Reader · end of a chapter']) {
+    assert.match(phones[label], /aria-label="Contents"[^]*aria-label="Smaller text"[^]*aria-label="Larger text"/, `${label}: the header has Contents and the two sizes`);
+    assert.match(phones[label], /class="bk-prog"/, `${label}: the thin progress line`);
+    assert.match(phones[label], /aria-label="(Previous|Next): [^"]+"/, `${label}: Previous and Next name where they go`);
+  }
+  assert.match(phones['Reader · dark'], /<div class="phone dk">/);
+  assert.match(phones['Reader · end of a chapter'], /class="step next" role="button" aria-label="Next: Chapter II[^"]*"[^]*class="step off" role="button" aria-label="Previous chapter\. This is the first chapter" aria-disabled="true"/, 'at the end of the first chapter Next is there and Previous is off');
 });
 
 console.log(`${n} of ${n} passed (Books screens)`);

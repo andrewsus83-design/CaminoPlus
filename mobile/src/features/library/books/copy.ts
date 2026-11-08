@@ -16,6 +16,8 @@ export const CONTINUE_CTA = 'Continue reading';
 export const START_NOTE = 'No rush';
 export const CONTINUE_NOTE = 'Onward!';
 export const NONE_LINE = 'The texts are being checked.';
+/** The small line of the banner while no book has a text: the same word as the covers say. */
+export const NONE_LABEL = 'Books · Soon';
 
 /** A book that has no text in the app yet: on its page, and why. */
 export const NOT_YET_TITLE = 'Not in the app yet';
@@ -45,7 +47,7 @@ export type BooksBannerView =
 export function booksBanner(books: readonly BannerBook[], has: (id: string) => boolean, last: Pick<BookPlace, 'id'> | null): BooksBannerView {
   const readable = books.filter((b) => has(b.id));
   if (readable.length === 0) {
-    return { kind: 'none', label: `Books · ${books.length} free`, title: BOOKS_BANNER_TITLE, line: NONE_LINE };
+    return { kind: 'none', label: NONE_LABEL, title: BOOKS_BANNER_TITLE, line: NONE_LINE };
   }
   const again = last ? readable.find((b) => b.id === last.id) : undefined;
   if (again) {

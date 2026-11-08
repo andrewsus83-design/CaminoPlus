@@ -571,7 +571,7 @@ check('the banner with no text in any book says plainly that the texts are being
   assert.equal((v as { line: string }).line, NONE_LINE);
   assert.equal(NONE_LINE, 'The texts are being checked.');
   assert.ok(!('cta' in v) && !('note' in v));
-  assert.equal(v.label, 'Books · 12 free');
+  assert.equal(v.label, 'Books · Soon', 'the same word as the covers: nothing claims that twelve books are there to read');
   const lastIsGone = booksBanner(books, () => false, { id: 'confessions' });
   assert.equal(lastIsGone.kind, 'none', 'a place in a book without a text opens nothing');
 });

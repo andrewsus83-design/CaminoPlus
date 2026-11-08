@@ -369,20 +369,23 @@ check('the design page shows the same Library: the compact banner, the three par
   assert.match(deutero, /<p class="lib-note">Esther and Daniel, in the Old Testament, include their Greek additions: Daniel 3 holds the Prayer of Azariah and the Song of the Three, 13 is Susanna and 14 is Bel and the Dragon\.<\/p>\s*<p class="lib-note">Orthodox Bibles include a few more books\.<\/p>/);
   assert.doesNotMatch(deutero, /Additions to|Added passages/);
 
-  // Books: Books on, a banner with no button, the notice, rows with a cover, title, author and era, the blurb, and the chips Free and Soon; no choices at the bottom, no gold pen
+  // Books: Books on, the compact banner with the words of the tab (Start reading, and no second button), the quiet line under it, the twelve covers (A5, two in a row, each ONE button and a ribbon of its own);
+  // no choices at the bottom, no gold pen. The covers are checked closer in booksWiring.test.ts
   assert.match(books, /<div class="cp-subtabs"[^>]*><span>Bible<\/span><span class="on">Books<\/span><span>Notes<\/span><\/div>/);
-  const banner = books.slice(books.indexOf('class="cp-banner lib"'), books.indexOf('class="lib-notice"'));
-  assert.match(banner, /<div class="ey">Preview · Books<\/div>\s*<h4>Twelve free companions for the road<\/h4>\s*<p class="line">Classics to read on the way\. Free to read\.<\/p>/);
-  assert.doesNotMatch(banner, /cp-btn|<button|role="button"/, 'the Books banner has no button');
-  assert.match(books, /<div class="p">Books are not in the app yet\. We are checking the editions before we add them\.<\/div>/);
-  assert.match(books, /class="t">The Way of a Pilgrim<\/div><div class="a">Anonymous · 19th century<\/div>[\s\S]*A Russian wanderer walks and prays the Jesus Prayer\.[\s\S]*<span class="lib-chip free">Free<\/span><span class="lib-chip soon">Soon<\/span>/);
-  assert.doesNotMatch(books, /lib-seg|role="radiogroup"|lib-tile|fab-slot|cp-fab-write/, 'Books has neither the choices of the Bible nor the gold pen');
-  assert.doesNotMatch(books, /gutenberg|ccel|licen[cs]e|translator|public domain/i, 'the data that is only for later is not on the design page either');
+  const banner = books.slice(books.indexOf('class="cp-banner cmp"'), books.indexOf('<p class="bk-cap">'));
+  assert.match(banner, /^class="cp-banner cmp" role="button" aria-label="Start reading\. Books for the road\. [^"]+"><div class="ey">[^<]+<\/div><h4>Books for the road<\/h4><div class="row"><span class="hw">No rush<\/span><span class="pill">Start reading<\/span><\/div><\/div>/);
+  assert.doesNotMatch(banner, /<button|cp-btn/, 'the Books banner is one button for a screen reader, the pill is only its look');
+  assert.match(books, /<p class="bk-cap">\d+ of the 12 books are in the app and can be read with no signal\. The others say Soon: we are still checking their editions\.<\/p>/);
+  assert.equal(count(books, /class="bk-cover"/g), 12, 'twelve covers');
+  assert.match(books, /aria-label="The Way of a Pilgrim, Anonymous, (free|soon)"/);
+  assert.doesNotMatch(books, /lib-seg|role="radiogroup"|lib-tile|fab-slot|cp-fab-write|lib-book/, 'Books has neither the choices of the Bible nor the gold pen, nor the old rows');
+  assert.doesNotMatch(books, /gutenberg|ccel|licen[cs]e|translator|public domain/i, 'the data that is only for later is not on the Books tab of the design page either');
 
   // Search: the books of the Bible, the example books and the verses under one notice; no choices, no gold pen
   assert.match(search, /105 results for “john”/);
   assert.match(search, /class="lib-label"[^>]*>Bible · 4<\/div>[\s\S]*class="lib-label"[^>]*>Books · 1<\/div>[\s\S]*class="lib-label"[^>]*>Verses · 100\+<\/div>/);
-  assert.match(search, /The twelve books are examples: they are not in the app yet\. The Bible text is\./);
+  assert.match(search, /<div class="h">Coming soon<\/div><div class="p">Books marked Soon are not in the app yet: we are still checking their editions\. The Bible text and the books marked Free are\.<\/div>/);
+  assert.match(search, /class="bk-brow"[^]*<span class="t">Dark Night of the Soul<\/span>[^]*<span class="lib-chip soon"/, 'a book in a list: a small cover, the title, the byline, the blurb, the mark');
   assert.match(search, /<div class="lib-bk">1 John<\/div><div class="lib-line">New&nbsp;Testament · <span class="mn">5&nbsp;chapters<\/span><\/div>/, 'a book of the Bible in a list: its name in Fraunces, the count in JetBrains Mono');
   assert.match(search, /<div class="vl">1 Maccabees 2:1<\/div><div class="vt">/, 'a verse in a list: the place in JetBrains Mono, then the words');
   // the verses of a search: the match is marked, and no notice because no example book is among the results
@@ -398,7 +401,7 @@ check('the design page shows the same Library: the compact banner, the three par
   // Bookmarks: the groups Bible (a row that opens the chapters), Books and Verses, then the posts
   assert.match(marks, /class="lib-label">Bible · 1<\/div>[\s\S]*Old&nbsp;Testament · <span class="mn">150&nbsp;chapters<\/span>[\s\S]*class="lib-label">Books · 1<\/div>[\s\S]*class="lib-label">Verses · 2<\/div>/);
   assert.match(marks, /<div class="vl">Psalm 121:3<\/div>[\s\S]*<div class="vl">John 3:16<\/div>/);
-  assert.match(marks, /The twelve books are examples: they are not in the app yet\. Bookmarks are kept only on this phone, and logging out clears them\./);
+  assert.match(marks, /<div class="h">Coming soon<\/div><div class="p">Books marked Soon are not in the app yet: we are still checking their editions\. Bookmarks are kept only on this phone, and logging out clears them\.<\/div>/);
   assert.doesNotMatch(marks, /Music|Soon<\/span><\/div><button/);
 
   // the chapters of the Psalms
