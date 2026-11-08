@@ -47,11 +47,14 @@ Then the **scenarios** ([scenarios.mjs](scenarios.mjs)), each in light and dark,
   two Bible rows that were taken out) or kept for a verse that is not in the text are ignored without an error;
 - Bible ([bible.scenarios.mjs](bible.scenarios.mjs), the same walks on the real text): the daily banner is compact (at most 120 high at 390
   wide, 140 at 320) and is one button; the three parts (Old Testament, Deuterocanon, New Testament) are a segmented control under the banner
-  that scrolls with the page, and each shows its books as three square tiles in a row; all 73 book names fit their tile at 320, 390 and 430;
+  that scrolls with the page, and each shows its books as three square tiles in a row; all 73 book names fit their tile at 320, 390 and 430, the
+  short ones at 22 or more on a phone of 390 and every one at 15 or more from 390 up;
   a tile opens the numbers of the chapters, a number opens the words, and Previous and Next name where they go, cross the books and the
   parts (Malachi 4 to Tobit 1) and are disabled at Genesis 1 and Revelation 22; prose is paragraphs, a psalm is stanzas, and the end of a
   chapter has the credit and says it is not the translation read at Mass; a touch chooses a verse and raises Bookmark, Copy and Share, a
-  bookmarked verse is listed on Bookmarks and opens the reader at it; a link to a verse (`?v=105`) opens the chapter with that verse chosen,
+  bookmarked verse is listed on Bookmarks and opens the reader at it; the three actions are big (a glyph of 30, a word of 16 in Inter
+  SemiBold, each at least 88 by 68, the reference 17) at 320, 390 and 430 wide, the bar clears the bottom edge, and a verse touched low on a
+  short phone (568 high) is brought above the bar; a link to a verse (`?v=105`) opens the chapter with that verse chosen,
   and an address that leads nowhere is a calm "Not found"; the search finds verses after the keystroke (typing is never blocked), marks the
   match and offers "Go to" for a typed reference; "Continue reading" shows only when something was read, reopens that chapter and is ignored
   when the place kept no longer exists;

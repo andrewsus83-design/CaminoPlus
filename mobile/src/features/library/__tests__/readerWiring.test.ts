@@ -65,10 +65,10 @@ check('the book tiles on the Bible tab: ONE button each named "Genesis, 50 chapt
   assert.match(src, /export const tileLabel = \(b: BibleBook\): string => `\$\{b\.name\}, \$\{chaptersLabel\(b\.chapters\)\.replace\(\/\\u00a0\/g, ' '\)\}`;/);
   assert.match(src, /accessibilityRole="button"\s+accessibilityLabel=\{tileLabel\(book\)\}\s+onPress=\{\(\) => onOpen\(book\.code\)\}/);
   assert.equal((src.match(/<Pressable\b/g) ?? []).length, 1, 'a tile is one Pressable, and nothing else in it can be pressed');
-  assert.match(src, /width: grid\.tile, height: grid\.tile, padding: grid\.pad/);
+  assert.match(src, /width: grid\.tile, height: grid\.tile, paddingHorizontal: grid\.padX, paddingVertical: grid\.padY/, 'the name is the hero: as little padding across as the round corners allow');
   assert.match(src, /const name = fitName\(book\.name, grid\.innerWidth, fontScale\);/);
   assert.match(src, /const count = fitCount\(chaptersLabel\(book\.chapters\), grid\.innerWidth, fontScale\);/);
-  assert.match(src, /<AppText\s+variant="h4"\s+maxFontSizeMultiplier=\{TEXT_SCALE_CAP\}\s+numberOfLines=\{name\.lines\.length\}\s+style=\{\{ fontSize: name\.size, lineHeight: name\.lineHeight \}\}\s+>\s+\{name\.lines\.join\('\\n'\)\}/);
+  assert.match(src, /<AppText\s+variant="h4"\s+maxFontSizeMultiplier=\{TEXT_SCALE_CAP\}\s+numberOfLines=\{name\.lines\.length\}\s+style=\{\{ fontSize: name\.size, lineHeight: name\.lineHeight, letterSpacing: name\.tracking \}\}\s+>\s+\{name\.lines\.join\('\\n'\)\}/);
   assert.match(src, /<AppText\s+variant="mono"\s+muted\s+maxFontSizeMultiplier=\{TEXT_SCALE_CAP\}\s+numberOfLines=\{1\}\s+style=\{\{ fontSize: count\.size, lineHeight: count\.lineHeight \}\}\s+>\s+\{chaptersLabel\(book\.chapters\)\}/);
   assert.match(src, /const \{ width, fontScale \} = useWindowDimensions\(\);\s+const grid = bookGrid\(width\);/);
   assert.match(src, /flexDirection: 'row', flexWrap: 'wrap', gap: grid\.gap/);
@@ -117,7 +117,7 @@ check('the reader is the screen at /library/bible/<code>/<chapter>: the address 
 
 check('the reader: the title of the chapter, the name of the book, the title of a psalm, Previous and Next at the top and at the end, the words, one handwritten note, the credit and the plain line that it is not read at Mass', () => {
   const src = code(read(`${BIBLE}/Reader.tsx`));
-  assert.match(src, /<Screen tabBar=\{false\} scrollRef=\{scroller\}>/);
+  assert.match(src, /<Screen tabBar=\{false\} scrollRef=\{scroller\} onScroll=\{onScroll\}>/, 'the reader reads the scroll of its screen, to keep a chosen verse above the bar');
   assert.match(src, /<AppText variant="h4" color=\{role\.accentText\} maxFontSizeMultiplier=\{READER_MAX_FONT_SCALE\}>\{book\.name\}<\/AppText>/, 'the name of the book is in Fraunces');
   assert.match(src, /<AppText variant="h2" accessibilityRole="header" maxFontSizeMultiplier=\{READER_MAX_FONT_SCALE\}>\{chapterTitle\(place\)\}<\/AppText>/, 'the chapter title is the heading of the screen, in Fraunces');
   assert.match(src, /\{!!chapter\.title && <AppText variant="h4" muted /);
@@ -147,8 +147,11 @@ check('Previous and Next replace the reader (Back still goes to where the person
   assert.match(src, /const linked = useMemo\(\(\) => \(chapter && verse !== null \? labelOfNumber\(chapter, verse\) : null\), \[chapter, verse\]\);/);
   assert.match(src, /const \[selected, setSelected\] = useState<string \| null>\(linked\);/, 'the verse a link names is chosen');
   assert.match(src, /scroller\.current\?\.scrollTo\(\{ y: Math\.max\(0, top\.current \+ box\.y \+ box\.h \* at\.at - SCROLL_MARGIN\), animated: false \}\);/);
-  assert.match(src, /const onSelect = useCallback\(\(label: string\) => setSelected\(\(now\) => \(now === label \? null : label\)\), \[\]\);/, 'touching the chosen verse again lets it go');
-  assert.match(src, /\{selected !== null && <View style=\{\{ height: ACTIONS_ROOM \}\} \/>\}/, 'room under the last words while the bar is up');
+  assert.match(src, /const choosing = selectedNow\.current !== label;[^\n]*\s+setSelected\(choosing \? label : null\);/, 'touching the chosen verse again lets it go');
+  assert.match(src, /if \(!choosing \|\| pageY === undefined\) return;\s+const down = scrollForBar\(pageY, windowHeight, covered, BODY_LINE\);\s+if \(down > 0\) scroller\.current\?\.scrollTo\(\{ y: scrollY\.current \+ down, animated: true \}\);/, 'a verse touched where the bar is about to be is brought up above it');
+  assert.match(src, /const covered = barCovers\(insets\.bottom\);/);
+  assert.match(src, /const onScroll = useCallback\(\(e: NativeSyntheticEvent<NativeScrollEvent>\) => \{ scrollY\.current = e\.nativeEvent\.contentOffset\.y; \}, \[\]\);/);
+  assert.match(src, /\{selected !== null && <View style=\{\{ height: roomUnder\(insets\.bottom\) \}\} \/>\}/, 'room under the last words while the bar is up: the end of the chapter can be scrolled above it');
   const nav = code(read(`${BIBLE}/ChapterNav.tsx`));
   assert.match(nav, /const spoken = \(side === 'previous' \? previousLabel\(place\) : nextLabel\(place\)\) \?\? \(side === 'previous' \? NO_PREVIOUS : NO_NEXT\);/, 'the name of the button is where it goes');
   assert.match(nav, /accessibilityRole="button"\s+accessibilityLabel=\{spoken\}\s+accessibilityState=\{\{ disabled: !to \}\}\s+disabled=\{!to\}\s+onPress=\{\(\) => \{ if \(to\) onGo\(to\); \}\}/, 'disabled at Genesis 1 and at Revelation 22, still drawn');
@@ -164,9 +167,10 @@ check('the words of the reader: prose is paragraphs and poetry is stanzas, each 
   assert.match(src, /export const READER_MAX_FONT_SCALE = 1\.6;/);
   assert.match(src, /export const BODY_SIZE = 19;\s+export const BODY_LINE = 32;/);
   assert.match(src, /<AppText variant="h4" accessibilityRole="header" maxFontSizeMultiplier=\{READER_MAX_FONT_SCALE\} style=\{\{ fontSize: 22, lineHeight: 28 \}\}>\{block\.text\}<\/AppText>/);
-  assert.match(src, /<Text accessibilityRole="link" onPress=\{\(\) => onSelect\(verse\)\} style=\{on \? chosen\(\) : undefined\}>/);
+  assert.match(src, /<Text accessibilityRole="link" onPress=\{\(e\) => onSelect\(verse, e\.nativeEvent\.pageY\)\} style=\{on \? chosen\(\) : undefined\}>/, 'a touch says which verse and how far down the screen it was');
   assert.match(src, /const chosen = \(\) => \(\{ backgroundColor: c\.goldSoft, textDecorationLine: 'underline' as const \}\);/, 'not the colour alone: an underline too');
-  assert.match(src, /<AppText variant="mono" maxFontSizeMultiplier=\{READER_MAX_FONT_SCALE\} color=\{on \? role\.text : role\.muted\} style=\{\{ fontSize: NUMBER_SIZE, lineHeight: BODY_LINE \}\}>\{superscript\(label\)\}<\/AppText>/);
+  assert.match(src, /<AppText variant="mono" maxFontSizeMultiplier=\{READER_MAX_FONT_SCALE\} color=\{on \? role\.text : role\.muted\} style=\{\{ fontSize: NUMBER_SIZE, lineHeight: BODY_LINE, letterSpacing: NUMBER_TRACKING \}\}>\{superscript\(label\)\}<\/AppText>/);
+  assert.match(src, /export const NUMBER_TRACKING = -3;/, 'the raised digits of a number of two or three figures are drawn close together: JetBrains Mono is monospaced');
   assert.match(src, /export const NUMBER_SIZE = 17;/);
   assert.match(src, /const BlockView = memo\(function BlockView/);
   assert.match(src, /const holding = useMemo\(\(\) => new Set\(selected \? blocksOfVerse\(blocks, selected\) : \[\]\), \[blocks, selected\]\);/);
@@ -183,7 +187,7 @@ check('the words of the reader: prose is paragraphs and poetry is stanzas, each 
   assert.match(src, /import \{ c, role \} from '@\/theme';/);
 });
 
-check('the actions on a verse: one at a time, Bookmark (under the place of the verse), Copy (only when the phone has the clipboard module: it is asked for first), Share (React Native\'s own); all at least 56 high; the chosen verse is announced', () => {
+check('the actions on a verse: one at a time, Bookmark (under the place of the verse), Copy (only when the phone has the clipboard module: it is asked for first), Share (React Native\'s own); all at least 88 wide and 68 high with a glyph of 30 and a word of 16 (Inter SemiBold); the chosen verse is announced', () => {
   const src = code(read(`${BIBLE}/VerseActions.tsx`));
   assert.match(src, /const canCopy = hasNativeModule\(NativeName\.clipboard\);/, 'asked before the button is drawn');
   assert.match(src, /\{canCopy && \(\s+<ActionButton\s+icon="copy"/, 'without the module there is no Copy button');
@@ -198,11 +202,16 @@ check('the actions on a verse: one at a time, Bookmark (under the place of the v
   assert.match(src, /AccessibilityInfo\.announceForAccessibility\?\.\(chosenAnnouncement\(place\)\);/, 'the verse that was chosen is said');
   assert.match(src, /accessibilityLiveRegion="polite" accessibilityLabel=\{`\$\{place\} selected`\}/);
   assert.match(src, /accessibilityRole="toolbar"/);
-  assert.match(src, /minHeight: 56, alignItems: 'center'/, 'at least 56 high');
+  assert.match(src, /flex: 1, minWidth: ACTION_MIN_WIDTH, minHeight: ACTION_MIN_HEIGHT, alignItems: 'center'/, 'at least 88 wide and 68 high');
+  assert.match(src, /<Icon name=\{icon\} color=\{role\.action\} size=\{ACTION_ICON\} filled=\{filled\} \/>/, 'the glyph is 30');
+  assert.match(src, /<AppText variant="label" maxFontSizeMultiplier=\{1\.3\} numberOfLines=\{1\} adjustsFontSizeToFit minimumFontScale=\{0\.77\} style=\{\{ fontSize: ACTION_LABEL, lineHeight: ACTION_LABEL_LINE \}\}>\{label\}<\/AppText>/, 'the word is Inter SemiBold 16, and never under 16 at the largest text size the screen allows (16 x 1.3 x 0.77)');
+  assert.match(src, /label="Bookmark" spoken=\{bookmarkLabel\(bookmarked, place\)\}/, 'the word does not change with the state: "Bookmarked" would not fit 88 at 16; the glyph is filled and a screen reader says "Remove bookmark"');
+  assert.match(src, /backgroundColor: pressed \|\| filled \? role\.sunken : 'transparent'/, 'a bookmarked verse has its button tinted');
+  assert.match(src, /style=\{\{ flex: 1, fontSize: PLACE_SIZE, lineHeight: PLACE_LINE \}\}>\{place\}/, 'the reference is 17');
   assert.match(src, /<AppText variant="mono"[^>]*color=\{role\.accentText\}[^>]*>\{place\}<\/AppText>/, 'the place of the verse is a reference: JetBrains Mono');
   assert.match(src, /accessibilityLabel="Close the verse actions"/);
-  assert.match(src, /bottom: insets\.bottom \+ 12/, 'above the safe area');
-  assert.match(src, /backgroundColor: role\.surface, borderWidth: 1, borderColor: role\.border, \.\.\.shadowStyle\('lg'\)/);
+  assert.match(src, /left: BAR_SIDE, right: BAR_SIDE, bottom: insets\.bottom \+ BAR_BOTTOM/, 'above the safe area');
+  assert.match(src, /borderRadius: radius\.lg, backgroundColor: role\.surface, borderWidth: 1, borderColor: role\.border, \.\.\.shadowStyle\('lg'\)/);
   assert.doesNotMatch(src, /#[0-9a-fA-F]{3,8}\b|\bfixed\.|\bc\.[a-z]|fontFamily/);
   // the reader gives it the verse, its place in words, whether it is bookmarked, and the key the bookmark is kept under
   const reader = code(read(`${BIBLE}/Reader.tsx`));
