@@ -1,0 +1,119 @@
+{
+  "slug": "camino-portugues-02",
+  "name": "Vilarinho to Barcelos",
+  "route_slug": "camino-portugues",
+  "stage_number": 2,
+  "route_id": "20000000-0000-0000-0000-000000000002",
+  "stage_id": "40000000-0000-0000-0001-000000000002",
+  "osm_extracts": [
+    "https://download.geofabrik.de/europe/portugal-latest.osm.pbf"
+  ],
+  "search_bbox": [
+    -8.8,
+    41.25,
+    -8.5,
+    41.62
+  ],
+  "coastal": false,
+  "route_name_regex": "cami(nho|no|ño) portugu[eéê]s\\b",
+  "route_exclude_regex": "\\bCPC\\b|costa|espiritual|braga|interior|plata|ap[uú]lia",
+  "fallback_route": "camino-portugues-02.route.geojson",
+  "clip_km": 6,
+  "min_route_km": 9.2,
+  "buffer_km": 3,
+  "maxzoom": 15,
+  "quality": {
+    "min_tiles": 490,
+    "max_tiles": 1310,
+    "min_size_mb": 4.6,
+    "max_size_mb": 12.5,
+    "required_layers": [
+      "building",
+      "place",
+      "poi",
+      "transportation",
+      "transportation_name"
+    ],
+    "max_change_ratio": 1.5,
+    "max_osm_age_days": 45
+  },
+  "waypoints": [
+    {
+      "name": "Vilarinho",
+      "at": [
+        -8.6819,
+        41.33857
+      ]
+    },
+    {
+      "name": "Arcos",
+      "at": [
+        -8.66423,
+        41.39517
+      ]
+    },
+    {
+      "name": "São Pedro de Rates",
+      "at": [
+        -8.67395,
+        41.42807
+      ]
+    },
+    {
+      "name": "Pedra Furada",
+      "at": [
+        -8.6369,
+        41.46836
+      ]
+    },
+    {
+      "name": "Carvalhal",
+      "at": [
+        -8.63505,
+        41.5104
+      ]
+    },
+    {
+      "name": "Barcelos",
+      "at": [
+        -8.61923,
+        41.53145
+      ]
+    }
+  ],
+  "render_checks": [
+    {
+      "name": "Vilarinho z15",
+      "at": [
+        -8.6819,
+        41.33857,
+        15
+      ],
+      "min_features": {
+        "poi": 45,
+        "transportation": 22,
+        "building": 3
+      },
+      "min_labels": {
+        "place": 1
+      }
+    },
+    {
+      "name": "Barcelos z15",
+      "at": [
+        -8.61923,
+        41.53145,
+        15
+      ],
+      "min_features": {
+        "poi": 319,
+        "transportation": 311,
+        "building": 12
+      },
+      "min_labels": {
+        "place": 1
+      }
+    }
+  ],
+  "generated_from": "catalog/camino-portugues/02.json"
+}

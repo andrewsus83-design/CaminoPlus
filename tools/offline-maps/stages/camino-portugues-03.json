@@ -1,0 +1,133 @@
+{
+  "slug": "camino-portugues-03",
+  "name": "Barcelos to Ponte de Lima",
+  "route_slug": "camino-portugues",
+  "stage_number": 3,
+  "route_id": "20000000-0000-0000-0000-000000000002",
+  "stage_id": "40000000-0000-0000-0001-000000000003",
+  "osm_extracts": [
+    "https://download.geofabrik.de/europe/portugal-latest.osm.pbf"
+  ],
+  "search_bbox": [
+    -8.76,
+    41.44,
+    -8.46,
+    41.86
+  ],
+  "coastal": false,
+  "route_name_regex": "cami(nho|no|ño) portugu[eéê]s\\b",
+  "route_exclude_regex": "\\bCPC\\b|costa|espiritual|braga|interior|plata|ap[uú]lia",
+  "fallback_route": "camino-portugues-03.route.geojson",
+  "clip_km": 6,
+  "min_route_km": 11.1,
+  "buffer_km": 3,
+  "maxzoom": 15,
+  "quality": {
+    "min_tiles": 540,
+    "max_tiles": 1440,
+    "min_size_mb": 3,
+    "max_size_mb": 8.1,
+    "required_layers": [
+      "building",
+      "place",
+      "poi",
+      "transportation",
+      "transportation_name"
+    ],
+    "max_change_ratio": 1.5,
+    "max_osm_age_days": 45
+  },
+  "waypoints": [
+    {
+      "name": "Barcelos",
+      "at": [
+        -8.61923,
+        41.53145
+      ]
+    },
+    {
+      "name": "Lijó",
+      "at": [
+        -8.61351,
+        41.56849
+      ]
+    },
+    {
+      "name": "Aborim",
+      "at": [
+        -8.6366,
+        41.60983
+      ]
+    },
+    {
+      "name": "Balugães",
+      "at": [
+        -8.63559,
+        41.64321
+      ]
+    },
+    {
+      "name": "Vitorino dos Piães",
+      "at": [
+        -8.6233,
+        41.68156
+      ]
+    },
+    {
+      "name": "Facha",
+      "at": [
+        -8.61709,
+        41.71389
+      ]
+    },
+    {
+      "name": "Correlhã",
+      "at": [
+        -8.6115,
+        41.74691
+      ]
+    },
+    {
+      "name": "Ponte de Lima",
+      "at": [
+        -8.5831,
+        41.7675
+      ]
+    }
+  ],
+  "render_checks": [
+    {
+      "name": "Barcelos z15",
+      "at": [
+        -8.61923,
+        41.53145,
+        15
+      ],
+      "min_features": {
+        "poi": 319,
+        "transportation": 311,
+        "building": 12
+      },
+      "min_labels": {
+        "place": 1
+      }
+    },
+    {
+      "name": "Ponte de Lima z15",
+      "at": [
+        -8.5831,
+        41.7675,
+        15
+      ],
+      "min_features": {
+        "poi": 230,
+        "transportation": 186,
+        "building": 6
+      },
+      "min_labels": {
+        "place": 1
+      }
+    }
+  ],
+  "generated_from": "catalog/camino-portugues/03.json"
+}

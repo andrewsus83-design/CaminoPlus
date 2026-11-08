@@ -15,7 +15,7 @@ check('the diary uses no network and no console, and the logic files import noth
     ...fs.readdirSync(path.join(root, 'src/features/diary')).filter((f) => /\.tsx?$/.test(f)).map((f) => `src/features/diary/${f}`),
     ...fs.readdirSync(path.join(root, 'app/diary')).map((f) => `app/diary/${f}`),
   ];
-  assert.ok(files.length >= 9, `the scan must see every diary file: ${files.join(', ')}`);
+  assert.ok(files.length >= 20, `the scan must see every diary file: ${files.join(', ')}`);
   const offenders: string[] = [];
   for (const f of files) {
     read(f).split('\n').forEach((line, i) => {
@@ -24,7 +24,7 @@ check('the diary uses no network and no console, and the logic files import noth
     });
   }
   assert.deepEqual(offenders, []);
-  for (const f of ['store.ts', 'autosave.ts', 'present.ts']) {
+  for (const f of ['store.ts', 'autosave.ts', 'present.ts', 'richtext.ts', 'media.ts', 'place.ts', 'deviceTypes.ts']) {
     for (const l of read(`src/features/diary/${f}`).split('\n').filter((line) => /^import /.test(line))) assert.doesNotMatch(l, /from '(react|react-native|expo|@\/)/, `${f}: ${l}`);
   }
   assert.match(read('src/features/diary/storage.ts'), /from '\.\.\/\.\.\/lib\/localStore'/, 'the phone store is plugged in by storage.ts only');
@@ -86,13 +86,12 @@ check('storage.ts reads strictly, in the same places localStore writes: nothing 
   // writes and removals are localStore's own, and the store is made over the strict reader, never over localStore itself
   assert.match(storage, /setJSON: \(key, value\) => localStore\.setJSON\(key, value\)/);
   assert.match(storage, /remove: \(key\) => localStore\.remove\(key\)/);
-  assert.match(storage, /createDiaryStore\(strictStorage\)/);
+  assert.match(storage, /createDiaryStore\(strictStorage, diaryFiles\)/, 'the photos and videos are files of their own, plugged in here');
   assert.doesNotMatch(storage, /createDiaryStore\(localStore\)/);
 });
 
-check('the list and the Library card read again when the screen comes back, so a page written a moment ago shows', () => {
+check('the list reads again when the screen comes back, so a page written a moment ago shows', () => {
   assert.match(read('src/features/diary/useDiary.ts'), /useFocusEffect\(/);
-  assert.match(read('src/features/diary/DiaryCard.tsx'), /useDiary\(\)/);
   assert.match(read('app/diary/index.tsx'), /useDiary\(\)/);
 });
 
@@ -103,9 +102,17 @@ check('the two pushed screens use the shared Screen without room for a tab bar, 
     const buttons = [...src.matchAll(/<IconButton\b/g)];
     assert.ok(buttons.length >= 1, f);
     for (const m of buttons) assert.match(src.slice(m.index, src.indexOf('/>', m.index)), /\blabel="|\blabel=\{/, `${f}: an IconButton without a label`);
-    for (const m of src.matchAll(/<Pressable\b/g)) assert.match(src.slice(m.index, (m.index ?? 0) + 400), /accessibilityLabel=/, `${f}: a Pressable without a label`);
+    // (a wrapper marked accessible={false} is no button for a screen reader: it hides nothing and has no label to give)
+    for (const m of src.matchAll(/<Pressable\b/g)) assert.match(src.slice(m.index, (m.index ?? 0) + 400), /accessibilityLabel=|accessible=\{false\}/, `${f}: a Pressable without a label`);
   }
-  assert.match(read('src/features/diary/DiaryCard.tsx'), /<Pressable accessibilityRole="button" accessibilityLabel=/);
+  // the parts the editor is made of: every Pressable says what it does, every field has a label
+  for (const f of ['FormatBar.tsx', 'MediaTiles.tsx', 'PlaceParts.tsx']) {
+    const src = read(`src/features/diary/${f}`);
+    for (const m of src.matchAll(/<Pressable\b/g)) assert.match(src.slice(m.index, (m.index ?? 0) + 520), /accessibilityLabel=/, `${f}: a Pressable without a label`);
+    for (const m of src.matchAll(/<TextInput\b/g)) assert.match(src.slice(m.index, (m.index ?? 0) + 700), /accessibilityLabel=/, `${f}: a field without a label`);
+  }
+  const editor = read('app/diary/[id].tsx');
+  for (const m of editor.matchAll(/<TextInput\b/g)) assert.match(editor.slice(m.index, (m.index ?? 0) + 1400), /accessibilityLabel=/, 'a field of the editor without a label');
   assert.match(read('app/diary/index.tsx'), /Write a new page/);
 });
 
@@ -135,7 +142,7 @@ check('deleting the account clears the diary: after the server said yes, never b
 });
 
 check('the delete screen tells the person the diary goes with the account, before they type DELETE', () => {
-  assert.match(read('app/delete-account.tsx'), /'The pages of your diary on this phone',/);
+  assert.match(read('app/delete-account.tsx'), /'The pages of your diary on this phone, with their photos, videos and places',/);
 });
 
 check('account deletion is the only place that clears a diary, and nothing in the app clears one on sign-out', () => {
@@ -150,6 +157,156 @@ check('account deletion is the only place that clears a diary, and nothing in th
   };
   walk('app'); walk('src');
   assert.deepEqual(offenders, []);
+});
+
+/* ---------------------------------------------------------------- rich text, photos, videos and the place */
+
+const diaryFiles = (): string[] => [
+  ...fs.readdirSync(path.join(root, 'src/features/diary')).filter((f) => /\.tsx?$/.test(f)).map((f) => `src/features/diary/${f}`),
+  ...fs.readdirSync(path.join(root, 'app/diary')).map((f) => `app/diary/${f}`),
+];
+const code = (f: string) => read(f).split('\n').map((line) => line.replace(/\/\/.*$/, '')).join('\n');
+
+check('every native module the diary can use is asked for first (hasNativeModule, which asks requireOptionalNativeModule) and only then required, and nothing imports one at the top: an older app must not crash on a module it does not have', () => {
+  const device = code('src/features/diary/device.ts');
+  const helper = read('src/lib/optionalNative.ts');
+  for (const [key, native, pkg] of [['imagePicker', 'ExponentImagePicker', 'expo-image-picker'], ['location', 'ExpoLocation', 'expo-location'], ['video', 'ExpoVideo', 'expo-video']]) {
+    const asked = device.indexOf(`hasNativeModule(NativeName.${key})`);
+    const required = device.indexOf(`require('${pkg}')`);
+    assert.ok(asked > 0 && required > asked && required - asked < 400, `${pkg}: the phone is asked for ${native} right before the package is required`);
+    assert.equal(device.split(`require('${pkg}')`).length - 1, 1, `${pkg} is required in one place`);
+    assert.ok(helper.includes(`${key}: '${native}'`), `the helper knows the name ${native}`);
+    const build = path.join(root, 'node_modules', pkg, 'build');
+    if (fs.existsSync(build)) {
+      const text = fs.readdirSync(build).filter((f) => f.endsWith('.js')).map((f) => fs.readFileSync(path.join(build, f), 'utf8')).join('\n');
+      assert.ok(text.includes(`('${native}')`), `${pkg} asks for a native module called ${native}: a wrong name would switch the feature off for everybody`);
+    }
+  }
+  assert.match(device, /import \{ NativeName, hasNativeModule \} from '@\/lib\/optionalNative';/);
+  assert.match(device, /Platform\.OS === 'web'/, 'and the web is guarded as well');
+  for (const f of diaryFiles()) {
+    const src = code(f);
+    for (const m of src.matchAll(/^import\s+(?!type\b)[^;]*?from\s+'(expo-[\w-]+|@expo\/[\w-]+)'/gm)) {
+      assert.ok(['expo-router', 'expo-file-system', 'expo-font'].includes(m[1]), `${f}: imports ${m[1]} at the top (the native ones are required in device.ts after they are asked for)`);
+    }
+    if (f !== 'src/features/diary/device.ts') assert.doesNotMatch(src, /\brequire\(/, `${f}: no require outside device.ts`);
+  }
+  for (const f of ['src/features/diary/RichText.tsx']) assert.match(code(f), /import \{ useFonts \} from 'expo-font';/);
+});
+
+check('the web gets a device that has none of it, imports nothing, and answers "not here" to every question', () => {
+  const web = code('src/features/diary/device.web.ts');
+  assert.doesNotMatch(web, /^import (?!type)/m, 'nothing is imported');
+  for (const method of ['canPickMedia', 'canFindPlace', 'canPlayVideo', 'pickMedia', 'placeAccess', 'findPlace', 'openMaps', 'openSettings', 'fileUri', 'video']) assert.match(web, new RegExp(`\\b${method}\\b`), method);
+  assert.match(web, /canPickMedia: \(\) => false/);
+  assert.match(web, /canFindPlace: \(\) => false/);
+  assert.match(web, /video: \(\) => null/);
+  assert.match(web, /status: 'unavailable'/);
+  assert.match(web, /status: 'unsupported'/);
+  const types = read('src/features/diary/deviceTypes.ts');
+  for (const method of ['canPickMedia', 'canFindPlace', 'canPlayVideo', 'pickMedia', 'placeAccess', 'findPlace', 'openMaps', 'openSettings', 'fileUri', 'video']) assert.match(types, new RegExp(`\\b${method}\\(`), `the shape has ${method}`);
+  assert.match(read('src/features/diary/device.ts'), /export const device: Device = \{/);
+  assert.match(web, /export const device: Device = \{/);
+});
+
+check('the diary needs nothing that is not in the app already: every package it imports is a dependency of the app, so there is no new native module', () => {
+  const deps = Object.keys((JSON.parse(read('package.json')) as { dependencies: Record<string, string> }).dependencies);
+  const builtIn = new Set(['react', 'react-native']);
+  const offenders: string[] = [];
+  for (const f of diaryFiles()) {
+    for (const m of read(f).matchAll(/(?:from|import|require\()\s*'([^'./@][^']*|@[^'/]+\/[^']+)'/g)) {
+      const pkg = m[1].startsWith('@') ? m[1].split('/').slice(0, 2).join('/') : m[1].split('/')[0];
+      if (!builtIn.has(pkg) && !deps.includes(pkg)) offenders.push(`${f}: ${pkg}`);
+    }
+  }
+  assert.deepEqual(offenders, []);
+  const forbidden = ['react-native-webview', 'expo-av', 'expo-media-library', 'expo-image', 'expo-video-thumbnails', 'expo-image-manipulator', 'expo-document-picker', 'expo-camera'];
+  for (const dep of forbidden) assert.ok(!deps.includes(dep), `${dep} is not a dependency, and the diary does not add it`);
+});
+
+check('the screens and parts of the diary take their colours from the theme: no colour written out, and no stylesheet', () => {
+  const offenders: string[] = [];
+  for (const f of diaryFiles().filter((x) => x.endsWith('.tsx'))) {
+    code(f).split('\n').forEach((line, i) => {
+      if (/#[0-9A-Fa-f]{3,8}\b|\brgba?\(|\bhsla?\(/.test(line)) offenders.push(`${f}:${i + 1}  ${line.trim().slice(0, 100)}`);
+    });
+  }
+  assert.deepEqual(offenders, []);
+});
+
+check('the files of the photos and videos live in a folder of their own (not kv/, which signing out empties), are built from the user id and a checked name, and only deleting the account removes the folder', () => {
+  const files = code('src/features/diary/files.ts');
+  assert.doesNotMatch(files, /['"`]kv['"`]/, 'not the folder of the small files that signing out wipes');
+  assert.match(files, /new Directory\(Paths\.document, \.\.\.mediaDirPieces\(uid\)\)/);
+  assert.match(read('src/features/diary/media.ts'), /export const MEDIA_FOLDER = 'diary-media';/);
+  assert.equal([...files.matchAll(/isMediaName\(name\)/g)].length, 3, 'copying, removing and finding a file each check the name first');
+  assert.doesNotMatch(read('src/lib/auth.tsx'), /diary-media|MEDIA_FOLDER|sweepMedia|attachMedia/, 'signing out knows nothing of the files');
+  assert.match(code('src/features/diary/store.ts'), /try \{ await files\.removeAll\(uid\); \}/, 'clearDiary removes the folder');
+  // the picker's own copy is only deleted when it is in the app's cache folder: never a file of the person's library
+  assert.match(files, /file\.uri\.startsWith\(cache\)/);
+  // the path is never kept in a page: the descriptor has a name, not an address
+  const media = code('src/features/diary/media.ts');
+  assert.doesNotMatch(media, /export type DiaryMedia = \{[^}]*\b(uri|path)\b/, 'a descriptor has no address');
+  assert.match(media, /export type DiaryMedia = \{ id: string; kind: MediaKind; name: string; bytes: number;/);
+});
+
+check('the editor adds files and the place through the saver (the one queue), formats through the pure functions, and the pickers are asked once per tap', () => {
+  const src = read('app/diary/[id].tsx');
+  assert.match(src, /saver\.attach\(picked\.assets\)/);
+  assert.match(src, /saver\.removeMedia\(/);
+  assert.match(src, /saver\.setPlace\(/);
+  assert.match(src, /toggleInline\(body, sel, action, BODY_MAX\)/);
+  assert.match(src, /toggleBlock\(body, sel,/);
+  assert.match(src, /continueList\(body, t,/);
+  assert.match(src, /selection=\{forced \?\? undefined\}/, 'the caret is only forced for a moment');
+  assert.match(src, /autoFocus=\{!initial\}/);
+  assert.doesNotMatch(src, /await saver\.flush\(\)/);
+  assert.doesNotMatch(src, /requestPermissionsAsync|requestForegroundPermissionsAsync|launchImageLibraryAsync/, 'permissions and pickers are asked for in device.ts only');
+  const device = code('src/features/diary/device.ts');
+  assert.equal((device.match(/requestForegroundPermissionsAsync\(\)/g) ?? []).length, 1, 'one prompt in the code, after one tap');
+  assert.doesNotMatch(device, /requestBackground|requestMediaLibraryPermissionsAsync|watchPositionAsync|startLocationUpdatesAsync/, 'foreground, once; no tracking; no library permission (the system picker needs none)');
+  assert.match(device, /Linking\.openURL\(mapsUrl\(place, Platform\.OS\)\)/);
+  assert.match(device, /Linking\.openSettings\(\)/);
+  const flow = code('src/features/diary/usePlace.ts');
+  assert.match(flow, /step: 'explain'/, 'the explanation comes before the phone asks');
+  assert.ok(flow.indexOf("set({ step: 'explain' })") < flow.indexOf('device.findPlace()') || flow.indexOf('const locate') < flow.indexOf('const start'), 'asking is a step the person takes');
+});
+
+check('the list says what is on each page, clean (never a mark), and asks before deleting a page that has photos, videos or a place', () => {
+  const list = read('app/diary/index.tsx');
+  assert.match(list, /metaLine\(e\)/);
+  assert.match(list, /mediaUsageLine\(entries\)/);
+  assert.match(list, /confirmDelete\(pageTitle\(e\), async \(\) => setDeleteFailed\(!\(await remove\(e\.id\)\)\), metaLine\(e\) !== ''\)/);
+  assert.match(read('src/features/diary/confirm.ts'), /Its photos, videos and place are deleted with it\./);
+  const present = read('src/features/diary/present.ts');
+  assert.match(present, /plainText\(body, READ_CHARS\)/, 'titles and previews read the page through the rich text reader');
+});
+
+check('the rich text and media tests run from diary.test.ts, and the test script of package.json runs diary.test.ts and this file, so none of them can be left out', () => {
+  const diary = read('src/features/diary/__tests__/diary.test.ts');
+  assert.match(diary, /import '\.\/richtext\.test';/);
+  assert.match(diary, /import \{ finished as mediaTests \} from '\.\/media\.test';/);
+  assert.match(diary, /await mediaTests;/);
+  const script = (JSON.parse(read('package.json')) as { scripts: Record<string, string> }).scripts['test:diary'];
+  assert.match(script, /tsc -p tsconfig\.diarytest\.json/, 'the tests are compiled first');
+  assert.match(script, /diary\.test\.js/, 'the script runs diary.test.js, which runs the rich text and the media tests');
+  assert.match(script, /wiring\.test\.js/, 'and this file');
+  const tsconfig = read('tsconfig.diarytest.json');
+  for (const f of ['diary', 'richtext', 'media', 'wiring']) assert.match(tsconfig, new RegExp(`${f}\\.test\\.ts`), `${f}.test.ts is compiled`);
+});
+
+check('every text that says what the diary keeps says it keeps photos, videos and the place too, and that deleting a page or the account removes them', () => {
+  const present = read('src/features/diary/present.ts');
+  assert.match(present, /Pages, photos, videos and places are not uploaded and not shared/);
+  assert.match(read('app/help.tsx'), /Where are my diary pages kept\?'[^}]*photos, videos and places[^}]*Logging out keeps them[^}]*deleting your account deletes the whole diary/);
+  // the one thing that leaves the app's hands is said where the place is added and in the help: the phone's own map service may be asked for the name
+  assert.match(present, /your phone's own map service may be asked/);
+  assert.match(read('app/help.tsx'), /Can I add photos, videos and where I am to a diary page\?'[^}]*map service may be asked[^}]*you can type a name/);
+  assert.match(read('app/delete-account.tsx'), /'The pages of your diary on this phone, with their photos, videos and places',/);
+  assert.match(read('app/download-data.tsx'), /Your diary is not in the file: its pages, photos, videos and places are only on this phone, and we never receive them\./);
+  const auth = read('AUTH.md');
+  assert.match(auth, /photos, videos and the place/i);
+  assert.match(auth, /diary-media/);
 });
 
 console.log(`${n} of ${n} passed`);

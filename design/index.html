@@ -169,6 +169,37 @@ textarea.cp-input { height: 120px; border-radius: var(--cp-radius-lg); padding: 
 .cp-search .txt { flex: 1; min-width: 0; }
 .cp-search .t1 { font-weight: 600; font-size: 18px; line-height: 20px; }
 .cp-search .t2 { font-size: 15px; line-height: 18px; color: var(--cp-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* Library: the row on top is a search pill (the free width) and two round buttons, bookmarks then the diary: 52 high, 8 apart, as in the app
+   (features/library/LibraryHeader.tsx). A row of a tab carries a bookmark button: a bare 44 round touch area, filled when it is on. */
+.lib-head { display: flex; align-items: center; gap: 8px; }
+.lib-head .cp-icon-btn { width: 52px; height: 52px; flex: none; }
+.lib-search { flex: 1; min-width: 0; height: 52px; display: flex; align-items: center; gap: 8px; padding: 0 4px 0 16px; border-radius: var(--cp-radius-pill); background: var(--cp-surface); box-shadow: inset 0 0 0 1px var(--cp-border); font-size: 17px; line-height: 22px; color: var(--cp-text-muted); }
+.lib-search .cp-icon { width: 22px; height: 22px; color: var(--cp-text); }
+.lib-search .t { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lib-search .t.typed { color: var(--cp-text); }
+.lib-search .x { width: 48px; height: 48px; flex: none; display: grid; place-items: center; color: var(--cp-text-muted); }
+.lib-search .x .cp-icon { width: 20px; height: 20px; color: inherit; }
+.lib-mark { width: 44px; height: 44px; flex: none; display: grid; place-items: center; border: 0; padding: 0; background: none; color: var(--cp-action); }
+.lib-mark.on .cp-icon { fill: currentColor; }
+.lib-row { display: flex; align-items: center; gap: 14px; min-height: 64px; padding: 10px 6px 10px 16px; border-top: 1px solid var(--cp-border); }
+.lib-row:first-child { border-top: 0; }
+.lib-row .t { font-weight: 600; font-size: 17px; line-height: 22px; }
+.lib-row .n { font-size: 15px; line-height: 21px; letter-spacing: .4px; font-weight: 500; color: var(--cp-text-muted); }
+.lib-row > .cp-icon { color: var(--cp-text-muted); }
+.lib-chip { display: inline-flex; align-items: center; align-self: flex-start; height: 24px; padding: 0 10px; border-radius: var(--cp-radius-pill); font-family: var(--cp-font-mono); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; }
+.lib-chip.soon { background: var(--cp-surface-sunken); color: var(--cp-text-muted); }
+.lib-chip.sample { background: var(--cp-color-gold-wash); color: var(--cp-color-gold-ink); box-shadow: inset 0 0 0 1px var(--cp-color-gold-soft); }
+.lib-notice { display: flex; align-items: flex-start; gap: 12px; padding: 14px; border-radius: var(--cp-radius-lg); background: var(--cp-color-gold-wash); box-shadow: inset 0 0 0 1px var(--cp-color-gold-soft); }
+.lib-notice > .cp-icon { width: 22px; height: 22px; color: var(--cp-color-gold-ink); }
+.lib-notice .h { font-weight: 600; font-size: 17px; line-height: 22px; color: var(--cp-color-gold-ink); }
+.lib-notice .p { font-size: 17px; line-height: 25px; }
+.lib-h { font-family: var(--cp-font-title); font-weight: 600; font-size: 24px; line-height: 30px; margin: 0; }
+.lib-label { font-family: var(--cp-font-mono); font-size: 12px; line-height: 22px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--cp-text-muted); margin-top: 8px; }
+.lib-covers { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.lib-cover { position: relative; aspect-ratio: 3 / 4; border-radius: var(--cp-radius-md); padding: 14px; display: flex; flex-direction: column; justify-content: space-between; color: var(--cp-color-blue); font-family: var(--cp-font-title); font-weight: 600; font-size: 24px; line-height: 30px; }
+.lib-cover > .cp-icon { width: 28px; height: 28px; }
+.lib-cover .lib-mark { position: absolute; top: 4px; right: 4px; color: var(--cp-color-blue); }
+.lib-kind { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; font-size: 15px; line-height: 21px; letter-spacing: .4px; font-weight: 500; color: var(--cp-text-muted); }
 .cp-switch { width: 52px; height: 32px; border-radius: var(--cp-radius-pill); background: var(--cp-border-strong); position: relative; flex: none; }
 .cp-switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 26px; height: 26px; border-radius: 50%; background: var(--cp-surface); box-shadow: var(--cp-shadow-sm); transition: left var(--cp-duration-base); }
 .cp-switch.on { background: var(--cp-color-blue); }
@@ -576,6 +607,36 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
 .cp-thumbs .th .rm { position: absolute; top: 6px; right: 6px; width: 22px; height: 22px; border-radius: 50%; background: rgba(12,35,64,.7); color: #fff; display: grid; place-items: center; }
 .cp-thumbs .th .rm .cp-icon { width: 12px; height: 12px; stroke-width: 3px; }
 .cp-thumbs .add { width: 84px; height: 104px; border-radius: var(--cp-radius-md); border: 2px dashed var(--cp-border-strong); display: grid; place-items: center; color: var(--cp-text-muted); flex: none; }
+/* Diary: the bar above the keyboard, the tiles of a page's photos and videos, its place, and the page as it is read (the diary phones) */
+.dy-prev { margin: 3px 0 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.dy-meta { margin: 3px 0 0; font-size: 14px; line-height: 20px; font-weight: 500; letter-spacing: 0.4px; color: var(--cp-text-accent); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dy-sel { background: var(--cp-color-blue-100); border-radius: 3px; }
+.dy-bar { position: absolute; left: 0; right: 0; bottom: 0; z-index: 6; display: flex; align-items: center; background: var(--cp-surface); border-top: 1px solid var(--cp-border); padding: 0 0 30px; }
+.dy-bar .t { flex: 1; height: 56px; border: 0; background: transparent; color: var(--cp-text); display: grid; place-items: center; padding: 0; }
+.dy-bar .t i { width: 44px; height: 40px; border-radius: var(--cp-radius-md); display: grid; place-items: center; }
+.dy-bar .t.on i { background: var(--cp-highlight); color: var(--cp-on-highlight); }
+.dy-bar .sep { width: 1px; height: 28px; margin: 0 2px; background: var(--cp-border); flex: none; }
+.dy-tiles { display: flex; gap: 10px; overflow: hidden; }
+.dy-tile { width: 104px; height: 104px; border-radius: var(--cp-radius-sm); position: relative; overflow: hidden; flex: none; }
+.dy-tile .cp-img { position: absolute; inset: 0; border-radius: 0; }
+.dy-tile .rm { position: absolute; top: 5px; right: 5px; width: 28px; height: 28px; border-radius: 50%; background: rgba(0, 0, 0, .45); color: #fff; display: grid; place-items: center; }
+.dy-tile .rm .cp-icon { width: 16px; height: 16px; stroke-width: 2.2px; }
+.dy-tile.clip { background: #000; display: grid; place-items: center; }
+.dy-tile.clip .play { width: 44px; height: 44px; border-radius: 50%; border: 2px solid #fff; background: rgba(0, 0, 0, .45); color: #fff; display: grid; place-items: center; }
+.dy-tile.clip .play .cp-icon { width: 20px; height: 20px; }
+.dy-tile .len { position: absolute; left: 6px; bottom: 6px; background: rgba(0, 0, 0, .45); color: #fff; border-radius: 8px; padding: 2px 6px; font-size: 13px; line-height: 17px; }
+.dy-place { display: flex; align-items: center; min-height: 56px; border-radius: var(--cp-radius-pill); box-shadow: inset 0 0 0 1px var(--cp-border); background: var(--cp-surface); padding: 0 4px; }
+.dy-place .pin { width: 48px; height: 48px; display: grid; place-items: center; color: var(--cp-text-accent); }
+.dy-place b { flex: 1; font-weight: 600; font-size: 17px; line-height: 22px; }
+.dy-place .x { width: 48px; height: 48px; display: grid; place-items: center; color: var(--cp-text-muted); }
+.dy-read p { margin: 0; font-size: 19px; line-height: 28px; }
+.dy-read b { font-weight: 600; }
+.dy-read .gap { height: 14px; }
+.dy-read .li { display: flex; gap: 10px; }
+.dy-read .li .dot { width: 14px; text-align: center; color: var(--cp-text-accent); font-size: 19px; line-height: 28px; }
+.dy-read .q { border-left: 3px solid var(--cp-color-gold); padding-left: 14px; }
+.dy-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.dy-grid .dy-tile { width: auto; height: auto; aspect-ratio: 1 / 1; }
 .cp-toolbar { display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; background: var(--cp-surface); border-radius: var(--cp-radius-pill); box-shadow: var(--cp-shadow-lg); }
 .cp-toolbar .cp-icon-btn { box-shadow: none; background: transparent; }
 .cp-toolbar .cp-icon-btn.on { background: var(--cp-color-gold-soft); }
@@ -877,6 +938,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></symbol>
     <symbol id="i-library" viewBox="0 0 24 24"><path d="M12 7.5C10.7 6.3 8.7 5.5 6.2 5.5H3.5v12h2.7c2.5 0 4.5.8 5.8 2 1.3-1.2 3.3-2 5.8-2h2.7v-12h-2.7c-2.5 0-4.5.8-5.8 2Z"/><path d="M12 7.5v12"/></symbol>
     <symbol id="i-book" viewBox="0 0 24 24"><path d="M7 3.5h10.5A1.5 1.5 0 0 1 19 5v14.5a1 1 0 0 1-1 1H7.5A2 2 0 0 1 5.5 18.5V5A1.5 1.5 0 0 1 7 3.5Z"/><path d="M5.5 18.5A2 2 0 0 1 7.5 16.5H19"/><path d="M12.25 6.5v6.5M9.5 8.9h5.5"/></symbol>
+    <symbol id="i-diary" viewBox="0 0 24 24"><path d="M8.5 4h10A1.5 1.5 0 0 1 20 5.5v13a1.5 1.5 0 0 1-1.5 1.5h-10A1.5 1.5 0 0 1 7 18.5v-13A1.5 1.5 0 0 1 8.5 4Z"/><path d="M4 8h4M4 12h4M4 16h4"/><path d="M11.5 8.5h5.5M11.5 12h3.5"/></symbol>
     <symbol id="i-music" viewBox="0 0 24 24"><path d="M9 18V5.5l11-2V16"/><path d="M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/><path d="M20 16a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></symbol>
     <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5a8.5 8.5 0 1 0 10.7 10.7Z"/></symbol>
     <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3.5 6.5h17"/><path d="M8.5 6.5v-2a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v2"/><path d="M18.5 6.5l-.8 12.6a2 2 0 0 1-2 1.9H8.3a2 2 0 0 1-2-1.9L5.5 6.5"/><path d="M10 11v5.5M14 11v5.5"/></symbol>
@@ -942,6 +1004,12 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     <symbol id="i-plug" viewBox="0 0 24 24"><path d="M9 3v5M15 3v5M6.5 8h11v3.5a5.5 5.5 0 0 1-11 0V8ZM12 17v4"/></symbol>
     <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
     <symbol id="i-image" viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="3.5"/><circle cx="9" cy="10" r="1.8"/><path d="m4 17 5-4.5 3.5 3L16 12l4.5 4.5"/></symbol>
+    <symbol id="i-bold" viewBox="0 0 24 24"><path d="M7 4v16"/><path d="M7 4h5.5a4 4 0 0 1 0 8H7"/><path d="M7 12h6.5a4 4 0 0 1 0 8H7"/></symbol>
+    <symbol id="i-italic" viewBox="0 0 24 24"><path d="M10 4h8M6 20h8M15 4 9 20"/></symbol>
+    <symbol id="i-heading" viewBox="0 0 24 24"><path d="M6 4v16M18 4v16M6 12h12"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1.2"/><circle cx="4.5" cy="12" r="1.2"/><circle cx="4.5" cy="18" r="1.2"/></symbol>
+    <symbol id="i-quote" viewBox="0 0 24 24"><path d="M5 5v14M10 8h9M10 12h9M10 16h5"/></symbol>
+    <symbol id="i-video" viewBox="0 0 24 24"><path d="M4 7.5A2.5 2.5 0 0 1 6.5 5h7A2.5 2.5 0 0 1 16 7.5v9a2.5 2.5 0 0 1-2.5 2.5h-7A2.5 2.5 0 0 1 4 16.5v-9Z"/><path d="m16 10.5 4.5-2.8v8.6L16 13.5"/></symbol>
     <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="12" height="12" rx="3"/><path d="M15.5 8.5V6.5a3 3 0 0 0-3-3h-6a3 3 0 0 0-3 3v6a3 3 0 0 0 3 3h2"/></symbol>
     <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5v-15Z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/></symbol>
     <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 4.5 6v5.5c0 4.6 3.2 8.2 7.5 9.5 4.3-1.3 7.5-4.9 7.5-9.5V6L12 3Z"/><path d="m8.8 12 2.4 2.4 4.2-4.6"/></symbol>
@@ -1596,7 +1664,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
   </div>
 
   <h3 id="actionrail">Action rail: love, bookmark, comments, share</h3>
-  <p class="note" style="max-width:720px;margin:0 0 20px">One rail for the whole app. Discover is the standard and the full-screen journey viewer (Me, Journey) draws the very same component, <code>components/ActionRail.tsx</code>, fed by <code>lib/actionRail.ts</code>. A screen never draws its own like, bookmark, comment or share buttons. The same comments sheet opens from both.</p>
+  <p class="note" style="max-width:720px;margin:0 0 20px">One rail for the whole app. Discover is the standard and the full-screen journey viewer (Me, Journey) draws the very same component, <code>components/ActionRail.tsx</code>, fed by <code>lib/actionRail.ts</code>. A screen never draws its own like, bookmark, comment or share buttons, and never decides where the rail sits: the rail places itself, so the column is in the same spot of the screen in Discover and in the viewer. The same comments sheet opens from both.</p>
   <div class="grid g2" style="align-items:start">
     <div class="panel">
       <div class="rail-demo">
@@ -1604,13 +1672,13 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
         <figure><div class="rail-stage cp-img v4"><div class="cp-rail"><button class="b love on" aria-label="Remove love, 12 likes"><svg class="cp-icon"><use href="#i-heart"/></svg><span class="n">12</span></button><button class="b save on" aria-label="Remove bookmark, 4 bookmarks"><svg class="cp-icon"><use href="#i-bookmark"/></svg><span class="n">4</span></button><button class="b comments" aria-label="Comments, 3 comments"><svg class="cp-icon"><use href="#i-chat"/></svg><span class="n">3</span></button><button class="b share" aria-label="Share, 1,234 shares"><svg class="cp-icon"><use href="#i-share"/></svg><span class="n">1.2K</span></button></div></div><figcaption>On is filled. Counts that were read, compact</figcaption></figure>
         <figure><div class="rail-stage cp-img v2"><div class="cp-rail"><button class="b love" aria-label="Love, 0 likes"><svg class="cp-icon"><use href="#i-heart"/></svg><span class="n">0</span></button><button class="b save" aria-label="Bookmark"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button><button class="b comments" aria-label="Comments, not available yet" disabled><svg class="cp-icon"><use href="#i-chat"/></svg></button><button class="b share" aria-label="Share"><svg class="cp-icon"><use href="#i-share"/></svg></button></div></div><figcaption>A real 0 shows. A button that cannot work yet is dimmed</figcaption></figure>
       </div>
-      <p class="spec" style="margin:20px 0 0">.cp-rail · 56 circles, 14 apart · right edge 16 (screen margin) · rgba(255,253,248,.85) · heart 28 red, bookmark 28 blue, chat 26, share 26 · count 11/13 under the icon</p>
+      <p class="spec" style="margin:20px 0 0">.cp-rail · 56 circles, 14 apart · right edge 16 (screen margin) · lowest circle 120 above the safe area, on every screen · rgba(255,253,248,.85) · heart 28 red, bookmark 28 blue, chat 26, share 26 · count 11/13 under the icon</p>
     </div>
     <div class="panel">
       <table class="contrast">
         <tr><th>What</th><th>The standard</th></tr>
         <tr><td><b>Order</b></td><td>Love, bookmark, comments, share, top to bottom. Never reordered, never hidden for a kind of content.</td></tr>
-        <tr><td><b>Circle</b></td><td>56 × 56, pill radius, paper white at 85 % so it reads on any photo. 14 apart, centred, the right edge on the 16 screen margin. Discover puts the lowest circle 120 above the safe area (above the tab bar); the viewer puts it 28 above it, with the caption kept clear.</td></tr>
+        <tr><td><b>Circle</b></td><td>56 × 56, pill radius, paper white at 85 % so it reads on any photo. 14 apart, centred, the right edge on the 16 screen margin and the lowest circle 120 above the safe area, on every screen that has the rail. That height clears Discover's floating tab bar; the full-screen viewer has no tab bar and keeps the same 120, so the buttons are under the thumb in the same place on both. The caption, and the text of a text-only post, keep clear of the column.</td></tr>
         <tr><td><b>Icons</b></td><td>Heart 28 in Cross Red, bookmark 28 in Atlantic Blue, chat 26 and share 26 in blue. Heart and bookmark are filled when on.</td></tr>
         <tr><td><b>Counts</b></td><td>Under the icon, 11/13 blue. Compact (999, 1.2K, 12.3K, 1M), rounded down, never more than the real number. Shown only when the count was read: a real 0 shows 0, a count nobody read shows nothing. Screen readers hear the whole number: "Love, 1,234 likes".</td></tr>
         <tr><td><b>States</b></td><td>Off, on, and "not available yet": dimmed to 45 %, disabled, and the label says so. The labels are Love / Remove love, Bookmark / Remove bookmark, Comments, Share.</td></tr>
@@ -1640,7 +1708,8 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     <div class="panel" style="padding:12px 24px 0"><div class="cp-subtabs" style="margin:0"><span class="on"><svg class="cp-icon sm"><use href="#i-steps"/></svg>Journey</span><span class=""><svg class="cp-icon sm"><use href="#i-shell"/></svg>Passport</span><span class=""><svg class="cp-icon sm"><use href="#i-flag"/></svg>Plan</span></div><p class="spec" style="margin:16px 0 20px">.cp-subtabs · 15/600 · 3px blue underline</p></div>
   </div>
   <p class="spec" style="margin-top:16px">.cp-tabbar · height 72 · radius pill · shadow-lg · icon 24 in 52×32 pill · label 12/500 (active 700)</p>
-  <p class="note" style="margin-top:12px;max-width:760px"><b>Settings is not a tab.</b> It opens from the gear at the top right of Me, next to the inbox bell, as a screen of its own: a back button on the left, light/dark and log out on the right, and no tab bar under it. <b>Library</b> is the fifth tab: a banner, your private diary, and the tabs Bible, Books and Music. Until we have chosen what we may include, those three tabs show example content and say so. <b>The diary</b> (Library, My diary) keeps its pages only on the phone: the list says so, nothing is uploaded, logging out keeps the pages, deleting the account deletes them, and a page is saved as it is typed, so there is no Save button.</p>
+  <p class="note" style="margin-top:12px;max-width:760px"><b>Settings is not a tab.</b> It opens from the gear at the top right of Me, next to the inbox bell, as a screen of its own: a back button on the left, light/dark and log out on the right, and no tab bar under it. <b>Library</b> is the fifth tab. It has no title: the row on top is a search field, then the round Bookmarks button, then the round diary button in the corner (the same size as the bell and the gear on Me), and under it a banner and the tabs Bible, Books and Music. Until we have chosen what we may include, those three tabs show example content and say so. <b>The diary</b> (Library, My diary) keeps its pages only on the phone: the list says so, nothing is uploaded, logging out keeps the pages, deleting the account deletes them, and a page is saved as it is typed, so there is no Save button.</p>
+  <p class="note" style="margin-top:12px;max-width:760px"><b>Library search</b> looks through all three tabs at once, as you type, and lists what it finds grouped by tab (Bible, Books, Music) under one Preview notice. A word counts when it starts a word of a row (its title, the line under it, or the name of the tab), so "music" lists the music rows. With nothing found it says "Nothing found for ..." and offers Clear search; clearing the field brings the banner and the tabs back. <b>Bookmarks</b> is a screen of its own, opened from the round button next to the diary: a back button, no tab bar, then two parts. Library lists the rows bookmarked from the tabs; they stay only on the phone and logging out clears them, and each is still an example. Posts lists the posts bookmarked in the journey viewer; they stay with the account, and with no signal the list from the last visit is shown, with a line that says so. A row that is taken off stays in place, with an empty bookmark, until the screen is left, so a slip can be put back with one tap.</p>
 </section>
 
 <!-- =================================================================== BUSINESS -->
@@ -1864,7 +1933,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
 <section class="doc" id="screens">
   <p class="eyebrow">15 · Screens @ 390 × 844</p>
   <h2>The app, tab by tab</h2>
-  <p class="intro">Reference layouts at iPhone 15 size. Scroll sideways to see all of them. Me has the My Camino card with its Change button, a row of highlights (one round picture for each destination of the day plan: a gold ring when you posted there, a dashed circle while it is still ahead), three sub-tabs, an inbox, a two-step write flow, a share screen and a stamp pop-up. Maps has two layers: helicopter view and city view. Stays opens into Airbnb / Agoda-style detail pages for stays and cafes. Explore has a second screen for the photo marketplace. Library has a banner, the private diary and the tabs Bible, Books and Music, with a gold note button that writes a diary page; the diary has a list of pages and an editor. Settings is a screen opened from the gear at the top right of Me; it opens the business-owner flow: a welcome page, five registration steps, the review status and the owner dashboard.</p>
+  <p class="intro">Reference layouts at iPhone 15 size. Scroll sideways to see all of them. Me has the My Camino card with its Change button, a row of highlights (one round picture for each destination of the day plan: a gold ring when you posted there, a dashed circle while it is still ahead), three sub-tabs, an inbox, a two-step write flow, a share screen and a stamp pop-up. Maps has two layers: helicopter view and city view. Stays opens into Airbnb / Agoda-style detail pages for stays and cafes. Explore has a second screen for the photo marketplace. Library has a search field with a bookmarks button and a diary button on top, a banner and the tabs Bible, Books and Music, with a gold note button that writes a diary page; a search lists its results grouped by tab, Bookmarks lists what the pilgrim kept, and the diary has a list of pages and an editor. Settings is a screen opened from the gear at the top right of Me; it opens the business-owner flow: a welcome page, five registration steps, the review status and the owner dashboard.</p>
 
   <div class="phones">
 
@@ -2569,11 +2638,15 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     </div>
 
     <div class="phone-wrap">
-      <p class="phone-label"><b>Library</b>Banner · diary · Bible, Books, Music</p>
+      <p class="phone-label"><b>Library</b>Search · bookmarks · diary · Bible, Books, Music</p>
       <div class="phone">
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
         <div class="scroll">
-          <h1 class="scr-title">Library</h1>
+          <div class="lib-head">
+            <div class="lib-search"><svg class="cp-icon"><use href="#i-search"/></svg><span class="t">Search the Library</span></div>
+            <button class="cp-icon-btn flat" aria-label="Bookmarks"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button>
+            <button class="cp-icon-btn flat" aria-label="My diary"><svg class="cp-icon"><use href="#i-diary"/></svg></button>
+          </div>
           <div class="cp-banner" style="margin-top:16px">
             <span class="art"><svg class="cp-icon"><use href="#i-book"/></svg></span>
             <div class="ey">Preview · Bible</div>
@@ -2581,20 +2654,16 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
             <button class="cp-btn sm">See the Bible tab</button>
           </div>
           <div class="cp-dots"><i class="on"></i><i></i><i></i></div>
-          <div class="cp-card" style="margin-top:18px;display:flex;align-items:center;gap:16px;padding:18px 20px">
-            <span style="width:52px;height:52px;border-radius:50%;display:grid;place-items:center;flex:none;background:var(--cp-color-gold);color:var(--cp-color-blue)"><svg class="cp-icon"><use href="#i-compose"/></svg></span>
-            <div style="flex:1;min-width:0"><div style="font-family:var(--cp-font-title);font-weight:600;font-size:22px;line-height:28px">My diary</div><div class="note" style="margin:0">3 pages</div><div style="font-weight:600;font-size:16px;margin-top:6px">Hontanas</div><div class="note" style="margin:0;font-size:14px">Friday 6 November</div></div>
-            <svg class="cp-icon sm" style="color:var(--cp-text-muted)"><use href="#i-chev"/></svg>
+          <div class="cp-subtabs" style="margin:16px 0"><span class="on">Bible</span><span>Books</span><span>Music</span></div>
+          <div class="lib-notice">
+            <svg class="cp-icon"><use href="#i-flag"/></svg>
+            <div><div class="h">Preview</div><div class="p">The Bible text is not in the app yet. We are choosing a translation we are allowed to include. This tab shows how reading will look.</div></div>
           </div>
-          <div class="cp-subtabs" style="margin:20px 0 18px"><span class="on">Bible</span><span>Books</span><span>Music</span></div>
-          <div class="cp-card" style="padding:16px;background:var(--cp-color-gold-wash);box-shadow:inset 0 0 0 1.5px var(--cp-color-gold-soft)">
-            <div style="font-weight:600;color:var(--cp-color-gold-ink)">Preview</div>
-            <p class="note" style="margin:4px 0 0;color:var(--cp-text)">The Bible text is not in the app yet. We are choosing a translation we are allowed to include. This tab shows how reading will look.</p>
-          </div>
-          <div class="s-group" style="margin-top:16px">
-            <div class="s-row"><svg class="cp-icon"><use href="#i-book"/></svg><span class="lbl">Psalms for walking</span><span class="cp-badge neutral">Soon</span></div>
-            <div class="s-row"><svg class="cp-icon"><use href="#i-book"/></svg><span class="lbl">The Gospels</span><span class="cp-badge neutral">Soon</span></div>
-            <div class="s-row"><svg class="cp-icon"><use href="#i-book"/></svg><span class="lbl">Prayers for the road</span><span class="cp-badge neutral">Soon</span></div>
+          <div class="cp-card" style="margin-top:16px;padding:4px">
+            <div class="lib-row"><svg class="cp-icon"><use href="#i-book"/></svg><div style="flex:1;min-width:0;display:flex;flex-direction:column"><div class="t">Psalms for walking</div><div class="n">Short, for a rest by the road</div><span class="lib-chip soon" style="margin-top:6px">Soon</span></div><button class="lib-mark" aria-label="Bookmark: Psalms for walking"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+            <div class="lib-row"><svg class="cp-icon"><use href="#i-book"/></svg><div style="flex:1;min-width:0;display:flex;flex-direction:column"><div class="t">The Gospels</div><div class="n">One chapter a day</div><span class="lib-chip soon" style="margin-top:6px">Soon</span></div><button class="lib-mark on" aria-label="Remove bookmark: The Gospels"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+            <div class="lib-row"><svg class="cp-icon"><use href="#i-book"/></svg><div style="flex:1;min-width:0;display:flex;flex-direction:column"><div class="t">Prayers for the road</div><div class="n">Morning, evening and the pilgrim blessing</div><span class="lib-chip soon" style="margin-top:6px">Soon</span></div><button class="lib-mark" aria-label="Bookmark: Prayers for the road"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+            <div class="lib-row"><svg class="cp-icon"><use href="#i-book"/></svg><div style="flex:1;min-width:0;display:flex;flex-direction:column"><div class="t">Reading plans</div><div class="n">One reading for each stage of your Camino</div><span class="lib-chip soon" style="margin-top:6px">Soon</span></div><button class="lib-mark" aria-label="Bookmark: Reading plans"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
           </div>
         </div>
         <div class="fab-slot"><button class="cp-fab-write" aria-label="Write in your diary"><svg class="cp-icon "><use href="#i-compose"/></svg></button></div>
@@ -2610,6 +2679,130 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     </div>
 
     <div class="phone-wrap">
+      <p class="phone-label"><b>Library · Search</b>All three tabs at once · grouped by tab</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll">
+          <div class="lib-head">
+            <div class="lib-search"><svg class="cp-icon"><use href="#i-search"/></svg><span class="t typed">pray</span><span class="x"><svg class="cp-icon"><use href="#i-x"/></svg></span></div>
+            <button class="cp-icon-btn flat" aria-label="Bookmarks"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button>
+            <button class="cp-icon-btn flat" aria-label="My diary"><svg class="cp-icon"><use href="#i-diary"/></svg></button>
+          </div>
+          <div class="lib-notice" style="margin-top:16px">
+            <svg class="cp-icon"><use href="#i-flag"/></svg>
+            <div><div class="h">Preview</div><div class="p">These results are examples. The Bible text, books and music are not in the app yet.</div></div>
+          </div>
+          <p class="note" style="margin:16px 0 0">2 results for “pray”</p>
+          <div class="lib-label" style="margin-top:24px">Bible · 1</div>
+          <div class="cp-card" style="margin-top:16px;padding:4px">
+            <div class="lib-row"><svg class="cp-icon"><use href="#i-book"/></svg><div style="flex:1;min-width:0;display:flex;flex-direction:column"><div class="t">Prayers for the road</div><div class="n">Morning, evening and the pilgrim blessing</div><span class="lib-chip soon" style="margin-top:6px">Soon</span></div><button class="lib-mark on" aria-label="Remove bookmark: Prayers for the road"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+          </div>
+          <div class="lib-label" style="margin-top:24px">Books · 1</div>
+          <div class="lib-covers" style="margin-top:16px">
+            <div>
+              <div class="lib-cover" style="background:var(--cp-success-wash)"><svg class="cp-icon"><use href="#i-book"/></svg>Prayers and blessings<button class="lib-mark" aria-label="Bookmark: Prayers and blessings"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+              <div class="lib-kind"><span>Prayer</span><span class="lib-chip sample">Sample</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="fab-slot"><button class="cp-fab-write" aria-label="Write in your diary"><svg class="cp-icon "><use href="#i-compose"/></svg></button></div>
+        <div class="tabdock"><nav class="cp-tabbar">
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Discover</div>
+          <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-library"/></svg></span>Library</div>
+        </nav></div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Library · Nothing found</b>A calm empty state · Clear search</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll">
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div class="lib-head">
+              <div class="lib-search"><svg class="cp-icon"><use href="#i-search"/></svg><span class="t typed">zzz</span><span class="x"><svg class="cp-icon"><use href="#i-x"/></svg></span></div>
+              <button class="cp-icon-btn flat" aria-label="Bookmarks"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button>
+              <button class="cp-icon-btn flat" aria-label="My diary"><svg class="cp-icon"><use href="#i-diary"/></svg></button>
+            </div>
+            <div class="lib-notice">
+              <svg class="cp-icon"><use href="#i-flag"/></svg>
+              <div><div class="h">Preview</div><div class="p">These results are examples. The Bible text, books and music are not in the app yet.</div></div>
+            </div>
+            <div class="cp-card" style="padding:32px 20px;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center">
+              <span style="width:64px;height:64px;border-radius:50%;background:var(--cp-surface-sunken);display:grid;place-items:center"><svg class="cp-icon" style="width:30px;height:30px;color:var(--cp-text-muted)"><use href="#i-search"/></svg></span>
+              <div class="lib-h">Nothing found for “zzz”</div>
+              <div class="note">Check the spelling, try a shorter word, or clear the search to browse the tabs.</div>
+              <button class="cp-btn md block" style="margin-top:8px;background:var(--cp-surface);color:var(--cp-text);box-shadow:inset 0 0 0 1px var(--cp-border)">Clear search</button>
+            </div>
+          </div>
+        </div>
+        <div class="fab-slot"><button class="cp-fab-write" aria-label="Write in your diary"><svg class="cp-icon "><use href="#i-compose"/></svg></button></div>
+        <div class="tabdock"><nav class="cp-tabbar">
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Discover</div>
+          <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-library"/></svg></span>Library</div>
+        </nav></div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Library · Bookmarks</b>Library rows on this phone · bookmarked posts</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll">
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div class="biz-top"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon "><use href="#i-back"/></svg></button></div>
+            <h1 class="scr-title" style="margin:0">Bookmarks</h1>
+            <h4 class="lib-h">Library</h4>
+            <div class="lib-notice">
+              <svg class="cp-icon"><use href="#i-flag"/></svg>
+              <div><div class="h">Preview</div><div class="p">These are examples from the Library preview. They are kept only on this phone, and logging out clears them.</div></div>
+            </div>
+            <div class="lib-label">Bible · 1</div>
+            <div class="cp-card" style="padding:4px">
+              <div class="lib-row"><svg class="cp-icon"><use href="#i-book"/></svg><div style="flex:1;min-width:0;display:flex;flex-direction:column"><div class="t">The Gospels</div><div class="n">One chapter a day</div><span class="lib-chip soon" style="margin-top:6px">Soon</span></div><button class="lib-mark on" aria-label="Remove bookmark: The Gospels"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+            </div>
+            <div class="lib-label">Music · 1</div>
+            <div class="cp-card" style="padding:4px">
+              <div class="lib-row"><span style="width:44px;height:44px;border-radius:50%;background:var(--cp-surface-sunken);display:grid;place-items:center;flex:none"><svg class="cp-icon" style="color:var(--cp-text-muted)"><use href="#i-music"/></svg></span><div style="flex:1;min-width:0;display:flex;flex-direction:column"><div class="t">Chants for the road</div><div class="n">Slow, simple chants for the road</div><span class="lib-chip soon" style="margin-top:6px">Soon</span></div><button class="lib-mark on" aria-label="Remove bookmark: Chants for the road"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+            </div>
+            <h4 class="lib-h" style="margin-top:8px">Posts</h4>
+            <div class="cp-card" style="padding:16px 6px 16px 20px;display:flex;align-items:center;gap:4px">
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px"><div style="font-weight:600;font-size:17px;line-height:22px">Hontanas · 6 Nov 2026</div><div class="note" style="display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">Sunrise over the meseta. Thirty kilometres and not one cloud.</div><div style="font-size:15px;line-height:21px;letter-spacing:.4px;font-weight:500;color:var(--cp-text-muted)">Your post · 2 photos or clips</div></div>
+              <button class="lib-mark on" aria-label="Remove bookmark: Hontanas · 6 Nov 2026"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button>
+            </div>
+          </div>
+        </div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Library · Bookmarks, empty</b>Nothing kept yet · says how to keep something</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll">
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div class="biz-top"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon "><use href="#i-back"/></svg></button></div>
+            <h1 class="scr-title" style="margin:0">Bookmarks</h1>
+            <h4 class="lib-h">Library</h4>
+            <div class="cp-card" style="padding:20px"><div class="note">Nothing bookmarked in the Library yet. Tap the bookmark on a row to keep it here.</div></div>
+            <h4 class="lib-h" style="margin-top:8px">Posts</h4>
+            <div class="cp-card" style="padding:20px"><div class="note">No bookmarked posts yet. Tap the bookmark on a post in your journey to keep it here.</div></div>
+          </div>
+        </div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
       <p class="phone-label"><b>Diary</b>Library · My diary · only on this phone</p>
       <div class="phone">
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
@@ -2617,19 +2810,20 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           <div class="biz-top"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon "><use href="#i-back"/></svg></button></div>
           <h1 class="scr-title" style="margin-top:14px">My diary</h1>
           <p class="note" style="margin:0;font-weight:600">3 pages</p>
-          <p class="note" style="margin:6px 0 0">Only on this phone. Not uploaded, not shared. If you delete the app or lose this phone, these pages are gone.</p>
+          <p class="note" style="margin:2px 0 0;font-size:14px">Photos and videos: 45 MB of 2 GB</p>
+          <p class="note" style="margin:6px 0 0">Only on this phone. Pages, photos, videos and places are not uploaded and not shared. If you delete the app or lose this phone, they are gone.</p>
           <button class="cp-btn cp-btn-primary block" style="margin-top:18px">Write a new page</button>
           <div style="display:flex;flex-direction:column;gap:12px;margin-top:16px">
             <div class="cp-card" style="display:flex;align-items:center;gap:6px;padding:16px 10px 16px 20px">
-              <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:17px">Hontanas</div><div class="note" style="margin:3px 0 0">A long, flat day across the meseta. Wind in my face from the first st…</div><div class="note" style="margin:3px 0 0;font-size:14px">Friday 6 November</div></div>
+              <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:17px">Hontanas</div><div class="note dy-prev">A long, flat day across the meseta. Wind in my face from the first step and no shade at all until the little village appeared.</div><div class="dy-meta">3 photos · 1 video · Hontanas</div><div class="note" style="margin:3px 0 0;font-size:14px">Friday 6 November</div></div>
               <button class="cp-icon-btn flat" aria-label="Delete page: Hontanas"><svg class="cp-icon"><use href="#i-trash"/></svg></button>
             </div>
             <div class="cp-card" style="display:flex;align-items:center;gap:6px;padding:16px 10px 16px 20px">
-              <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:17px">Left Burgos in the dark.</div><div class="note" style="margin:3px 0 0">The cathedral stayed lit behind me for a long time. I met a Dutch …</div><div class="note" style="margin:3px 0 0;font-size:14px">Thursday 5 November</div></div>
+              <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:17px">Left Burgos in the dark.</div><div class="note dy-prev">The cathedral stayed lit behind me for a long time. I met a Dutch woman who has walked the Camino three times and she told me to slow down.</div><div class="dy-meta">1 photo</div><div class="note" style="margin:3px 0 0;font-size:14px">Thursday 5 November</div></div>
               <button class="cp-icon-btn flat" aria-label="Delete page: Left Burgos in the dark."><svg class="cp-icon"><use href="#i-trash"/></svg></button>
             </div>
             <div class="cp-card" style="display:flex;align-items:center;gap:6px;padding:16px 10px 16px 20px">
-              <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:17px">Roncesvalles</div><div class="note" style="margin:3px 0 0">First night. Cold and clear. Mass in the old church and the blessing …</div><div class="note" style="margin:3px 0 0;font-size:14px">Tuesday 4 November 2025</div></div>
+              <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:17px">Roncesvalles</div><div class="note dy-prev">First night. Cold and clear. Mass in the old church and the blessing of the pilgrims.</div><div class="dy-meta">Roncesvalles</div><div class="note" style="margin:3px 0 0;font-size:14px">Tuesday 4 November 2025</div></div>
               <button class="cp-icon-btn flat" aria-label="Delete page: Roncesvalles"><svg class="cp-icon"><use href="#i-trash"/></svg></button>
             </div>
           </div>
@@ -2639,18 +2833,68 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     </div>
 
     <div class="phone-wrap">
-      <p class="phone-label"><b>Diary · page</b>Saved as you type · no Save button</p>
+      <p class="phone-label"><b>Diary · page</b>Saved as you type · the bar sits above the keyboard</p>
       <div class="phone">
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
-        <div class="scroll" style="display:flex;flex-direction:column">
-          <div class="biz-top" style="justify-content:space-between"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon "><use href="#i-back"/></svg></button><button class="cp-icon-btn" aria-label="Delete this page"><svg class="cp-icon "><use href="#i-trash"/></svg></button></div>
+        <div class="scroll" style="display:flex;flex-direction:column;padding-bottom:104px">
+          <div class="biz-top" style="justify-content:space-between"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon "><use href="#i-back"/></svg></button><span style="display:flex;align-items:center;gap:8px"><button class="cp-btn md" style="height:48px;padding:0 20px;font-size:17px;background:var(--cp-surface);color:var(--cp-text);box-shadow:inset 0 0 0 1px var(--cp-border)">Read</button><button class="cp-icon-btn flat" aria-label="Delete this page"><svg class="cp-icon "><use href="#i-trash"/></svg></button></span></div>
           <p class="note" style="margin:12px 0 10px">Friday 6 November</p>
-          <div class="cp-card" style="padding:0;flex:1;min-height:420px;box-shadow:inset 0 0 0 2px var(--cp-color-gold)">
-            <div style="font-family:var(--cp-font-title);font-weight:600;font-size:22px;line-height:28px;padding:16px 20px 12px">Hontanas</div>
-            <div style="height:1px;margin:0 20px;background:var(--cp-border)"></div>
-            <div style="font-size:18px;line-height:28px;padding:16px 20px">A long, flat day across the meseta. Wind in my face from the first step and no shade at all until the little village appeared.<br><br>The albergue served lentil soup and I slept like a stone.</div>
+          <div class="cp-card" style="padding:0;flex:1;min-height:236px;box-shadow:inset 0 0 0 2px var(--cp-color-gold)">
+            <div style="font-family:var(--cp-font-title);font-weight:600;font-size:24px;line-height:30px;padding:14px 18px 10px">Hontanas</div>
+            <div style="height:1px;margin:0 18px;background:var(--cp-border)"></div>
+            <div style="font-size:19px;line-height:28px;padding:14px 18px;white-space:pre-wrap">A long, flat day across the meseta. **<span class="dy-sel">Wind in my face</span>** from the first step and _no shade_ at all.
+
+- lentil soup
+- bread and a **very** cold beer</div>
           </div>
+          <div class="dy-tiles" style="margin-top:12px">
+            <div class="dy-tile"><div class="cp-img"></div><span class="rm"><svg class="cp-icon"><use href="#i-x"/></svg></span></div>
+            <div class="dy-tile"><div class="cp-img v2"></div><span class="rm"><svg class="cp-icon"><use href="#i-x"/></svg></span></div>
+            <div class="dy-tile clip"><span class="play"><svg class="cp-icon" style="fill:currentColor"><use href="#i-play"/></svg></span><span class="len">0:42 · 36 MB</span><span class="rm"><svg class="cp-icon"><use href="#i-x"/></svg></span></div>
+            <div class="dy-tile"><div class="cp-img v5"></div></div>
+          </div>
+          <div class="dy-place" style="margin-top:12px"><span class="pin"><svg class="cp-icon"><use href="#i-pin"/></svg></span><b>Hontanas, Castilla y León</b><span class="x"><svg class="cp-icon sm"><use href="#i-x"/></svg></span></div>
+          <p class="note" style="margin:6px 0 0 16px;font-size:14px">42.4172° N, 4.2477° W</p>
           <p class="note" style="margin:10px 0 0;font-size:14px">Saved on this phone</p>
+        </div>
+        <div class="dy-bar">
+          <button class="t on" aria-label="Bold, on"><i><svg class="cp-icon"><use href="#i-bold"/></svg></i></button>
+          <button class="t" aria-label="Italic"><i><svg class="cp-icon"><use href="#i-italic"/></svg></i></button>
+          <button class="t" aria-label="Heading"><i><svg class="cp-icon"><use href="#i-heading"/></svg></i></button>
+          <button class="t" aria-label="Bulleted list"><i><svg class="cp-icon"><use href="#i-list"/></svg></i></button>
+          <button class="t" aria-label="Quote"><i><svg class="cp-icon"><use href="#i-quote"/></svg></i></button>
+          <span class="sep"></span>
+          <button class="t" aria-label="Add photos or videos"><i><svg class="cp-icon"><use href="#i-image"/></svg></i></button>
+          <button class="t" aria-label="Change place"><i><svg class="cp-icon"><use href="#i-pin"/></svg></i></button>
+        </div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Diary · read</b>A page as it will be remembered · tap Edit to write</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll">
+          <div class="biz-top" style="justify-content:space-between"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon "><use href="#i-back"/></svg></button><span style="display:flex;align-items:center;gap:8px"><button class="cp-btn md" style="height:48px;padding:0 20px;font-size:17px;background:var(--cp-surface);color:var(--cp-text);box-shadow:inset 0 0 0 1px var(--cp-border)">Edit</button><button class="cp-icon-btn flat" aria-label="Delete this page"><svg class="cp-icon "><use href="#i-trash"/></svg></button></span></div>
+          <p class="note" style="margin:12px 0 8px">Friday 6 November</p>
+          <h1 style="font-family:var(--cp-font-title);font-weight:600;font-size:28px;line-height:34px;margin:0 0 14px">Hontanas</h1>
+          <div class="dy-read">
+            <p>A long, flat day across the meseta. <b>Wind in my face</b> from the first step and <i>no shade</i> at all until the little village appeared.</p>
+            <div class="gap"></div>
+            <div class="li"><span class="dot">•</span><p>lentil soup</p></div>
+            <div class="li"><span class="dot">•</span><p>bread and a <b>very</b> cold beer</p></div>
+            <div class="gap"></div>
+            <div class="q"><p>“Slow down,” said a Dutch woman. “The Camino will wait.”</p></div>
+          </div>
+          <div class="dy-grid" style="margin-top:16px">
+            <div class="dy-tile"><div class="cp-img"></div></div>
+            <div class="dy-tile"><div class="cp-img v2"></div></div>
+            <div class="dy-tile clip"><span class="play"><svg class="cp-icon" style="fill:currentColor"><use href="#i-play"/></svg></span><span class="len">0:42 · 36 MB</span></div>
+            <div class="dy-tile"><div class="cp-img v5"></div></div>
+          </div>
+          <div class="dy-place" style="margin-top:14px;display:inline-flex;padding:0 18px 0 4px"><span class="pin"><svg class="cp-icon"><use href="#i-pin"/></svg></span><b>Hontanas, Castilla y León</b></div>
+          <p class="note" style="margin:12px 0 0;font-size:14px">Saved on this phone</p>
         </div>
         <span class="home-ind"></span>
       </div>
@@ -2921,7 +3165,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     <div class="icon-cell"><svg class="cp-icon"><use href="#i-chat"/></svg>whatsapp</div>
     <div class="icon-cell"><svg class="cp-icon"><use href="#i-msg"/></svg>message</div>
     <div class="icon-cell"><svg class="cp-icon"><use href="#i-bolt"/></svg>instant</div>
-    <div class="icon-cell"><svg class="cp-icon"><use href="#i-sos"/></svg>sos</div><div class="icon-cell"><svg class="cp-icon"><use href="#i-heli"/></svg>helicopter</div><div class="icon-cell"><svg class="cp-icon"><use href="#i-city"/></svg>city</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-pencil"/></svg>write</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-link"/></svg>link</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-wifi"/></svg>wifi</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-utensils"/></svg>food</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-wash"/></svg>laundry</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-bike"/></svg>bike</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-plug"/></svg>charging</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-clock"/></svg>hours</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-image"/></svg>photo</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-copy"/></svg>copy</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-book"/></svg>article</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-shield"/></svg>policy</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-phone"/></svg>call</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-tagpeople"/></svg>tag people</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-briefcase"/></svg>business</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-store"/></svg>shop</div>
+    <div class="icon-cell"><svg class="cp-icon"><use href="#i-sos"/></svg>sos</div><div class="icon-cell"><svg class="cp-icon"><use href="#i-heli"/></svg>helicopter</div><div class="icon-cell"><svg class="cp-icon"><use href="#i-city"/></svg>city</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-pencil"/></svg>write</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-link"/></svg>link</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-wifi"/></svg>wifi</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-utensils"/></svg>food</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-wash"/></svg>laundry</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-bike"/></svg>bike</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-plug"/></svg>charging</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-clock"/></svg>hours</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-image"/></svg>photo</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-copy"/></svg>copy</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-book"/></svg>article</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-shield"/></svg>policy</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-phone"/></svg>call</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-tagpeople"/></svg>tag people</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-briefcase"/></svg>business</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-store"/></svg>shop</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-diary"/></svg>diary</div>
   </div>
 </section>
 
@@ -2967,17 +3211,19 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
 <tr><td><code>surfaceInverse</code></td><td><span class="sample-pill" style="background:#14365D;color:#FFFDF8;font-size:13px;box-shadow:inset 0 0 0 1px var(--cp-border)">#14365D</span></td><td><span class="sample-pill" style="background:#1E4A7A;color:#FFFDF8;font-size:13px;box-shadow:inset 0 0 0 1px var(--cp-border)">#1E4A7A</span></td><td>The hero card: journey card, Connect your smartwatch, promo banners.</td></tr>
 <tr><td><code>border</code></td><td><span class="sample-pill" style="background:#E4D7BF;color:#14365D;font-size:13px;box-shadow:inset 0 0 0 1px var(--cp-border)">#E4D7BF</span></td><td><span class="sample-pill" style="background:#2B405C;color:#FFFDF8;font-size:13px;box-shadow:inset 0 0 0 1px var(--cp-border)">#2B405C</span></td><td>Hairlines and card edges.</td></tr>
 <tr><td><code>text</code></td><td><span class="sample-pill" style="background:#14365D;color:#FFFDF8;font-size:13px;box-shadow:inset 0 0 0 1px var(--cp-border)">#14365D</span></td><td><span class="sample-pill" style="background:#F6EFE2;color:#14365D;font-size:13px;box-shadow:inset 0 0 0 1px var(--cp-border)">#F6EFE2</span></td><td>Body text and headlines.</td></tr>
-<tr><td><code>textMuted</code></td><td><span class="sample-pill" style="background:#556274;color:#FFFDF8;font-size:13px;box-shadow:inset 0 0 0 1px var(--cp-border)">#556274</span></td><td><span class="sample-pill" style="background:#A9B6C8;color:#14365D;font-size:13px;box-shadow:inset 0 0 0 1px var(--cp-border)">#A9B6C8</span></td><td>Secondary text, and the inactive tab (icon and label).</td></tr>
+<tr><td><code>textMuted</code></td><td><span class="sample-pill" style="background:#556274;color:#FFFDF8;font-size:13px;box-shadow:inset 0 0 0 1px var(--cp-border)">#556274</span></td><td><span class="sample-pill" style="background:#A9B6C8;color:#14365D;font-size:13px;box-shadow:inset 0 0 0 1px var(--cp-border)">#A9B6C8</span></td><td>Secondary text.</td></tr>
 <tr><td><code>textPlaceholder</code></td><td><span class="sample-pill" style="background:#8C8272;color:#FFFDF8;font-size:13px;box-shadow:inset 0 0 0 1px var(--cp-border)">#8C8272</span></td><td><span class="sample-pill" style="background:#8D9BB0;color:#14365D;font-size:13px;box-shadow:inset 0 0 0 1px var(--cp-border)">#8D9BB0</span></td><td>Placeholder text in a field.</td></tr>
 <tr><td><code>textInverse</code></td><td><span class="sample-pill" style="background:#F6EFE2;color:#14365D;font-size:13px;box-shadow:inset 0 0 0 1px var(--cp-border)">#F6EFE2</span></td><td><span class="sample-pill" style="background:#F6EFE2;color:#14365D;font-size:13px;box-shadow:inset 0 0 0 1px var(--cp-border)">#F6EFE2</span></td><td>Text on a hero card (cream in both modes).</td></tr>
 <tr><td><code>textInverseAccent</code></td><td><span class="sample-pill" style="background:#F3DFA6;color:#14365D;font-size:13px;box-shadow:inset 0 0 0 1px var(--cp-border)">#F3DFA6</span></td><td><span class="sample-pill" style="background:#F3DFA6;color:#14365D;font-size:13px;box-shadow:inset 0 0 0 1px var(--cp-border)">#F3DFA6</span></td><td>Pale gold text on a hero card.</td></tr>
 <tr><td><code>textAccent</code></td><td><span class="sample-pill" style="background:#7A5A0C;color:#FFFDF8;font-size:13px;box-shadow:inset 0 0 0 1px var(--cp-border)">#7A5A0C</span></td><td><span class="sample-pill" style="background:#E8B53A;color:#14365D;font-size:13px;box-shadow:inset 0 0 0 1px var(--cp-border)">#E8B53A</span></td><td>Gold text on the page or a card.</td></tr>
-<tr><td><code>action</code></td><td><span class="sample-pill" style="background:#14365D;color:#FFFDF8;font-size:13px;box-shadow:inset 0 0 0 1px var(--cp-border)">#14365D</span></td><td><span class="sample-pill" style="background:#8FB3E0;color:#14365D;font-size:13px;box-shadow:inset 0 0 0 1px var(--cp-border)">#8FB3E0</span></td><td>Links, ghost buttons, the active tab, primary button fill.</td></tr>
+<tr><td><code>action</code></td><td><span class="sample-pill" style="background:#14365D;color:#FFFDF8;font-size:13px;box-shadow:inset 0 0 0 1px var(--cp-border)">#14365D</span></td><td><span class="sample-pill" style="background:#8FB3E0;color:#14365D;font-size:13px;box-shadow:inset 0 0 0 1px var(--cp-border)">#8FB3E0</span></td><td>Links, ghost buttons, primary button fill.</td></tr>
 <tr><td><code>onAction</code></td><td><span class="sample-pill" style="background:#F6EFE2;color:#14365D;font-size:13px;box-shadow:inset 0 0 0 1px var(--cp-border)">#F6EFE2</span></td><td><span class="sample-pill" style="background:#0F1A2B;color:#FFFDF8;font-size:13px;box-shadow:inset 0 0 0 1px var(--cp-border)">#0F1A2B</span></td><td>Label of a primary button.</td></tr>
 <tr><td><code>highlight</code></td><td><span class="sample-pill" style="background:#D9A21B;color:#14365D;font-size:13px;box-shadow:inset 0 0 0 1px var(--cp-border)">#D9A21B</span></td><td><span class="sample-pill" style="background:#D9A21B;color:#14365D;font-size:13px;box-shadow:inset 0 0 0 1px var(--cp-border)">#D9A21B</span></td><td>Gold fills: badges, the gold button, progress.</td></tr>
 <tr><td><code>onHighlight</code></td><td><span class="sample-pill" style="background:#14365D;color:#FFFDF8;font-size:13px;box-shadow:inset 0 0 0 1px var(--cp-border)">#14365D</span></td><td><span class="sample-pill" style="background:#14365D;color:#FFFDF8;font-size:13px;box-shadow:inset 0 0 0 1px var(--cp-border)">#14365D</span></td><td>Text and icons on gold. Navy in both modes, because gold does not change.</td></tr>
 <tr><td><code>danger</code></td><td><span class="sample-pill" style="background:#A63D2F;color:#FFFDF8;font-size:13px;box-shadow:inset 0 0 0 1px var(--cp-border)">#A63D2F</span></td><td><span class="sample-pill" style="background:#E07868;color:#14365D;font-size:13px;box-shadow:inset 0 0 0 1px var(--cp-border)">#E07868</span></td><td>Errors, hazards, SOS.</td></tr>
 <tr><td><code>onDanger</code></td><td><span class="sample-pill" style="background:#FFFDF8;color:#14365D;font-size:13px;box-shadow:inset 0 0 0 1px var(--cp-border)">#FFFDF8</span></td><td><span class="sample-pill" style="background:#17263B;color:#FFFDF8;font-size:13px;box-shadow:inset 0 0 0 1px var(--cp-border)">#17263B</span></td><td>Label of a danger button.</td></tr>
+<tr><td><code>tabActive</code></td><td><span class="sample-pill" style="background:#14365D;color:#FFFDF8;font-size:13px;box-shadow:inset 0 0 0 1px var(--cp-border)">#14365D</span></td><td><span class="sample-pill" style="background:#FFFFFF;color:#14365D;font-size:13px;box-shadow:inset 0 0 0 1px var(--cp-border)">#FFFFFF</span></td><td>The active tab of the tab bar, icon and label. Blue in light mode, white in dark mode: the brightest thing on the bar.</td></tr>
+<tr><td><code>tabInactive</code></td><td><span class="sample-pill" style="background:#556274;color:#FFFDF8;font-size:13px;box-shadow:inset 0 0 0 1px var(--cp-border)">#556274</span></td><td><span class="sample-pill" style="background:#BAC6D6;color:#14365D;font-size:13px;box-shadow:inset 0 0 0 1px var(--cp-border)">#BAC6D6</span></td><td>The inactive tabs, icon and label. Stone in light mode; in dark mode a little lighter than <code>textMuted</code> so they stay easy to see, and always clearly quieter than the active tab. Only the tab bar uses these two roles, so changing them never changes a caption or a link.</td></tr>
     </table>
   </div>
 
@@ -2988,14 +3234,16 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
 <tr><td><code>text</code> on <code>bg</code><br><span class="note">body text on the screen</span></td><td><span class="sample-pill" style="background:#F6EFE2;color:#14365D;box-shadow:inset 0 0 0 1px var(--cp-border)">Buen Camino</span></td><td class="mono">10.7 : 1</td><td><span class="sample-pill" style="background:#0F1A2B;color:#F6EFE2">Buen Camino</span></td><td class="mono">15.3 : 1</td><td class="pass">≥ 4.5 ✓</td></tr>
 <tr><td><code>text</code> on <code>surface</code><br><span class="note">text on a card</span></td><td><span class="sample-pill" style="background:#FFFDF8;color:#14365D;box-shadow:inset 0 0 0 1px var(--cp-border)">Buen Camino</span></td><td class="mono">12.0 : 1</td><td><span class="sample-pill" style="background:#17263B;color:#F6EFE2">Buen Camino</span></td><td class="mono">13.3 : 1</td><td class="pass">≥ 4.5 ✓</td></tr>
 <tr><td><code>text</code> on <code>surfaceSunken</code><br><span class="note">text on a sunken field</span></td><td><span class="sample-pill" style="background:#EFE5D2;color:#14365D;box-shadow:inset 0 0 0 1px var(--cp-border)">Buen Camino</span></td><td class="mono">9.8 : 1</td><td><span class="sample-pill" style="background:#1E3047;color:#F6EFE2">Buen Camino</span></td><td class="mono">11.7 : 1</td><td class="pass">≥ 4.5 ✓</td></tr>
-<tr><td><code>textMuted</code> on <code>bg</code><br><span class="note">secondary text on the screen; the inactive tab icon and label</span></td><td><span class="sample-pill" style="background:#F6EFE2;color:#556274;box-shadow:inset 0 0 0 1px var(--cp-border)">Buen Camino</span></td><td class="mono">5.4 : 1</td><td><span class="sample-pill" style="background:#0F1A2B;color:#A9B6C8">Buen Camino</span></td><td class="mono">8.5 : 1</td><td class="pass">≥ 4.5 ✓</td></tr>
-<tr><td><code>textMuted</code> on <code>surface</code><br><span class="note">secondary text on a card; the inactive tab icon and label on the tab bar</span></td><td><span class="sample-pill" style="background:#FFFDF8;color:#556274;box-shadow:inset 0 0 0 1px var(--cp-border)">Buen Camino</span></td><td class="mono">6.1 : 1</td><td><span class="sample-pill" style="background:#17263B;color:#A9B6C8">Buen Camino</span></td><td class="mono">7.4 : 1</td><td class="pass">≥ 4.5 ✓</td></tr>
+<tr><td><code>textMuted</code> on <code>bg</code><br><span class="note">secondary text on the screen</span></td><td><span class="sample-pill" style="background:#F6EFE2;color:#556274;box-shadow:inset 0 0 0 1px var(--cp-border)">Buen Camino</span></td><td class="mono">5.4 : 1</td><td><span class="sample-pill" style="background:#0F1A2B;color:#A9B6C8">Buen Camino</span></td><td class="mono">8.5 : 1</td><td class="pass">≥ 4.5 ✓</td></tr>
+<tr><td><code>textMuted</code> on <code>surface</code><br><span class="note">secondary text on a card</span></td><td><span class="sample-pill" style="background:#FFFDF8;color:#556274;box-shadow:inset 0 0 0 1px var(--cp-border)">Buen Camino</span></td><td class="mono">6.1 : 1</td><td><span class="sample-pill" style="background:#17263B;color:#A9B6C8">Buen Camino</span></td><td class="mono">7.4 : 1</td><td class="pass">≥ 4.5 ✓</td></tr>
 <tr><td><code>textMuted</code> on <code>surfaceSunken</code><br><span class="note">secondary text on a sunken field</span></td><td><span class="sample-pill" style="background:#EFE5D2;color:#556274;box-shadow:inset 0 0 0 1px var(--cp-border)">Buen Camino</span></td><td class="mono">5.0 : 1</td><td><span class="sample-pill" style="background:#1E3047;color:#A9B6C8">Buen Camino</span></td><td class="mono">6.5 : 1</td><td class="pass">≥ 4.5 ✓</td></tr>
 <tr><td><code>textPlaceholder</code> on <code>surface</code><br><span class="note">placeholder text in a field</span></td><td><span class="sample-pill" style="background:#FFFDF8;color:#8C8272;box-shadow:inset 0 0 0 1px var(--cp-border)">Buen Camino</span></td><td class="mono">3.7 : 1</td><td><span class="sample-pill" style="background:#17263B;color:#8D9BB0">Buen Camino</span></td><td class="mono">5.4 : 1</td><td class="pass">≥ 3 ✓</td></tr>
 <tr><td><code>textAccent</code> on <code>bg</code><br><span class="note">gold text on the screen</span></td><td><span class="sample-pill" style="background:#F6EFE2;color:#7A5A0C;box-shadow:inset 0 0 0 1px var(--cp-border)">Buen Camino</span></td><td class="mono">5.6 : 1</td><td><span class="sample-pill" style="background:#0F1A2B;color:#E8B53A">Buen Camino</span></td><td class="mono">9.2 : 1</td><td class="pass">≥ 4.5 ✓</td></tr>
 <tr><td><code>textAccent</code> on <code>surface</code><br><span class="note">gold text on a card</span></td><td><span class="sample-pill" style="background:#FFFDF8;color:#7A5A0C;box-shadow:inset 0 0 0 1px var(--cp-border)">Buen Camino</span></td><td class="mono">6.3 : 1</td><td><span class="sample-pill" style="background:#17263B;color:#E8B53A">Buen Camino</span></td><td class="mono">8.1 : 1</td><td class="pass">≥ 4.5 ✓</td></tr>
-<tr><td><code>action</code> on <code>bg</code><br><span class="note">links and the labels of ghost buttons, icons of the active tab</span></td><td><span class="sample-pill" style="background:#F6EFE2;color:#14365D;box-shadow:inset 0 0 0 1px var(--cp-border)">Buen Camino</span></td><td class="mono">10.7 : 1</td><td><span class="sample-pill" style="background:#0F1A2B;color:#8FB3E0">Buen Camino</span></td><td class="mono">8.1 : 1</td><td class="pass">≥ 4.5 ✓</td></tr>
-<tr><td><code>action</code> on <code>surface</code><br><span class="note">links and icons on a card, the active tab on the tab bar</span></td><td><span class="sample-pill" style="background:#FFFDF8;color:#14365D;box-shadow:inset 0 0 0 1px var(--cp-border)">Buen Camino</span></td><td class="mono">12.0 : 1</td><td><span class="sample-pill" style="background:#17263B;color:#8FB3E0">Buen Camino</span></td><td class="mono">7.0 : 1</td><td class="pass">≥ 4.5 ✓</td></tr>
+<tr><td><code>action</code> on <code>bg</code><br><span class="note">links and the labels of ghost buttons</span></td><td><span class="sample-pill" style="background:#F6EFE2;color:#14365D;box-shadow:inset 0 0 0 1px var(--cp-border)">Buen Camino</span></td><td class="mono">10.7 : 1</td><td><span class="sample-pill" style="background:#0F1A2B;color:#8FB3E0">Buen Camino</span></td><td class="mono">8.1 : 1</td><td class="pass">≥ 4.5 ✓</td></tr>
+<tr><td><code>action</code> on <code>surface</code><br><span class="note">links and icons on a card</span></td><td><span class="sample-pill" style="background:#FFFDF8;color:#14365D;box-shadow:inset 0 0 0 1px var(--cp-border)">Buen Camino</span></td><td class="mono">12.0 : 1</td><td><span class="sample-pill" style="background:#17263B;color:#8FB3E0">Buen Camino</span></td><td class="mono">7.0 : 1</td><td class="pass">≥ 4.5 ✓</td></tr>
+<tr><td><code>tabInactive</code> on <code>surface</code><br><span class="note">the inactive tab icon and label on the tab bar</span></td><td><span class="sample-pill" style="background:#FFFDF8;color:#556274;box-shadow:inset 0 0 0 1px var(--cp-border)">Buen Camino</span></td><td class="mono">6.1 : 1</td><td><span class="sample-pill" style="background:#17263B;color:#BAC6D6">Buen Camino</span></td><td class="mono">8.8 : 1</td><td class="pass">≥ 4.5 ✓</td></tr>
+<tr><td><code>tabActive</code> on <code>surface</code><br><span class="note">the active tab icon and label on the tab bar (at least 1.5 times the contrast of an inactive tab)</span></td><td><span class="sample-pill" style="background:#FFFDF8;color:#14365D;box-shadow:inset 0 0 0 1px var(--cp-border)">Buen Camino</span></td><td class="mono">12.0 : 1</td><td><span class="sample-pill" style="background:#17263B;color:#FFFFFF">Buen Camino</span></td><td class="mono">15.3 : 1</td><td class="pass">≥ 4.5 ✓</td></tr>
 <tr><td><code>danger</code> on <code>bg</code><br><span class="note">error text on the screen</span></td><td><span class="sample-pill" style="background:#F6EFE2;color:#A63D2F;box-shadow:inset 0 0 0 1px var(--cp-border)">Buen Camino</span></td><td class="mono">5.5 : 1</td><td><span class="sample-pill" style="background:#0F1A2B;color:#E07868">Buen Camino</span></td><td class="mono">5.9 : 1</td><td class="pass">≥ 4.5 ✓</td></tr>
 <tr><td><code>danger</code> on <code>surface</code><br><span class="note">error text on a card</span></td><td><span class="sample-pill" style="background:#FFFDF8;color:#A63D2F;box-shadow:inset 0 0 0 1px var(--cp-border)">Buen Camino</span></td><td class="mono">6.2 : 1</td><td><span class="sample-pill" style="background:#17263B;color:#E07868">Buen Camino</span></td><td class="mono">5.1 : 1</td><td class="pass">≥ 4.5 ✓</td></tr>
 <tr><td><code>onAction</code> on <code>action</code><br><span class="note">label of a primary button</span></td><td><span class="sample-pill" style="background:#14365D;color:#F6EFE2;box-shadow:inset 0 0 0 1px var(--cp-border)">Buen Camino</span></td><td class="mono">10.7 : 1</td><td><span class="sample-pill" style="background:#8FB3E0;color:#0F1A2B">Buen Camino</span></td><td class="mono">8.1 : 1</td><td class="pass">≥ 4.5 ✓</td></tr>
@@ -3016,9 +3264,9 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
 
   <h3>Example: the tab bar</h3>
   <div class="grid g2">
-    <div class="swatch"><div style="padding:20px;background:#0F1A2B"><div style="display:flex;justify-content:space-around;padding:14px 10px;border-radius:30px;background:#17263B"><span style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#A9B6C8;font-size:13px;font-weight:600"><svg class="cp-icon" style="stroke-width:1.6"><use href="#i-me"/></svg>Me</span><span style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#A9B6C8;font-size:13px;font-weight:600"><svg class="cp-icon" style="stroke-width:1.6"><use href="#i-stays"/></svg>Stays</span><span style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#8FB3E0;font-size:13px;font-weight:600"><svg class="cp-icon" style="stroke-width:2.6"><use href="#i-maps"/></svg>Maps</span><span style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#A9B6C8;font-size:13px;font-weight:600"><svg class="cp-icon" style="stroke-width:1.6"><use href="#i-compass"/></svg>Discover</span></div></div>
-      <div class="body"><p><b>Do</b> · inactive tab = <code>role.muted</code> #A9B6C8, active = <code>role.action</code>, thicker stroke and a bold label.</p><p class="note">Inactive 7.4 : 1 on the bar. The same role gives 6.1 : 1 in light mode.</p></div></div>
-    <div class="swatch"><div style="padding:20px;background:#0F1A2B"><div style="display:flex;justify-content:space-around;padding:14px 10px;border-radius:30px;background:#17263B"><span style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#162D49;font-size:13px;font-weight:600"><svg class="cp-icon" style="stroke-width:1.6"><use href="#i-me"/></svg>Me</span><span style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#162D49;font-size:13px;font-weight:600"><svg class="cp-icon" style="stroke-width:1.6"><use href="#i-stays"/></svg>Stays</span><span style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#8FB3E0;font-size:13px;font-weight:600"><svg class="cp-icon" style="stroke-width:2.6"><use href="#i-maps"/></svg>Maps</span><span style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#162D49;font-size:13px;font-weight:600"><svg class="cp-icon" style="stroke-width:1.6"><use href="#i-compass"/></svg>Discover</span></div></div>
+    <div class="swatch"><div style="padding:20px;background:#0F1A2B"><div style="display:flex;justify-content:space-around;padding:14px 10px;border-radius:30px;background:#17263B"><span style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#BAC6D6;font-size:13px;font-weight:600"><svg class="cp-icon" style="stroke-width:1.6"><use href="#i-me"/></svg>Me</span><span style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#BAC6D6;font-size:13px;font-weight:600"><svg class="cp-icon" style="stroke-width:1.6"><use href="#i-stays"/></svg>Stays</span><span style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#FFFFFF;font-size:13px;font-weight:600"><svg class="cp-icon" style="stroke-width:2.6"><use href="#i-maps"/></svg>Maps</span><span style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#BAC6D6;font-size:13px;font-weight:600"><svg class="cp-icon" style="stroke-width:1.6"><use href="#i-compass"/></svg>Discover</span></div></div>
+      <div class="body"><p><b>Do</b> · inactive tab = <code>role.tabInactive</code> #BAC6D6, active = <code>role.tabActive</code> #FFFFFF, thicker stroke and a bold label.</p><p class="note">Inactive 8.8 : 1 on the bar, active 15.3 : 1: the active tab has at least 1.5 times the contrast of an inactive one. In light mode the same two roles are the blue (12.0 : 1) and the stone (6.1 : 1) the bar always had.</p></div></div>
+    <div class="swatch"><div style="padding:20px;background:#0F1A2B"><div style="display:flex;justify-content:space-around;padding:14px 10px;border-radius:30px;background:#17263B"><span style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#162D49;font-size:13px;font-weight:600"><svg class="cp-icon" style="stroke-width:1.6"><use href="#i-me"/></svg>Me</span><span style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#162D49;font-size:13px;font-weight:600"><svg class="cp-icon" style="stroke-width:1.6"><use href="#i-stays"/></svg>Stays</span><span style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#FFFFFF;font-size:13px;font-weight:600"><svg class="cp-icon" style="stroke-width:2.6"><use href="#i-maps"/></svg>Maps</span><span style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#162D49;font-size:13px;font-weight:600"><svg class="cp-icon" style="stroke-width:1.6"><use href="#i-compass"/></svg>Discover</span></div></div>
       <div class="body"><p><b>Don't</b> · a fixed navy at 42% for the inactive tab (#162D49): 1.1 : 1 on the dark bar, the icons vanish. It was 2.4 : 1 in light mode too.</p><p class="note">A person walking in bright sun needs the inactive tabs as much as anyone: low contrast hides them.</p></div></div>
   </div>
 </section>

@@ -1,0 +1,85 @@
+{
+  "slug": "camino-portugues-09",
+  "name": "Pontevedra to Caldas de Reis",
+  "route_slug": "camino-portugues",
+  "stage_number": 9,
+  "route_id": "20000000-0000-0000-0000-000000000002",
+  "stage_id": "40000000-0000-0000-0001-000000000009",
+  "osm_extracts": [
+    "https://download.geofabrik.de/europe/spain/galicia-latest.osm.pbf"
+  ],
+  "search_bbox": [
+    -8.77,
+    42.34,
+    -8.52,
+    42.69
+  ],
+  "coastal": true,
+  "route_name_regex": "cami(nho|no|ño) portugu[eéê]s\\b",
+  "route_exclude_regex": "\\bCPC\\b|costa|espiritual|braga|interior|plata|ap[uú]lia",
+  "fallback_route": "camino-portugues-09.route.geojson",
+  "clip_km": 6,
+  "min_route_km": 7.7,
+  "buffer_km": 3,
+  "maxzoom": 15,
+  "waypoints": [
+    {
+      "name": "Pontevedra",
+      "at": [
+        -8.64316,
+        42.43189
+      ]
+    },
+    {
+      "name": "Santa María de Alba",
+      "at": [
+        -8.65143,
+        42.47587
+      ]
+    },
+    {
+      "name": "A Cancela",
+      "at": [
+        -8.64717,
+        42.51479
+      ]
+    },
+    {
+      "name": "Briallos",
+      "at": [
+        -8.63829,
+        42.56431
+      ]
+    },
+    {
+      "name": "Caldas de Reis",
+      "at": [
+        -8.64217,
+        42.60411
+      ]
+    }
+  ],
+  "render_checks": [
+    {
+      "name": "Pontevedra z15",
+      "at": [
+        -8.64316,
+        42.43189,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    },
+    {
+      "name": "Caldas de Reis z15",
+      "at": [
+        -8.64217,
+        42.60411,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    }
+  ],
+  "generated_from": "catalog/camino-portugues/09.json"
+}

@@ -5,19 +5,24 @@
 //   useDiaryPage(id)    one page for the editor, read once. `new` is a blank page. A page that is not there (deleted, or
 //                       another account's) or no session at all is "missing", never an error.
 //   usePageSaver()      the autosave of the editor (autosave.ts), tied to the screen: it writes when the screen goes away and
-//                       when the app goes to the background, so leaving never loses text.
+//                       when the app goes to the background, so leaving never loses text (and adds photos and videos through
+//                       the same queue, so an attachment never races a save of the text).
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AppState } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import { useAuth } from '@/lib/auth';
 import { createPageSaver, type SaverView } from './autosave';
-import { deleteEntry, loadEntries, newId, saveEntry } from './storage';
+import { attachMedia, deleteEntry, loadEntries, newId, saveEntry, sweepMedia } from './storage';
 import type { DiaryEntry } from './store';
 
 /** The route id of a blank page: /diary/new. */
 export const NEW_PAGE = 'new';
 
 const NONE: DiaryEntry[] = [];
+
+// Files of a page that was never written (the app was killed between copying a file and writing its page) are swept once per run
+// of the app and person, the first time the diary is read. The sweep takes its turn like every other thing the store does.
+const swept = new Set<string>();
 
 function useUid(): string | null {
   const { session } = useAuth();
@@ -32,7 +37,10 @@ export function useDiary() {
     useCallback(() => {
       if (!uid) { setLoaded({ uid, entries: NONE }); return; }
       let alive = true;
-      void loadEntries(uid).then((entries) => { if (alive) setLoaded({ uid, entries }); });
+      void loadEntries(uid).then((entries) => {
+        if (alive) setLoaded({ uid, entries });
+        if (!swept.has(uid)) { swept.add(uid); void sweepMedia(uid); }
+      });
       return () => { alive = false; };
     }, [uid]),
   );
@@ -79,6 +87,7 @@ export function usePageSaver(uid: string, initial: DiaryEntry | null) {
   const [saver] = useState(() => createPageSaver({
     save: (entry) => saveEntry(uid, entry),
     remove: (id) => deleteEntry(uid, id),
+    attach: (entry, picked) => attachMedia(uid, entry, picked),
     newId,
     onChange: (v) => { if (alive.current) setView(v); },
   }, initial));

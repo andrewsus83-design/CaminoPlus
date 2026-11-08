@@ -1,0 +1,37 @@
+{
+  "n": 7,
+  "name": "O Porriño to Redondela",
+  "from": {
+    "name": "O Porriño",
+    "lat": 42.16188,
+    "lng": -8.62027,
+    "source": "photon.komoot.io node/299059474 place=town"
+  },
+  "to": {
+    "name": "Redondela",
+    "lat": 42.28422,
+    "lng": -8.6086,
+    "source": "photon.komoot.io node/84824093 place=town"
+  },
+  "via": [
+    {
+      "name": "Mos",
+      "lat": 42.19704,
+      "lng": -8.59859,
+      "source": "nominatim relation/12684582 boundary=administrative place=civil_parish wikidata=Q12393630"
+    },
+    {
+      "name": "O Souto",
+      "lat": 42.25743,
+      "lng": -8.60604,
+      "source": "nominatim node/2464733175 place=hamlet (Redondela)"
+    }
+  ],
+  "extracts": [
+    "galicia"
+  ],
+  "coastal": true,
+  "distance_km": null,
+  "distance_source": null,
+  "notes": "from is O Porriño (end of stage 6). Xunta de Galicia stage O Porriño to Redondela, with Mos and O Souto on the way. Mos: the civil parish relation (relation/12684582), 0.83 km from the OSM route; the municipality relation is 0.77 km away and was not used. O Souto: hamlet node in Redondela (Nominatim also finds places called O Souto in Mos and in Vigo, 2.4 and 3.1 km from the route; not used). Redondela: place=town node from Photon, 0.06 km from the route. coastal is true: Redondela lies at the head of the Ría de Vigo, and an OSM API map call around the town finds natural=coastline ways (the nearest node is 0.08 km from a point 0.4 km west of the town point). The relation 12786089 (also named Caminho Português de Santiago, but ref CPC, A Guarda to Redondela, the Costa route) ends here too and is excluded by route_exclude_regex. Checked against OSM relation 12786090 (Caminho Português de Santiago, ref CP), read through the OSM API on 2026-11-07: the 15.9 km between the two ends stay within 0.89 km of the straight lines through these points. Published figures seen, not copied into distance_km: Rother 16.7 km, Vagamundos 16 km."
+}

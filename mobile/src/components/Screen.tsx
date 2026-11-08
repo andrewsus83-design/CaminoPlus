@@ -8,12 +8,14 @@ import { layout, role } from '@/theme';
 // one token, the Map's "Whole route / Near me" switch included, so the distance to the top is the same everywhere.
 // src/lib/__tests__/screenTop.test.ts fails when a screen brings its own number back.
 // A screen pushed over the tabs (Settings) has no tab bar under it: `tabBar={false}` drops the room kept for the bar.
-export function Screen({ children, scroll = true, margin = layout.screenMargin, tabBar = true }: { children: ReactNode; scroll?: boolean; margin?: number; tabBar?: boolean }) {
+// A screen with a text field at the top (the Library search) sets `keyboard`: a tap on a button still works while the keyboard is up
+// (without it the first tap only closes the keyboard), and scrolling the list closes the keyboard.
+export function Screen({ children, scroll = true, margin = layout.screenMargin, tabBar = true, keyboard = false }: { children: ReactNode; scroll?: boolean; margin?: number; tabBar?: boolean; keyboard?: boolean }) {
   const insets = useSafeAreaInsets();
   const pad = { paddingTop: insets.top + layout.screenTop, paddingHorizontal: margin };
   if (!scroll) return <View style={[{ flex: 1, backgroundColor: role.bg }, pad]}>{children}</View>;
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: role.bg }} contentContainerStyle={[pad, { paddingBottom: (tabBar ? layout.tabbarHeight : 0) + insets.bottom + 40, gap: 16 }]}>
+    <ScrollView style={{ flex: 1, backgroundColor: role.bg }} keyboardShouldPersistTaps={keyboard ? 'handled' : 'never'} keyboardDismissMode={keyboard ? 'on-drag' : 'none'} contentContainerStyle={[pad, { paddingBottom: (tabBar ? layout.tabbarHeight : 0) + insets.bottom + 40, gap: 16 }]}>
       {children}
     </ScrollView>
   );

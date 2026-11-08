@@ -60,7 +60,7 @@ export default function DownloadData() {
       <Card style={{ gap: 8 }}>
         <AppText variant="label">What is in the file</AppText>
         {INCLUDED.map((t) => <AppText key={t} variant="small">• {t}</AppText>)}
-        <AppText variant="caption" muted>Photos and videos are not inside the file. Other people appear only as ids. Your diary is not in the file: its pages are only on this phone, and we never receive them.</AppText>
+        <AppText variant="caption" muted>Photos and videos are not inside the file. Other people appear only as ids. Your diary is not in the file: its pages, photos, videos and places are only on this phone, and we never receive them.</AppText>
       </Card>
       {!!error && <FormMessage>{error}</FormMessage>}
       {done && <Card style={{ backgroundColor: c.goldWash }}><AppText variant="small">Your data was shared. Keep the file somewhere safe: it is personal.</AppText></Card>}

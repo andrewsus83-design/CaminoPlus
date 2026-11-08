@@ -166,11 +166,18 @@ jobs:
       - run: npm ci --no-audit --no-fund
       # osmium, shapely and pyproj are what route_from_osm.py needs; its tests build a tiny PBF and run the real script.
       - run: pip install -q -r requirements.txt
+      # The osmium command, the same package the stage builds install: test_merge_extracts.py runs merge_extracts.sh with it.
+      - name: Install osmium-tool
+        timeout-minutes: 5
+        run: |
+          sudo apt-get -o Acquire::Retries=3 update -qq
+          sudo apt-get -o Acquire::Retries=3 install -y -qq osmium-tool
       - name: Syntax of the scripts
         run: |
           for f in scripts/*.mjs scripts/lib/*.mjs test/*.mjs viewer/style.js; do node --check "$f"; done
           python -m py_compile scripts/*.py
           bash -n scripts/build_stage.sh
+          bash -n scripts/merge_extracts.sh
           shellcheck scripts/*.sh
       - name: Unit tests (quality gates, calibration, stage planner, publish against a mock Supabase, dev server, PMTiles header, stage generator, route selection)
         run: |

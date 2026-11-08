@@ -17,7 +17,8 @@
 #   time, the same build with the stricter gates (route must come from OSM, the ocean polygons of a coastal stage
 #   must be the real ones, OSM data must be fresh, size and tile count inside the band of the stage file and
 #   close to the live pack), then upload + register
-#   through public.register_offline_pack. It runs in the GitHub Environment "pack-publish": the owner can
+#   through public.register_offline_pack. Its first step stops the job in seconds, red, when the Supabase secrets
+#   are not set (it never ends green with nothing uploaded). It runs in the GitHub Environment "pack-publish": the owner can
 #   add required reviewers there, so nothing reaches Pilgrim Plus users without an approval.
 #
 # Artifacts hold JSON only (manifest, measurements, render report). The .pmtiles files are never
@@ -234,6 +235,22 @@ jobs:
       SLUG: ${{ matrix.slug }}
       PACK: ${{ matrix.pack }}
     steps:
+      # First, before ten minutes of building: a publish job exists only because somebody asked to publish (the monthly
+      # schedule, or a manual run with "publish"), so missing secrets end it red at once and say where to add them. It
+      # used to run the quality gates as a dry run and end green with nothing uploaded, which reads as "published".
+      # Only two booleans (is the secret set?) reach this step, never a value: the values go to the last step.
+      - name: Check that the Supabase secrets are set
+        env:
+          HAVE_SUPABASE_URL: ${{ secrets.SUPABASE_URL != '' }}
+          HAVE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY != '' }}
+        run: |
+          if [ "$HAVE_SUPABASE_URL" != true ] || [ "$HAVE_SUPABASE_SERVICE_ROLE_KEY" != true ]; then
+            msg="$SLUG: nothing can be published because SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are not both set. Add them as secrets of the GitHub Environment pack-publish (Settings, Environments, pack-publish, Add environment secret) and run the workflow again."
+            echo "::error title=publish secrets missing::$msg"
+            echo "$msg" >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
@@ -256,13 +273,7 @@ jobs:
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
           R2_BUCKET: ${{ vars.R2_BUCKET || 'caminoplus-packs' }}
-        run: |
-          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_SERVICE_ROLE_KEY" ]; then
-            echo "$SLUG: SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY secrets not set; quality gates only, no upload" | tee -a "$GITHUB_STEP_SUMMARY"
-            node scripts/publish_pack.mjs "dist/$PACK.json" --stage "$STAGE" --target "$PACK_TARGET" --dry-run
-            exit 0
-          fi
-          node scripts/publish_pack.mjs "dist/$PACK.json" --stage "$STAGE" --target "$PACK_TARGET"
+        run: node scripts/publish_pack.mjs "dist/$PACK.json" --stage "$STAGE" --target "$PACK_TARGET"
 
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()

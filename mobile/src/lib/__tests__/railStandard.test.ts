@@ -1,9 +1,11 @@
 // Plain-node checks that the app has ONE action rail (love, bookmark, comments, share), Discover's, and that Discover and the
-// full-screen journey viewer both draw it with the shared component and open the shared comments sheet. A second hand-made
-// rail, or a theme colour that flips in dark mode on a surface that does not, fails here. Run: npm run test:lib
+// full-screen journey viewer both draw it with the shared component, put it on the same spot of the screen, and open the
+// shared comments sheet. A second hand-made rail, a screen that gives the rail numbers of its own, or a theme colour that
+// flips in dark mode on a surface that does not, fails here. Run: npm run test:lib
 //
-// The standard is documented in design/index.html ("Action rail"); the data is lib/actionRail.ts, the drawing is
-// components/ActionRail.tsx, the colours that never flip are components/fixedColors.ts.
+// The standard is documented in design/index.html ("Action rail"); the data is lib/actionRail.ts, the drawing and the
+// position are components/ActionRail.tsx (RAIL_BOTTOM above the safe area, the screen margin from the right edge, set by
+// the rail itself), the colours that never flip are components/fixedColors.ts.
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
@@ -65,8 +67,10 @@ check('no second hand-made rail: the old read-only pill is gone and nothing else
     const src = code(read(f));
     if (/EngagementRail|engagementItems/.test(src)) offenders.push(`${f}: still names the old rail`);
     if (f !== RAIL && /rgba\(255,\s*253,\s*248,\s*0?\.85\)|FIXED\.railCircle/.test(src) && f !== 'src/components/fixedColors.ts') offenders.push(`${f}: draws the rail's cream circle`);
-    // the bookmark icon belongs to the rail: its name is only in the rail model and in the icon set
-    if (!['src/lib/actionRail.ts', 'src/components/Icon.tsx'].includes(f) && /\bname=\{?[^}\n]*['"]bookmark['"]|\bicon:\s*['"]bookmark['"]/.test(src)) offenders.push(`${f}: uses the bookmark icon outside the rail`);
+    // the bookmark icon belongs to the rail: its name is only in the rail model and in the icon set. The one other place is the Library's
+    // own bookmark buttons (src/features/library: the button next to the diary, and the one on each row), which are buttons of a list
+    // and not a rail: no circles on a photo, no counts, no comments or share.
+    if (!['src/lib/actionRail.ts', 'src/components/Icon.tsx'].includes(f) && !f.startsWith('src/features/library/') && /\bname=\{?[^}\n]*['"]bookmark['"]|\bicon:\s*['"]bookmark['"]/.test(src)) offenders.push(`${f}: uses the bookmark icon outside the rail`);
   }
   assert.deepEqual(offenders, [], 'use components/ActionRail.tsx (data: lib/actionRail.ts) instead');
 });
@@ -79,8 +83,76 @@ check('the rail is the standard: 56 px circles, 14 px apart, at the screen margi
   assert.match(src, /backgroundColor: FIXED\.railCircle/);
   assert.match(src, /it\.tone === 'love' \? FIXED\.red : FIXED\.blue/);
   assert.match(src, /fontSize: 11, lineHeight: 13/, 'the count under the icon');
-  assert.match(code(read(DISCOVER)), /bottom=\{insets\.bottom \+ 120\}/, 'Discover keeps the rail above the tab bar');
   for (const f of [DISCOVER, VIEWER]) assert.match(code(read(f)), /paddingRight: layout\.screenMargin \+ RAIL_CIRCLE \+ 12/, `${f}: the caption keeps clear of the rail`);
+  assert.match(code(read(VIEWER)), /padding: small \? 12 : 32, paddingRight: small \? 12 : layout\.screenMargin \+ RAIL_CIRCLE \+ 12/, 'the text of a text-only post keeps clear of the rail in the viewer, as the caption does');
+});
+
+// ---- where the rail sits: one place, owned by the rail, the same on every screen that draws it
+type Jsx = ts.JsxSelfClosingElement | ts.JsxOpeningElement;
+function jsx(file: string, tag: string): { sf: ts.SourceFile; found: Jsx[] } {
+  const sf = ts.createSourceFile(file, read(file), ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+  const found: Jsx[] = [];
+  const visit = (node: ts.Node) => {
+    if ((ts.isJsxSelfClosingElement(node) || ts.isJsxOpeningElement(node)) && node.tagName.getText(sf) === tag) found.push(node);
+    ts.forEachChild(node, visit);
+  };
+  visit(sf);
+  return { sf, found };
+}
+const rails = files.filter((f) => /<ActionRail\b/.test(code(read(f)))); // every screen that draws the rail, not only the two known ones
+
+check('the rail places itself: RAIL_BOTTOM above the safe area and the screen margin from the right, with no prop to change either', () => {
+  const src = code(read(RAIL));
+  assert.equal([...src.matchAll(/\bRAIL_BOTTOM\s*=/g)].length, 1, 'the offset is defined once');
+  assert.match(src, /export const RAIL_BOTTOM = 120;/, "Discover's number: the lowest circle 120 above the safe area, clear of the tab bar");
+  assert.match(src, /const insets = useSafeAreaInsets\(\);/, 'the rail reads the safe area itself');
+  assert.match(src, /position: 'absolute', right: layout\.screenMargin, bottom: insets\.bottom \+ RAIL_BOTTOM,/, 'the one place: screen margin from the right, RAIL_BOTTOM above the safe area');
+  assert.match(src, /export function ActionRail\(\{ items, onPress \}: \{ items: RailItem\[\]; onPress: \(kind: RailKind\) => void \}\)/, 'its props are what to show and what a tap does: no bottom, right or style');
+});
+
+check('every screen that draws the rail (Discover, the journey viewer) hands it items and onPress and nothing about where', () => {
+  assert.ok(rails.includes(DISCOVER) && rails.includes(VIEWER), `rails are drawn in: ${rails.join(', ')}`);
+  for (const f of rails) {
+    const { sf, found } = jsx(f, 'ActionRail');
+    assert.equal(found.length, 1, `${f} draws the rail once`);
+    const names = found[0].attributes.properties.map((p) => (ts.isJsxAttribute(p) ? p.name.getText(sf) : '...spread')).sort();
+    assert.deepEqual(names, ['items', 'onPress'], `${f} gives the rail a prop that places it (or spreads one): the rail sits where the rail puts it, on every screen`);
+  }
+});
+
+check('the rail is drawn straight into a page that fills the window: that page has width and height and no offset, margin or transform', () => {
+  const moves = /^(position|top|bottom|left|right|start|end|inset\w*|margin\w*|transform|translate\w*)$/;
+  for (const f of rails) {
+    const { sf, found } = jsx(f, 'ActionRail');
+    let page: ts.Node | undefined = found[0].parent;
+    while (page && !ts.isJsxElement(page)) page = page.parent; // the element the rail is a child of
+    assert.ok(page && ts.isJsxElement(page), `${f}: the rail is inside an element`);
+    const open = (page as ts.JsxElement).openingElement;
+    assert.equal(open.tagName.getText(sf), 'View', `${f}: the rail's page is a View`);
+    const style = open.attributes.properties.find((p): p is ts.JsxAttribute => ts.isJsxAttribute(p) && p.name.getText(sf) === 'style');
+    const lit = style?.initializer && ts.isJsxExpression(style.initializer) ? style.initializer.expression : undefined;
+    assert.ok(lit && ts.isObjectLiteralExpression(lit), `${f}: the page has a style object`);
+    const keys = (lit as ts.ObjectLiteralExpression).properties.map((p) => (p.name ? p.name.getText(sf) : '...'));
+    assert.ok(keys.includes('width') && keys.includes('height'), `${f}: the page is width x height of the window (${keys.join(', ')})`);
+    assert.deepEqual(keys.filter((k) => moves.test(k) || k === '...'), [], `${f}: something between the rail and the screen moves it`);
+    assert.match(code(read(f)), /const \{ width, height \} = useWindowDimensions\(\);/, `${f}: width and height are the window's`);
+  }
+});
+
+check("Discover's caption ends where the lowest circle does, through RAIL_BOTTOM: no second copy of the number", () => {
+  const discover = code(read(DISCOVER));
+  assert.match(discover, /import \{[^}]*\bRAIL_BOTTOM\b[^}]*\} from '@\/components\/ActionRail'/);
+  assert.match(discover, /paddingBottom: insets\.bottom \+ RAIL_BOTTOM/, "Discover's caption uses the rail's own number");
+  assert.doesNotMatch(discover, /insets\.bottom \+ 120\b/, 'no second copy of the 120');
+});
+
+check('the design page says where the rail sits, with the number the component has, and the old "viewer 28" is gone', () => {
+  const n = /\bRAIL_BOTTOM = (\d+);/.exec(code(read(RAIL)))![1];
+  const page = readFileSync(join(root, '..', 'design', 'index.html'), 'utf8');
+  const section = page.slice(page.indexOf('id="actionrail"'), page.indexOf('id="tabbar"'));
+  assert.ok(section.length > 1000, 'the Action rail section of the design page was found');
+  assert.match(section, new RegExp(`lowest circle ${n} above the safe area`), 'the page states the offset the component uses');
+  assert.doesNotMatch(section, /viewer puts it 28/, 'the viewer has no offset of its own any more');
 });
 
 check('on a surface that does not change in dark mode no colour changes: the rail and Discover use FIXED, never the flipping theme colours', () => {

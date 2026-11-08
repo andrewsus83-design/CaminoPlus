@@ -1,0 +1,113 @@
+{
+  "slug": "camino-portugues-06",
+  "name": "Tui to O Porriño",
+  "route_slug": "camino-portugues",
+  "stage_number": 6,
+  "route_id": "20000000-0000-0000-0000-000000000002",
+  "stage_id": "40000000-0000-0000-0001-000000000006",
+  "osm_extracts": [
+    "https://download.geofabrik.de/europe/spain/galicia-latest.osm.pbf",
+    "https://download.geofabrik.de/europe/portugal-latest.osm.pbf"
+  ],
+  "search_bbox": [
+    -8.77,
+    41.96,
+    -8.5,
+    42.25
+  ],
+  "coastal": false,
+  "route_name_regex": "cami(nho|no|ño) portugu[eéê]s\\b",
+  "route_exclude_regex": "\\bCPC\\b|costa|espiritual|braga|interior|plata|ap[uú]lia",
+  "fallback_route": "camino-portugues-06.route.geojson",
+  "clip_km": 6,
+  "min_route_km": 5.3,
+  "buffer_km": 3,
+  "maxzoom": 15,
+  "quality": {
+    "min_tiles": 310,
+    "max_tiles": 860,
+    "min_size_mb": 2.9,
+    "max_size_mb": 8,
+    "required_layers": [
+      "building",
+      "place",
+      "poi",
+      "transportation",
+      "transportation_name"
+    ],
+    "max_change_ratio": 1.5,
+    "max_osm_age_days": 45
+  },
+  "waypoints": [
+    {
+      "name": "Tui",
+      "at": [
+        -8.64657,
+        42.05013
+      ]
+    },
+    {
+      "name": "Ponte das Febres",
+      "at": [
+        -8.63743,
+        42.08625
+      ]
+    },
+    {
+      "name": "Gándaras de Budiño",
+      "at": [
+        -8.62907,
+        42.10003
+      ]
+    },
+    {
+      "name": "Centeáns",
+      "at": [
+        -8.64326,
+        42.12835
+      ]
+    },
+    {
+      "name": "O Porriño",
+      "at": [
+        -8.62027,
+        42.16188
+      ]
+    }
+  ],
+  "render_checks": [
+    {
+      "name": "Tui z15",
+      "at": [
+        -8.64657,
+        42.05013,
+        15
+      ],
+      "min_features": {
+        "poi": 140,
+        "transportation": 118,
+        "building": 24
+      },
+      "min_labels": {
+        "place": 1
+      }
+    },
+    {
+      "name": "O Porriño z15",
+      "at": [
+        -8.62027,
+        42.16188,
+        15
+      ],
+      "min_features": {
+        "poi": 369,
+        "transportation": 260,
+        "building": 47
+      },
+      "min_labels": {
+        "place": 1
+      }
+    }
+  ],
+  "generated_from": "catalog/camino-portugues/06.json"
+}

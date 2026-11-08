@@ -1,0 +1,112 @@
+{
+  "slug": "camino-portugues-01",
+  "name": "Porto to Vilarinho",
+  "route_slug": "camino-portugues",
+  "stage_number": 1,
+  "route_id": "20000000-0000-0000-0000-000000000002",
+  "stage_id": "40000000-0000-0000-0001-000000000001",
+  "osm_extracts": [
+    "https://download.geofabrik.de/europe/portugal-latest.osm.pbf"
+  ],
+  "search_bbox": [
+    -8.8,
+    41.05,
+    -8.49,
+    41.43
+  ],
+  "coastal": false,
+  "route_name_regex": "cami(nho|no|ño) portugu[eéê]s\\b",
+  "route_exclude_regex": "\\bCPC\\b|costa|espiritual|braga|interior|plata|ap[uú]lia",
+  "fallback_route": "camino-portugues-01.route.geojson",
+  "clip_km": 6,
+  "min_route_km": 9.1,
+  "buffer_km": 3,
+  "maxzoom": 15,
+  "quality": {
+    "min_tiles": 550,
+    "max_tiles": 1470,
+    "min_size_mb": 13.9,
+    "max_size_mb": 37.1,
+    "required_layers": [
+      "building",
+      "place",
+      "poi",
+      "transportation",
+      "transportation_name"
+    ],
+    "max_change_ratio": 1.5,
+    "max_osm_age_days": 45
+  },
+  "waypoints": [
+    {
+      "name": "Porto",
+      "at": [
+        -8.61121,
+        41.1428
+      ]
+    },
+    {
+      "name": "Moreira da Maia",
+      "at": [
+        -8.64686,
+        41.24742
+      ]
+    },
+    {
+      "name": "Vilar de Pinheiro",
+      "at": [
+        -8.66551,
+        41.26835
+      ]
+    },
+    {
+      "name": "Aldeia Nova",
+      "at": [
+        -8.67338,
+        41.31828
+      ]
+    },
+    {
+      "name": "Vilarinho",
+      "at": [
+        -8.6819,
+        41.33857
+      ]
+    }
+  ],
+  "render_checks": [
+    {
+      "name": "Porto z15",
+      "at": [
+        -8.61121,
+        41.1428,
+        15
+      ],
+      "min_features": {
+        "poi": 2336,
+        "transportation": 760,
+        "building": 88
+      },
+      "min_labels": {
+        "place": 1
+      }
+    },
+    {
+      "name": "Vilarinho z15",
+      "at": [
+        -8.6819,
+        41.33857,
+        15
+      ],
+      "min_features": {
+        "poi": 45,
+        "transportation": 22,
+        "building": 3
+      },
+      "min_labels": {
+        "place": 1
+      }
+    }
+  ],
+  "generated_from": "catalog/camino-portugues/01.json"
+}

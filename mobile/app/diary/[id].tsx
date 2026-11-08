@@ -1,15 +1,25 @@
-import { useRef, useState, type ComponentRef } from 'react';
-import { KeyboardAvoidingView, Platform, TextInput, View } from 'react-native';
+import { useCallback, useEffect, useRef, useState, type ComponentRef } from 'react';
+import { Keyboard, KeyboardAvoidingView, Platform, Pressable, ScrollView, TextInput, View } from 'react-native';
 import { useLocalSearchParams, usePreventRemove, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Screen } from '@/components/Screen';
 import { AppText } from '@/components/AppText';
+import { Icon } from '@/components/Icon';
 import { Pill } from '@/components/Pill';
 import { IconButton } from '@/components/ui';
 import { FormMessage } from '@/components/auth/Field';
 import { confirmDelete } from '@/features/diary/confirm';
-import { dateLine, pageTitle, problemMessage, thousands } from '@/features/diary/present';
+import { device } from '@/features/diary/device';
+import { FormatBar, type FormatAction } from '@/features/diary/FormatBar';
+import { MediaGrid, MediaStrip, MediaViewer } from '@/features/diary/MediaTiles';
+import { MEDIA_PER_PAGE_MAX, mediaOf } from '@/features/diary/media';
+import { PlaceChip, PlaceEditRow, PlacePanel } from '@/features/diary/PlaceParts';
+import { normalizePlace, withName, type DiaryPlace } from '@/features/diary/place';
+import { FEATURES_NEED_NEW_APP, MEDIA_NEEDS_NEW_APP, MEDIA_ON_WEB, attachMessage, dateLine, metaLine, pageTitle, placeProblemMessage, problemMessage, thousands } from '@/features/diary/present';
+import { RichText } from '@/features/diary/RichText';
+import { continueList, formatsAt, toggleBlock, toggleInline, type Edit, type Sel } from '@/features/diary/richtext';
 import { BODY_MAX, TITLE_MAX, type DiaryEntry } from '@/features/diary/store';
+import { usePlaceFlow } from '@/features/diary/usePlace';
 import { NEW_PAGE, useDiaryPage, usePageSaver } from '@/features/diary/useDiary';
 import { c, radius, role, textStyle } from '@/theme';
 
@@ -19,6 +29,11 @@ const noOutline = (Platform.OS === 'web' ? { outlineStyle: 'none' } : null) as o
 
 // One diary page. [id] is a saved page's id, or "new" for a blank page. The text is written as it is typed
 // (src/features/diary/autosave.ts) and again whenever the person leaves, so there is no Save button.
+//
+// The page can be formatted (a bar above the keyboard: bold, italic, heading, bullets, quote; the text keeps the marks, richtext.ts),
+// can hold photos and videos from the phone's library (copied into the app, shown as tiles, a tap shows one full screen) and the
+// place the pilgrim is at. A page that has something in it opens READ, drawn the way it will be remembered; "Edit" opens it for
+// writing. Everything is written by the same saver, so a photo added while a save of the text is pending cannot race it.
 export default function DiaryPage() {
   const router = useRouter();
   const params = useLocalSearchParams<{ id?: string | string[] }>();
@@ -46,17 +61,61 @@ function NotHere({ goBack }: { goBack: () => void }) {
   );
 }
 
+type Note = { tone: 'info' | 'error'; text: string };
+
+/** True while the keyboard is up: the page then gives the room to the text. */
+function useKeyboardVisible(): boolean {
+  const [shown, setShown] = useState(false);
+  useEffect(() => {
+    const ios = Platform.OS === 'ios';
+    const show = Keyboard.addListener(ios ? 'keyboardWillShow' : 'keyboardDidShow', () => setShown(true));
+    const hide = Keyboard.addListener(ios ? 'keyboardWillHide' : 'keyboardDidHide', () => setShown(false));
+    return () => { show.remove(); hide.remove(); };
+  }, []);
+  return shown;
+}
+
+const hasContent = (e: Pick<DiaryEntry, 'title' | 'body' | 'media' | 'place'>) => !!e.title.trim() || !!e.body.trim() || mediaOf(e).length > 0 || normalizePlace(e.place) !== null;
+
 function PageEditor({ uid, initial, goBack }: { uid: string; initial: DiaryEntry | null; goBack: () => void }) {
   const insets = useSafeAreaInsets();
   const bodyRef = useRef<ComponentRef<typeof TextInput>>(null);
   const [title, setTitle] = useState(initial?.title ?? '');
   const [body, setBody] = useState(initial?.body ?? '');
   const [focused, setFocused] = useState(false);
+  const [titleFocus, setTitleFocus] = useState(false);
   const [deleteFailed, setDeleteFailed] = useState(false);
   const [date] = useState(() => dateLine(initial?.createdAt ?? new Date().toISOString()));
   const { saver, view } = usePageSaver(uid, initial);
   const [leaving, setLeaving] = useState(false);
   const left = useRef(false);
+  const alive = useRef(true);
+  useEffect(() => { alive.current = true; return () => { alive.current = false; }; }, []);
+
+  // A page that has something in it opens READ; a new or empty page opens for writing.
+  const [reading, setReading] = useState(() => !!initial && hasContent(initial));
+  const [note, setNote] = useState<Note | null>(null);
+  const [busy, setBusy] = useState<'idle' | 'picking' | 'copying'>('idle');
+  const [viewing, setViewing] = useState<number | null>(null);
+  const [nameFocus, setNameFocus] = useState(false);
+  const keyboard = useKeyboardVisible();
+  const say = useCallback((n: Note | null) => { if (alive.current) setNote(n); }, []);
+  useEffect(() => {
+    if (!note) return undefined;
+    const t = setTimeout(() => setNote(null), 12_000);
+    return () => clearTimeout(t);
+  }, [note]);
+
+  // Where the caret and the selection are, for the formatting bar. A change made by the bar (or the Return key in a list) puts the
+  // caret where it belongs one frame after the new text, and only for a moment: a selection that is always forced fights the typing.
+  const [sel, setSel] = useState<Sel>({ start: (initial?.body ?? '').length, end: (initial?.body ?? '').length });
+  const [forced, setForced] = useState<Sel | null>(null);
+  useEffect(() => {
+    if (!forced) return undefined;
+    const t = setTimeout(() => setForced(null), 500);
+    return () => clearTimeout(t);
+  }, [forced]);
+  const formats = formatsAt(body, sel);
 
   // Every way of leaving this screen (the Back button, the system's back, the swipe from the edge, the browser's back) is held
   // here while what was typed is not safely on the phone (a write is pending, or the last one failed): it is written first,
@@ -70,37 +129,156 @@ function PageEditor({ uid, initial, goBack }: { uid: string; initial: DiaryEntry
       repeat();
     });
   });
+  const attached = metaLine({ media: view.media, place: view.place ?? undefined });
   const askDelete = () => confirmDelete(pageTitle({ title, body }), async () => {
     setDeleteFailed(false);
     if (await saver.discard()) { setLeaving(true); disablePrevention(); goBack(); }
     else setDeleteFailed(true);
-  });
+  }, attached !== '');
+
+  const apply = (e: Edit) => {
+    setBody(e.text);
+    saver.edit({ body: e.text });
+    setSel(e.selection);
+    requestAnimationFrame(() => { if (alive.current) setForced(e.selection); });
+  };
+  const typed = (t: string) => {
+    // Return in a bullet starts the next bullet; on an empty bullet it ends the list
+    const more = continueList(body, t, sel.start === sel.end ? sel.start : undefined, BODY_MAX);
+    if (more) { apply(more); return; }
+    setBody(t);
+    saver.edit({ body: t });
+  };
+  const format = (action: FormatAction) => {
+    say(null);
+    let edit: Edit | null = null;
+    try {
+      edit = action === 'bold' || action === 'italic' ? toggleInline(body, sel, action, BODY_MAX) : toggleBlock(body, sel, action === 'heading' ? 'heading' : action === 'bullet' ? 'bullet' : 'quote', BODY_MAX);
+    } catch {
+      edit = null; // the page is never touched by a mark that could not be made
+    }
+    if (edit) { apply(edit); bodyRef.current?.focus(); } else if (body.length >= BODY_MAX - 4) say({ tone: 'info', text: problemMessage('body-too-long') });
+  };
+
+  const addMedia = async () => {
+    if (busy !== 'idle') return;
+    say(null);
+    Keyboard.dismiss();
+    if (view.media.length >= MEDIA_PER_PAGE_MAX) { say(attachMessage({ added: 0, refused: [{ reason: 'page-full' }], failed: null })); return; }
+    setBusy('picking');
+    try {
+      const picked = await device.pickMedia(MEDIA_PER_PAGE_MAX - view.media.length);
+      if (picked.status === 'unavailable') say({ tone: 'info', text: MEDIA_NEEDS_NEW_APP });
+      else if (picked.status === 'error') say({ tone: 'error', text: 'The photo library could not be opened. Please try again.' });
+      else if (picked.status === 'picked') {
+        if (alive.current) setBusy('copying');
+        say(attachMessage(await saver.attach(picked.assets)));
+      }
+    } finally {
+      if (alive.current) setBusy('idle');
+    }
+  };
+
+  const placeFlow = usePlaceFlow((p) => { saver.setPlace(p); say(null); });
+  const addPlace = () => { say(null); Keyboard.dismiss(); void placeFlow.start(); };
+  const openMaps = async (p: DiaryPlace) => { if (!(await device.openMaps(p))) say({ tone: 'info', text: 'No maps app on this phone could open the place.' }); };
+  const openSettings = async () => { if (!(await device.openSettings())) say({ tone: 'info', text: "Open your phone's Settings, then CaminoPlus, and allow location." }); };
+
+  const toggleMode = () => { say(null); Keyboard.dismiss(); setReading((r) => !r); };
+  const wasReading = useRef(reading);
+  useEffect(() => {
+    if (wasReading.current && !reading) requestAnimationFrame(() => bodyRef.current?.focus());
+    wasReading.current = reading;
+  }, [reading]);
 
   const problem = view.problem ?? (body.length >= BODY_MAX ? 'body-too-long' : null);
   const caption = view.status === 'saving' ? 'Saving…' : view.status === 'failed' ? 'Not saved' : 'Saved on this phone';
+  const canMedia = device.canPickMedia();
+  const canPlace = device.canFindPlace();
+  const hasAny = !!title.trim() || !!body.trim() || view.media.length > 0 || view.place !== null;
+  // What this device cannot do, said once and honestly: the web preview has none of it, an older app lacks one or both.
+  const lines = !canMedia && !canPlace ? [Platform.OS === 'web' ? MEDIA_ON_WEB : FEATURES_NEED_NEW_APP] : [!canMedia ? MEDIA_NEEDS_NEW_APP : '', !canPlace ? placeProblemMessage('unsupported') : ''].filter(Boolean);
 
+  const topBar = (
+    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+      <IconButton name="back" label="Back" onPress={goBack} />
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+        {(hasAny || reading) && (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={reading ? 'Edit this page' : 'Read this page'}
+            accessibilityHint={reading ? 'Opens the page for writing' : 'Shows the page as it will be read'}
+            onPress={toggleMode}
+            style={({ pressed }) => ({ minHeight: 48, paddingHorizontal: 20, borderRadius: radius.pill, borderWidth: 1, borderColor: role.border, backgroundColor: role.surface, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.8 : 1 })}
+          >
+            <AppText variant="label">{reading ? 'Edit' : 'Read'}</AppText>
+          </Pressable>
+        )}
+        {view.stored && <IconButton name="trash" label="Delete this page" onPress={askDelete} />}
+      </View>
+    </View>
+  );
+
+  const messages = (
+    <>
+      {!!problem && <FormMessage tone={problem === 'body-too-long' ? 'info' : 'error'}>{problemMessage(problem)}</FormMessage>}
+      {note !== null && <FormMessage tone={note.tone}>{note.text}</FormMessage>}
+      {deleteFailed && <FormMessage>That page could not be deleted. Please try again.</FormMessage>}
+    </>
+  );
+  const captionRow = (
+    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', minHeight: 24 }}>
+      <AppText variant="caption" color={view.status === 'failed' ? role.danger : role.muted}>{caption}</AppText>
+      {!reading && body.length >= BODY_MAX - 1000 && <AppText variant="caption" muted>{thousands(body.length)} / {thousands(BODY_MAX)}</AppText>}
+    </View>
+  );
+  const viewer = viewing !== null && (
+    <MediaViewer uid={uid} items={view.media} start={viewing} onClose={() => setViewing(null)} onRemove={reading ? undefined : (mid) => saver.removeMedia(mid)} />
+  );
+
+  if (reading) {
+    return (
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1, backgroundColor: role.bg }}>
+        <Screen tabBar={false}>
+          {topBar}
+          <AppText variant="small" muted>{date}</AppText>
+          {!!title.trim() && <AppText variant="h3" accessibilityRole="header">{title.trim()}</AppText>}
+          {/* A tap on the words opens the page for writing. The Edit button above is the way in for a screen reader: this wrapper is not a
+              labelled button of its own, so it cannot hide the words from one. */}
+          <Pressable accessible={false} onPress={toggleMode}>
+            {body.trim() ? <RichText text={body} /> : <AppText muted>No words on this page yet. Tap to write.</AppText>}
+          </Pressable>
+          <MediaGrid uid={uid} items={view.media} onOpen={setViewing} />
+          {view.place !== null && <PlaceChip place={view.place} onOpen={() => void openMaps(view.place as DiaryPlace)} />}
+          {messages}
+          {captionRow}
+        </Screen>
+        {viewer}
+      </KeyboardAvoidingView>
+    );
+  }
+
+  // While the keyboard is up the attachments fold into one line (the text keeps the room); a tap on it puts the keyboard away.
+  const compact = keyboard && !nameFocus;
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1, backgroundColor: role.bg }}>
       <Screen tabBar={false} scroll={false}>
-        <View style={{ flex: 1, gap: 12, paddingBottom: Math.max(insets.bottom, 12) }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-            <IconButton name="back" label="Back" onPress={goBack} />
-            {view.stored && <IconButton name="trash" label="Delete this page" onPress={askDelete} />}
-          </View>
+        <View style={{ flex: 1, gap: 12, paddingBottom: 8 }}>
+          {topBar}
           <AppText variant="small" muted>{date}</AppText>
 
-          <View style={{ flex: 1, backgroundColor: role.surface, borderRadius: radius.lg, borderWidth: 2, borderColor: focused ? c.gold : role.border, overflow: 'hidden' }}>
+          <View style={{ flex: 1, minHeight: keyboard ? 96 : 140, backgroundColor: role.surface, borderRadius: radius.lg, borderWidth: 2, borderColor: focused ? c.gold : role.border, overflow: 'hidden' }}>
             <TextInput
               value={title}
               onChangeText={(t) => { setTitle(t); saver.edit({ title: t }); }}
-              onFocus={() => setFocused(true)}
-              onBlur={() => setFocused(false)}
+              onFocus={() => { setFocused(true); setTitleFocus(true); }}
+              onBlur={() => { setFocused(false); setTitleFocus(false); }}
               onSubmitEditing={() => bodyRef.current?.focus()}
               returnKeyType="next"
               submitBehavior="submit"
               maxLength={TITLE_MAX}
               placeholder="Title (optional)"
-              placeholderTextColor={role.placeholder}
+              placeholderTextColor={role.muted}
               accessibilityLabel="Page title"
               style={[textStyle('h4'), { color: role.text, minHeight: 64, paddingHorizontal: 18, paddingTop: 14, paddingBottom: 10 }, noOutline]}
             />
@@ -108,27 +286,52 @@ function PageEditor({ uid, initial, goBack }: { uid: string; initial: DiaryEntry
             <TextInput
               ref={bodyRef}
               value={body}
-              onChangeText={(t) => { setBody(t); saver.edit({ body: t }); }}
+              onChangeText={typed}
+              selection={forced ?? undefined}
+              onSelectionChange={(e) => {
+                const s = e.nativeEvent.selection;
+                setSel(s);
+                if (forced && s.start === forced.start && s.end === forced.end) setForced(null);
+              }}
               onFocus={() => setFocused(true)}
               onBlur={() => setFocused(false)}
               autoFocus={!initial}
               multiline
               maxLength={BODY_MAX}
               placeholder="Write about your day"
-              placeholderTextColor={role.placeholder}
+              placeholderTextColor={role.muted}
               accessibilityLabel="Page text"
               style={[textStyle('body'), { flex: 1, color: role.text, paddingHorizontal: 18, paddingTop: 14, paddingBottom: 18, textAlignVertical: 'top' }, noOutline]}
             />
           </View>
 
-          {!!problem && <FormMessage tone={problem === 'body-too-long' ? 'info' : 'error'}>{problemMessage(problem)}</FormMessage>}
-          {deleteFailed && <FormMessage>That page could not be deleted. Please try again.</FormMessage>}
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', minHeight: 24 }}>
-            <AppText variant="caption" color={view.status === 'failed' ? role.danger : role.muted}>{caption}</AppText>
-            {body.length >= BODY_MAX - 1000 && <AppText variant="caption" muted>{thousands(body.length)} / {thousands(BODY_MAX)}</AppText>}
-          </View>
+          {compact && attached !== '' && (
+            <Pressable accessibilityRole="button" accessibilityLabel={`On this page: ${attached}. Shows them`} onPress={() => Keyboard.dismiss()} style={{ minHeight: 48, flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+              <Icon name="image" color={role.muted} size={20} />
+              <AppText variant="small" muted numberOfLines={1} style={{ flex: 1 }}>{attached}</AppText>
+            </Pressable>
+          )}
+          {!compact && (
+            // Under the text: the files, the place, the steps of adding one. When the screen is short this part shrinks and scrolls,
+            // so the text keeps its room and the messages and the caption below it are never pushed off the screen.
+            <ScrollView style={{ flexGrow: 0, flexShrink: 1 }} contentContainerStyle={{ gap: 12 }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+              <MediaStrip uid={uid} items={view.media} adding={busy === 'copying'} onOpen={setViewing} onRemove={(mid) => saver.removeMedia(mid)} />
+              {view.place !== null && (
+                <PlaceEditRow key={`${view.place.lat},${view.place.lon},${view.place.at}`} place={view.place} onOpen={() => void openMaps(view.place as DiaryPlace)} onRemove={() => saver.setPlace(null)} onFocusChange={setNameFocus} onName={(name) => saver.setPlace(withName(view.place as DiaryPlace, name), { soon: true })} />
+              )}
+              <PlacePanel flow={placeFlow.flow} onContinue={() => void placeFlow.confirm()} onClose={placeFlow.close} onSettings={() => void openSettings()} />
+              {!hasAny && (canMedia || canPlace) && <AppText variant="small" muted>Tap the picture or the pin below to add photos, videos and where you are.</AppText>}
+              {lines.map((l) => <AppText key={l} variant="small" muted>{l}</AppText>)}
+            </ScrollView>
+          )}
+          {messages}
+          {captionRow}
         </View>
       </Screen>
+      <View style={{ paddingBottom: keyboard ? 0 : Math.max(insets.bottom, 0), backgroundColor: role.surface }}>
+        <FormatBar formats={formats} formatsOff={titleFocus} onFormat={format} onMedia={canMedia ? () => void addMedia() : undefined} onPlace={canPlace ? addPlace : undefined} mediaBusy={busy !== 'idle'} hasPlace={view.place !== null} />
+      </View>
+      {viewer}
     </KeyboardAvoidingView>
   );
 }

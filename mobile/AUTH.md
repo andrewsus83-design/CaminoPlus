@@ -61,13 +61,22 @@ The app has to open on the trail, so it never waits for the network to decide wh
   cut off half way cannot take the whole diary with it; `src/features/diary/store.ts`): that is the pilgrim's own
   writing and exists only on this phone, so it is there again when the same person signs in. The keys deliberately
   do not start with `u.`; `src/features/diary/__tests__/diary.test.ts` fails if that changes.
+- The diary also keeps what the pilgrim adds to a page: photos, videos and the place they were at (photos and videos come
+  from the phone's library). They are never uploaded. Each photo or video is a copy in the app's own folder, `<documents>/diary-media/<userId>/` (not
+  the `kv/` folder that signing out empties, so signing out keeps them too); the page keeps only a small descriptor (name,
+  kind, size) and the path is built again from the user id and the name each time, because the app's folder moves when the
+  app is updated. The place is a field of the page (coordinates, a name, the time). Deleting a page deletes its files; deleting
+  the account deletes the whole folder; files no page refers to (a kill between copying a file and writing its page) are swept
+  up the next time the diary is read, and only when both slots can be read (`src/features/diary/media.ts`, `files.ts`).
+  The one thing that leaves the app's own code is the name of a place: the phone's own map service (Apple Maps on an iPhone,
+  Google on Android) is asked for it with the coordinates when there is a signal, and the screen says so before it asks.
 
 ## Deleting an account
 
 Me > gear > Settings > Account > Delete account (also under Edit account; `app/delete-account.tsx`). The pilgrim types DELETE;
 the app calls the `delete-account` edge function (service role: removes the user's files, then the auth
-user; the database cascades the rest), then deletes the diary pages on this phone (`clearDiary`, only after the
-server said yes) and signs out. Subscriptions are billed by the stores and are not cancelled by deletion; the
+user; the database cascades the rest), then deletes the diary on this phone: its pages and the folder of their photos
+and videos (`clearDiary`, only after the server said yes), and signs out. Subscriptions are billed by the stores and are not cancelled by deletion; the
 screen says so.
 
 ## Owner setup (Supabase and Google), one time

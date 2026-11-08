@@ -1,0 +1,43 @@
+{
+  "n": 9,
+  "name": "Pontevedra to Caldas de Reis",
+  "from": {
+    "name": "Pontevedra",
+    "lat": 42.43189,
+    "lng": -8.64316,
+    "source": "photon.komoot.io node/764716504 place=city"
+  },
+  "to": {
+    "name": "Caldas de Reis",
+    "lat": 42.60411,
+    "lng": -8.64217,
+    "source": "photon.komoot.io node/615606226 place=town"
+  },
+  "via": [
+    {
+      "name": "Santa María de Alba",
+      "lat": 42.47587,
+      "lng": -8.65143,
+      "source": "nominatim relation/12688970 boundary=administrative place=civil_parish wikidata=Q3396695 (OSM name 'Alba')"
+    },
+    {
+      "name": "A Cancela",
+      "lat": 42.51479,
+      "lng": -8.64717,
+      "source": "nominatim node/8776112978 place=hamlet (Barro)"
+    },
+    {
+      "name": "Briallos",
+      "lat": 42.56431,
+      "lng": -8.63829,
+      "source": "nominatim relation/12656145 boundary=administrative place=civil_parish wikidata=Q12681157"
+    }
+  ],
+  "extracts": [
+    "galicia"
+  ],
+  "coastal": true,
+  "distance_km": null,
+  "distance_source": null,
+  "notes": "from is Pontevedra (end of stage 8). Xunta de Galicia stage Pontevedra to Caldas de Reis, with Santa María de Alba, A Cancela and Albergue de Briallos on the way. Alba: the OSM civil parish 'Alba' (relation/12688970; the Xunta writes Santa María de Alba), 0.11 km from the route. A Cancela: hamlet node (Barro), 0.11 km from the route; the Igrexa de San Mamede da Portela (way/1154550106, cited by Vagamundos) is in the same place. Briallos: civil parish relation (Portas), 0.25 km from the route. Caldas de Reis: place=town node from Photon. Cerponzons (Vagamundos) gave no Nominatim result near the route. coastal is true because the first kilometres leave Pontevedra within 3 km of the Lérez estuary (OSM coastline 0.36 km from a point in the city). The Variante Espiritual (relation 6259246) leaves the Central at Pontevedra (general knowledge) and is excluded by route_exclude_regex. Checked against OSM relation 12786090 (Caminho Português de Santiago, ref CP), read through the OSM API on 2026-11-07: the 21.2 km between the two ends stay within 0.47 km of the straight lines through these points. Published figures seen, not copied into distance_km: Rother 23.0 km, Vagamundos 23 km."
+}

@@ -1,0 +1,78 @@
+{
+  "slug": "camino-portugues-08",
+  "name": "Redondela to Pontevedra",
+  "route_slug": "camino-portugues",
+  "stage_number": 8,
+  "route_id": "20000000-0000-0000-0000-000000000002",
+  "stage_id": "40000000-0000-0000-0001-000000000008",
+  "osm_extracts": [
+    "https://download.geofabrik.de/europe/spain/galicia-latest.osm.pbf"
+  ],
+  "search_bbox": [
+    -8.77,
+    42.19,
+    -8.48,
+    42.52
+  ],
+  "coastal": true,
+  "route_name_regex": "cami(nho|no|ño) portugu[eéê]s\\b",
+  "route_exclude_regex": "\\bCPC\\b|costa|espiritual|braga|interior|plata|ap[uú]lia",
+  "fallback_route": "camino-portugues-08.route.geojson",
+  "clip_km": 6,
+  "min_route_km": 6.8,
+  "buffer_km": 3,
+  "maxzoom": 15,
+  "waypoints": [
+    {
+      "name": "Redondela",
+      "at": [
+        -8.6086,
+        42.28422
+      ]
+    },
+    {
+      "name": "Arcade",
+      "at": [
+        -8.60154,
+        42.3366
+      ]
+    },
+    {
+      "name": "Bergunde",
+      "at": [
+        -8.6264,
+        42.37047
+      ]
+    },
+    {
+      "name": "Pontevedra",
+      "at": [
+        -8.64316,
+        42.43189
+      ]
+    }
+  ],
+  "render_checks": [
+    {
+      "name": "Redondela z15",
+      "at": [
+        -8.6086,
+        42.28422,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    },
+    {
+      "name": "Pontevedra z15",
+      "at": [
+        -8.64316,
+        42.43189,
+        15
+      ],
+      "min_features": {},
+      "min_labels": {}
+    }
+  ],
+  "generated_from": "catalog/camino-portugues/08.json"
+}
