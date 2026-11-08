@@ -212,6 +212,34 @@ export function pieces(text: string, max: number = PIECE_MAX): string[] {
   return out;
 }
 
+/** One thing the reader draws: a whole block, or one piece of a long paragraph. */
+export type Item = {
+  /** Stable for a chapter: the index of the block, and of the piece in it. */
+  key: string;
+  k: BookBlock['k'];
+  t: string;
+  /** A piece after the first of a long paragraph: it follows the one above with no space between. */
+  cont: boolean;
+  /** The last piece of its block: the space after a paragraph is under this one. */
+  end: boolean;
+};
+
+/**
+ * The blocks of a chapter as the things to draw, in order. A paragraph over PIECE_MAX characters becomes several pieces; every other block is one
+ * item. A block that is not a block (an unknown kind, no text: a damaged text) is left out, so the reader never throws on it.
+ */
+export function layoutBlocks(blocks: readonly BookBlock[], max: number = PIECE_MAX): Item[] {
+  const out: Item[] = [];
+  blocks.forEach((b, i) => {
+    if (!b || typeof b !== 'object') return;
+    if (b.k === 'hr') { out.push({ key: `${i}`, k: 'hr', t: '', cont: false, end: true }); return; }
+    if ((b.k !== 'p' && b.k !== 'h' && b.k !== 'q' && b.k !== 'li') || typeof b.t !== 'string') return;
+    const parts = b.k === 'p' ? pieces(b.t, max) : [b.t];
+    parts.forEach((t, j) => out.push({ key: `${i}.${j}`, k: b.k, t, cont: j > 0, end: j === parts.length - 1 }));
+  });
+  return out;
+}
+
 /** A numbered or bulleted point: its marker ("12.", "(3)", "4)", "•") and the rest. No marker when the text does not start with one. */
 export function splitMarker(text: string): { marker: string; rest: string } {
   const m = /^((?:\(?[0-9]{1,3}[.)]|\([0-9]{1,3}\)|[ivxlc]{1,6}[.)]|[a-z][.)]|[•·▪◦–—-])\s+)/i.exec(text);

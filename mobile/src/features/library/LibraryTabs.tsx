@@ -1,9 +1,7 @@
 import { Pressable, View } from 'react-native';
 import { AppText } from '@/components/AppText';
-import { Icon } from '@/components/Icon';
-import { SampleNotice } from '@/components/SampleNotice';
 import { Card, SectionLabel } from '@/components/ui';
-import { c, fixed, radius, role } from '@/theme';
+import { role } from '@/theme';
 import { BookmarkToggle } from './BookmarkToggle';
 import { BibleBookGrid } from './bible/BookGrid';
 import { TestamentBar } from './bible/TestamentBar';
@@ -11,33 +9,22 @@ import { VerseRowList } from './bible/VerseRows';
 import { ADDITIONS_NOTE, DEUTERO_NOTE, TESTAMENT_LABEL, bookLine, booksOf, chaptersLabel, countLine, partWords, type BibleBook, type Testament } from './bible/books';
 import type { Ref } from './bible/ref';
 import { VERSES_CAPPED_NOTE, versesLabel } from './bible/verseRows';
-import { BOOK_CATALOG, bookByline, type CatalogBook } from './books/catalog';
-import { BIBLE_SOURCE_LINE, BOOKS_NOTICE, type RowTab } from './sample';
+import { BOOK_CATALOG } from './books/catalog';
+import { BookRows } from './books/BookRows';
+import { BooksGrid } from './books/BooksGrid';
+import { BooksNotice } from './books/BooksNotice';
+import { BIBLE_SOURCE_LINE, type RowTab } from './sample';
 import { hitGroups, itemKey, type Hits } from './search';
 import type { LibraryMarks } from './useLibraryBookmarks';
 
-// The two Library tabs that hold rows: Bible (the books of the Bible, one part at a time, as a grid of square tiles) and Books (twelve free classics).
-// The Bible is real: its text is in the app (see sample.ts). The Books tab is a preview and starts with an honest notice, and its rows say "Soon". The
-// third tab, Notes, is the diary and lives in features/library/notes. Colours are read while drawing, never at import.
+// The two Library tabs that hold rows: Bible (the books of the Bible, one part at a time, as a grid of square tiles) and Books (twelve free classics, as a grid
+// of A5 covers, books/BooksGrid.tsx). The Bible is real: its text is in the app (see sample.ts). The Books tab has the text of the books whose edition is
+// confirmed, and says "Soon" on the others, with a notice that says so honestly (books/BooksNotice.tsx). The third tab, Notes, is the diary and lives in
+// features/library/notes. Colours are read while drawing, never at import.
 //
-// A row can carry a bookmark button (when `marks` is given): the button is its own component. The rows of a book of the Bible are also what a search
-// result and the Bookmarks screen draw (LibraryGroups), where a tap opens the book; the rows of the twelve books are pictures of what will be there.
-// The banners are in LibraryBanner.tsx.
-
-const Notice = () => <SampleNotice title="Preview">{BOOKS_NOTICE}</SampleNotice>;
-
-/** A small label on a row, in the style of the "Sample" tag: caps in mono on a pale ground. */
-const Chip = ({ label, spoken, bg, fg }: { label: string; spoken: string; bg: string; fg: string }) => (
-  <View accessibilityLabel={spoken} style={{ alignSelf: 'flex-start', paddingHorizontal: 10, height: 24, borderRadius: radius.pill, backgroundColor: bg, justifyContent: 'center' }}>
-    <AppText variant="mono" color={fg} style={{ fontSize: 12, lineHeight: 16, letterSpacing: 1 }}>{label}</AppText>
-  </View>
-);
-
-/** The chip that says a row is not available yet. */
-const Soon = () => <Chip label="SOON" spoken="Coming soon" bg={role.sunken} fg={role.muted} />;
-
-/** The chip that says a book costs nothing to read. */
-const Free = () => <Chip label="FREE" spoken="Free to read" bg={c.successWash} fg={c.success} />;
+// A row can carry a bookmark button (when `marks` is given): the button is its own component. The rows of a book of the Bible and of the twelve books are also
+// what a search result and the Bookmarks screen draw (LibraryGroups), where a tap opens the book (books/BookRows.tsx for the twelve). The banners are in
+// LibraryBanner.tsx (the Bible tab's) and books/BooksBanner.tsx (the Books tab's).
 
 /** The padding of a row: 16 at the start, and 6 at the end when the bookmark button (44 wide) is there. */
 const rowStyle = (first: boolean, marks?: LibraryMarks) => ({
@@ -82,40 +69,9 @@ export function BibleBookRows({ items, marks, withPart = false, onOpen }: { item
 }
 
 /**
- * The books of the Books tab, one under the other: a cover (a pale colour with a glyph, which does not change with light and dark, so
- * what is on it is the fixed navy), the title, "author · era", the bookmark button; under them the blurb and the chips "Free" and "Soon".
- * Nothing of a book is shown but this: the group, the source and the licence notes of the catalog are data for later.
- */
-export function BookRows({ items, marks }: { items: readonly CatalogBook[]; marks?: LibraryMarks }) {
-  return (
-    <Card style={{ padding: 4 }}>
-      {items.map((b, i) => (
-        <View key={b.id} accessibilityState={marks ? undefined : { disabled: true }} style={{ ...rowStyle(i === 0, marks), paddingTop: 14, paddingBottom: 14, gap: 10 }}>
-          <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 14 }}>
-            <View aria-hidden style={{ width: 52, height: 68, borderRadius: radius.xs, backgroundColor: fixed[b.cover], alignItems: 'center', justifyContent: 'center' }}>
-              <Icon name={b.icon} color={fixed.blue} size={26} />
-            </View>
-            <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
-              <AppText variant="label">{b.title}</AppText>
-              <AppText variant="caption" muted>{bookByline(b)}</AppText>
-            </View>
-            <Mark marks={marks} tab="Books" id={b.id} title={b.title} />
-          </View>
-          <AppText variant="small">{b.blurb}</AppText>
-          <View style={{ flexDirection: 'row', gap: 8 }}>
-            <Free />
-            <Soon />
-          </View>
-        </View>
-      ))}
-    </Card>
-  );
-}
-
-/**
  * The rows of a list of results, group after group (the books of the Bible, the twelve books, the verses), each under its own label ("Bible · 2",
  * "Verses · 12"). What a search and the Bookmarks screen show; a group that has no row in it is not drawn. A tap on a book of the Bible opens its chapters
- * and a tap on a verse opens the reader at it: the screen says where (`onOpenBook`, `onOpenVerse`). The twelve books open nothing.
+ * and a tap on a verse opens the reader at it: the screen says where (`onOpenBook`, `onOpenVerse`). A tap on one of the twelve books opens its page.
  */
 export function LibraryGroups({ hits, marks, onOpenBook, onOpenVerse, versesCapped = false }: { hits: Hits; marks: LibraryMarks; onOpenBook: (code: string) => void; onOpenVerse: (ref: Ref) => void; versesCapped?: boolean }) {
   return (
@@ -160,12 +116,15 @@ export function BibleTab({ testament, onTestament, onOpenBook }: { testament: Te
   );
 }
 
-/** The Books tab under its banner: the Preview notice and the twelve books. */
+/**
+ * The Books tab under its banner: the notice about what is still missing (none once every book has its text), and the twelve books as covers, two in a row,
+ * each an A5 page that opens its book (books/BooksGrid.tsx). Whether a book has a text is asked of bookText.ts; nothing about it is kept here.
+ */
 export function BooksTab({ marks }: { marks?: LibraryMarks }) {
   return (
     <View style={{ gap: 16 }}>
-      <Notice />
-      <BookRows items={BOOK_CATALOG} marks={marks} />
+      <BooksNotice />
+      <BooksGrid items={BOOK_CATALOG} marks={marks} />
     </View>
   );
 }
