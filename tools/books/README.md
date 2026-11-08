@@ -109,6 +109,23 @@ Introductions, prefaces and notes by editors and translators are left out unless
   text, then update the recipe).
 - Output: compact UTF-8 JSON with a final newline, the same bytes on every run (the tests run the importer twice and `--check`s it).
 
+### Size
+
+Measured on 8 November 2026 with the six texts of the table. The JSON files are bundled as JavaScript (Metro), and Hermes compiles them into the
+bundle even though each book is only `require`d when it is first opened.
+
+| What | Size |
+|---|---|
+| the six books, index and manifest, as files | 2,842,527 bytes (2.8 MB), 946,683 bytes gzipped |
+| the Android Hermes bundle of `main` | 4,969,952 bytes |
+| the same with the Licences screen of this branch (it reads `manifest.json`, 10.6 KB) | 4,980,731 bytes (+10,779) |
+| the same with the books pulled into the bundle (a probe import of `bookText.ts`, not committed) | 8,792,110 bytes (+3,822,158 over main) |
+
+So the books cost about 3.8 MB of bundle, 1.35 times their size as JSON; every book that is added costs 1.35 times its file. The books alone are far
+under 8 MB (the Bible text adds about 5.9 MB on its own: together they are about 9.7 MB of bundle if both are bundled as JavaScript). The way to cut
+without a native module or a config change is to leave books out (remove their recipes from `RECIPES` in `books_recipes.py` and run the importer,
+which writes only the books that have a recipe; the largest are the Life of St. Teresa, 0.74 MB, and the Confessions, 0.61 MB).
+
 ## The books that are not in the app, and what the owner can do
 
 | Book | Why | Best alternatives |
