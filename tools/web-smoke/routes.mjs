@@ -29,6 +29,8 @@ export const SAMPLE_OVERRIDES = {
   // the chapters of the Psalms and Psalm 121 (the reader), so that the sweep draws the real screens and not their "Not found"
   '/library/bible/[code]': 'PSA',
   '/library/bible/[code]/[chapter]': { code: 'PSA', chapter: '121' },
+  // the profile of a friend (fixtures.mjs: Hannah, with three posts), so that the sweep draws the real screen. An id nobody has is "not available": pilgrim.scenarios.mjs walks that one
+  '/pilgrim/[id]': '22222222-2222-4222-8222-222222222222',
   // a book of the Books tab: its page, and its reader (which opens at the first chapter), so that the sweep draws the real screens and not "That book is not in the Library"
   '/library/book/[id]': 'camino-frances-guide',
   '/library/book/[id]/read': 'camino-frances-guide',

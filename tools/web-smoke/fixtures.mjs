@@ -104,6 +104,29 @@ export const FRIENDS = [
   { ...LUCAS, km_walked: 38, since: iso(4 * DAY) },
 ];
 
+// The profile of another pilgrim (mobile/app/pilgrim/[id].tsx). Hannah is a friend with three posts, Lucas has asked to be a friend (the request the Requests tab
+// lists), Marta is a stranger with a public profile and nothing this pilgrim may see, Ines is a stranger with a private profile. Any other id is "not available".
+export const HANNAH_CARD = { bio: 'Walking the Camino for my father. Ultreia!', is_private: false, km_walked: 112.4, posts_count: 3, stamps_count: 7 };
+export const LUCAS_CARD = { bio: 'Third Camino. Bring good socks.', is_private: false, km_walked: 38, posts_count: 1, stamps_count: 2 };
+export const MARTA = { id: '44444444-4444-4444-8444-444444444444', username: 'marta', display_name: 'Marta Vidal', avatar_url: null, bio: 'From Lisbon, on the Camino Portugues.', is_private: false, km_walked: 64, posts_count: 5, stamps_count: 3 };
+export const INES = { id: '55555555-5555-4555-8555-555555555555', username: 'ines', display_name: 'Ines Duarte', avatar_url: null, bio: 'Only my friends read this.', is_private: true, km_walked: 220, posts_count: 9, stamps_count: 12 };
+
+const hannahPost = (n, o) => ({ id: `81000000-0000-4000-8000-00000000000${n}`, body: null, place_name: null, published_at: iso(n * DAY), like_count: 0, comment_count: 0, media_count: 0, health_summary: null, save_count: 0, share_count: 0, user_id: HANNAH.id, status: 'published', kind: 'journal', deleted_at: null, ...o });
+export const HANNAH_POSTS = [
+  hannahPost(1, { body: 'Cruz de Ferro. I left my father\'s stone here.', place_name: 'Cruz de Ferro', like_count: 4, comment_count: 1 }),
+  hannahPost(2, { body: 'Stamp number 20, and a very good soup.', place_name: 'Astorga' }),
+  hannahPost(3, { body: 'The meseta in the morning: nothing but sky.', place_name: 'Hontanas' }),
+];
+// A friendship is one row per pair, the smaller id first (user_a < user_b); the app reads its own row with each pilgrim.
+export const FRIENDSHIPS = [
+  { user_a: UID, user_b: HANNAH.id, requested_by: UID, status: 'accepted' },
+  { user_a: UID, user_b: LUCAS.id, requested_by: LUCAS.id, status: 'pending' },
+];
+// What Lucas wrote under the first post of Hannah, so the comments sheet has a name to open.
+export const HANNAH_COMMENTS = [
+  { id: 'c1000000-0000-4000-8000-000000000001', post_id: HANNAH_POSTS[0].id, user_id: LUCAS.id, body: 'Golden light! Which stage was this?', created_at: iso(DAY / 2), deleted_at: null, moderation_status: 'ok', author: { username: LUCAS.username, display_name: LUCAS.display_name } },
+];
+
 // The chat the "[id]" routes open: its id is the sample value of a route parameter (routes.mjs), so /chat/<sample> is a real chat.
 export const CHAT_ID = SAMPLE_PARAM;
 const GROUP_ID = '90000000-0000-4000-8000-000000000002';
@@ -161,13 +184,15 @@ export const POIS = [
 function tables({ persona, data }) {
   const full = persona === 'in' && data !== 'empty';
   return {
-    profiles: [PROFILE, HANNAH, LUCAS].map((p) => ({ ...p })),
+    profiles: [PROFILE, { ...HANNAH, ...HANNAH_CARD }, { ...LUCAS, ...LUCAS_CARD }, MARTA, INES].map((p) => ({ ...p })),
+    friendships: full ? FRIENDSHIPS : [],
+    post_comments: full ? HANNAH_COMMENTS : [],
     journeys: persona === 'in' ? [{ ...JOURNEY, user_id: UID, deleted_at: null }] : [],
     routes: data === 'empty' ? [] : ROUTES.map((r) => ({ ...r, is_published: true, deleted_at: null })),
     stages: data === 'empty' ? [] : STAGES.map((s) => ({ ...s, is_published: true, variant_of: null, deleted_at: null })),
     journey_days: full ? JOURNEY_DAYS : [],
     user_stamps: full ? STAMPS : [],
-    posts: full ? POSTS : [],
+    posts: full ? [...POSTS, ...HANNAH_POSTS] : [],
     post_saves: full ? POST_SAVES : [],
     notifications: full ? NOTIFICATIONS.map((n) => ({ user_id: UID, ...n })) : [],
     messages: full ? [...MESSAGES].reverse() : [], // the app asks for the newest first
@@ -181,6 +206,7 @@ const RPC = {
   list_conversations: (_b, s) => (s.full ? CONVERSATIONS : []),
   list_conversation_members: (_b, s) => (s.full ? MEMBERS : []),
   list_friends: (_b, s) => (s.full ? FRIENDS : []),
+  start_direct_chat: () => CHAT_ID, // the Message button of a friend's profile: the one chat the "[id]" routes open
   list_friend_requests: (_b, s) => (s.full ? [{ direction: 'incoming', id: LUCAS.id, username: LUCAS.username, display_name: LUCAS.display_name, avatar_url: null, created_at: iso(3_600_000) }] : []),
   list_stage_stays: (_b, s) => (s.full ? STAYS : []),
   list_stage_pois: (_b, s) => (s.full ? POIS : []),

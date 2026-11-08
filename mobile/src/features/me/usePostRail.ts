@@ -8,7 +8,7 @@ import { REPORT_PROMPT, REPORT_REASONS, REPORT_THANKS, reportContent, type Repor
 import { assertOnline } from '@/lib/net';
 import { failureMessage, optimistic, optimisticToggle, type Reaction } from '@/lib/optimistic';
 import { commentText, toSheetComments, type SheetComment } from '@/lib/postComments';
-import { shareAndRecord, shareMessage } from '@/lib/postShare';
+import { SHARE_APP, shareAndRecord, shareMessage } from '@/lib/postShare';
 import { useAuth } from '@/lib/auth';
 import { useLocalReactions } from '@/lib/useLocalReactions';
 import { uuid } from '@/lib/uuid';
@@ -117,6 +117,13 @@ export function usePostRail({ posts, sample }: { posts: Post[]; sample: boolean 
   };
 
   const share = async (post: Post) => {
+    // Another pilgrim's post (the journey of a friend, features/pilgrim): their words may be for friends only, so they never go out of the app from here.
+    // The invitation to the app goes instead, and nothing is counted as a share of their post.
+    if (post.author_id && post.author_id !== uid) {
+      const sent = await shareAndRecord({ share: () => Share.share({ message: SHARE_APP }) });
+      if (sent.outcome === 'failed') say(failureMessage('share', sent.error));
+      return;
+    }
     const res = await shareAndRecord({
       share: () => Share.share({ message: shareMessage(post, sample) }),
       record: sample || !uid ? undefined : () => recordPostShare(post.id),
