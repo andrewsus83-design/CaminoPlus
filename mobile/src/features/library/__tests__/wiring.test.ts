@@ -22,7 +22,7 @@ check('the feature is the files this test expects, so a new one is looked at (an
   const names = featureFiles.map((f) => path.basename(f)).sort();
   assert.deepEqual(names, [
     'BookmarkToggle.tsx', 'LibraryHeader.tsx', 'LibraryTabs.tsx', 'SavedPostCard.tsx', 'SearchBar.tsx', 'SearchResults.tsx', 'bookmarks.tsx', 'bookmarks.ts', 'client.ts',
-    'sample.ts', 'savedPosts.ts', 'search.ts', 'useLibraryBookmarks.ts', 'useSavedPosts.ts',
+    'bookBundle.ts', 'books.ts', 'sample.ts', 'savedPosts.ts', 'search.ts', 'useLibraryBookmarks.ts', 'useSavedPosts.ts',
   ].sort());
 });
 

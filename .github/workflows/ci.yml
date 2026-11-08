@@ -138,8 +138,17 @@ jobs:
         run: git ls-files -z 'tools/*.py' | xargs -0 python -m py_compile
       - name: POI audit tests
         run: python -m unittest discover -s tools/poi-audit/tests -v
-      - name: Tools tests (website generator, design tokens)
+      - name: Tools tests (website generator, design tokens, book tools)
         run: python -m unittest discover -s tools/tests -v
+      - name: Books pass their checks (every quoted passage is verified against its public-domain source)
+        run: |
+          mkdir -p "$RUNNER_TEMP/book-sources"
+          for n in 1653 13871 3296 8294; do
+            curl -fsS --retry 4 --retry-delay 5 -o "$RUNNER_TEMP/book-sources/pg$n.txt" "https://www.gutenberg.org/cache/epub/$n/pg$n.txt"
+          done
+          python tools/check_books.py --sources "$RUNNER_TEMP/book-sources"
+      - name: The Library bundle in mobile/ is what books/ makes
+        run: python tools/build_books.py --check
       - name: Documentation links and anchors
         run: python tools/check_docs_links.py
 

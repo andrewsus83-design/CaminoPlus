@@ -17,6 +17,7 @@ never "CaminoPlus plan".
 | `design/` | The design system: `tokens.css` and `tokens.json` are the single source of truth for colour, type, spacing; `index.html` shows the screens | open `design/index.html` |
 | `web/` | The camino.plus site: plain HTML and CSS, **generated** by `tools/build_web.py` | [`web/README.md`](web/README.md) |
 | `brand/` | Brand guideline, SVG logo and icon pack, the social content factory (plans, templates, QA checklist) | [`brand/README.md`](brand/README.md) |
+| `books/` | The CaminoPlus Library: 12 books (route guidebooks and reflection books on public-domain classics), written and published with the two skills in `.claude/skills/` (`book-writer`, `book-publisher`) | [`books/series.md`](books/series.md) |
 | `tools/` | `offline-maps/` builds, tests and publishes the offline map packs; `poi-audit/` cross-checks places from open data; scripts for the site, tokens, screenshots and brand SVGs | [`tools/offline-maps/README.md`](tools/offline-maps/README.md), [`tools/poi-audit/README.md`](tools/poi-audit/README.md) |
 | `.github/` | CI, the two pipelines (offline maps, POI audit), Dependabot | [`.github/workflows/ci.yml`](.github/workflows/ci.yml) |
 
@@ -46,6 +47,8 @@ Preview with any static server, for example `npx serve web`. Deploys from Vercel
 
 **POI audit**: `cd tools/poi-audit && pip install -r requirements.txt && python audit.py --stage ../offline-maps/stages/camino-frances-01.json --out out/stage-1`.
 
+**The books**: `python3 tools/check_books.py --sources <folder with the source texts>` checks them (the folder is fetched as `books/sources/SOURCES.md` says); `python3 tools/build_books.py` builds the EPUB, PDF, cover and store metadata into `books/dist/` and refreshes the app's Library bundle (`mobile/assets/library/`); `--check` verifies the bundle is in sync.
+
 **Brand SVGs**: `pip install fonttools && python3 tools/build_brand_svg.py` (`--icons-only` after a design change that only touches icons).
 
 ## Checks
@@ -57,6 +60,7 @@ CI (`.github/workflows/ci.yml`) runs these on every pull request and every push 
 | App | `cd mobile && npm ci && npm run typecheck && npm test && npx expo export --platform android` |
 | Database | `supabase/dev/validate.sh` (set `PG_BIN=/usr/lib/postgresql/16/bin` if needed) |
 | Edge functions | `deno test --allow-net --allow-env --allow-run --allow-read supabase/functions` |
+| Books | `python3 tools/check_books.py --sources <folder>` and `python3 tools/build_books.py --check` |
 | Website in sync | `python3 tools/build_web.py /tmp/web-gen` and `diff -r` against `web/` (the generated files); `python3 tools/sync_tokens.py --check` |
 | Python tools | `python -m unittest discover -s tools/poi-audit/tests`, `python -m unittest discover -s tools/tests`, `python3 tools/check_docs_links.py` |
 | Offline map scripts | `cd tools/offline-maps && npm ci && npm test && npm run test:python && npm run test:render-fixture` |
