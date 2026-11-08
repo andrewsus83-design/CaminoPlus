@@ -32,6 +32,7 @@ check('the feature is the files this test expects, so a new one is looked at (an
     `${DIR}/SearchResults.tsx`, `${DIR}/bookmarks.ts`, `${DIR}/client.ts`, `${DIR}/sample.ts`, `${DIR}/savedPosts.ts`, `${DIR}/search.ts`, `${DIR}/useLibraryBookmarks.ts`,
     `${DIR}/useSavedPosts.ts`,
     `${DIR}/bible/TestamentBar.tsx`, `${DIR}/bible/books.ts`, `${DIR}/bible/today.ts`,
+    `${DIR}/bible/text.ts`, `${DIR}/bible/textCore.ts`, `${DIR}/bible/textTypes.ts`, `${DIR}/bible/webc.generated.ts`,
     `${DIR}/books/catalog.ts`,
   ].sort());
 });
