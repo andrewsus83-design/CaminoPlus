@@ -17,6 +17,7 @@ import { BOOKMARK_DAY, UNBOOKMARK_DAY } from '../daily/bookmarks';
 import { dayContent } from '../daily/content';
 import { arrows, dailyReducer, initDaily, type DailyAction, type DailyState } from '../daily/state';
 import './liturgy.test'; // the liturgical calendar (daily/liturgy.ts): its own file, run here so no script has to name it
+import './weekstrip.test'; // the week strip, the date of a bookmark, the readings provider and the bookmark key of a day: its own file, run here too
 
 let n = 0;
 const check = (name: string, fn: () => void) => { fn(); n += 1; console.log(`ok   ${name}`); };
