@@ -1,14 +1,15 @@
 // Choosing a photo for a chat message. expo-image-picker is a native module: when the running
 // build does not have it we say so instead of crashing (same approach as the journal composer).
+// The photo is then made ready by prepareImage (1280 px for everybody, location data removed; src/lib/media).
 import { NativeName, hasNativeModule } from '@/lib/optionalNative';
+import { MediaTier, canResizePhotos, pickerQuality, prepareImage } from '@/lib/media';
 
 export class PickerUnavailable extends Error {}
 
 export type PickedPhoto = { uri: string; mimeType?: string | null; fileSize?: number | null };
 
-export const MAX_PHOTO_BYTES = 15 * 1024 * 1024;
-
-export async function pickPhoto(): Promise<PickedPhoto | null> {
+/** Throws MediaRejected (with a message to show) when the photo is too big for the plan. */
+export async function pickPhoto(tier: MediaTier): Promise<PickedPhoto | null> {
   let Picker: typeof import('expo-image-picker');
   try {
     if (!hasNativeModule(NativeName.imagePicker)) throw new Error('missing');
@@ -18,10 +19,10 @@ export async function pickPhoto(): Promise<PickedPhoto | null> {
   } catch {
     throw new PickerUnavailable('Choosing photos needs the next app build.');
   }
-  const perm = await Picker.requestMediaLibraryPermissionsAsync();
-  if (!perm.granted) throw new Error('Allow photo access in Settings to share a picture.');
-  const res = await Picker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 0.7, allowsEditing: false });
+  // No permission question first: the system photo picker needs none (on Android 11 and 12 asking would request storage access).
+  const res = await Picker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: pickerQuality(tier, 'chat', canResizePhotos()), allowsEditing: false });
   if (res.canceled || !res.assets[0]) return null;
   const a = res.assets[0];
-  return { uri: a.uri, mimeType: a.mimeType, fileSize: a.fileSize };
+  const photo = await prepareImage(a.uri, tier, { use: 'chat', width: a.width, height: a.height, bytes: a.fileSize, mimeType: a.mimeType });
+  return { uri: photo.uri, mimeType: photo.mimeType, fileSize: photo.bytes };
 }

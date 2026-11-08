@@ -102,6 +102,9 @@ export function retryItem(id: string) {
 }
 
 export function discardItem(id: string) {
+  // A photo that went up but whose message was never sent would stay in storage and count against the quota.
+  const gone = items.find((i) => i.id === id);
+  if (gone?.media_path) void socialApi.deleteChatImage(gone.media_path);
   items = removeOutbox(items, id);
   emit();
   persist();

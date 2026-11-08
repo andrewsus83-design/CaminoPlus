@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { Alert, Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, TextInput, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -9,7 +9,10 @@ import { Pill } from '@/components/Pill';
 import { FormMessage } from '@/components/auth/Field';
 import { c, fixed, fonts, radius, role, layout } from '@/theme';
 import { useAuth } from '@/lib/auth';
-import { PickedMedia, createJournalPost, uploadPostMedia } from '@/lib/api';
+import { PickedMedia, PreparedMedia, createJournalPost, uploadPostMedia } from '@/lib/api';
+import { useMyStorage } from '@/lib/billing';
+import { MAX_VIDEO_SECONDS, MediaCancelled, MediaRejected, MediaTier, canResizePhotos, pickerQuality, pickerVideoPreset, prepareImage, prepareVideo, quotaCheck, tierFor } from '@/lib/media';
+import { MediaPreparing } from '@/components/MediaPreparing';
 import { NativeName, hasNativeModule } from '@/lib/optionalNative';
 
 // Story composer, TikTok / Reels / Shorts style: a post is a row of slides. Each slide is a
@@ -30,7 +33,7 @@ type TextStyleName = (typeof STYLES)[number];
 const styleFont = (s: TextStyleName) => (s === 'Classic' ? fonts.title : s === 'Bold' ? fonts.bodyBold : fonts.accent);
 const MAX_SLIDES = 10;
 
-type Slide = { id: string; media?: PickedMedia; text: string; bgIdx: number; style: TextStyleName; place: string };
+type Slide = { id: string; media?: PreparedMedia; text: string; bgIdx: number; style: TextStyleName; place: string };
 const newSlide = (over: Partial<Slide> = {}): Slide => ({ id: `s${Date.now()}${Math.random().toString(36).slice(2, 6)}`, text: '', bgIdx: 0, style: 'Classic', place: '', ...over });
 
 // expo-video is native too: use it when the build has it, otherwise show a play tile.
@@ -64,7 +67,7 @@ function Backdrop({ slide }: { slide: Slide }) {
   return <View style={{ position: 'absolute', width: '100%', height: '100%', backgroundColor: bg.bg }} />;
 }
 
-async function pickMedia(): Promise<PickedMedia[] | null> {
+async function pickMedia(tier: MediaTier): Promise<PickedMedia[] | null> {
   let Picker: typeof import('expo-image-picker');
   try {
     if (!hasNativeModule(NativeName.imagePicker)) throw new Error('missing');
@@ -75,12 +78,13 @@ async function pickMedia(): Promise<PickedMedia[] | null> {
     Alert.alert('Next build', 'Choosing photos and videos needs the next app build. Text slides work now.');
     return null;
   }
-  const perm = await Picker.requestMediaLibraryPermissionsAsync();
-  if (!perm.granted) {
-    Alert.alert('Photos are off', 'Allow photo access for CaminoPlus in Settings to add pictures and videos.');
-    return null;
-  }
-  const res = await Picker.launchImageLibraryAsync({ mediaTypes: ['images', 'videos'], allowsMultipleSelection: true, selectionLimit: MAX_SLIDES, quality: 0.8, videoMaxDuration: 60 });
+  // No permission question first: the system photo picker needs none (on Android 11 and 12 asking would request storage access).
+  // On iPhone the picker itself exports a clip at the plan's size (720p Free, 1080p Plus); see src/lib/media/picker.ts.
+  const res = await Picker.launchImageLibraryAsync({
+    mediaTypes: ['images', 'videos'], allowsMultipleSelection: true, selectionLimit: MAX_SLIDES,
+    quality: pickerQuality(tier, 'post', canResizePhotos()), videoMaxDuration: MAX_VIDEO_SECONDS,
+    videoExportPreset: pickerVideoPreset(Picker.VideoExportPreset as unknown as Record<string, unknown>, tier, Platform.OS),
+  });
   if (res.canceled) return null;
   return res.assets.map((a) => ({ uri: a.uri, type: a.type === 'video' ? 'video' : 'image', mimeType: a.mimeType, width: a.width, height: a.height, durationMs: a.duration, fileSize: a.fileSize }));
 }
@@ -97,6 +101,11 @@ export default function Write() {
   const [audience, setAudience] = useState<'followers' | 'public'>('followers');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Photos and clips are made ready (smaller, location data removed) right after they are picked: src/lib/media.
+  const storage = useMyStorage();
+  const tier = tierFor(storage.data);
+  const [preparing, setPreparing] = useState<{ label: string; fraction: number | null } | null>(null);
+  const cancelRef = useRef<AbortController | null>(null);
 
   const slide = slides[idx];
   const bg = BACKGROUNDS[slide.bgIdx];
@@ -106,9 +115,46 @@ export default function Write() {
   const patch = (p: Partial<Slide>) => setSlides((all) => all.map((s, i) => (i === idx ? { ...s, ...p } : s)));
   const hasContent = slides.some((s) => s.text.trim() || s.media);
 
+  /** Make each picked file ready. Files that cannot go up are left out, with the reason; Cancel stops the rest. */
+  const prepareAll = async (picked: PickedMedia[]): Promise<PreparedMedia[]> => {
+    const ctrl = new AbortController();
+    cancelRef.current = ctrl;
+    const ready: PreparedMedia[] = [];
+    const problems: string[] = [];
+    try {
+      for (const m of picked) {
+        if (ctrl.signal.aborted) break;
+        try {
+          if (m.type === 'video') {
+            setPreparing({ label: 'Preparing your video', fraction: 0 });
+            const v = await prepareVideo(m.uri, tier, (f) => setPreparing({ label: 'Preparing your video', fraction: f }), ctrl.signal, { width: m.width, height: m.height, bytes: m.fileSize, durationMs: m.durationMs, mimeType: m.mimeType });
+            ready.push({ prepared: true, type: 'video', uri: v.uri, mimeType: v.mimeType, width: v.width, height: v.height, durationMs: v.durationMs, bytes: v.bytes, thumbUri: null });
+          } else {
+            setPreparing({ label: picked.length > 1 ? 'Preparing your photos' : 'Preparing your photo', fraction: null });
+            const ph = await prepareImage(m.uri, tier, { use: 'post', width: m.width, height: m.height, bytes: m.fileSize, mimeType: m.mimeType, thumb: true });
+            ready.push({ prepared: true, type: 'image', uri: ph.uri, mimeType: ph.mimeType, width: ph.width, height: ph.height, durationMs: null, bytes: ph.bytes, thumbUri: ph.thumb?.uri ?? null });
+          }
+        } catch (e) {
+          if (e instanceof MediaCancelled) break;
+          problems.push(e instanceof MediaRejected ? e.message : 'One photo or video could not be read. Try it again.');
+        }
+      }
+    } finally {
+      cancelRef.current = null;
+      setPreparing(null);
+    }
+    if (problems.length) {
+      const left = problems.length === 1 ? 'It was left out.' : `${problems.length} files were left out.`;
+      Alert.alert('Not added', `${problems[0]} ${left}`);
+    }
+    return ready;
+  };
+
   const addMedia = async () => {
-    const picked = await pickMedia();
-    if (!picked || picked.length === 0) return;
+    const raw = await pickMedia(tier);
+    if (!raw || raw.length === 0) return;
+    const picked = await prepareAll(raw.slice(0, MAX_SLIDES));
+    if (picked.length === 0) return;
     setSlides((all) => {
       const empty = !all[idx].text.trim() && !all[idx].media;
       const base = empty ? all.filter((_, i) => i !== idx) : all;
@@ -131,6 +177,11 @@ export default function Write() {
 
   const share = async () => {
     if (!session || !hasContent) return setError('Add a few words or a photo about today first.');
+    const needed = slides.reduce((sum, s) => sum + (s.media?.bytes ?? 0), 0);
+    if (needed > 0) {
+      const room = quotaCheck(needed, storage.data);
+      if (!room.ok) return setError(`${room.message} You can also remove the photos and videos and share the words.`);
+    }
     setBusy(true); setError(null);
     try {
       const texts = slides.map((s) => s.text.trim()).filter(Boolean);
@@ -140,7 +191,7 @@ export default function Write() {
       const media = slides.flatMap((s) => (s.media ? [s.media] : []));
       const failed = media.length ? await uploadPostMedia(session.user.id, post.id, media) : 0;
       await refresh();
-      if (failed > 0) Alert.alert('Posted without some media', `${failed} of ${media.length} photos or videos could not be uploaded. Cloud storage is part of Pilgrim Plus.`);
+      if (failed > 0) Alert.alert('Posted without some media', `${failed} of ${media.length} photos or videos could not be uploaded. Check your cloud storage in Settings.`);
       router.back();
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
@@ -276,6 +327,7 @@ export default function Write() {
           </View>
         </View>
       </View>
+      {preparing && <MediaPreparing label={preparing.label} fraction={preparing.fraction} onCancel={() => cancelRef.current?.abort()} />}
     </KeyboardAvoidingView>
   );
 }

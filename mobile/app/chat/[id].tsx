@@ -14,8 +14,9 @@ import { EmptyState, ErrorState, Notice, OFFLINE_TEXT } from '@/features/social/
 import { MessageAction, buildTimeline, conversationName, friendlyError, messageActions, pilgrimsLabel, REPORT_PROMPT, REPORT_REASONS, REPORT_THANKS, snippet, storageGate, toInverted, ts } from '@/features/social/logic';
 import { pilgrimHref } from '@/features/pilgrim/logic';
 import { goBack } from '@/features/social/nav';
-import { MAX_PHOTO_BYTES, PickerUnavailable, pickPhoto } from '@/features/social/pick';
-import type { ChatMessage, MessageEntry, ReportReason, TimelineEntry } from '@/features/social/types';
+import { PickerUnavailable, pickPhoto } from '@/features/social/pick';
+import { MediaRejected, quotaCheck, tierFor } from '@/lib/media';
+import type { ChatMessage, MessageEntry, ReportReason, StorageInfo, TimelineEntry } from '@/features/social/types';
 import { copyText } from '@/lib/clipboard';
 import { config } from '@/lib/config';
 import { c, radius, role, shadowStyle, layout } from '@/theme';
@@ -45,7 +46,7 @@ export default function ChatScreen() {
   const [unblocking, setUnblocking] = useState(false);
   const nearBottom = useRef(true);
   const lastSeen = useRef<number | null>(null);
-  const storage = useRef<{ at: number; gate: ReturnType<typeof storageGate> } | null>(null);
+  const storage = useRef<{ at: number; gate: ReturnType<typeof storageGate>; info: StorageInfo | null } | null>(null);
 
   const conv = chat.conversation;
   const group = conv?.kind === 'group';
@@ -109,11 +110,13 @@ export default function ChatScreen() {
 
   const addPhoto = useCallback(async () => {
     // Photos need cloud storage (Pilgrim Plus). Ask once a minute at most; offline we let the upload decide.
-    let gate = storage.current && Date.now() - storage.current.at < 60_000 ? storage.current.gate : null;
-    if (!gate) {
-      gate = storageGate(await socialApi.storage().catch(() => null));
-      storage.current = { at: Date.now(), gate };
+    let known = storage.current && Date.now() - storage.current.at < 60_000 ? storage.current : null;
+    if (!known) {
+      const info = await socialApi.storage().catch(() => null);
+      known = { at: Date.now(), gate: storageGate(info), info };
+      storage.current = known;
     }
+    const gate = known.gate;
     if (gate === 'plus_required') {
       const go = await notice({
         title: 'Photos in chat are part of Pilgrim Plus', icon: 'image',
@@ -128,14 +131,15 @@ export default function ChatScreen() {
       return;
     }
     try {
-      const photo = await pickPhoto();
+      const photo = await pickPhoto(tierFor(known.info));
       if (!photo) return;
-      if ((photo.fileSize ?? 0) > MAX_PHOTO_BYTES) { toast('That photo is bigger than 15 MB. Pick a smaller one.'); return; }
+      const room = quotaCheck(photo.fileSize ?? 0, known.info);
+      if (!room.ok) { await notice({ title: 'Not enough cloud storage', icon: 'image', message: room.message }); return; }
       chat.sendImage(photo, replyTo?.id ?? null);
       setReplyTo(null);
       scrollToBottom();
     } catch (e) {
-      toast(e instanceof PickerUnavailable ? e.message : friendlyError(e, 'Could not add that photo.'));
+      toast(e instanceof PickerUnavailable || e instanceof MediaRejected ? e.message : friendlyError(e, 'Could not add that photo.'));
     }
   }, [chat, notice, replyTo, router, scrollToBottom, toast]);
 
@@ -152,7 +156,7 @@ export default function ChatScreen() {
       if (await confirm({ title: 'Delete this message?', message: 'It has not been sent yet. It will be removed from this phone.', confirmLabel: 'Delete', destructive: true, icon: 'trash' })) chat.discard(m.id);
     } else if (action === 'unsend') {
       if (await confirm({ title: 'Unsend this message?', message: 'It will disappear for everyone in this chat.', confirmLabel: 'Unsend', destructive: true, icon: 'trash' })) {
-        const err = await chat.unsend(m.id);
+        const err = await chat.unsend(m.id, m.media_path);
         if (err) toast(err);
       }
     } else if (action === 'report') {

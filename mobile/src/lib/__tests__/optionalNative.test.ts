@@ -16,6 +16,7 @@ const GUARDED: Record<string, string> = {
   'expo-clipboard': 'ExpoClipboard',
   'expo-image-picker': 'ExponentImagePicker',
   'expo-video': 'ExpoVideo',
+  'expo-image-manipulator': 'ExpoImageManipulator',
 };
 
 function sources(dir: string): string[] {
@@ -69,6 +70,7 @@ check('the question names the right package in each file', () => {
     [join('app', 'write.tsx'), 'expo-image-picker', 'NativeName.imagePicker'],
     [join('app', 'write.tsx'), 'expo-video', 'NativeName.video'],
     [join('src', 'features', 'me', 'JourneyGrid.tsx'), 'expo-video', 'NativeName.video'],
+    [join('src', 'lib', 'media', 'index.ts'), 'expo-image-manipulator', 'NativeName.imageManipulator'],
   ];
   for (const [f, pkg, name] of expectations) {
     const text = read(f);

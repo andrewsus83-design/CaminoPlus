@@ -1,6 +1,7 @@
 // Typed Supabase queries used by the app. Keep screens free of query strings so
 // the offline layer (local SQLite + outbox) can later wrap these same functions.
 import { supabase } from './supabase';
+import { MEDIA_BUCKET, deleteMedia, signedUrls, upload } from './mediaStorage';
 import { assertOnline } from './net';
 import { uuid } from './uuid';
 import { isCount } from './engagement';
@@ -240,42 +241,68 @@ export async function createJournalPost(opts: { userId: string; body: string; jo
 
 export type PickedMedia = { uri: string; type: 'image' | 'video'; mimeType?: string | null; width?: number; height?: number; durationMs?: number | null; fileSize?: number | null };
 
-/** Upload photos/videos of a post to the private user-media bucket and register them in post_media.
- *  Returns how many failed (cloud storage quota is 0 on the free plan, so uploads can be refused). */
-export async function uploadPostMedia(userId: string, postId: string, items: PickedMedia[]) {
+/** A photo or clip after prepareImage / prepareVideo (src/lib/media): the only kind uploadPostMedia takes. */
+export type PreparedMedia = {
+  prepared: true;
+  uri: string; type: 'image' | 'video'; mimeType: string;
+  width: number | null; height: number | null; durationMs: number | null; bytes: number | null;
+  /** the 480 px thumbnail of a photo, when this build could make one */
+  thumbUri: string | null;
+};
+
+/** Upload photos/videos of a post to the private user-media bucket and register them in post_media (with the storage key
+ *  of the photo's thumbnail in thumb_path). Returns how many failed (the server refuses uploads over the plan's storage). */
+export async function uploadPostMedia(userId: string, postId: string, items: PreparedMedia[]) {
   await assertOnline();
   let failed = 0;
   for (let i = 0; i < items.length; i++) {
     const m = items[i];
+    const uploaded: string[] = [];
     try {
       const ext = m.type === 'video' ? (m.mimeType === 'video/quicktime' ? 'mov' : 'mp4') : m.mimeType === 'image/png' ? 'png' : 'jpg';
       const path = `${userId}/posts/${postId}-${i}.${ext}`;
-      const body = await (await fetch(m.uri)).arrayBuffer();
-      const up = await supabase.storage.from('user-media').upload(path, body, { contentType: m.mimeType ?? (m.type === 'video' ? 'video/mp4' : 'image/jpeg'), upsert: true });
-      if (up.error) throw new Error(up.error.message);
-      must(await supabase.from('post_media').insert({ post_id: postId, user_id: userId, sort_order: i, media_type: m.type, storage_path: path, width: m.width ?? null, height: m.height ?? null, duration_ms: m.durationMs ? Math.round(m.durationMs) : null, size_bytes: m.fileSize ?? body.byteLength, upload_status: 'uploaded' }));
+      const main = await upload(MEDIA_BUCKET.userMedia, path, m.uri, m.mimeType);
+      uploaded.push(path);
+      let thumbPath: string | null = null;
+      if (m.thumbUri) {
+        try {
+          const t = await upload(MEDIA_BUCKET.userMedia, `${userId}/posts/${postId}-${i}-thumb.jpg`, m.thumbUri, 'image/jpeg');
+          thumbPath = t.path;
+          uploaded.push(t.path);
+        } catch {
+          thumbPath = null; // lists then show the photo itself
+        }
+      }
+      must(await supabase.from('post_media').insert({ post_id: postId, user_id: userId, sort_order: i, media_type: m.type, storage_path: path, thumb_path: thumbPath, width: m.width ?? null, height: m.height ?? null, duration_ms: m.durationMs ? Math.round(m.durationMs) : null, size_bytes: m.bytes ?? main.bytes, upload_status: 'uploaded' }));
     } catch {
       failed++;
+      // A file without its post_media row is never shown and would only take up the pilgrim's storage.
+      if (uploaded.length) void deleteMedia(MEDIA_BUCKET.userMedia, uploaded);
     }
   }
   return failed;
 }
 
-export type PostMediaUrl = { type: 'image' | 'video'; url: string };
-/** Signed URLs (1 h) for the photos and videos of your posts, grouped by post id and in slide order. */
+export type PostMediaUrl = { type: 'image' | 'video'; url: string; thumbUrl?: string | null };
+/** Signed URLs (1 h, reused for 50 min) for the photos and videos of your posts, grouped by post id and in slide order.
+ *  thumbUrl is the small thumbnail for grids and lists; url is the photo itself for the viewer. */
 export async function listPostMediaUrls(postIds: string[]) {
   await assertOnline();
   const out: Record<string, PostMediaUrl[]> = {};
   if (postIds.length === 0) return out;
   const rows = must(
-    await supabase.from('post_media').select('post_id, media_type, storage_path, sort_order').in('post_id', postIds).is('deleted_at', null).order('sort_order'),
-  ) as { post_id: string; media_type: 'image' | 'video'; storage_path: string }[];
+    await supabase.from('post_media').select('post_id, media_type, storage_path, thumb_path, sort_order').in('post_id', postIds).is('deleted_at', null).order('sort_order'),
+  ) as { post_id: string; media_type: 'image' | 'video'; storage_path: string; thumb_path: string | null }[];
   if (rows.length === 0) return out;
-  const signed = await supabase.storage.from('user-media').createSignedUrls(rows.map((r) => r.storage_path), 3600);
-  if (signed.error || !signed.data) return out;
-  rows.forEach((r, i) => {
-    const url = signed.data[i]?.signedUrl;
-    if (url) (out[r.post_id] ??= []).push({ type: r.media_type, url });
-  });
+  let signed: Record<string, string>;
+  try {
+    signed = await signedUrls(MEDIA_BUCKET.userMedia, rows.flatMap((r) => (r.thumb_path ? [r.storage_path, r.thumb_path] : [r.storage_path])));
+  } catch {
+    return out;
+  }
+  for (const r of rows) {
+    const url = signed[r.storage_path];
+    if (url) (out[r.post_id] ??= []).push({ type: r.media_type, url, thumbUrl: r.thumb_path ? signed[r.thumb_path] ?? null : null });
+  }
   return out;
 }
