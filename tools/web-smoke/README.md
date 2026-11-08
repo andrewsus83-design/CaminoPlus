@@ -38,14 +38,23 @@ Then the **scenarios** ([scenarios.mjs](scenarios.mjs)), each in light and dark,
 - the gear on Me opens `/settings` (no tab bar there) and Back returns to `/me`, also when Settings was opened from a link;
 - switching light/dark on Settings returns to Settings, and Back goes to Me;
 - Library: its top row is a search field and the Bookmarks button (no title, no diary button); directly under it, before any banner, the tabs
-  Bible, Books and Notes, in that order; Bible and Books each have a banner and a Preview notice, Notes has neither; the Books tab lists twelve
-  books marked Free and Soon and shows nothing that is only data (links, licence notes, groups); the gold pen shows only on Notes and opens
-  `/diary/new`; the three choices at the bottom of Bible (Old Testament, Deuterocanon, New Testament) float above the tab bar, list that
-  part with its count, and are gone on Books, on Notes and while something is typed in the search; the banner of the Bible tab (the whole card
-  and its "Read today" button) opens `/library/daily`; a search lists what it finds in Bible and Books grouped by tab (and says "Nothing found
-  for ..." with a way back); the Bookmarks button opens `/library/bookmarks` with the bookmarked rows of both tabs and the bookmarked post (the
-  full account has one bookmarked post); bookmarks kept before the tabs changed (a Music row, the old example rows) are ignored without an
-  error;
+  Bible, Books and Notes, in that order; Bible and Books each have a banner, Books has the Preview notice (its twelve books are examples),
+  Bible has none (its text is real), Notes has neither; the Books tab lists twelve books marked Free and Soon and shows nothing that is only
+  data (links, licence notes, groups); the gold pen shows only on Notes and opens `/diary/new`; the banner of the Bible tab (the whole card
+  and its "Read today" button) opens `/library/daily`; a search lists what it finds in Bible, Books and Verses (and says "Nothing found
+  for ..." with a way back); the Bookmarks button opens `/library/bookmarks` with the bookmarked rows of both tabs, a verse and the
+  bookmarked post (the full account has one bookmarked post); bookmarks kept before the tabs changed (a Music row, the old example rows, the
+  two Bible rows that were taken out) or kept for a verse that is not in the text are ignored without an error;
+- Bible ([bible.scenarios.mjs](bible.scenarios.mjs), the same walks on the real text): the daily banner is compact (at most 120 high at 390
+  wide, 140 at 320) and is one button; the three parts (Old Testament, Deuterocanon, New Testament) are a segmented control under the banner
+  that scrolls with the page, and each shows its books as three square tiles in a row; all 73 book names fit their tile at 320, 390 and 430;
+  a tile opens the numbers of the chapters, a number opens the words, and Previous and Next name where they go, cross the books and the
+  parts (Malachi 4 to Tobit 1) and are disabled at Genesis 1 and Revelation 22; prose is paragraphs, a psalm is stanzas, and the end of a
+  chapter has the credit and says it is not the translation read at Mass; a touch chooses a verse and raises Bookmark, Copy and Share, a
+  bookmarked verse is listed on Bookmarks and opens the reader at it; a link to a verse (`?v=105`) opens the chapter with that verse chosen,
+  and an address that leads nowhere is a calm "Not found"; the search finds verses after the keystroke (typing is never blocked), marks the
+  match and offers "Go to" for a typed reference; "Continue reading" shows only when something was read, reopens that chapter and is ignored
+  when the place kept no longer exists;
 - Stays lists the stays of the stage and one opens with its details;
 - logging out from Settings lands on Welcome;
 - launching the app lands on Welcome (signed out), Onboarding (signed in, no journey) or Me;
@@ -53,7 +62,9 @@ Then the **scenarios** ([scenarios.mjs](scenarios.mjs)), each in light and dark,
   and with an expired login (also with nothing saved: "No signal right now") the app does not wait for the network.
 
 The diary screens, the Notes tab and the daily reading belong to their own features: they are swept (they must load without errors), and
-the Library scenarios only check where the pen and the banner lead and that Notes has no banner, never what those screens contain.
+the Library scenarios only check where the pen and the banner lead and that Notes has no banner, never what those screens contain. The
+Bible screens are the Bible feature's own, and they run on the real text (Psalm 121, John 1, Psalm 119, Malachi 4, Tobit 1), so those
+walks fail when the text is missing or the import is wrong.
 
 ### Routes and account states come from the source
 
@@ -154,6 +165,7 @@ Chromium; a test checks they agree). Bump both on purpose, with the tests looked
 | [routes.mjs](routes.mjs) | routes from `mobile/app`, account states from the guards |
 | [plan.mjs](plan.mjs) | which checks exist (route x state x scheme x mode, then the scenarios), the redirect list |
 | [scenarios.mjs](scenarios.mjs) | the walks a person does |
+| [bible.scenarios.mjs](bible.scenarios.mjs) | the walks of the Bible tab and the reader (kept apart so the other walks stay short) |
 | [fixtures.mjs](fixtures.mjs) | the Supabase project, the saved state of the phone, the realtime socket |
 | [collector.mjs](collector.mjs) | what counts as a failure; the console allow-list |
 | [server.mjs](server.mjs) | a static server with single-page-app fallback, on a free port |
