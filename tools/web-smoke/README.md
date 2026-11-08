@@ -48,7 +48,8 @@ Then the **scenarios** ([scenarios.mjs](scenarios.mjs)), each in light and dark,
 - Bible ([bible.scenarios.mjs](bible.scenarios.mjs), the same walks on the real text): the daily banner is compact (at most 120 high at 390
   wide, 140 at 320) and is one button; the three parts (Old Testament, Deuterocanon, New Testament) are a segmented control under the banner
   that scrolls with the page, and each shows its books as three square tiles in a row; all 73 book names fit their tile at 320, 390 and 430, the
-  short ones at 22 or more on a phone of 390 and every one at 15 or more from 390 up;
+  short ones at 22 or more on a phone of 390 and every one at 15 or more from 390 up (the two Thessalonians 14); a Chromium that hints the glyphs (CI's does)
+  lays a name wider than one that does not, so the fit counts every letter rounded up to a pixel (tried with --font-render-hinting set to none, slight, medium and full);
   a tile opens the numbers of the chapters, a number opens the words, and Previous and Next name where they go, cross the books and the
   parts (Malachi 4 to Tobit 1) and are disabled at Genesis 1 and Revelation 22; prose is paragraphs, a psalm is stanzas, and the end of a
   chapter has the credit and says it is not the translation read at Mass; a touch chooses a verse and raises Bookmark, Copy and Share, a

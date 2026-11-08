@@ -153,7 +153,7 @@ export const BIBLE_SCENARIOS = [
     },
   },
   {
-    name: 'Library: every one of the 73 book names fits its square tile without being cut, in 320, 390 and 430 wide, in the three parts: the name is the hero (24, the long words down to 15 from 390 up), the count small',
+    name: 'Library: every one of the 73 book names fits its square tile without being cut, in 320, 390 and 430 wide, in the three parts, as a browser lays them out whether it hints the glyphs or not: the name is the hero (24, the long words down to 15 and the two Thessalonians to 14 from 390 up), the count small',
     persona: 'in',
     async run({ page, step, go }) {
       step('open Library');
@@ -173,7 +173,7 @@ export const BIBLE_SCENARIOS = [
             assert.equal(t.countLines, 1, `${where}: the count is on one line`);
             assert(!t.countCut, `${where}: the count is cut`);
             assert(t.nameSize >= 11 && t.nameSize <= 24, `${where}: the name is drawn at ${t.nameSize}`);
-            if (width >= 390) assert(t.nameSize >= 15, `${where}: the name is drawn at ${t.nameSize}, under 15`);
+            if (width >= 390) assert(t.nameSize >= (/Thessalonians/.test(t.name) ? 14 : 15), `${where}: the name is drawn at ${t.nameSize}, under ${/Thessalonians/.test(t.name) ? 14 : 15}`);
             if (width >= 390 && SHORT_NAMES.includes(t.name)) assert(t.nameSize >= 22, `${where}: a short name is the hero of its tile and is drawn at ${t.nameSize}`);
             assert(t.countSize >= 10 && t.countSize <= 12, `${where}: the count is drawn at ${t.countSize}`);
             assert(Math.abs(t.w - t.h) <= 1 && t.w >= 44, `${where}: the tile is ${t.w} x ${t.h}`);

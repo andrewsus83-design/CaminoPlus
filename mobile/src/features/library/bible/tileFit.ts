@@ -9,7 +9,12 @@
 //
 // The name is the hero of the tile: as large as the tile allows, up to NAME_MAX. The short names are all at that size; a long word comes down just
 // enough to fit (and never breaks inside the word), and the letters of a name are set a little closer than the font's own spacing (NAME_TRACKING,
-// the way a display face is set), which is what lets "Thessalonians" be 15 on a phone of 390 instead of 14.
+// the way a display face is set).
+//
+// How wide a line is drawn depends on the browser, and the web smoke found it out: a Chromium that hints the glyphs (the runners of CI, or any with full hinting) gives
+// every letter a whole number of pixels, and "Corinthians" came out 3 px wider than the font file says and broke into two lines. So the width of a line is counted with every
+// letter rounded UP to whole pixels at the size it is drawn (inkPx): never narrower than any layout of this font (measured in Chromium with hinting none, slight, medium and
+// full: no line, at any size from 11 to 24, was wider than that by more than 0.02 px), and a phone that does not hint (iOS, Android) draws it narrower, never wider.
 //
 // The size is for the phone's own text size too: a person who has made the text larger gets names that stay as wide as the tile (the size
 // is reduced by what the system adds, up to CAP, which the text itself is held to with maxFontSizeMultiplier) and never under the floor.
@@ -17,14 +22,14 @@
 /** The largest a name is drawn, and the smallest. Both are the size as drawn, with the phone's text size in it. */
 export const NAME_MAX = 24;
 export const NAME_FLOOR = 11;
-/** What every name reaches from a phone of 390 wide up (the longest words come down to it and no further there); on a phone of 320 a tile is only 90 wide and "Thessalonians" is 12. */
-export const NAME_WANTED = 15;
+/** What every name reaches from a phone of 390 wide up (only the two Thessalonians come down to it and no further there; everything else is 15 or more); on a phone of 320 a tile is only 90 wide and "Thessalonians" is 11. */
+export const NAME_WANTED = 14;
 /** The letters of a name are set this much closer than the font spaces them, in em of the size they are drawn at. */
 export const NAME_TRACKING = -0.02;
 /** The largest the phone's own text size counts for a tile (the text is held to it with maxFontSizeMultiplier). */
 export const TEXT_SCALE_CAP = 1.3;
-/** A line is taken to be this much wider than the sum of its letters, for what the phone adds (rounding, kerning goes the other way). */
-export const FIT_SAFETY = 1.02;
+/** A line is taken to be this much wider than the sum of its letters rounded up, for what a phone adds that no table has (kerning goes the other way): a pixel in a hundred. */
+export const FIT_SAFETY = 1.01;
 /** The count under a name: drawn at most so large, at least so small, in JetBrains Mono, whose letters are all 0.6 em wide. */
 export const COUNT_MAX = 12;
 export const COUNT_FLOOR = 10;
@@ -42,8 +47,20 @@ export const FRAUNCES_600: Readonly<Record<string, number>> = {
 /** The width of a line of a name in em. A character that is not in the table counts as a wide one (0.8 em), so that a surprise is never too narrow. */
 export const lineWidth = (line: string): number => [...line].reduce((sum, ch) => sum + (FRAUNCES_600[ch] ?? 0.8), 0);
 
-/** The width of the ink of a line of a name in em, with the letters set closer by NAME_TRACKING (between the letters: the gap after the last one is not ink). */
+/** The width of the ink of a line of a name in em, with the letters set closer by NAME_TRACKING (between the letters: the gap after the last one is not ink). Unhinted. */
 export const inkWidth = (line: string): number => lineWidth(line) + ([...line].length - 1) * NAME_TRACKING;
+
+/** The table above is the font file to a quarter of this much (em; it is rounded to 0.0005 and bible.test.ts reads the file again): a letter is rounded up with it counted in. */
+export const TABLE_TOLERANCE = 0.0003;
+
+/** Rounded up to a whole number, with a hair of room for the sums that come out a billionth over a whole number. */
+const up = (x: number): number => Math.ceil(x - 1e-9);
+
+/**
+ * The width in px of a line of a name drawn at `size` (as drawn), as a browser that hints the glyphs lays it out: every letter takes a whole number of pixels, rounded up, and the
+ * letters are set NAME_TRACKING closer (between the letters, as inkWidth). The unhinted layout of the font file is never wider than this.
+ */
+export const inkPx = (line: string, size: number): number => [...line].reduce((sum, ch) => sum + up(((FRAUNCES_600[ch] ?? 0.8) + TABLE_TOLERANCE) * size), 0) + ([...line].length - 1) * NAME_TRACKING * size;
 
 /**
  * The lines of a name. A name with a number in front ("1 Samuel") breaks after the number, in every numbered book alike, so the number is a
@@ -65,7 +82,6 @@ export function nameLines(name: string): string[] {
   return best;
 }
 
-const half = (n: number): number => Math.floor(n * 2) / 2;
 const held = (fontScale: number): number => Math.min(Math.max(fontScale, 1), TEXT_SCALE_CAP);
 
 export type NameFit = {
@@ -83,19 +99,26 @@ export type NameFit = {
 export function fitName(name: string, inner: number, fontScale = 1): NameFit {
   const m = held(fontScale);
   const lines = nameLines(name);
-  const widest = Math.max(...lines.map(inkWidth));
+  const widest = (drawn: number): number => Math.max(...lines.map((line) => inkPx(line, drawn))) * FIT_SAFETY;
   // the size as it is drawn, in half pixels: the largest the tile allows (up to NAME_MAX) and never under NAME_FLOOR; the size to give the text is that less what the phone adds
-  const drawn = Math.max(half(Math.min(NAME_MAX, inner / (widest * FIT_SAFETY))), NAME_FLOOR);
+  let drawn = NAME_MAX;
+  while (drawn > NAME_FLOOR && widest(drawn) > inner) drawn -= 0.5;
   const size = drawn / m;
-  return { lines, size, lineHeight: Math.round(size * 1.2), tracking: NAME_TRACKING * size, fits: widest * FIT_SAFETY * drawn <= inner + 1e-9 };
+  return { lines, size, lineHeight: Math.round(size * 1.2), tracking: NAME_TRACKING * size, fits: widest(drawn) <= inner + 1e-9 };
 }
 
 export type CountFit = { size: number; lineHeight: number; fits: boolean };
 
-/** The same for the count under a name ("150 chapters"), which is one line in JetBrains Mono. */
+/**
+ * The same for the count under a name ("150 chapters"), which is one line in JetBrains Mono. Every letter takes a whole number of pixels there too when the browser hints
+ * (6.6 becomes 7 at 11), so the width is the number of letters times the advance rounded up, as drawn.
+ */
 export function fitCount(text: string, inner: number, fontScale = 1): CountFit {
   const m = held(fontScale);
-  const em = [...text].length * MONO_ADVANCE;
-  const size = Math.max(half(Math.min(COUNT_MAX / m, inner / (em * FIT_SAFETY * m))), COUNT_FLOOR / m);
-  return { size, lineHeight: Math.round(size * 1.4), fits: em * FIT_SAFETY * size * m <= inner + 1e-9 };
+  const letters = [...text].length;
+  const widest = (drawn: number): number => letters * up(MONO_ADVANCE * drawn) * FIT_SAFETY;
+  let drawn = COUNT_MAX;
+  while (drawn > COUNT_FLOOR && widest(drawn) > inner) drawn -= 0.5;
+  const size = drawn / m;
+  return { size, lineHeight: Math.round(size * 1.4), fits: widest(drawn) <= inner + 1e-9 };
 }
