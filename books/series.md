@@ -4,6 +4,9 @@ Twenty books for the app's **Library** (Books tab) and for sale as EPUB and PDF:
 made from a famous book in the public domain and paired with one Camino. Written with the [`book-writer`](../.claude/skills/book-writer/SKILL.md) skill, built and
 packaged with the [`book-publisher`](../.claude/skills/book-publisher/SKILL.md) skill. Where the classics come from: [`sources/SOURCES.md`](sources/SOURCES.md).
 
+The same plan exists in machine-readable form in [`plan.json`](plan.json): `python3 tools/check_series.py` fails when a planned book is missing, an unplanned book appears, or a book disagrees with the plan.
+Six catalog routes (Aragonés, Salvador, Sanabrés, Madrid, Baztanes, Lisbon) have no guide yet; the plan lists them on purpose, and a second batch is writing them.
+
 ## The guidebooks (up to 12,000 words each)
 
 Each guide covers one route of the app's catalog (14 routes), so a book can be linked to its route (`route_slug`). They follow

@@ -112,3 +112,19 @@ per classic, which is what the checker verifies every quote against:
 - A guide has its `facts.md`. A reflection book has every passage verified against its source by the checker, `days` equal to its day chapters, and its end-of-day questions as lists.
 - Your report to the person says: the word count and reading time, what you could not verify and left out, and anything they
   must decide (for example a claim you could not source).
+
+## Running a batch of books (the lessons of the first twenty)
+
+Writing many books at once works if the batch itself is controlled. What went wrong or nearly wrong, and the rule that prevents it:
+
+1. **The plan comes first.** Add every book to `books/plan.json` (id, kind, order, route, and for a reflection book its days and source ids) and to `books/series.md` before any writer starts.
+   `python3 tools/check_series.py` then fails on a book that is skipped, a folder nobody planned, a mismatch of order, kind, route, days or sources, and a catalog route with no guide.
+2. **Half-written books never reach a commit.** While a batch runs, hide each new folder from git with a local line in `.git/info/exclude` (`books/<id>/`, never committed), and remove the line
+   when the book passes. Commit by explicit path (`git add books/<id>`), never `git add -A` in the middle of a batch: a snapshot of a half-written book is how a red commit and a partly-finished book reach a branch.
+3. **At most six writers at once**, each inside its own folder, none running git, none touching another folder or the tools. Nine to ten ran without a crash, but reports and commits then arrive faster than they can be checked.
+4. **The sources list is derived, not typed.** `python3 tools/fetch_book_sources.py DIR` reads every `book.json`, so CI cannot check fewer sources than the books use (a hand-written list of four checked four of twelve).
+5. **The gate, in this order:** `check_books.py --strict --sources DIR` on every book, then `check_series.py`, then (once the app takes the books) `build_books.py --check`, then the tests. A book is finished
+   when it passes all of them and its writer's report has been read; "the checker passes" does not mean its facts have been reviewed by a person.
+6. **Merge by squash, from a branch that holds only what is ready.** Before a merge, `git fetch` and look at what `main` and the other branches are doing: parts of the app may have been rebuilt by someone else in the
+   meantime (the Library was), and content that does not touch the app can merge safely while app changes wait for a decision.
+7. **Count by running the checker, never from memory.** Twice in this project a count of finished books was wrong because it was remembered.

@@ -29,7 +29,7 @@ reader to the app for beds, cafes, closures and weather.
 
 These ranges are **aims that fit under the 12,000-word cap**, not rules: the checker enforces only the total (never more than 12,000) and 1,800 words for any one chapter.
 A route of 14 days cannot give each day 500 words and also keep the chapters around the stages; the guides written so far spend about 300 words a day on stages and
-7,000 to 8,000 words on everything around them. Never pad a short route to reach 9,000: say what a pilgrim needs and stop.
+7,000 to 8,000 words on everything around them. Never pad a short route to reach 9,000 (the checker only warns below 7,000): say what a pilgrim needs and stop.
 
 ## The stages
 

@@ -31,7 +31,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import book_kit as bk  # noqa: E402
 
 GUIDE_MAX_WORDS = 12_000
-GUIDE_MIN_WORDS = 9_000
+GUIDE_MIN_WORDS = 7_000        # a very short route (three days) is not padded to reach 9,000
 REFLECTION_HARD_MAX_WORDS = 39_000          # 3 hours at 220 words a minute is 39,600
 DAYS = (3, 21)                              # a reflection book has as many days as suits its classic and its Camino, never more than three weeks
 DAY_WORDS_MIN, DAY_WORDS_MAX = 1400, 2000   # one day: a 5-minute morning reading and a 3-minute evening reflection

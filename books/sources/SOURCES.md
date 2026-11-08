@@ -4,9 +4,8 @@ Every passage quoted in a reflection book is copied word for word from one of th
 domain; the files are **not** kept in this repository (they are large). Fetch them into a folder outside the repository:
 
 ```bash
-mkdir -p /tmp/book-sources && cd /tmp/book-sources
-for n in 1653 3296 131 1002 13871 8294 52958 8120 24534 1022 63084 46921; do curl -sS -o pg$n.txt "https://www.gutenberg.org/cache/epub/$n/pg$n.txt"; done
-python3 /path/to/repo/tools/check_books.py --sources /tmp/book-sources
+python3 tools/fetch_book_sources.py /tmp/book-sources     # every source named by any book, into pg<number>.txt (the list comes from books/*/book.json)
+python3 tools/check_books.py --strict --sources /tmp/book-sources
 ```
 
 ## Used
@@ -22,7 +21,7 @@ marked "known", the file does not state it and it is the well-documented first p
 | `gutenberg-1002` | *Divine Comedy*, Dante: *Purgatory* (the file also exists whole as 1004) | Translated by Henry Wadsworth Longfellow (1867, known) | Translator died in 1882 |
 | `gutenberg-13871` | *The Practice of the Presence of God the Best Rule of a Holy Life*, Brother Lawrence | Fleming H. Revell Company edition, "translated from the French" (an old print edition) | Old print edition, no U.S. copyright |
 | `gutenberg-8294` | *The World English Bible (WEB)*, Psalms 120 to 134 (the Songs of Ascents) | World English Bible | Dedicated to the public domain worldwide; no Crown patent |
-| `gutenberg-52958` | *Revelations of Divine Love*, Julian of Norwich | Edited by Grace Warrack, 1901 (the edition's date is in the file) | Edition of 1901; the editor died in 1944 |
+| `gutenberg-52958` | *Revelations of Divine Love*, Julian of Norwich | Edited by Grace Warrack, 1901 (the edition's date is in the file) | Edition of 1901 (in the file); the editor's death year was not checked here |
 | `gutenberg-8120` | *The Life of St. Teresa of Jesus*, Teresa of Ávila | Translated by David Lewis (1814 to 1895); the edition of 1904 (the date of its imprimatur is in the file) | Translator died in 1895; the 1904 edition's own introduction is not quoted |
 | `gutenberg-24534` | *The Autobiography of St. Ignatius*, Ignatius of Loyola | Edited by J. F. X. O'Conor, S.J., "Copyright 1900, by Benziger Brothers" (in the file) | Published in 1900 |
 | `gutenberg-1022` | *Walking*, Henry David Thoreau | The essay (1862, known); no translator, no modern editor named in the file | Nineteenth-century text |
