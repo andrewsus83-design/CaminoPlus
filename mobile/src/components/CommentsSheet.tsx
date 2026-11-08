@@ -28,7 +28,7 @@ export type CommentReport = {
   send: (comment: SheetComment, reason: string) => Promise<string | null>;
 };
 
-export function CommentsSheet({ visible, comments, status = 'ready', message, report, onSend, onClose }: {
+export function CommentsSheet({ visible, comments, status = 'ready', message, report, onSend, onClose, onOpenAuthor }: {
   visible: boolean;
   comments: SheetComment[];
   /** loading: the comments are being read. error: they could not be (the message says why) and nothing can be sent. */
@@ -37,6 +37,8 @@ export function CommentsSheet({ visible, comments, status = 'ready', message, re
   report?: CommentReport;
   onSend: (text: string) => boolean | Promise<boolean>;
   onClose: () => void;
+  /** The name of another pilgrim was tapped (a comment that knows who wrote it): the screen closes this sheet and opens their profile. Without it names are plain text. */
+  onOpenAuthor?: (userId: string) => void;
 }) {
   const { height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
@@ -95,7 +97,13 @@ export function CommentsSheet({ visible, comments, status = 'ready', message, re
                 {comments.map((cm) => (
                   <View key={cm.id} style={{ gap: 2, opacity: cm.pending ? 0.6 : 1 }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <AppText variant="caption" muted>@{cm.user}{cm.pending ? ' · sending…' : ''}</AppText>
+                      {!!onOpenAuthor && !!cm.userId && !cm.mine && !cm.pending ? (
+                        <Pressable accessibilityRole="button" accessibilityLabel={`Open profile of @${cm.user}`} onPress={() => onOpenAuthor(cm.userId!)} hitSlop={{ top: 14, bottom: 14, left: 12, right: 12 }}>
+                          <AppText variant="caption" muted style={{ textDecorationLine: 'underline' }}>@{cm.user}</AppText>
+                        </Pressable>
+                      ) : (
+                        <AppText variant="caption" muted>@{cm.user}{cm.pending ? ' · sending…' : ''}</AppText>
+                      )}
                       {!!report && !cm.mine && !cm.pending && (
                         <Pressable accessibilityRole="button" accessibilityLabel={`Report comment by @${cm.user}`} onPress={() => { setReported(null); setReporting(cm); }} hitSlop={{ top: 12, bottom: 12, left: 16, right: 4 }}>
                           <AppText variant="caption" muted style={{ textDecorationLine: 'underline' }}>Report</AppText>

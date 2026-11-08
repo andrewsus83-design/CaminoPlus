@@ -8,10 +8,12 @@ import { CommentsSheet } from '@/components/CommentsSheet';
 import { FIXED } from '@/components/fixedColors';
 import { Icon } from '@/components/Icon';
 import { Post, PostMediaUrl, listPostMediaUrls } from '@/lib/api';
-import { gridCellRows, gridMetrics, shownPosts } from '@/lib/gridLayout';
+import { gridCellRows, gridMetrics, shownPosts, withoutCard } from '@/lib/gridLayout';
 import { SAMPLE_VIEWER_LABEL } from '@/lib/sampleJourney';
 import { NativeName, hasNativeModule } from '@/lib/optionalNative';
-import { c, fixed, fonts, radius, layout } from '@/theme';
+import { pilgrimHref } from '@/features/pilgrim/logic';
+import { PilgrimAvatar } from '@/features/social/components/primitives';
+import { c, fixed, fonts, radius, layout, space } from '@/theme';
 import { JOURNEY_WRITE } from './tabs';
 import { PostRail, usePostRail } from './usePostRail';
 import { WriteCard } from './WriteCard';
@@ -25,6 +27,12 @@ import { WriteCard } from './WriteCard';
 // The first tile, top left, is the "Write a journey post" card (WriteCard.tsx), in the grid of every journey: the sample, a real one, and one filtered to a
 // destination. It is a cell of the grid and not a post: the viewer, the rail, `only`, the likes and the bookmarks work on `posts` alone, so the post in cell k
 // is post k - 1 (lib/gridLayout.ts: gridCellRows) and the viewer opens at the index of the post among the posts shown, never at the cell.
+// Another pilgrim's journey (features/pilgrim) is this same grid and viewer: `owner` says whose posts they are. It has no card in front (only your own journey
+// writes), the viewer names who posted, and what the viewer shows is theirs to keep: the share button sends the invitation to the app, never their words.
+export type JourneyOwner = { id: string; name: string; username?: string | null; avatarUrl?: string | null };
+/** Wait this long after the viewer has closed before another screen is pushed: a screen pushed while a modal is still leaving can be lost on a phone. */
+const AFTER_MODAL_MS = 320;
+
 const CARD_COLORS = [
   { bg: fixed.blue, fg: fixed.parchment },
   { bg: fixed.gold, fg: fixed.blue },
@@ -93,7 +101,15 @@ function PostVisual({ post, media, index, active, small }: { post: Post; media?:
   );
 }
 
-export function JourneyGrid({ posts, margin = layout.screenMargin, sample, media: given, only }: { posts: Post[]; margin?: number; sample?: Record<string, Visual[]>; media?: Record<string, Visual[]>; only?: ReadonlySet<string> | null }) {
+export function JourneyGrid({ posts, margin = layout.screenMargin, sample, media: given, only, owner, allowWrite = !owner, onOpenPilgrim }: {
+  posts: Post[]; margin?: number; sample?: Record<string, Visual[]>; media?: Record<string, Visual[]>; only?: ReadonlySet<string> | null;
+  /** Whose posts these are, when they are not yours. */
+  owner?: JourneyOwner;
+  /** The card that writes a post is the first cell: only on your own journey (the default). */
+  allowWrite?: boolean;
+  /** A name in the viewer (the author of a comment, the owner) was tapped: open that pilgrim. By default the profile screen is pushed. */
+  onOpenPilgrim?: (id: string) => void;
+}) {
   // `sample`: the bundled sample journey. Its pictures and clips come with the app, so nothing is fetched.
   // `media`: the pictures when the screen has already fetched them (Me shares one fetch with the highlights), so nothing is fetched here either.
   const [own, setOwn] = useState<Record<string, Visual[]>>(sample ?? {});
@@ -117,11 +133,20 @@ export function JourneyGrid({ posts, margin = layout.screenMargin, sample, media
   const shown = useMemo(() => shownPosts(posts, only), [posts, only]);
   // Even rows of two tiles, the write card first and then the posts. The only space between tiles is `gap` (2 px, sideways and downwards); the page background shows through it.
   const rows = useMemo(() => gridCellRows(shown.length), [shown.length]);
+  // Another pilgrim's journey has no card: the same cells without it, the posts flowing from the top left.
+  const cells = allowWrite ? rows : withoutCard(rows);
+
+  // A name in the viewer was tapped: the comments sheet and the viewer go, then the pilgrim opens (the profile screen, or what the screen that drew this grid wants).
+  const goPilgrim = (id: string) => {
+    rail.sheet.onClose();
+    setOpenAt(null);
+    setTimeout(() => (onOpenPilgrim ? onOpenPilgrim(id) : router.push(pilgrimHref(id))), AFTER_MODAL_MS);
+  };
 
   return (
     <>
       <View style={{ marginHorizontal, gap }}>
-        {rows.map((row, r) => (
+        {cells.map((row, r) => (
           <View key={r} style={{ flexDirection: 'row', gap }}>
             {row.map((cell) => {
               if (cell.kind === 'write') return <WriteCard key="write" width={colW} height={tileH} onPress={() => router.push(JOURNEY_WRITE.href)} />;
@@ -146,14 +171,14 @@ export function JourneyGrid({ posts, margin = layout.screenMargin, sample, media
           </View>
         ))}
       </View>
-      {openAt !== null && <Viewer posts={shown} media={media} start={openAt} rail={rail} sampleLabel={sample ? SAMPLE_VIEWER_LABEL : undefined} onClose={() => setOpenAt(null)} />}
+      {openAt !== null && <Viewer posts={shown} media={media} start={openAt} rail={rail} sampleLabel={sample ? SAMPLE_VIEWER_LABEL : undefined} owner={owner} onOpenPilgrim={goPilgrim} onClose={() => setOpenAt(null)} />}
     </>
   );
 }
 
 const CLOSE_SIZE = 52;
 
-function Viewer({ posts, media, start, rail, onClose, sampleLabel }: { posts: readonly Post[]; media: Record<string, Visual[]>; start: number; rail: PostRail; onClose: () => void; sampleLabel?: string }) {
+function Viewer({ posts, media, start, rail, onClose, sampleLabel, owner, onOpenPilgrim }: { posts: readonly Post[]; media: Record<string, Visual[]>; start: number; rail: PostRail; onClose: () => void; sampleLabel?: string; owner?: JourneyOwner; onOpenPilgrim: (id: string) => void }) {
   const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const [cur, setCur] = useState(start);
@@ -198,6 +223,13 @@ function Viewer({ posts, media, start, rail, onClose, sampleLabel }: { posts: re
         <Pressable accessibilityRole="button" accessibilityLabel="Close" onPress={onClose} hitSlop={12} style={{ position: 'absolute', top: insets.top + layout.screenTop, left: 16, width: CLOSE_SIZE, height: CLOSE_SIZE, borderRadius: CLOSE_SIZE / 2, backgroundColor: FIXED.photoChip, alignItems: 'center', justifyContent: 'center' }}>
           <Icon name="close" color={FIXED.onPhoto} size={28} />
         </Pressable>
+        {/* Whose posts these are, when they are not yours: their picture and name beside the close button. A tap closes the viewer and shows their profile (this very screen, or the one that opens). */}
+        {!!owner && (
+          <Pressable accessibilityRole="button" accessibilityLabel={`${owner.name}. Open profile`} onPress={() => onOpenPilgrim(owner.id)} style={{ position: 'absolute', top: insets.top + layout.screenTop, left: 16 + CLOSE_SIZE + 12, maxWidth: width - (16 + CLOSE_SIZE + 12) - 16, minHeight: CLOSE_SIZE, flexDirection: 'row', alignItems: 'center', gap: space[2], paddingLeft: space[2], paddingRight: space[4], paddingVertical: space[2], borderRadius: radius.pill, backgroundColor: FIXED.photoChip }}>
+            <PilgrimAvatar name={owner.name} uri={owner.avatarUrl} seed={owner.id} size={36} />
+            <AppText variant="label" color={FIXED.onPhoto} numberOfLines={1} style={{ flexShrink: 1 }}>{owner.name}</AppText>
+          </Pressable>
+        )}
         {/* One short sentence when a like, bookmark or share did not work (offline, refused). Next to the close button, clear of the caption and the rail. */}
         {!!rail.notice && (
           <View pointerEvents="none" style={{ position: 'absolute', top: insets.top + layout.screenTop, left: 16 + CLOSE_SIZE + 12, right: 16, minHeight: CLOSE_SIZE, alignItems: 'center', justifyContent: 'center' }}>
@@ -206,7 +238,7 @@ function Viewer({ posts, media, start, rail, onClose, sampleLabel }: { posts: re
             </View>
           </View>
         )}
-        <CommentsSheet {...rail.sheet} />
+        <CommentsSheet {...rail.sheet} onOpenAuthor={onOpenPilgrim} />
       </View>
     </Modal>
   );

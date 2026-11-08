@@ -12,6 +12,7 @@ import { useDialogs } from '@/features/social/components/dialogs';
 import { CountBadge, PilgrimAvatar } from '@/features/social/components/primitives';
 import { EmptyState, ErrorState, Notice, OFFLINE_TEXT } from '@/features/social/components/states';
 import { MessageAction, buildTimeline, conversationName, friendlyError, messageActions, pilgrimsLabel, REPORT_PROMPT, REPORT_REASONS, REPORT_THANKS, snippet, storageGate, toInverted, ts } from '@/features/social/logic';
+import { pilgrimHref } from '@/features/pilgrim/logic';
 import { goBack } from '@/features/social/nav';
 import { MAX_PHOTO_BYTES, PickerUnavailable, pickPhoto } from '@/features/social/pick';
 import type { ChatMessage, MessageEntry, ReportReason, TimelineEntry } from '@/features/social/types';
@@ -49,6 +50,7 @@ export default function ChatScreen() {
   const conv = chat.conversation;
   const group = conv?.kind === 'group';
   const title = conv ? conversationName(conv) : 'Chat';
+  const peerId = conv && !group ? conv.peer_id : null; // the other pilgrim of a direct chat
   const meId = chat.uid ?? '';
 
   const entries = useMemo(
@@ -221,7 +223,8 @@ export default function ChatScreen() {
     <KeyboardAvoidingView behavior="padding" style={{ flex: 1, backgroundColor: role.bg }}>
       <View style={{ paddingTop: insets.top + layout.screenTop, paddingBottom: 10, paddingHorizontal: layout.screenMargin, flexDirection: 'row', alignItems: 'center', gap: 6, borderBottomWidth: 1, borderBottomColor: role.border, backgroundColor: role.bg }}>
         <BackButton onPress={() => goBack(router)} />
-        <Pressable accessibilityRole="button" accessibilityLabel={`${title}. ${group ? pilgrimsLabel(conv?.member_count ?? 0) : 'Friend'}. Open chat info`} onPress={() => router.push(`/chat/info/${id}`)} style={{ flex: 1, minHeight: 52, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+        {/* The name of a direct chat opens the profile of the pilgrim (the info button next to it is the chat's own settings); the name of a group opens the group's info. */}
+        <Pressable accessibilityRole="button" accessibilityLabel={peerId ? `${title}. Friend. Open profile` : `${title}. ${group ? pilgrimsLabel(conv?.member_count ?? 0) : 'Friend'}. Open chat info`} onPress={() => router.push(peerId ? pilgrimHref(peerId) : `/chat/info/${id}`)} style={{ flex: 1, minHeight: 52, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
           {conv
             ? <PilgrimAvatar name={title} uri={group ? conv.avatar_url : conv.peer_avatar_url} seed={conv.peer_id ?? String(id)} size={44} group={group} />
             : <View style={{ width: 44, height: 44, borderRadius: radius.pill, backgroundColor: c.sand200 }} />}

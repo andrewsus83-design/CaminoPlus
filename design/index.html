@@ -860,6 +860,17 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
 .jg .jt.write { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 0 12px; background: var(--cp-surface); box-shadow: inset 0 0 0 1px var(--cp-border); font-weight: 600; font-size: 17px; line-height: 22px; text-align: center; cursor: pointer; }
 .jg .jt.write .ico { width: 64px; height: 64px; border-radius: 50%; background: var(--cp-highlight); color: var(--cp-on-highlight); display: grid; place-items: center; }
 .jg .jt.write .ico .cp-icon { width: 30px; height: 30px; stroke-width: 2.2px; }
+/* ---- Pilgrim: the profile of another pilgrim (mobile/app/pilgrim/[id].tsx). Back, @username and the three dots; the card; Message, Add friend, Requested, or Accept and Decline; their journey in the
+   grid of Me without the card that writes a post. A private profile that is not a friend's is a minimal card. Nothing private is on it: no Notes, Plan or Health, no tab strip. ---- */
+.pf-top { display: flex; align-items: center; gap: 12px; }
+.pf-top .un { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pf-top .cp-icon-btn { flex: none; }
+.pf-id { margin-top: 16px; display: flex; flex-direction: column; gap: 4px; }
+.pf-id b { font-size: 19px; line-height: 28px; font-weight: 600; }
+.pf-id .h { font-size: 17px; line-height: 25px; color: var(--cp-text-muted); }
+.pf-id p { margin: 0; font-size: 17px; line-height: 25px; }
+.pf-btn { margin-top: 16px; }
+.pf-h { margin: 24px 0 12px; font-family: var(--cp-font-title); font-weight: 600; font-size: 24px; line-height: 30px; }
 .cp-toolbar { display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; background: var(--cp-surface); border-radius: var(--cp-radius-pill); box-shadow: var(--cp-shadow-lg); }
 .cp-toolbar .cp-icon-btn { box-shadow: none; background: transparent; }
 .cp-toolbar .cp-icon-btn.on { background: var(--cp-color-gold-soft); }
@@ -1218,6 +1229,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
     <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
     <symbol id="i-dots" viewBox="0 0 24 24"><circle cx="6" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="18" cy="12" r="1"/></symbol>
+    <symbol id="i-user-plus" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.3 2.9-5.5 6.5-5.5s6.5 2.2 6.5 5.5"/><path d="M19 7.5v6M16 10.5h6"/></symbol>
     <symbol id="i-pencil" viewBox="0 0 24 24"><path d="M4 20h4L19.5 8.5a2.8 2.8 0 0 0-4-4L4 16v4Z"/><path d="m13.5 6.5 4 4"/></symbol>
     <symbol id="i-pen" viewBox="0 0 24 24"><path d="M4 20l1-4L16.5 4.5a2.1 2.1 0 0 1 3 3L8 19l-4 1Z"/></symbol>
     <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"/></symbol>
@@ -2178,7 +2190,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
 <section class="doc" id="screens">
   <p class="eyebrow">15 · Screens @ 390 × 844</p>
   <h2>The app, tab by tab</h2>
-  <p class="intro">Reference layouts at iPhone 15 size. Scroll sideways to see all of them. Me has the My Camino card with its Change button, a row of highlights (first All, pinned at the left, which opens one stamp for every place of the Camino and, with a tap on a stamp, your journeys there; then one round picture for each destination of the day plan: a gold ring when you posted there, a dashed circle while it is still ahead), four sub-tabs (Notes, Journey, Plan, Health), a chat button that opens the inbox, a two-step write flow, a share screen and a stamp pop-up. Maps has two layers: helicopter view and city view. Stays opens into Airbnb / Agoda-style detail pages for stays and cafes. Explore has a second screen for the photo marketplace. Library has a search field with a bookmarks button on top and directly under it the tabs Bible and Books, each with its banner; Bible has three choices at the bottom (Old Testament, Deuterocanon, New Testament); a search lists its results grouped by tab, Bookmarks lists what the pilgrim kept, and the diary (the Notes sub-tab of Me) has a feed of pages and an editor. Settings is a screen opened from the gear at the top right of Me; it opens the business-owner flow: a welcome page, five registration steps, the review status and the owner dashboard.</p>
+  <p class="intro">Reference layouts at iPhone 15 size. Scroll sideways to see all of them. Me has the My Camino card with its Change button, a row of highlights (first All, pinned at the left, which opens one stamp for every place of the Camino and, with a tap on a stamp, your journeys there; then one round picture for each destination of the day plan: a gold ring when you posted there, a dashed circle while it is still ahead), four sub-tabs (Notes, Journey, Plan, Health), a chat button that opens the inbox, a two-step write flow, a share screen and a stamp pop-up. Maps has two layers: helicopter view and city view. Stays opens into Airbnb / Agoda-style detail pages for stays and cafes. Explore has a second screen for the photo marketplace. Library has a search field with a bookmarks button on top and directly under it the tabs Bible and Books, each with its banner; Bible has three choices at the bottom (Old Testament, Deuterocanon, New Testament); a search lists its results grouped by tab, Bookmarks lists what the pilgrim kept, and the diary (the Notes sub-tab of Me) has a feed of pages and an editor. A pilgrim's profile (opened from a friend, a search result, a comment or the header of a chat) shows the card, Message or Add friend and their journey in the grid of Me without the card that writes a post; nothing private is on it. Settings is a screen opened from the gear at the top right of Me; it opens the business-owner flow: a welcome page, five registration steps, the review status and the owner dashboard.</p>
 
   <div class="phones">
 
@@ -2622,6 +2634,133 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           <div class="cp-tab"><span class="ico"><svg class="cp-icon "><use href="#i-explore"/></svg></span>Discover</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-library"/></svg></span>Library</div>
         </nav></div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Pilgrim · Friend</b>The profile of a friend, from the friends list, a search result, a comment or a chat · Back, @username, the three dots · the card · Message · their journey in the grid of Me, with no card that writes a post · no Notes, Plan or Health</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll" style="padding-bottom:40px">
+          <div class="pf-top">
+            <button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon "><use href="#i-back"/></svg></button>
+            <span class="un">hannah</span>
+            <button class="cp-icon-btn flat" aria-label="More options for Hannah Meyer"><svg class="cp-icon "><use href="#i-dots"/></svg></button>
+          </div>
+          <div class="profile-top" style="margin-top:16px">
+            <span class="cp-ring"><span class="cp-avatar" style="width:86px;height:86px;background:linear-gradient(150deg,#D7C6E0,#6E5470)"></span></span>
+            <div class="pstats"><div><b>112</b><span>km</span></div><div><b>3</b><span>posts</span></div><div><b>7</b><span>stamps</span></div></div>
+          </div>
+          <div class="pf-id"><b>Hannah Meyer</b><span class="h">@hannah</span><p>Walking the Camino for my father. Ultreia!</p></div>
+          <button class="cp-btn cp-btn-primary md block pf-btn"><svg class="cp-icon"><use href="#i-chat"/></svg>Message</button>
+          <h4 class="pf-h">Journey</h4>
+          <div class="jg">
+            <div class="jt"><div class="cp-img v2"></div><span class="cap">Cruz de Ferro</span></div>
+            <div class="jt txt gold"><p>Stamp number 20, and a very good soup.</p><span class="cap">Astorga</span></div>
+            <div class="jt"><div class="cp-img v5"></div><span class="n">3</span><span class="cap">Hontanas</span></div>
+          </div>
+        </div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Pilgrim · Friend, dark</b>The same screen after sunset</p>
+      <div class="phone dk">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll" style="padding-bottom:40px">
+          <div class="pf-top">
+            <button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon "><use href="#i-back"/></svg></button>
+            <span class="un">hannah</span>
+            <button class="cp-icon-btn flat" aria-label="More options for Hannah Meyer"><svg class="cp-icon "><use href="#i-dots"/></svg></button>
+          </div>
+          <div class="profile-top" style="margin-top:16px">
+            <span class="cp-ring"><span class="cp-avatar" style="width:86px;height:86px;background:linear-gradient(150deg,#D7C6E0,#6E5470)"></span></span>
+            <div class="pstats"><div><b>112</b><span>km</span></div><div><b>3</b><span>posts</span></div><div><b>7</b><span>stamps</span></div></div>
+          </div>
+          <div class="pf-id"><b>Hannah Meyer</b><span class="h">@hannah</span><p>Walking the Camino for my father. Ultreia!</p></div>
+          <button class="cp-btn cp-btn-primary md block pf-btn"><svg class="cp-icon"><use href="#i-chat"/></svg>Message</button>
+          <h4 class="pf-h">Journey</h4>
+          <div class="jg">
+            <div class="jt"><div class="cp-img v2"></div><span class="cap">Cruz de Ferro</span></div>
+            <div class="jt txt gold"><p>Stamp number 20, and a very good soup.</p><span class="cap">Astorga</span></div>
+            <div class="jt"><div class="cp-img v5"></div><span class="n">3</span><span class="cap">Hontanas</span></div>
+          </div>
+        </div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Pilgrim · Stranger</b>Add friend instead of Message · the journey says that journeys shared with friends are not shown here · the three dots have no Unfriend</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll" style="padding-bottom:40px">
+          <div class="pf-top">
+            <button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon "><use href="#i-back"/></svg></button>
+            <span class="un">marta</span>
+            <button class="cp-icon-btn flat" aria-label="More options for Marta Vidal"><svg class="cp-icon "><use href="#i-dots"/></svg></button>
+          </div>
+          <div class="profile-top" style="margin-top:16px">
+            <span class="cp-ring"><span class="cp-avatar" style="width:86px;height:86px;background:linear-gradient(150deg,#BFD0C4,#4E6B5A)"></span></span>
+            <div class="pstats"><div><b>64</b><span>km</span></div><div><b>5</b><span>posts</span></div><div><b>3</b><span>stamps</span></div></div>
+          </div>
+          <div class="pf-id"><b>Marta Vidal</b><span class="h">@marta</span><p>From Lisbon, on the Camino Portugu&eacute;s.</p></div>
+          <button class="cp-btn cp-btn-primary md block pf-btn"><svg class="cp-icon"><use href="#i-user-plus"/></svg>Add friend</button>
+          <h4 class="pf-h">Journey</h4>
+          <div class="nt-empty">
+            <span class="badge"><svg class="cp-icon"><use href="#i-steps"/></svg></span>
+            <h4>No journeys to show yet</h4>
+            <p>Journeys shared with friends are not shown here. Add Marta Vidal as a friend to see them.</p>
+          </div>
+        </div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Pilgrim · Private</b>A private profile that is not a friend&rsquo;s is a minimal card: the name and the button, none of the numbers or the words, no journey</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll" style="padding-bottom:40px">
+          <div class="pf-top">
+            <button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon "><use href="#i-back"/></svg></button>
+            <span class="un">ines</span>
+            <button class="cp-icon-btn flat" aria-label="More options for Ines Duarte"><svg class="cp-icon "><use href="#i-dots"/></svg></button>
+          </div>
+          <div class="profile-top" style="margin-top:16px">
+            <span class="cp-ring"><span class="cp-avatar" style="width:86px;height:86px;background:linear-gradient(150deg,#9DB4CC,#14365D)"></span></span>
+            
+          </div>
+          <div class="pf-id"><b>Ines Duarte</b><span class="h">@ines</span></div>
+          <button class="cp-btn cp-btn-primary md block pf-btn"><svg class="cp-icon"><use href="#i-user-plus"/></svg>Add friend</button>
+          <div class="nt-empty">
+            <span class="badge"><svg class="cp-icon"><use href="#i-shield"/></svg></span>
+            <h4>This profile is private</h4>
+            <p>Ines Duarte shares journeys with friends only. Send a friend request to see them.</p>
+          </div>
+        </div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Pilgrim · Not available</b>An id nobody has, a pilgrim who left, or one who blocked you or whom you blocked: one calm card, never an error · Go to Friends</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll" style="padding-bottom:40px">
+          <div class="pf-top">
+            <button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon "><use href="#i-back"/></svg></button>
+            <span class="un">Profile</span>
+          </div>
+          <div class="nt-empty" style="padding-top:56px">
+            <span class="badge"><svg class="cp-icon"><use href="#i-me"/></svg></span>
+            <h4>This profile is not available</h4>
+            <p>The pilgrim may have left the app, or this profile cannot be shown to you.</p>
+            <button class="cp-btn cp-btn-gold md" style="margin-top:10px">Go to Friends</button>
+          </div>
+        </div>
         <span class="home-ind"></span>
       </div>
     </div>

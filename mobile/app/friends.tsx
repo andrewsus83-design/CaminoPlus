@@ -11,6 +11,7 @@ import { useDialogs } from '@/features/social/components/dialogs';
 import { Btn, RoundBtn, ScreenHeader, SearchField, SegmentedTabs } from '@/features/social/components/primitives';
 import { PersonRow } from '@/features/social/components/rows';
 import { EmptyState, ErrorState, LoadingRows, Notice, Section } from '@/features/social/components/states';
+import { pilgrimHref, UNFRIEND_MESSAGE } from '@/features/pilgrim/logic';
 import { friendAction, friendlyError, notificationTime, personName } from '@/features/social/logic';
 import { goBack } from '@/features/social/nav';
 import type { Friend, FriendRequest, PilgrimResult } from '@/features/social/types';
@@ -56,6 +57,9 @@ export default function FriendsScreen() {
     }
   }, [opening, router, toast]);
 
+  // A name or a picture opens the profile of that pilgrim; the round chat button is the way to their chat.
+  const openProfile = useCallback((userId: string) => router.push(pilgrimHref(userId)), [router]);
+
   const say = async (job: Promise<string | null>, ok: string) => { const err = await job; toast(err ?? ok); };
 
   // Blocking ends a friendship or a request on the server, so the lists follow at once: the person leaves the friends,
@@ -78,7 +82,7 @@ export default function FriendsScreen() {
       ],
     });
     if (choice === 'unfriend') {
-      const ok = await confirm({ title: `Unfriend ${name}?`, message: 'You will stop seeing each other\'s friends-only posts and cannot chat until you are friends again.', confirmLabel: 'Unfriend', destructive: true, icon: 'close' });
+      const ok = await confirm({ title: `Unfriend ${name}?`, message: UNFRIEND_MESSAGE, confirmLabel: 'Unfriend', destructive: true, icon: 'close' });
       if (ok) await say(data.unfriend(f.id), `${name} is no longer your friend.`);
     } else if (choice === 'report') {
       await safety.reportPerson({ id: f.id, name });
@@ -118,7 +122,7 @@ export default function FriendsScreen() {
       return (
         <PersonRow
           name={name} username={f.username} uri={f.avatar_url} seed={f.id} detail={`${Math.round(Number(f.km_walked ?? 0))} km walked`}
-          accessibilityLabel={`${name}${f.username ? `, @${f.username}` : ''}. Open chat`} onPress={() => openChat(f.id)}
+          accessibilityLabel={`${name}${f.username ? `, @${f.username}` : ''}. Open profile`} onPress={() => openProfile(f.id)}
           trailing={
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
               <RoundBtn icon="chat" label={`Message ${name}`} onPress={() => openChat(f.id)} loading={opening === f.id} />
@@ -135,6 +139,7 @@ export default function FriendsScreen() {
       return (
         <PersonRow
           name={name} username={r.username} uri={r.avatar_url} seed={r.id} detail={notificationTime(r.requested_at, now)}
+          accessibilityLabel={`${name}${r.username ? `, @${r.username}` : ''}. Open profile`} onPress={() => openProfile(r.id)}
           trailing={<MoreBtn name={name} onPress={() => personMenu({ id: r.id, name })} />}
           below={
             <View style={{ flexDirection: 'row', gap: 10 }}>
@@ -151,6 +156,7 @@ export default function FriendsScreen() {
       return (
         <PersonRow
           name={name} username={r.username} uri={r.avatar_url} seed={r.id} detail={`Sent ${notificationTime(r.requested_at, now).replace(/^Just now$/, 'just now')}`}
+          accessibilityLabel={`${name}${r.username ? `, @${r.username}` : ''}. Open profile`} onPress={() => openProfile(r.id)}
           trailing={
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
               <Btn label="Cancel" size="sm" variant="ghost" style={{ paddingHorizontal: 12 }} loading={data.busy.has(r.id)} onPress={() => say(data.cancel(r.id), 'Request cancelled.')} accessibilityLabel={`Cancel your request to ${name}`} />
@@ -172,7 +178,7 @@ export default function FriendsScreen() {
     // The row has to fit the button, the "more" button and a readable name: no icon in the button, less padding around its label.
     return (
       <PersonRow
-        name={name} username={p.username} uri={p.avatar_url} seed={p.id} accessibilityLabel={`${name}${p.username ? `, @${p.username}` : ''}`}
+        name={name} username={p.username} uri={p.avatar_url} seed={p.id} accessibilityLabel={`${name}${p.username ? `, @${p.username}` : ''}. Open profile`} onPress={() => openProfile(p.id)}
         trailing={
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <Btn label={act.label} size="sm" style={{ paddingHorizontal: 10 }} variant={act.kind === 'add' ? 'primary' : act.kind === 'accept' ? 'gold' : act.kind === 'message' ? 'soft' : 'ghost'} loading={busy || opening === p.id} onPress={press} accessibilityLabel={label} hint={act.kind === 'cancel' ? 'Tap to cancel the request' : undefined} />

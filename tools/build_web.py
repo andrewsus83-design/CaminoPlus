@@ -261,6 +261,7 @@ TABS = [
    "Plan: a stage-by-stage tracker for where you sleep tonight and tomorrow",
    "Health from your smartwatch: steps, distance and heart rate",
    "Friends, notifications and messages behind the chat button at the bottom right: friend requests, notifications, chats and group chats with pilgrims",
+   "A friend's profile: tap a friend's name or picture to see the journeys they shared, in the same grid and full-screen view with love, bookmark, comments and share; their notes, plan and health are never shown, and a private profile shows only a name until you are friends",
    "Settings behind the gear at the top right: subscription and storage, account and password, light or dark mode, your smartwatch and your business listing"],
   [("me-journey", "Me tab, Journey: your posts in a grid, the first card writes a new one, and the chat button at the bottom right opens friends, notifications and messages"), ("me-notes", "Me tab, Notes: the card that writes a note, then your private notes, and the chat button at the bottom right")]),
  ("stays", "bed", "Stays", "Albergues, hostels and cafés on your stage.",

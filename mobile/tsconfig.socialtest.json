@@ -11,5 +11,9 @@
     "outDir": "node_modules/.cache/social-test",
     "rootDir": "src"
   },
-  "files": ["src/features/social/__tests__/social.test.ts"]
+  "files": [
+    "src/features/social/__tests__/social.test.ts",
+    "src/features/pilgrim/__tests__/pilgrim.test.ts",
+    "src/features/pilgrim/__tests__/privacy.test.ts"
+  ]
 }
