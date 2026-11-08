@@ -1,12 +1,13 @@
 # Day 6. Daily bread and a breath of wind
 
-*What do I need for today, and what do I only want to be known for?*
+*What do you need for today, and what do you only want to be known for?*
 
 ## The passage
 
 > Give unto us this day our daily manna, Withouten which in this rough wilderness Backward goes he who toils most to advance. … Here of such pride is paid the forfeiture; And yet I should not be here, were it not That, having power to sin, I turned to God. … O thou vain glory of the human powers, How little green upon thy summit lingers, If’t be not followed by an age of grossness! In painting Cimabue thought that he Should hold the field, now Giotto has the cry, So that the other’s fame is growing dim. … Naught is this mundane rumour but a breath Of wind, that comes now this way and now that, And changes name, because it changes side.
 >
 > — Dante Alighieri, *Purgatory* (*The Divine Comedy*), Canto XI (tr. Henry Wadsworth Longfellow)
+
 ## Reflection
 
 The first meal of a walking day is easy to rush: a coffee on your feet, something sweet in your pocket, and out. It does not feel like an important decision. But a good deal of the day is settled at that bar counter, or on that bench, in the next ten minutes.
@@ -17,17 +18,17 @@ That is a very practical sentence to find in a prayer. It describes a person who
 
 The prayer ends, in the poem, with a request that is not for the speakers. They say they need no protection for themselves, so the last words are for the sake of those who have been left behind. These are bent, weighed-down people, and their last breath of prayer goes to someone else.
 
-Then one of them twists under his stone and looks up at Dante, who has been walking bowed beside them, and calls him by name. He is Oderisi, a painter of manuscript pages from Gubbio (Agobbio, in the translation), who was once much admired. He says the pages painted by another man, Franco, are now the more laughing, and the honour is mostly Franco's. And he adds, with honesty, that he would not have been so gracious while he lived, because of the great desire for excellence on which his heart was set. It cost him a place on this ledge. And yet, he says, he would not be here at all had he not turned to God while he still had the power to sin.
+Then one of them twists under his stone and looks up at Dante, who has been walking bowed beside them, and calls him by name. He is Oderisi, a painter of manuscript pages from Gubbio (Agobbio, in the translation), who was once much admired. He says the pages painted by another man, Franco, now outshine his own, and the honour is mostly Franco's. And he adds, with honesty, that he would not have been so gracious while he lived, because of the great desire for excellence on which his heart was set. It cost him a place on this ledge. And yet, he says, he would not be here at all had he not turned to God while he still had the power to sin.
 
-Then he speaks of fame. Vain glory, he says, keeps so little green on its summit, unless a dull age comes after. Cimabue thought he held the field in painting, and now Giotto has the cry, and the older man's fame grows dim. They were painters of Dante's own day, one after the other, and each was the best in his time. And then the line that is the core of the passage: *Naught is this mundane rumour but a breath Of wind, that comes now this way and now that, And changes name, because it changes side.*
+Then he speaks of fame. Vain glory, he says, keeps so little green on its summit, unless a dull age comes after. Cimabue thought he held the field in painting, and now Giotto has the cry, and Cimabue's fame grows dim. They were painters of Dante's own day, one after the other, and each was the best in his time. And then the line that is the core of the passage: *Naught is this mundane rumour but a breath Of wind, that comes now this way and now that, And changes name, because it changes side.*
 
-Look at the picture. A wind that changes name when it changes side. The reputation you have is not in you; it is in the way the air is moving at the moment, and it is called something different tomorrow. Put beside the bread, it makes a pair. One is what you need to keep going. The other is what you would like to be thought of while you do it.
+Hold the picture a moment. A wind that changes name when it changes side. The reputation you have is not in you; it is in the way the air is moving at the moment, and it is called something different tomorrow. Put beside the bread, it makes a pair. One is what you need to keep going. The other is what you would like to be thought of while you do it.
 
 A road lends itself to scoring. There are the kilometres, the early starts, the weight of the pack, the stage you did when others stopped, and the story you are already composing for the people at home. None of this is bad in itself. But it is wind, and the more of it you carry, the more you lean.
 
-There are two doubts. First, Oderisi is not saying that excellence is a sin. The poem calls him the honour of his art, and the wish to do a thing well is a good wish. What he regrets is the need to be first, which turns a craft into a contest. Second, there is a joke in the passage, whether or not the poet meant it. The speaker of this lecture on the shortness of fame is a character in a poem that has been read for some seven centuries, and that has helped keep his name in circulation. Reputation may be a breath of wind, but some breaths last longer than others.
+A pair of qualifications. First, Oderisi is not saying that excellence is a sin. The poem calls him the honour of his art, and the wish to do a thing well is a good wish. What he regrets is the need to be first, which turns a craft into a contest. Second, there is a joke in the passage, whether or not the poet meant it. The speaker of this lecture on the shortness of fame is a character in a poem that has been read for some seven centuries, and that has helped keep his name in circulation. Reputation may be a breath of wind, but some breaths last longer than others.
 
-What does it ask of an ordinary day? Eat, drink, and rest as if your progress depended on it, because it does. And when someone overtakes you, let them go with your good wishes and not your arithmetic.
+In practice: eat, drink and rest as if your progress depended on it, because it does. And when someone overtakes you, let them go with your good wishes and not your arithmetic.
 
 ## For the walk
 
@@ -48,6 +49,8 @@ Remember, too, where the passage's prayer ended: with those who stayed behind. S
 
 And what praise did you want today? Most of us want some, at the end of a hard day, and it is honest to admit it. The question is whether you needed it or only wanted it. Needing it is human. Wanting it is only wind, but it pulls hard when you are tired, and it is better to know the pull by name.
 
+Try a small test. Imagine telling the story of today tomorrow, at a table with strangers. What would you leave out, and what would you polish? There is nothing sinister in it, since everyone edits. But the day as it was, with its bread and its sulks and its sore heel, is better company than the day as it will be told.
+
 If you are too tired for any of this, leave it. A meal, a wash and a bed are a good evening's work, and the questions will keep until tomorrow. They are not an examination.
 
 - Did I take today's bread, and was it enough?
@@ -56,4 +59,4 @@ If you are too tired for any of this, leave it. A meal, a wash and a bed are a g
 
 ## A short prayer
 
-*Give me today's bread and not tomorrow's worry. Keep my eyes off other people's pace. Let what I do be good, and let the credit be small. Bless the ones who passed me and the ones I passed.*
+*Give me today's bread and not tomorrow's worry. Keep my eyes off other people's pace, and let the credit for what I do be small. Bless the ones who passed me and the ones I passed.*

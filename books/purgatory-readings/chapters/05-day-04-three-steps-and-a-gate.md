@@ -7,6 +7,7 @@
 > Thither did we approach; and the first stair Was marble white, so polished and so smooth, I mirrored myself therein as I appear. The second, tinct of deeper hue than perse, Was of a calcined and uneven stone, Cracked all asunder lengthwise and across. The third, that uppermost rests massively, Porphyry seemed to me, as flaming red As blood that from a vein is spirting forth. … Devoutly at the holy feet I cast me, For mercy’s sake besought that he would open, But first upon my breast three times I smote. Seven P’s upon my forehead he described With the sword’s point, and, “Take heed that thou wash These wounds, when thou shalt be within,” he said. … Then pushed the portals of the sacred door, Exclaiming: “Enter; but I give you warning That forth returns whoever looks behind.”
 >
 > — Dante Alighieri, *Purgatory* (*The Divine Comedy*), Canto IX (tr. Henry Wadsworth Longfellow)
+
 ## Reflection
 
 Some thresholds on a road are real: a gate in a wall, a bridge, the sign at the edge of a town. You step through, and the place behind you stops being yours. Others you only notice afterwards, when you realise that somewhere in the last hour you stopped being a person who has just arrived and became a person who is walking.
@@ -21,7 +22,7 @@ The poem does not say what the steps mean. Many readers have taken them as the s
 
 Dante climbs them with his guide pulling him gently on, and kneels, and strikes his breast three times, and asks for mercy. The keeper takes the point of his sword and writes seven letters on Dante's forehead, each a P. On the usual reading, the P stands for the Latin word for sin, one for each ledge of the mountain, though the passage does not say so. He tells Dante to wash these wounds when he is inside. They are given as a task, not a sentence. Then the keeper takes out two keys, one gold and one silver, and opens the door. He says he has them from Peter, and that Peter told him to err on the side of opening rather than keeping shut, as long as people fall down at his feet.
 
-Notice that the door is more generous than the warning that follows. *Enter; but I give you warning That forth returns whoever looks behind.* It is the one line in the passage that sounds like a trap, and we do not want to explain it away. But look at what it says. It does not say that the door locks. It says that whoever looks behind goes out again. On Day 2 the two travellers sat down on a ledge and looked back at the shore, and the poem called it a delight. The gate's warning is a different kind of looking: the glance of regret, the one that wishes you were still on the other side.
+The door is more generous than the warning that follows. *Enter; but I give you warning That forth returns whoever looks behind.* It is the one line in the passage that sounds like a trap, and we do not want to explain it away. But look at what it says. It does not say that the door locks. It says that whoever looks behind goes out again. On Day 2 the two travellers sat down on a ledge and looked back at the shore, and the poem called it a delight. The gate's warning is a different kind of looking: the glance of regret, the one that wishes you were still on the other side.
 
 On the Camino nobody is forced onward. You can stop, you can take a bus, you can go home, and nobody should shame you for it. The poem is speaking of the heart and not the timetable. The question it puts to a walker is what you are leaving, and whether you can leave it without keeping one foot on the old side.
 
@@ -34,7 +35,7 @@ On the Camino nobody is forced onward. You can stop, you can take a bus, you can
 
 A day has more doors in it than you notice. The one you went out of this morning, the first step onto the road, the door of the place where you ate, and the door of the place where you are sitting now. Each time you passed one you were a little different on the other side.
 
-You could do what the first step did, and look at yourself. If there is a mirror where you are staying, even a small one over a basin, look into it for a full minute. Not to judge the face, and not to flatter it. Let it show you the day as it appears: the colour, the lines about the eyes, the dust at the hairline. The step in the poem is *so polished and so smooth* that Dante sees himself exactly. See what you can bear to see.
+You could do what the first step did, and look at yourself. If there is a mirror where you are staying, even a small one over a basin, look into it for a full minute. If there is none, a dark window will do. Not to judge the face, and not to flatter it. Let it show you the day as it appears: the colour, the lines about the eyes, the dust at the hairline. The step in the poem is *so polished and so smooth* that Dante sees himself exactly. See what you can bear to see.
 
 Then the second step, the crack. Something broke or bent today. A plan, a pace, a mood, a hope about how a stage would go. Say what it was. A crack is information, and information is more useful than a sealed surface.
 
@@ -52,4 +53,4 @@ Tomorrow will open with a door of its own, the one of the room you are in now. Y
 
 ## A short prayer
 
-*Open the door a little wider than I expect. Let me see myself plainly and not turn away. Wash what needs washing, and do it gently. Carry me where my legs cannot, and let me go on without a look over my shoulder.*
+*Open the door a little wider than I expect. Let me see myself plainly and not turn away. Wash what needs washing, and do it gently. Carry me where my legs cannot. Let me go on without a look over my shoulder.*

@@ -62,6 +62,12 @@ class Extract(unittest.TestCase):
         self.assertEqual(passage.extract(src, "He went to the wars", "changed.").where, ["_Chapter III_"])
         self.assertEqual(passage.extract(src, "She watered the garden", "so on.").where, ["Chapter XI."])
 
+    def test_canto_headings_with_a_title_before_them_are_recognised(self):
+        src = ("*** START OF THE PROJECT GUTENBERG EBOOK X ***\nPurgatorio: Canto IV\n\nThe more one climbs, the less it hurts, he said.\n\nPurgatorio: Canto VIII\n\n"
+               "It was the hour that turns back the desire.\n*** END OF THE PROJECT GUTENBERG EBOOK X ***\n")
+        self.assertEqual(passage.extract(src, "The more one climbs", "he said.").where, ["Purgatorio: Canto IV"])
+        self.assertEqual(passage.extract(src, "It was the hour", "desire.").where, ["Purgatorio: Canto VIII"])
+
     def test_conversations_and_letters_are_chapter_level_headings(self):
         src = "*** START OF THE PROJECT GUTENBERG EBOOK X ***\nFIRST CONVERSATION.\n\nHe walked a long way.\n\nSEVENTH LETTER.\n\nYou ask how to begin, and so I say: begin.\n*** END OF THE PROJECT GUTENBERG EBOOK X ***\n"
         self.assertEqual(passage.extract(src, "You ask how", "begin.").where, ["SEVENTH LETTER."])

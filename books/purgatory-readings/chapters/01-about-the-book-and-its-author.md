@@ -2,7 +2,7 @@
 
 ## The poet
 
-Dante Alighieri was born in Florence in 1265 and died in 1321. He was a poet, and he also took part in the public life of his city. In 1302 Florence sent him into exile, and he did not go home again. He wrote his great poem during those years of exile, over roughly the last dozen or so years of his life. The file we quote from gives only his name, so these few facts are general knowledge. We have marked "about" and "roughly" what is not exact, and we have not tried to say more than we know.
+Dante Alighieri was born in Florence in 1265 and died in 1321. He was a poet, and he also took part in the public life of his city. In 1302 Florence sent him into exile, and he did not go home again. He wrote his great poem during those years of exile, over roughly the last dozen or so years of his life. The file we quote from gives only his name, so these few facts are general knowledge. We say "roughly" where a figure is not exact, and we have not tried to say more than we know.
 
 ## The poem
 

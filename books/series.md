@@ -72,10 +72,16 @@ Yours to decide (the build leaves these open on purpose): who holds the rights t
 were written with AI assistance under CaminoPlus's direction); who checks the facts of each guide before it is sold; ISBNs and prices; and whether and where to publish. Putting the books in the
 app's Library is a product decision too: the Books tab now shows them (it used to say "Books are not in the app yet").
 
-## Status
+## Status (8 November 2026)
 
-The checker prints the real numbers for each book (`python3 tools/check_books.py`).
+| | Written | Strict checker | EPUB, PDF, cover, store data | In the app's Library bundle |
+|---|---|---|---|---|
+| 8 route guidebooks | yes | passes, no warnings | built, structure checked | yes |
+| 12 reflection books | yes | passes, no warnings (every passage verified word for word) | built, structure checked | yes |
 
-| Book | Written | Checked | In the Library bundle |
-|---|---|---|---|
-| 1 to 20 | in progress | not yet | not yet |
+The checker prints the real numbers for each book (`python3 tools/check_books.py --strict --sources <folder>`). Together the books are about 311,000 words; the longest reflection book reads in about 2 h 29 min
+(the ceiling is 3 hours) and the longest guide has 11,648 words (the cap is 12,000).
+
+**What "passes" does and does not mean.** The checker verifies structure, length, the rules of the skills, and that every quoted passage is in its public-domain source. It cannot verify a fact. The facts of each guide are
+in its `facts.md` ledger with a named source, but **no person has reviewed them yet**, and the writers list in their reports the claims that rest on a single or a secondary source. The EPUBs have been checked for structure
+(zip, XML, manifest) but **not with the official EPUBCheck validator**. Nothing has been uploaded, priced or published.

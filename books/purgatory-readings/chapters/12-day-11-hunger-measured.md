@@ -7,11 +7,12 @@
 > In the same way that thoughtful pilgrims do, Who, unknown people on the road o’ertaking, Turn themselves round to them, and do not stop, Even thus, behind us with a swifter motion Coming and passing onward, gazed upon us A crowd of spirits silent and devout. … Desire to eat and drink enkindles in us The scent that issues from the apple-tree, And from the spray that sprinkles o’er the verdure; And not a single time alone, this ground Encompassing, is refreshed our pain,— I say our pain, and ought to say our solace,— For the same wish doth lead us to the tree Which led the Christ rejoicing to say ‘Eli,’ When with his veins he liberated us. … And heard it said: “Blessed are they whom grace So much illumines, that the love of taste Excites not in their breasts too great desire, Hungering at all times so far as is just.”
 >
 > — Dante Alighieri, *Purgatory* (*The Divine Comedy*), Cantos XXIII and XXIV (tr. Henry Wadsworth Longfellow)
+
 ## Reflection
 
-You pass a kitchen door at the end of a long stage, and the smell reaches you before you have understood where you are. Something frying, bread, onions, the warmth of a place where people cook. You did not know how hungry you were until the smell told you, and now it is the only thing in the street. It is one of the plainest pleasures of a long walk, and it is where the sixth ledge of the mountain begins.
+You pass a kitchen door at the end of a long stage, and the smell reaches you before you have understood where you are. Something frying, bread, onions, the warmth of a place where people cook. You did not know how hungry you were until the smell told you, and now it is the only thing in the street. That is where the sixth ledge of the mountain begins.
 
-The first lines of our passage are not about food at all. They are about the road. A crowd of spirits comes up behind Dante, Virgil and a third traveller, the poet Statius, who has joined them along the way. They are going faster than the travellers, and the poet compares the way they gaze at the two travellers to what thoughtful pilgrims do when they overtake strangers on the road: they turn round to look and do not stop. A glance, perhaps a word, and on. Anyone who has walked a well-used road knows the custom.
+The first lines of our passage are not about food at all. They are about the road. A crowd of spirits comes up behind Dante, Virgil and a third traveller, the poet Statius, who has joined them along the way. They are going faster, and the poet compares the way they gaze at the travellers to what thoughtful pilgrims do when they overtake strangers on the road: they turn round to look and do not stop. A glance, perhaps a word, and on. A walker will know the custom.
 
 But these are no ordinary walkers. The crowd is silent and devout, and so wasted that the skin seems to take its shape from the bones. Dante cannot understand what has done it. Then he is told, and it is astonishing: the smell of an apple, and of water. There is a tree on the ledge with fruit and fresh leaves, and a spray of clear water falling over it, and every time the souls pass it their hunger and thirst are kindled again, and they walk on.
 
@@ -23,7 +24,7 @@ He also tells Dante how he got so far up so fast. It was his widow, Nella, whose
 
 The last lines of the passage come a canto later, after the three travellers have passed another tree. An angel stands in the road, so bright that Dante has to turn away, and tells them to go this way for peace. A breeze touches Dante's forehead, with a scent of something like ambrosia, and a voice says: *Blessed are they whom grace So much illumines, that the love of taste Excites not in their breasts too great desire, Hungering at all times so far as is just.*
 
-Look at the last phrase. The blessed are not people who have stopped being hungry. They hunger *at all times*, and what they have learned is to hunger *so far as is just*, which in the poem means: to the right degree. The fault was never the appetite. It was the measure. The poem's idea of the good life is not a body that wants nothing. It is a body whose wanting has the right size.
+The last phrase carries it. The blessed are not people who have stopped being hungry. They hunger *at all times*, and what they have learned is to hunger *so far as is just*, which in the poem means: to the right degree. The fault was never the appetite. It was the measure. The poem's idea of the good life is not a body that wants nothing. It is a body whose wanting has the right size.
 
 For a walker, that is practical sense. A long day makes you honestly hungry, and the walking body needs real food and real water, and a good deal of both. Nothing here asks you to go without. What it asks about is the manner: whether you can eat at the end of a day with attention, enjoy the taste, and know when it is enough. The same goes for the second glass.
 
@@ -42,7 +43,9 @@ Supper is the biggest meal of the day for most walkers, and the hunger that come
 
 The poem is wise about the other side of it too. A second helping, a third glass, the dessert you did not want but ordered, are all small matters. They only deserve a thought if they leave you heavy, or if you ate against the grain of what you wanted. Be gentle about it. A day of hard walking is a poor judge of its own appetite, and tomorrow's will be easier to guess.
 
-But there are other hungers in a day, and the poem hints at them. Which of yours went unfed? There is the hunger for rest, and the hunger for company, and the hunger for a quiet half hour in which nobody wants anything from you. There is the hunger for a view you did not stop for, and the hunger to be asked how you are. Name the one that was loudest today. You may not be able to feed it tonight, but you can say what it is, and sometimes that is half the meal.
+Think of Forese's phrase, which puts pain and solace in one breath. Was there a discomfort today that turned out, afterwards, to carry something? A thirst that made the water taste of something, a tiredness that made a bench feel like a gift. Not everything works that way, and you do not have to force it. But the best moments of a walking day are very often built out of a need.
+
+But there are other hungers in a day, and the poem hints at them. Which of yours went unfed? There is the hunger for rest, and the hunger for company, and the hunger for a quiet half hour in which nobody wants anything from you. There is the hunger for a view you did not stop for, and the hunger to be asked how you are. Name the one that was loudest today. You may not be able to feed it tonight, but you can say what it is, and sometimes that is half the meal. If it is rest, the bed is already waiting.
 
 Think too of the road. The poet makes a picture of pilgrims passing strangers: a glance, a turn of the head, and they do not stop. Whom did you pass today, or who passed you? A nod, a greeting, a *Buen Camino* said and answered. They may be gone by morning, and the exchange will be what is left. It is a small, steady kindness, and a road is held together by it.
 
@@ -54,4 +57,4 @@ Dante knew Forese by his voice when his face was changed past knowing. Tonight t
 
 ## A short prayer
 
-*Thank you for the food, the water and the bed. Teach me the measure of enough, in what I eat and in what I want. Feed the hungers I forgot today, and quiet the ones that shout. Bless the strangers who passed me on the road.*
+*I am glad of the food, the water and the bed. Teach me the measure of enough, in what I eat and in what I want. Feed the hungers I forgot today, and quiet the ones that shout. Bless the strangers who passed me on the road.*

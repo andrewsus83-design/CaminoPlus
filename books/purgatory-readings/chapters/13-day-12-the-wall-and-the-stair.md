@@ -7,9 +7,10 @@
 > And I still motionless, and ’gainst my conscience! Seeing me stand still motionless and stubborn, Somewhat disturbed he said: “Now look thou, Son, ’Twixt Beatrice and thee there is this wall.” … When I was in it, into molten glass I would have cast me to refresh myself, So without measure was the burning there! … “The sun departs,” it added, “and night cometh; Tarry ye not, but onward urge your steps, So long as yet the west becomes not dark.” … Each of us of a stair had made his bed; Because the nature of the mount took from us The power of climbing, more than the delight. … And now before the antelucan splendours That unto pilgrims the more grateful rise, As, home-returning, less remote they lodge, The darkness fled away on every side, And slumber with it; whereupon I rose, Seeing already the great Masters risen.
 >
 > — Dante Alighieri, *Purgatory* (*The Divine Comedy*), Canto XXVII (tr. Henry Wadsworth Longfellow)
+
 ## Reflection
 
-Most long roads have one stretch that is feared. It is not always the longest or the steepest. It is the one you cannot see round: a steep descent in the wet, a crossing, a road with no verge, or simply the last day, with everything you have put into the walk hanging on it. You can feel it coming for a day or more. And then the moment arrives, and it is a few hundred metres of track, and you are in it.
+Most long roads have one stretch that is feared. It is not always the longest or the steepest. It is the one you cannot see round: a steep descent in the wet, a crossing, a road with no verge, or simply the last day, with everything you have put into the walk hanging on it. And then the moment arrives, and it is a few hundred metres of track, and you are in it.
 
 The poem has put a wall of fire across the last stretch of the climb. It lies on the seventh and last ledge, and the day is ending. An angel stands outside the flames and sings. Nobody goes further, he says, unless the fire bites first, so they must go in and listen for the song beyond. Dante hears it and goes pale. He says he became like a man being put into the grave. He clasps his hands, stares into the flames and remembers the bodies of people he has seen burned.
 
@@ -23,13 +24,13 @@ That is the first lesson, and it is a small one. Fear is rarely beaten by argume
 
 The second lesson is in the stairs. On the far side a voice sings, and the travellers follow it up a stair cut straight through the rock. The voice also gives a rule: the sun is leaving, and night is coming, so do not linger but go on while the west is not yet dark. They climb a few stairs, and the sun sets behind them. And then comes the sentence that this book keeps coming back to: each of them made a bed of a stair, *Because the nature of the mount took from us The power of climbing, more than the delight.*
 
-Read it slowly. It is not that they no longer want to climb. The delight is intact. What the mountain withdraws is the power, at night, and it does so as a law of its nature. Nobody is blamed. Dante lies down, sees the stars larger and brighter than he has known them, and sleeps. It is the opposite of the story where the hero goes on through the night. The poem insists that a night is part of the climb.
+Read it slowly. It is not that they no longer want to climb. The delight is intact. What the mountain withdraws is the power, at night, and it does so as a law of its nature. Nobody is blamed. Dante lies down, sees the stars larger and brighter than he has known them, and sleeps. The poem insists that a night is part of the climb.
 
 On a real road the point has a practical edge. Dusk on an unfamiliar path is when walking is most dangerous. Plan to be indoors before the light goes. If you cannot, ask for a lift or a bed, and stop early. No one will think less of you.
 
 And look at how the night ends. *And now before the antelucan splendours That unto pilgrims the more grateful rise, As, home-returning, less remote they lodge.* The light before dawn is more welcome to pilgrims, the poem says, the nearer they lodge to home. The last mornings are the sweetest.
 
-Two honest doubts. The Camino has no wall of fire, and the poem's sentence is not that it will not hurt. It is that it will hurt and will not kill. If your fear is about a real danger, a river in flood or a bad fall, listen to it, because it may be right. The sentence is for the fear that is mostly about the unknown. And the last ledge, the poem's ledge of love that ran too hot, is not one this book follows. The passage is about the wall.
+Two points of honesty. The Camino has no wall of fire, and the poem's sentence is not that it will not hurt. It is that it will hurt and will not kill. If your fear is about a real danger, a river in flood or a bad fall, listen to it, because it may be right. The sentence is for the fear that is mostly about the unknown. And the last ledge, the poem's ledge of love that ran too hot, is not one this book follows.
 
 ## For the walk
 
@@ -48,6 +49,10 @@ If you can see the sky from where you are, look at it. Dante saw the stars on th
 
 And think about the power and the delight. There may have been a moment today when you wanted to go on and could not, or when you went on and perhaps should not have. The mountain's law is honest about it. Wanting is not enough, and the body's no is not an insult. You can keep the desire and give the night its due. Tomorrow's strength is being made while you lie here, which is something the lying down is for.
 
+Before you sleep, make ready for the dawn. Boots by the door, water filled, the first hour in your mind. The poem says that the light before sunrise is the more welcome the nearer pilgrims lodge to home, and it helps to give it something to be welcome to: a clean sock, a clear head, a plan that is only the first few kilometres.
+
+If you ever cannot be indoors by dusk, tell somebody, a host, a companion, a friend on the phone, where you are and where you mean to sleep. The mountain's law is easier to keep with a witness.
+
 You may be tired enough now that none of this matters. That is as it should be. Eat, drink and sleep, and let the dawn come to you.
 
 - Which wall did I meet today, and what carried me through it?
@@ -56,4 +61,4 @@ You may be tired enough now that none of this matters. That is as it should be. 
 
 ## A short prayer
 
-*Be with me at the wall, and go in before me. Give me a name to say when I am afraid. Let this night be a stair I can lie down on, and let the dawn be kind. Keep the ones I love while I sleep.*
+*Be with me at the wall, and go in before me. Give me a name to say when I am afraid. Let this night be a stair I can lie down on. Let the dawn be kind. Keep the ones I love while I sleep.*

@@ -7,6 +7,7 @@
 > And even as I asked, behold the third, Saying: “Love those from whom ye have had evil!” … Covered with sackcloth vile they seemed to me, And one sustained the other with his shoulder, And all of them were by the bank sustained. Thus do the blind, in want of livelihood, Stand at the doors of churches asking alms, And one upon another leans his head, So that in others pity soon may rise, Not only at the accent of their words, But at their aspect, which no less implores. … “O brother mine, each one is citizen Of one true city; but thy meaning is, Who may have lived in Italy a pilgrim.”
 >
 > — Dante Alighieri, *Purgatory* (*The Divine Comedy*), Canto XIII (tr. Henry Wadsworth Longfellow)
+
 ## Reflection
 
 Look at a rest stop in the middle of a morning. A low wall in the shade, a row of packs leaning against it, and people leaning against the packs. Nobody has arranged it. Shoulders touch because the wall is only so long and the shade only so wide, and for ten minutes nobody minds. It is one of the plainest sights on any long road, and it is a picture the second ledge of the mountain can make something of.
@@ -25,9 +26,9 @@ On a road, envy is small. It is the person with the lighter pack, the knees that
 
 The poem's answer is odd, and worth sitting with. It does not take the envious and make them stronger, or better at winning. It shuts their eyes, so that they cannot look sideways, and then it makes them lean on each other. The cure for the sideways look is to need someone, and to be seen needing. A group that is propping itself up has little room for a contest.
 
-There are two doubts. First, the wire is a grim image, and a reader may reasonably think it too much. We would say only that the poem's pictures of punishment are mirrors of the fault: the eyes that were always looking at others are now closed. Second, *Love those from whom ye have had evil* is a hard command. It is not advice on forgiving someone who has asked. It is a voice from the air, and the poem does not pretend it is easy. On a road it may be small: the person who pushed in at the water tap, or snored all night. You are not asked to feel anything. You are asked, perhaps, to wish them well once.
+Two places in this passage are hard. First, the wire is a grim image, and a reader may reasonably think it too much. We would say only that the poem's pictures of punishment are mirrors of the fault: the eyes that were always looking at others are now closed. Second, *Love those from whom ye have had evil* is a hard command. It is not advice on forgiving someone who has asked. It is a voice from the air, and the poem does not pretend it is easy. On a road it may be small: the person who pushed in at the water tap, or snored all night. You are not asked to feel anything. You are asked, perhaps, to wish them well once.
 
-What does it ask of an ordinary day? To lean, and to be leant on. To take the shoulder that is offered, and to be one. And when the sideways look comes, to answer it with a small, silent good wish for the person you are looking at.
+The day's task, then, is to lean and to be leant on. To take the shoulder that is offered, and to be one. And when the sideways look comes, to answer it with a small, silent good wish for the person you are looking at.
 
 ## For the walk
 
@@ -45,6 +46,8 @@ Now the sideways look. Did you meet it today? It is worth looking at it calmly n
 There is something else the poem notices, in Dante's own shame. He walks past people who cannot see him, and he finds it awkward to look at them. It is a good instinct. Today, did you look at anyone who did not know it: a stranger asleep on a bench, someone limping, a person talking quietly into a phone? There is a courtesy in looking away. There is another in looking, and seeing whether a hand is needed.
 
 Think, last of all, of the people in the room tonight, or at the next table. They are all on their way to the same city, and some of them you will never see again. If you can, say one good word to somebody before the light goes out. It costs nothing, and envy is hard to keep up against it.
+
+Turn it round, once. Somebody may have looked at you today with that small twitch: for your lighter boots, your companion, your easy stride, a bed you were lucky to get. It is hard to imagine from the inside, because you know what the day cost you. A little care costs nothing, and the best answer to a sideways look is to be easy to be near.
 
 If envy was loud today, note that it is louder when you are hungry or tired. That is not an excuse, only a fact, and a reason to eat and sleep.
 

@@ -8,15 +8,24 @@ export const CATALOG: readonly CatalogBook[] = (require('../../../assets/library
 const CONTENT: Record<string, () => BookContent> = {
   'camino-frances-guide': () => require('../../../assets/library/books/camino-frances-guide.json') as BookContent,
   'camino-portugues-guide': () => require('../../../assets/library/books/camino-portugues-guide.json') as BookContent,
+  'camino-portugues-costero-guide': () => require('../../../assets/library/books/camino-portugues-costero-guide.json') as BookContent,
+  'camino-del-norte-guide': () => require('../../../assets/library/books/camino-del-norte-guide.json') as BookContent,
   'camino-primitivo-guide': () => require('../../../assets/library/books/camino-primitivo-guide.json') as BookContent,
   'camino-ingles-guide': () => require('../../../assets/library/books/camino-ingles-guide.json') as BookContent,
   'camino-finisterre-muxia-guide': () => require('../../../assets/library/books/camino-finisterre-muxia-guide.json') as BookContent,
+  'camino-de-invierno-guide': () => require('../../../assets/library/books/camino-de-invierno-guide.json') as BookContent,
   'imitation-of-christ-readings': () => require('../../../assets/library/books/imitation-of-christ-readings.json') as BookContent,
+  'confessions-readings': () => require('../../../assets/library/books/confessions-readings.json') as BookContent,
+  'pilgrims-progress-readings': () => require('../../../assets/library/books/pilgrims-progress-readings.json') as BookContent,
+  'purgatory-readings': () => require('../../../assets/library/books/purgatory-readings.json') as BookContent,
   'presence-of-god-readings': () => require('../../../assets/library/books/presence-of-god-readings.json') as BookContent,
   'songs-of-ascents-readings': () => require('../../../assets/library/books/songs-of-ascents-readings.json') as BookContent,
   'revelations-readings': () => require('../../../assets/library/books/revelations-readings.json') as BookContent,
+  'teresa-life-readings': () => require('../../../assets/library/books/teresa-life-readings.json') as BookContent,
   'ignatius-pilgrim-readings': () => require('../../../assets/library/books/ignatius-pilgrim-readings.json') as BookContent,
   'walking-readings': () => require('../../../assets/library/books/walking-readings.json') as BookContent,
+  'francis-readings': () => require('../../../assets/library/books/francis-readings.json') as BookContent,
+  'pascal-readings': () => require('../../../assets/library/books/pascal-readings.json') as BookContent,
 };
 
 /** The text of a book, or null when the catalog has no such book. */
