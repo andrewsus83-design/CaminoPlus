@@ -84,6 +84,32 @@ def sha(path):
     return hashlib.sha256(open(path, "rb").read()).hexdigest()
 
 
+def try_breakage(root, rel, old, new, runner):
+    """Break `old` into `new` in root/rel, run `runner` in root and put the file back byte for byte. Returns ("RED" | "STILL GREEN", why), or
+    ("SKIPPED: ...", "") when `old` is not in the file exactly once.
+
+    Python is told not to write bytecode while the file is broken. A breakage of a Python file that keeps its size, put back within the same second
+    (the tests take a fraction of one), would otherwise leave a .pyc that the next run takes for the restored file's own: the next breakage, or
+    the next ordinary run of the tests, would run the code of this one.
+
+    The runner also gets BREAKAGE_CHECK_RUNNING=1, which skips the one test that is about this file's own list (every breakage finds its text exactly
+    once): with a breakage in place that test is red for every breakage, and a red that does not come from the guard under test proves nothing."""
+    path = pathlib.Path(root) / rel
+    raw = path.read_bytes()
+    text = raw.decode("utf8")
+    if text.count(old) != 1:
+        return "SKIPPED: the text to break was found %d times" % text.count(old), ""
+    try:
+        path.write_bytes(text.replace(old, new, 1).encode("utf8"))
+        proc = subprocess.run(runner, cwd=root, capture_output=True, text=True, timeout=300,
+                              env=dict(os.environ, PYTHONDONTWRITEBYTECODE="1", BREAKAGE_CHECK_RUNNING="1"))
+        tail = (proc.stdout + proc.stderr).strip().splitlines()
+        why = next((l.strip() for l in reversed(tail) if "Error" in l or "FAIL" in l or "error" in l), tail[-1] if tail else "")
+        return ("RED" if proc.returncode != 0 else "STILL GREEN"), why[:110]
+    finally:
+        path.write_bytes(raw)
+
+
 def main():
     only = sys.argv[1] if len(sys.argv) > 1 else ""
     before = {}
@@ -91,23 +117,9 @@ def main():
     for name, runner, rel, old, new in MUTATIONS:
         if only and only not in name:
             continue
-        path = os.path.join(ROOT, rel)
-        raw = open(path, "rb").read()
-        before.setdefault(rel, hashlib.sha256(raw).hexdigest())
-        text = raw.decode("utf8")
-        if text.count(old) != 1:
-            results.append((name, "SKIPPED: the text to break was found %d times" % text.count(old)))
-            print(results[-1], flush=True)
-            continue
-        try:
-            open(path, "wb").write(text.replace(old, new, 1).encode("utf8"))
-            proc = subprocess.run(runner, cwd=ROOT, capture_output=True, text=True, timeout=300)
-            red = proc.returncode != 0
-            tail = (proc.stdout + proc.stderr).strip().splitlines()
-            why = next((l.strip() for l in reversed(tail) if "Error" in l or "FAIL" in l or "error" in l), tail[-1] if tail else "")
-            results.append((name, "RED" if red else "STILL GREEN", why[:110]))
-        finally:
-            open(path, "wb").write(raw)
+        before.setdefault(rel, sha(os.path.join(ROOT, rel)))
+        outcome, why = try_breakage(ROOT, rel, old, new, runner)
+        results.append((name, outcome, why))
         print(results[-1], flush=True)
     bad = [r for r in results if r[1] != "RED"]
     restored = all(sha(os.path.join(ROOT, rel)) == h for rel, h in before.items())
