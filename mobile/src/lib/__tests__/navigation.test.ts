@@ -217,7 +217,7 @@ check('Library: directly under the search row the two tabs Bible and Books, and 
   assert.deepEqual([...ROW_TABS], ['Bible', 'Books']);
   assert.equal(BIBLE_SOURCE_LINE, 'World English Bible, Catholic edition · public domain');
   const screen = read(join('app', '(tabs)', 'library.tsx'));
-  assert.match(screen, /<Screen keyboard>/, 'a button can be tapped while the keyboard is up');
+  assert.match(screen, /<Screen keyboard overlay=\{<ContinueBar \/>\}>/, 'a button can be tapped while the keyboard is up, and the Continue reading bar is the one thing that floats over this screen');
   assert.doesNotMatch(screen, /PromoBanner/, 'the carousel with dots is gone from Library: one banner for each of two tabs');
   assert.doesNotMatch(screen, /MusicTab|'Music'/);
   // the Notes tab is gone from the screen for good: no tab, no feed, no host, no pen, no keyboard special case
@@ -233,15 +233,16 @@ check('Library: directly under the search row the two tabs Bible and Books, and 
   assert.ok(header < strip, 'the search row comes first, the tab strip directly after it');
   assert.match(screen, /\{!searching && <SubTabs tabs=\{LIBRARY_TABS\} value=\{tab\} onChange=\{setTab\} \/>\}/, 'the tab strip is drawn unless something is typed, and it is drawn before any banner or content');
   assert.equal((screen.match(/\{top\}/g) ?? []).length, 1, 'the top is drawn once, in the screen\'s own scroll');
-  // Bible and Books and the results: rows in the screen's own scroll, after the top: on Bible the card that continues the chapter, the compact banner, then the Bible tab (the choice of the part, the tiles)
+  // Bible and Books and the results: rows in the screen's own scroll, after the top: on Bible the compact banner, then the Bible tab (the choice of the part, the tiles). There is no continue card among them: "Continue reading" floats above the tab bar instead (the bar, mounted as the overlay of this Screen)
   const screenAt = at('<Screen keyboard');
-  const card = at('<ContinueCard', screenAt), daily = at('<DailyBanner', screenAt), bible = at('<BibleTab', screenAt), books = at('<BooksBanner reading={booksReading} />', screenAt), booksTab = at('<BooksTab', screenAt);
-  assert.ok(at('{top}', screenAt) < card && card < daily && daily < bible && bible < books && books < booksTab, 'the top, the continue card, the Bible banner, Bible, the Books banner, Books');
-  assert.match(screen, /\{searching \? \(\s*<SearchResults[^]*?\/>\s*\) : \(\s*<>\s*\{tab === 'Bible' && lastRead\.place && <ContinueCard/, 'the results take the place of the banners and the tab content, and clearing the field brings them back');
+  const daily = at('<DailyBanner', screenAt), bible = at('<BibleTab', screenAt), books = at('<BooksBanner />', screenAt), booksTab = at('<BooksTab', screenAt);
+  assert.ok(at('{top}', screenAt) < daily && daily < bible && bible < books && books < booksTab, 'the top, the Bible banner, Bible, the Books banner, Books');
+  assert.doesNotMatch(screen, /ContinueCard/, 'the continue card is gone from the page: the bar above the tab bar replaced it');
+  assert.match(screen, /\{searching \? \(\s*<SearchResults[^]*?\/>\s*\) : \(\s*<>\s*\{tab === 'Bible' && <DailyBanner/, 'the results take the place of the banners and the tab content, and clearing the field brings them back');
   assert.match(screen, /const searching = isSearching\(query\);/);
   // each banner is shown under its own tab only
   assert.match(screen, /\{tab === 'Bible' && <DailyBanner onOpen=\{\(\) => router\.push\('\/library\/daily'\)\} \/>\}/);
-  assert.match(screen, /\{tab === 'Books' && <BooksBanner reading=\{booksReading\} \/>\}/);
+  assert.match(screen, /\{tab === 'Books' && <BooksBanner \/>\}/);
   assert.equal((screen.match(/<DailyBanner/g) ?? []).length + (screen.match(/<BooksBanner/g) ?? []).length, 2, 'two banners, one for each tab that has one');
   // neither tab has a notice: the text of the Bible is in the app (one quiet source line instead) and so are the books (each book page says how they were written, notices.ts)
   const tabsSrc = read(join('src', 'features', 'library', 'LibraryTabs.tsx'));
@@ -253,9 +254,10 @@ check('Library: directly under the search row the two tabs Bible and Books, and 
   assert.match(read(join('src', 'components', 'Screen.tsx')), /keyboardShouldPersistTaps=\{keyboard \? 'handled' : 'never'\}/);
 });
 
-check('what floats at the bottom of the Library: nothing. The three choices of the Bible are in the page, directly under the banner, and the gold pen moved to Me', () => {
+check('what floats at the bottom of the Library: the one Continue reading bar above the tab bar and nothing else (no gold pen: it moved to Me); the three choices of the Bible are in the page, directly under the banner, and nothing of them floats', () => {
   const screen = read(join('app', '(tabs)', 'library.tsx'));
   assert.equal((screen.match(/<Fab\b/g) ?? []).length, 0, 'the gold pen moved to Me: one pen there, following the sub-tab');
+  assert.equal((screen.match(/<ContinueBar\b/g) ?? []).length, 1, 'one bar, mounted once');
   assert.equal((screen.match(/<TestamentBar\b/g) ?? []).length, 0, 'the screen draws no bar of its own: the Bible tab draws the choices in the page');
   // Default: the Old Testament
   assert.match(screen, /useState<Testament>\('old'\)/);
@@ -658,8 +660,8 @@ check('the four fonts by role on the Bible side of the Library: Fraunces for nam
     [join(L, 'LibraryBanner.tsx'), /<AppText variant="h4"[^>]*>\{title\}<\/AppText>/, 'the title of the banner is Fraunces'],
     [join(L, 'LibraryBanner.tsx'), /<AppText variant="accent"[^>]*>\{note\}<\/AppText>/, 'the one note of the banner is Caveat'],
     [join(L, 'LibraryBanner.tsx'), /<AppText variant="label"[^>]*>\{cta\}<\/AppText>/, 'the label of the gold pill is Inter, never the handwriting'],
-    [join(L, 'bible', 'ContinueCard.tsx'), /<AppText variant="mono"[^>]*>\{placeLabel\(place\)\}<\/AppText>/, 'the chapter on the continue card is a reference: JetBrains Mono'],
-    [join(L, 'bible', 'ContinueCard.tsx'), /<AppText variant="label" muted[^>]*>\{CONTINUE_TITLE\}<\/AppText>/, 'the words over it are Inter'],
+    [join(L, 'continueBar', 'ContinueBar.tsx'), /<AppText variant="h4"[^>]*>\{view\.label\}<\/AppText>/, 'the place on the Continue reading bar is Fraunces (h4)'],
+    [join(L, 'continueBar', 'ContinueBar.tsx'), /<AppText variant="label"[^>]*>\{CONTINUE_TITLE\}<\/AppText>/, 'the words over it are Inter'],
     [join(L, 'bible', 'Reader.tsx'), /<AppText variant="h4" color=\{role\.accentText\}[^>]*>\{book\.name\}<\/AppText>/, 'the name of the book over the chapter is Fraunces'],
     [join(L, 'bible', 'Reader.tsx'), /<AppText variant="h2" accessibilityRole="header"[^>]*>\{chapterTitle\(place\)\}<\/AppText>/, 'the title of the chapter is Fraunces'],
     [join(L, 'bible', 'Reader.tsx'), /\{!!chapter\.title && <AppText variant="h4" muted /, 'the title of a psalm is Fraunces'],
@@ -690,7 +692,7 @@ check('the four fonts by role on the Bible side of the Library: Fraunces for nam
   // Caveat: ONE short note per screen, never more (the brand: max one per design), counted over the files each screen draws
   const accent = (files: string[]) => files.reduce((sum, f) => sum + (strip(read(f)).match(/variant="accent"/g) ?? []).length, 0);
   const screens: Record<string, { files: string[]; notes: number }> = {
-    'the Bible tab': { files: [join('app', '(tabs)', 'library.tsx'), join(L, 'LibraryBanner.tsx'), join(L, 'LibraryTabs.tsx'), join(L, 'bible', 'BookGrid.tsx'), join(L, 'bible', 'TestamentBar.tsx'), join(L, 'bible', 'ContinueCard.tsx')], notes: 1 },
+    'the Bible tab': { files: [join('app', '(tabs)', 'library.tsx'), join(L, 'LibraryBanner.tsx'), join(L, 'LibraryTabs.tsx'), join(L, 'bible', 'BookGrid.tsx'), join(L, 'bible', 'TestamentBar.tsx'), join(L, 'continueBar', 'ContinueBar.tsx')], notes: 1 },
     'the chapters of a book': { files: [join('app', 'library', 'bible', '[code]', 'index.tsx'), join(L, 'bible', 'ChapterGrid.tsx')], notes: 1 },
     'the reader': { files: [join(L, 'bible', 'Reader.tsx'), join(L, 'bible', 'ReaderText.tsx'), join(L, 'bible', 'ChapterNav.tsx'), join(L, 'bible', 'VerseActions.tsx')], notes: 1 },
     'the results of a search': { files: [join(L, 'SearchResults.tsx'), join(L, 'bible', 'VerseRows.tsx')], notes: 0 },

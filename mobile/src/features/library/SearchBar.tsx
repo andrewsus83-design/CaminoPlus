@@ -1,7 +1,8 @@
-import { type ComponentRef, useRef, useState } from 'react';
+import { type ComponentRef, useEffect, useRef, useState } from 'react';
 import { Platform, Pressable, TextInput, View, useWindowDimensions } from 'react-native';
 import { Icon } from '@/components/Icon';
 import { c, fonts, radius, role } from '@/theme';
+import { setSearchFocused } from './continueBar/searchFocus';
 
 /** Browsers draw a focus outline on inputs; the border of the pill already shows focus. (Web only: native rejects the value.) */
 const noOutline = (Platform.OS === 'web' ? { outlineStyle: 'none' } : null) as object | null;
@@ -22,13 +23,16 @@ export const CLEAR_LABEL = 'Clear search';
  * dark), border role.border and gold while it has focus. Focus makes the border 2 instead of 1 thick and takes the same from the
  * padding, so nothing in the row moves. The phone's own keyboard key says "search" and closes the keyboard; there is no
  * autocorrect, no capital letter and no spell check, because what is typed is a few letters of a title. `onFocus` tells the screen the field was touched: it is
- * the moment to get the search ready (the first search of the Bible reads and folds its words), a beat before the first letter arrives.
+ * the moment to get the search ready (the first search of the Bible reads and folds its words), a beat before the first letter arrives. Whether the field has the
+ * focus is also told to the "Continue reading" bar (continueBar/searchFocus.ts), which steps aside while it does, so it never floats over the keyboard.
  */
 export function SearchBar({ value, onChangeText, onFocus }: { value: string; onChangeText: (text: string) => void; onFocus?: () => void }) {
   const [focus, setFocus] = useState(false);
   const input = useRef<ComponentRef<typeof TextInput>>(null);
   const narrow = useWindowDimensions().width < NARROW_UNDER;
   const edge = focus ? 2 : 1;
+  // The "Continue reading" bar steps aside while the field has the focus; a field that goes away while it has it gives the focus back.
+  useEffect(() => { setSearchFocused(focus); return () => setSearchFocused(false); }, [focus]);
   return (
     <View
       style={{

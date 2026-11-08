@@ -79,14 +79,13 @@ check('the book tiles on the Bible tab: ONE button each named "Genesis, 50 chapt
   assert.match(code(read('src/features/library/LibraryTabs.tsx')), /<BibleBookGrid books=\{booksOf\(testament\)\} onOpen=\{onOpenBook\} \/>/);
 });
 
-check('the Bible tab: the continue card (only when something was read), the compact banner, the three choices, the heading with the count and the quiet source line, then the tiles; the tab opens a book and the card opens the chapter', () => {
+check('the Bible tab: the compact banner, the three choices, the heading with the count and the quiet source line, then the tiles; the tab opens a book. There is no continue card in the page any more: the Continue reading bar floats above the tab bar instead (continueBarWiring.test.ts)', () => {
   const screen = code(read('app/(tabs)/library.tsx'));
-  const bible = screen.slice(screen.indexOf('<Screen keyboard>'));
-  const order = ["tab === 'Bible' && lastRead.place && <ContinueCard", "tab === 'Bible' && <DailyBanner", "tab === 'Bible' && <BibleTab"].map((needle) => bible.indexOf(needle));
-  assert.ok(order.every((i) => i > 0) && order.every((i, k) => k === 0 || i > order[k - 1]), `the card, the banner, the Bible tab (${order})`);
-  assert.match(bible, /<ContinueCard place=\{lastRead\.place\} onOpen=\{\(\) => router\.push\(readerHref\(\{ code: lastRead\.place!\.code, chapter: lastRead\.place!\.chapter \}\)\)\} \/>/);
+  const bible = screen.slice(screen.indexOf('<Screen keyboard'));
+  const order = ["tab === 'Bible' && <DailyBanner", "tab === 'Bible' && <BibleTab"].map((needle) => bible.indexOf(needle));
+  assert.ok(order.every((i) => i > 0) && order.every((i, k) => k === 0 || i > order[k - 1]), `the banner, the Bible tab (${order})`);
+  assert.doesNotMatch(screen, /ContinueCard|useLastRead/, 'the card is gone from the page: the place read last is continued from one bar above the tab bar, not from two things');
   assert.match(bible, /<BibleTab testament=\{testament\} onTestament=\{setTestament\} onOpenBook=\{\(code\) => router\.push\(bookHref\(code\)\)\} \/>/);
-  assert.match(screen, /const lastRead = useLastRead\(\);/);
   assert.match(screen, /useState<Testament>\('old'\)/, 'the Old Testament is on first');
   const tabs = code(read('src/features/library/LibraryTabs.tsx'));
   const tab = tabs.slice(tabs.indexOf('export function BibleTab'), tabs.indexOf('export function BooksTab'));
@@ -226,7 +225,7 @@ check('the actions on a verse: one at a time, Bookmark (under the place of the v
   assert.match(reader, /place=\{refLabel\(ref\)\}\s+words=\{verseText\(chosen\)\}/);
 });
 
-check('the card that continues the chapter read last is kept only on the phone under a per-person key, shows only a place that exists, and opens that chapter', () => {
+check('the chapter read last is kept only on the phone under a per-person key and is only a place that exists; the Continue reading bar (continueBarWiring.test.ts) is what continues it, and the card that did is gone', () => {
   const hook = code(read(`${BIBLE}/useLastRead.ts`));
   assert.match(hook, /const key = uid \? userKey\(uid, LAST_READ_NAME\) : null;/);
   assert.match(hook, /localStore\.getJSON<unknown>\(key\)/);
@@ -236,13 +235,7 @@ check('the card that continues the chapter read last is kept only on the phone u
   assert.match(hook, /useFocusEffect\(/, 'read again whenever the screen comes into view, because the reader changes it');
   assert.doesNotMatch(hook, /supabase|lib\/api|lib\/net|fetch\(/, 'the place never leaves the phone');
   assert.match(read(`${BIBLE}/lastRead.ts`), /export const LAST_READ_NAME = 'library\.lastRead';/);
-  const card = code(read(`${BIBLE}/ContinueCard.tsx`));
-  assert.match(card, /accessibilityRole="button"\s+accessibilityLabel=\{continueLabel\(place\)\}/);
-  assert.match(card, /minHeight: 64/);
-  assert.match(card, /<AppText variant="mono"[^>]*>\{placeLabel\(place\)\}<\/AppText>/, 'the chapter is a reference: JetBrains Mono');
-  assert.match(card, /<AppText variant="label" muted[^>]*>\{CONTINUE_TITLE\}<\/AppText>/);
-  assert.match(card, /backgroundColor: pressed \? role\.sunken : role\.surface, borderWidth: 1, borderColor: role\.border/);
-  assert.doesNotMatch(card, /#[0-9a-fA-F]{3,8}\b|\bfixed\.|\bc\.[a-z]|fontFamily/);
+  assert.ok(!fs.existsSync(path.join(root, `${BIBLE}/ContinueCard.tsx`)), 'the card is deleted: the bar above the tab bar replaced it, and nothing imports it');
   assert.match(read('src/lib/auth.tsx'), /await clearUserData\(uid\);/, 'logging out wipes it with every u.<userId>. key');
 });
 
