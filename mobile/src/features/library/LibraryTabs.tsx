@@ -1,26 +1,30 @@
-import { LayoutChangeEvent, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
 import { SampleNotice } from '@/components/SampleNotice';
 import { Card, SectionLabel } from '@/components/ui';
 import { c, fixed, radius, role } from '@/theme';
 import { BookmarkToggle } from './BookmarkToggle';
-import { DEUTERO_NOTE, TESTAMENT_LABEL, bookLine, booksOf, countLine, type BibleBook, type Testament } from './bible/books';
+import { BibleBookGrid } from './bible/BookGrid';
+import { TestamentBar } from './bible/TestamentBar';
+import { VerseRowList } from './bible/VerseRows';
+import { ADDITIONS_NOTE, DEUTERO_NOTE, TESTAMENT_LABEL, bookLine, booksOf, chaptersLabel, countLine, partWords, type BibleBook, type Testament } from './bible/books';
+import type { Ref } from './bible/ref';
+import { VERSES_CAPPED_NOTE, versesLabel } from './bible/verseRows';
 import { BOOK_CATALOG, bookByline, type CatalogBook } from './books/catalog';
-import { PREVIEW_NOTICE, type SampleTab } from './sample';
-import { hitTabs, itemKey, type Hits } from './search';
+import { BIBLE_SOURCE_LINE, BOOKS_NOTICE, type RowTab } from './sample';
+import { hitGroups, itemKey, type Hits } from './search';
 import type { LibraryMarks } from './useLibraryBookmarks';
 
-// The two Library tabs that hold rows: Bible (the books of the Bible, one part at a time) and Books (twelve free classics). There is no
-// real text yet (see sample.ts), so each tab starts with an honest notice and then shows, with rows that say "Soon", what will be
-// there. The third tab, Notes, is the diary and lives in features/library/notes. Colours are read while drawing, never at import.
+// The two Library tabs that hold rows: Bible (the books of the Bible, one part at a time, as a grid of square tiles) and Books (twelve free classics).
+// The Bible is real: its text is in the app (see sample.ts). The Books tab is a preview and starts with an honest notice, and its rows say "Soon". The
+// third tab, Notes, is the diary and lives in features/library/notes. Colours are read while drawing, never at import.
 //
-// A row can carry a bookmark button (when `marks` is given): the button is its own component, so a row stays a plain picture of
-// what will be there. The rows of one tab are also what a search result and the Bookmarks screen draw (LibraryGroups), so a row
-// looks the same wherever it is. The banners, which can be pressed, are in LibraryBanner.tsx, and the three choices of the Bible
-// tab in bible/TestamentBar.tsx: nothing in this file acts when it is touched except the bookmark.
+// A row can carry a bookmark button (when `marks` is given): the button is its own component. The rows of a book of the Bible are also what a search
+// result and the Bookmarks screen draw (LibraryGroups), where a tap opens the book; the rows of the twelve books are pictures of what will be there.
+// The banners are in LibraryBanner.tsx.
 
-const Notice = ({ tab }: { tab: SampleTab }) => <SampleNotice title="Preview">{PREVIEW_NOTICE[tab]}</SampleNotice>;
+const Notice = () => <SampleNotice title="Preview">{BOOKS_NOTICE}</SampleNotice>;
 
 /** A small label on a row, in the style of the "Sample" tag: caps in mono on a pale ground. */
 const Chip = ({ label, spoken, bg, fg }: { label: string; spoken: string; bg: string; fg: string }) => (
@@ -41,29 +45,35 @@ const rowStyle = (first: boolean, marks?: LibraryMarks) => ({
   borderTopWidth: first ? 0 : 1, borderTopColor: role.border,
 });
 
-const Mark = ({ marks, tab, id, title, color }: { marks?: LibraryMarks; tab: SampleTab; id: string; title: string; color?: string }) => {
+const Mark = ({ marks, tab, id, title, color }: { marks?: LibraryMarks; tab: RowTab; id: string; title: string; color?: string }) => {
   if (!marks) return null;
   const key = itemKey(tab, id);
   return <BookmarkToggle on={marks.has(key)} title={title} toggle={() => marks.toggle(key)} color={color} />;
 };
 
+/** The line under the name of a book of the Bible in a list that mixes the parts: "Old Testament · 150 chapters · detail". The count is data, so it is in JetBrains Mono; the rest is Inter. */
+const BibleBookLine = ({ book, withPart }: { book: BibleBook; withPart: boolean }) => (
+  <AppText variant="caption" muted>
+    {withPart ? `${partWords(book)} · ` : ''}
+    <AppText variant="mono" muted style={{ fontSize: 14, lineHeight: 21 }}>{chaptersLabel(book.chapters)}</AppText>
+    {book.detail ? ` · ${book.detail}` : ''}
+  </AppText>
+);
+
 /**
- * The books of the Bible, one under the other: the name, "50 chapters" and the "Soon" chip, and the bookmark button. `withPart` puts the
- * part (Old Testament, Deuterocanon, New Testament) in front of the chapters, for a list that mixes the three (search, Bookmarks).
+ * The books of the Bible as rows, one under the other, for a list of results or of Bookmarks (the Bible tab itself shows them as tiles): the name in
+ * Fraunces, "Old Testament · 50 chapters" under it, the bookmark button at the end. The row is ONE button that opens the chapters of the book (`onOpen` says
+ * where); the bookmark button is another beside it, not inside it. `withPart` puts the part (Old Testament, Deuterocanon, New Testament) in front of the chapters.
  */
-export function BibleBookRows({ items, marks, withPart = false }: { items: readonly BibleBook[]; marks?: LibraryMarks; withPart?: boolean }) {
+export function BibleBookRows({ items, marks, withPart = false, onOpen }: { items: readonly BibleBook[]; marks?: LibraryMarks; withPart?: boolean; onOpen: (code: string) => void }) {
   return (
     <Card style={{ padding: 4 }}>
       {items.map((b, i) => (
-        <View key={b.id} accessibilityState={marks ? undefined : { disabled: true }} style={{ ...rowStyle(i === 0, marks), minHeight: 64, flexDirection: 'row', alignItems: 'center', gap: 14 }}>
-          <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
-            <AppText variant="label">{b.name}</AppText>
-            {/* The chip sits beside "50 chapters" and goes under the line when the line is long (the part is in it, or a detail): in one list all the rows do the same. */}
-            <View style={{ flexDirection: withPart || b.detail ? 'column' : 'row', alignItems: withPart || b.detail ? 'flex-start' : 'center', gap: withPart || b.detail ? 6 : 8 }}>
-              <AppText variant="caption" muted>{bookLine(b, withPart)}</AppText>
-              <Soon />
-            </View>
-          </View>
+        <View key={b.id} style={{ ...rowStyle(i === 0, marks), minHeight: 64, flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 4 }}>
+          <Pressable accessibilityRole="button" accessibilityLabel={`${b.name}, ${bookLine(b, withPart).replace(/ /g, ' ')}`} accessibilityHint="Opens the chapters" onPress={() => onOpen(b.code)} style={{ flex: 1, minWidth: 0, gap: 2, paddingVertical: 6 }}>
+            <AppText variant="h4" style={{ fontSize: 20, lineHeight: 26 }}>{b.name}</AppText>
+            <BibleBookLine book={b} withPart={withPart} />
+          </Pressable>
           <Mark marks={marks} tab="Bible" id={b.id} title={b.name} />
         </View>
       ))}
@@ -103,17 +113,20 @@ export function BookRows({ items, marks }: { items: readonly CatalogBook[]; mark
 }
 
 /**
- * The rows of a list of results, group after group in the order of the tabs, each under its own label ("Bible · 2"). What a search
- * and the Bookmarks screen show; a tab that has no row in it is not drawn.
+ * The rows of a list of results, group after group (the books of the Bible, the twelve books, the verses), each under its own label ("Bible · 2",
+ * "Verses · 12"). What a search and the Bookmarks screen show; a group that has no row in it is not drawn. A tap on a book of the Bible opens its chapters
+ * and a tap on a verse opens the reader at it: the screen says where (`onOpenBook`, `onOpenVerse`). The twelve books open nothing.
  */
-export function LibraryGroups({ hits, marks }: { hits: Hits; marks: LibraryMarks }) {
+export function LibraryGroups({ hits, marks, onOpenBook, onOpenVerse, versesCapped = false }: { hits: Hits; marks: LibraryMarks; onOpenBook: (code: string) => void; onOpenVerse: (ref: Ref) => void; versesCapped?: boolean }) {
   return (
     <>
-      {hitTabs(hits).map((tab) => (
-        <View key={tab} style={{ gap: 16 }}>
-          <SectionLabel>{`${tab} · ${hits[tab].length}`}</SectionLabel>
-          {tab === 'Bible' && <BibleBookRows items={hits.Bible} marks={marks} withPart />}
-          {tab === 'Books' && <BookRows items={hits.Books} marks={marks} />}
+      {hitGroups(hits).map((group) => (
+        <View key={group} style={{ gap: 16 }}>
+          <SectionLabel>{group === 'Verses' ? versesLabel(hits.Verses.length, versesCapped) : `${group} · ${hits[group].length}`}</SectionLabel>
+          {group === 'Bible' && <BibleBookRows items={hits.Bible} marks={marks} withPart onOpen={onOpenBook} />}
+          {group === 'Books' && <BookRows items={hits.Books} marks={marks} />}
+          {group === 'Verses' && <VerseRowList rows={hits.Verses} marks={marks} onOpen={onOpenVerse} />}
+          {group === 'Verses' && versesCapped && <AppText variant="caption" muted>{VERSES_CAPPED_NOTE}</AppText>}
         </View>
       ))}
     </>
@@ -121,23 +134,26 @@ export function LibraryGroups({ hits, marks }: { hits: Hits; marks: LibraryMarks
 }
 
 /**
- * The Bible tab under its banner: the Preview notice, then "Books of the Bible" with how many the chosen part holds, and the books of
- * that part (and, for the Deuterocanon, the one line about the Orthodox Bibles). The part is chosen with the three choices at the bottom
- * of the screen (bible/TestamentBar.tsx), which the screen draws. The notice and the list are both children of the screen's own column
- * (a fragment, not a wrapper), so `onListLayout` tells the screen where the list starts in it: where to scroll back to when another part
- * is chosen.
+ * The Bible tab under its banner: the choice of the part (Old Testament, Deuterocanon, New Testament, a segmented pill that scrolls with the page), then
+ * "Books of the Bible" with how many the chosen part holds, the one quiet line that says which translation it is, and the books of that part as a grid of
+ * square tiles, three in a row. Under the Deuterocanon, where a reader looks for Susanna, two lines: where the Greek additions of Esther and Daniel are, and the
+ * one about the Orthodox Bibles. A tap on a tile opens the chapters of the book (the screen says where: `onOpenBook`). The count is a polite live region that says
+ * the part with it: a screen reader answers a choice with "Old Testament, 39 books".
  */
-export function BibleTab({ marks, testament, onListLayout }: { marks?: LibraryMarks; testament: Testament; onListLayout?: (e: LayoutChangeEvent) => void }) {
+export function BibleTab({ testament, onTestament, onOpenBook }: { testament: Testament; onTestament: (t: Testament) => void; onOpenBook: (code: string) => void }) {
   return (
     <>
-      <Notice tab="Bible" />
-      <View onLayout={onListLayout} style={{ gap: 16 }}>
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'baseline', justifyContent: 'space-between', columnGap: 12, rowGap: 2 }}>
-          <AppText variant="h4" accessibilityRole="header">Books of the Bible</AppText>
-          {/* How many the chosen part holds, on the same line (under the heading when it is long). A polite live region that says the part with it: a screen reader answers a choice at the bottom with "Old Testament, 39 books". */}
-          <AppText variant="small" muted accessibilityLiveRegion="polite" accessibilityLabel={`${TESTAMENT_LABEL[testament]}, ${countLine(testament)}`}>{countLine(testament)}</AppText>
+      <TestamentBar value={testament} onChange={onTestament} />
+      <View style={{ gap: 16 }}>
+        <View style={{ gap: 4 }}>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'baseline', justifyContent: 'space-between', columnGap: 12, rowGap: 2 }}>
+            <AppText variant="h4" accessibilityRole="header">Books of the Bible</AppText>
+            <AppText variant="mono" muted accessibilityLiveRegion="polite" accessibilityLabel={`${TESTAMENT_LABEL[testament]}, ${countLine(testament)}`} style={{ fontSize: 14, lineHeight: 20 }}>{countLine(testament)}</AppText>
+          </View>
+          <AppText variant="caption" muted>{BIBLE_SOURCE_LINE}</AppText>
         </View>
-        <BibleBookRows items={booksOf(testament)} marks={marks} />
+        <BibleBookGrid books={booksOf(testament)} onOpen={onOpenBook} />
+        {testament === 'deutero' && <AppText variant="caption" muted>{ADDITIONS_NOTE}</AppText>}
         {testament === 'deutero' && <AppText variant="caption" muted>{DEUTERO_NOTE}</AppText>}
       </View>
     </>
@@ -148,7 +164,7 @@ export function BibleTab({ marks, testament, onListLayout }: { marks?: LibraryMa
 export function BooksTab({ marks }: { marks?: LibraryMarks }) {
   return (
     <View style={{ gap: 16 }}>
-      <Notice tab="Books" />
+      <Notice />
       <BookRows items={BOOK_CATALOG} marks={marks} />
     </View>
   );

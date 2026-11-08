@@ -1,0 +1,110 @@
+import { memo, useMemo } from 'react';
+import { Text, View, type LayoutChangeEvent } from 'react-native';
+import { AppText } from '@/components/AppText';
+import { c, role } from '@/theme';
+import { blocksOfVerse, superscript, type Block, type Gap, type PoemBlock, type ProseBlock } from './blocks';
+
+/** The most the phone's own text size may enlarge the words of the Bible: a person who needs it large gets it large, up to this. */
+export const READER_MAX_FONT_SCALE = 1.6;
+
+/** The words of the Bible: Inter 19 with 32 between the lines (generous: the line is 1.7 times the letter). */
+export const BODY_SIZE = 19;
+export const BODY_LINE = 32;
+
+/** A line of poetry goes in by an em space for each tab at its start (Inter has one: 19 wide at this size). */
+export const INDENT = ' ';
+
+/** The space above a block of each kind of gap. A heading keeps 28 above it (none at the top of the chapter) and 6 under it. */
+export const GAP: Record<Gap, number> = { none: 0, paragraph: 16, stanza: 26 };
+export const HEADING_ABOVE = 28;
+export const HEADING_BELOW = 6;
+
+/** What a verse that is chosen looks like: a pale gold ground and an underline, so that it is not the colour alone that says so. */
+const chosen = () => ({ backgroundColor: c.goldSoft, textDecorationLine: 'underline' as const });
+
+/**
+ * The number of a verse, in front of its words: small digits raised above the line, JetBrains Mono, muted (the colour of the text when the verse is chosen).
+ * The digits are the superscript characters of Unicode (blocks.ts superscript), which that font draws. Its line height is the line of the words, so that
+ * the number never makes a line taller.
+ */
+function VerseNumber({ label, on }: { label: string; on: boolean }) {
+  return (
+    <>
+      <AppText variant="mono" maxFontSizeMultiplier={READER_MAX_FONT_SCALE} color={on ? role.text : role.muted} style={{ fontSize: 15, lineHeight: BODY_LINE }}>{superscript(label)}</AppText>
+      {' '}
+    </>
+  );
+}
+
+type Select = (verse: string) => void;
+
+/** The words of one verse (or of the part of it that is in this block), a text of its own that a touch chooses. A link for a screen reader (its rotor lists the verses). */
+function Words({ verse, number, text, on, onSelect }: { verse: string; number: string | null; text: string; on: boolean; onSelect: Select }) {
+  return (
+    <Text accessibilityRole="link" onPress={() => onSelect(verse)} style={on ? chosen() : undefined}>
+      {number !== null && <VerseNumber label={number} on={on} />}
+      {text}
+    </Text>
+  );
+}
+
+function Prose({ block, selected, onSelect }: { block: ProseBlock; selected: string | null; onSelect: Select }) {
+  return (
+    <AppText maxFontSizeMultiplier={READER_MAX_FONT_SCALE} style={{ fontSize: BODY_SIZE, lineHeight: BODY_LINE }}>
+      {block.spans.map((s, k) => (
+        <Text key={k}>
+          <Words verse={s.verse} number={s.n} text={s.text} on={s.verse === selected} onSelect={onSelect} />
+          {k < block.spans.length - 1 ? ' ' : ''}
+        </Text>
+      ))}
+    </AppText>
+  );
+}
+
+/** A stanza is ONE text, a line after the other: a screen reader reads it as it reads a paragraph, and a Psalm of 176 verses is 22 texts, not 350. */
+function Poem({ block, selected, onSelect }: { block: PoemBlock; selected: string | null; onSelect: Select }) {
+  return (
+    <AppText maxFontSizeMultiplier={READER_MAX_FONT_SCALE} style={{ fontSize: BODY_SIZE, lineHeight: BODY_LINE }}>
+      {block.lines.map((l, k) => (
+        <Text key={k}>
+          {INDENT.repeat(l.indent)}
+          <Words verse={l.verse} number={l.n} text={l.text} on={l.verse === selected} onSelect={onSelect} />
+          {k < block.lines.length - 1 ? '\n' : ''}
+        </Text>
+      ))}
+    </AppText>
+  );
+}
+
+type ViewProps = { index: number; block: Block; selected: string | null; onSelect: Select; onBlockLayout: (index: number, y: number, height: number) => void };
+
+/** One block, drawn again only when its own block or whether it holds the chosen verse changes. */
+const BlockView = memo(function BlockView({ index, block, selected, onSelect, onBlockLayout }: ViewProps) {
+  const onLayout = (e: LayoutChangeEvent) => onBlockLayout(index, e.nativeEvent.layout.y, e.nativeEvent.layout.height);
+  if (block.kind === 'heading') {
+    return (
+      <View onLayout={onLayout} style={{ marginTop: index === 0 ? 0 : HEADING_ABOVE, marginBottom: HEADING_BELOW }}>
+        <AppText variant="h4" accessibilityRole="header" maxFontSizeMultiplier={READER_MAX_FONT_SCALE} style={{ fontSize: 22, lineHeight: 28 }}>{block.text}</AppText>
+      </View>
+    );
+  }
+  return (
+    <View onLayout={onLayout} style={{ marginTop: GAP[block.gap] }}>
+      {block.kind === 'prose' ? <Prose block={block} selected={selected} onSelect={onSelect} /> : <Poem block={block} selected={selected} onSelect={onSelect} />}
+    </View>
+  );
+});
+
+/**
+ * The words of a chapter, block after block. Prose is paragraphs (the verses without a new paragraph flow on in one text, each with its small raised number);
+ * poetry is stanzas, a line after the other, each line gone in by its tabs; a heading is a heading for a screen reader and Fraunces for the eye. Touching the words of
+ * a verse chooses it (`onSelect` with its label); only the blocks that hold the chosen verse, and the one that held it, are drawn again.
+ */
+export function ReaderText({ blocks, selected, onSelect, onBlockLayout }: { blocks: readonly Block[]; selected: string | null; onSelect: Select; onBlockLayout: ViewProps['onBlockLayout'] }) {
+  const holding = useMemo(() => new Set(selected ? blocksOfVerse(blocks, selected) : []), [blocks, selected]);
+  return (
+    <>
+      {blocks.map((b, i) => <BlockView key={b.key} index={i} block={b} selected={holding.has(i) ? selected : null} onSelect={onSelect} onBlockLayout={onBlockLayout} />)}
+    </>
+  );
+}

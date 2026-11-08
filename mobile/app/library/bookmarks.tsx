@@ -6,18 +6,21 @@ import { AppText } from '@/components/AppText';
 import { SampleNotice } from '@/components/SampleNotice';
 import { Card, IconButton } from '@/components/ui';
 import { FormMessage } from '@/components/auth/Field';
+import { bookHref, readerHref } from '@/features/library/bible/order';
+import { hasBook, loadBook } from '@/features/library/bible/text';
 import { BOOKMARK_NOT_SAVED, LIBRARY_BOOKMARKS_EMPTY } from '@/features/library/bookmarks';
 import { LibraryGroups } from '@/features/library/LibraryTabs';
 import { SavedPostCard } from '@/features/library/SavedPostCard';
-import { BOOKMARKS_NOTICE } from '@/features/library/sample';
+import { BOOKMARKS_KEPT, BOOKMARKS_NOTICE } from '@/features/library/sample';
 import { SAVED_EMPTY, SAVED_FAILED, SAVED_LIMIT_NOTE, SAVED_OFFLINE_EMPTY, SAVED_OFFLINE_NOTE } from '@/features/library/savedPosts';
 import { hitCount, hitsForKeys } from '@/features/library/search';
 import { useLibraryBookmarks } from '@/features/library/useLibraryBookmarks';
 import { useSavedPosts } from '@/features/library/useSavedPosts';
 import { role } from '@/theme';
 
-// Library > Bookmarks: what the pilgrim kept, in two parts. Library: the rows bookmarked in the tabs, which are examples for now and
-// live only on this phone (features/library/bookmarks.ts). Posts: the posts bookmarked in the journey viewer, read from the account
+// Library > Bookmarks: what the pilgrim kept, in two parts. Library: what was bookmarked in the tabs and in the Bible (a book of the Bible, a verse
+// of it, one of the twelve example books), kept only on this phone (features/library/bookmarks.ts); a book opens its chapters and a verse opens the reader
+// at it, and a bookmark whose book, chapter or verse is not in the text is left out without a word. Posts: the posts bookmarked in the journey viewer, read from the account
 // (features/library/savedPosts.ts) with the copy of the last visit when there is no signal. A bookmark taken off here stays in its place,
 // with an empty bookmark, until the screen is left, so a slip is put back with one tap.
 export default function Bookmarks() {
@@ -25,7 +28,7 @@ export default function Bookmarks() {
   const goBack = () => (router.canGoBack() ? router.back() : router.replace('/library'));
   const marks = useLibraryBookmarks();
   const saved = useSavedPosts();
-  const hits = useMemo(() => hitsForKeys(marks.shown), [marks.shown]);
+  const hits = useMemo(() => hitsForKeys(marks.shown, { hasBook, loadBook }), [marks.shown]);
 
   return (
     <Screen tabBar={false}>
@@ -36,8 +39,10 @@ export default function Bookmarks() {
       {marks.failed && <FormMessage>{BOOKMARK_NOT_SAVED}</FormMessage>}
       {hitCount(hits) > 0 ? (
         <>
-          <SampleNotice title="Preview">{BOOKMARKS_NOTICE}</SampleNotice>
-          <LibraryGroups hits={hits} marks={marks} />
+          {hits.Books.length > 0
+            ? <SampleNotice title="Preview">{BOOKMARKS_NOTICE}</SampleNotice>
+            : <AppText variant="caption" muted>{BOOKMARKS_KEPT}</AppText>}
+          <LibraryGroups hits={hits} marks={marks} onOpenBook={(code) => router.push(bookHref(code))} onOpenVerse={(ref) => router.push(readerHref(ref))} />
         </>
       ) : marks.ready && (
         <Card><AppText variant="small" muted>{LIBRARY_BOOKMARKS_EMPTY}</AppText></Card>
