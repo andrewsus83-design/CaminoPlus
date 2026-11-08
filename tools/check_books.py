@@ -65,6 +65,15 @@ FIRST_PERSON = re.compile(r"\bI\b|\bI['’](?:m|ve|ll|d)\b|\b(?:my|myself)\b")
 GUIDE_CHAPTER_MAX_WORDS = 1_800
 HOURS = re.compile(r"\b(?:opens?|closes?|closed|open)\b[^.;\n]{0,40}?\b\d{1,2}(?:[:.]\d{2})?\s?(?:am|pm|h)\b", re.I)
 SOURCES_CHAPTER = re.compile(r"source|thanks|credit", re.I)
+# The two sentences every guide says word for word (books/shared-facts.md has them; a test keeps this file and that one the same).
+STANDARD_WELCOME = ("This book was written with AI assistance, from public sources, and its author has not walked the road. "
+                    "So it gives you sources instead of memories, and it says plainly when the sources disagree.")
+STANDARD_PURPOSE = ("The Office awards the Compostela to those who walk for religious or spiritual reasons, and it describes the pilgrimage it has in mind "
+                    "as one made \"with a Christian sentiment, even if it is only with an attitude of search\". If that does not describe your reason "
+                    "for walking, ask the Pilgrim's Office what it can give you: it also offers a Certificate of Distance, which records the kilometres "
+                    "you walked from wherever you started.")
+# The Office has a digital credential of its own (its credencial page, 8 November 2026): a book never says that a passport "in any app" is only a keepsake.
+LOOSE_APP_PASSPORT = re.compile(r"\bpassport in any app is\b", re.I)
 
 
 @dataclasses.dataclass
@@ -308,6 +317,12 @@ def _guide(book: bk.Book, rep: Report) -> None:
                     km_hits.append(f"{ch.file}: '{km.group(0)}'")
     if km_hits:
         rep.warn(f"{len(km_hits)} figure(s) without '~' (distances, altitudes and temperatures are approximate and are marked with ~), e.g. " + "; ".join(km_hits[:4]))
+    whole = _strict(" ".join(bk.block_text(b) for ch in book.chapters for b in ch.blocks))
+    for what, sentence in (("the welcome", STANDARD_WELCOME), ("the Compostela rule", STANDARD_PURPOSE)):
+        if _strict(sentence) not in whole:
+            rep.error(f"the standard sentence of {what} is missing or changed: every guide says it word for word (books/shared-facts.md)")
+    if LOOSE_APP_PASSPORT.search(whole):
+        rep.error("'a passport in any app is...': the Pilgrim's Office has a digital credential of its own, so say 'in CaminoPlus, or in any app other than the Office's own digital credential' (books/shared-facts.md)")
 
 
 def _section(ch: bk.Chapter, name: str) -> list[dict]:

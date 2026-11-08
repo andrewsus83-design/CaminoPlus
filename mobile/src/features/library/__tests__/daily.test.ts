@@ -851,7 +851,7 @@ check('the dark phones are the dark palette of tokens.json, role by role (the pa
   const expected: Record<string, string> = {
     '--cp-bg': roleDark('bg'), '--cp-surface': roleDark('surface'), '--cp-surface-sunken': roleDark('surfaceSunken'), '--cp-surface-inverse': roleDark('surfaceInverse'),
     '--cp-border': roleDark('border'), '--cp-border-strong': roleDark('borderStrong'), '--cp-text': roleDark('text'), '--cp-text-muted': roleDark('textMuted'),
-    '--cp-text-placeholder': roleDark('textPlaceholder'), '--cp-tab-inactive': roleDark('tabInactive'), '--cp-text-inverse': roleDark('textInverse'), '--cp-text-accent': roleDark('textAccent'), '--cp-action': roleDark('action'),
+    '--cp-text-placeholder': roleDark('textPlaceholder'), '--cp-tab-inactive': roleDark('tabInactive'), '--cp-tab-bar': roleDark('tabBar'), '--cp-tab-bar-border': roleDark('tabBarBorder'), '--cp-text-inverse': roleDark('textInverse'), '--cp-text-accent': roleDark('textAccent'), '--cp-action': roleDark('action'),
     '--cp-on-action': roleDark('onAction'), '--cp-highlight': roleDark('highlight'), '--cp-on-highlight': roleDark('onHighlight'), '--cp-danger': roleDark('danger'), '--cp-on-danger': roleDark('onDanger'),
     '--cp-color-gold-ink': dark.goldInk.toUpperCase(), '--cp-color-gold-soft': dark.goldSoft.toUpperCase(), '--cp-color-gold-wash': dark.goldWash.toUpperCase(),
   };
