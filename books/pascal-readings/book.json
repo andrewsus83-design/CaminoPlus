@@ -1,0 +1,43 @@
+{
+  "id": "pascal-readings",
+  "kind": "reflection",
+  "order": 20,
+  "title": "The Silence of the Heart",
+  "subtitle": "Ten Days with Pascal's Thoughts for the Camino Sanabrés",
+  "route_slug": "camino-sanabres",
+  "days": 10,
+  "description_short": "Ten days with the Thoughts of Blaise Pascal for the Camino Sanabrés: a morning reading and an evening reflection each day, on silence, habit, doubt and a restless mind.",
+  "description_long": "Blaise Pascal was a French mathematician and writer who lived from 1623 to 1662. The Thoughts are the notes he left behind for a defence of the Christian religion that he never finished: scraps, fragments, a page or a line at a time, put in order after his death by other hands. They are about the things a quiet road brings to the surface: why we cannot sit still, what a mind is worth beside a sky, what habit does to us, what we know without proof, what we are willing to risk, and what rest might be.\n\nThe Silence of the Heart is made to go with the Camino Sanabrés, which the app lists from Granja de Moreruela to Santiago de Compostela. It has ten days, one for each day of walking or each day at home. Every day has a morning reading of about five minutes and an evening reflection of about three. The morning begins with a short passage from the Thoughts, quoted word for word from C. Kegan Paul's English translation of 1885, which is in the public domain. Then comes a reflection that starts from something on the road: an empty hour, a night sky, a fork in the path, a mist. Then two small things to carry for the next hour, a question and a practice that needs nothing but attention. The evening looks back over the day with two or three gentle questions and ends with a short original prayer, open enough to be said as a wish by a reader who prays differently, or who does not pray.\n\nThe days run from a quiet room, through a thinking reed and the silence of the sky, to habit, the heart, the wager and the half-light, and end in consolation. Pascal's book is a Christian book and this one says so plainly. It invites and does not push, it leaves aside the passages that need a long explanation, and it is honest where Pascal is hard to follow. Read it on a bench, in a pilgrim hostel bunk, or at your own kitchen table.",
+  "keywords": [
+    "Camino de Santiago",
+    "Camino Sanabrés",
+    "Blaise Pascal",
+    "pilgrimage reflections",
+    "daily readings",
+    "silence",
+    "prayer"
+  ],
+  "categories": [
+    "Philosophy / Religious",
+    "Religion / Christian Living / Spiritual Growth",
+    "Travel / Special Interest / Pilgrimages"
+  ],
+  "cover": {
+    "colour": "blue100",
+    "icon": "book"
+  },
+  "version": "1.0.0",
+  "date": "2026-11",
+  "sources": [
+    {
+      "id": "gutenberg-46921",
+      "work": "The Thoughts of Blaise Pascal",
+      "author": "Blaise Pascal",
+      "translator": "C. Kegan Paul (edited by Auguste Molinier)",
+      "year": "1885",
+      "licence": "Public domain",
+      "url": "https://www.gutenberg.org/ebooks/46921",
+      "text_from": "This year of Grace 1654,"
+    }
+  ]
+}

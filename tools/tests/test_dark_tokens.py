@@ -51,8 +51,13 @@ def contrast(a: str, b: str) -> float:
 
 
 TEXT, GRAPHIC, PLACEHOLDER = 4.5, 3.0, 3.0
-# On the tab bar the active tab has at least this many times the contrast of an inactive one (light mode: 2.0, dark mode: 1.7)
+# On the tab bar the active tab has at least this many times the contrast of an inactive one (light mode: 2.6, dark mode: 4.0)
 ACTIVE_OVER_INACTIVE = 1.5
+# The inactive tabs recede: at most this strong on the bar in both modes (light mode 4.6:1, dark mode 4.7:1). The owner asked on 2026-11-08 for
+# inactive tabs that are lighter and more transparent, and again for dark mode once the bar was darker (the same stone would have been 6.7:1).
+INACTIVE_MAX = 5.0
+# In dark mode the hairline around the tab bar is at least this visible against the bar (it is 1.8:1)
+HAIRLINE = 1.5
 
 # (foreground role, background role, needed ratio, where it is drawn)
 ROLE_PAIRS = [
@@ -67,9 +72,9 @@ ROLE_PAIRS = [
     ("textAccent", "surface", TEXT, "gold text on a card"),
     ("action", "bg", TEXT, "links and the labels of ghost buttons"),
     ("action", "surface", TEXT, "links and icons on a card"),
-    # the tab bar has roles of its own, so that what it needs never changes a caption or a link
-    ("tabInactive", "surface", TEXT, "the inactive tab icon and label on the tab bar"),
-    ("tabActive", "surface", TEXT, "the active tab icon and label on the tab bar"),
+    # the tab bar has roles of its own (the bar, its hairline and the two kinds of tab), so that what it needs never changes a card, a caption or a link
+    ("tabInactive", "tabBar", TEXT, "the inactive tab icon and label on the tab bar"),
+    ("tabActive", "tabBar", TEXT, "the active tab icon and label on the tab bar"),
     ("danger", "bg", TEXT, "error text on the screen"),
     ("danger", "surface", TEXT, "error text on a card"),
     ("onAction", "action", TEXT, "label of a primary button"),
@@ -116,10 +121,10 @@ class Contrast(unittest.TestCase):
             self.assertGreaterEqual(contrast(r["surfaceInverse"], r[other]), 1.5, f"surfaceInverse must stand out from {other}")
 
     def test_the_inactive_tab_is_readable_on_the_tab_bar(self):
-        # the tab bar is a surface; the inactive tab is tabInactive. This pair was invisible in dark mode once (a fixed navy).
+        # the tab bar is tabBar; the inactive tab is tabInactive. This pair was invisible in dark mode once (a fixed navy).
         for mode in ("light", "dark"):
             r = roles(mode)
-            self.assertGreaterEqual(contrast(r["tabInactive"], r["surface"]), TEXT, mode)
+            self.assertGreaterEqual(contrast(r["tabInactive"], r["tabBar"]), TEXT, mode)
 
     def test_the_active_tab_stands_out_from_the_inactive_ones(self):
         # In dark mode the active tab used to be the action blue (7.0:1 on the bar) and the inactive ones muted text (7.4:1):
@@ -127,24 +132,43 @@ class Contrast(unittest.TestCase):
         # lighter inactive tab can never make the active one hard to find.
         for mode in ("light", "dark"):
             r = roles(mode)
-            active, inactive = contrast(r["tabActive"], r["surface"]), contrast(r["tabInactive"], r["surface"])
+            active, inactive = contrast(r["tabActive"], r["tabBar"]), contrast(r["tabInactive"], r["tabBar"])
             self.assertGreaterEqual(active, ACTIVE_OVER_INACTIVE * inactive, f"{mode}: active {active:.2f}:1, inactive {inactive:.2f}:1 on the bar")
 
-    def test_the_dark_inactive_tab_is_not_darker_than_muted_text(self):
-        # it was lifted because it was hard to see; it must not slip back below the muted text colour it started from
-        r = roles("dark")
-        self.assertGreaterEqual(contrast(r["tabInactive"], r["surface"]), contrast(r["textMuted"], r["surface"]))
+    def test_the_inactive_tab_is_quieter_than_muted_text_but_readable(self):
+        # the owner asked (2026-11-08) for inactive tabs that are lighter and more transparent in both modes, so the active tab stands
+        # out; they still pass the text floor, so they can never vanish again (a fixed navy at 42% was 1.1:1 on the dark bar)
+        for mode in ("light", "dark"):
+            r = roles(mode)
+            inactive = contrast(r["tabInactive"], r["tabBar"])
+            self.assertGreaterEqual(inactive, TEXT, f"{mode}: {inactive:.2f}:1")
+            self.assertLessEqual(inactive, INACTIVE_MAX, f"{mode}: {inactive:.2f}:1 is not receding (at most {INACTIVE_MAX}:1)")
+            self.assertLessEqual(inactive, contrast(r["textMuted"], r["tabBar"]), f"{mode}: quieter than muted text")
 
-    def test_light_mode_tab_colours_are_the_ones_the_tab_bar_always_had(self):
-        # the tab bar used to draw the active tab in action (blue) and the inactive ones in textMuted (stone), in both modes
+    def test_light_mode_tab_colours(self):
+        # the active tab is the action blue it always was; the inactive tabs are a lighter stone (stone550) than textMuted
         r = roles("light")
         self.assertEqual(r["tabActive"], r["action"])
-        self.assertEqual(r["tabInactive"], r["textMuted"])
-        self.assertEqual((r["tabActive"], r["tabInactive"]), ("#14365D", "#556274"), "the light tab colours as they were published")
+        self.assertNotEqual(r["tabInactive"], r["textMuted"])
+        self.assertEqual((r["tabActive"], r["tabInactive"]), ("#14365D", "#697584"), "the light tab colours as they are published")
+        # the owner liked light mode as it was (2026-11-08): the bar is still the card white and has no visible edge (the shadow does the work)
+        self.assertEqual(r["tabBar"], r["surface"])
+        self.assertEqual(r["tabBarBorder"], r["tabBar"])
+
+    def test_the_dark_tab_bar_is_the_darkest_thing_and_has_a_hairline(self):
+        # The bar floats over the cards. In dark mode it was the card colour (role surface) with only a shadow, and a shadow cannot be seen on a
+        # dark screen: a card scrolling under the bar swallowed it. The owner chose (2026-11-08) a darker bar with a hairline.
+        r = roles("dark")
+        self.assertLess(luminance(r["tabBar"]), luminance(r["bg"]), "the bar is darker than the page")
+        self.assertLess(luminance(r["bg"]), luminance(r["surface"]), "...and so darker than every card")
+        self.assertLess(luminance(r["tabBar"]), luminance(r["surfaceSunken"]))
+        self.assertNotEqual(r["tabBar"], r["surface"], "a bar in the card colour is swallowed by a card behind it")
+        self.assertGreaterEqual(contrast(r["tabBarBorder"], r["tabBar"]), HAIRLINE, "the hairline is visible against the bar")
+        self.assertNotEqual(r["tabBarBorder"], r["surface"])
 
     def test_the_tab_roles_have_a_dark_value_of_their_own(self):
         # without one, dark mode would fall back to the light mapping (blue, stone600) and the tab bar would look as before
-        for name in ("tabActive", "tabInactive"):
+        for name in ("tabActive", "tabInactive", "tabBar", "tabBarBorder"):
             self.assertIn(name, TOKENS["role"], name)
             self.assertIn(name, TOKENS["dark"]["role"], f"dark.role.{name}")
 
@@ -188,7 +212,7 @@ class Helpers(unittest.TestCase):
 
     def test_the_old_inactive_tab_would_fail(self):
         # rgba(20,54,93,0.42) over the dark tab bar: the colour the tab bar used to draw in dark mode
-        bar = TOKENS["dark"]["color"]["white"]
+        bar = TOKENS["dark"]["role"]["tabBar"]
         a = 0.42
         navy = (20, 54, 93)
         blended = "#" + "".join(f"{round(n * a + int(bar[i:i + 2], 16) * (1 - a)):02X}" for n, i in zip(navy, (1, 3, 5)))

@@ -1,0 +1,42 @@
+{
+  "id": "presence-of-god-readings",
+  "kind": "reflection",
+  "order": 13,
+  "title": "Present at Every Step",
+  "subtitle": "Six Days with Brother Lawrence for the Camino Inglés",
+  "route_slug": "camino-ingles",
+  "days": 6,
+  "description_short": "Six days with Brother Lawrence, the Paris lay brother who kept God in mind among kitchen chores and errands: a short book of readings for a short road, the Camino Inglés.",
+  "description_long": "Brother Lawrence was Nicholas Herman, of Lorraine: a footman and a soldier who, in 1666, was admitted as a lay brother among the barefooted Carmelites in Paris. He worked in the kitchen and was sent out to buy the community's wine. What remains of him is small: notes of four conversations and fifteen letters, put together by others. It is a book about keeping company with God in the middle of ordinary work.\n\nPresent at Every Step is made to go with the Camino Inglés, a road of about a week. It has six days, one for each day of walking, or six days at home. Every day has a morning reading of about five minutes and an evening reflection of about three. The morning begins with a short passage from Brother Lawrence, quoted word for word from an old English translation that is in the public domain. Then comes a reflection that starts from something on the road: a chore, a wandering mind, a flat afternoon, a straw on the path. Then two small things to carry for the next hour, a question and a practice that needs nothing but attention. The evening looks back over the day with two or three gentle questions and ends with a short original prayer, open enough to be said as a wish by a reader who prays differently, or who does not pray.\n\nThe days follow a walk: setting out, the ordinary task, distraction and return, dryness, the small kindnesses, going on. The classic is a Christian book and this book says so plainly. It invites and does not push, and it is honest where Brother Lawrence is hard to follow. The English of the passages is an anonymous translation from the French, from an undated old print edition published by the Fleming H. Revell Company.",
+  "keywords": [
+    "Camino de Santiago",
+    "Camino Inglés",
+    "Brother Lawrence",
+    "practice of the presence of God",
+    "pilgrimage reflections",
+    "daily readings",
+    "prayer"
+  ],
+  "categories": [
+    "Religion / Christian Living / Spiritual Growth",
+    "Religion / Christianity / Devotional",
+    "Travel / Special Interest / Pilgrimages"
+  ],
+  "cover": {
+    "colour": "goldWash",
+    "icon": "book"
+  },
+  "version": "1.0.0",
+  "date": "2026-11",
+  "sources": [
+    {
+      "id": "gutenberg-13871",
+      "work": "The Practice of the Presence of God the Best Rule of a Holy Life",
+      "author": "Brother Lawrence",
+      "translator": "anonymous translation from the French, Fleming H. Revell Company edition",
+      "year": "undated old print edition",
+      "licence": "Public domain",
+      "url": "https://www.gutenberg.org/ebooks/13871"
+    }
+  ]
+}

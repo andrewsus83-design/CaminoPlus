@@ -1,0 +1,43 @@
+{
+  "id": "purgatory-readings",
+  "kind": "reflection",
+  "order": 12,
+  "title": "The Mountain of the Heart",
+  "subtitle": "Fourteen Days with Dante's Purgatory for the Camino del Norte",
+  "route_slug": "camino-del-norte",
+  "days": 14,
+  "description_short": "Fourteen days with Dante's Purgatory in Longfellow's translation: a morning reading and an evening reflection for each day of the Camino del Norte. Slow, honest and quiet.",
+  "description_long": "The Purgatorio is the second part of the Divine Comedy, the long poem Dante Alighieri wrote in the early fourteenth century, in exile from his home city of Florence. In it a poet and his guide climb a mountain in stages: a shore at dawn, a gate, seven terraces, a garden at the top. It is a poem about walking up a hill with a burden on your back, and about how the climb changes the climber.\n\nThe Mountain of the Heart is made to go with the Camino del Norte, which runs from Irun to Santiago de Compostela, ~820 km, a long road of sea and hills. It has fourteen days. Every day has a morning reading of about five minutes and an evening reflection of about three. The morning begins with a short passage from the poem, quoted word for word from Henry Wadsworth Longfellow's translation of 1867, which is in the public domain. Then comes a reflection that starts from something on the road: a first light, a hard hill, a bell at the end of the afternoon, a heavy pack. Then two small things to carry for the next hour, a question and a practice that needs nothing but attention. The evening looks back over the day with two or three gentle questions and ends with a short original prayer, open enough to be said as a wish by a reader who prays differently, or who does not pray.\n\nThe days follow the climb: the shore and the foot of the mountain, the gate, the terraces one by one, the last night on the stairs, and the garden at the top. The poem belongs to the medieval Catholic imagination and this book says so plainly. It is read here as a poem of a pilgrim's climb, for any reader, and it neither explains nor argues the faith it comes from. It invites and does not push, and it is honest where the poem is hard. Read it on a bench, in a pilgrim hostel bunk, or at your own kitchen table once the walking is done.",
+  "keywords": [
+    "Camino de Santiago",
+    "Camino del Norte",
+    "Dante Purgatorio",
+    "Divine Comedy",
+    "pilgrimage reflections",
+    "daily readings",
+    "prayer"
+  ],
+  "categories": [
+    "Poetry / Subjects & Themes / Inspirational & Religious",
+    "Religion / Christian Living / Spiritual Growth",
+    "Travel / Special Interest / Pilgrimages"
+  ],
+  "cover": {
+    "colour": "successWash",
+    "icon": "book"
+  },
+  "version": "1.0.0",
+  "date": "2026-11",
+  "sources": [
+    {
+      "id": "gutenberg-1002",
+      "work": "The Divine Comedy: Purgatory",
+      "author": "Dante Alighieri",
+      "translator": "Henry Wadsworth Longfellow",
+      "year": "1867",
+      "licence": "Public domain",
+      "url": "https://www.gutenberg.org/ebooks/1002",
+      "text_from": "To run o’er better waters hoists its sail"
+    }
+  ]
+}

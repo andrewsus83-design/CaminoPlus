@@ -8,7 +8,7 @@
    Naming:  --cp-<category>-<name>[-<variant>]
    ========================================================================== */
 
-@import url("https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap");
 
 :root {
   /* ------------------------------------------------------------------------
@@ -40,6 +40,7 @@
   --cp-color-sand-300:   #E4D7BF; /* borders, dividers                              */
   --cp-color-sand-400:   #CDBC9C; /* strong border, disabled icon                   */
   --cp-color-stone-500:  #8C8272; /* placeholder text (non-essential only)          */
+  --cp-color-stone-550:  #697584; /* inactive tab icon and label · 4.6:1 on the tab bar */
   --cp-color-stone-600:  #556274; /* secondary text · 5.4:1 on parchment            */
   --cp-color-ink:        #14365D; /* primary text = Atlantic Blue · 10.7:1          */
   --cp-color-ink-strong: #0C2340; /* headlines on white                             */
@@ -57,6 +58,9 @@
   --cp-text:             var(--cp-color-ink);
   --cp-text-muted:       var(--cp-color-stone-600);
   --cp-text-placeholder: var(--cp-color-stone-500);
+  --cp-tab-inactive:     var(--cp-color-stone-550);  /* inactive tab icon and label on the tab bar */
+  --cp-tab-bar:          var(--cp-color-white);      /* the floating tab bar: light mode the card white, dark mode darker than the page */
+  --cp-tab-bar-border:   var(--cp-color-white);      /* its hairline: invisible in light mode (the shadow separates it), a lighter navy in dark mode */
   --cp-text-inverse:     var(--cp-color-parchment);
   --cp-text-accent:      var(--cp-color-gold-ink);
 
