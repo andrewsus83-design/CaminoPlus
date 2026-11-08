@@ -232,7 +232,9 @@ check('the Notes tab and the daily reading are plugged in here and built elsewhe
   assert.match(screen, /import \{ NotesTab \} from '@\/features\/library\/notes\/NotesTab';/);
   assert.match(screen, /<View style=\{\{ flex: 1 \}\}><NotesTab \/><\/View>/, 'no props, in a box of its own that fills what is under the tabs: the notes start right under them');
   assert.doesNotMatch(screen, /<NotesTab\s[^>]*\w+=/, 'NotesTab takes no props');
-  assert.doesNotMatch(screen.slice(screen.indexOf("if (!searching && tab === 'Notes') {"), screen.indexOf('<Screen keyboard')), /Banner|<Screen\b|ScrollView/, 'Notes has no banner and no scroll view around it: the feed scrolls by itself');
+  const notesHost = screen.slice(screen.indexOf("if (tab === 'Notes') {"), screen.indexOf('<Screen keyboard'));
+  assert.ok(notesHost.includes('<NotesTab />'), 'the host of the Notes tab is found');
+  assert.doesNotMatch(notesHost.slice(notesHost.indexOf(') : (')), /Banner|<Screen\b|ScrollView/, 'Notes has no banner and no scroll view around it: the feed scrolls by itself');
   assert.match(screen, /<DailyBanner onOpen=\{\(\) => router\.push\('\/library\/daily'\)\} \/>/);
   assert.ok(fs.existsSync(path.join(root, 'src/features/library/notes/NotesTab.tsx')), 'the file of the Notes tab is there (a placeholder until the real one is merged)');
   assert.match(read('src/features/library/notes/NotesTab.tsx'), /export function NotesTab\(\)/);

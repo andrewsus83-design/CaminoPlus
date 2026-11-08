@@ -67,12 +67,21 @@ export default function Library() {
     </>
   );
 
-  if (!searching && tab === 'Notes') {
+  if (tab === 'Notes') {
+    // The pinned host is used for Notes also while something is typed, so the search field stays the same element: a field that moves to another
+    // parent when the first letter arrives is made again, and the keyboard goes away. The results take the place of the feed, in a scroll view of
+    // their own that is set up like Screen's (a tap on a button works while the keyboard is up, a scroll closes it), and the pen is not drawn over them.
     return (
       <View style={{ flex: 1, backgroundColor: role.bg }}>
         <View style={{ paddingTop: insets.top + layout.screenTop, paddingHorizontal: layout.screenMargin, paddingBottom: 16, gap: 16 }}>{top}</View>
-        <View style={{ flex: 1 }}><NotesTab /></View>
-        <Fab label="Write a note" icon="compose" onPress={() => router.push('/diary/new')} />
+        {searching ? (
+          <ScrollView keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag" contentContainerStyle={{ paddingHorizontal: layout.screenMargin, paddingBottom: layout.tabbarHeight + insets.bottom + 40, gap: 16 }}>
+            <SearchResults query={query} marks={marks} onClear={() => setQuery('')} />
+          </ScrollView>
+        ) : (
+          <View style={{ flex: 1 }}><NotesTab /></View>
+        )}
+        {!searching && <Fab label="Write a note" icon="compose" onPress={() => router.push('/diary/new')} />}
       </View>
     );
   }

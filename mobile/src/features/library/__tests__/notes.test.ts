@@ -520,7 +520,7 @@ check('the tab owns its scroll, and it is a virtualised list: a FlatList of ever
   assert.match(src, /windowSize=\{7\}/);
   assert.doesNotMatch(src, /entries\.map\(|data\.map\(|shown\.map\(|\.slice\(/, 'no row is drawn by mapping over the notes');
   assert.match(src, /keyboardShouldPersistTaps="handled"/, 'a tap on a note works while the keyboard of the search field is up');
-  assert.match(src, /keyboardDismissMode="on-drag"/);
+  assert.match(src, /keyboardDismissMode=\{Platform\.OS === 'web' \? 'none' : 'on-drag'\}/, 'a drag puts the keyboard away on a phone; on the web a scroll nobody made must not take the focus from the search field');
   assert.match(src, /<RefreshControl\b[^>]*refreshing=\{refreshing\}[^>]*onRefresh=\{refresh\}/, 'pull to refresh');
   assert.doesNotMatch(src, /ownScroll/, 'the tab has one way of being hosted: it is the scroller');
 });
