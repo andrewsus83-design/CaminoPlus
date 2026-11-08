@@ -1,12 +1,13 @@
 // Plain-node checks for the Walk view maths (nav.ts). Run: npm run test:map
+import './lineShim'; // first: it lets the compiled sampleRoute find the OSM lines in assets/map/lines
 import assert from 'node:assert/strict';
 import { distanceM, lineLengthM, pointAlong, type LngLat } from '../geo';
 import {
-  DEFAULT_WALK_SPEED_MPS, EMPTY_TRACK, angleDiff, arrivalClock, bannerFor, bearingDeg, cardFor, classifyTurn, cumulative, etaMinutes, formatDistance,
+  DEFAULT_WALK_SPEED_MPS, EMPTY_TRACK, type ManeuverKind, angleDiff, arrivalClock, bannerFor, bearingDeg, cardFor, classifyTurn, cumulative, etaMinutes, formatDistance,
   formatDuration, isNight, lineTotalM, nextManeuver, nextOnTheWay, normDeg, pointAtAlong, progressAlong, remainingToStageEnd, roundForTurn, routeAhead, routeBearingAt,
   sliceAlong, smoothHeading, stageEnds, sunElevationDeg, sunTimes, updateTrack, walkingSpeedMps,
 } from '../nav';
-import { pois, routeLine, samplePosition, stageForPoint, stages, towns } from '../sampleRoute';
+import { pois, routeLine, samplePosition, stageEndAlongM, stageForPoint, stages, towns } from '../sampleRoute';
 
 let n = 0;
 const test = (name: string, fn: () => void) => {
@@ -130,10 +131,13 @@ test('nextManeuver: slight, sharp and u-turns', () => {
   assert.equal(nextManeuver(bend(180), 0).kind, 'u-turn');
 });
 
-test('nextManeuver: a 36 degree bend is still found, with the corner about where it is', () => {
-  const m = nextManeuver(bend(36), 0);
+test('nextManeuver: a 36 degree bend is straight on, a 42 degree one is announced with the corner about where it is (the threshold is 40 degrees, it was 35)', () => {
+  assert.equal(nextManeuver(bend(36), 0).kind, 'straight');
+  assert.equal(nextManeuver(bend(-38), 0).kind, 'straight');
+  const m = nextManeuver(bend(42), 0);
   assert.equal(m.kind, 'slight-right');
   near(m.distanceM, 300, 8);
+  assert.equal(nextManeuver(bend(-42), 0).kind, 'slight-left');
 });
 
 test('nextManeuver: bends under 35 degrees are straight on', () => {
@@ -191,16 +195,132 @@ test('nextManeuver: arrive at the end of the stage, and no turn is reported past
   assert.equal(nextManeuver(beyond, 0).kind, 'right', 'without a stage end the bend is a turn');
 });
 
-test('nextManeuver on the sample route: one bend of 36 degrees in stage 1, then arrive', () => {
+/** A route from off(0, 0) made of legs [heading in degrees, length in metres]: vertices only at the corners. */
+const legsRoute = (...legs: [number, number][]) => {
+  const pts: [number, number][] = [[0, 0]];
+  let x = 0;
+  let y = 0;
+  for (const [h, len] of legs) {
+    const [dx, dy] = heading(h, len);
+    x += dx;
+    y += dy;
+    pts.push([x, y]);
+  }
+  return path(...pts);
+};
+/** The legs of a smooth right-hand curve of the given radius through `turn` degrees, a leg every 10 m or so, starting from heading `from`. */
+const curve = (radius: number, turn: number, from = 0): [number, number][] => {
+  const arc = (radius * turn * Math.PI) / 180;
+  const k = Math.max(2, Math.ceil(arc / 10));
+  return Array.from({ length: k }, (_, i) => [from + ((i + 0.5) * turn) / k, arc / k] as [number, number]);
+};
+/** Every maneuver the walker is told about on the way along `line`: [metres along where it is, kind, turn], one per place. */
+const announced = (line: LngLat[], end = Infinity, from = 0, step = 3) => {
+  const out: { at: number; kind: string; turnDeg: number }[] = [];
+  for (let w = from; w < Math.min(end, lineTotalM(line)) - 40; w += step) {
+    const m = nextManeuver(line, w, end);
+    if (m.kind === 'straight' || m.kind === 'arrive') continue;
+    const at = w + m.distanceM;
+    const prev = out[out.length - 1];
+    if (prev && Math.abs(prev.at - at) <= 3) assert.deepEqual([prev.kind, prev.turnDeg], [m.kind, m.turnDeg], `the corner at ${at} changed its turn as the walker came up to it`);
+    else out.push({ at, kind: m.kind, turnDeg: m.turnDeg });
+  }
+  return out;
+};
+
+test('nextManeuver: a hairpin is one announcement, a sharp turn, wherever the walker stands on the way to it', () => {
+  // north 300 m, a link of 15 m (or 40 m) east and straight back south: two corners of 90 degrees
+  const short = announced(legsRoute([0, 300], [90, 15], [180, 700]));
+  assert.equal(short.length, 1, JSON.stringify(short));
+  assert.ok(short[0].kind === 'sharp-right' || short[0].kind === 'u-turn', short[0].kind);
+  near(short[0].at, 305, 12);
+  const long = announced(legsRoute([0, 300], [90, 40], [180, 700]));
+  assert.equal(long.length, 1, JSON.stringify(long));
+  assert.equal(long[0].kind, 'u-turn', 'two corners 40 m apart are one turn of 180 degrees');
+  near(long[0].at, 300, 12);
+});
+
+test('nextManeuver: a long gentle curve is not a turn, however far it bends; a tight smooth bend is not one either, a corner of the same angle is', () => {
+  for (const [radius, turn] of [[150, 90], [100, 180], [250, 60]] as const) {
+    const line = legsRoute([0, 300], ...curve(radius, turn), [turn, 700]);
+    assert.deepEqual(announced(line), [], `radius ${radius} m through ${turn} degrees`);
+  }
+  assert.deepEqual(announced(legsRoute([0, 300], ...curve(40, 90), [90, 700])), [], 'a smooth bend of radius 40 m has 43 degrees in its 60 m window, spread over a curve');
+  const corner = announced(legsRoute([0, 300], [90, 700]));
+  assert.equal(corner.length, 1);
+  assert.equal(corner[0].kind, 'right');
+  near(corner[0].at, 300, 8);
+  const smallRadius = announced(legsRoute([0, 300], ...curve(15, 90), [90, 700]));
+  assert.equal(smallRadius.length, 1, 'a bend of radius 15 m is a turn');
+  assert.equal(smallRadius[0].kind, 'right');
+});
+
+test('nextManeuver: two turns 80 m apart are one announcement (the net turn, at the first corner), a bend and its counter-bend cancel, 130 m apart they are two', () => {
+  const same = legsRoute([0, 300], [45, 80], [90, 700]);
+  const m = nextManeuver(same, 0);
+  assert.equal(m.kind, 'right');
+  near(m.turnDeg, 90, 3);
+  near(m.distanceM, 300, 8);
+  assert.equal(announced(same).length, 1);
+  assert.equal(nextManeuver(same, 340).kind, 'straight', 'between the two corners: the second belongs to the turn the walker is making');
+  assert.deepEqual(announced(legsRoute([0, 300], [60, 80], [0, 700])), [], 'a jog: right 60 degrees, left 60 degrees, 80 m later');
+  const apart = announced(legsRoute([0, 300], [45, 130], [90, 700]));
+  assert.equal(apart.length, 2);
+  near(apart[0].at, 300, 8);
+  near(apart[1].at, 430, 8);
+  assert.deepEqual(apart.map((a) => a.kind), ['slight-right', 'slight-right']);
+});
+
+test('nextManeuver: a T junction is announced once, counting down, and not again once passed', () => {
+  const line = legsRoute([0, 380], [-90, 700]);
+  assert.deepEqual(announced(line).map((a) => a.kind), ['left']);
+  near(nextManeuver(line, 0).distanceM, 380, 8);
+  near(nextManeuver(line, 200).distanceM, 180, 8);
+  assert.equal(nextManeuver(line, 379).kind, 'left');
+  for (const past of [1, 3, 10, 30, 45, 59]) assert.equal(nextManeuver(line, 380 + past).kind, 'straight', `${past} m past the corner`);
+});
+
+test('nextManeuver: a winding path does not add up (30 degree zig-zags, twelve gentle bends of 12 degrees) and a turn 40 m ahead is still announced', () => {
+  const zigzag = legsRoute([0, 300], ...Array.from({ length: 12 }, (_, i) => [i % 2 ? -15 : 15, 40] as [number, number]), [0, 700]);
+  assert.deepEqual(announced(zigzag), []);
+  const gentle = legsRoute([0, 300], ...Array.from({ length: 8 }, (_, i) => [12 * (i + 1), 30] as [number, number]), [96, 700]);
+  assert.deepEqual(announced(gentle), []);
+  near(nextManeuver(bend(90, 300, 700), 260).distanceM, 40, 8);
+});
+
+test('nextManeuver: a corner the path goes back from within 80 m is not a decision, the same corner with the new heading kept is', () => {
+  // right 60 degrees, then three gentle bends of 20 degrees back to the old heading, all within 75 m
+  const wiggle = legsRoute([0, 300], [60, 25], [40, 25], [20, 25], [0, 700]);
+  assert.deepEqual(announced(wiggle), []);
+  const kept = announced(legsRoute([0, 300], [60, 700]));
+  assert.equal(kept.length, 1);
+  assert.equal(kept[0].kind, 'slight-right');
+});
+
+test('nextManeuver on the OSM stages: one announcement every 1 to 2 km, each a real turn, none closer than 100 m, and each stays where it is as the walker comes up to it', () => {
+  let from = 0;
+  stages.forEach((stage, i) => {
+    const end = stageEndAlongM[i];
+    const list = announced(routeLine, end, from, 7);
+    const km = (end - from) / 1000;
+    for (const a of list) {
+      // (the kind is named from the turn before it is rounded to whole degrees: -69.6 is slight-left, and shows as -70)
+      assert.ok(Math.abs(a.turnDeg) >= 40 && [classifyTurn(a.turnDeg - 0.5), classifyTurn(a.turnDeg + 0.5)].includes(a.kind as ManeuverKind), `stage ${stage.number}: ${a.kind} ${a.turnDeg}`);
+      assert.ok(a.at > from && a.at < end - 18, `stage ${stage.number}: a turn at ${a.at} is outside the stage`);
+    }
+    list.slice(1).forEach((a, j) => assert.ok(a.at - list[j].at >= 100, `stage ${stage.number}: turns ${a.at - list[j].at} m apart`));
+    const perKm = list.length / km;
+    console.log(`   stage ${stage.number}: ${list.length} announcements in ${km.toFixed(1)} km, one per ${Math.round(1000 / perKm)} m`);
+    if (stage.number <= 2) assert.ok(1000 / perKm >= 1000 && 1000 / perKm <= 2000, `stage ${stage.number}: one per ${1000 / perKm} m`);
+    else assert.ok(1000 / perKm >= 750 && 1000 / perKm <= 2000, `stage ${stage.number}: one per ${1000 / perKm} m`);
+    from = end;
+  });
   const stage = stages[0];
   const end = progressAlong(routeLine, stage.line[stage.line.length - 1]).alongM;
-  const m = nextManeuver(routeLine, 5800, end);
-  assert.equal(m.kind, 'slight-right');
-  near(m.distanceM, 6152 - 5800, 8);
-  assert.equal(nextManeuver(routeLine, 9000, end).kind, 'straight');
-  const arr = nextManeuver(routeLine, end - 300, end);
+  assert.equal(nextManeuver(routeLine, 9000, end).kind, 'straight', 'the sample position: nothing to turn at in the next 400 m');
+  const arr = nextManeuver(routeLine, end - 20, end);
   assert.equal(arr.kind, 'arrive');
-  near(arr.distanceM, 300, 1);
+  near(arr.distanceM, 20, 1);
 });
 
 /* ---------------------------------------------------------------- sample route progress */
@@ -214,24 +334,25 @@ test('stage end along the route: remaining + walked = the stage end, and the sam
   near(end.offM, 0, 0.01);
   near(end.alongM, lineLengthM(stage.line), 2, 'stage 1 ends where its own line ends');
   const remaining = end.alongM - pos.alongM;
-  near(remaining, 11275, 10);
+  near(remaining, lineLengthM(stage.line) - 9000, 10);
   assert.ok(Math.abs(remaining + pos.alongM - end.alongM) < 1e-6);
 });
 
 test('remainingToStageEnd: distance along the route to the end of the stage, never negative', () => {
   const stage = stages[0];
   const end = stage.line[stage.line.length - 1];
+  const stageLen = lineLengthM(stage.line);
   const here = remainingToStageEnd(routeLine, samplePosition, end);
   near(here.pos.alongM, 9000, 5);
-  near(here.remainingM, 11275, 10);
-  near(here.endAlongM, 20274.6, 1);
+  near(here.remainingM, stageLen - 9000, 10);
+  near(here.endAlongM, stageLen, 1);
   // 1 km off the route: measured from the point of the route nearest to the walker
   const off1km: LngLat = [samplePosition[0] + 0.0123, samplePosition[1]];
   const offRoute = remainingToStageEnd(routeLine, off1km, end);
   assert.ok(offRoute.pos.offM > 800 && offRoute.pos.offM < 1100);
-  assert.ok(Math.abs(offRoute.remainingM - 11275) < 900, `snapped remaining ${offRoute.remainingM}`);
+  assert.ok(Math.abs(offRoute.remainingM - (stageLen - 9000)) < 900, `snapped remaining ${offRoute.remainingM}`);
   // past the end of the stage (in stage 2): 0 left, not a negative number
-  const stage2 = pointAlong(routeLine, 25_000);
+  const stage2 = pointAlong(routeLine, stageLen + 1000);
   assert.equal(remainingToStageEnd(routeLine, stage2, end).remainingM, 0);
   // at the very start of the stage the whole stage is left
   near(remainingToStageEnd(routeLine, stage.line[0], end).remainingM, lineLengthM(stage.line), 5);
@@ -247,7 +368,7 @@ test('nextOnTheWay lists the next places ahead with distances along the route', 
   assert.equal(next.length, 3);
   assert.deepEqual(next.map((x) => x.name), ['Fontaine de Roland', 'Col de Lepoeder', 'Roncesvalles'], 'a town wins over the pins inside it');
   assert.ok(next[0].distanceM > 0 && next[0].distanceM < next[1].distanceM && next[1].distanceM < next[2].distanceM);
-  near(next[2].distanceM, 11275, 60);
+  near(next[2].distanceM, lineLengthM(stages[0].line) - 9000, 60);
   const all = nextOnTheWay(routeLine, pos.alongM, items, 99, 0);
   assert.ok(all.every((x) => x.distanceM > 0), 'nothing behind the walker');
   assert.ok(!all.some((x) => x.name === 'Refuge Orisson'), 'already passed');

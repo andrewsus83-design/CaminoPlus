@@ -13,6 +13,7 @@ import './reading.test'; // reading a book and drawing its cover: the neighbours
 import './reader.test';
 import './passages.test'; // what a pilgrim can keep from a book: the key of a passage, its words, the rows of the Bookmarks screen
 import './designBooks.test'; // the Books phones of the design page are what the books make of them (designBooks.ts draws them from the bundle)
+import './continueBar.test'; // the Continue reading bar: the most recent place of the Bible and the books, closing it and bringing it back, where it sits above the tab bar
 import {
   BOOKMARKS_MAX, bookmarkKeys, hasBookmark, packBookmarks, parseBookmarks, toggleBookmark, type Bookmark,
 } from '../bookmarks';
