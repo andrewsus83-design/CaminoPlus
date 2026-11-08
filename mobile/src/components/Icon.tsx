@@ -76,6 +76,8 @@ const PATHS = {
   video: ['M4 7.5A2.5 2.5 0 0 1 6.5 5h7A2.5 2.5 0 0 1 16 7.5v9a2.5 2.5 0 0 1-2.5 2.5h-7A2.5 2.5 0 0 1 4 16.5v-9Z', 'm16 10.5 4.5-2.8v8.6L16 13.5'],
   play: ['M8 5.5v13l11-6.5-11-6.5Z'],
   diary: ['M8.5 4h10A1.5 1.5 0 0 1 20 5.5v13a1.5 1.5 0 0 1-1.5 1.5h-10A1.5 1.5 0 0 1 7 18.5v-13A1.5 1.5 0 0 1 8.5 4Z', 'M4 8h4M4 12h4M4 16h4', 'M11.5 8.5h5.5M11.5 12h3.5'],
+  // The Daily reading's calendar button: a month page with its two rings. The design page sprite has the same one, symbol i-calendar.
+  calendar: ['M6.5 5h11A2.5 2.5 0 0 1 20 7.5v10a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 17.5v-10A2.5 2.5 0 0 1 6.5 5Z', 'M4 10h16', 'M8 3v4M16 3v4'],
 } as const;
 
 export type IconName = keyof typeof PATHS;
