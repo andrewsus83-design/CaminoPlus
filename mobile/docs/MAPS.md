@@ -94,7 +94,7 @@ screen ("routes") and in the route sheet of the Maps tab.
 
 | | Where it comes from |
 |---|---|
-| Base map tiles | OpenStreetMap: OpenFreeMap tiles online, our own `.pmtiles` packs offline |
+| Base map tiles | OpenStreetMap data: MapTiler tiles (with a key) or OpenFreeMap tiles online, our own `.pmtiles` packs offline |
 | The line of stages 1 to 3 (Saint-Jean-Pied-de-Port to Pamplona) | OpenStreetMap, bundled with the app (`assets/map/lines`); `manifest.json` has the date of the data |
 | Stays and points of interest of a stage | The database: OpenStreetMap places imported by `import_osm.py`. The twelve bundled sample pins (`pois` in `sampleRoute.ts`) are drawn only while the database has none for the stage |
 | The route after Pamplona (stage 4 on) | Still a sample: straight lines between hand-placed towns. Do not navigate with it |
