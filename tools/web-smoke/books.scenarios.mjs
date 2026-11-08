@@ -93,7 +93,7 @@ export const BOOKS_SCENARIOS = [
       await page.getByRole('heading', { name: 'Readings for the Way', exact: true }).waitFor();
       await page.getByText(`${guides} books`, { exact: true }).first().waitFor();
       step('a banner with a button, no notice above the covers, and no book that says Soon or Free');
-      const banner = page.getByRole('button', { name: /^(Start|Continue) reading\. Books for the road/ });
+      const banner = page.getByRole('button', { name: /^Start reading\. Books for the road/ }); // it never continues a book: the Continue reading bar above the tab bar does (continue.scenarios.mjs)
       await banner.waitFor();
       const b = await box(banner, 'the banner');
       assert(b.height <= 120, `the banner is ${b.height} high (at most 120 on a 390 phone)`);
@@ -341,7 +341,7 @@ export const BOOKS_SCENARIOS = [
     },
   },
   {
-    name: 'Books: the reader remembers where you stopped (Continue on the page and on the Books tab, the same line), the size of the text (five steps, kept), and a damaged place opens the book at its start',
+    name: 'Books: the reader remembers where you stopped (Continue on the page and the Continue reading bar above the tab bar, the same line), the size of the text (five steps, kept), and a damaged place opens the book at its start',
     persona: 'in',
     async run(ctx) {
       const { page, step, go } = ctx;
@@ -356,15 +356,15 @@ export const BOOKS_SCENARIOS = [
       await scrollTo(page, 0.5);
       step('the place is written a moment later, only on the phone, under the person\'s own key, with the time');
       await eventually(() => saved(page, UID), (v) => !!v && JSON.parse(v).items.some((p) => p.id === id && p.c === chapter.id && Math.abs(p.y - 0.5) < 0.03 && p.at > 0), { what: 'the saved place', timeout: 10000 });
-      step('the page of the book says "Continue: …" and the Books tab "Continue reading", for this book');
+      step('the page of the book says "Continue: …" and the bar above the tab bar of the Books tab "Continue reading", for this book and this chapter');
       await go(`/library/book/${id}`);
       await page.getByRole('button', { name: /^Continue: / }).first().waitFor();
       assert(!(await page.getByRole('button', { name: /^Start reading$/ }).count()), 'no "Start reading" once something was read');
       await page.getByText('LAST READ', { exact: true }).first().waitFor();
       await openBooks(ctx);
-      await page.getByRole('button', { name: new RegExp(`^Continue reading\\. Books for the road\\. ${esc(book.title)}`) }).waitFor();
-      step('"Continue" opens the same chapter at the same line');
-      await page.getByRole('button', { name: /^Continue reading/ }).click();
+      await page.getByRole('button', { name: `Continue reading, ${book.title}, Chapter ${longest + 1}`, exact: true }).waitFor();
+      step('"Continue reading" opens the same chapter at the same line');
+      await page.getByRole('button', { name: /^Continue reading, / }).click();
       await eventually(() => new URL(page.url()).pathname, (p) => p === `/library/book/${id}/read`, { what: 'the address of the reader' });
       await eventually(() => scroller(page), (s) => s && Math.abs(s.top / (s.height - s.client) - 0.5) < 0.03, { what: 'the line where the person stopped', timeout: 10000 });
       step('the text size: Larger makes it bigger, five steps, the buttons stop at the ends, and the size is kept when the reader is opened again');
