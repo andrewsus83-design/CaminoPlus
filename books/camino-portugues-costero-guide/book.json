@@ -1,0 +1,29 @@
+{
+  "id": "camino-portugues-costero-guide",
+  "kind": "guide",
+  "order": 3,
+  "title": "The Coastal Way",
+  "subtitle": "A Pilgrim's Guide to the Camino Portugués Costero",
+  "route_slug": "camino-portugues-costero",
+  "description_short": "A calm, honest guide to the Camino Portugués Costero from Porto: twelve walking days beside the Atlantic, the boat across the Minho, when to go, what to carry, and how the Compostela rule works.",
+  "description_long": "The Coastal Way is the road from the cathedral of Porto to the cathedral of Santiago de Compostela that follows the Atlantic: about 260 km in the CaminoPlus catalog, walked here in twelve days. It runs through Vila do Conde, Esposende and Viana do Castelo to Caminha, crosses the Minho by boat to A Guarda, and goes on through Oia, Baiona and Vigo to Redondela, where it joins the road that the Central route also takes. From there it is the same way to Pontevedra, Caldas de Reis, Padrón and Santiago.\n\nThis guide is written for the Planner first and the Walker's evenings second. It helps you decide whether this is your Camino, shape the walk, pack, and know what to check locally. It says plainly where the sources disagree, which on this road they often do: Portugal's own official figures for the Portuguese part differ by about 12 km, and published plans differ again.\n\nYou will find a day-by-day account in three chapters, from the Sé of Porto to the Praterías entrance of the cathedral; the other ways in and out (the Litoral start, the river link to Valença and Tui, the Spiritual Variant); chapters on when to go, with the climate of Porto, Viana do Castelo, Vigo and Santiago in plain numbers; on the credencial and getting there; on sleeping, eating and resting; on body, weather and safety, with the wind, the sun and the sea; on the inner side of walking; and on arriving and going home. It explains how the Pilgrim's Office describes the rule for the Compostela, and why a start near Vigo is a question to put to the Office.\n\nEvery distance is marked approximate. The book names no hostels, cafes or prices, because they change, and it sends you to the CaminoPlus app and to local information for the live answer. It was written with AI assistance from public sources, which it credits, by an author who has not walked the road.",
+  "keywords": [
+    "Camino Portugués Costero",
+    "Portuguese Coastal Way",
+    "Camino de Santiago",
+    "Porto to Santiago",
+    "pilgrim guidebook",
+    "Caminho Português da Costa",
+    "Compostela"
+  ],
+  "categories": [
+    "Travel / Special Interest / Pilgrimages",
+    "Travel / Europe / Portugal"
+  ],
+  "cover": {
+    "colour": "blue100",
+    "icon": "library"
+  },
+  "version": "1.0.0",
+  "date": "2026-11"
+}
