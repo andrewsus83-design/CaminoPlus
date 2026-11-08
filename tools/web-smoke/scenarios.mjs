@@ -28,8 +28,10 @@ import { ALL_PLACES_SCENARIOS } from './allplaces.scenarios.mjs';
 
 /** design/tokens.json: the weights of the tabs of the tab bar (section tab) are read from it, as the app reads them. */
 const TAB_TOKENS = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'design', 'tokens.json'), 'utf8')).tab;
-/** The stem of Inter Light is 136 of 2048 units (themeScheme.test.ts reads it from the font file on every run): 0.93 px at the 14 px of a tab label. */
-const LIGHT_STEM_PX = (136 / 2048) * 14;
+/** The stem of the inactive tab label by weight (themeScheme.test.ts reads them from the font files on every run): Inter Light 136 and Regular 180 of
+ * 2048 units, 0.93 and 1.23 px at the 14 px of a tab label. Dark mode draws Light, light mode Regular (tokens.tab.inactiveLabelWeight). */
+const STEM_PX = { 300: (136 / 2048) * 14, 400: (180 / 2048) * 14 };
+const INACTIVE_FONT = { 300: 'Inter_300Light', 400: 'Inter_400Regular' };
 const TABS = ['Me', 'Stays', 'Maps', 'Discover', 'Library'];
 const TAB_PATH = { Me: '/me', Stays: '/stays', Maps: '/maps', Discover: '/explore', Library: '/library' };
 
@@ -68,7 +70,7 @@ export const SCENARIOS = [
     },
   },
   {
-    name: 'Tab bar: an inactive tab is thin and Light and its icon is drawn exactly as thick as the stem of its label (0.93 px), the active tab is heavier in both',
+    name: 'Tab bar: an inactive tab is thin (Light in dark mode, Regular in light mode) and its icon is drawn exactly as thick as the stem of its label, the active tab is heavier in both',
     persona: 'in',
     async run({ page, step, go, task }) {
       step('open Me, where Me is the active tab and the other four are not');
@@ -85,12 +87,13 @@ export const SCENARIOS = [
       const scheme = task.scheme;
       const inactive = drawn.filter((t) => t.name !== 'Me');
       assert.equal(inactive.length, 4, 'four tabs are inactive');
-      step('each inactive tab: the icon is the stroke of tokens.tab (0.8 of its 24 units, drawn 28 px square: 0.93 px) within 10 percent of the stem of its Light label at 14 px, and the label is Inter Light');
+      const weight = TAB_TOKENS.inactiveLabelWeight[scheme], stem = STEM_PX[weight];
+      step(`each inactive tab: the icon is the stroke of tokens.tab (${TAB_TOKENS.inactiveStroke[scheme]} of its 24 units, drawn 28 px square) within 10 percent of the stem of its label at 14 px (${stem.toFixed(2)} px), and the label is ${INACTIVE_FONT[weight]}`);
       for (const t of inactive) {
         assert.equal(t.stroke, TAB_TOKENS.inactiveStroke[scheme], `${t.name}: the stroke is the token`);
         const px = (t.stroke * t.size) / t.box;
-        assert(Math.abs(px / LIGHT_STEM_PX - 1) <= 0.1, `${t.name}: the icon is drawn ${px.toFixed(3)} px thick, the stem of its label is ${LIGHT_STEM_PX.toFixed(3)} px`);
-        assert(/Inter_300Light/.test(t.family), `${t.name}: the label is Inter Light (${t.family})`);
+        assert(Math.abs(px / stem - 1) <= 0.1, `${t.name}: the icon is drawn ${px.toFixed(3)} px thick, the stem of its label is ${stem.toFixed(3)} px`);
+        assert(new RegExp(INACTIVE_FONT[weight]).test(t.family), `${t.name}: the label is ${INACTIVE_FONT[weight]} (${t.family})`);
         assert.equal(t.fontSize, '14px', `${t.name}: the label is 14 px`);
       }
       const active = drawn.find((t) => t.name === 'Me');
