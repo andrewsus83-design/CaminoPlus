@@ -1,205 +1,154 @@
-// Plain-node checks of the Library's books: the small pure functions of books.ts, and the contract of the bundle the app ships
-// (mobile/assets/library, written by tools/build_books.py): every book in the catalog has its text, the catalog and the text say the same
-// about the chapters, and nothing the reader cannot draw is in a book. No React, no network. Run: npm run test:library
+// Plain-node checks of the twelve free books of the Books tab (books/catalog.ts): which they are and in what order, what is said of each,
+// and that the data that is only for later (group, source, licence notes) is kept apart from what is drawn. No React, no network.
+// Run: npm run test:library (library.test.ts runs this file too).
+//
+// The owner's list is typed in again below on purpose, and not read from the catalog: a typo in a title, an author or a blurb, a book
+// moved, or a link pasted back in that was found to point at another book, then fails here instead of reaching the screen.
 import assert from 'node:assert/strict';
-import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
-import { blockText, bookLine, chapterPlace, coverCaption, coverTitleSize, creditLine, dayCount, findBook, findChapter, formatMinutes, kindLabel, libraryBooks, snippet, spansText, unbreakableCaption, type Block, type BookContent, type CatalogBook } from '../books';
+import { BOOK_CATALOG, bookByline, type CatalogBook } from '../books/catalog';
 
 let n = 0;
 const check = (name: string, fn: () => void) => { fn(); n += 1; console.log(`ok   ${name}`); };
 const root = process.cwd(); // npm test runs from mobile/
 const read = (p: string) => readFileSync(join(root, p), 'utf8');
 
-const book = (over: Partial<CatalogBook>): CatalogBook => ({
-  id: 'b', kind: 'guide', order: 1, title: 'B', subtitle: 'S', description: 'D', words: 100, minutes: 1, cover: { colour: 'goldSoft', icon: 'library' },
-  chapters: [{ id: '00-a', title: 'A', minutes: 1 }, { id: '01-b', title: 'B', minutes: 1 }, { id: '02-c', title: 'C', minutes: 1 }], ...over,
+// [id, title, author, era, blurb, group]: the owner's twelve, in the owner's order.
+const OWNERS_LIST: readonly [string, string, string, string, string, string][] = [
+  ['way-of-a-pilgrim', 'The Way of a Pilgrim', 'Anonymous', '19th century', 'A Russian wanderer walks and prays the Jesus Prayer.', 'Pilgrims on foot'],
+  ['life-of-st-teresa', 'The Life of St. Teresa of Jesus', 'Teresa of Ávila', '1565', 'Her own story, written in Spain: prayer, struggle and courage.', 'Pilgrims on foot'],
+  ['little-flowers', 'The Little Flowers of Saint Francis', 'Anonymous', '14th century', 'Simple, warm stories of Francis and his brothers on the road.', 'Pilgrims on foot'],
+  ['dark-night', 'Dark Night of the Soul', 'John of the Cross', '16th century', 'For lonely or doubting days: a poem and its guide, from Spain.', 'Spanish and contemplative'],
+  ['interior-castle', 'The Interior Castle', 'Teresa of Ávila', '1577', 'The soul as a castle of seven rooms, to read a chapter at a time.', 'Spanish and contemplative'],
+  ['spiritual-exercises', 'The Spiritual Exercises', 'Ignatius of Loyola', '1522 to 1524', 'A guide to prayer begun at Manresa, in Spain.', 'Spanish and contemplative'],
+  ['imitation-of-christ', 'The Imitation of Christ', 'Thomas à Kempis', 'c. 1420', 'Short, sharp counsels on humility and the daily cross.', 'Reflection and inner peace'],
+  ['devout-life', 'Introduction to the Devout Life', 'Francis de Sales', '1609', 'Practical holiness for ordinary people in the middle of life.', 'Reflection and inner peace'],
+  ['abandonment-to-providence', 'Abandonment to Divine Providence', 'Jean-Pierre de Caussade', '18th century', 'Giving each moment to God: calm for tired and lost days.', 'Reflection and inner peace'],
+  ['confessions', 'Confessions', 'Augustine of Hippo', 'c. 400', 'The great story of a restless heart finding rest in God.', 'Great classics'],
+  ['dialogue-of-st-catherine', 'The Dialogue of Saint Catherine of Siena', 'Catherine of Siena', '1370', 'A conversation with God, and Christ as the bridge.', 'Great classics'],
+  ['story-of-a-soul', 'The Story of a Soul', 'Thérèse of Lisieux', '1898', 'The little way: love in small things, even a smile when tired.', 'Great classics'],
+];
+
+// The links that were checked (id -> source). A book that is not here has no source yet.
+const CHECKED_SOURCES: Record<string, string> = {
+  'way-of-a-pilgrim': 'https://ccel.org/ccel/philip_allan/pilgrim',
+  'life-of-st-teresa': 'https://www.gutenberg.org/ebooks/8120',
+  'imitation-of-christ': 'https://www.gutenberg.org/ebooks/1653',
+  'abandonment-to-providence': 'https://www.gutenberg.org/ebooks/52057',
+  confessions: 'https://www.gutenberg.org/ebooks/3296',
+  'story-of-a-soul': 'https://www.gutenberg.org/ebooks/16772',
+};
+// Gutenberg numbers that were given first and turned out to be other books: they must not come back.
+const WRONG_NUMBERS = ['40375', '14287', '17799', '57173', '43896', '59828', '5069'];
+
+check('twelve books, in the owner\'s order: the title, the author, the era and the blurb of each are the owner\'s words', () => {
+  assert.equal(BOOK_CATALOG.length, 12);
+  assert.deepEqual(BOOK_CATALOG.map((b) => [b.id, b.title, b.author, b.era, b.blurb, b.group]), OWNERS_LIST.map((r) => [...r]));
 });
 
-check('minutes are written as the build writes them', () => {
-  assert.equal(formatMinutes(0), '0 min');
-  assert.equal(formatMinutes(45), '45 min');
-  assert.equal(formatMinutes(60), '1 h');
-  assert.equal(formatMinutes(144), '2 h 24 min');
-  assert.equal(formatMinutes(180), '3 h');
-  assert.equal(formatMinutes(-5), '0 min');
-});
-
-check('the line under a cover says what the book is and how long it reads', () => {
-  assert.equal(kindLabel('guide'), 'Guide');
-  assert.equal(kindLabel('reflection'), 'Readings');
-  assert.equal(coverCaption({ kind: 'guide', minutes: 200 }), 'Guide · 3 h 20 min');
-  assert.equal(coverCaption({ kind: 'reflection', minutes: 150 }), 'Readings · 2 h 30 min');
-});
-
-check('the rows of the Books tab follow the catalog order, guides before readings, and copy nothing it should not', () => {
-  const rows = libraryBooks([book({ id: 'r', kind: 'reflection', order: 9, title: 'Readings' }), book({ id: 'g2', order: 2, title: 'Two' }), book({ id: 'g1', order: 1, title: 'One' })]);
-  assert.deepEqual(rows.map((r) => r.id), ['g1', 'g2', 'r']);
-  assert.deepEqual(rows[0], { id: 'g1', title: 'One', kind: 'Guide · 1 min', colour: 'goldSoft', icon: 'library', subtitle: 'S', minutes: 1 });
-  const input = [book({ id: 'x', order: 2 }), book({ id: 'y', order: 1 })];
-  libraryBooks(input);
-  assert.deepEqual(input.map((b) => b.id), ['x', 'y'], 'the catalog itself is not reordered');
-});
-
-check('a book and a chapter are found by id, and an id that is not there is null, never a throw', () => {
-  const cat = [book({ id: 'one' }), book({ id: 'two' })];
-  assert.equal(findBook(cat, 'two')?.id, 'two');
-  assert.equal(findBook(cat, 'gone'), null);
-  assert.equal(findBook(cat, undefined), null);
-  assert.equal(findBook([], 'one'), null);
-  const ch = cat[0].chapters;
-  assert.deepEqual(chapterPlace(ch, '00-a'), { index: 0, count: 3, prev: null, next: '01-b' });
-  assert.deepEqual(chapterPlace(ch, '01-b'), { index: 1, count: 3, prev: '00-a', next: '02-c' });
-  assert.deepEqual(chapterPlace(ch, '02-c'), { index: 2, count: 3, prev: '01-b', next: null });
-  assert.equal(chapterPlace(ch, 'nope'), null);
-  assert.equal(chapterPlace(ch, undefined), null);
-  assert.equal(chapterPlace([], '00-a'), null);
-});
-
-check('the credit of a book is the sentence the build wrote (one place words it); only a bundle without it falls back to the plain facts, or to the author of the book', () => {
-  assert.equal(creditLine({ author: 'CaminoPlus', credit: 'The Imitation of Christ, Thomas à Kempis. Translated by William Benham (1886). Public domain.' }), 'The Imitation of Christ, Thomas à Kempis. Translated by William Benham (1886). Public domain.');
-  assert.equal(creditLine({ author: 'CaminoPlus', credit: 'Walking, Henry David Thoreau. English original, 1862. Public domain.' }), 'Walking, Henry David Thoreau. English original, 1862. Public domain.', 'a modern or original edition is worded by the build, not rebuilt from a translator field');
-  assert.equal(creditLine({ author: 'CaminoPlus', credit: 'By CaminoPlus.' }), 'By CaminoPlus.');
-  assert.equal(creditLine({ author: 'CaminoPlus', credit: '  By CaminoPlus.  ' }), 'By CaminoPlus.', 'trimmed');
-  assert.equal(creditLine({ author: 'CaminoPlus', credit: '' }), 'By CaminoPlus.', 'an empty credit is no credit');
-  assert.equal(creditLine({ author: 'CaminoPlus' }), 'By CaminoPlus.');
-  assert.equal(creditLine({ author: 'CaminoPlus', sources: [{ work: 'The Imitation of Christ', author: 'Thomas à Kempis', licence: 'Public domain' }] }), 'The Imitation of Christ, Thomas à Kempis. Public domain.', 'the fallback never claims a translator');
-  assert.equal(spansText([{ t: 'a ' }, { t: 'b', i: 1 }, { t: '.' }]), 'a b.');
-});
-
-check('the words of a block: a paragraph, a heading, a list, a quote (not its attribution) and a break, on one line without their marks', () => {
-  const sp = (...t: string[]) => t.map((x) => ({ t: x }));
-  assert.equal(blockText({ t: 'p', spans: [{ t: 'one ' }, { t: 'two', i: 1 }, { t: ',\n three', b: 1 }, { t: ' four', href: 'https://example.org' }] }), 'one two, three four');
-  assert.equal(blockText({ t: 'h', level: 2, spans: sp('The passage') }), 'The passage');
-  assert.equal(blockText({ t: 'ul', items: [sp('a'), sp('b ', 'c')] }), 'a b c');
-  assert.equal(blockText({ t: 'ol', items: [sp('first'), sp('second')] }), 'first second');
-  assert.equal(blockText({ t: 'quote', paras: [sp('First.'), sp('Second.')], cite: sp('Someone') }), 'First. Second.');
-  assert.equal(blockText({ t: 'hr' }), '');
-  assert.equal(blockText({ t: 'p', spans: [] }), '');
-  assert.equal(blockText({ t: 'unknown' } as unknown as Block), '', 'a block the reader does not know has no words');
-});
-
-check('a text is cut at a word with an ellipsis, never longer than asked, and never in the middle of an emoji', () => {
-  assert.equal(snippet('short', 10), 'short');
-  assert.equal(snippet('exactly ten', 11), 'exactly ten');
-  const cut = snippet('the quick brown fox jumps over the lazy dog', 20);
-  assert.ok(cut.length <= 20 && cut.endsWith('…') && !cut.endsWith(' …'), cut);
-  assert.equal(cut, 'the quick brown fox…');
-  assert.equal(snippet('x'.repeat(50), 10), `${'x'.repeat(9)}…`, 'no space to cut at: cut at the limit');
-  const emoji = snippet(`${'a'.repeat(8)}😀😀😀`, 10);
-  assert.ok(emoji.length <= 10);
-  assert.doesNotMatch(emoji, /[\ud800-\udbff](?![\udc00-\udfff])/);
-});
-
-check('a chapter is found by id, and a reflection book says how many days it has', () => {
-  const ch = [{ id: '00-a', title: 'A' }, { id: '01-b', title: 'B' }];
-  assert.equal(findChapter(ch, '01-b')?.title, 'B');
-  assert.equal(findChapter(ch, 'nope'), null);
-  assert.equal(findChapter(ch, undefined), null);
-  assert.equal(findChapter([], '00-a'), null);
-  const readings = book({ kind: 'reflection', minutes: 165, chapters: [{ id: '00-how', title: 'How to use this book', minutes: 4 }, { id: '02-day-01', title: 'Day 1. A stranger', minutes: 7 }, { id: '03-day-02', title: 'Day 2. The load', minutes: 7 }, { id: '04-day-10', title: 'Day 10. Rest', minutes: 7 }, { id: '05-carry', title: 'Carry it with you', minutes: 4 }] });
-  assert.equal(dayCount(readings), 3);
-  assert.equal(dayCount(book({})), 0, 'a guide has no days');
-  assert.equal(bookLine(readings), 'Readings · 2 h 45 min · 3 days');
-  assert.equal(bookLine(book({ kind: 'guide', minutes: 47 })), 'Guide · 47 min');
-  assert.equal(bookLine(book({ kind: 'reflection', minutes: 30, chapters: [{ id: '02-day-01', title: 'Day 1. Only one', minutes: 7 }] })), 'Readings · 30 min · 1 day');
-});
-
-check('a cover title is the app\'s title size where its longest word fits and smaller where it does not, between 17 and 24', () => {
-  assert.equal(coverTitleSize('The Quiet Road', 145), 24, 'a wide phone: the title size');
-  assert.equal(coverTitleSize('The Portuguese Way', 145), 24);
-  assert.ok(coverTitleSize('The Portuguese Way', 110) < 24, 'a narrow phone: "Portuguese" gets a smaller size');
-  assert.ok(coverTitleSize('The Portuguese Way', 110) * 10 * 0.58 <= 110, 'and then the word fits');
-  assert.equal(coverTitleSize('The Portuguese Way', 20), 17, 'never under 17');
-  assert.equal(coverTitleSize('', 100), 24);
-  assert.equal(coverTitleSize('Short', 0), 24, 'no width known: the title size');
-  assert.equal(coverTitleSize('Short', Number.NaN), 24);
-  assert.equal(unbreakableCaption('Readings · 2 h 29 min'), 'Readings · 2\u00a0h\u00a029\u00a0min');
-  assert.equal(unbreakableCaption('Guide · 47 min'), 'Guide · 47\u00a0min');
-  assert.equal(unbreakableCaption('Guide'), 'Guide');
-});
-
-check('books.ts is pure: it imports a type and nothing else', () => {
-  const imports = [...read('src/features/library/books.ts').matchAll(/^import [^;]*? from '([^']+)';/gm)].map((m) => m[0]);
-  assert.deepEqual(imports, ["import type { CoverColour } from './sample';"]);
-});
-
-// ---- the bundle the app ships ------------------------------------------------------------------------------------------------------------
-
-const BUNDLE = 'assets/library';
-const COLOURS = ['goldSoft', 'blue100', 'successWash', 'red100', 'sand300', 'goldWash'];
-const ICONS = ['library', 'book', 'chat'];
-const BLOCKS = new Set(['h', 'p', 'ul', 'ol', 'quote', 'hr']);
-
-type Cat = { version: number; books: CatalogBook[] };
-const catalog = (): Cat => JSON.parse(read(`${BUNDLE}/catalog.json`));
-const content = (id: string): BookContent => JSON.parse(read(`${BUNDLE}/books/${id}.json`));
-
-check('the bundle: the catalog is there, and every book of it has its text and no text is left over', () => {
-  assert.ok(existsSync(join(root, BUNDLE, 'catalog.json')), 'run: python3 tools/build_books.py --no-render');
-  const cat = catalog();
-  assert.equal(cat.version, 1);
-  const ids = cat.books.map((b) => b.id);
-  assert.equal(new Set(ids).size, ids.length, 'ids are unique');
-  const files = readdirSync(join(root, BUNDLE, 'books')).filter((f) => f.endsWith('.json')).map((f) => f.replace(/\.json$/, ''));
-  assert.deepEqual([...files].sort(), [...ids].sort());
-  for (const id of ids) assert.match(id, /^[a-z0-9]+(-[a-z0-9]+)*$/, `${id} is a safe id`);
-});
-
-check('the bundle: the catalog and the text of each book say the same about its chapters', () => {
-  for (const b of catalog().books) {
-    const c = content(b.id);
-    assert.equal(c.id, b.id);
-    assert.equal(c.title, b.title);
-    assert.equal(c.kind, b.kind);
-    assert.deepEqual(c.chapters.map((x) => ({ id: x.id, title: x.title })), b.chapters.map((x) => ({ id: x.id, title: x.title })), `${b.id}: chapters`);
-    assert.ok(b.chapters.length > 0 && b.chapters.every((x) => x.title.length > 0 && x.minutes >= 1), `${b.id}: every chapter has a title and a time`);
-    assert.ok(COLOURS.includes(b.cover.colour) && ICONS.includes(b.cover.icon), `${b.id}: a cover the Library can draw`);
-    assert.ok(b.kind === 'guide' || b.kind === 'reflection');
-    if (b.kind === 'guide') assert.ok(b.route_slug, `${b.id}: a guide names its route`);
-    assert.ok(c.rights.length > 0 && c.ai_disclosure.length > 0, `${b.id}: the rights and the AI disclosure travel with the text`);
-    assert.ok(typeof c.credit === 'string' && c.credit.length > 0, `${b.id}: the credit sentence travels with the text`);
-    if (b.kind === 'reflection') assert.ok((c.sources?.length ?? 0) > 0, `${b.id}: a reflection book credits its sources`);
+check('every id is its own, lower case and stable (a bookmark is kept under it), and every book is free and has an author and a blurb', () => {
+  const ids = BOOK_CATALOG.map((b) => b.id);
+  assert.equal(new Set(ids).size, ids.length);
+  assert.equal(new Set(BOOK_CATALOG.map((b) => b.title)).size, 12, 'no title twice');
+  for (const b of BOOK_CATALOG) {
+    assert.match(b.id, /^[a-z0-9]+(-[a-z0-9]+)*$/, b.id);
+    assert.equal(b.free, true, `${b.title} is free`);
+    for (const field of ['title', 'author', 'era', 'blurb'] as const) assert.ok(b[field].trim().length > 0, `${b.id} has a ${field}`);
+    assert.equal(b.blurb, b.blurb.trim());
+    assert.match(b.blurb, /[.]$/, `${b.id}: a blurb is a sentence`);
+    assert.ok(b.blurb.length <= 80, `${b.id}: the blurb is short enough for a row (${b.blurb.length})`);
   }
 });
 
-check('the bundle: the promises of the books hold (a guide is at most 12,000 words, a reflection book at most 3 hours)', () => {
-  for (const b of catalog().books) {
-    if (b.kind === 'guide') assert.ok(b.words <= 12000, `${b.id}: ${b.words} words`);
-    else assert.ok(b.minutes <= 180, `${b.id}: ${b.minutes} minutes`);
-    assert.equal(b.minutes, Math.max(1, Math.ceil(b.words / 220)), `${b.id}: the time is the words at 220 a minute`);
-  }
+check('the blurbs say nothing the owner did not (no promise of a date, a price or a place to read it, no claim about who walked where)', () => {
+  const text = BOOK_CATALOG.map((b) => `${b.title} ${b.blurb}`).join('\n');
+  assert.doesNotMatch(text, /\$\d|€\d|offline|download|available|santiago|camino|walked to/i);
 });
 
-check('the bundle: nothing the reader cannot draw is in a book (only the known blocks, text as strings, links to the web only)', () => {
-  const spans = (s: unknown, where: string) => {
-    assert.ok(Array.isArray(s), `${where}: spans`);
-    for (const x of s as { t: unknown; href?: unknown }[]) {
-      assert.equal(typeof x.t, 'string', where);
-      if (x.href !== undefined) assert.match(String(x.href), /^https?:\/\//, `${where}: a link goes to the web`);
+check('the groups are data only: four of three books, in the owner\'s order, and no heading on screen is made from them', () => {
+  const groups = [...new Set(BOOK_CATALOG.map((b) => b.group))];
+  assert.deepEqual(groups, ['Pilgrims on foot', 'Spanish and contemplative', 'Reflection and inner peace', 'Great classics']);
+  for (const g of groups) assert.equal(BOOK_CATALOG.filter((b) => b.group === g).length, 3, g);
+});
+
+check('sources: optional; one that is there is an https link and one of the checked ones; the seven numbers that pointed at other books are not in the data', () => {
+  const withSource = BOOK_CATALOG.filter((b) => b.source !== undefined);
+  assert.deepEqual(Object.fromEntries(withSource.map((b) => [b.id, b.source])), CHECKED_SOURCES);
+  assert.equal(withSource.length, 6);
+  for (const b of withSource) {
+    const url = new URL(b.source!);
+    assert.equal(url.protocol, 'https:', `${b.id}: a source is an https link`);
+    assert.ok(['ccel.org', 'www.gutenberg.org'].includes(url.host), `${b.id}: ${url.host}`);
+  }
+  for (const b of BOOK_CATALOG.filter((x) => x.source === undefined)) assert.ok(!('source' in b), `${b.id}: no source means no key, not an empty one`);
+  const all = JSON.stringify(BOOK_CATALOG);
+  for (const wrong of WRONG_NUMBERS) assert.ok(!all.includes(`/ebooks/${wrong}`), `the link /ebooks/${wrong} is the wrong book`);
+});
+
+check('licence: only The Way of a Pilgrim and The Story of a Soul say "check the edition"; every book has a note and the same line about the edition', () => {
+  assert.deepEqual(BOOK_CATALOG.filter((b) => b.licenceFlag === 'check-edition').map((b) => b.id), ['way-of-a-pilgrim', 'story-of-a-soul']);
+  assert.ok(BOOK_CATALOG.filter((b) => b.licenceFlag !== 'check-edition').every((b) => b.licenceFlag === 'public-domain-original'));
+  for (const b of BOOK_CATALOG) {
+    assert.ok(b.licenceNote.trim().length > 0, `${b.id} has a licence note`);
+    assert.equal(b.editionToConfirm, 'to confirm: translator and year of the edition at the source');
+  }
+  const by = (id: string): CatalogBook => BOOK_CATALOG.find((b) => b.id === id)!;
+  assert.match(by('way-of-a-pilgrim').licenceNote, /1930 R\. M\. French translation \(Philip Allan\) is only just public domain in the US; other countries unchecked/);
+  assert.match(by('story-of-a-soul').licenceNote, /Thomas N\. Taylor \(1873-1963\), 1912; .*until 2033/);
+  assert.match(by('spiritual-exercises').licenceNote, /Gutenberg 70790 is a Jesuit adaptation by Coppens, not the plain translation/);
+  for (const id of ['little-flowers', 'dark-night', 'interior-castle', 'devout-life']) assert.equal(by(id).licenceNote, 'edition to find', id);
+  assert.equal(by('dialogue-of-st-catherine').licenceNote, 'English edition to find');
+});
+
+check('the covers: a colour of the palette and a glyph of the app\'s icons for each; the navy that is drawn on them is read in navigation.test.ts', () => {
+  const tokens = JSON.parse(read('src/theme/tokens.json')) as { color: Record<string, string> };
+  const icons = [...read('src/components/Icon.tsx').split('} as const;')[0].matchAll(/^ {2}(?:'([\w-]+)'|(\w+)):/gm)].map((m) => m[1] ?? m[2]);
+  for (const b of BOOK_CATALOG) {
+    assert.ok(b.cover in tokens.color, `${b.id}: ${b.cover} is not a colour of the palette`);
+    assert.ok(icons.includes(b.icon), `${b.id}: Icon.tsx has no icon "${b.icon}"`);
+  }
+  assert.ok(new Set(BOOK_CATALOG.map((b) => b.icon)).size >= 10, 'the glyphs are not all alike');
+});
+
+check('the line under a title: the author, a dot and the era, which never breaks inside (no-break spaces)', () => {
+  const by = (id: string): CatalogBook => BOOK_CATALOG.find((b) => b.id === id)!;
+  assert.equal(bookByline(by('imitation-of-christ')).replace(/ /g, ' '), 'Thomas à Kempis · c. 1420');
+  assert.equal(bookByline(by('dark-night')), 'John of the Cross · 16th century');
+  assert.equal(bookByline(by('spiritual-exercises')), 'Ignatius of Loyola · 1522 to 1524');
+  assert.equal(bookByline(by('confessions')), 'Augustine of Hippo · c. 400');
+});
+
+check('the data of the catalog is pure: no React, no React Native, no theme', () => {
+  assert.doesNotMatch(read('src/features/library/books/catalog.ts'), /from '(react|react-native|expo|@\/)/);
+});
+
+/** The screens must not draw a book's group, source, licence flag or notes, nor the edition: they are data for later. */
+function sources(dir: string): string[] {
+  const out: string[] = [];
+  for (const name of readdirSync(join(root, dir))) {
+    const rel = join(dir, name);
+    if (statSync(join(root, rel)).isDirectory()) {
+      if (name !== '__tests__' && name !== 'node_modules') out.push(...sources(rel));
+    } else if (/\.tsx?$/.test(name)) out.push(rel);
+  }
+  return out;
+}
+
+check('data only: no screen, component or hook in the app reads or prints the group, the source, the licence flag, the licence note or the edition of a book', () => {
+  const offenders: string[] = [];
+  const all = [...sources('app'), ...sources('src')].filter((f) => f !== join('src', 'features', 'library', 'books', 'catalog.ts'));
+  for (const f of all) {
+    const src = read(f).split('\n').filter((l) => !/^\s*(\/\/|\/?\*)/.test(l)).join('\n');
+    if (/\b(licenceNote|licenceFlag|editionToConfirm)\b/.test(src)) offenders.push(`${f}: names a licence field`);
+    if (/\.(source|group)\b/.test(src) && /books\/catalog|CatalogBook|BOOK_CATALOG/.test(src)) offenders.push(`${f}: reads .source or .group of a book`);
+    for (const b of BOOK_CATALOG) {
+      if (b.source && src.includes(b.source)) offenders.push(`${f}: has the link of ${b.id}`);
+      if (b.licenceNote.length > 20 && src.includes(b.licenceNote)) offenders.push(`${f}: has the licence note of ${b.id}`);
     }
-  };
-  for (const b of catalog().books) {
-    for (const ch of content(b.id).chapters) {
-      assert.ok(ch.blocks.length > 0, `${b.id}/${ch.id}: has text`);
-      ch.blocks.forEach((blk, i) => {
-        const where = `${b.id}/${ch.id}#${i}`;
-        assert.ok(BLOCKS.has(blk.t), `${where}: block ${blk.t}`);
-        if (blk.t === 'h') { spans(blk.spans, where); assert.ok(blk.level === 2 || blk.level === 3, `${where}: heading level`); }
-        if (blk.t === 'p') spans(blk.spans, where);
-        if (blk.t === 'ul' || blk.t === 'ol') { assert.ok(blk.items.length > 0, where); blk.items.forEach((it) => spans(it, where)); }
-        if (blk.t === 'quote') { blk.paras.forEach((p) => spans(p, where)); if (blk.cite) spans(blk.cite, where); }
-        assert.ok(!('unbalanced' in blk), `${where}: no unclosed emphasis`);
-      });
-    }
+    if (/gutenberg|ccel\.org/i.test(src)) offenders.push(`${f}: names a source site`);
   }
+  assert.deepEqual(offenders, []);
 });
 
-check('the bundle: bookBundle.ts is the one module that reads it, and it lists every book of the catalog and reads none of them when it loads', () => {
-  const src = read('src/features/library/bookBundle.ts');
-  assert.match(src, /^\/\/ GENERATED by tools\/build_books\.py/);
-  for (const b of catalog().books) assert.ok(src.includes(`'${b.id}': () => require('../../../assets/library/books/${b.id}.json') as BookContent,`), `${b.id} is loadable`);
-  assert.doesNotMatch(src, /^import .*\.json/m, 'a book is required when it is opened, never imported');
-});
-
-console.log(`${n} of ${n} passed`);
+console.log(`${n} of ${n} passed (Books)`);

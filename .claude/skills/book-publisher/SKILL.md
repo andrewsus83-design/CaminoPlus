@@ -14,7 +14,7 @@ outputs from the same chapter blocks, so the app, the EPUB and the PDF cannot di
 | Reading PDF, 6 x 9 in, page numbers | `books/dist/<id>/<id>.pdf` | no |
 | Store cover, 1600 x 2560 PNG | `books/dist/<id>/<id>.cover.png` | no |
 | Store metadata: titles, descriptions, keywords, categories, rights, AI disclosure | `books/dist/<id>/store.json` | no |
-| **App Library bundle**: `catalog.json` and `books/<id>.json` | `mobile/assets/library/` | **yes**: the app imports it |
+| **App Library bundle**: `catalog.json` and `books/<id>.json` | `mobile/assets/library/` | **not yet**: the bundle format is ready, but the app's Library does not read it and the bundle is not in the repository (see `books/series.md`, "In the app: not yet") |
 
 ## Steps
 
@@ -52,15 +52,14 @@ outputs from the same chapter blocks, so the app, the EPUB and the PDF cannot di
    `java -jar epubcheck.jar books/dist/<id>/<id>.epub`, from https://github.com/w3c/epubcheck/releases. Fix every error it
    reports in `tools/build_books.py`, not in the output file.
 
-5. **App bundle.** Commit `mobile/assets/library/` together with the books that produced it. CI runs
-   `python3 tools/build_books.py --check` and fails when the committed bundle is not what `books/` makes.
+5. **App bundle.** Not part of the repository yet. When the app takes the books, the bundle is committed with the books that produced it and `python3 tools/build_books.py --check` becomes a CI step again; until then it is only built, never committed.
 
 6. **Report.** For each book: title, kind, words, reading time, PDF pages, what the checker warned about, and the open
    decisions below.
 
 ## In the app: bookmarks, side notes and reflections
 
-The bundle is built so the app can attach a pilgrim's own writing to the books. The design (decided with the owner; details of the screens belong to the app work):
+The bundle is built so an app can attach a pilgrim's own writing to the books. This is a **design, not a shipped feature**: it was built once on a branch and not merged (see `books/series.md`, "In the app: not yet"), and it has to be reconciled with the Notes tab the owner built (a feed of the diary). The design:
 
 - **Side notes, not a feed.** A note is **anchored** to the thing it is about and shown beside it, like a note in the margin: a small mark next to the paragraph, a side sheet to read and
   write it. There is no timeline, no likes, no comments, no followers. Notes are **private and on the phone** (kept under the pilgrim's own key and cleared on log-out, like the Library's bookmarks; the Diary, by contrast, keeps its pages when you log out; the screens say which) unless the

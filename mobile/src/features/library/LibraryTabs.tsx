@@ -1,77 +1,101 @@
-import { View } from 'react-native';
+import { LayoutChangeEvent, View } from 'react-native';
 import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
-import { SampleNotice, SampleTag } from '@/components/SampleNotice';
+import { SampleNotice } from '@/components/SampleNotice';
 import { Card, SectionLabel } from '@/components/ui';
-import { radius, role } from '@/theme';
-import type { LibraryBook } from './books';
-import { BookCovers } from './BookShelf';
+import { c, fixed, radius, role } from '@/theme';
 import { BookmarkToggle } from './BookmarkToggle';
-import { PREVIEW_NOTICE, SAMPLE_PLAYLISTS, SAMPLE_SHELVES, type ExampleTab, type LibraryTab, type Playlist, type Shelf } from './sample';
+import { DEUTERO_NOTE, TESTAMENT_LABEL, bookLine, booksOf, countLine, type BibleBook, type Testament } from './bible/books';
+import { BOOK_CATALOG, bookByline, type CatalogBook } from './books/catalog';
+import { PREVIEW_NOTICE, type SampleTab } from './sample';
 import { hitTabs, itemKey, type Hits } from './search';
 import type { LibraryMarks } from './useLibraryBookmarks';
 
-// The three Library tabs. The Bible and Music tabs have no real content yet (see sample.ts), so each starts with an honest notice and then
-// shows, with example rows, where the content will go. The Books tab is real: its covers are the books of the bundle (BookShelf.tsx), they
-// open the book, and there is no notice because nothing on it is an example. Colours are read while drawing, never at import.
+// The two Library tabs that hold rows: Bible (the books of the Bible, one part at a time) and Books (twelve free classics). There is no
+// real text yet (see sample.ts), so each tab starts with an honest notice and then shows, with rows that say "Soon", what will be
+// there. The third tab, Notes, is the diary and lives in features/library/notes. Colours are read while drawing, never at import.
 //
-// An example row can carry a bookmark button (when `marks` is given): the button is its own component, so a row stays a plain picture of
+// A row can carry a bookmark button (when `marks` is given): the button is its own component, so a row stays a plain picture of
 // what will be there. The rows of one tab are also what a search result and the Bookmarks screen draw (LibraryGroups), so a row
-// looks the same wherever it is.
+// looks the same wherever it is. The banners, which can be pressed, are in LibraryBanner.tsx, and the three choices of the Bible
+// tab in bible/TestamentBar.tsx: nothing in this file acts when it is touched except the bookmark.
 
-const Notice = ({ tab }: { tab: ExampleTab }) => <SampleNotice title="Preview">{PREVIEW_NOTICE[tab]}</SampleNotice>;
+const Notice = ({ tab }: { tab: SampleTab }) => <SampleNotice title="Preview">{PREVIEW_NOTICE[tab]}</SampleNotice>;
 
-/** A small chip that says a row is not available yet. */
-const Soon = () => (
-  <View accessibilityLabel="Coming soon" style={{ alignSelf: 'flex-start', marginTop: 6, paddingHorizontal: 10, height: 24, borderRadius: radius.pill, backgroundColor: role.sunken, justifyContent: 'center' }}>
-    <AppText variant="mono" muted style={{ fontSize: 11, letterSpacing: 1 }}>SOON</AppText>
+/** A small label on a row, in the style of the "Sample" tag: caps in mono on a pale ground. */
+const Chip = ({ label, spoken, bg, fg }: { label: string; spoken: string; bg: string; fg: string }) => (
+  <View accessibilityLabel={spoken} style={{ alignSelf: 'flex-start', paddingHorizontal: 10, height: 24, borderRadius: radius.pill, backgroundColor: bg, justifyContent: 'center' }}>
+    <AppText variant="mono" color={fg} style={{ fontSize: 12, lineHeight: 16, letterSpacing: 1 }}>{label}</AppText>
   </View>
 );
 
+/** The chip that says a row is not available yet. */
+const Soon = () => <Chip label="SOON" spoken="Coming soon" bg={role.sunken} fg={role.muted} />;
+
+/** The chip that says a book costs nothing to read. */
+const Free = () => <Chip label="FREE" spoken="Free to read" bg={c.successWash} fg={c.success} />;
+
 /** The padding of a row: 16 at the start, and 6 at the end when the bookmark button (44 wide) is there. */
 const rowStyle = (first: boolean, marks?: LibraryMarks) => ({
-  minHeight: 64, flexDirection: 'row' as const, alignItems: 'center' as const, gap: 14, paddingLeft: 16, paddingRight: marks ? 6 : 16, paddingVertical: 10,
+  paddingLeft: 16, paddingRight: marks ? 6 : 16, paddingVertical: 10,
   borderTopWidth: first ? 0 : 1, borderTopColor: role.border,
 });
 
-const Mark = ({ marks, tab, id, title, color }: { marks?: LibraryMarks; tab: LibraryTab; id: string; title: string; color?: string }) => {
+const Mark = ({ marks, tab, id, title, color }: { marks?: LibraryMarks; tab: SampleTab; id: string; title: string; color?: string }) => {
   if (!marks) return null;
   const key = itemKey(tab, id);
   return <BookmarkToggle on={marks.has(key)} title={title} toggle={() => marks.toggle(key)} color={color} />;
 };
 
-export function BibleShelves({ items, marks }: { items: readonly Shelf[]; marks?: LibraryMarks }) {
+/**
+ * The books of the Bible, one under the other: the name, "50 chapters" and the "Soon" chip, and the bookmark button. `withPart` puts the
+ * part (Old Testament, Deuterocanon, New Testament) in front of the chapters, for a list that mixes the three (search, Bookmarks).
+ */
+export function BibleBookRows({ items, marks, withPart = false }: { items: readonly BibleBook[]; marks?: LibraryMarks; withPart?: boolean }) {
   return (
     <Card style={{ padding: 4 }}>
-      {items.map((s, i) => (
-        <View key={s.id} accessibilityState={marks ? undefined : { disabled: true }} style={rowStyle(i === 0, marks)}>
-          <Icon name="book" color={role.muted} size={24} />
-          <View style={{ flex: 1 }}>
-            <AppText variant="label">{s.title}</AppText>
-            <AppText variant="caption" muted>{s.note}</AppText>
-            <Soon />
+      {items.map((b, i) => (
+        <View key={b.id} accessibilityState={marks ? undefined : { disabled: true }} style={{ ...rowStyle(i === 0, marks), minHeight: 64, flexDirection: 'row', alignItems: 'center', gap: 14 }}>
+          <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
+            <AppText variant="label">{b.name}</AppText>
+            {/* The chip sits beside "50 chapters" and goes under the line when the line is long (the part is in it, or a detail): in one list all the rows do the same. */}
+            <View style={{ flexDirection: withPart || b.detail ? 'column' : 'row', alignItems: withPart || b.detail ? 'flex-start' : 'center', gap: withPart || b.detail ? 6 : 8 }}>
+              <AppText variant="caption" muted>{bookLine(b, withPart)}</AppText>
+              <Soon />
+            </View>
           </View>
-          <Mark marks={marks} tab="Bible" id={s.id} title={s.title} />
+          <Mark marks={marks} tab="Bible" id={b.id} title={b.name} />
         </View>
       ))}
     </Card>
   );
 }
 
-export function PlaylistRows({ items, marks }: { items: readonly Playlist[]; marks?: LibraryMarks }) {
+/**
+ * The books of the Books tab, one under the other: a cover (a pale colour with a glyph, which does not change with light and dark, so
+ * what is on it is the fixed navy), the title, "author · era", the bookmark button; under them the blurb and the chips "Free" and "Soon".
+ * Nothing of a book is shown but this: the group, the source and the licence notes of the catalog are data for later.
+ */
+export function BookRows({ items, marks }: { items: readonly CatalogBook[]; marks?: LibraryMarks }) {
   return (
     <Card style={{ padding: 4 }}>
-      {items.map((p, i) => (
-        <View key={p.id} accessibilityState={marks ? undefined : { disabled: true }} style={{ ...rowStyle(i === 0, marks), minHeight: 72 }}>
-          <View style={{ width: 44, height: 44, borderRadius: radius.pill, backgroundColor: role.sunken, alignItems: 'center', justifyContent: 'center' }}>
-            <Icon name="music" color={role.muted} size={22} />
+      {items.map((b, i) => (
+        <View key={b.id} accessibilityState={marks ? undefined : { disabled: true }} style={{ ...rowStyle(i === 0, marks), paddingTop: 14, paddingBottom: 14, gap: 10 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 14 }}>
+            <View aria-hidden style={{ width: 52, height: 68, borderRadius: radius.xs, backgroundColor: fixed[b.cover], alignItems: 'center', justifyContent: 'center' }}>
+              <Icon name={b.icon} color={fixed.blue} size={26} />
+            </View>
+            <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
+              <AppText variant="label">{b.title}</AppText>
+              <AppText variant="caption" muted>{bookByline(b)}</AppText>
+            </View>
+            <Mark marks={marks} tab="Books" id={b.id} title={b.title} />
           </View>
-          <View style={{ flex: 1 }}>
-            <AppText variant="label">{p.title}</AppText>
-            <AppText variant="caption" muted>{p.note}</AppText>
+          <AppText variant="small">{b.blurb}</AppText>
+          <View style={{ flexDirection: 'row', gap: 8 }}>
+            <Free />
             <Soon />
           </View>
-          <Mark marks={marks} tab="Music" id={p.id} title={p.title} />
         </View>
       ))}
     </Card>
@@ -88,58 +112,44 @@ export function LibraryGroups({ hits, marks }: { hits: Hits; marks: LibraryMarks
       {hitTabs(hits).map((tab) => (
         <View key={tab} style={{ gap: 16 }}>
           <SectionLabel>{`${tab} · ${hits[tab].length}`}</SectionLabel>
-          {tab === 'Bible' && <BibleShelves items={hits.Bible} marks={marks} />}
-          {tab === 'Books' && <BookCovers items={hits.Books} marks={marks} />}
-          {tab === 'Music' && <PlaylistRows items={hits.Music} marks={marks} />}
+          {tab === 'Bible' && <BibleBookRows items={hits.Bible} marks={marks} withPart />}
+          {tab === 'Books' && <BookRows items={hits.Books} marks={marks} />}
         </View>
       ))}
     </>
   );
 }
 
-export function BibleTab({ marks }: { marks?: LibraryMarks }) {
+/**
+ * The Bible tab under its banner: the Preview notice, then "Books of the Bible" with how many the chosen part holds, and the books of
+ * that part (and, for the Deuterocanon, the one line about the Orthodox Bibles). The part is chosen with the three choices at the bottom
+ * of the screen (bible/TestamentBar.tsx), which the screen draws. The notice and the list are both children of the screen's own column
+ * (a fragment, not a wrapper), so `onListLayout` tells the screen where the list starts in it: where to scroll back to when another part
+ * is chosen.
+ */
+export function BibleTab({ marks, testament, onListLayout }: { marks?: LibraryMarks; testament: Testament; onListLayout?: (e: LayoutChangeEvent) => void }) {
   return (
-    <View style={{ gap: 16 }}>
+    <>
       <Notice tab="Bible" />
-      <Card style={{ gap: 8 }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-          <AppText variant="mono" muted style={{ textTransform: 'uppercase', letterSpacing: 1.2, fontSize: 12 }}>Today&apos;s reading</AppText>
-          <SampleTag />
+      <View onLayout={onListLayout} style={{ gap: 16 }}>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'baseline', justifyContent: 'space-between', columnGap: 12, rowGap: 2 }}>
+          <AppText variant="h4" accessibilityRole="header">Books of the Bible</AppText>
+          {/* How many the chosen part holds, on the same line (under the heading when it is long). A polite live region that says the part with it: a screen reader answers a choice at the bottom with "Old Testament, 39 books". */}
+          <AppText variant="small" muted accessibilityLiveRegion="polite" accessibilityLabel={`${TESTAMENT_LABEL[testament]}, ${countLine(testament)}`}>{countLine(testament)}</AppText>
         </View>
-        <AppText variant="h4">One short reading for today</AppText>
-        <AppText variant="small" muted>When the Bible is in the app, today&apos;s reading will be here, and it will work without a signal.</AppText>
-      </Card>
-      <BibleShelves items={SAMPLE_SHELVES} marks={marks} />
-    </View>
+        <BibleBookRows items={booksOf(testament)} marks={marks} />
+        {testament === 'deutero' && <AppText variant="caption" muted>{DEUTERO_NOTE}</AppText>}
+      </View>
+    </>
   );
 }
 
-/** The line under the Books tab's covers' heading: how many books there are, and that they are in the app. */
-export const booksLine = (n: number) => `${n} ${n === 1 ? 'book' : 'books'} in the app. They are saved on this phone, so they read without a signal.`;
-/** The Books tab when the bundle has no book (a build made before the books were added). */
-export const BOOKS_NONE = 'No books are in this version of the app yet.';
-
-export function BooksTab({ books, marks }: { books: readonly LibraryBook[]; marks?: LibraryMarks }) {
+/** The Books tab under its banner: the Preview notice and the twelve books. */
+export function BooksTab({ marks }: { marks?: LibraryMarks }) {
   return (
     <View style={{ gap: 16 }}>
-      {books.length > 0 ? (
-        <>
-          <AppText variant="small" muted>{booksLine(books.length)}</AppText>
-          <BookCovers items={books} marks={marks} />
-        </>
-      ) : (
-        <Card><AppText variant="small" muted>{BOOKS_NONE}</AppText></Card>
-      )}
-    </View>
-  );
-}
-
-export function MusicTab({ marks }: { marks?: LibraryMarks }) {
-  return (
-    <View style={{ gap: 16 }}>
-      <Notice tab="Music" />
-      <PlaylistRows items={SAMPLE_PLAYLISTS} marks={marks} />
-      <AppText variant="caption" muted>Songs will play only with a licence for them. Until we have one, nothing plays here.</AppText>
+      <Notice tab="Books" />
+      <BookRows items={BOOK_CATALOG} marks={marks} />
     </View>
   );
 }

@@ -1,6 +1,6 @@
 # The CaminoPlus Library: 20 books
 
-Twenty books for the app's **Library** (Books tab) and for sale as EPUB and PDF: **eight route guidebooks** and **twelve reflection books**, each reflection book
+Twenty books written for the app's **Library** and for sale as EPUB and PDF (neither is done yet: see "In the app" below): **eight route guidebooks** and **twelve reflection books**, each reflection book
 made from a famous book in the public domain and paired with one Camino. Written with the [`book-writer`](../.claude/skills/book-writer/SKILL.md) skill, built and
 packaged with the [`book-publisher`](../.claude/skills/book-publisher/SKILL.md) skill. Where the classics come from: [`sources/SOURCES.md`](sources/SOURCES.md).
 
@@ -59,12 +59,16 @@ All twelve are free to publish: every edition was opened and its translator, edi
 (not found in a clean public-domain edition yet), *The Cloud of Unknowing*, *The Little Flowers of St Francis*, Marcus Aurelius's *Meditations*, *Introduction to the Devout Life*.
 *The Way of a Pilgrim* is a natural fit for walkers, but its common English translation may still be protected.
 
-## Notes and bookmarks in the app
+## In the app: not yet
 
-Built (see the app's Library): the Books tab shows these books, a book screen and a reader, bookmarks on a book, a chapter or day and a paragraph, **anchored side notes** (private, on the phone,
-not a feed), a reflection written from each day's end-of-day questions, and a Notebook that groups notes by book and chapter. Notes are kept under the pilgrim's own key and cleared on log-out,
-as the Library's bookmarks are; the Diary, by contrast, stays. The anchor scheme is in `.claude/skills/book-publisher/SKILL.md` ("In the app"); the Bible, daily reading and stage anchors are designed in
-but have no screens yet.
+**The books are not in the app.** They are written, checked and ready: `python3 tools/build_books.py` turns them into the data an app can read (a catalog and one file per book, in blocks), but that bundle is **not
+in the repository**, and the app's Library does not read it.
+
+Why. While these books were being written, the owner rebuilt the Library on `main` (Bible, Books and Notes tabs; a Books tab of twelve free classics with a licence check for each; a Notes tab that shows the diary as a
+feed) and other branches (`claude/books-text`, `claude/books-reader`, `claude/bible-reader`, `claude/bible-text`) were building the text importer and a reader. A reader with side notes, bookmarks on a paragraph and a
+Notebook was built here as well, in the history of the branch `claude/funny-mendel-uphqz3` (the last commit that has it is `c7a3844`; it passed 724 app checks, the typecheck and the Android export on the Library as it was
+then), and it was **not merged**: it would have conflicted in 14 files with the new Library and duplicated the reader of the other branch. How these books (and anchored side notes, which are not the same thing as the
+Notes tab) join the owner's Library is a decision for the owner. The design is in `.claude/skills/book-publisher/SKILL.md` ("In the app") and the data format in `tools/book_kit.py` and `tools/build_books.py`.
 
 ## What is decided and what is yours to decide
 
@@ -73,14 +77,14 @@ guides, parchment for reflection books), the format of a day.
 
 Yours to decide (the build leaves these open on purpose): who holds the rights to the original text and how it is licensed; the wording of the AI disclosure (it says today only that the books
 were written with AI assistance under CaminoPlus's direction); who checks the facts of each guide before it is sold; ISBNs and prices; and whether and where to publish. Putting the books in the
-app's Library is a product decision too: the Books tab now shows them (it used to say "Books are not in the app yet").
+app's Library is a product decision too (see "In the app: not yet").
 
 ## Status (8 November 2026)
 
-| | Written | Strict checker | EPUB, PDF, cover, store data | In the app's Library bundle |
+| | Written | Strict checker | EPUB, PDF, cover, store data | In the app |
 |---|---|---|---|---|
-| 8 route guidebooks | yes | passes, no warnings | built, structure checked | yes |
-| 12 reflection books | yes | passes, no warnings (every passage verified word for word) | built, structure checked | yes |
+| 8 route guidebooks | yes | passes, no warnings | built, structure checked | not yet |
+| 12 reflection books | yes | passes, no warnings (every passage verified word for word) | built, structure checked | not yet |
 
 The checker prints the real numbers for each book (`python3 tools/check_books.py --strict --sources <folder>`). Together the books are about 311,000 words; the longest reflection book reads in about 2 h 29 min
 (the ceiling is 3 hours) and the longest guide has 11,648 words (the cap is 12,000).

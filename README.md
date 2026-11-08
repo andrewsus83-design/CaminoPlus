@@ -47,7 +47,7 @@ Preview with any static server, for example `npx serve web`. Deploys from Vercel
 
 **POI audit**: `cd tools/poi-audit && pip install -r requirements.txt && python audit.py --stage ../offline-maps/stages/camino-frances-01.json --out out/stage-1`.
 
-**The books**: `python3 tools/check_books.py --sources <folder with the source texts>` checks them (the folder is fetched as `books/sources/SOURCES.md` says); `python3 tools/build_books.py` builds the EPUB, PDF, cover and store metadata into `books/dist/` and refreshes the app's Library bundle (`mobile/assets/library/`); `--check` verifies the bundle is in sync.
+**The books**: `python3 tools/fetch_book_sources.py /tmp/book-sources` downloads the public-domain texts the reflection books quote; `python3 tools/check_books.py --strict --sources /tmp/book-sources` checks every book; `python3 tools/check_series.py` checks that the books are exactly the planned ones (`books/plan.json`); `python3 tools/build_books.py` builds the EPUB, PDF, cover and store metadata into `books/dist/` (and an app bundle, which is not part of the repository yet: see `books/series.md`).
 
 **Brand SVGs**: `pip install fonttools && python3 tools/build_brand_svg.py` (`--icons-only` after a design change that only touches icons).
 
@@ -60,7 +60,7 @@ CI (`.github/workflows/ci.yml`) runs these on every pull request and every push 
 | App | `cd mobile && npm ci && npm run typecheck && npm test && npx expo export --platform android` |
 | Database | `supabase/dev/validate.sh` (set `PG_BIN=/usr/lib/postgresql/16/bin` if needed) |
 | Edge functions | `deno test --allow-net --allow-env --allow-run --allow-read supabase/functions` |
-| Books | `python3 tools/check_books.py --sources <folder>` and `python3 tools/build_books.py --check` |
+| Books | `python3 tools/fetch_book_sources.py <folder>`, then `python3 tools/check_books.py --strict --sources <folder>` and `python3 tools/check_series.py` |
 | Website in sync | `python3 tools/build_web.py /tmp/web-gen` and `diff -r` against `web/` (the generated files); `python3 tools/sync_tokens.py --check` |
 | Python tools | `python -m unittest discover -s tools/poi-audit/tests`, `python -m unittest discover -s tools/tests`, `python3 tools/check_docs_links.py` |
 | Offline map scripts | `cd tools/offline-maps && npm ci && npm test && npm run test:python && npm run test:render-fixture` |

@@ -24,8 +24,3 @@ export function BookmarkToggle({ on, title, toggle, color }: { on: boolean; titl
     </Pressable>
   );
 }
-
-/** A filled bookmark that is only a picture: what a chapter or a paragraph shows when it is bookmarked (a toggle is the button that changes it). */
-export function KeptMark({ size = 18 }: { size?: number }) {
-  return <Icon name="bookmark" color={role.action} size={size} filled />;
-}

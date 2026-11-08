@@ -95,9 +95,7 @@ function RootStack() {
         <Stack.Screen name="diary/index" />
         <Stack.Screen name="diary/[id]" />
         <Stack.Screen name="library/bookmarks" />
-        <Stack.Screen name="library/notes" />
-        <Stack.Screen name="library/book/[id]/index" />
-        <Stack.Screen name="library/book/[id]/[chapter]" />
+        <Stack.Screen name="library/daily" />
         <Stack.Screen name="stay/[id]" />
         <Stack.Screen name="write" options={{ presentation: 'fullScreenModal', animation: 'slide_from_bottom' }} />
         <Stack.Screen name="inbox" />

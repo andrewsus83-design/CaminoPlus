@@ -8,7 +8,7 @@ import { BODY_MAX, ENTRIES_MAX, TITLE_MAX, TOTAL_MAX, type DiaryEntry, type Save
 export const UNTITLED = 'Untitled page';
 /** Said on the list, honestly: where the pages are, what is in them, and what that means. */
 export const PRIVACY_LINE = 'Only on this phone. Pages, photos, videos and places are not uploaded and not shared. If you delete the app or lose this phone, they are gone.';
-/** The diary card on the Library screen when there is no page. "The pen" is the gold button on that screen. */
+/** The line for a diary with no page in it, for the Notes tab of the Library. "The pen" is the gold button on that tab. */
 export const EMPTY_CARD_LINE = 'Your diary is empty. Tap the pen to write the first page.';
 
 export const pagesLabel = (n: number) => `${n} ${n === 1 ? 'page' : 'pages'}`;

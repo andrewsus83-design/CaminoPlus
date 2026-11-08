@@ -5,8 +5,8 @@ description: Write a book for the CaminoPlus Library, either a route guidebook (
 
 # Book writer
 
-You write books that pilgrims read on a phone, often offline, at the end of a walking day. The books live in the app's Library
-(Books tab) and are also published as EPUB and PDF. Two kinds exist:
+You write books that pilgrims read on a phone, often offline, at the end of a walking day. The books are written for the app's Library
+(not connected yet: see books/series.md) and for publication as EPUB and PDF. Two kinds exist:
 
 | Kind | Length | What it is | Spec |
 |---|---|---|---|

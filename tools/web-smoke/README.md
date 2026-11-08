@@ -37,22 +37,23 @@ Then the **scenarios** ([scenarios.mjs](scenarios.mjs)), each in light and dark,
 - the tab bar shows Me, Stays, Maps, Discover and Library, and each tab opens;
 - the gear on Me opens `/settings` (no tab bar there) and Back returns to `/me`, also when Settings was opened from a link;
 - switching light/dark on Settings returns to Settings, and Back goes to Me;
-- Library shows a banner and the Bible, Books and Music tabs (Bible and Music say they are previews; Books is real and says how many books are in the app);
-  the gold pen opens `/diary/new`; its top row is a search field, the Bookmarks button and the diary button (no title, no diary card): the diary
-  button opens `/diary`, a search lists what it finds from all three tabs grouped by tab (the Preview notice shows only while an example is in the
-  results, and says "Nothing found for ..." with a way back and no notice when nothing is), and the Bookmarks button opens `/library/bookmarks` with
-  the bookmarked row and post (the full account has one bookmarked post);
-- a Books cover opens its book (`/library/book/<id>`), Start reading opens the reader, Next replaces the chapter and Back returns to the book;
-- a note is written beside a paragraph, shows its mark, is listed in the Notebook (opened from Bookmarks, `/library/notes`) under its book, grows into a
-  Diary page and is deleted;
+- Library: its top row is a search field and the Bookmarks button (no title, no diary button); directly under it, before any banner, the tabs
+  Bible, Books and Notes, in that order; Bible and Books each have a banner and a Preview notice, Notes has neither; the Books tab lists twelve
+  books marked Free and Soon and shows nothing that is only data (links, licence notes, groups); the gold pen shows only on Notes and opens
+  `/diary/new`; the three choices at the bottom of Bible (Old Testament, Deuterocanon, New Testament) float above the tab bar, list that
+  part with its count, and are gone on Books, on Notes and while something is typed in the search; the banner of the Bible tab (the whole card
+  and its "Read today" button) opens `/library/daily`; a search lists what it finds in Bible and Books grouped by tab (and says "Nothing found
+  for ..." with a way back); the Bookmarks button opens `/library/bookmarks` with the bookmarked rows of both tabs and the bookmarked post (the
+  full account has one bookmarked post); bookmarks kept before the tabs changed (a Music row, the old example rows) are ignored without an
+  error;
 - Stays lists the stays of the stage and one opens with its details;
 - logging out from Settings lands on Welcome;
 - launching the app lands on Welcome (signed out), Onboarding (signed in, no journey) or Me;
 - with an expired login the session is renewed online; offline the account saved on the phone opens on Me and says it is offline,
   and with an expired login (also with nothing saved: "No signal right now") the app does not wait for the network.
 
-The diary screens are placeholders while that feature is built: they are only swept (they must load without errors) and the pen
-only checks where it goes, never what those screens contain.
+The diary screens, the Notes tab and the daily reading belong to their own features: they are swept (they must load without errors), and
+the Library scenarios only check where the pen and the banner lead and that Notes has no banner, never what those screens contain.
 
 ### Routes and account states come from the source
 
@@ -74,7 +75,7 @@ cd mobile && npm ci && npx expo export --platform web --output-dir ../tools/web-
 cd ../tools/web-smoke && npm ci
 npx playwright install chromium    # once; CI uses --with-deps
 npm test                           # the self-test: the harness against an app built to misbehave (about 25 s)
-npm run smoke                      # about 3 minutes: about 340 checks at the time of writing, 4 pages at a time
+npm run smoke                      # about 3 minutes: about 375 checks at the time of writing, 4 pages at a time
 ```
 
 `npm run build:app` runs the export command for you. Use the normal (production) export, as CI does: a development export (`--dev`)

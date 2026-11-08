@@ -1,7 +1,10 @@
-// Source-level checks of how the Library search and Bookmarks are wired into the app, in the style of the diary's wiring test: they
-// read the files, nothing is run. What the pure parts do is checked in library.test.ts; here it is that the screens use them the way
-// they must (a row keeps its key, a bookmark is cleared when the person logs out, a post is bookmarked only through the calls the
-// journey viewer makes, every button has a label, nothing needs a new native module). Run: npm run test:library
+// Source-level checks of how the Library (its tabs, search and Bookmarks) is wired into the app, in the style of the diary's wiring test:
+// they read the files, nothing is run. What the pure parts do is checked in library.test.ts, bible.test.ts and books.test.ts; here it is
+// that the screens use them the way they must (a row keeps its key, a bookmark is cleared when the person logs out, a post is bookmarked
+// only through the calls the journey viewer makes, the rows cannot be pressed and the few things that can have a label and a state,
+// nothing needs a new native module). The Notes tab (features/library/notes) and the daily reading (features/library/daily,
+// app/library/daily.tsx) belong to their own features and their own tests: only the way they are plugged in is checked here.
+// Run: npm run test:library
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -11,27 +14,30 @@ const check = (name: string, fn: () => void) => { fn(); n += 1; console.log(`ok 
 const root = process.cwd(); // npm test runs from mobile/
 const read = (p: string) => fs.readFileSync(path.join(root, p), 'utf8');
 const code = (src: string) => src.split('\n').filter((l) => !/^\s*(\/\/|\/?\*)/.test(l)).join('\n'); // without comment lines
+import './notes.test'; // the Notes tab (src/features/library/notes): its logic and its wiring, run here so no script has to name it
 
 const DIR = 'src/features/library';
-function walk(dir: string): string[] {
-  const out: string[] = [];
-  for (const name of fs.readdirSync(path.join(root, dir))) {
-    const rel = `${dir}/${name}`;
-    if (fs.statSync(path.join(root, rel)).isDirectory()) { if (name !== '__tests__') out.push(...walk(rel)); } else if (/\.tsx?$/.test(name)) out.push(rel);
-  }
-  return out;
-}
-const featureFiles = [...walk(DIR), ...walk('app/library')];
+// The files of this feature: the folder itself, the Bible and Books folders, and the screens of app/library. Not notes/ and daily/, nor
+// app/library/daily.tsx: the Notes tab and the daily reading are other features with their own tests.
+const OWN_FOLDERS = ['', 'bible/', 'books/'];
+const featureFiles = [
+  ...OWN_FOLDERS.flatMap((sub) => fs.readdirSync(path.join(root, DIR, sub), { withFileTypes: true }).filter((f) => f.isFile() && /\.tsx?$/.test(f.name)).map((f) => `${DIR}/${sub}${f.name}`)),
+  ...fs.readdirSync(path.join(root, 'app/library'), { withFileTypes: true }).filter((f) => f.isFile() && /\.tsx?$/.test(f.name) && !f.name.startsWith('daily')).map((f) => `app/library/${f.name}`),
+];
 
 check('the feature is the files this test expects, so a new one is looked at (and the scan below sees all of them)', () => {
   assert.deepEqual([...featureFiles].sort(), [
-    'BookShelf.tsx', 'BookText.tsx', 'BookmarkToggle.tsx', 'LibraryHeader.tsx', 'LibraryTabs.tsx', 'NotHere.tsx', 'PlaceRows.tsx', 'ReaderBlock.tsx', 'ReflectionCard.tsx', 'SavedPostCard.tsx', 'SearchBar.tsx', 'SearchResults.tsx',
-    'bookBundle.ts', 'bookmarks.ts', 'books.ts', 'client.ts', 'places.ts', 'reading.ts', 'sample.ts', 'savedPosts.ts', 'search.ts', 'useBook.ts', 'useLibraryBookmarks.ts', 'useReadingPlaces.ts', 'useSavedPosts.ts',
-  ].map((f) => `${DIR}/${f}`).concat(['app/library/bookmarks.tsx', 'app/library/notes.tsx', 'app/library/book/[id]/index.tsx', 'app/library/book/[id]/[chapter].tsx']).sort());
+    'app/library/bookmarks.tsx',
+    `${DIR}/BookmarkToggle.tsx`, `${DIR}/LibraryBanner.tsx`, `${DIR}/LibraryHeader.tsx`, `${DIR}/LibraryTabs.tsx`, `${DIR}/SavedPostCard.tsx`, `${DIR}/SearchBar.tsx`,
+    `${DIR}/SearchResults.tsx`, `${DIR}/bookmarks.ts`, `${DIR}/client.ts`, `${DIR}/sample.ts`, `${DIR}/savedPosts.ts`, `${DIR}/search.ts`, `${DIR}/useLibraryBookmarks.ts`,
+    `${DIR}/useSavedPosts.ts`,
+    `${DIR}/bible/TestamentBar.tsx`, `${DIR}/bible/books.ts`, `${DIR}/bible/today.ts`,
+    `${DIR}/books/catalog.ts`,
+  ].sort());
 });
 
-check('no new native module: the feature imports React, React Native, expo-router and the app\'s own files, nothing else', () => {
-  const allowed = /^(react|react-native|expo-router)$|^\.{1,2}\/|^@\//;
+check('no new native module: the feature imports React, React Native, expo-router, the safe-area module the tab bar already uses and the app\'s own files, nothing else', () => {
+  const allowed = /^(react|react-native|expo-router|react-native-safe-area-context)$|^\.{1,2}\/|^@\//;
   const offenders: string[] = [];
   for (const f of featureFiles) {
     for (const m of read(f).matchAll(/^import [^;]*? from '([^']+)';/gm)) if (!allowed.test(m[1])) offenders.push(`${f}: ${m[1]}`);
@@ -39,42 +45,21 @@ check('no new native module: the feature imports React, React Native, expo-route
   assert.deepEqual(offenders, []);
 });
 
-check('a row of the examples has no press handler of its own, and the bookmark button is the one thing on it that can be pressed; a real book\'s cover is a button that opens the book, with the bookmark button beside it, not inside it', () => {
+check('a row has no press handler of its own: the rows of the tabs are pictures, and the bookmark button is the one thing on them that can be pressed', () => {
   const tabs = code(read(`${DIR}/LibraryTabs.tsx`));
   assert.doesNotMatch(tabs, /onPress|Pressable|onClick/);
   assert.match(tabs, /import \{ BookmarkToggle \} from '\.\/BookmarkToggle';/);
   assert.match(tabs, /<BookmarkToggle on=\{marks\.has\(key\)\} title=\{title\} toggle=\{\(\) => marks\.toggle\(key\)\} color=\{color\} \/>/);
-  // an example row is bookmarked under the key of its own tab: the Bible rows under "bible:", the playlists under "music:"
-  assert.match(tabs, /<Mark marks=\{marks\} tab="Bible" id=\{s\.id\} title=\{s\.title\} \/>/);
-  assert.match(tabs, /<Mark marks=\{marks\} tab="Music" id=\{p\.id\} title=\{p\.title\} \/>/);
+  // a row is bookmarked under the key of its own tab: the Bible rows under "bible:", the books under "books:"; there is no Music
+  assert.match(tabs, /<Mark marks=\{marks\} tab="Bible" id=\{b\.id\} title=\{b\.name\} \/>/);
+  assert.match(tabs, /<Mark marks=\{marks\} tab="Books" id=\{b\.id\} title=\{b\.title\} \/>/);
   assert.match(tabs, /const key = itemKey\(tab, id\);/);
-  assert.doesNotMatch(tabs, /<Mark marks=\{marks\} tab="Books"/, 'the covers of the books are not example rows any more');
-  // every row of every tab is drawn by the tab and by the results with the same three components
-  assert.match(tabs, /\{tab === 'Bible' && <BibleShelves items=\{hits\.Bible\} marks=\{marks\} \/>\}/);
-  assert.match(tabs, /\{tab === 'Books' && <BookCovers items=\{hits\.Books\} marks=\{marks\} \/>\}/);
-  assert.match(tabs, /\{tab === 'Music' && <PlaylistRows items=\{hits\.Music\} marks=\{marks\} \/>\}/);
-  assert.match(tabs, /<BibleShelves items=\{SAMPLE_SHELVES\} marks=\{marks\} \/>/);
-  assert.match(tabs, /<BookCovers items=\{books\} marks=\{marks\} \/>/, 'the Books tab shows the books it is given, which are the books of the bundle');
-  assert.match(tabs, /<PlaylistRows items=\{SAMPLE_PLAYLISTS\} marks=\{marks\} \/>/);
-  assert.match(tabs, /import \{ BookCovers \} from '\.\/BookShelf';/);
-  assert.doesNotMatch(tabs, /SAMPLE_BOOKS/, 'there are no example books any more');
-  // the Books tab has no Preview notice: nothing on it is an example. The Bible and Music tabs have theirs.
-  assert.doesNotMatch(tabs, /<Notice tab="Books" \/>/);
-  for (const t of ['Bible', 'Music']) assert.match(tabs, new RegExp(`<Notice tab="${t}" />`), `the ${t} tab starts with its notice`);
-  // the covers
-  const shelf = code(read(`${DIR}/BookShelf.tsx`));
-  assert.equal((shelf.match(/<Pressable\b/g) ?? []).length, 1, 'one button on a cover: the one that opens the book');
-  assert.match(shelf, /accessibilityLabel=\{`\$\{b\.title\}\. \$\{b\.kind\}`\}/);
-  assert.match(shelf, /accessibilityHint="Opens the book"/);
-  assert.match(shelf, /onPress=\{\(\) => router\.push\(bookRoute\(b\.id\)\)\}/);
-  assert.match(shelf, /export const bookRoute = \(id: string\) => `\/library\/book\/\$\{id\}`;/);
-  assert.match(shelf, /const key = itemKey\('Books', b\.id\);/);
-  assert.match(shelf, /<BookmarkToggle on=\{marks\.has\(key\)\} title=\{b\.title\} toggle=\{\(\) => marks\.toggle\(key\)\} color=\{fixed\.blue\} \/>/);
-  assert.match(shelf, /position: 'absolute', top: 4, right: 4/, 'the bookmark button sits over the corner of the cover, as a sibling of the cover\'s own button');
-  assert.match(shelf, /backgroundColor: fixed\[b\.colour\]/, 'a cover is a picture colour that does not change with light and dark');
-  assert.match(shelf, /aspectRatio: 3 \/ 4/);
-  assert.match(shelf, /const size = coverTitleSize\(title, room\);/, 'a long word never breaks in the middle on a narrow phone');
-  assert.match(shelf, /unbreakableCaption\(b\.kind\)/);
+  assert.doesNotMatch(tabs, /Music|Playlist|PLAYLIST/);
+  // every row of every tab is drawn by the tab and by the results with the same two components
+  assert.match(tabs, /\{tab === 'Bible' && <BibleBookRows items=\{hits\.Bible\} marks=\{marks\} withPart \/>\}/);
+  assert.match(tabs, /\{tab === 'Books' && <BookRows items=\{hits\.Books\} marks=\{marks\} \/>\}/);
+  assert.match(tabs, /<BibleBookRows items=\{booksOf\(testament\)\} marks=\{marks\} \/>/);
+  assert.match(tabs, /<BookRows items=\{BOOK_CATALOG\} marks=\{marks\} \/>/);
   const toggle = code(read(`${DIR}/BookmarkToggle.tsx`));
   assert.match(toggle, /bookmarkLabel = \(on: boolean, title: string\) => `\$\{on \? 'Remove bookmark' : 'Bookmark'\}: \$\{title\}`/);
   assert.match(toggle, /accessibilityLabel=\{bookmarkLabel\(on, title\)\}/);
@@ -82,29 +67,85 @@ check('a row of the examples has no press handler of its own, and the bookmark b
   assert.match(toggle, /width: 44, height: 44/);
 });
 
-check('the Books tab is the books of the bundle, in the catalog order; the Library screen hands them to the tab, to the search and nothing else is a book', () => {
-  const screen = code(read('app/(tabs)/library.tsx'));
-  assert.match(screen, /import \{ CATALOG \} from '@\/features\/library\/bookBundle';/);
-  assert.match(screen, /const books = useMemo\(\(\) => libraryBooks\(CATALOG\), \[\]\);/);
-  assert.match(screen, /\{tab === 'Books' && <BooksTab books=\{books\} marks=\{marks\} \/>\}/);
-  assert.match(screen, /<SearchResults query=\{query\} books=\{books\} marks=\{marks\} onClear=\{\(\) => setQuery\(''\)\} \/>/);
+check('what can be pressed in the feature: the bookmark button, the search field\'s clear button, the banner of the Bible tab and the three choices at the bottom of it, and nothing else', () => {
+  const pressable = featureFiles.filter((f) => /<Pressable\b/.test(code(read(f)))).map((f) => path.basename(f)).sort();
+  assert.deepEqual(pressable, ['BookmarkToggle.tsx', 'LibraryBanner.tsx', 'SearchBar.tsx', 'TestamentBar.tsx']);
+  // a row of the Bible and of the Books is a View, with the chips "Soon" and "Free" next to its bookmark: it says what will be there and acts like nothing
   const tabs = code(read(`${DIR}/LibraryTabs.tsx`));
-  assert.match(tabs, /booksLine = \(n: number\) => `\$\{n\} \$\{n === 1 \? 'book' : 'books'\} in the app\. They are saved on this phone, so they read without a signal\.`;/, 'said of what is true: the books are in the bundle');
-  assert.match(tabs, /BOOKS_NONE = 'No books are in this version of the app yet\.'/);
-  // nothing says Preview or example about the books any more: not the banner, not the tab
-  assert.doesNotMatch(screen, /eyebrow: 'Preview · Books'/);
-  assert.match(screen, /eyebrow: 'Books', title: 'Guides and readings for the Way'/);
-  assert.match(screen, /eyebrow: 'Preview · Bible'/);
-  assert.match(screen, /eyebrow: 'Preview · Music'/);
-  assert.match(code(read(`${DIR}/sample.ts`)), /PREVIEW_NOTICE: Record<ExampleTab, string>/);
+  assert.match(tabs, /<View key=\{b\.id\} accessibilityState=\{marks \? undefined : \{ disabled: true \}\}/);
+  assert.equal((tabs.match(/<Soon \/>/g) ?? []).length, 2, 'every row of both lists says Soon');
+  assert.equal((tabs.match(/<Free \/>/g) ?? []).length, 1, 'every book says Free');
+  assert.match(tabs, /const Soon = \(\) => <Chip label="SOON" spoken="Coming soon"/);
+  assert.match(tabs, /const Free = \(\) => <Chip label="FREE" spoken="Free to read"/);
+  // the sample content never acts like real content: no data file has a handler either
+  for (const f of ['sample.ts', 'bible/books.ts', 'books/catalog.ts']) assert.doesNotMatch(code(read(`${DIR}/${f}`)), /onPress|Pressable|onClick|=>\s*router/, f);
 });
 
-check('the search says "example" only while an example is in the results: its notice is a function of the tabs that have results, and nothing found has none', () => {
-  const src = code(read(`${DIR}/SearchResults.tsx`));
-  assert.match(src, /const notice = searchNotice\(hitTabs\(found\.hits\)\);/);
-  assert.match(src, /\{!!notice && <SampleNotice title="Preview">\{notice\}<\/SampleNotice>\}/);
-  assert.match(src, /searchLibrary\(query, books\)/);
-  assert.doesNotMatch(src, /SEARCH_NOTICE/);
+check('the banner of the Bible tab is ONE button for a screen reader (the gold pill is its look), it opens the daily reading, and the banner of the Books tab has no button because no book opens', () => {
+  const src = code(read(`${DIR}/LibraryBanner.tsx`));
+  assert.equal((src.match(/<Pressable\b/g) ?? []).length, 1, 'the card is the one Pressable; the gold pill inside it is a View');
+  assert.match(src, /if \(!cta \|\| !onOpen\) return card;/, 'without a button the card is only a card');
+  assert.match(src, /accessibilityRole="button"\s+accessibilityLabel=\{\[cta, title, line\]\.filter\(Boolean\)\.join\('\. '\)\}/, 'the label is the button\'s words, then the title and the date');
+  assert.match(src, /onPress=\{onOpen\}/);
+  assert.match(src, /export const DAILY_KICKER = 'Today · Daily reading';/);
+  assert.match(src, /export const DAILY_TITLE = "Today's reading and a short reflection";/);
+  assert.match(src, /export const DAILY_CTA = 'Read today';/);
+  assert.match(src, /<LibraryBanner kicker=\{DAILY_KICKER\} title=\{DAILY_TITLE\} line=\{todayLine\(now\)\} icon="book" cta=\{DAILY_CTA\} onOpen=\{onOpen\} /);
+  assert.match(src, /useFocusEffect\(useCallback\(\(\) => \{ setNow\(new Date\(\)\); \}, \[\]\)\);/, 'the date is read again whenever the Library comes into view');
+  assert.match(src, /export const BOOKS_KICKER = 'Preview · Books';/);
+  assert.match(src, /export const BOOKS_TITLE = 'Twelve free companions for the road';/);
+  assert.match(src, /export const BOOKS_LINE = 'Classics to read on the way\. Free to read\.';/);
+  assert.match(src, /<LibraryBanner kicker=\{BOOKS_KICKER\} title=\{BOOKS_TITLE\} line=\{BOOKS_LINE\} icon="library" \/>/, 'no cta, no onOpen');
+  // the look of the promo banner of the design system, not a second invention (the same numbers as components/PromoBanner.tsx)
+  const promo = code(read('src/components/PromoBanner.tsx'));
+  for (const part of [
+    'minHeight: 190, borderRadius: radius.xl, backgroundColor: role.inverse, padding: 24, overflow: \'hidden\', justifyContent: \'space-between\'',
+    'position: \'absolute\', right: -36, bottom: -44, opacity: 0.9',
+    'color={c.gold} size={200} strokeWidth={1.2} />',
+    'fontFamily: fonts.title, fontSize: 28, lineHeight: 34, color: role.onInverse, maxWidth: 230',
+    'height: 48, paddingHorizontal: 24, borderRadius: radius.pill, backgroundColor: c.gold',
+    'color={role.onHighlight}',
+    'color={role.onInverseAccent} style={{ textTransform: \'uppercase\', letterSpacing: 1.5 }}',
+  ]) {
+    assert.ok(promo.includes(part), `PromoBanner.tsx no longer has: ${part}`);
+    assert.ok(src.includes(part), `the Library banner has drifted from the promo banner: ${part}`);
+  }
+  assert.doesNotMatch(src, /#[0-9a-fA-F]{3,8}\b|\bfixed\./, 'colours are roles and the gold, never a literal');
+});
+
+check('the three choices at the bottom of the Bible tab: radio buttons in a radio group (not tabs), checked state for web and phone, a label each, never under 44, roles for every colour', () => {
+  const src = code(read(`${DIR}/bible/TestamentBar.tsx`));
+  assert.match(src, /accessibilityRole="radiogroup"\s+accessibilityLabel="Part of the Bible"/);
+  assert.match(src, /accessibilityRole="radio"\s+accessibilityState=\{\{ checked: on \}\}\s+aria-checked=\{on\}\s+accessibilityLabel=\{TESTAMENT_LABEL\[t\]\}\s+onPress=\{\(\) => onChange\(t\)\}/);
+  assert.doesNotMatch(src, /accessibilityRole="tab"|role="tab"/, 'the real tab bar is the only "tab" on the screen (the web smoke counts them)');
+  assert.match(src, /\{TESTAMENTS\.map\(\(t\) => \{/, 'one choice for each part, in the order of the parts');
+  assert.match(src, /export const BAR_DRAWN: Record<Testament, string> = \{ old: 'Old\\nTestament', deutero: 'Deuterocanon', new: 'New\\nTestament' \};/);
+  assert.match(src, /\{BAR_DRAWN\[t\]\}<\/AppText>/);
+  assert.match(src, /export const BAR_MAX_FONT_SCALE = 1\.2;/);
+  assert.match(src, /<AppText maxFontSizeMultiplier=\{BAR_MAX_FONT_SCALE\} style=/, 'larger text still fits three labels in a row');
+  // size: 56 high with 3 of padding and a border of 1 is a choice 48 high; the middle one keeps its own width, the others share the rest
+  const height = Number(/export const BAR_HEIGHT = (\d+);/.exec(src)?.[1]);
+  const padding = Number(/gap: 2, padding: (\d+)/.exec(src)?.[1]);
+  const border = Number(/borderWidth: (\d+), borderColor: role\.border/.exec(src)?.[1]);
+  assert.ok(height - 2 * padding - 2 * border >= 44, `a choice is ${height - 2 * padding - 2 * border} high`);
+  assert.match(src, /flexGrow: t === 'deutero' \? 0 : 1, flexShrink: t === 'deutero' \? 0 : 1, flexBasis: t === 'deutero' \? 'auto' : 0/);
+  assert.match(src, /export const BAR_ROOM = BAR_HEIGHT;/);
+  // colours: roles only
+  assert.match(src, /backgroundColor: on \? role\.action : 'transparent'/);
+  assert.match(src, /color: on \? role\.onAction : role\.text/);
+  assert.match(src, /backgroundColor: role\.surface, borderWidth: 1, borderColor: role\.border/);
+  assert.doesNotMatch(src, /#[0-9a-fA-F]{3,8}\b|\bfixed\.|\bc\.[a-z]/, 'colours are theme roles, never a literal, the fixed palette or a palette colour');
+  // it sits where the tab bar says: the same numbers as the tab bar and the gold pen (components/TabBar.tsx, components/Fab.tsx)
+  const bar = read('src/components/TabBar.tsx');
+  const fab = read('src/components/Fab.tsx');
+  assert.match(bar, /Math\.max\(insets\.bottom - 14, 10\)/);
+  assert.match(bar, /height: 88/);
+  assert.match(src, /bottom: Math\.max\(insets\.bottom - 14, 10\) \+ 88 \+ 8/);
+  assert.match(fab, /Math\.max\(insets\.bottom - 14, 10\) \+ 88 \+ 8/);
+  // on a phone narrower than the search field's own limit the bar keeps 12 from the edges, so that the three labels fit down to 320
+  assert.match(src, /BAR_NARROW_UNDER = 352;/);
+  assert.match(code(read(`${DIR}/SearchBar.tsx`)), /NARROW_UNDER = 352;/);
+  assert.match(src, /const edge = narrow \? 12 : layout\.screenMargin;/);
 });
 
 check('Library bookmarks are kept only on the phone, per person, under a u.<userId>. key, which logging out wipes', () => {
@@ -152,85 +193,19 @@ check('bookmarked posts: the three reads come from one place, the real client is
   assert.match(hook, /useFocusEffect\(/, 'refreshed every time the screen comes into view');
 });
 
-check('the Bookmarks screen: nothing is said about the Library part before it is read, the examples notice shows only while an example is on it, books, chapters and paragraphs are listed and open at their place, every state of the Posts part has its words, and a post card cannot be pressed', () => {
+check('the Bookmarks screen: nothing is said about the Library part before it is read, every state of the Posts part has its words, and a post card cannot be pressed', () => {
   const src = code(read('app/library/bookmarks.tsx'));
   assert.match(src, /\) : marks\.ready && \(\s*<Card><AppText variant="small" muted>\{LIBRARY_BOOKMARKS_EMPTY\}<\/AppText><\/Card>/, 'no "nothing bookmarked" while the list is still being read');
-  assert.match(src, /\{hitCount\(hits\) > 0 \|\| places\.length > 0 \? \(/, 'something kept in the Library: the books, the places in them, the examples');
-  assert.match(src, /const notice = bookmarksNotice\(hitTabs\(hits\)\);/);
-  assert.match(src, /\{!!notice && <SampleNotice title="Preview">\{notice\}<\/SampleNotice>\}/, 'the examples notice is only for Bible and Music rows on the screen');
-  assert.doesNotMatch(src, /BOOKMARKS_NOTICE/);
-  assert.match(src, /<AppText variant="caption" muted>\{BOOKMARKS_PRIVATE_LINE\}<\/AppText>/, 'where the bookmarks are and what clears them, whatever is kept');
-  assert.match(src, /const places = useMemo\(\(\) => bookPlaces\(marks\.shown, CATALOG, readBook\), \[marks\.shown\]\);/);
-  assert.match(src, /<PlaceRows places=\{places\} marks=\{marks\} \/>/);
-  assert.match(src, /const readBook = \(id: string\): BookContent \| null => \{ try \{ return loadBookContent\(id\); \} catch \{ return null; \} \};/, 'a book that cannot be read has no paragraph to show, and never stops the screen');
   for (const view of ['loading', 'offline-empty', 'failed-empty', 'empty', 'list']) assert.match(src, new RegExp(`saved\\.view === '${view}'`), `the ${view} state is drawn`);
   assert.match(src, /saved\.offlineNote && <FormMessage tone="info">\{SAVED_OFFLINE_NOTE\}<\/FormMessage>/);
   assert.match(src, /saved\.failedNote && <FormMessage>\{SAVED_FAILED\}<\/FormMessage>/);
   assert.match(src, /!!saved\.notice && <FormMessage>\{saved\.notice\}<\/FormMessage>/);
   assert.match(src, /marks\.failed && <FormMessage>\{BOOKMARK_NOT_SAVED\}<\/FormMessage>/);
-  assert.match(src, /const hits = useMemo\(\(\) => hitsForKeys\(marks\.shown, books\), \[marks\.shown, books\]\);/, 'a row taken off stays until the screen is left');
+  assert.match(src, /const hits = useMemo\(\(\) => hitsForKeys\(marks\.shown\), \[marks\.shown\]\);/, 'a row taken off stays until the screen is left');
   assert.match(src, /<ActivityIndicator accessibilityLabel="Loading your bookmarked posts"/);
   const card = code(read(`${DIR}/SavedPostCard.tsx`));
   assert.doesNotMatch(card, /onPress|Pressable/, 'there is no screen for one post yet: the card shows what was kept');
   assert.match(card, /<BookmarkToggle on=\{on\} title=\{heading\} toggle=\{toggle\} \/>/);
-  // a place in a book opens the exact place in the reader; its bookmark button is a button of its own beside the row's
-  const rows = code(read(`${DIR}/PlaceRows.tsx`));
-  assert.match(rows, /export const placeRoute = \(p: Pick<BookPlace, 'bookId' \| 'chapterId' \| 'block'>\) => `\/library\/book\/\$\{p\.bookId\}\/\$\{p\.chapterId\}\$\{p\.block === null \? '' : `\?block=\$\{p\.block\}`\}`;/);
-  assert.match(rows, /onPress=\{\(\) => router\.push\(placeRoute\(p\)\)\}/);
-  assert.match(rows, /<BookmarkToggle on=\{marks\.has\(p\.key\)\} title=\{p\.title\} toggle=\{\(\) => marks\.toggle\(p\.key\)\} \/>/);
-  assert.equal((rows.match(/<Pressable\b/g) ?? []).length, 1);
-});
-
-check('the book screen: Continue reading goes to the place that was read last, the chapters open the reader, the bookmark is the book\'s anchor, and the credit, the rights and the AI disclosure are drawn exactly as the bundle has them', () => {
-  const src = code(read('app/library/book/[id]/index.tsx'));
-  assert.match(src, /const open = useBook\(id\);/);
-  assert.match(src, /if \(!open\) return <NotHere title="This book is not here"/, 'a book that is not there is a calm page, not an error');
-  assert.match(src, /const resume = resumePoint\(book, reading\.places\);/);
-  assert.match(src, /label=\{resume\.resumed \? 'Continue reading' : 'Start reading'\} onPress=\{\(\) => go\(resume\.chapterId\)\}/);
-  assert.match(src, /const go = \(chapterId: string\) => router\.push\(`\/library\/book\/\$\{book\.id\}\/\$\{chapterId\}`\);/);
-  assert.match(src, /const bookKey = itemKey\('Books', book\.id\);/);
-  assert.match(src, /<BookmarkToggle on=\{marks\.has\(bookKey\)\} title=\{book\.title\} toggle=\{\(\) => marks\.toggle\(bookKey\)\} color=\{fixed\.blue\} \/>/);
-  assert.match(src, /\{creditLine\(content\)\}/);
-  assert.match(src, /\{content\.rights\}/);
-  assert.match(src, /\{content\.ai_disclosure\}/);
-  assert.match(src, /\{bookLine\(book\)\}/);
-  assert.match(src, /\{book\.description\}/);
-  assert.match(src, /formatMinutes\(ch\.minutes\)/);
-  assert.match(src, /backgroundColor: fixed\[book\.cover\.colour\]/);
-  const hook = code(read(`${DIR}/useBook.ts`));
-  assert.match(hook, /try \{\s*const content = loadBookContent\(book\.id\);/, 'the text of a book is read when it is opened, and a book that cannot be read is "not here"');
-  const places = code(read(`${DIR}/useReadingPlaces.ts`));
-  assert.match(places, /const key = uid \? userKey\(uid, READING_NAME\) : null;/);
-  assert.match(places, /if \(!key \|\| !cur \|\| cur\.key !== key\) return;/, 'ignored until the places for this person were read');
-  assert.match(places, /useFocusEffect\(/);
-  assert.doesNotMatch(places, /supabase|lib\/api|lib\/net|fetch\(/, 'where a pilgrim is in a book never leaves the phone');
-});
-
-check('the reader draws what a book is made of, with the app\'s own text styles and colours read while drawing, links to the web only through the phone\'s browser, and every paragraph a note or a bookmark can be on', () => {
-  const text = code(read(`${DIR}/BookText.tsx`));
-  for (const kind of ["'h'", "'p'", "'ul'", "'ol'", "'quote'", "'hr'"]) assert.match(text, new RegExp(`case ${kind}:`), `a block of kind ${kind} is drawn`);
-  assert.match(text, /\{!!block\.cite && block\.cite\.length > 0 && \(/, 'a quote shows its attribution');
-  assert.match(text, /s\.b && s\.i/);
-  assert.match(text, /accessibilityRole="link" onPress=\{\(\) => open\(s\.href as string\)\}/);
-  assert.match(text, /Linking\.openURL\(href\)\.catch\(\(\) => undefined\)/, 'a link that cannot open says nothing and breaks nothing');
-  assert.match(text, /export const READING = \{ fontSize: 19, lineHeight: 30 \} as const;/);
-  assert.match(text, /import \{ BOLD_ITALIC_FACE, ITALIC_FACE \} from '@\/components\/ItalicFaces';/);
-  assert.match(text, /overflowWrap: 'anywhere'/, 'a very long word breaks instead of pushing the page wider');
-  assert.doesNotMatch(text, /dangerouslySetInnerHTML|WebView|\.html\b/);
-  const reader = code(read('app/library/book/[id]/[chapter].tsx'));
-  assert.match(reader, /<Screen tabBar=\{false\} scroll=\{false\} margin=\{0\}>/, 'the text scrolls edge to edge, with the way back and the bookmark of the chapter staying on top');
-  assert.match(reader, /<IconButton name="back" label="Back" onPress=\{goBack\} \/>/);
-  assert.match(reader, /<BookmarkToggle on=\{marks\.has\(chapterKey\)\} title=\{chapter\.title\} toggle=\{\(\) => marks\.toggle\(chapterKey\)\} \/>/);
-  assert.match(reader, /const chapterKey = chapterAnchor\(book\.id, chapter\.id\);/);
-  assert.match(reader, /bookmarked=\{marks\.has\(key\)\}/);
-  assert.match(reader, /onBookmark=\{\(\) => marks\.toggle\(key\)\}/);
-  assert.match(reader, /const nav = \(id: string\) => router\.replace\(`\/library\/book\/\$\{book\.id\}\/\$\{id\}`\);/, 'next and previous replace the chapter, so Back still returns to the book');
-  assert.match(reader, /accessibilityLabel=\{`\$\{next \? 'Next' : 'Previous'\}: \$\{title\}`\}/);
-  assert.match(reader, /minHeight: 68/);
-  assert.match(reader, /if \(!chapter\) return <NotHere title="This chapter is not here"/);
-  assert.match(reader, /Number\.isInteger\(block\) && block >= 0 && block < chapter\.blocks\.length \? block : null/, 'a block that is not in the chapter is no place to scroll to');
-  const part = code(read(`${DIR}/ReaderBlock.tsx`));
-  assert.match(part, /blockLabel = \(text: string, notes: number, bookmarked: boolean\): string =>/);
 });
 
 check('every button of the feature has a label for a screen reader, and the search says what it is typed into', () => {
@@ -250,6 +225,41 @@ check('the feature uses no console, no interval and no StyleSheet.create (colour
     });
   }
   assert.deepEqual(offenders, []);
+});
+
+check('the Notes tab and the daily reading are plugged in here and built elsewhere: the screen draws NotesTab as the third tab, with no banner, and the banner opens /library/daily', () => {
+  const screen = code(read('app/(tabs)/library.tsx'));
+  assert.match(screen, /import \{ NotesTab \} from '@\/features\/library\/notes\/NotesTab';/);
+  assert.match(screen, /<View style=\{\{ flex: 1 \}\}><NotesTab \/><\/View>/, 'no props, in a box of its own that fills what is under the tabs: the notes start right under them');
+  assert.doesNotMatch(screen, /<NotesTab\s[^>]*\w+=/, 'NotesTab takes no props');
+  const notesHost = screen.slice(screen.indexOf("if (tab === 'Notes') {"), screen.indexOf('<Screen keyboard'));
+  assert.ok(notesHost.includes('<NotesTab />'), 'the host of the Notes tab is found');
+  assert.doesNotMatch(notesHost.slice(notesHost.indexOf(') : (')), /Banner|<Screen\b|ScrollView/, 'Notes has no banner and no scroll view around it: the feed scrolls by itself');
+  assert.match(screen, /<DailyBanner onOpen=\{\(\) => router\.push\('\/library\/daily'\)\} \/>/);
+  assert.ok(fs.existsSync(path.join(root, 'src/features/library/notes/NotesTab.tsx')), 'the file of the Notes tab is there (a placeholder until the real one is merged)');
+  assert.match(read('src/features/library/notes/NotesTab.tsx'), /export function NotesTab\(\)/);
+  assert.ok(fs.existsSync(path.join(root, 'app/library/daily.tsx')), 'the route /library/daily is a file (a placeholder until the real screen is merged)');
+  assert.match(read('app/library/daily.tsx'), /export default function /);
+});
+
+check('there is no Music left: not a tab, not a notice, not a group of the search or of Bookmarks, not a playlist row', () => {
+  const offenders: string[] = [];
+  for (const f of [...featureFiles, 'app/(tabs)/library.tsx']) {
+    code(read(f)).split('\n').forEach((line, i) => {
+      if (/music|playlist/i.test(line)) offenders.push(`${f}:${i + 1}  ${line.trim().slice(0, 100)}`);
+    });
+  }
+  assert.deepEqual(offenders, []);
+});
+
+check('the Bookmarks screen groups the Library rows by tab with the same component as the search (Bible, then Books), and says how to bookmark when nothing current is kept', () => {
+  const src = code(read('app/library/bookmarks.tsx'));
+  assert.match(src, /<LibraryGroups hits=\{hits\} marks=\{marks\} \/>/);
+  assert.match(src, /hitCount\(hits\) > 0 \? \(/);
+  assert.match(src, /LIBRARY_BOOKMARKS_EMPTY/);
+  const tabs = code(read(`${DIR}/LibraryTabs.tsx`));
+  assert.match(tabs, /\{hitTabs\(hits\)\.map\(\(tab\) => \(/, 'a tab that has no row in it is not drawn');
+  assert.match(code(read(`${DIR}/search.ts`)), /export const hitTabs = \(h: Hits\): SampleTab\[\] => SAMPLE_TABS\.filter\(\(t\) => h\[t\]\.length > 0\);/);
 });
 
 console.log(`${n} of ${n} passed`);
