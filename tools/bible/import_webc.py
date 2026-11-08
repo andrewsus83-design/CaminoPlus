@@ -686,10 +686,14 @@ def download(url: str, directory: pathlib.Path) -> pathlib.Path:
 
 def read_zip(path: pathlib.Path, sha256: str) -> tuple[dict[str, bytes], str, int]:
     """The files of the zip that matter, read into memory with limits. The zip is refused unless it is the pinned file."""
-    size = path.stat().st_size
+    try:
+        size = path.stat().st_size
+        if size <= MAX_ZIP_BYTES:
+            digest = sha256_file(path)
+    except OSError as e:
+        raise ImportProblem(f"cannot read {path}: {e.strerror or e}") from None
     if size > MAX_ZIP_BYTES:
         raise ImportProblem(f"{path} is {size:,} bytes, more than {MAX_ZIP_BYTES:,}: not the file this importer was written for")
-    digest = sha256_file(path)
     if digest != sha256:
         raise ImportProblem(
             f"{path} is not the zip this importer is pinned to.\n  its sha256:    {digest}\n  pinned sha256: {sha256}\n"
