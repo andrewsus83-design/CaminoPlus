@@ -54,7 +54,7 @@ function useSeen(userId: string | null | undefined) {
 function AllItem({ visited, total, on, onPress }: { visited: number; total: number; on: boolean; onPress: () => void }) {
   const glyph = <Icon name="shell" color={role.action} size={28} />;
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={allLabel(visited, total)} accessibilityHint={allHint(on)} accessibilityState={{ selected: on }} onPress={onPress} style={{ width: ITEM_W, alignItems: 'center', gap: 6 }}>
+    <Pressable accessibilityRole="button" accessibilityLabel={allLabel(visited, total)} accessibilityHint={allHint(on)} accessibilityState={{ selected: on }} aria-selected={on} onPress={onPress} style={{ width: ITEM_W, alignItems: 'center', gap: 6 }}>
       {on ? (
         // the ring of an opened highlight: gold, then the page colour, then the round itself
         <View style={{ width: RING, height: RING, borderRadius: RING / 2, padding: 3, backgroundColor: c.gold }}>

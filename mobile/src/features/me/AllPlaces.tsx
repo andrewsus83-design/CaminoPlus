@@ -10,7 +10,8 @@ import { placesLine, stampLabel, visitedCount, type RoutePoint } from './routePo
 // The "All" view of Me: every place of the Camino as a stamp, in the look of the passport (app/passport.tsx): three round slots in a row, the name of the place under
 // each, filled when there is something, dashed when there is not. Here "something" is a journey post of the pilgrim at that place, and the filled stamp carries
 // how many. A tap on a stamp shows those posts in the Journey grid (the bar over the grid goes back to these stamps). Which post belongs to which place is routePoints.ts.
-const SLOT = 78; // the round of a stamp, as in the passport
+// the round of a stamp is 78, as in the passport
+const SLOT = 78;
 
 function Stamp({ p, onPress }: { p: RoutePoint<Post>; onPress: () => void }) {
   const done = p.posts.length > 0;

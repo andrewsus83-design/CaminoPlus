@@ -21,6 +21,7 @@ import { domQuiet, eventually, pathOf } from './harness.mjs';
 import { BIBLE_SCENARIOS } from './bible.scenarios.mjs';
 import { BOOKS_SCENARIOS, CATALOG, COVER_LABEL } from './books.scenarios.mjs';
 import { ME_SCENARIOS } from './me.scenarios.mjs';
+import { ALL_PLACES_SCENARIOS } from './allplaces.scenarios.mjs';
 
 /** design/tokens.json: the weights of the tabs of the tab bar (section tab) are read from it, as the app reads them. */
 const TAB_TOKENS = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'design', 'tokens.json'), 'utf8')).tab;
@@ -518,4 +519,5 @@ export const SCENARIOS = [
     },
   },
   ...DAILY_SCENARIOS,
+  ...ALL_PLACES_SCENARIOS,
 ];

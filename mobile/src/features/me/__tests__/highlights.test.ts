@@ -289,7 +289,7 @@ check('the All item: the first item of the row, pinned at its left (outside the 
   assert.match(src, /borderWidth: 1, borderColor: role\.border, backgroundColor: role\.surface/, 'a hairline ring and the surface fill');
   assert.match(src, /padding: 3, backgroundColor: c\.gold/, 'the gold ring of an opened highlight while its view is on');
   assert.match(src, /fontFamily: on \? fonts\.bodyBold : fonts\.bodyMedium \}\}>All<\/AppText>/, 'the label is "All", bold while its view is on');
-  assert.match(src, /accessibilityLabel=\{allLabel\(visited, total\)\} accessibilityHint=\{allHint\(on\)\} accessibilityState=\{\{ selected: on \}\}/, '"All places, N of M with journeys", selected while its view is on');
+  assert.match(src, /accessibilityLabel=\{allLabel\(visited, total\)\} accessibilityHint=\{allHint\(on\)\} accessibilityState=\{\{ selected: on \}\} aria-selected=\{on\}/, '"All places, N of M with journeys", selected while its view is on (the state for the phone, aria-selected for the web)');
   const item = src.slice(src.indexOf('function AllItem'), src.indexOf('function Item('));
   assert.doesNotMatch(item, /seen|mark\(/, 'it is never seen or unseen');
   assert.match(item, /width: ITEM_W/, 'as wide as the other items');
