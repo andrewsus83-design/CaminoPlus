@@ -3,6 +3,7 @@ import { Platform, Pressable, Text, View, type AccessibilityActionEvent } from '
 import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
 import type { DiaryPlace } from '@/features/diary/place';
+import { DRAFT_TAG } from '@/features/diary/present';
 import { RichText } from '@/features/diary/RichText';
 import type { DiaryEntry } from '@/features/diary/store';
 import { PilgrimAvatar } from '@/features/social/components/primitives';
@@ -119,6 +120,12 @@ function NoteRowView({ entry, uid, now, who, open, actions }: { entry: DiaryEntr
                   {who.handle !== '' && <Text style={[textStyle('caption'), { color: role.muted }]}>{` ${who.handle}`}</Text>}
                 </AppText>
                 {time !== null && <AppText variant="caption" muted style={{ flexShrink: 0 }}>{` · ${time.short}`}</AppText>}
+                {/* A draft is a note still being written: the tag says so. A screen reader gets it in the sentence of the row, not twice. */}
+                {row.draft && (
+                  <View aria-hidden accessibilityElementsHidden importantForAccessibility="no-hide-descendants" style={{ flexShrink: 0, marginLeft: 8, alignSelf: 'center', paddingHorizontal: 8, paddingVertical: 1, borderRadius: radius.pill, borderWidth: 1, borderColor: role.border, backgroundColor: role.sunken }}>
+                    <AppText variant="caption" color={role.accentText}>{DRAFT_TAG}</AppText>
+                  </View>
+                )}
               </View>
               {/* 44 by 44 to touch; the negative margins keep the line as low as its text, and the dots on the edge of the column */}
               <Pressable

@@ -361,7 +361,7 @@ export default function Maps() {
             <AppText variant="small" muted>
               {m.walkedKm} of {routeLengthKm} km walked · stage {m.stage.number} · {m.nextTownKm} km to {m.stage.name.split('→')[1]?.trim()}
             </AppText>
-            <AppText variant="caption" muted>Preview data: the first three stages are hand-placed and the rest is drawn as straight lines between towns. Do not navigate with it yet.</AppText>
+            <AppText variant="caption" muted>{m.routeNotice}</AppText>
             {m.pinSource === 'sample' && m.pins.length > 0 && <AppText variant="caption" muted>The pins on the map are examples.</AppText>}
             {m.pinSource !== 'sample' && <AppText variant="caption" muted>{`The pins on the map are places from OpenStreetMap${m.pinSource === 'cache' ? ', saved on this phone' : ''}. Tap one to see how far it was checked. ${OSM_CREDIT}.`}</AppText>}
             <View style={{ marginTop: 12, gap: 10 }}>

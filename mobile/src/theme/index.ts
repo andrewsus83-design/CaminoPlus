@@ -159,7 +159,8 @@ export const fonts = {
   accent: 'Caveat_700Bold',
 } as const;
 
-export type TextVariant = 'display' | 'h1' | 'h2' | 'h3' | 'h4' | 'lead' | 'body' | 'small' | 'label' | 'caption' | 'mono' | 'accent';
+/** A variant of AppText is a token of design/tokens.json "text" (display, h1 to h6, lead, body, small, label, caption, mono, accent): the type is the keys of the file, so a token is usable the moment it is in it. */
+export type TextVariant = keyof typeof tokens.text;
 
 const family: Record<string, string> = { title: fonts.title, body: fonts.body, mono: fonts.mono, accent: fonts.accent };
 

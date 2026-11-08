@@ -9,7 +9,8 @@
     "esModuleInterop": true,
     "types": ["node"],
     "outDir": "node_modules/.cache/library-test",
-    "rootDir": "src"
+    "rootDir": "src",
+    "resolveJsonModule": true
   },
   "files": [
     "src/features/library/__tests__/library.test.ts",

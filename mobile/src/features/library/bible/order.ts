@@ -44,7 +44,7 @@ export function nextPlace(p: Place): Place | null {
 
 const nameOf = (code: string): string | undefined => bookByCode(code)?.name;
 
-/** "Psalm 121", "John 3", "1 Corinthians 13": a chapter named the way a reference says it. For the words of a button ("Next: Psalm 122") and the card on the Bible tab. */
+/** "Psalm 121", "John 3", "1 Corinthians 13": a chapter named the way a reference says it. For the words of a button ("Next: Psalm 122") and the Continue reading bar. */
 export const placeLabel = (p: Place): string => formatRef({ code: p.code, chapter: p.chapter }, nameOf);
 
 /** The reference to a place and a verse the way a reference says it: "Psalm 121:3". */
