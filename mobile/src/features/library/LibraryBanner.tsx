@@ -1,14 +1,19 @@
-import { useCallback, useState } from 'react';
-import { Pressable, View } from 'react-native';
+import { useCallback, useMemo, useState } from 'react';
+import { Pressable, View, useWindowDimensions } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import { AppText } from '@/components/AppText';
 import { c, radius, role, space } from '@/theme';
 import { todayLine } from './bible/today';
+import { todayOf } from './daily/calendar';
+import { pillBesideTitle } from './daily/bannerLayout';
+import { NO_READINGS, readingsLine, readingsSpoken } from './daily/content';
+import { dateKey } from './daily/datekey';
+import { dayBrief } from './daily/dayData';
 
-// The compact banner at the top of the Bible tab (the daily reading) and the base the banner of the Books tab is built on (books/BooksBanner.tsx), under the tab
-// strip. Its own file, apart from the rows (LibraryTabs.tsx).
+// The two banners under the tab strip of the Library, in a file apart from the rows (LibraryTabs.tsx): the card of the daily reading at the top of the Bible tab (DailyBanner, below)
+// and the compact banner that the Books tab is built on (books/BooksBanner.tsx).
 //
-// CompactBanner is the one the Bible tab has, and the base of the Books tab's: a dark blue card no taller than 128 on a
+// CompactBanner is the base of the Books tab's: a dark blue card no taller than 128 on a
 // 390 wide phone (148 on a 320 wide one), in the four fonts of the brand: a small gold line in JetBrains Mono (a date, or a few words), the title in
 // Fraunces, an optional short line in Inter, one short handwritten note in Caveat (the one accent of the card) and, on the right, the gold pill with its
 // label in Inter. With a pill and something to do, the whole card is ONE button for a screen reader (the pill is its look, not a second stop), so a tap
@@ -16,7 +21,6 @@ import { todayLine } from './bible/today';
 // (dark blue in light mode, a lighter blue in dark mode) and what is on it keeps its contrast in both.
 
 export const DAILY_TITLE = 'Daily reading';
-export const DAILY_NOTE = 'Buen Camino!';
 export const DAILY_CTA = 'Read today';
 
 /** The compact banner is never taller than the first number on a phone 390 wide, nor than the second on one 320 wide (with the phone's text at its normal size). */
@@ -81,13 +85,53 @@ export function CompactBanner({ label, title, line, note, cta, onPress, hint }: 
   );
 }
 
+/** The card of the daily reading is never taller than the first number on a phone 390 wide, nor than the second on one 320 wide (the phone's text at its normal size, the longest day of the readings we have). */
+export const DAILY_BANNER_MAX_HEIGHT = 190;
+export const DAILY_BANNER_MAX_HEIGHT_NARROW = 250;
+
 /**
- * The banner of the Bible tab: the daily reading, with today's date and a gold "Read today", and one handwritten note. The whole card opens the
- * daily reading (the screen decides where: app/(tabs)/library.tsx). The date is read again each time the Library comes into view, so the banner
- * never says yesterday after a night with the app open.
+ * The banner of the Bible tab: the daily reading. In the four fonts of the brand and on the colours of a hero card (role.inverse, so it keeps its contrast in light and in dark): the
+ * date and the weekday in a small gold line (JetBrains Mono, capitals), the title "Daily reading" (Fraunces) with the gold pill "Read today" at its right, then what the day is
+ * (Inter: the memorial or feast the readings file names, else the Sunday or the weekday of the calendar, "32nd Sunday in Ordinary Time"), then the readings as one line of references
+ * ("Wisdom 6:12-16 · Psalm 63 · Matthew 25:1-13": the first reading, the psalm, the second reading on a Sunday or a solemnity, the Gospel). A day we have no readings for says so, in
+ * the same place. The pill moves under the last line on a phone too narrow, or with text too big, for the title and the pill to share a row (pillBesideTitle).
+ *
+ * The whole card is ONE button for a screen reader (the pill is its look, not a second stop) and opens the daily reading (the screen decides where: app/(tabs)/library.tsx); what it says
+ * is the pill's words, the title, the date, the day and the readings. The date is read again each time the Library comes into view, so the banner never says yesterday after a night
+ * with the app open. It has no handwritten note: Buen Camino! is said on the screens that have room for a greeting.
  */
 export function DailyBanner({ onOpen }: { onOpen: () => void }) {
   const [now, setNow] = useState(() => new Date());
   useFocusEffect(useCallback(() => { setNow(new Date()); }, []));
-  return <CompactBanner label={todayLine(now)} title={DAILY_TITLE} note={DAILY_NOTE} cta={DAILY_CTA} onPress={onOpen} hint="Opens today's reading and the calendar" />;
+  const { width, fontScale } = useWindowDimensions();
+  const label = todayLine(now);
+  const brief = useMemo(() => dayBrief(dateKey(todayOf(now))), [now]);
+  const line = brief.readings ? readingsLine(brief.readings) : NO_READINGS;
+  const spoken = brief.readings ? `Readings: ${readingsSpoken(brief.readings)}` : NO_READINGS;
+  const beside = pillBesideTitle(width, fontScale, COMPACT_BANNER_MAX_FONT_SCALE);
+  const pill = (
+    <View style={{ height: 44, paddingHorizontal: space[4], borderRadius: radius.pill, backgroundColor: c.gold, alignItems: 'center', justifyContent: 'center' }}>
+      <AppText variant="label" maxFontSizeMultiplier={COMPACT_BANNER_MAX_FONT_SCALE} color={role.onHighlight}>{DAILY_CTA}</AppText>
+    </View>
+  );
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={[DAILY_CTA, DAILY_TITLE, label, brief.title, spoken].filter(Boolean).join('. ')}
+      accessibilityHint="Opens today's reading and the calendar"
+      onPress={onOpen}
+      style={({ pressed }) => ({ opacity: pressed ? 0.92 : 1 })}
+    >
+      <View style={{ borderRadius: radius.lg, backgroundColor: role.inverse, paddingHorizontal: space[4], paddingVertical: space[3], gap: space[1] }}>
+        <AppText variant="mono" maxFontSizeMultiplier={COMPACT_BANNER_MAX_FONT_SCALE} numberOfLines={1} color={role.onInverseAccent} style={{ textTransform: 'uppercase' }}>{label}</AppText>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: space[3] }}>
+          <AppText variant="h4" maxFontSizeMultiplier={COMPACT_BANNER_MAX_FONT_SCALE} color={role.onInverse} style={{ flexShrink: 1 }}>{DAILY_TITLE}</AppText>
+          {beside && pill}
+        </View>
+        <AppText variant="label" maxFontSizeMultiplier={COMPACT_BANNER_MAX_FONT_SCALE} color={role.onInverse}>{brief.title}</AppText>
+        <AppText variant="caption" maxFontSizeMultiplier={COMPACT_BANNER_MAX_FONT_SCALE} color={role.onInverseAccent}>{line}</AppText>
+        {!beside && <View style={{ alignSelf: 'flex-end', marginTop: space[1] }}>{pill}</View>}
+      </View>
+    </Pressable>
+  );
 }

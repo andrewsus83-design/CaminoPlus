@@ -38,7 +38,7 @@ export function DailyBookmarks({ marks }: { marks: LibraryMarks }) {
                 style={({ pressed }) => ({ flex: 1, minWidth: 0, minHeight: 48, justifyContent: 'center', gap: space[1], opacity: pressed ? 0.6 : 1 })}
               >
                 <AppText variant="label">{date}</AppText>
-                <AppText variant="caption" muted>{title}</AppText>
+                <AppText variant="small" muted>{title}</AppText>
               </Pressable>
               <BookmarkToggle on={marks.has(key)} title={`${DAILY_GROUP}, ${date}`} toggle={() => marks.toggle(key)} />
             </View>
