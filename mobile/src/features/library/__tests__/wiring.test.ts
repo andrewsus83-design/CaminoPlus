@@ -164,7 +164,9 @@ check('the three choices of the Bible tab are an inline segmented pill: radio bu
   assert.doesNotMatch(src, /accessibilityRole="tab"|role="tab"/, 'the real tab bar is the only "tab" on the screen (the web smoke counts them)');
   assert.match(src, /\{TESTAMENTS\.map\(\(t\) => \{/, 'one choice for each part, in the order of the parts');
   assert.match(src, /export const BAR_DRAWN: Record<Testament, string> = \{ old: 'Old\\nTestament', deutero: 'Deuterocanon', new: 'New\\nTestament' \};/, 'the labels stay as they were');
-  assert.match(src, /\{BAR_DRAWN\[t\]\}<\/AppText>/);
+  assert.match(src, /\{drawn\[t\]\}<\/AppText>/);
+  assert.match(src, /const drawn = useWindowDimensions\(\)\.width < NARROW_UNDER \? BAR_DRAWN_NARROW : BAR_DRAWN;/, 'under 352 the words are Old, Deuterocanon and New: Testament does not fit three across at 15');
+  assert.match(src, /export const BAR_DRAWN_NARROW: Record<Testament, string> = \{ old: 'Old', deutero: 'Deuterocanon', new: 'New' \};/);
   assert.match(src, /export const BAR_MAX_FONT_SCALE = 1\.2;/);
   assert.match(src, /<AppText variant="caption" maxFontSizeMultiplier=\{BAR_MAX_FONT_SCALE\} color=\{on \? role\.onAction : role\.text\} style=\{\{ textAlign: 'center' \}\}>/, 'Inter, the same for the filled one and the others, and larger text still fits three labels in a row');
   // size: 56 high with 4 of padding is a choice 48 high; the middle one keeps its own width, the others share the rest
@@ -178,7 +180,7 @@ check('the three choices of the Bible tab are an inline segmented pill: radio bu
   assert.match(src, /backgroundColor: on \? role\.action : 'transparent'/);
   assert.doesNotMatch(src, /#[0-9a-fA-F]{3,8}\b|\bfixed\.|\bc\.[a-z]/, 'colours are theme roles, never a literal, the fixed palette or a palette colour');
   // it is in the page: nothing floats, nothing is placed by the tab bar's numbers any more
-  assert.doesNotMatch(src, /position: 'absolute'|useSafeAreaInsets|useWindowDimensions|BAR_ROOM|BAR_NARROW_UNDER|bottom:|shadowStyle|fontFamily/, 'an inline control: no floating logic left');
+  assert.doesNotMatch(src, /position: 'absolute'|useSafeAreaInsets|BAR_ROOM|BAR_NARROW_UNDER|bottom:|shadowStyle|fontFamily/, 'an inline control: no floating logic left');
   assert.doesNotMatch(read('app/(tabs)/library.tsx'), /BAR_ROOM|TestamentBar|scrollRef|onListLayout|scroller|listTop|useRef/, 'and none left in the screen');
 });
 

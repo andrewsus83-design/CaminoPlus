@@ -1,7 +1,8 @@
-import { Pressable, View } from 'react-native';
+import { Pressable, View, useWindowDimensions } from 'react-native';
 import { AppText } from '@/components/AppText';
 import { radius, role, space } from '@/theme';
 import { TESTAMENTS, TESTAMENT_LABEL, type Testament } from './books';
+import { NARROW_UNDER } from './gridMath';
 
 /** The control is this high: the choices inside it are 58 (the two lines of a label, 21 each, and 8 above and below), with 4 of the track around them. */
 export const BAR_HEIGHT = 66;
@@ -11,6 +12,12 @@ export const BAR_MAX_FONT_SCALE = 1.2;
 
 /** What is drawn on a choice: the two that have two words go on two lines, so the three fit side by side from 320 up and look alike at every width. A screen reader says the plain label. */
 export const BAR_DRAWN: Record<Testament, string> = { old: 'Old\nTestament', deutero: 'Deuterocanon', new: 'New\nTestament' };
+
+/**
+ * What is drawn on a choice on a phone narrower than NARROW_UNDER (352): the word "Testament" is 80 wide at 15 and the two outer choices have 73 on a phone 320 wide (92 on 352), so it
+ * would touch the edge of its choice; the three are "Old", "Deuterocanon" and "New" there. A screen reader says the plain label (TESTAMENT_LABEL) either way.
+ */
+export const BAR_DRAWN_NARROW: Record<Testament, string> = { old: 'Old', deutero: 'Deuterocanon', new: 'New' };
 
 /**
  * The three choices of the Bible tab: Old Testament, Deuterocanon, New Testament. One is on at a time (the filled one); the grid of books under it
@@ -24,6 +31,7 @@ export const BAR_DRAWN: Record<Testament, string> = { old: 'Old\nTestament', deu
  * Colours are roles: the filled choice is role.action with role.onAction, the others role.text on the role.sunken track.
  */
 export function TestamentBar({ value, onChange }: { value: Testament; onChange: (t: Testament) => void }) {
+  const drawn = useWindowDimensions().width < NARROW_UNDER ? BAR_DRAWN_NARROW : BAR_DRAWN;
   return (
     <View
       accessibilityRole="radiogroup"
@@ -46,7 +54,7 @@ export function TestamentBar({ value, onChange }: { value: Testament; onChange: 
               backgroundColor: on ? role.action : 'transparent', opacity: pressed ? 0.85 : 1,
             })}
           >
-            <AppText variant="caption" maxFontSizeMultiplier={BAR_MAX_FONT_SCALE} color={on ? role.onAction : role.text} style={{ textAlign: 'center' }}>{BAR_DRAWN[t]}</AppText>
+            <AppText variant="caption" maxFontSizeMultiplier={BAR_MAX_FONT_SCALE} color={on ? role.onAction : role.text} style={{ textAlign: 'center' }}>{drawn[t]}</AppText>
           </Pressable>
         );
       })}
