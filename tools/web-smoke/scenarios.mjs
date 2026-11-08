@@ -12,6 +12,9 @@
 // The Bible side of the Library (the grid of books, the chapters, the reader, the search of verses, Continue reading) is in bible.scenarios.mjs,
 // and the Books side (the covers, the book page, the reader of a book) in books.scenarios.mjs.
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { DAILY_SCENARIOS } from './daily.scenarios.mjs';
 import { UID } from './fixtures.mjs';
 import { domQuiet, eventually, pathOf } from './harness.mjs';
@@ -19,6 +22,10 @@ import { BIBLE_SCENARIOS } from './bible.scenarios.mjs';
 import { BOOKS_SCENARIOS, CATALOG, COVER_LABEL } from './books.scenarios.mjs';
 import { ME_SCENARIOS } from './me.scenarios.mjs';
 
+/** design/tokens.json: the weights of the tabs of the tab bar (section tab) are read from it, as the app reads them. */
+const TAB_TOKENS = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'design', 'tokens.json'), 'utf8')).tab;
+/** The stem of Inter Light is 136 of 2048 units (themeScheme.test.ts reads it from the font file on every run): 0.93 px at the 14 px of a tab label. */
+const LIGHT_STEM_PX = (136 / 2048) * 14;
 const TABS = ['Me', 'Stays', 'Maps', 'Discover', 'Library'];
 const TAB_PATH = { Me: '/me', Stays: '/stays', Maps: '/maps', Discover: '/explore', Library: '/library' };
 
@@ -54,6 +61,38 @@ export const SCENARIOS = [
         await waitPath(page, TAB_PATH[label], `the address after tapping ${label}`);
         await eventually(() => texts(page.getByRole('tab')), (t) => t.join('|') === TABS.join('|'), { what: `the tab bar after tapping ${label}` });
       }
+    },
+  },
+  {
+    name: 'Tab bar: an inactive tab is thin and Light and its icon is drawn exactly as thick as the stem of its label (0.93 px), the active tab is heavier in both',
+    persona: 'in',
+    async run({ page, step, go, task }) {
+      step('open Me, where Me is the active tab and the other four are not');
+      await go('/me');
+      await eventually(() => texts(page.getByRole('tab')), (t) => t.join('|') === TABS.join('|'), { what: 'the tabs of the tab bar' });
+      const drawn = await page.evaluate(() => [...document.querySelectorAll('[role="tab"]')].map((el) => {
+        const svg = el.querySelector('svg');
+        const shape = svg.querySelector('path, circle');
+        const label = [...el.querySelectorAll('div[dir]')].pop();
+        const cs = getComputedStyle(label);
+        return { name: label.textContent, size: svg.getBoundingClientRect().width, box: svg.viewBox.baseVal.width, stroke: Number(shape.getAttribute('stroke-width')), family: cs.fontFamily, fontSize: cs.fontSize };
+      }));
+      assert.equal(drawn.length, TABS.length);
+      const scheme = task.scheme;
+      const inactive = drawn.filter((t) => t.name !== 'Me');
+      assert.equal(inactive.length, 4, 'four tabs are inactive');
+      step('each inactive tab: the icon is the stroke of tokens.tab (0.8 of its 24 units, drawn 28 px square: 0.93 px) within 10 percent of the stem of its Light label at 14 px, and the label is Inter Light');
+      for (const t of inactive) {
+        assert.equal(t.stroke, TAB_TOKENS.inactiveStroke[scheme], `${t.name}: the stroke is the token`);
+        const px = (t.stroke * t.size) / t.box;
+        assert(Math.abs(px / LIGHT_STEM_PX - 1) <= 0.1, `${t.name}: the icon is drawn ${px.toFixed(3)} px thick, the stem of its label is ${LIGHT_STEM_PX.toFixed(3)} px`);
+        assert(/Inter_300Light/.test(t.family), `${t.name}: the label is Inter Light (${t.family})`);
+        assert.equal(t.fontSize, '14px', `${t.name}: the label is 14 px`);
+      }
+      const active = drawn.find((t) => t.name === 'Me');
+      assert.equal(active.stroke, TAB_TOKENS.activeStroke[scheme], 'the active icon is the active stroke of the mode');
+      assert(active.stroke >= 1.5 * inactive[0].stroke, 'much heavier than an inactive one');
+      assert(new RegExp(scheme === 'light' ? 'Inter_700Bold' : 'Inter_600SemiBold').test(active.family), `the active label is ${scheme === 'light' ? 'Bold' : 'SemiBold'} (${active.family})`);
     },
   },
   {
@@ -236,6 +275,105 @@ export const SCENARIOS = [
     },
   },
   ...ME_SCENARIOS,
+  {
+    name: 'Notes: a page is a draft until it is published. The marks are inside the text box; Read (a third) and Publish (two thirds) are one row at the bottom; Save draft is at the top right and keeps a note with a Draft tag; Publish takes the tag away',
+    persona: 'in',
+    async run(ctx) {
+      const { page, step, go } = ctx;
+      const label = (t) => page.getByText(t, { exact: true }).filter({ visible: true }).first();
+      const box = async (locator, what) => { const b = await locator.boundingBox(); if (!b) throw new Error(`${what} has no box (it is not on the screen)`); return b; };
+      const button = (name) => page.getByRole('button', { name, exact: true });
+      const W = 390;
+      const near = (a, b, what) => assert(Math.abs(a - b) <= 2, `${what}: ${a} and ${b} should be the same`);
+      const inFeed = (text) => page.getByText(text).filter({ visible: true }).first();
+      const tags = () => page.getByText('Draft', { exact: true }).filter({ visible: true }).count();
+      const feedOpen = async () => { await go('/me'); await label('Notes').click(); await page.getByText('Notes stay on this phone.', { exact: true }).waitFor(); };
+
+      step('open Me, choose Notes and tap the pen: a blank page');
+      await feedOpen();
+      await page.getByRole('button', { name: 'Write a note', exact: true }).click();
+      await waitPath(page, '/diary/new', 'the address after the pen');
+      const bodyField = page.getByRole('textbox', { name: 'Page text' });
+      await bodyField.waitFor();
+
+      step('a blank page cannot be published or read, and has no Save draft yet');
+      await eventually(() => button('Publish this note').isDisabled(), (v) => v === true, { what: 'Publish is off on a blank page' });
+      await eventually(() => button('Read this page').isDisabled(), (v) => v === true, { what: 'Read is off on a blank page' });
+      await eventually(() => button('Save draft').count(), (n) => n === 0, { what: 'the number of Save draft buttons on a blank page' });
+
+      step('write a few words: Save draft appears at the top right, and the date says Draft');
+      await bodyField.fill('Rain over the meseta, soup at noon.');
+      await button('Save draft').waitFor();
+      const save = await box(button('Save draft'), 'Save draft');
+      assert(save.y < 150, 'Save draft is in the top bar');
+      assert(save.x + save.width > W / 2, 'Save draft is on the right');
+      await page.getByText(/ · Draft$/).first().waitFor();
+
+      step('the marks (Bold, Italic, Heading, Bulleted list, Quote) are inside the text box, under the text and above the bottom row');
+      const title = await box(page.getByRole('textbox', { name: 'Page title' }), 'the title field');
+      const text = await box(bodyField, 'the text field');
+      const read = await box(button('Read this page'), 'Read');
+      const publish = await box(button('Publish this note'), 'Publish');
+      for (const name of ['Bold', 'Italic', 'Heading', 'Bulleted list', 'Quote']) {
+        const b = await box(button(name), name);
+        assert(b.x >= title.x - 1 && b.x + b.width <= title.x + title.width + 1, `${name} is inside the box, not edge to edge on the screen`);
+        assert(b.y >= text.y + text.height - 2, `${name} is under the text`);
+        assert(b.y + b.height <= read.y, `${name} is above the bottom row`);
+      }
+
+      step('Read is the first third and Publish the other two thirds of one row at the bottom, both big enough to touch');
+      near(read.y, publish.y, 'one row');
+      assert(read.y > 500, 'the row is at the bottom of the screen');
+      assert(read.height >= 48 && publish.height >= 48, 'both are at least 48 high');
+      near(read.x, 16, 'Read starts at the margin');
+      near(publish.x + publish.width, W - 16, 'Publish ends at the margin');
+      assert(publish.x >= read.x + read.width + 8, 'a gap between them');
+      const ratio = publish.width / read.width;
+      assert(ratio > 1.9 && ratio < 2.1, `Publish is twice as wide as Read (${publish.width} against ${read.width})`);
+
+      step('Read shows the page as it will be read; the same place says Edit, and the marks are gone until it is opened again');
+      await button('Read this page').click();
+      await button('Edit this page').waitFor();
+      await eventually(() => button('Bold').count(), (n) => n === 0, { what: 'the number of marks while the page is read' });
+      await eventually(() => button('Save draft').count(), (n) => n === 0, { what: 'Save draft while the page is read' });
+      const edit = await box(button('Edit this page'), 'Edit');
+      near(edit.x, read.x, 'Edit is where Read was');
+      near(edit.width, read.width, 'and as wide');
+      await button('Edit this page').click();
+      await bodyField.waitFor();
+      await button('Save draft').waitFor();
+
+      step('Save draft goes back to the feed, where the note is, with a Draft tag');
+      await button('Save draft').click();
+      await waitPath(page, '/me', 'the address after Save draft');
+      await inFeed('Rain over the meseta, soup at noon.').waitFor();
+      await eventually(tags, (n) => n === 1, { what: 'the Draft tags in the feed' });
+
+      step('open the draft: it is read, with Edit and Publish at the bottom and no Save draft; Publish makes it a note and the tag goes');
+      await inFeed('Rain over the meseta, soup at noon.').click();
+      await eventually(() => pathOf(page), (p) => p.startsWith('/diary/') && p !== '/diary/new', { what: 'the address of the page' });
+      await button('Edit this page').waitFor();
+      await eventually(() => button('Save draft').count(), (n) => n === 0, { what: 'Save draft on a page that is read' });
+      await button('Publish this note').click();
+      await waitPath(page, '/me', 'the address after Publish');
+      await inFeed('Rain over the meseta, soup at noon.').waitFor();
+      await eventually(tags, (n) => n === 0, { what: 'the Draft tags in the feed after Publish' });
+
+      step('a published note that is read has Edit alone, across the whole row; written, it has Read and Done, and no Save draft');
+      await inFeed('Rain over the meseta, soup at noon.').click();
+      await button('Edit this page').waitFor();
+      await eventually(() => button('Publish this note').count(), (n) => n === 0, { what: 'Publish on a note that is published' });
+      const only = await box(button('Edit this page'), 'Edit (alone)');
+      near(only.x, 16, 'Edit starts at the margin');
+      near(only.x + only.width, W - 16, 'and ends at the margin');
+      await button('Edit this page').click();
+      await button('Done').waitFor();
+      await eventually(() => button('Save draft').count(), (n) => n === 0, { what: 'Save draft on a note that is published' });
+      await button('Done').click();
+      await waitPath(page, '/me', 'the address after Done');
+      await eventually(tags, (n) => n === 0, { what: 'the Draft tags after Done: editing a published note keeps it published' });
+    },
+  },
   {
     name: 'Library: the banner of the Bible tab opens /library/daily, the whole banner and the "Read today" button alike',
     persona: 'in',

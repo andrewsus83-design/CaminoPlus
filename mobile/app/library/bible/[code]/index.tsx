@@ -2,7 +2,7 @@ import { View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Screen } from '@/components/Screen';
 import { AppText } from '@/components/AppText';
-import { IconButton } from '@/components/ui';
+import { BackButton } from '@/components/BackButton';
 import { BookmarkToggle } from '@/features/library/BookmarkToggle';
 import { ChapterNumbers } from '@/features/library/bible/ChapterGrid';
 import { MISSING_BOOK, PlaceMissing } from '@/features/library/bible/PlaceMissing';
@@ -23,12 +23,11 @@ export default function BibleBook() {
   const marks = useLibraryBookmarks();
   const book = bookByCode(typeof code === 'string' ? code.toUpperCase() : '');
   if (!book) return <PlaceMissing message={MISSING_BOOK} />;
-  const goBack = () => (router.canGoBack() ? router.back() : router.replace('/library'));
   const key = itemKey('Bible', book.id);
   return (
     <Screen tabBar={false}>
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-        <IconButton name="back" label="Back" onPress={goBack} />
+        <BackButton fallback="/library" />
         <BookmarkToggle on={marks.has(key)} title={book.name} toggle={() => marks.toggle(key)} />
       </View>
       <View style={{ gap: 2 }}>

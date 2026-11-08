@@ -79,19 +79,25 @@ const LITURGICAL_DARK = { green: '#6FBF98', violet: '#B79BE0', white: '#FFFDF8',
 export const liturgical: Record<keyof typeof LITURGICAL_LIGHT, string> = { ...LITURGICAL_LIGHT };
 
 /**
- * How heavy the active tab of the bottom tab bar is drawn (design/tokens.json: tab): the stroke of its icon and the font of its label. The same
- * stroke looks thinner dark on light than light on dark, so light mode is a little heavier. Updated in place with the scheme, like `role`.
+ * How heavy the tabs of the bottom tab bar are drawn (design/tokens.json: tab): the stroke of the icon and the font of the label, for the active tab
+ * (`tabActiveWeight`) and for the inactive ones (`tabInactiveWeight`). The same stroke looks thinner dark on light than light on dark, so the active tab is
+ * a little heavier in light mode. An inactive icon is drawn exactly as thick as the stem of its label (a stroke of 0.8 is 0.93 px at the size the tab bar draws
+ * it, and the stem of Inter Light is 0.93 px at 14 px), so that the two look equally thin. Both are updated in place with the scheme, like `role`.
  */
-const TAB = tokens.tab as { activeStroke: Record<Scheme, number>; activeLabelWeight: Record<Scheme, number> };
-const TAB_LABEL_FONT: Record<number, string> = { 600: 'Inter_600SemiBold', 700: 'Inter_700Bold' };
+type TabWeights = { activeStroke: Record<Scheme, number>; activeLabelWeight: Record<Scheme, number>; inactiveStroke: Record<Scheme, number>; inactiveLabelWeight: Record<Scheme, number> };
+const TAB = tokens.tab as TabWeights;
+const TAB_LABEL_FONT: Record<number, string> = { 300: 'Inter_300Light', 400: 'Inter_400Regular', 600: 'Inter_600SemiBold', 700: 'Inter_700Bold' };
 const tabWeightFor = (scheme: Scheme) => ({ stroke: TAB.activeStroke[scheme], font: TAB_LABEL_FONT[TAB.activeLabelWeight[scheme]] });
+const tabInactiveWeightFor = (scheme: Scheme) => ({ stroke: TAB.inactiveStroke[scheme], font: TAB_LABEL_FONT[TAB.inactiveLabelWeight[scheme]] });
 export const tabActiveWeight = tabWeightFor('light');
+export const tabInactiveWeight = tabInactiveWeightFor('light');
 
 export function applyScheme(scheme: Scheme) {
   Object.assign(c, LIGHT, scheme === 'dark' ? DARK : {});
   Object.assign(role, roleFor(c, scheme));
   Object.assign(liturgical, scheme === 'dark' ? LITURGICAL_DARK : LITURGICAL_LIGHT);
   Object.assign(tabActiveWeight, tabWeightFor(scheme));
+  Object.assign(tabInactiveWeight, tabInactiveWeightFor(scheme));
 }
 
 /** The dimming behind a sheet or a dialog. Navy at 45% over either mode's screen; it does not change with the mode. */
@@ -104,7 +110,7 @@ export const shadow = tokens.shadow;
 
 export const fonts = {
   title: 'Fraunces_600SemiBold',
-  /** Only the inactive tab labels of the tab bar: the active one is bodyBold, so the weight says which is which as well as the colour. */
+  /** Only the inactive tab labels of the tab bar (tokens.tab.inactiveLabelWeight): the active one is heavier, so the weight says which is which as well as the colour. */
   bodyLight: 'Inter_300Light',
   body: 'Inter_400Regular',
   bodyMedium: 'Inter_500Medium',

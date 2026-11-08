@@ -4,6 +4,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '@/components/AppText';
 import { Icon, IconName } from '@/components/Icon';
+import { BackButton } from '@/components/BackButton';
 import { IconButton } from '@/components/ui';
 import { reportMessage, socialApi, useChat, useOnlineStatus } from '@/features/social';
 import { Composer, DateChip, ImageViewer, MessageBubble, ReplyInfo, SenderInfo, SystemChip, UnreadDivider } from '@/features/social/components/chat';
@@ -219,7 +220,7 @@ export default function ChatScreen() {
   return (
     <KeyboardAvoidingView behavior="padding" style={{ flex: 1, backgroundColor: role.bg }}>
       <View style={{ paddingTop: insets.top + layout.screenTop, paddingBottom: 10, paddingHorizontal: layout.screenMargin, flexDirection: 'row', alignItems: 'center', gap: 6, borderBottomWidth: 1, borderBottomColor: role.border, backgroundColor: role.bg }}>
-        <IconButton name="back" label="Back" flat onPress={() => goBack(router)} />
+        <BackButton onPress={() => goBack(router)} />
         <Pressable accessibilityRole="button" accessibilityLabel={`${title}. ${group ? pilgrimsLabel(conv?.member_count ?? 0) : 'Friend'}. Open chat info`} onPress={() => router.push(`/chat/info/${id}`)} style={{ flex: 1, minHeight: 52, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
           {conv
             ? <PilgrimAvatar name={title} uri={group ? conv.avatar_url : conv.peer_avatar_url} seed={conv.peer_id ?? String(id)} size={44} group={group} />
@@ -229,7 +230,7 @@ export default function ChatScreen() {
             {!!conv && <AppText variant="caption" muted numberOfLines={1} style={{ letterSpacing: 0, fontSize: 14, lineHeight: 18 }}>{group ? pilgrimsLabel(conv.member_count) : 'Friend'}</AppText>}
           </View>
         </Pressable>
-        <IconButton name="info" label="Chat info" flat onPress={() => router.push(`/chat/info/${id}`)} />
+        <IconButton name="info" label="Chat info" onPress={() => router.push(`/chat/info/${id}`)} />
       </View>
       {(!online || chat.stalled) && <Notice icon="wifi-off" text={OFFLINE_TEXT} />}
       <View style={{ flex: 1 }}>

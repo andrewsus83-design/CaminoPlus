@@ -16,6 +16,8 @@
 // person signs in again. Another account on the same phone has another id, so other keys, and never sees it. Only deleting
 // the account removes it (clearDiary, called by app/delete-account.tsx).
 //
+// A page is a draft or published (`status`, NoteStatus: only a draft says so, and a page of an earlier build says nothing and is published).
+//
 // A page can also keep photos and videos (`media`, small descriptors; the files are copies in the app's own folder, media.ts) and a
 // place (`place`, place.ts). Both are optional fields of the page, so a page of an earlier build reads as before. The files go with
 // their page: a save that drops a descriptor deletes its file, deleting a page deletes its files, clearDiary deletes the whole
@@ -28,7 +30,17 @@ import {
 } from './media';
 import { normalizePlace, type DiaryPlace } from './place';
 
-export type DiaryEntry = { id: string; createdAt: string; updatedAt: string; title: string; body: string; media?: DiaryMedia[]; place?: DiaryPlace };
+/**
+ * Where a page is in its life: a draft is still being written (the Notes feed shows it with a "Draft" tag), a published page is a finished
+ * note like any other. Both are only on this phone. A page that does not say, one of an earlier build, is published.
+ */
+export type NoteStatus = 'draft' | 'published';
+
+export type DiaryEntry = { id: string; createdAt: string; updatedAt: string; title: string; body: string; media?: DiaryMedia[]; place?: DiaryPlace; status?: NoteStatus };
+
+/** The status of a page as the screens read it: a draft only when the page says so; anything else (nothing, or a word this build does not know) is published. */
+export const statusOf = (e: { status?: unknown }): NoteStatus => (e.status === 'draft' ? 'draft' : 'published');
+export const isDraft = (e: { status?: unknown }): boolean => statusOf(e) === 'draft';
 
 /** Characters in the text of one page. The editor stops typing here and says so; saveEntry refuses more. */
 export const BODY_MAX = 20_000;
@@ -81,14 +93,17 @@ const isSeq = (v: unknown): v is number => typeof v === 'number' && Number.isSaf
 const isSlot = (v: unknown): v is Stored => !!v && typeof v === 'object' && !Array.isArray(v) && (v as Stored).v === 1 && Array.isArray((v as Stored).entries) && isSeq((v as Stored).seq);
 const isOldDiary = (v: unknown): v is { v: 1; entries: unknown[] } => !!v && typeof v === 'object' && !Array.isArray(v) && (v as Stored).v === 1 && Array.isArray((v as Stored).entries);
 
-/** A page as the screens get it: its files and place only when they are usable (a damaged one is left out, and the page still opens). */
+/**
+ * A page as the screens get it: its files and place only when they are usable (a damaged one is left out, and the page still opens),
+ * and its status only when it is a draft (published is the absence of the word, so every screen reads one thing).
+ */
 function tidyPage(e: DiaryEntry): DiaryEntry {
-  if (!('media' in e) && !('place' in e)) return e;
-  const { media: _media, place: _place, ...rest } = e;
-  void _media; void _place;
+  if (!('media' in e) && !('place' in e) && !('status' in e)) return e;
+  const { media: _media, place: _place, status: _status, ...rest } = e;
+  void _media; void _place; void _status;
   const media = mediaOf(e);
   const place = normalizePlace(e.place);
-  return { ...rest, ...(media.length > 0 ? { media } : {}), ...(place ? { place } : {}) };
+  return { ...rest, ...(media.length > 0 ? { media } : {}), ...(place ? { place } : {}), ...(isDraft(e) ? { status: 'draft' as const } : {}) };
 }
 
 /** The pages in a stored list, newest first (by the day they were begun), once each. Anything that is not a page is left out. */
@@ -229,6 +244,9 @@ export function createDiaryStore(storage: DiaryStorage, files: MediaFiles = noFi
     const merged: Record<string, unknown> = { ...(at >= 0 ? (raw[at] as object) : {}), id: page.id, createdAt: page.createdAt, updatedAt: page.updatedAt, title: page.title, body: page.body };
     if (media.length > 0) merged.media = media; else delete merged.media;
     if (place) merged.place = place; else delete merged.place;
+    // The status is the page's own when it is given: a draft says so, a published page says nothing (the way a page of an earlier build is). A page
+    // that does not say (a caller that does not know of drafts) keeps what is stored.
+    if (page.status === 'draft') merged.status = 'draft'; else if (page.status === 'published') delete merged.status;
     if (at >= 0) raw[at] = merged;
     else if (raw.length >= ENTRIES_MAX) return { ok: false, reason: 'too-many-pages' };
     else raw.push(merged);
@@ -249,7 +267,7 @@ export function createDiaryStore(storage: DiaryStorage, files: MediaFiles = noFi
     }).catch((): DiaryEntry[] => []);
   };
 
-  const fieldsOf = (entry: DiaryEntry): DiaryEntry => ({ id: entry.id, createdAt: entry.createdAt, updatedAt: entry.updatedAt, title: entry.title, body: entry.body });
+  const fieldsOf = (entry: DiaryEntry): DiaryEntry => ({ id: entry.id, createdAt: entry.createdAt, updatedAt: entry.updatedAt, title: entry.title, body: entry.body, ...(entry.status === 'draft' || entry.status === 'published' ? { status: entry.status } : {}) });
 
   /**
    * Adds the page, or replaces the one with the same id (its title, text, files and place are the ones given; files it no longer

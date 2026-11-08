@@ -3,7 +3,8 @@ import { ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Screen } from '@/components/Screen';
 import { AppText } from '@/components/AppText';
-import { Card, IconButton } from '@/components/ui';
+import { BackButton } from '@/components/BackButton';
+import { Card } from '@/components/ui';
 import { FormMessage } from '@/components/auth/Field';
 import { bookHref, readerHref } from '@/features/library/bible/order';
 import { hasBook, loadBook } from '@/features/library/bible/text';
@@ -29,7 +30,6 @@ import { role } from '@/theme';
 // with an empty bookmark, until the screen is left, so a slip is put back with one tap.
 export default function Bookmarks() {
   const router = useRouter();
-  const goBack = () => (router.canGoBack() ? router.back() : router.replace('/library'));
   const marks = useLibraryBookmarks();
   const saved = useSavedPosts();
   const hits = useMemo(() => hitsForKeys(marks.shown, { hasBook, loadBook }), [marks.shown]);
@@ -37,7 +37,7 @@ export default function Bookmarks() {
 
   return (
     <Screen tabBar={false}>
-      <IconButton name="back" label="Back" onPress={goBack} />
+      <BackButton fallback="/library" />
       <AppText variant="h2" accessibilityRole="header">Bookmarks</AppText>
 
       <AppText variant="h4" accessibilityRole="header">Library</AppText>
