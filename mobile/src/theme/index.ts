@@ -103,10 +103,48 @@ export function applyScheme(scheme: Scheme) {
 /** The dimming behind a sheet or a dialog. Navy at 45% over either mode's screen; it does not change with the mode. */
 export const scrim = 'rgba(20,54,93,0.45)';
 
+// ---- The scales of design/tokens.json that code reads as numbers ------------------------------------------------------------
+// Each export is the file's own value (src/lib/__tests__/themeScheme.test.ts compares every one with tokens.json). The design lint
+// (tools/design-audit/scan.py, the `design-lint` job of CI) reads the same scales and fails for new code that leaves them: a padding, margin
+// or gap that is not a `space` step, an icon size that is not an `icon` size, a font size under 15, a tap target under `layout.touchHard`.
+// mobile/docs/DESIGN-RULES.md has the rules in words.
+
+type NumericKeys<T> = { [K in keyof T]: K extends `${infer N extends number}` ? N : never }[keyof T];
+
+/** One step of the spacing scale: the number in `space[n]` (0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16 | 20 | 24 | 32), not the pixels. */
+export type SpaceStep = NumericKeys<typeof tokens.space>;
+
+/** The spacing scale. Padding, margin and gap come from these steps: `space[4]` is 16, `space[10]` is 40. A step that is not on the scale does not compile (`space[7]`). */
 export const space = tokens.space;
 export const radius = tokens.radius;
+/**
+ * Layout numbers. Tap targets: `touchHard` (48) is the hard minimum, nothing tappable is drawn smaller (a hitSlop counts); `touchPrimary` (56) is the target
+ * for primary actions (buttons, fields, list rows). `touchMin` is the old name of `touchPrimary`, with the same value, kept so that nothing breaks: new code
+ * uses `touchHard` or `touchPrimary`.
+ */
 export const layout = tokens.layout;
 export const shadow = tokens.shadow;
+
+/** Icon sizes in px: sm 18, smPlus 20, md 24 (the default of <Icon>), mdPlus 28, lg 32; `stroke` is the line weight. `<Icon name="pin" size={icon.smPlus} />` */
+export const icon = tokens.icon;
+
+/** Border widths in px: `width` 1 (cards, inputs, chips) and `widthStrong` 2 (focus, a selected choice). */
+export const border = tokens.border;
+
+/** Stacking order: base 0, sticky 10, tabbar 20, sheet 30, toast 40. */
+export const z = tokens.z;
+
+type Bezier = readonly [number, number, number, number];
+const bezier = (v: number[]): Bezier => [v[0], v[1], v[2], v[3]];
+
+/** Durations in ms (fast 120, base 200, slow 320) and the two easing curves as cubic-bezier control points: `Easing.bezier(...motion.easeStandard)`. */
+export const motion = {
+  fast: tokens.motion.fast,
+  base: tokens.motion.base,
+  slow: tokens.motion.slow,
+  easeStandard: bezier(tokens.motion.easeStandard),
+  easeEmphasis: bezier(tokens.motion.easeEmphasis),
+} as const;
 
 export const fonts = {
   title: 'Fraunces_600SemiBold',
@@ -121,9 +159,20 @@ export const fonts = {
   accent: 'Caveat_700Bold',
 } as const;
 
-export type TextVariant = 'display' | 'h1' | 'h2' | 'h3' | 'h4' | 'lead' | 'body' | 'small' | 'label' | 'caption' | 'mono' | 'accent';
+/** A variant of AppText is a token of design/tokens.json "text" (display, h1 to h6, lead, body, small, label, caption, mono, accent): the type is the keys of the file, so a token is usable the moment it is in it. */
+export type TextVariant = keyof typeof tokens.text;
 
 const family: Record<string, string> = { title: fonts.title, body: fonts.body, mono: fonts.mono, accent: fonts.accent };
+
+export interface TextSize { size: number; lineHeight: number; letterSpacing: number }
+
+/**
+ * The size, line height and letter spacing of every text variant (`text.small.size` is 17, `text.small.lineHeight` is 25), for layout code that needs the
+ * numbers. Text itself is drawn with <AppText variant="small"> or textStyle('small'), which also carry the family and the weight.
+ */
+export const text = Object.fromEntries(
+  Object.entries(tokens.text).map(([k, v]) => [k, { size: v.size, lineHeight: v.lineHeight, letterSpacing: (v as { letterSpacing?: number }).letterSpacing ?? 0 }]),
+) as Record<TextVariant, TextSize>;
 
 export function textStyle(v: TextVariant) {
   const t = tokens.text[v] as { size: number; lineHeight: number; letterSpacing?: number; font: string; weight: string };

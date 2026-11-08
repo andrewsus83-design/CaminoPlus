@@ -1,5 +1,5 @@
 // The Books phones of design/index.html, drawn from the REAL catalog and the real text of the bundle (mobile/assets/library), with the functions the app itself uses to
-// work out what a cover, a page and a chapter say: the covers (cover.ts: the A5 size, how the title is broken into lines, the kind and the time), the shelves, the banner
+// work out what a cover, a page and a chapter say: the covers (cover.ts: the A5 size, how the title is broken into lines and the size it is set at, and the time; the kind of book is not on the cover), the shelves, the banner
 // and the words (copy.ts), the notice of each kind (notices.ts), the contents, the facts and the reader's layout (reading.ts), the type scale of the reader (readerType.ts),
 // the passages (passages.ts) and the search (search.ts). Nothing here is typed by hand that the app knows, so the page cannot say a number, a title or a notice that the
 // app does not: designBooks.test.ts draws the page again on every run and fails when design/index.html is not what this file makes of the bundle.
@@ -123,7 +123,6 @@ export function coverHtml(b: CatalogBook, width: number, o: { bookmarked?: boole
     + `<span class="bk-face" style="left:${m.spine + m.padX}px;right:${m.edge + m.padX}px;top:${m.padTop}px;bottom:${m.padBottom}px">`
     + `<span class="bk-ring" style="width:${m.medallion}px;height:${m.medallion}px">${svg(b.cover.icon, `width:${m.glyph}px;height:${m.glyph}px;stroke-width:1.5px`)}</span>`
     + `<span class="bk-t"><span style="font-size:${t.title.size}px;line-height:${t.title.lineHeight}px">${t.title.lines.map(esc).join('<br>')}</span></span>`
-    + `<span class="bk-kind" style="font-size:${t.kind.size}px;line-height:${t.kind.lineHeight}px;letter-spacing:${t.kind.spacing}px">${t.kind.lines.map(esc).join('<br>')}</span>`
     + `<span class="bk-time" style="font-size:${m.time.size}px;line-height:${m.time.lineHeight}px">${esc(t.time)}</span>`
     + '</span></div>'
     + `<button class="bk-ribbon${on ? ' on' : ''}" aria-label="${esc(bookmarkWords(on, b.title))}" style="right:${ribbonRight}px;width:${m.ribbon.touch}px;height:${m.ribbon.touch}px">`
@@ -430,8 +429,7 @@ const STYLE = `<style>
   .bk-face { position: absolute; display: flex; flex-direction: column; align-items: center; }
   .bk-ring { flex: none; display: grid; place-items: center; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(20, 54, 93, .45); }
   .bk-t { flex: 1; align-self: stretch; display: flex; align-items: center; justify-content: center; text-align: center; font-family: var(--cp-font-title); font-weight: 600; }
-  .bk-kind { text-align: center; font-family: var(--cp-font-body); font-weight: 600; }
-  .bk-time { margin-top: 4px; text-align: center; font-family: var(--cp-font-mono); white-space: nowrap; }
+  .bk-time { text-align: center; font-family: var(--cp-font-mono); white-space: nowrap; }
   .bk-ribbon { position: absolute; top: 0; padding: 0; border: 0; background: none; display: flex; flex-direction: column; align-items: center; cursor: pointer; }
   .bk-ribbon .rb { display: grid; place-items: center; background: var(--bk-ink); color: var(--bk-parchment); padding-bottom: 2px; }
   .bk-ribbon .rb .cp-icon { stroke-width: 1.75px; }
@@ -562,7 +560,8 @@ function groupNotes(): string {
   <p class="note" style="margin:-4px 0 20px;max-width:760px">The Books tab shows its books as <b>covers</b> on one <b>shelf</b> for each kind of book (Pilgrim's guides, then Readings for the Way), each shelf with its heading, the number of its books and one quiet line.
   A cover is an A5 page, portrait (148 by 210 mm, so as high as 210/148 of its width), two in a row, 16 from the edge and 12 apart (${cover390.tile} by ${cover390.height} on a 390 phone, ${cover320.tile} by ${cover320.height} on 320, ${cover430.tile} by ${cover430.height} on 430).
   Each is drawn like a book: a spine with a groove and the shade of the hinge, the edges of the pages on the right, a small radius, a soft shadow, the glyph of the book in a ring, the title set like a cover in Fraunces
-  (as large as fits, never a word cut: "${esc(first.title.lines.join(' '))}" is set at ${first.title.size}), the kind of book in small spaced capitals (Inter) and how long it takes in JetBrains Mono. There is no mark of free or soon: every book is in the app.
+  (as large as fits, at a size of the type scale and never a word cut: "${esc(first.title.lines.join(' '))}" is set at ${first.title.size}) and how long it takes in JetBrains Mono at the mono token (${first.m.time.size}). Inside a cover the space is 12 at the sides and at the bottom and 16 at the top.
+  The cover does not print the kind of book: the book page shows it and the label below says it. There is no mark of free or soon: every book is in the app.
   The paper does not change with light and dark, nor does the navy printed on it. A cover is <b>one button</b> ("${esc(coverLabel(GUIDE!))}") and the ribbon at its top right is <b>another</b>, 44 by 44, that bookmarks the book (the key is <code>books:id</code>).
   The banner is the compact one of the Bible tab: a label (the first book), a title, one short handwritten note and a gold pill: <b>Start reading</b>. It does not continue a book: going back to the place read last, in a book or in the Bible,
   is the <b>Continue reading</b> bar that floats above the tab bar (the same bar on both tabs of the Library, with a close button of its own, and room kept for it at the end of the lists): a book is named by its title and the chapter the reader will open ("${esc(barOf(SHOWN.guide).label)}").
@@ -580,7 +579,7 @@ function groupPhones(): string {
   const second = shelves(BOOK_CATALOG)[1];
   const place = placeIn(guide);
   const out: string[] = [
-    booksTabPhone({ title: 'Books · second shelf', sub: `The tab scrolled down to ${esc(second.title)}: ${second.books.length} books, every cover with its kind and its time`, only: 'second' }),
+    booksTabPhone({ title: 'Books · second shelf', sub: `The tab scrolled down to ${esc(second.title)}: ${second.books.length} books, every cover with its title and its time`, only: 'second' }),
     booksTabPhone({ title: 'Books · dark', sub: 'The Continue reading bar names a book and its chapter · the banner still starts the first book · the covers are paper: they do not change', dark: true, bar: barOf(guide), limit: 6 }),
     booksTabPhone({ title: 'Books · 320 wide', sub: `The smallest phone: ${cover320.tile} by ${cover320.height} covers, titles fitted`, width: 320, limit: 6 }),
     bookPagePhone(GUIDE!, { title: 'Book page · guide', sub: 'Cover and ribbon · the notice of a guide above the button · Start reading · the minutes of each chapter', marked: true }),

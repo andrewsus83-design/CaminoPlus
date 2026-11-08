@@ -60,23 +60,29 @@ check('the chapter tiles: one button each ("Psalm 121", "Chapter 3"), square, at
   assert.match(code(read('src/features/library/bible/gridMath.ts')), /export const CHAPTER_TILE_MIN = 56;/);
 });
 
-check('the book tiles on the Bible tab: ONE button each named "Genesis, 50 chapters", square, the name in Fraunces (h4) fitted by tileFit.ts and the count in JetBrains Mono, no bookmark and no chip, three in a row between the side margins', () => {
+check('the book tiles on the Bible tab: ONE button each named "Genesis, 50 chapters", a compact card, two in a row between the side margins, the name in Fraunces at h4, h5 or h6 (fitted by tileFit.ts, never a size of its own) and the count in JetBrains Mono at the mono token, no bookmark and no chip, and the words never larger with the phone\'s text size', () => {
   const src = code(read(`${BIBLE}/BookGrid.tsx`));
   assert.match(src, /export const tileLabel = \(b: BibleBook\): string => `\$\{b\.name\}, \$\{chaptersLabel\(b\.chapters\)\.replace\(\/\\u00a0\/g, ' '\)\}`;/);
   assert.match(src, /accessibilityRole="button"\s+accessibilityLabel=\{tileLabel\(book\)\}\s+onPress=\{\(\) => onOpen\(book\.code\)\}/);
   assert.equal((src.match(/<Pressable\b/g) ?? []).length, 1, 'a tile is one Pressable, and nothing else in it can be pressed');
-  assert.match(src, /width: grid\.tile, height: grid\.tile, paddingHorizontal: grid\.padX, paddingVertical: grid\.padY/, 'the name is the hero: as little padding across as the round corners allow');
-  assert.match(src, /const name = fitName\(book\.name, grid\.innerWidth, fontScale\);/);
-  assert.match(src, /const count = fitCount\(chaptersLabel\(book\.chapters\), grid\.innerWidth, fontScale\);/);
-  assert.match(src, /<AppText\s+variant="h4"\s+maxFontSizeMultiplier=\{TEXT_SCALE_CAP\}\s+numberOfLines=\{name\.lines\.length\}\s+style=\{\{ fontSize: name\.size, lineHeight: name\.lineHeight, letterSpacing: name\.tracking \}\}\s+>\s+\{name\.lines\.join\('\\n'\)\}/);
-  assert.match(src, /<AppText\s+variant="mono"\s+muted\s+maxFontSizeMultiplier=\{TEXT_SCALE_CAP\}\s+numberOfLines=\{1\}\s+style=\{\{ fontSize: count\.size, lineHeight: count\.lineHeight \}\}\s+>\s+\{chaptersLabel\(book\.chapters\)\}/);
-  assert.match(src, /const \{ width, fontScale \} = useWindowDimensions\(\);\s+const grid = bookGrid\(width\);/);
+  assert.match(src, /width: grid\.tile, height: grid\.height, padding: grid\.pad, justifyContent: 'space-between', borderRadius: radius\.md/, 'a compact card as high as its words, the words one step of the space scale from the hairline on every side');
+  assert.match(src, /const name = fitName\(book\.name, grid\.innerWidth\);/);
+  assert.match(src, /<AppText variant=\{name\.variant\} maxFontSizeMultiplier=\{1\} numberOfLines=\{name\.lines\.length\}>\s+\{name\.lines\.join\('\\n'\)\}/, 'the name is the variant tileFit.ts chose (h4, h5 or h6), in the lines it worked out, never larger with the text size of the phone');
+  assert.match(src, /<AppText variant="mono" muted maxFontSizeMultiplier=\{1\} numberOfLines=\{1\}>\s+\{chaptersLabel\(book\.chapters\)\}/, 'the count is the mono token');
+  assert.match(src, /const \{ width \} = useWindowDimensions\(\);\s+const grid = useMemo\(\(\) => bookGrid\(width\), \[width\]\);/);
   assert.match(src, /flexDirection: 'row', flexWrap: 'wrap', gap: grid\.gap/);
-  assert.match(src, /backgroundColor: pressed \? role\.sunken : role\.surface, borderWidth: 1, borderColor: role\.border/);
-  assert.doesNotMatch(src, /BookmarkToggle|marks|Soon|Chip|#[0-9a-fA-F]{3,8}\b|\bfixed\.|\bc\.[a-z]|fontFamily|adjustsFontSizeToFit/, 'the 44 touch target of a bookmark does not fit a square of 90: the book is bookmarked on its own screen; no chip; no literal colour or font');
+  assert.match(src, /backgroundColor: pressed \? role\.sunken : role\.surface, borderWidth: grid\.border, borderColor: role\.border/);
+  assert.doesNotMatch(src, /BookmarkToggle|marks|Soon|Chip|#[0-9a-fA-F]{3,8}\b|\bfixed\.|\bc\.[a-z]|fontFamily|adjustsFontSizeToFit/, 'the 44 touch target of a bookmark does not fit a tile this small: the book is bookmarked on its own screen; no chip; no literal colour or font');
+  assert.doesNotMatch(src, /fontSize|lineHeight|letterSpacing|fontScale|TEXT_SCALE_CAP/, 'no size of its own: the variants are the type scale');
+  assert.doesNotMatch(src, /\b(?:padding|margin|gap|width|height|borderWidth|borderRadius)\w*: \d/, 'no number of space of its own: gridMath.ts has them, from the tokens');
   assert.match(src, /memo\(function BookTile/, 'a tile is drawn again only when its own props change');
   // where it is used: the Bible tab, for the books of the chosen part
   assert.match(code(read('src/features/library/LibraryTabs.tsx')), /<BibleBookGrid books=\{booksOf\(testament\)\} onOpen=\{onOpenBook\} \/>/);
+  // the sums are the tokens' and nothing else (reader.test.ts checks the values): the pure files read tokens.json and type none of the numbers again
+  for (const f of ['gridMath.ts', 'tileFit.ts']) assert.match(code(read(`${BIBLE}/${f}`)), /import tokens from '\.\.\/\.\.\/\.\.\/theme\/tokens\.json';/, `${f} reads the tokens`);
+  assert.match(code(read(`${BIBLE}/gridMath.ts`)), /export const SIDE: number = tokens\.layout\.screenMargin;/);
+  assert.match(code(read(`${BIBLE}/gridMath.ts`)), /const gap = narrow \? space\['2'\] : space\['3'\];\s+const pad = narrow \? space\['3'\] : space\['4'\];/);
+  assert.match(code(read(`${BIBLE}/tileFit.ts`)), /export const NAME_VARIANTS = \['h4', 'h5', 'h6'\] as const;/);
 });
 
 check('the Bible tab: the compact banner, the three choices, the heading with the count and the quiet source line, then the tiles; the tab opens a book. There is no continue card in the page any more: the Continue reading bar floats above the tab bar instead (continueBarWiring.test.ts)', () => {

@@ -9,7 +9,8 @@ import assert from 'node:assert/strict';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import tokens from '../../theme/tokens.json';
-import { applyScheme, c, fixed, fonts, role, scrim, tabActiveWeight, tabInactiveWeight } from '../../theme';
+import { applyScheme, border, c, fixed, fonts, icon, layout, motion, radius, role, scrim, space, tabActiveWeight, tabInactiveWeight, text as textSizes, textStyle, z } from '../../theme';
+import type { SpaceStep, TextVariant } from '../../theme';
 import { fontPath, readFont } from './fontFile';
 
 let n = 0;
@@ -63,6 +64,35 @@ check('light mode is the light palette of design/tokens.json, color by color and
   // light mode is as the owner liked it: the bar is the card white and has no visible edge (the shadow separates it)
   assert.equal(role.tabBar, role.surface, 'light mode: the tab bar is the card white it always was');
   assert.equal(role.tabBarBorder, role.tabBar, 'light mode: no visible edge');
+});
+
+check('the type scale is design/tokens.json "text": every token is a variant of AppText with exactly its size, line height, letter spacing and font; h5 and h6 are the two small titles (17 / 22 and 15 / 21, Fraunces 600); tokens.css has the same figures', () => {
+  type T = { size: number; lineHeight: number; letterSpacing?: number; font: string; weight: string };
+  const text = tokens.text as Record<string, T>;
+  const names = Object.keys(text);
+  assert.deepEqual(names, ['display', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'lead', 'body', 'small', 'label', 'caption', 'mono', 'accent'], 'the scale, in order');
+  const family = (t: T) => (t.font === 'title' ? fonts.title : t.font === 'mono' ? fonts.mono : t.font === 'accent' ? fonts.accent : t.weight === '600' ? fonts.bodyBold : t.weight === '500' ? fonts.bodyMedium : fonts.body);
+  for (const name of names) {
+    const t = text[name];
+    const style = textStyle(name as TextVariant);
+    assert.deepEqual(style, { fontSize: t.size, lineHeight: t.lineHeight, letterSpacing: t.letterSpacing ?? 0, fontFamily: family(t) }, `${name}: AppText draws the token`);
+  }
+  assert.deepEqual(textStyle('h5'), { fontSize: 17, lineHeight: 22, letterSpacing: 0, fontFamily: 'Fraunces_600SemiBold' });
+  assert.deepEqual(textStyle('h6'), { fontSize: 15, lineHeight: 21, letterSpacing: 0, fontFamily: 'Fraunces_600SemiBold' });
+  // the variants are the keys of the file: nothing to add in the theme when a token is added
+  assert.match(read(join('src', 'theme', 'index.ts')), /export type TextVariant = keyof typeof tokens\.text;/);
+  assert.match(read(join('src', 'components', 'AppText.tsx')), /variant\?: TextVariant/);
+  const css = readFileSync(join(root, '..', 'design', 'tokens.css'), 'utf8');
+  const vars = new Map([...css.matchAll(/(--cp-[a-z0-9-]+)\s*:\s*([^;]+);/g)].map((m) => [m[1], m[2].trim()] as const));
+  for (const name of names) {
+    const t = text[name];
+    assert.equal(vars.get(`--cp-text-${name}-size`), `${t.size}px`, `tokens.css ${name} size`);
+    assert.equal(vars.get(`--cp-text-${name}-lh`), `${t.lineHeight}px`, `tokens.css ${name} line height`);
+    if (t.letterSpacing !== undefined) assert.equal(parseFloat(vars.get(`--cp-text-${name}-ls`) ?? 'x'), t.letterSpacing, `tokens.css ${name} letter spacing`);
+  }
+  // and the table of the design page is checked against the same file by tools/tests/test_type_scale.py
+  const page = readFileSync(join(root, '..', 'design', 'index.html'), 'utf8');
+  for (const name of names) assert.ok(page.includes(`<div class="spec">${name}<br>${text[name].size} / ${text[name].lineHeight}`), `the type-scale table of the design page has the row ${name} at ${text[name].size} / ${text[name].lineHeight}`);
 });
 
 check('dark mode is the dark section of design/tokens.json: nothing about it is defined a second time in the app', () => {
@@ -361,6 +391,53 @@ check('no theme colour is read once when a file loads: it would never follow the
     }
   }
   assert.deepEqual(offenders, [], 'make it a function or a getter, or use fixed.* if the colour must not change');
+});
+
+// ---- the numeric scales the theme exports are design/tokens.json (the design lint, tools/design-audit/scan.py, reads the same file)
+check('space, icon, border, z, radius and layout are exported exactly as design/tokens.json has them', () => {
+  assert.deepEqual({ ...space }, tokens.space, 'space');
+  assert.deepEqual(Object.keys(space).map(Number), [0, 1, 2, 3, 4, 5, 6, 8, 10, 12, 16, 20, 24, 32], 'the 14 steps of the spacing scale');
+  const steps: SpaceStep[] = [0, 1, 2, 3, 4, 5, 6, 8, 10, 12, 16, 20, 24, 32];
+  assert.deepEqual(steps.map((k) => space[k]), [0, 4, 8, 12, 16, 20, 24, 32, 40, 48, 64, 80, 96, 128], 'space[n] is in pixels');
+  assert.deepEqual({ ...icon }, tokens.icon, 'icon');
+  assert.deepEqual([icon.sm, icon.smPlus, icon.md, icon.mdPlus, icon.lg], [18, 20, 24, 28, 32], 'the icon sizes are 18, 20, 24, 28 and 32');
+  assert.equal(icon.stroke, 1.75);
+  assert.deepEqual({ ...border }, tokens.border, 'border');
+  assert.deepEqual({ ...z }, tokens.z, 'z');
+  assert.deepEqual({ ...radius }, tokens.radius, 'radius');
+  assert.deepEqual({ ...layout }, tokens.layout, 'layout');
+});
+
+check('motion and the text sizes are exported as design/tokens.json has them, variant by variant', () => {
+  assert.equal(motion.fast, tokens.motion.fast);
+  assert.equal(motion.base, tokens.motion.base);
+  assert.equal(motion.slow, tokens.motion.slow);
+  assert.deepEqual([...motion.easeStandard], tokens.motion.easeStandard);
+  assert.deepEqual([...motion.easeEmphasis], tokens.motion.easeEmphasis);
+  assert.equal(motion.easeStandard.length, 4, 'a cubic-bezier has four control values');
+  assert.deepEqual(Object.keys(textSizes), Object.keys(tokens.text), 'every text variant has its sizes');
+  for (const [name, t] of Object.entries(tokens.text)) {
+    const want = t as { size: number; lineHeight: number; letterSpacing?: number };
+    const got = textSizes[name as TextVariant];
+    assert.deepEqual(got, { size: want.size, lineHeight: want.lineHeight, letterSpacing: want.letterSpacing ?? 0 }, `text.${name}`);
+    const style = textStyle(name as TextVariant);
+    assert.equal(style.fontSize, got.size, `textStyle(${name}) draws the size of text.${name}`);
+    assert.equal(style.lineHeight, got.lineHeight, `textStyle(${name}) draws the line height of text.${name}`);
+  }
+  assert.equal(textSizes.small.size, 17);
+  assert.equal(textSizes.small.lineHeight, 25);
+  assert.equal(Math.min(...Object.values(textSizes).map((t) => t.size)) >= 15, true, 'no text variant is smaller than 15');
+});
+
+check('tap targets: touchHard 48 is the hard minimum, touchPrimary 56 is the primary target, and the old touchMin keeps its 56', () => {
+  assert.equal(layout.touchHard, 48);
+  assert.equal(layout.touchPrimary, 56);
+  assert.equal(layout.touchMin, 56, 'every consumer of the old name keeps the pixels it had');
+  assert.equal(layout.touchMin, layout.touchPrimary, 'touchMin is the old name of touchPrimary');
+  assert.ok(layout.touchHard < layout.touchPrimary);
+  // the shared button and the fields are drawn at the primary target; the remove button of a photo tile is the hard minimum (it was touchMin - 8)
+  assert.match(read('src/components/Pill.tsx'), /minHeight: large \? 68 : [^,]*layout\.touchPrimary/);
+  assert.match(read('src/features/diary/MediaTiles.tsx'), /width: layout\.touchHard, height: layout\.touchHard/);
 });
 
 console.log(`${n} checks passed`);

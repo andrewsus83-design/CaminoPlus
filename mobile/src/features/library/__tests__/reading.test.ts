@@ -10,7 +10,7 @@ import {
   CONTINUE_CTA, CONTINUE_NOTE, KIND_ORDER, NONE_LINE, START_CTA, START_NOTE, booksBanner, bookPath, kindMark, kindName, pageNote, readerPath, shelves,
 } from '../books/copy';
 import {
-  A5_RATIO, GRID_COLUMNS, TILE_MAX, TITLE_MAX_LINES, a5Height, coverGrid, coverLabel, coverMetrics, coverText, fitKind, fitTitle, withAlpha,
+  A5_RATIO, GRID_COLUMNS, SCALE_SIZES, TILE_MAX, TITLE_MAX_LINES, TITLE_MIN, a5Height, coverGrid, coverLabel, coverMetrics, coverText, fitTitle, timeWidth, withAlpha,
 } from '../books/cover';
 import { noticeFor, GUIDE_NOTICE, READINGS_NOTICE, OTHER_NOTICE } from '../books/notices';
 import {
@@ -594,9 +594,8 @@ check('every cover is a book: a spine, page edges, a small radius, a ribbon of a
   }
 });
 
-check('every title of every book fits its cover as large as it can be, in at most four lines, with no word cut, from 320 to 430 wide and at the widest', () => {
+check('every title of every book fits its cover as large as it can be, in at most four lines, with no word cut, at a size of the type scale, from 320 to 430 wide and at the widest', () => {
   assert.equal(TITLE_MAX_LINES, 4, 'a title is at most four lines');
-  assert.equal(coverMetrics(173).kind.maxLines, 2, 'and the kind of book at most two');
   const widths: number[] = [];
   for (let screen = 320; screen <= 430; screen += 1) widths.push(coverGrid(screen, 16).tile);
   widths.push(TILE_MAX);
@@ -606,15 +605,54 @@ check('every title of every book fits its cover as large as it can be, in at mos
       assert.ok(t.title.fits, `${b.title} at ${w}: ${t.title.lines.length} lines at ${t.title.size} do not fit`);
       assert.ok(t.title.lines.length <= TITLE_MAX_LINES && t.title.lines.length >= 1);
       assert.ok(t.title.lines.length * t.title.lineHeight <= t.m.titleBox, `${b.title} at ${w}: ${t.title.lines.length * t.title.lineHeight} high in ${t.m.titleBox}`);
-      assert.ok(t.title.size >= 12, `${b.title} at ${w}: the title is ${t.title.size} (never under 12)`);
+      assert.ok(SCALE_SIZES.includes(t.title.size), `${b.title} at ${w}: the title is ${t.title.size}, which is no size of the type scale`);
+      assert.ok(t.title.size >= TITLE_MIN && t.title.size <= t.m.title.max, `${b.title} at ${w}: the title is ${t.title.size}, between ${TITLE_MIN} and ${t.m.title.max}`);
       for (const line of t.title.lines) assert.ok(textWidth('fraunces', line, t.title.size) <= t.m.text, `${b.title} at ${w}: "${line}" is too wide`);
       assert.equal(t.title.lines.join(' '), b.title.replace(/\s+/g, ' '), 'the lines are the title, nothing cut');
-      assert.ok(t.kind.fits, `${b.kind} at ${w}: ${t.kind.lines.length} lines`);
-      assert.ok(t.kind.lines.length <= 2);
-      assert.ok(t.kind.size >= 8.5);
       assert.ok(t.timeFits, `${t.time} at ${w} is one line`);
+      assert.equal('kind' in t, false, 'the kind of book is not on the cover');
     }
   }
+});
+
+check('the space and the type of a cover are tokens of the design file, read from it: 12 at the sides and at the bottom (space.3), 16 at the top (space.4), the time in JetBrains Mono at the mono token (15 on 22) and no kind line; the longest time, "2 h 29 min", fits the text width of the narrowest cover', () => {
+  const tokens = JSON.parse(readFileSync(join(process.cwd(), 'src', 'theme', 'tokens.json'), 'utf8')) as {
+    space: Record<string, number>; text: Record<string, { size: number; lineHeight: number; font: string }>; border: { width: number };
+  };
+  const scale = [...new Set(Object.values(tokens.text).map((t) => t.size))].sort((a, b) => b - a);
+  assert.deepEqual([...SCALE_SIZES], scale, 'the sizes a title may be set at are the sizes of the type scale: 64 48 36 30 28 24 22 19 17 15');
+  assert.equal(TITLE_MIN, 15, 'and the smallest is 15');
+  assert.deepEqual([...SCALE_SIZES].filter((s) => s <= 26 && s >= 15), [24, 22, 19, 17, 15]);
+  for (let w = 138; w <= TILE_MAX; w += 1) {
+    const m = coverMetrics(w);
+    assert.deepEqual([m.padX, m.padTop, m.padBottom], [tokens.space['3'], tokens.space['4'], tokens.space['3']], `${w}: 12 at the sides, 16 at the top, 12 at the bottom`);
+    assert.deepEqual([m.padX, m.padTop, m.padBottom], [12, 16, 12]);
+    assert.deepEqual([m.time.size, m.time.lineHeight], [tokens.text.mono.size, tokens.text.mono.lineHeight], `${w}: the time is the mono token`);
+    assert.equal(tokens.text.mono.font, 'mono');
+    assert.equal(m.gapTop, m.gapTitle, `${w}: the title sits in the middle between the ring and the time`);
+    assert.ok([tokens.space['2'], tokens.space['3']].includes(m.gapTop), `${w}: the gap is a step of the space scale`);
+    assert.ok(SCALE_SIZES.includes(m.title.max) && m.title.max <= Math.max(Math.round(w * 0.125), TITLE_MIN), `${w}: the largest title is ${m.title.max}, a size of the scale and no more than an eighth of the width`);
+    assert.equal(m.title.min, 15);
+    assert.equal(m.titleBox, m.height - 2 * tokens.border.width - (m.padTop + m.medallion + m.gapTop) - (m.padBottom + m.time.lineHeight) - m.gapTitle, `${w}: the room of the title is what is left between the ring and the time`);
+    assert.equal(m.text, m.width - m.spine - m.edge - 2 * m.padX);
+  }
+  assert.deepEqual([coverMetrics(138).text, coverMetrics(173).text, coverMetrics(193).text], [101, 133, 151]);
+  // every time of every book fits the narrowest cover, the longest of all ("2 h 29 min") with room to spare
+  const narrowest = coverMetrics(coverGrid(320, 16).tile);
+  assert.equal(coverGrid(320, 16).tile, 138);
+  let longest = 0;
+  for (const b of BOOK_CATALOG) {
+    const t = coverText(b, 138);
+    assert.ok(t.timeFits, `${b.id}: ${t.time} fits at 320`);
+    longest = Math.max(longest, timeWidth(t.time, narrowest));
+  }
+  assert.ok(longest <= narrowest.text, `the longest time is ${longest.toFixed(1)} in ${narrowest.text}`);
+  assert.equal(timeWidth('2 h 29 min', narrowest), 10 * 0.6 * 15 * 1.04, '"2 h 29 min": ten letters of 9 px, with the safety of typeMetrics.ts');
+  assert.ok(timeWidth('2 h 29 min', narrowest) <= narrowest.text);
+  // the cover says no kind, and the label still does
+  assert.equal(Object.keys(coverText(BOOK_CATALOG[0], 173)).sort().join(), 'm,time,timeFits,title');
+  assert.match(coverLabel(BOOK_CATALOG.find((b) => b.kind === 'guide')!), /, Pilgrim's guide, /);
+  assert.match(coverLabel(BOOK_CATALOG.find((b) => b.kind === 'reflection')!), /, Readings for the Way, /);
 });
 
 check('the longest title of the books fits at 320, 390 and 430, and a short title is set larger than a long one', () => {
@@ -633,7 +671,6 @@ check('a title that cannot fit says so instead of being cut: a word wider than t
   const m = coverMetrics(138);
   assert.equal(fitTitle('Supercalifragilisticexpialidocious', m.text, m.titleBox, m.title.max, m.title.min).fits, false);
   assert.equal(fitTitle('word '.repeat(60), m.text, m.titleBox, m.title.max, m.title.min).fits, false);
-  assert.equal(fitKind('A very long kind of book that goes on and on and on and on and on', m.text, m).fits, false);
   const ok = fitTitle('The Quiet Road', m.text, m.titleBox, m.title.max, m.title.min);
   assert.ok(ok.fits && ok.size <= m.title.max && ok.size >= m.title.min);
 });
@@ -659,7 +696,6 @@ check('the shades of a cover come from its colours: the same colour with an alph
   assert.equal(coverLabel({ title: 'The French Way', kind: 'guide', minutes: 51 }), "The French Way, Pilgrim's guide, 51 minutes");
   assert.equal(coverLabel({ title: 'The Quiet Road', kind: 'reflection', minutes: 149 }), 'The Quiet Road, Readings for the Way, 2 hours 29 minutes');
   assert.equal(coverLabel({ title: 'X', kind: 'essay', minutes: 1 }), 'X, Book, 1 minute', 'a kind this app does not know is still a book');
-  assert.deepEqual(coverText({ title: 'The Quiet Road', kind: 'reflection', minutes: 149 }, 173).kind.lines.join(' '), 'READINGS FOR THE WAY');
   assert.equal(coverText({ title: 'The Quiet Road', kind: 'reflection', minutes: 149 }, 173).time, '2 h 29 min');
 });
 

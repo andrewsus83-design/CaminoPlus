@@ -47,8 +47,9 @@ Then the **scenarios** ([scenarios.mjs](scenarios.mjs)), each in light and dark,
   two Bible rows that were taken out) or kept for a verse that is not in the text are ignored without an error;
 - Bible ([bible.scenarios.mjs](bible.scenarios.mjs), the same walks on the real text): the daily banner is compact (at most 120 high at 390
   wide, 140 at 320) and is one button; the three parts (Old Testament, Deuterocanon, New Testament) are a segmented control under the banner
-  that scrolls with the page, and each shows its books as three square tiles in a row; all 73 book names fit their tile at 320, 390 and 430, the
-  short ones at 22 or more on a phone of 390 and every one at 15 or more from 390 up (the two Thessalonians 14); a Chromium that hints the glyphs (CI's does)
+  that scrolls with the page, and each shows its books as compact tiles, two in a row (173 by 124 on a phone of 390, 140 by 116 on 320), the words 17 from the outline
+  (13 under 352 wide) and the first row clear of the tab bar; all 73 book names fit their tile at 320, 360, 390 and 430, each at a size of the type scale (24, 17 or 15, in Fraunces;
+  the 21 short ones the full 24; 17 or more from 390 up) with the count in JetBrains Mono at 15; a Chromium that hints the glyphs (CI's does)
   lays a name wider than one that does not, so the fit counts every letter rounded up to a pixel (tried with --font-render-hinting set to none, slight, medium and full);
   a tile opens the numbers of the chapters, a number opens the words, and Previous and Next name where they go, cross the books and the
   parts (Malachi 4 to Tobit 1) and are disabled at Genesis 1 and Revelation 22; prose is paragraphs, a psalm is stanzas, and the end of a
@@ -61,7 +62,8 @@ Then the **scenarios** ([scenarios.mjs](scenarios.mjs)), each in light and dark,
 - Books ([books.scenarios.mjs](books.scenarios.mjs)): the Books tab is a compact banner and the covers, A5 (148 by 210) in two columns, 16 from the edge and 12 apart (173 by
   245 on a 390 phone, 138 by 196 on 320, 193 by 274 on 430, never wider than the screen), on a shelf for each kind of book (Pilgrim's guides, Readings for the Way) with its
   heading, each ONE button named "title, kind of book, time" with its own ribbon, a 44 by 44 button that bookmarks the book, in the four fonts of the brand (Fraunces,
-  Inter, JetBrains Mono, and at most one handwritten Caveat note on the screen); no cover says Soon or Free; a cover opens the book page (the cover, the title, the subtitle,
+  Inter, JetBrains Mono, and at most one handwritten Caveat note on the screen); a cover prints its title and its time (JetBrains Mono at 15, on one line, 12 clear of the
+  sides) and no kind of book (the label still says it); no cover says Soon or Free; a cover opens the book page (the cover, the title, the subtitle,
   the kind, the facts, THE NOTICE OF ITS KIND above the button, "Start reading", the contents with the minutes of each chapter, the credit) and Back returns to the tab; the
   first and the last book of each kind show the wording of `notices.ts`; the reader opens at chapter 1, Next and Previous (named by where they go, in the bar at the bottom)
   go through the chapters, are off at the first and at the last chapter, the browser's Back goes to the page and not through the chapters, and the Back button of the reader (the round 48 one of every screen, in a row with the two round 48 size buttons, 16 from the edge; there is no "Contents" pill) goes to the contents; the title of the book in the bar is one line of 19 px in Inter SemiBold (the longest titles whole on 390 and 430, cut with an ellipsis on 320, the bar as tall for every book); the reader keeps
@@ -93,9 +95,15 @@ Then the **scenarios** ([scenarios.mjs](scenarios.mjs)), each in light and dark,
     and the card opens `/write`; a pilgrim with no post yet (the account with nothing in it) has the sample journey, whose banner says to tap the first card,
     with the card in front of the ten samples (the last sample is alone on its row);
   - Notes is the first sub-tab: its feed starts, right under the strip, with ONE card, "Write a note" (full width, at least 64 high, "Notes stay on this
-    phone." under its title); there is no filter row (no tab named All, Photos and videos or Places, none of those words, no tab list); the empty diary says
+    phone." under its title); there is no filter row (no tab named All, Photos and videos or Places, none of those words except the All item of the highlights row, no tab list); the empty diary says
     "No notes yet" with no button of its own; Plan and Health have no card; Journey has its own; the card opens `/diary/new`, and a note written there is
     in the feed after Back;
+  - All places ([allplaces.scenarios.mjs](allplaces.scenarios.mjs), on the 33 stages of the Camino Francés and six posts made up in the walk): the highlights row starts with "All" (the
+    shell, pinned at the left, the leftmost button of the row, 72 wide, selected only while its stamps are open), then the destinations of the plan; a tap opens one stamp for every place of
+    the route (33 stages are 34 places), three in a row, each a button of at least 48 named "<place>, N journeys" or "<place>, no journeys yet", a filled one with its number, and the line
+    "3 of 34 places"; a stamp shows exactly the posts at that place with the card that writes a post once, the app's one Back button over it goes back to the stamps (not to all the posts), and
+    All again closes the stamps; a place with no post says "No journeys at <place> yet" over the card alone; from Plan and Health All opens the stamps of Journey, and a destination of the row
+    still shows its posts (the same one again clears it); a plan with no destination still has the All item, alone in the row; an account whose route has no places has no All item;
 - Notes, a page is a draft until it is published: on a blank page Read and Publish are off and there is no Save draft; with words in it Save draft is at the
   top right and the date says Draft; the marks (Bold, Italic, Heading, Bulleted list, Quote) sit inside the text box, under the text and above the bottom
   row; Read is a third and Publish two thirds of one row at the bottom (margin to margin, at least 48 high); Read turns into Edit in the same place; Save draft
@@ -237,6 +245,7 @@ Chromium; a test checks they agree). Bump both on purpose, with the tests looked
 | [scenarios.mjs](scenarios.mjs) | the walks a person does |
 | [me.scenarios.mjs](me.scenarios.mjs) | the walks of Me: the header with the gear alone, the chat button and where it opens, the card of Journey (also in the sample journey), the card of Notes |
 | [pilgrim.scenarios.mjs](pilgrim.scenarios.mjs) | the walks of the profile of another pilgrim: a friend, a stranger, a private one, one that is not there, no signal, the name of a comment author, and that nothing private is on it |
+| [allplaces.scenarios.mjs](allplaces.scenarios.mjs) | the walks of the All item of Me: the row, the stamps of the route, the journeys at a place, the way back, Plan and Health, no destination, no places |
 | [bible.scenarios.mjs](bible.scenarios.mjs) | the walks of the Bible tab and the reader (kept apart so the other walks stay short) |
 | [books.scenarios.mjs](books.scenarios.mjs) | the walks of the Books tab: the covers, a book page, the reader, the place kept on the phone, the notice of each kind |
 | [continue.scenarios.mjs](continue.scenarios.mjs) | the walks of the Continue reading bar above the tab bar of the Library: where it sits, closing it, the most recent place, a mark that does not read |

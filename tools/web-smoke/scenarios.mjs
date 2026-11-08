@@ -24,6 +24,7 @@ import { BOOKS_SCENARIOS, CATALOG, COVER_LABEL } from './books.scenarios.mjs';
 import { CONTINUE_SCENARIOS } from './continue.scenarios.mjs';
 import { ME_SCENARIOS } from './me.scenarios.mjs';
 import { PILGRIM_SCENARIOS } from './pilgrim.scenarios.mjs';
+import { ALL_PLACES_SCENARIOS } from './allplaces.scenarios.mjs';
 
 /** design/tokens.json: the weights of the tabs of the tab bar (section tab) are read from it, as the app reads them. */
 const TAB_TOKENS = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'design', 'tokens.json'), 'utf8')).tab;
@@ -248,11 +249,16 @@ export const SCENARIOS = [
       assert(c.height >= 64, `the card is at least 64 high (${c.height})`);
       assert((await cardNote.innerText()).replace(/\s+/g, ' ').trim() === 'Write a note Notes stay on this phone.', `the card says "Write a note" and, under it, "Notes stay on this phone." (${await cardNote.innerText()})`);
       await eventually(() => page.getByText('Notes stay on this phone.', { exact: true }).count(), (n) => n === 1, { what: 'the number of lines "Notes stay on this phone." (it is in the card)' });
-      step('there is no filter row: no tab named All, Photos and videos or Places, and none of those words on the screen');
+      step('there is no filter row: no tab named All, Photos and videos or Places, and none of those words on the screen, except the All item of the highlights row, which is meant to be there');
+      // The word "All" is also the first item of the highlights row under the My Camino card (one button, "All places, N of M with journeys", which opens the stamps of the
+      // route; it is drawn on every sub-tab, Notes too). That item is not a filter of the notes, so its label is left out of the count; any other label with these words,
+      // or a tab named like one of them, is the old filter row come back.
+      const labelsOutsideTheAllItem = (name) => page.getByText(name, { exact: true }).filter({ visible: true }).evaluateAll((els) => els.filter((e) => !e.closest('[aria-label^="All places, "]')).length);
       for (const name of ['All', 'Photos and videos', 'Places']) {
         await eventually(() => page.getByRole('tab', { name: new RegExp(`^${name}`) }).count(), (n) => n === 0, { what: `the number of tabs named "${name}"` });
-        await eventually(() => page.getByText(name, { exact: true }).filter({ visible: true }).count(), (n) => n === 0, { what: `the number of "${name}" labels on Notes` });
+        await eventually(() => labelsOutsideTheAllItem(name), (n) => n === 0, { what: `the number of "${name}" labels on Notes (the All item of the highlights row is not one of them)` });
       }
+      await eventually(() => page.getByRole('button', { name: /^All places, \d+ of \d+ with journeys$/ }).count(), (n) => n === 1, { what: 'the number of All items of the highlights row on Notes (one, in the row under the card)' });
       await eventually(() => page.getByRole('tablist').count(), (n) => n === 0, { what: 'the number of tab lists on Notes (there is no filter row)' });
       step('the empty diary has no second write button: the card is the way in');
       await eventually(() => page.getByRole('button', { name: /Write your first note|Write a new note/ }).count(), (n) => n === 0, { what: 'the number of second write buttons' });
@@ -622,4 +628,5 @@ export const SCENARIOS = [
     },
   },
   ...DAILY_SCENARIOS,
+  ...ALL_PLACES_SCENARIOS,
 ];

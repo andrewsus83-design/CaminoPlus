@@ -21,7 +21,7 @@ function Tool({ icon, label, on, onPress, disabled }: { icon: IconName; label: s
       accessibilityState={{ selected: !!on, disabled: !!disabled }}
       disabled={disabled}
       onPress={onPress}
-      style={({ pressed }) => ({ flexGrow: 1, flexBasis: 0, minWidth: 48, height: layout.touchMin, alignItems: 'center', justifyContent: 'center', opacity: disabled ? 0.5 : pressed ? 0.7 : 1 })}
+      style={({ pressed }) => ({ flexGrow: 1, flexBasis: 0, minWidth: 48, height: layout.touchPrimary, alignItems: 'center', justifyContent: 'center', opacity: disabled ? 0.5 : pressed ? 0.7 : 1 })}
     >
       <View style={{ width: 44, height: 40, borderRadius: radius.md, alignItems: 'center', justifyContent: 'center', backgroundColor: on ? role.highlight : 'transparent' }}>
         <Icon name={icon} color={on ? role.onHighlight : role.text} size={24} strokeWidth={on ? 2.2 : 1.75} />

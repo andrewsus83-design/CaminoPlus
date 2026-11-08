@@ -14,7 +14,7 @@ outputs from the same chapter blocks, so the app, the EPUB and the PDF cannot di
 | Reading PDF, 6 x 9 in, page numbers | `books/dist/<id>/<id>.pdf` | no |
 | Store cover, 1600 x 2560 PNG | `books/dist/<id>/<id>.cover.png` | no |
 | Store metadata: titles, descriptions, keywords, categories, rights, AI disclosure | `books/dist/<id>/store.json` | no |
-| **App Library bundle**: `catalog.json` and `books/<id>.json` | `mobile/assets/library/` | **not yet**: the bundle format is ready, but the app's Library does not read it and the bundle is not in the repository (see `books/series.md`, "In the app: not yet") |
+| **App Library bundle**: `catalog.json`, `books/<id>.json` and `bookBundle.ts` | `mobile/assets/library/` and `mobile/src/features/library/bookBundle.ts` | **yes**: the app's Books tab reads it (see `books/series.md`, "In the app") |
 
 ## Steps
 
@@ -52,14 +52,14 @@ outputs from the same chapter blocks, so the app, the EPUB and the PDF cannot di
    `java -jar epubcheck.jar books/dist/<id>/<id>.epub`, from https://github.com/w3c/epubcheck/releases. Fix every error it
    reports in `tools/build_books.py`, not in the output file.
 
-5. **App bundle.** Not part of the repository yet. When the app takes the books, the bundle is committed with the books that produced it and `python3 tools/build_books.py --check` becomes a CI step again; until then it is only built, never committed.
+5. **App bundle.** The app reads it, so it is committed with the books that produced it: `python3 tools/build_books.py --no-render` (or the full build) refreshes `mobile/assets/library/` and `mobile/src/features/library/bookBundle.ts`, and `python3 tools/build_books.py --check` fails when they are out of date (CI does not run it yet). The bundle names no model: `ai_disclosure` stays in `store.json` and the EPUB only, and a test pins that. A changed catalog also changes the Books phones of the design page, which are drawn from it; the test `designBooks.test.ts` says how to draw them again.
 
 6. **Report.** For each book: title, kind, words, reading time, PDF pages, what the checker warned about, and the open
    decisions below.
 
 ## In the app: bookmarks, side notes and reflections
 
-The bundle is built so an app can attach a pilgrim's own writing to the books. This is a **design, not a shipped feature**: it was built once on a branch and not merged (see `books/series.md`, "In the app: not yet"), and it has to be reconciled with the Notes tab the owner built (a feed of the diary). The design:
+The bundle is built so an app can attach a pilgrim's own writing to the books. **What is built** (pull request #98): bookmarks on a passage and on a book, the place where you stopped, and **Note**, which starts an ordinary diary page with the passage quoted (see `books/series.md`, "In the app"). **What is still a design**, not a shipped feature: side notes anchored to a paragraph, a Notebook, and reflections as notes. It was built once on a branch and not merged, and it has to be reconciled with the diary the owner built (Me > Notes, a list of pages, not notes in a margin). The design:
 
 - **Side notes, not a feed.** A note is **anchored** to the thing it is about and shown beside it, like a note in the margin: a small mark next to the paragraph, a side sheet to read and
   write it. There is no timeline, no likes, no comments, no followers. Notes are **private and on the phone** (kept under the pilgrim's own key and cleared on log-out, like the Library's bookmarks; the Diary, by contrast, keeps its pages when you log out; the screens say which) unless the
@@ -69,7 +69,7 @@ The bundle is built so an app can attach a pilgrim's own writing to the books. T
   `book:<bookId>/<chapterId>` (a whole chapter or day), `book:<bookId>` (a book); later `bible:<translation>/<book>/<chapter>:<verse>`, `daily:<date>`, `stage:<routeSlug>/<n>`, `place:<id>`.
   A note stores the anchor, the **quoted text** it was made on (so it can be found again if a book is revised: chapter ids and the text are stable, block indexes are not guaranteed to be), its own
   text, and the **context** added automatically: date and, when known, the Camino and the stage the pilgrim is on. That context is how a note on a reading joins the Camino experience.
-- **Bookmarks** are markers on the same anchors (a book, a chapter or day, a paragraph) and "continue reading" remembers the last place in each book.
+- **Bookmarks** (built, with another key): the app keys a passage `books:<book id>.<chapter>.<block>` (`mobile/src/features/library/books/passages.ts`) and a book `books:<book id>`, and the reader keeps the last place in each book. The anchors above are the design for notes, not the keys the app uses today.
 - **Reflections**: each day of a reflection book ends with its questions as a list (`## At the end of the day`, a `-` list; the checker requires it). The app shows those questions as the prompt,
   and the pilgrim's answer is a note of type *reflection* on that day. A side note can be grown into a Diary page.
 - **Never** in the bundle: a pilgrim's notes. The bundle is the book; notes are the pilgrim's, and live only on the phone (any later backup through the paid plan's cloud storage is a separate,
