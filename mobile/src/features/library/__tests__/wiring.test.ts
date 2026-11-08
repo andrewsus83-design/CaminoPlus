@@ -21,10 +21,9 @@ import './readerWiring.test'; // the Bible screens: the book grid, the chapters,
 const DIR = 'src/features/library';
 // The files of this feature: the folder itself, the Bible and Books folders, and the screens of app/library (the Bible screens too). Not notes/ and daily/,
 // nor app/library/daily.tsx: the Notes tab and the daily reading are other features with their own tests. The files that bring the text itself in (text.ts,
-// searchText.ts and what the data branch generates for them) are the data layer: they have their own tests and are not scanned here.
+// searchText.ts and what the importer generates for them) are scanned like the rest; what they do is checked in bibletext.test.ts and searchtext.test.ts.
 const OWN_FOLDERS = ['', 'bible/', 'books/'];
-const DATA_LAYER = new Set(['text.ts', 'searchText.ts', 'textTypes.ts', 'webc.generated.ts']);
-const sourcesIn = (dir: string) => fs.readdirSync(path.join(root, dir), { withFileTypes: true }).filter((f) => f.isFile() && /\.tsx?$/.test(f.name) && !DATA_LAYER.has(f.name)).map((f) => `${dir}/${f.name}`);
+const sourcesIn = (dir: string) => fs.readdirSync(path.join(root, dir), { withFileTypes: true }).filter((f) => f.isFile() && /\.tsx?$/.test(f.name)).map((f) => `${dir}/${f.name}`);
 const featureFiles = [
   ...OWN_FOLDERS.flatMap((sub) => sourcesIn(`${DIR}/${sub}`.replace(/\/$/, ''))),
   ...sourcesIn('app/library').filter((f) => !path.basename(f).startsWith('daily')),
@@ -42,6 +41,8 @@ check('the feature is the files this test expects, so a new one is looked at (an
     `${DIR}/bible/blocks.ts`, `${DIR}/bible/books.ts`, `${DIR}/bible/credit.ts`, `${DIR}/bible/gridMath.ts`, `${DIR}/bible/lastRead.ts`, `${DIR}/bible/order.ts`,
     `${DIR}/bible/ref.ts`, `${DIR}/bible/tileFit.ts`, `${DIR}/bible/today.ts`, `${DIR}/bible/useLastRead.ts`, `${DIR}/bible/useVerseSearch.ts`, `${DIR}/bible/verseActions.ts`,
     `${DIR}/bible/verseRows.ts`,
+    `${DIR}/bible/searchCore.ts`, `${DIR}/bible/searchText.ts`,
+    `${DIR}/bible/text.ts`, `${DIR}/bible/textCore.ts`, `${DIR}/bible/textTypes.ts`, `${DIR}/bible/webc.generated.ts`,
     `${DIR}/books/catalog.ts`,
   ].sort());
   for (const f of ['text.ts', 'searchText.ts', 'textTypes.ts']) assert.ok(fs.existsSync(path.join(root, DIR, 'bible', f)), `${f} is the text layer of the Bible: the screens read the words only through it`);
