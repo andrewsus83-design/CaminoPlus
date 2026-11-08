@@ -11,8 +11,8 @@ import type { DiaryPlace } from '../../diary/place';
 import { AVATAR_TINTS } from '../../social/logic';
 import {
   BLANK_NOTE, BODY_CLAMP_PX, BODY_LINES, BODY_LINE_PX, COMPOSER_PLACEHOLDER, DELETE_FAILED, EMPTY_BUTTON, FALLBACK_NAME, FEED_CHARS, FILTER_EMPTY, FILTER_LABEL, MAPS_FAILED, MEDIA_GAP, MEDIA_RATIO,
-  MEDIA_SHOWN_MAX, NOTES_PAGE, NOTES_PRIVACY, NOTE_FILTERS, SHARE_FAILED, TOUCH_MIN, feedBody, feedState, filterLabel, filterNotes, hasMedia, hasPlace, identity, matchesFilter, mediaPlan, moreNotesLabel,
-  needsMore, nextLimit, noteCounts, noteRow, noteTime, notesLeft, pageOf, rowLabel, shareText, tileLabel, toggled, type NoteFilter, type NoteLike,
+  MEDIA_SHOWN_MAX, NOTES_PRIVACY, NOTE_FILTERS, SHARE_FAILED, TOUCH_MIN, feedBody, feedState, filterLabel, filterNotes, hasMedia, hasPlace, identity, matchesFilter, mediaPlan,
+  needsMore, noteCounts, noteRow, noteTime, rowLabel, shareText, tileLabel, toggled, type NoteFilter, type NoteLike,
 } from '../notes/timeline';
 
 let n = 0;
@@ -483,38 +483,6 @@ check('the rows that are opened out are a set that is changed by copying: the on
   assert.deepEqual([...two].sort(), ['a', 'b']);
 });
 
-check('a page of notes at a time (in the page of the host): 30, a button for 30 more, never past the end; 2,000 notes take 66 presses', () => {
-  const list = Array.from({ length: 2000 }, (_, i) => i);
-  assert.equal(NOTES_PAGE, 30);
-  assert.deepEqual(pageOf(list, 30), list.slice(0, 30));
-  assert.equal(pageOf(list, 5000), list, 'the very list when it is not longer');
-  assert.equal(pageOf(list, 2000), list);
-  assert.deepEqual(pageOf(list, 0), []);
-  assert.deepEqual(pageOf(list, -4), []);
-  assert.deepEqual(pageOf(list, Number.NaN), []);
-  assert.deepEqual(pageOf(list, 2.9), [0, 1]);
-  assert.equal(notesLeft(2000, 30), 1970);
-  assert.equal(notesLeft(10, 30), 0);
-  assert.equal(notesLeft(10, -5), 10);
-  let limit = NOTES_PAGE;
-  let presses = 0;
-  while (notesLeft(2000, pageOf(list, limit).length) > 0) { const next = nextLimit(limit, 2000); assert.ok(next > limit && next <= 2000); limit = next; presses += 1; }
-  assert.equal(presses, 66);
-  assert.equal(limit, 2000);
-  assert.equal(nextLimit(1990, 2000), 2000);
-  assert.equal(nextLimit(2000, 2000), 2000);
-  assert.equal(nextLimit(30, 0), 0);
-  assert.equal(moreNotesLabel(1970), 'Show 30 more notes');
-  assert.equal(moreNotesLabel(30), 'Show 30 more notes');
-  assert.equal(moreNotesLabel(12), 'Show 12 more notes');
-  assert.equal(moreNotesLabel(1), 'Show 1 more note');
-  for (let total = 0; total < 200; total += 7) {
-    let l = NOTES_PAGE;
-    for (let k = 0; k < 20 && notesLeft(total, pageOf(list.slice(0, total), l).length) > 0; k++) l = nextLimit(l, total);
-    assert.equal(pageOf(list.slice(0, total), l).length, total, `${total} notes: all are reached by the button`);
-  }
-});
-
 check('a thing to touch is at least 44 pixels', () => {
   assert.ok(TOUCH_MIN >= 44);
 });
@@ -536,29 +504,25 @@ check('the Notes tab is the files this test expects, so a new one is looked at (
   assert.deepEqual(files, ['NoteMedia.tsx', 'NoteMenu.tsx', 'NoteRow.tsx', 'NotesHeader.tsx', 'NotesTab.tsx', 'timeline.ts']);
 });
 
-check('the shell gets what was agreed: a named export NotesTab that works with no props (in the page of the host), one optional prop for a list of its own, and no gold pen (the shell draws it)', () => {
+check('the shell gets what was agreed: a named export NotesTab, with no props, and no gold pen of its own (the shell draws it)', () => {
   const src = code('NotesTab.tsx');
-  assert.match(src, /export function NotesTab\(\{ ownScroll = false \}: \{ ownScroll\?: boolean \}\) \{/);
+  assert.match(src, /export function NotesTab\(\) \{/);
   for (const f of files) assert.doesNotMatch(code(f), /\bFab\b/, `${f}: the gold pen belongs to the shell`);
   assert.doesNotMatch(src, /\bScreen\b/, 'the tab does not bring a screen of its own: it fills what the shell gives it');
 });
 
-check('with a list of its own the tab is a virtualised list: a FlatList of every note, only the rows on screen drawn; in the page of the host the notes come a page at a time, never all of them mapped into a view', () => {
+check('the tab owns its scroll, and it is a virtualised list: a FlatList of every note, only the rows on screen drawn, never the notes mapped into a view', () => {
   const src = code('NotesTab.tsx');
   assert.match(src, /<FlatList\b/);
-  assert.match(src, /data=\{shown\}/, 'the list of its own has every note, and draws the ones on screen');
+  assert.match(src, /data=\{shown\}/, 'every note is in the list, and the list draws the ones on screen');
   assert.match(src, /keyExtractor=\{keyOf\}/);
   assert.match(src, /initialNumToRender=\{6\}/);
   assert.match(src, /windowSize=\{7\}/);
-  assert.doesNotMatch(src, /entries\.map\(|data\.map\(|shown\.map\(/, 'no row is drawn by mapping over all the notes');
-  assert.match(src, /const drawn = useMemo\(\(\) => \(ownScroll \? shown : pageOf\(shown, limit\)\), \[ownScroll, shown, limit\]\);/, 'what is mapped is one page of them');
-  assert.match(src, /\{drawn\.map\(\(e, i\) => \(/);
-  assert.match(src, /if \(!ownScroll\) \{\s*return \(\s*<View style=\{\{ marginHorizontal: -layout\.screenMargin, backgroundColor: role\.bg \}\}>/, 'in the page of the host it runs from edge to edge: the margin of the Screen it sits in');
-  assert.match(src, /<Pill variant="ghost" label=\{moreNotesLabel\(left\)\} onPress=\{\(\) => setLimit\(\(n\) => nextLimit\(n, shown\.length\)\)\} \/>/, 'and a button brings the next page');
-  assert.match(src, /const chooseFilter = useCallback\(\(f: NoteFilter\) => \{ setFilter\(f\); setLimit\(NOTES_PAGE\); \}, \[\]\);/, 'another filter starts from its first page');
+  assert.doesNotMatch(src, /entries\.map\(|data\.map\(|shown\.map\(|\.slice\(/, 'no row is drawn by mapping over the notes');
   assert.match(src, /keyboardShouldPersistTaps="handled"/, 'a tap on a note works while the keyboard of the search field is up');
   assert.match(src, /keyboardDismissMode="on-drag"/);
   assert.match(src, /<RefreshControl\b[^>]*refreshing=\{refreshing\}[^>]*onRefresh=\{refresh\}/, 'pull to refresh');
+  assert.doesNotMatch(src, /ownScroll/, 'the tab has one way of being hosted: it is the scroller');
 });
 
 check('pull to refresh reads the phone again (useDiary.reload) and nothing else; the note list comes from useDiary, the one reader of the diary', () => {
@@ -630,6 +594,7 @@ check('a row is one thing for a screen reader, with the actions of its parts as 
   assert.match(row, /onAccessibilityAction=\{/);
   for (const name of ['share', 'edit', 'delete']) assert.match(row, new RegExp(`name: '${name}'`), `the action ${name}`);
   assert.match(row, /accessibilityLabel="More: edit or delete this note"/, 'the "…" button says what it opens');
+  assert.match(row, /style=\{\[\{ fontSize: 20, lineHeight: 26, marginTop: 2 \}, breakAnywhere\]\}>\{row\.title\}/, 'a very long word in a title breaks on the web instead of widening the note');
 });
 
 check('every control has a label and is at least 44 big: Pressables, buttons and the filter tabs', () => {

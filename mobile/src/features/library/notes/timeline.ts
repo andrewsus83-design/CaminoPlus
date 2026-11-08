@@ -298,31 +298,5 @@ export function toggled(set: ReadonlySet<string>, id: string): Set<string> {
   return next;
 }
 
-/* ------------------------------------------------------------------------------------------------ a page of notes at a time */
-
-/**
- * When the tab is drawn in the page of its host (inside the Library's own scroll view, with no list of its own) it cannot draw only the rows on
- * screen, so it draws this many notes, and a button adds this many more. A tab with a list of its own has no need of it.
- */
-export const NOTES_PAGE = 30;
-
-/** The first `limit` notes of the list (the very list when it is not longer). */
-export function pageOf<T>(list: readonly T[], limit: number): readonly T[] {
-  const n = Number.isFinite(limit) ? Math.max(0, Math.floor(limit)) : 0;
-  return n >= list.length ? list : list.slice(0, n);
-}
-
-/** How many notes are still behind the button. */
-export const notesLeft = (total: number, drawn: number): number => Math.max(0, Math.floor(total) - Math.max(0, Math.floor(drawn)));
-
-/** The limit after the button: one more page, never past the end. */
-export const nextLimit = (limit: number, total: number): number => Math.min(Math.max(0, Math.floor(total)), Math.max(0, Math.floor(limit)) + NOTES_PAGE);
-
-/** "Show 30 more notes", "Show 1 more note": what the button says, and how many it adds. */
-export function moreNotesLabel(left: number): string {
-  const n = Math.min(Math.max(0, Math.floor(left)), NOTES_PAGE);
-  return `Show ${n} more ${n === 1 ? 'note' : 'notes'}`;
-}
-
 /** The smallest a thing to touch is, in pixels: every button of the feed is at least this big, with or without the room around it. */
 export const TOUCH_MIN = 44;
