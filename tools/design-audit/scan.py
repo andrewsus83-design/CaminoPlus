@@ -26,6 +26,7 @@ import collections
 import hashlib
 import json
 import os
+import posixpath
 import re
 import subprocess
 import sys
@@ -584,9 +585,13 @@ class FileIdx:
                     close = match.get(k, k)
                     if len(chain) == 1 and tn.get(chain[0]) == 'space':
                         # space[4]: a step of the spacing scale, a token use; space[step] with a variable is one too
-                        step = toks[k + 1] if k + 1 < close else None
-                        lit = step is not None and step.t == 'num' and k + 2 == close and float(step.n).is_integer()
-                        out.append(('ref', 'space.' + (str(int(step.n)) if lit else '?'), j, False))
+                        step = toks[k + 1] if k + 2 == close else None
+                        key = None
+                        if step is not None and step.t == 'num' and float(step.n).is_integer():
+                            key = str(int(step.n))
+                        elif step is not None and step.t == 'str' and step.v.isdigit():
+                            key = step.v   # space['2'], the way the tile grid writes it
+                        out.append(('ref', 'space.' + (key if key is not None else '?'), j, False))
                     else:
                         out.append(('id', name + '[]', j, False))  # indexing: a lookup, not a value we can read
                     j = close + 1
@@ -783,8 +788,14 @@ class FileIdx:
                 if len(chain) == 1 and tn.get(chain[0]) == 'space' and k < ve and toks[k].t == 'p' and toks[k].v == '[':
                     close = self.match.get(k, k)
                     pos[0] = close + 1
-                    if k + 2 == close and toks[k + 1].t == 'num' and str(int(toks[k + 1].n)) in S.space:
-                        return frozenset([float(S.space[str(int(toks[k + 1].n))])])
+                    step = toks[k + 1] if k + 2 == close else None
+                    key = None
+                    if step is not None and step.t == 'num' and float(step.n).is_integer():
+                        key = str(int(step.n))
+                    elif step is not None and step.t == 'str':
+                        key = step.v
+                    if key in S.space:
+                        return frozenset([float(S.space[key])])
                     return None
                 pos[0] = k
                 if chain[0] in tn and len(chain) == 2:
@@ -795,7 +806,7 @@ class FileIdx:
                 if chain[0] in tn and len(chain) == 3 and tn[chain[0]] == 'text' and chain[1] in S.text and chain[2] in ('size', 'lineHeight', 'letterSpacing'):
                     return frozenset([float(S.text[chain[1]].get(chain[2], 0))])
                 if len(chain) >= 2 and P is not None:
-                    cands = P.named_num.get(chain[-1])
+                    cands = P.linked_candidates(self, chain[-1])
                     if cands and len(cands) == 1:
                         return frozenset(float(x) for x in cands[0][0])
                 if len(chain) == 1:
@@ -938,6 +949,31 @@ class Project:
                             k += 1
                         if ok and vals:
                             self.named_num[name].append((vals, fx.rel, toks[i + 1].line))
+
+    def imported_modules(self, fx):
+        """The modules a file imports, as paths below mobile/ without an extension ('src/features/library/bible/gridMath')."""
+        cache = self.__dict__.setdefault('_imported_modules', {})
+        if fx.rel not in cache:
+            out = set()
+            for local, (orig, mod) in fx.imports.items():
+                if mod.startswith('@/'):
+                    out.add('src/' + mod[2:])
+                elif mod.startswith('.'):
+                    out.add(posixpath.normpath(posixpath.join(posixpath.dirname(fx.rel), mod)))
+            cache[fx.rel] = out
+        return cache[fx.rel]
+
+    def linked_candidates(self, fx, name):
+        """The constants called `name` (see _build_const_tables) that `fx` can see: in the file itself or in a file it imports. A dotted reference such as
+        `grid.padX` is read through the constant `padX` only when exactly one such constant is in view; the same name in a file nobody imported says nothing
+        about this value."""
+        seen = self.imported_modules(fx)
+
+        def module_of(rel):
+            base = re.sub(r'\.tsx?$', '', rel)
+            return base[:-len('/index')] if base.endswith('/index') else base
+
+        return [c for c in self.named_num.get(name, []) if c[1] == fx.rel or module_of(c[1]) in seen]
 
     def resolve_const(self, fx, name):
         """Resolve a bare identifier to a number: same-file const first, then a project const imported into this file."""
@@ -1193,7 +1229,7 @@ class Analyzer:
                             via=f'const {name} ({via})', obj=r.obj)
                     continue
                 last = name.split('.')[-1]
-                cands = self.P.named_num.get(last)
+                cands = self.P.linked_candidates(fx, last)
                 if cands and '.' in name and len(cands) == 1:
                     vals = cands[0][0]
                     mn = min(vals)

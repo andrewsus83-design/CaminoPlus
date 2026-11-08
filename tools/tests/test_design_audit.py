@@ -596,6 +596,46 @@ export function Demo({ narrow }: { narrow: boolean }) {
         self.assertEqual([(e["bucket"], e["smallest"]) for e in touch], [("lt56", 48)], "space[12] is 48")
 
 
+class NamedConstants(unittest.TestCase):
+    """`grid.padX` is read through the constant called padX when exactly one is in view: in the file itself, or in a file it imports. The name alone is not enough:
+    the tile PR made gridMath.ts compute its gap from space['2'], which left src/components/PlanCarousel.tsx (`const gap = 14`) as the only constant called gap in
+    the project, and every grid.gap, t.gap and type.gap of the app was read as 14."""
+
+    USER = "import { View } from 'react-native';\nimport { sizes } from '%s';\nexport function A() {\n  const t = sizes();\n  return <View style={{ gap: t.gap, marginBottom: Math.round(t.gap * 1.2) }} />;\n}\n"
+    CAROUSEL = "const gap = 14;\nexport function P() { return gap; }\n"
+
+    def test_a_constant_in_an_imported_file_is_read(self):
+        res = Repo(self, {
+            "src/features/gridMath.ts": "export const padX = 3;\nexport const bookGrid = () => ({ padX });\n",
+            "app/x.tsx": "import { View } from 'react-native';\nimport { bookGrid } from '@/features/gridMath';\nexport function A() {\n  const grid = bookGrid();\n  return <View style={{ paddingHorizontal: grid.padX }} />;\n}\n",
+        }).scan()
+        self.assertEqual(vals(res, "spacing", "padding"), ["3"])
+
+    def test_a_relative_import_links_the_files_too(self):
+        res = Repo(self, {
+            "src/features/gridMath.ts": "export const padX = 3;\nexport const bookGrid = () => ({ padX });\n",
+            "src/features/Tile.tsx": "import { View } from 'react-native';\nimport { bookGrid } from './gridMath';\nexport function A() {\n  const grid = bookGrid();\n  return <View style={{ paddingHorizontal: grid.padX }} />;\n}\n",
+        }).scan()
+        self.assertEqual(vals(res, "spacing", "padding"), ["3"])
+
+    def test_the_same_name_in_a_file_nobody_imported_says_nothing(self):
+        res = Repo(self, {
+            "src/components/PlanCarousel.tsx": self.CAROUSEL,
+            "src/features/sizes.ts": "export const sizes = () => ({ gap: 12 });\n",
+            "app/x.tsx": self.USER % "@/features/sizes",
+        }).scan()
+        self.assertEqual(vals(res, "spacing"), [], "t.gap is not the gap of the carousel")
+
+    def test_the_same_name_in_a_file_that_is_imported_is_read(self):
+        res = Repo(self, {"src/components/PlanCarousel.tsx": self.CAROUSEL, "app/x.tsx": self.USER % "@/components/PlanCarousel"}).scan()
+        self.assertEqual(vals(res, "spacing"), ["14", "14"], "gap and marginBottom, both read through the one gap in view")
+
+    def test_a_string_step_of_the_space_scale_is_a_token_and_is_evaluated(self):
+        res = Repo(self, {"app/y.tsx": "import { Pressable } from 'react-native';\nimport { space } from '@/theme';\nexport const A = () => <Pressable style={{ padding: space['3'], minHeight: space['12'] }} />;\n"}).scan()
+        self.assertEqual([e["bucket"] for e in res.events if e["cat"] == "spacing"], ["token"], "space['3'] is a token use")
+        self.assertEqual([(e["bucket"], e["smallest"]) for e in res.events if e["cat"] == "touch"], [("lt56", 48)], "space['12'] is 48")
+
+
 class Lexer(unittest.TestCase):
     def test_comments_are_returned_apart_with_their_lines(self):
         toks, errors, comments = lexer.lex("const a = 1; // one\n/* two\n three */\n<View style={{ padding: 3 }} />", True)

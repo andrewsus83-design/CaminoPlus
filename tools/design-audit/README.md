@@ -128,7 +128,8 @@ An exception is for a decision, not for a deadline: when a rule is wrong for man
 ## What it can and cannot see
 
 It reads the code, not the screen. It does not see a size that is computed, a style built in another file, a width that comes from the parent, or the
-real size of a tap target that grows with its text. Measuring every element of every screen in a browser, light and dark, is a different tool.
+real size of a tap target that grows with its text. One case it does read across files: `grid.padX` is read through the constant `padX`, when exactly one constant of
+that name is in the file itself or in a file it imports (the same name in a file nobody imported says nothing about the value). Measuring every element of every screen in a browser, light and dark, is a different tool.
 The scanner skips what is not app UI code: tests (`__tests__`, `*.test.*`), `mobile/src/theme`, `*.d.ts`, and the generated or sample-data files
 listed in `EXCLUDE_FILES` at the top of `scan.py`. The one built-in exception: the four colours of the Google G in `GoogleButton.tsx`.
 
