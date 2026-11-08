@@ -20,8 +20,16 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 WEB = ROOT / "web"  # the committed site: asset hashes and the previous sitemap dates come from here
 SITE = "https://camino.plus"
-LEGAL_UPDATED = "7 November 2026"  # bump by hand whenever the Privacy Policy or Terms change
+LEGAL_UPDATED = "8 November 2026"  # bump by hand whenever the Privacy Policy or Terms change
 PAGES = {}  # file name -> html, filled by page()
+# The share-link page (/s) calls the database with the same PUBLIC config the app embeds (mobile/src/lib/config.ts):
+# the project URL and the publishable key. Neither is a secret: row level security and the get_shared() function decide
+# what a link shows. tools/tests/test_web.py fails if these drift from the app's.
+SHARE_SUPABASE_URL = "https://xgikdabgdqmbdgagowva.supabase.co"
+SHARE_SUPABASE_KEY = "sb_publishable_tM2U4JVCBMgnMZ86-_DM0g_KxYFGNVQ"
+# No inline script or style on that page: everything it runs is /assets/share.js, and it may talk to the database only.
+SHARE_CSP = ("default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self'; "
+             f"connect-src {SHARE_SUPABASE_URL}; base-uri 'none'; form-action 'none'")
 
 
 def esc(s):
@@ -254,7 +262,7 @@ TABS = [
  ("me", "user", "Me", "Your Camino, your story.",
   "A profile that feels like Instagram and a timeline like Facebook, built around the walk. Post your day, collect stamps in a digital credencial and keep track of every stage.",
   ["Notes: a private notebook, the first tab under your profile. Tap the card at the top, Write a note, and the page is saved on your phone as you type. Make words bold or italic, add headings and lists, and attach photos, videos and the place you are at",
-   "Nothing in Notes is uploaded or shared, so it is not backed up either. It works without a signal and stays on your phone when you log out",
+   "Nothing in Notes is uploaded unless you share one note by link, so it is not backed up either. It works without a signal and stays on your phone when you log out",
    "Your journey as a grid of posts: tap the first card, Write a journey post, pick photos, write a caption, post",
    "All places: the first item in the row under your Camino card opens a stamp for every place of your route, filled where you have posted. Tap a stamp to see your own journeys there",
    "Passport &amp; stamps: a digital credencial, each stamp with its story",
@@ -355,7 +363,8 @@ FAQ = [
  ]),
  ("privacy", "Privacy &amp; data", [
   ("gdpr", "Is CaminoPlus GDPR compliant?", "<p>We design CaminoPlus around the EU General Data Protection Regulation (GDPR). You can see, export, correct and delete your data, and we only use processors that offer GDPR-ready data processing terms. Read the <a href=\"/privacy\">Privacy Policy</a>.</p>"),
-  ("who-sees", "Who can see my journey?", "<p>You choose who sees each post you share. Your journey is yours.</p>"),
+  ("who-sees", "Who can see my journey?", "<p>You choose who sees each post you share. Friends and followers see your journey: the posts you share with them, your profile card and its counts. Your plan, the notes of each day, your stamps, GPS tracks, health data and your notes are only for you. On a public profile anyone can follow you without asking; on a private profile you approve each follower.</p>"),
+  ("share-link", "Can I show my plan or a note to someone?", "<p>Yes, with a link that opens just that one plan or that one note. Anyone who has the link can see it until you stop sharing it. A plan link shows the route, the dates and where each day starts and ends (the place you sleep only if you choose); never notes, bookings, health or GPS. A note link carries a copy of the words of that one note; photos and videos are not included. Details are in the <a href=\"/privacy\">Privacy Policy</a>.</p>"),
   ("chat-privacy", "Are my messages private?", "<p>Messages in chats and group chats are only shown to the people in the chat, but they are stored on our servers and are <b>not end-to-end encrypted</b>. Do not send passwords or card numbers in chat. You can unsend your own messages, and they are deleted with your account. Details are in the <a href=\"/privacy\">Privacy Policy</a>.</p>"),
   ("sell", "Do you sell my data?", "<p>No. We do not sell personal data, and we do not run third-party ad tracking in the app.</p>"),
   ("delete", "How do I delete my account?", "<p>In the app, go to Settings (the gear at the top right of Me), then Account, then Delete account. That button is being finished and will be in the first release; until it is in your version, email <a href=\"mailto:privacy@camino.plus\">privacy@camino.plus</a> from the address you signed up with and we will do it for you. We delete your account and your data, including your messages, within 30 days, apart from what we must keep by law, such as billing records.</p>"),
@@ -782,7 +791,21 @@ def privacy():
 </ul>
 <p>We do not sell personal data and we do not use third-party advertising trackers in the app.</p>
 <h2>Friends</h2>
-<p>Friends are mutual: you become friends when you send a request and the other person accepts. We store the request, who sent it and when. Declining or cancelling a request deletes it, and so does removing a friend. People you block cannot send you friend requests or messages, and you do not appear in their search. A post you share with “Friends” is shown to your accepted friends and to anyone you have approved as a follower.</p>
+<p>Friends are mutual: you become friends when you send a request and the other person accepts. We store the request, who sent it and when. Declining or cancelling a request deletes it, and so does removing a friend. People you block cannot send you friend requests or messages, and you do not appear in their search. A post you share with “Friends” is shown to your accepted friends and to your followers. On a public profile anyone can follow you without asking; on a private profile you approve each follower.</p>
+<h2>Who sees what</h2>
+<ul>
+<li><b>Your journey</b> (the posts you share, your profile card and its counts, and your route with its status, its planned start and end dates and its distance) is shown to the people each post or setting allows: only you, your friends and followers, or everyone.</li>
+<li><b>Only for you:</b> your plan day by day (the date of each day, where it starts and ends, stays, bookings and the notes of each day), your passport stamps (their notes, places and photos), your GPS tracks and your health data. Friends and followers do not see them.</li>
+<li><b>Your notes</b> in the app stay on your phone and are not uploaded.</li>
+</ul>
+<h2>Share links</h2>
+<p>You can share one plan or one note through a link. Anyone who has the link can see what it shows, until you stop sharing it in the app. Links can also be made to expire.</p>
+<ul>
+<li>A <b>plan link</b> shows your plan as it is when the link is opened: the route, the start date, the distance, and for each day the date, where it starts and ends, its distance and whether it is walked. The name of the place you sleep is shown only if you choose. It never shows the notes of a day, bookings, contact details, health, GPS tracks or stamps.</li>
+<li>A <b>note link</b> carries a copy of the words of that one note (its title, text and date), made when you share it and stored on our servers until you stop sharing it. Photos, videos and the place of the note are not included.</li>
+<li>We store only a fingerprint (a hash) of each link, not the link itself, so we cannot give a lost link back; make a new one instead. We count how often a link is opened and when it was last opened, and show you both.</li>
+<li>The link page on this website reads the link only in your browser and does not use cookies or analytics. When you delete your account, your links stop working and are deleted.</li>
+</ul>
 <h2>Chat messages and groups</h2>
 <ul>
 <li>Messages you send in direct chats and group chats are stored on our servers so they can reach the other people in the chat and appear on your other devices.</li>
@@ -939,12 +962,94 @@ def licences():
     page("licences", "Licences", "The open data, fonts and software CaminoPlus is built on, with their licences and credits: OpenStreetMap, OpenMapTiles, Natural Earth, Overture, Wikidata and more.", body, None)
 
 
+def share():
+    """/s#<token>: one plan or one note somebody shared by link. The token is in the FRAGMENT of the address, so it never
+    reaches a server log or a Referer; /assets/share.js reads it, asks get_shared() and draws the answer with textContent only.
+    Every address on the page is relative, so it works on whatever host serves web/ (vercel.json adds the same CSP as a header,
+    with frame-ancestors). Not indexed, no referrer, no cookies, no analytics, no canonical and no preview card."""
+    title = "Shared with you · CaminoPlus"
+    body = f'''<section class="page-head share-head"><div class="wrap">
+  <p class="eyebrow">Shared with you</p>
+  <div id="share" class="share" data-api="{SHARE_SUPABASE_URL}" data-key="{SHARE_SUPABASE_KEY}" aria-live="polite" aria-busy="true">
+    <p class="lead share-loading">Opening the link…</p>
+    <noscript><h1>Turn on JavaScript</h1><p class="lead">This page needs JavaScript to open a shared plan or note.</p></noscript>
+  </div>
+</div></section>
+<template id="t-unavailable">
+  <h1>This link is not available</h1>
+  <p class="lead">It may have been stopped by the person who shared it, or it may have expired. Ask them for a new link.</p>
+</template>
+<template id="t-failed">
+  <h1>We could not open the link</h1>
+  <p class="lead">Check your connection and try again.</p>
+  <p class="share-actions"><button class="btn btn-primary" type="button" data-retry>Try again</button></p>
+</template>
+<template id="t-plan">
+  <h1 data-f="route"></h1>
+  <p class="lead">Shared by <b data-f="owner"></b></p>
+  <ul class="share-facts" data-f="facts"></ul>
+  <div class="card share-box">
+    <h2 class="share-box-title">What this link shows</h2>
+    <p data-f="shows"></p>
+    <h2 class="share-box-title">What it does not show</h2>
+    <p>Notes, bookings, contact details, health, GPS tracks, stamps and photos.</p>
+    <p class="share-small">This plan is live: you see the latest version each time you open the link. <span data-f="owner"></span> can stop sharing it at any time.</p>
+  </div>
+  <ol class="share-days" data-f="days"></ol>
+</template>
+<template id="t-day">
+  <li class="share-day">
+    <p class="share-day-head"><span class="share-day-n" data-f="n"></span><span class="share-day-date" data-f="date"></span><span class="share-status" data-f="status"></span></p>
+    <p class="share-day-way" data-f="way"></p>
+    <p class="share-day-meta" data-f="meta"></p>
+  </li>
+</template>
+<template id="t-note">
+  <h1 data-f="title"></h1>
+  <p class="lead">Shared by <b data-f="owner"></b></p>
+  <p class="share-day-meta" data-f="meta"></p>
+  <div class="card share-note" data-f="body"></div>
+  <div class="card share-box">
+    <h2 class="share-box-title">What this link shows</h2>
+    <p>A copy of this one note, made when it was shared.</p>
+    <h2 class="share-box-title">What it does not show</h2>
+    <p>Photos, videos, the other notes and the rest of the journey.</p>
+    <p class="share-small"><span data-f="owner"></span> can stop sharing it at any time.</p>
+  </div>
+</template>'''
+    PAGES["s/index.html"] = f'''<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="{SHARE_CSP}">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex,nofollow">
+<title>{esc(title)}</title>
+<meta name="description" content="A Camino plan or note somebody shared with you.">
+<meta name="theme-color" content="#F6EFE2">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+{FONT_PRELOADS}<link rel="stylesheet" href="{asset_url("tokens.css")}">
+<link rel="stylesheet" href="{asset_url("site.css")}">
+<script src="{asset_url("share.js")}" defer></script>
+</head>
+<body>
+{header(None)}
+<main id="main">
+{body}
+</main>
+{FOOTER}
+</body>
+</html>
+'''
+
+
 def notfound():
     body = head("404", "You've wandered off the Way.", "This page doesn't exist. Follow the yellow arrows back home.",
                 '<p style="margin-top:32px"><a class="btn btn-primary" href="/">Back to home</a></p>')
     page("404", "Page not found", "This page does not exist.", body, None)
 
-PAGE_FUNCS = (home, features, routes, pricing, offline, faq, about, contact, privacy, terms, licences, notfound)
+PAGE_FUNCS = (home, features, routes, pricing, offline, faq, about, contact, privacy, terms, licences, notfound, share)
 SITEMAP_ORDER = ("index", "features", "routes", "offline-maps", "pricing", "faq", "about", "contact", "privacy", "terms", "licences")
 
 
@@ -989,6 +1094,7 @@ def main(argv):
     out = pathlib.Path(args[0])
     out.mkdir(parents=True, exist_ok=True)
     for name, content in build_all(previous).items():
+        (out / name).parent.mkdir(parents=True, exist_ok=True)
         (out / name).write_text(content, encoding="utf-8")
     print("ok")
 

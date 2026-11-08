@@ -180,7 +180,7 @@ class Claims(unittest.TestCase):
     def test_legal_pages(self):
         privacy, terms = HTML["privacy.html"], HTML["terms.html"]
         for content in (privacy, terms):
-            self.assertIn("Last updated 7 November 2026.", content)
+            self.assertIn("Last updated 8 November 2026.", content)
             self.assertIn("Draft for launch", content)
         for needle in ("not end-to-end encrypted", "Settings, then Account, then Delete account", "Supabase", "MapTiler and OpenFreeMap",
                        "friend requests", "within 30 days", "when enabled"):
@@ -323,6 +323,7 @@ class Sitemap(unittest.TestCase):
             prev = pathlib.Path(prev)
             # previous site: identical pages, an old sitemap, except /faq which differs
             for name, content in HTML.items():
+                (prev / name).parent.mkdir(parents=True, exist_ok=True)  # s/index.html lives in a folder
                 (prev / name).write_text(content if name != "faq.html" else content + "<!-- old -->", encoding="utf-8")
             old = build_web.sitemap(prev)  # no previous sitemap yet: everything is "today"
             self.assertEqual(old.count("2030-01-02"), len(build_web.SITEMAP_ORDER))
@@ -336,6 +337,7 @@ class Sitemap(unittest.TestCase):
         with tempfile.TemporaryDirectory() as out:
             out = pathlib.Path(out)
             for name, content in PAGES.items():
+                (out / name).parent.mkdir(parents=True, exist_ok=True)
                 (out / name).write_text(content, encoding="utf-8")
             os.environ["SITEMAP_LASTMOD"] = "2099-01-01"
             self.assertEqual(build_web.sitemap(out), PAGES["sitemap.xml"])
@@ -346,6 +348,66 @@ class CommittedSite(unittest.TestCase):
         """The committed pages are what the generator makes (CI runs the same check in its own job)."""
         for name, content in build_web.build_all().items():
             self.assertEqual((ROOT / "web" / name).read_text(encoding="utf-8"), content, f"web/{name} is stale: run python3 tools/build_web.py web")
+
+
+class SharePage(unittest.TestCase):
+    """/s#<token>: the page of a share link (tools/build_web.py share(), web/assets/share.js)."""
+    page = HTML["s/index.html"]
+    js = (ROOT / "web" / "assets" / "share.js").read_text(encoding="utf-8")
+
+    def test_it_is_private_by_its_head(self):
+        self.assertIn('<meta name="robots" content="noindex,nofollow">', self.page)
+        self.assertIn('<meta name="referrer" content="no-referrer">', self.page)
+        self.assertIn(f'<meta http-equiv="Content-Security-Policy" content="{build_web.SHARE_CSP}">', self.page)
+        self.assertNotIn('rel="canonical"', self.page)
+        self.assertNotIn('property="og:', self.page, "no preview card: a chat app that fetches the link learns nothing")
+        self.assertNotIn("https://camino.plus", self.page, "works on whatever host serves web/")
+        self.assertNotIn("/s<", PAGES["sitemap.xml"])
+
+    def test_the_policy_allows_the_database_and_nothing_else(self):
+        csp = dict(part.strip().split(" ", 1) for part in build_web.SHARE_CSP.split(";"))
+        self.assertEqual(csp["default-src"], "'none'")
+        self.assertEqual(csp["script-src"], "'self'")
+        self.assertEqual(csp["connect-src"], build_web.SHARE_SUPABASE_URL)
+        self.assertNotIn("unsafe", build_web.SHARE_CSP)
+        # no inline script, style or handler that the policy would block
+        self.assertEqual(re.findall(r"<script(?![^>]*\bsrc=)[^>]*>", self.page), [])
+        self.assertNotIn(" style=", self.page)
+        self.assertNotRegex(self.page, r"\son[a-z]+=", "no inline event handler")
+        cfg = json.loads((ROOT / "web" / "vercel.json").read_text())
+        rule = next(h for h in cfg["headers"] if h["source"] == "/s(/.*)?")
+        values = {h["key"]: h["value"] for h in rule["headers"]}
+        self.assertEqual(values["Content-Security-Policy"], build_web.SHARE_CSP + "; frame-ancestors 'none'")
+        self.assertEqual(values["Referrer-Policy"], "no-referrer")
+        self.assertEqual(values["X-Robots-Tag"], "noindex, nofollow")
+        self.assertIs(cfg["headers"][-1], rule, "after the catch-all rule, so its Referrer-Policy wins")
+
+    def test_it_uses_the_public_config_of_the_app(self):
+        config = (ROOT / "mobile" / "src" / "lib" / "config.ts").read_text(encoding="utf-8")
+        self.assertIn(f"EU_PROJECT_URL = '{build_web.SHARE_SUPABASE_URL}'", config)
+        self.assertIn(f"EU_PUBLISHABLE_KEY = '{build_web.SHARE_SUPABASE_KEY}'", config)
+        self.assertTrue(build_web.SHARE_SUPABASE_KEY.startswith("sb_publishable_"), "the publishable key, never a secret one")
+        self.assertIn(f'data-api="{build_web.SHARE_SUPABASE_URL}" data-key="{build_web.SHARE_SUPABASE_KEY}"', self.page)
+        self.assertRegex(self.page, r'<script src="/assets/share\.js\?v=[0-9a-f]{10}" defer></script>')
+
+    def test_the_script_reads_the_fragment_and_draws_text_only(self):
+        js = re.sub(r"//[^\n]*", "", self.js)
+        self.assertIn("window.location.hash", js)
+        self.assertIn("'/rest/v1/rpc/get_shared'", js)
+        self.assertIn("method: 'POST'", js)
+        self.assertIn("credentials: 'omit'", js)
+        for bad in ("innerHTML", "outerHTML", "insertAdjacentHTML", "document.write", "eval(", "new Function", "localStorage",
+                    "sessionStorage", "document.cookie", "location.search", "sendBeacon", "XMLHttpRequest"):
+            self.assertNotIn(bad, js, bad)
+        self.assertIn("textContent", js)
+
+    def test_it_says_what_is_shown_and_what_is_not(self):
+        text = html.unescape(re.sub(r"<[^>]+>", " ", self.page))
+        for words in ("This link is not available", "What this link shows", "What it does not show",
+                      "Notes, bookings, contact details, health, GPS tracks, stamps and photos.",
+                      "A copy of this one note, made when it was shared.", "Photos, videos, the other notes and the rest of the journey.",
+                      "This plan is live"):
+            self.assertIn(words, text)
 
 
 if __name__ == "__main__":

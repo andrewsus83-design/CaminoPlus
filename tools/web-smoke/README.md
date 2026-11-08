@@ -252,3 +252,4 @@ Chromium; a test checks they agree). Bump both on purpose, with the tests looked
 | [fixtures.mjs](fixtures.mjs) | the Supabase project, the saved state of the phone, the realtime socket |
 | [collector.mjs](collector.mjs) | what counts as a failure; the console allow-list |
 | [server.mjs](server.mjs) | a static server with single-page-app fallback, on a free port |
+| [share-page.mjs](share-page.mjs) | not part of the app sweep: the share-link page of the WEBSITE (`web/s/index.html`, `web/assets/share.js`) served from `web/` with `get_shared` mocked; a plan, a note (its words never drawn as HTML), an unknown, a malformed and a failing link, light and dark, 390 and 320 wide. `node tools/web-smoke/share-page.mjs [--shots DIR]` |

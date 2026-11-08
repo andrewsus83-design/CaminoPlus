@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self'; connect-src https://xgikdabgdqmbdgagowva.supabase.co; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex,nofollow">
+<title>Shared with you · CaminoPlus</title>
+<meta name="description" content="A Camino plan or note somebody shared with you.">
+<meta name="theme-color" content="#F6EFE2">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="/assets/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/fraunces-latin-opsz-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/tokens.css?v=cef51b7252">
+<link rel="stylesheet" href="/assets/site.css?v=22bc181fb2">
+<script src="/assets/share.js?v=1297f24d27" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="wrap">
+    <nav class="nav" aria-label="Main">
+      <a class="brand" href="/" aria-label="CaminoPlus home"><svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="20" fill="#14365D"/><g transform="translate(0 -2.12)"><path d="M20 28.5L5.84 22.20A2.84 2.84 0 0 1 8.64 17.96A2.84 2.84 0 0 1 12.66 14.85A2.84 2.84 0 0 1 17.46 13.21A2.84 2.84 0 0 1 22.54 13.21A2.84 2.84 0 0 1 27.34 14.85A2.84 2.84 0 0 1 31.36 17.96A2.84 2.84 0 0 1 34.16 22.20z" fill="#D9A21B"/><path d="M20 29.0Q14.09 22.35 8.49 17.82M20 29.0Q16.22 20.86 12.56 14.67M20 29.0Q18.70 20.07 17.43 13.01M20 29.0Q21.30 20.07 22.57 13.01M20 29.0Q23.78 20.86 27.44 14.67M20 29.0Q25.91 22.35 31.51 17.82" stroke="#14365D" stroke-width="1.15" stroke-linecap="round" fill="none"/><path d="M15.2 31.4Q18 30.6 18.4 28.3H21.6Q22 30.6 24.8 31.4Q24.6 32.6 20 32.6Q15.4 32.6 15.2 31.4z" fill="#D9A21B"/></g></svg><span>Camino<span class="plus">+</span></span></a>
+      <ul class="nav-links"><li><a href="/features">Features</a></li><li><a href="/routes">Routes</a></li><li><a href="/offline-maps">Offline maps</a></li><li><a href="/pricing">Pricing</a></li><li><a href="/faq">FAQ</a></li><li><a href="/about">About</a></li><li><a href="/contact">Contact</a></li></ul>
+      <a class="btn btn-primary nav-cta" href="/#download">Get the app</a>
+      <button class="menu-btn" type="button" aria-expanded="false" aria-controls="mobile-nav" aria-label="Open menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+    </nav>
+    <div class="mobile-nav" id="mobile-nav">
+      <ul><li><a href="/features">Features</a></li><li><a href="/routes">Routes</a></li><li><a href="/offline-maps">Offline maps</a></li><li><a href="/pricing">Pricing</a></li><li><a href="/faq">FAQ</a></li><li><a href="/about">About</a></li><li><a href="/contact">Contact</a></li></ul>
+      <a class="btn btn-gold" href="/#download">Get the app</a>
+    </div>
+  </div>
+</header>
+<main id="main">
+<section class="page-head share-head"><div class="wrap">
+  <p class="eyebrow">Shared with you</p>
+  <div id="share" class="share" data-api="https://xgikdabgdqmbdgagowva.supabase.co" data-key="sb_publishable_tM2U4JVCBMgnMZ86-_DM0g_KxYFGNVQ" aria-live="polite" aria-busy="true">
+    <p class="lead share-loading">Opening the link…</p>
+    <noscript><h1>Turn on JavaScript</h1><p class="lead">This page needs JavaScript to open a shared plan or note.</p></noscript>
+  </div>
+</div></section>
+<template id="t-unavailable">
+  <h1>This link is not available</h1>
+  <p class="lead">It may have been stopped by the person who shared it, or it may have expired. Ask them for a new link.</p>
+</template>
+<template id="t-failed">
+  <h1>We could not open the link</h1>
+  <p class="lead">Check your connection and try again.</p>
+  <p class="share-actions"><button class="btn btn-primary" type="button" data-retry>Try again</button></p>
+</template>
+<template id="t-plan">
+  <h1 data-f="route"></h1>
+  <p class="lead">Shared by <b data-f="owner"></b></p>
+  <ul class="share-facts" data-f="facts"></ul>
+  <div class="card share-box">
+    <h2 class="share-box-title">What this link shows</h2>
+    <p data-f="shows"></p>
+    <h2 class="share-box-title">What it does not show</h2>
+    <p>Notes, bookings, contact details, health, GPS tracks, stamps and photos.</p>
+    <p class="share-small">This plan is live: you see the latest version each time you open the link. <span data-f="owner"></span> can stop sharing it at any time.</p>
+  </div>
+  <ol class="share-days" data-f="days"></ol>
+</template>
+<template id="t-day">
+  <li class="share-day">
+    <p class="share-day-head"><span class="share-day-n" data-f="n"></span><span class="share-day-date" data-f="date"></span><span class="share-status" data-f="status"></span></p>
+    <p class="share-day-way" data-f="way"></p>
+    <p class="share-day-meta" data-f="meta"></p>
+  </li>
+</template>
+<template id="t-note">
+  <h1 data-f="title"></h1>
+  <p class="lead">Shared by <b data-f="owner"></b></p>
+  <p class="share-day-meta" data-f="meta"></p>
+  <div class="card share-note" data-f="body"></div>
+  <div class="card share-box">
+    <h2 class="share-box-title">What this link shows</h2>
+    <p>A copy of this one note, made when it was shared.</p>
+    <h2 class="share-box-title">What it does not show</h2>
+    <p>Photos, videos, the other notes and the rest of the journey.</p>
+    <p class="share-small"><span data-f="owner"></span> can stop sharing it at any time.</p>
+  </div>
+</template>
+</main>
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="stack">
+        <a class="brand" href="/"><svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="20" fill="#14365D"/><g transform="translate(0 -2.12)"><path d="M20 28.5L5.84 22.20A2.84 2.84 0 0 1 8.64 17.96A2.84 2.84 0 0 1 12.66 14.85A2.84 2.84 0 0 1 17.46 13.21A2.84 2.84 0 0 1 22.54 13.21A2.84 2.84 0 0 1 27.34 14.85A2.84 2.84 0 0 1 31.36 17.96A2.84 2.84 0 0 1 34.16 22.20z" fill="#D9A21B"/><path d="M20 29.0Q14.09 22.35 8.49 17.82M20 29.0Q16.22 20.86 12.56 14.67M20 29.0Q18.70 20.07 17.43 13.01M20 29.0Q21.30 20.07 22.57 13.01M20 29.0Q23.78 20.86 27.44 14.67M20 29.0Q25.91 22.35 31.51 17.82" stroke="#14365D" stroke-width="1.15" stroke-linecap="round" fill="none"/><path d="M15.2 31.4Q18 30.6 18.4 28.3H21.6Q22 30.6 24.8 31.4Q24.6 32.6 20 32.6Q15.4 32.6 15.2 31.4z" fill="#D9A21B"/></g></svg><span>Camino<span class="plus">+</span></span></a>
+        <p>The offline-first companion for every Camino de Santiago route. Maps, stays, stamps and stories, in one app.</p>
+        <div class="on-dark"><div class="stores"><span class="store" aria-disabled="true">iOS: coming soon</span><span class="store" aria-disabled="true">Android: coming soon</span></div></div>
+      </div>
+      <div><h4>Product</h4><ul>
+        <li><a href="/features">Features</a></li><li><a href="/routes">Routes</a></li>
+        <li><a href="/offline-maps">Offline maps</a></li><li><a href="/pricing">Pricing</a></li></ul></div>
+      <div><h4>Help</h4><ul>
+        <li><a href="/faq">FAQ</a></li><li><a href="/contact">Contact</a></li>
+        <li><a href="mailto:hello@camino.plus">hello@camino.plus</a></li></ul></div>
+      <div><h4>Company</h4><ul>
+        <li><a href="/about">About</a></li><li><a href="/privacy">Privacy</a></li>
+        <li><a href="/terms">Terms</a></li><li><a href="/licences">Licences</a></li></ul></div>
+    </div>
+    <p class="foot-credit">Photos and backgrounds on this site are AI-generated illustrations, not photographs. Landmarks may differ from the real thing.</p>
+    <div class="foot-bottom">
+      <span>© 2026 CaminoPlus. Map data © <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap contributors</a>.</span>
+      <span class="script">Buen Camino</span>
+    </div>
+  </div>
+</footer>
+<script src="/assets/site.js?v=260f714cdb" defer></script>
+</body>
+</html>
