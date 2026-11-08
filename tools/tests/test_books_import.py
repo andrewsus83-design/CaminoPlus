@@ -10,8 +10,10 @@ import dataclasses
 import hashlib
 import io
 import json
+import os
 import pathlib
 import re
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -914,6 +916,7 @@ class Repository(unittest.TestCase):
         for path in sorted((TOOLS / "books").glob("*.py")):
             py_compile.compile(str(path), doraise=True, cfile=str(pathlib.Path(tempfile.gettempdir()) / "books_check.pyc"))
 
+    @unittest.skipIf(os.environ.get("BREAKAGE_CHECK_RUNNING"), "a breakage is in place: the breakage check says itself when a text is not found exactly once")
     def test_every_breakage_of_the_breakage_check_still_finds_its_text_exactly_once_and_there_are_enough_of_them(self):
         import breakage_check as BC
         self.assertGreaterEqual(len(BC.MUTATIONS), 30)
@@ -922,6 +925,40 @@ class Repository(unittest.TestCase):
             text = (ROOT / rel).read_text(encoding="utf-8")
             self.assertEqual(text.count(old), 1, f"{name}: the text to break is not in {rel} exactly once")
             self.assertNotEqual(old, new, name)
+
+    def test_a_breakage_is_red_when_the_runner_fails_green_when_it_does_not_skipped_when_its_text_is_not_there_once_and_the_file_always_comes_back(self):
+        import breakage_check as BC
+        with tempfile.TemporaryDirectory() as d:
+            path = pathlib.Path(d) / "m.py"
+            path.write_text("A = 1\nB = 2\nB = 2\n", encoding="utf-8")
+            before = path.read_bytes()
+            green = [sys.executable, "-c", "pass"]
+            red = [sys.executable, "-c", "raise SystemExit(1)"]
+            self.assertEqual(BC.try_breakage(d, "m.py", "A = 1", "A = 9", green)[0], "STILL GREEN")
+            self.assertEqual(BC.try_breakage(d, "m.py", "A = 1", "A = 9", red)[0], "RED")
+            self.assertEqual(BC.try_breakage(d, "m.py", "B = 2", "B = 9", red)[0], "SKIPPED: the text to break was found 2 times")
+            self.assertEqual(BC.try_breakage(d, "m.py", "C = 3", "C = 9", red)[0], "SKIPPED: the text to break was found 0 times")
+            self.assertEqual(path.read_bytes(), before, "the file is back, byte for byte")
+            with self.assertRaises(FileNotFoundError):
+                BC.try_breakage(d, "m.py", "A = 1", "A = 9", ["no-such-program-for-the-breakage-check"])
+            self.assertEqual(path.read_bytes(), before, "the file is back even when the runner could not start")
+
+    def test_a_breakage_put_back_within_the_same_second_leaves_no_bytecode_of_the_breakage_behind(self):
+        import breakage_check as BC
+        with tempfile.TemporaryDirectory() as d, unittest.mock.patch.dict(os.environ):
+            os.environ.pop("PYTHONDONTWRITEBYTECODE", None)  # whoever runs these tests (the breakage check does) must not decide what is tested
+            module = pathlib.Path(d) / "m.py"
+            (pathlib.Path(d) / "t.py").write_text("import m\nassert m.X == 1882, m.X\n", encoding="utf-8")
+            runner = [sys.executable, "t.py"]
+            for attempt in range(5):  # a breakage and its undoing fall in one second nearly every time: one attempt in five is enough to show it
+                module.write_text("X = 1882\n", encoding="utf-8")
+                long_ago = module.stat().st_mtime - 3600
+                os.utime(module, (long_ago, long_ago))
+                self.assertEqual(subprocess.run(runner, cwd=d, capture_output=True, text=True).returncode, 0, "the file as it is, with its bytecode as in a checkout")
+                outcome, why = BC.try_breakage(d, "m.py", "1882", "1960", runner)  # the same size, so only the time tells the files apart
+                self.assertEqual(outcome, "RED", why)
+                after = subprocess.run(runner, cwd=d, capture_output=True, text=True)
+                self.assertEqual(after.returncode, 0, f"attempt {attempt}: the file is back, but Python runs the breakage ({after.stderr.strip()[-60:]})")
 
     def test_dataclass_is_frozen(self):
         with self.assertRaises(dataclasses.FrozenInstanceError):
