@@ -169,7 +169,7 @@ textarea.cp-input { height: 120px; border-radius: var(--cp-radius-lg); padding: 
 .cp-search .txt { flex: 1; min-width: 0; }
 .cp-search .t1 { font-weight: 600; font-size: 18px; line-height: 20px; }
 .cp-search .t2 { font-size: 15px; line-height: 18px; color: var(--cp-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-/* Library: the row on top is a search pill (the free width) and two round buttons, bookmarks then the diary: 52 high, 8 apart, as in the app
+/* Library: the row on top is a search pill (the free width) and one round button, Bookmarks: 52 high, 8 apart, as in the app
    (features/library/LibraryHeader.tsx). A row of a tab carries a bookmark button: a bare 44 round touch area, filled when it is on. */
 .lib-head { display: flex; align-items: center; gap: 8px; }
 .lib-head .cp-icon-btn { width: 52px; height: 52px; flex: none; }
@@ -186,7 +186,7 @@ textarea.cp-input { height: 120px; border-radius: var(--cp-radius-lg); padding: 
 .lib-row .t { font-weight: 600; font-size: 17px; line-height: 22px; }
 .lib-row .n { font-size: 15px; line-height: 21px; letter-spacing: .4px; font-weight: 500; color: var(--cp-text-muted); }
 .lib-row > .cp-icon { color: var(--cp-text-muted); }
-.lib-chip { display: inline-flex; align-items: center; align-self: flex-start; height: 24px; padding: 0 10px; border-radius: var(--cp-radius-pill); font-family: var(--cp-font-mono); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; }
+.lib-chip { display: inline-flex; align-items: center; align-self: flex-start; height: 24px; padding: 0 10px; border-radius: var(--cp-radius-pill); font-family: var(--cp-font-mono); font-size: 12px; line-height: 16px; letter-spacing: 1px; text-transform: uppercase; }
 .lib-chip.soon { background: var(--cp-surface-sunken); color: var(--cp-text-muted); }
 .lib-chip.sample { background: var(--cp-color-gold-wash); color: var(--cp-color-gold-ink); box-shadow: inset 0 0 0 1px var(--cp-color-gold-soft); }
 .lib-notice { display: flex; align-items: flex-start; gap: 12px; padding: 14px; border-radius: var(--cp-radius-lg); background: var(--cp-color-gold-wash); box-shadow: inset 0 0 0 1px var(--cp-color-gold-soft); }
@@ -200,6 +200,38 @@ textarea.cp-input { height: 120px; border-radius: var(--cp-radius-lg); padding: 
 .lib-cover > .cp-icon { width: 28px; height: 28px; }
 .lib-cover .lib-mark { position: absolute; top: 4px; right: 4px; color: var(--cp-color-blue); }
 .lib-kind { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; font-size: 15px; line-height: 21px; letter-spacing: .4px; font-weight: 500; color: var(--cp-text-muted); }
+/* Library tabs (features/library): under the tab strip, Bible and Books each have one banner, a single card with no dots, in the look of the promo
+   banner (.cp-banner) with a line under the title. The Bible banner is one button (the gold pill is its look). The rows of the two tabs: a Bible row is the
+   name, then "50 chapters" with the Soon chip beside it (under it when the line carries the part, or a detail); a book is a cover, the title and
+   "author · era", the bookmark, and under them the blurb and the chips Free and Soon. The three choices of the Bible tab float above the tab bar,
+   where the gold pen sits on Notes (8 clear of the bar, which here is 26 from the bottom of the phone): 56 high with 3 of padding, the chosen one filled, the middle one keeps the width of its word. */
+.cp-banner.lib { padding: 24px; min-height: 190px; display: flex; flex-direction: column; justify-content: space-between; }
+.cp-banner.lib .ey, .cp-banner.lib h4, .cp-banner.lib .line { position: relative; }
+.cp-banner.lib .ey { font-size: 15px; line-height: 22px; color: var(--cp-color-gold-soft); }
+.cp-banner.lib h4 { font-size: 28px; line-height: 34px; margin: 8px 0 0; max-width: 230px; }
+.cp-banner.lib .line { margin: 8px 0 0; font-size: 17px; line-height: 25px; max-width: 230px; color: var(--cp-text-inverse); }
+.cp-banner.lib .cp-btn { height: 48px; padding: 0 24px; font-size: 17px; margin-top: 16px; align-self: flex-start; }
+.lib-tx { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.lib-sub { display: flex; align-items: center; gap: 8px; }
+.lib-sub.stack { flex-direction: column; align-items: flex-start; gap: 6px; }
+.lib-sub .n { font-size: 15px; line-height: 21px; letter-spacing: .4px; font-weight: 500; color: var(--cp-text-muted); }
+.lib-chip.free { background: var(--cp-success-wash); color: var(--cp-success); }
+.lib-hrow { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; column-gap: 12px; row-gap: 2px; }
+.lib-hrow .cnt { font-size: 17px; line-height: 25px; color: var(--cp-text-muted); }
+.lib-book { display: flex; flex-direction: column; gap: 10px; padding: 14px 6px 14px 16px; border-top: 1px solid var(--cp-border); }
+.lib-book:first-child { border-top: 0; }
+.lib-book .top { display: flex; align-items: flex-start; gap: 14px; }
+.lib-book .cv { width: 52px; height: 68px; flex: none; border-radius: var(--cp-radius-xs, 8px); display: grid; place-items: center; color: var(--cp-color-blue); }
+.lib-book .cv .cp-icon { width: 26px; height: 26px; }
+.lib-book .tt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.lib-book .t { font-weight: 600; font-size: 17px; line-height: 22px; }
+.lib-book .a { font-size: 15px; line-height: 21px; letter-spacing: .4px; font-weight: 500; color: var(--cp-text-muted); }
+.lib-book p { margin: 0; padding-right: 10px; font-size: 17px; line-height: 25px; }
+.lib-book .chips { display: flex; gap: 8px; }
+.lib-bar { position: absolute; left: 16px; right: 16px; bottom: 122px; z-index: 7; height: 56px; display: flex; gap: 2px; padding: 3px; border-radius: var(--cp-radius-pill); background: var(--cp-surface); box-shadow: inset 0 0 0 1px var(--cp-border), var(--cp-shadow-md); }
+.lib-bar button { flex: 1 1 0; min-width: 0; border: 0; padding: 0 8px; border-radius: var(--cp-radius-pill); background: none; color: var(--cp-text); font: 600 14px/18px var(--cp-font-body); text-align: center; cursor: pointer; }
+.lib-bar button.mid { flex: 0 0 auto; }
+.lib-bar button.on { background: var(--cp-action); color: var(--cp-on-action); }
 .cp-switch { width: 52px; height: 32px; border-radius: var(--cp-radius-pill); background: var(--cp-border-strong); position: relative; flex: none; }
 .cp-switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 26px; height: 26px; border-radius: 50%; background: var(--cp-surface); box-shadow: var(--cp-shadow-sm); transition: left var(--cp-duration-base); }
 .cp-switch.on { background: var(--cp-color-blue); }
@@ -637,6 +669,64 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
 .dy-read .q { border-left: 3px solid var(--cp-color-gold); padding-left: 14px; }
 .dy-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .dy-grid .dy-tile { width: auto; height: auto; aspect-ratio: 1 / 1; }
+/* ---- Library · Notes: the diary's pages as a feed (start) ---- */
+.nt-top { position: absolute; top: 54px; left: 0; right: 0; z-index: 4; padding: var(--cp-screen-top) var(--cp-screen-margin) 0; background: var(--cp-bg); }
+.nt-top .cp-subtabs { margin-top: 16px; }
+.nt-feed.scroll { top: 181px; padding: 0 0 140px; }
+.nt-av { width: 44px; height: 44px; border-radius: 50%; flex: none; background: #C9A48A; color: var(--cp-color-blue); display: grid; place-items: center; font-weight: 600; font-size: 16px; line-height: 20px; }
+.nt-compose { display: flex; gap: 12px; padding: 12px 16px 0; }
+.nt-compose .nt-body { flex: 1; min-width: 0; }
+.nt-prompt { min-height: 48px; display: flex; align-items: center; font-size: 19px; line-height: 28px; color: var(--cp-text-muted); }
+.nt-short { display: flex; margin-left: -11px; color: var(--cp-action); }
+.nt-short span { width: 44px; height: 44px; display: grid; place-items: center; }
+.nt-short .cp-icon { width: 22px; height: 22px; }
+.nt-private { margin: 0; padding: 2px 16px 14px; font-size: 15px; line-height: 21px; letter-spacing: .4px; font-weight: 500; color: var(--cp-text-muted); }
+.nt-filters { display: flex; border-top: 1px solid var(--cp-border); border-bottom: 1px solid var(--cp-border); }
+.nt-filters span { flex: 1 1 auto; text-align: center; min-height: 44px; padding: 12px 12px 10px; font-size: 17px; line-height: 22px; font-weight: 600; color: var(--cp-text-muted); border-bottom: 3px solid transparent; margin-bottom: -1px; }
+.nt-filters span.on { color: var(--cp-text); border-color: var(--cp-color-blue); }
+.nt-row { display: flex; gap: 12px; padding: 12px 16px 4px; border-bottom: 1px solid var(--cp-border); }
+.nt-row.noacts { padding-bottom: 14px; }
+.nt-main { flex: 1; min-width: 0; }
+.nt-hd { display: flex; align-items: center; min-height: 24px; }
+.nt-hd .who { flex: 0 1 auto; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; font-size: 17px; line-height: 22px; }
+.nt-hd .who i { font-style: normal; font-weight: 500; font-size: 15px; letter-spacing: .4px; color: var(--cp-text-muted); }
+.nt-hd .tm { flex: none; white-space: pre; font-size: 15px; line-height: 21px; letter-spacing: .4px; font-weight: 500; color: var(--cp-text-muted); }
+.nt-hd .more { flex: none; width: 44px; height: 44px; margin: -10px -12px -10px auto; display: grid; place-items: center; color: var(--cp-text-muted); }
+.nt-hd .more .cp-icon { width: 22px; height: 22px; }
+.nt-title { margin: 2px 0 0; font-family: var(--cp-font-title); font-weight: 600; font-size: 20px; line-height: 26px; }
+.nt-words { margin-top: 4px; position: relative; }
+.nt-words.cut { max-height: 224px; overflow: hidden; }
+.nt-words.cut::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 16px; background: linear-gradient(to bottom, transparent, var(--cp-bg)); }
+.nt-showmore { min-height: 44px; display: flex; align-items: center; font-weight: 600; font-size: 17px; line-height: 22px; color: var(--cp-text-accent); }
+.nt-grid { margin-top: 10px; aspect-ratio: 16 / 9; border-radius: var(--cp-radius-md); overflow: hidden; display: flex; gap: 2px; background: var(--cp-bg); }
+.nt-grid .col { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.nt-tile { flex: 1; position: relative; overflow: hidden; min-height: 0; }
+.nt-tile .cp-img { position: absolute; inset: 0; border-radius: 0; }
+.nt-tile.clip { background: #000; display: grid; place-items: center; }
+.nt-tile.clip .play { width: 44px; height: 44px; border-radius: 50%; border: 2px solid #fff; background: rgba(0, 0, 0, .45); color: #fff; display: grid; place-items: center; }
+.nt-tile.clip.big .play { width: 56px; height: 56px; }
+.nt-tile.clip .play .cp-icon { width: 20px; height: 20px; fill: currentColor; }
+.nt-tile.clip.big .play .cp-icon { width: 26px; height: 26px; }
+.nt-tile .len { position: absolute; left: 6px; bottom: 6px; background: rgba(0, 0, 0, .45); color: #fff; border-radius: 8px; padding: 2px 6px; font-size: 13px; line-height: 17px; }
+.nt-tile .plus { position: absolute; inset: 0; background: rgba(0, 0, 0, .45); color: #fff; display: grid; place-items: center; font-family: var(--cp-font-title); font-weight: 600; font-size: 24px; line-height: 30px; }
+.nt-place { margin-top: 10px; display: inline-flex; align-items: center; gap: 8px; max-width: 100%; min-height: 44px; padding: 0 14px; border-radius: var(--cp-radius-pill); background: var(--cp-surface); box-shadow: inset 0 0 0 1px var(--cp-border); font-size: 15px; line-height: 21px; letter-spacing: .4px; font-weight: 500; }
+.nt-place .cp-icon { width: 18px; height: 18px; stroke-width: 2px; color: var(--cp-text-accent); }
+.nt-acts { display: flex; margin: 4px 0 0 -11px; color: var(--cp-text-muted); }
+.nt-acts span { width: 44px; height: 44px; display: grid; place-items: center; }
+.nt-acts .cp-icon { width: 22px; height: 22px; }
+.nt-empty { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 24px 32px 24px; text-align: center; }
+.nt-empty .badge { width: 56px; height: 56px; border-radius: 50%; background: var(--cp-highlight); color: var(--cp-on-highlight); display: grid; place-items: center; }
+.nt-empty .badge .cp-icon { width: 28px; height: 28px; }
+.nt-empty h4 { margin: 0; font-family: var(--cp-font-title); font-weight: 600; font-size: 24px; line-height: 30px; }
+.nt-empty p { margin: 0; font-size: 17px; line-height: 25px; color: var(--cp-text-muted); }
+.nt-scrim { position: absolute; inset: 0; z-index: 8; background: rgba(20, 54, 93, .45); }
+.nt-sheet { position: absolute; left: 0; right: 0; bottom: 0; z-index: 9; background: var(--cp-surface); border-radius: var(--cp-radius-lg) var(--cp-radius-lg) 0 0; padding: 20px 16px 34px; display: flex; flex-direction: column; gap: 4px; }
+.nt-sheet .what { padding: 0 12px 8px; font-size: 17px; line-height: 25px; color: var(--cp-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nt-sheet .item { display: flex; align-items: center; gap: 16px; min-height: 56px; padding: 0 12px; font-size: 22px; line-height: 32px; }
+.nt-sheet .item .cp-icon { width: 24px; height: 24px; }
+.nt-sheet .item.danger { color: var(--cp-danger); }
+.nt-sheet .cp-btn { margin-top: 12px; height: 68px; font-size: 22px; background: var(--cp-surface); color: var(--cp-text); box-shadow: inset 0 0 0 1px var(--cp-border); }
+/* ---- Library · Notes (end) ---- */
 .cp-toolbar { display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; background: var(--cp-surface); border-radius: var(--cp-radius-pill); box-shadow: var(--cp-shadow-lg); }
 .cp-toolbar .cp-icon-btn { box-shadow: none; background: transparent; }
 .cp-toolbar .cp-icon-btn.on { background: var(--cp-color-gold-soft); }
@@ -937,6 +1027,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     <symbol id="i-more" viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="3.25"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="3.25"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="3.25"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="3.25"/></symbol>
     <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></symbol>
     <symbol id="i-library" viewBox="0 0 24 24"><path d="M12 7.5C10.7 6.3 8.7 5.5 6.2 5.5H3.5v12h2.7c2.5 0 4.5.8 5.8 2 1.3-1.2 3.3-2 5.8-2h2.7v-12h-2.7c-2.5 0-4.5.8-5.8 2Z"/><path d="M12 7.5v12"/></symbol>
+    <symbol id="i-building" viewBox="0 0 24 24"><path d="M5 21V4.5A1.5 1.5 0 0 1 6.5 3h7A1.5 1.5 0 0 1 15 4.5V21"/><path d="M15 9.5h2.5A1.5 1.5 0 0 1 19 11v10"/><path d="M3 21h18"/><path d="M8.5 7h2M8.5 11h2M8.5 15h2"/></symbol>
     <symbol id="i-book" viewBox="0 0 24 24"><path d="M7 3.5h10.5A1.5 1.5 0 0 1 19 5v14.5a1 1 0 0 1-1 1H7.5A2 2 0 0 1 5.5 18.5V5A1.5 1.5 0 0 1 7 3.5Z"/><path d="M5.5 18.5A2 2 0 0 1 7.5 16.5H19"/><path d="M12.25 6.5v6.5M9.5 8.9h5.5"/></symbol>
     <symbol id="i-diary" viewBox="0 0 24 24"><path d="M8.5 4h10A1.5 1.5 0 0 1 20 5.5v13a1.5 1.5 0 0 1-1.5 1.5h-10A1.5 1.5 0 0 1 7 18.5v-13A1.5 1.5 0 0 1 8.5 4Z"/><path d="M4 8h4M4 12h4M4 16h4"/><path d="M11.5 8.5h5.5M11.5 12h3.5"/></symbol>
     <symbol id="i-music" viewBox="0 0 24 24"><path d="M9 18V5.5l11-2V16"/><path d="M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/><path d="M20 16a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></symbol>
@@ -1512,7 +1603,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
       <div style="display:flex;align-items:center;gap:10px"><span class="un">ana.camina</span><span class="cp-edit-pill"><svg class="cp-icon "><use href="#i-pencil"/></svg>camino.plus/ana</span></div>
     </div>
     <div class="panel">
-      <p class="spec" style="margin:0 0 16px">.cp-fab-write · gold, 60 round, icon only, bottom-right above the tab bar. Me: the pen writes a journey post. Library: the note icon writes a diary page. One component in the app (components/Fab.tsx).</p>
+      <p class="spec" style="margin:0 0 16px">.cp-fab-write · gold, 60 round, icon only, bottom-right above the tab bar. Me: the pen writes a journey post. Library: on the Notes tab the note icon writes a note. One component in the app (components/Fab.tsx).</p>
       <div class="row"><button class="cp-fab-write" aria-label="Write a journey post"><svg class="cp-icon "><use href="#i-pencil"/></svg></button></div>
     </div>
   </div>
@@ -1708,8 +1799,8 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     <div class="panel" style="padding:12px 24px 0"><div class="cp-subtabs" style="margin:0"><span class="on"><svg class="cp-icon sm"><use href="#i-steps"/></svg>Journey</span><span class=""><svg class="cp-icon sm"><use href="#i-shell"/></svg>Passport</span><span class=""><svg class="cp-icon sm"><use href="#i-flag"/></svg>Plan</span></div><p class="spec" style="margin:16px 0 20px">.cp-subtabs · 15/600 · 3px blue underline</p></div>
   </div>
   <p class="spec" style="margin-top:16px">.cp-tabbar · height 72 · radius pill · shadow-lg · icon 24 in 52×32 pill · label 12/500 (active 700)</p>
-  <p class="note" style="margin-top:12px;max-width:760px"><b>Settings is not a tab.</b> It opens from the gear at the top right of Me, next to the inbox bell, as a screen of its own: a back button on the left, light/dark and log out on the right, and no tab bar under it. <b>Library</b> is the fifth tab. It has no title: the row on top is a search field, then the round Bookmarks button, then the round diary button in the corner (the same size as the bell and the gear on Me), and under it a banner and the tabs Bible, Books and Music. Until we have chosen what we may include, those three tabs show example content and say so. <b>The diary</b> (Library, My diary) keeps its pages only on the phone: the list says so, nothing is uploaded, logging out keeps the pages, deleting the account deletes them, and a page is saved as it is typed, so there is no Save button.</p>
-  <p class="note" style="margin-top:12px;max-width:760px"><b>Library search</b> looks through all three tabs at once, as you type, and lists what it finds grouped by tab (Bible, Books, Music) under one Preview notice. A word counts when it starts a word of a row (its title, the line under it, or the name of the tab), so "music" lists the music rows. With nothing found it says "Nothing found for ..." and offers Clear search; clearing the field brings the banner and the tabs back. <b>Bookmarks</b> is a screen of its own, opened from the round button next to the diary: a back button, no tab bar, then two parts. Library lists the rows bookmarked from the tabs; they stay only on the phone and logging out clears them, and each is still an example. Posts lists the posts bookmarked in the journey viewer; they stay with the account, and with no signal the list from the last visit is shown, with a line that says so. A row that is taken off stays in place, with an empty bookmark, until the screen is left, so a slip can be put back with one tap.</p>
+  <p class="note" style="margin-top:12px;max-width:760px"><b>Settings is not a tab.</b> It opens from the gear at the top right of Me, next to the inbox bell, as a screen of its own: a back button on the left, light/dark and log out on the right, and no tab bar under it. <b>Library</b> is the fifth tab. It has no title: the row on top is a search field and the round Bookmarks button in the corner (the same size as the bell and the gear on Me), and directly under it the tabs Bible, Books and Notes, then the banner of the tab. Bible has a banner for the daily reading and Books one for its twelve books; Notes, which is the diary, has none. Until we have chosen what we may include, Bible and Books show example rows and say so. At the bottom of Bible three choices float above the tab bar (Old Testament, Deuterocanon, New Testament); on Notes the gold button writes a note, and the search row and the tabs stay at the top while the notes scroll under them. <b>The diary</b> (Library, Notes) keeps its pages only on the phone: the list says so, nothing is uploaded, logging out keeps the pages, deleting the account deletes them, and a page is saved as it is typed, so there is no Save button.</p>
+  <p class="note" style="margin-top:12px;max-width:760px"><b>Library search</b> looks through the Bible and Books tabs at once, as you type (every book of the Bible and the twelve books; Notes are not searched here), and lists what it finds grouped by tab (Bible, Books) under one Preview notice. A word counts when it starts a word of a row (a name or title, the author, the part of the Bible, the line under it, or the name of the tab), so "new testament" lists the 27 books of the New Testament. With nothing found it says "Nothing found for ..." and offers Clear search; clearing the field brings the tabs and the banner back. <b>Bookmarks</b> is a screen of its own, opened from the round button in the corner: a back button, no tab bar, then two parts. Library lists the rows bookmarked from the tabs; they stay only on the phone and logging out clears them, and each is still an example. Posts lists the posts bookmarked in the journey viewer; they stay with the account, and with no signal the list from the last visit is shown, with a line that says so. A row that is taken off stays in place, with an empty bookmark, until the screen is left, so a slip can be put back with one tap.</p>
 </section>
 
 <!-- =================================================================== BUSINESS -->
@@ -1933,7 +2024,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
 <section class="doc" id="screens">
   <p class="eyebrow">15 · Screens @ 390 × 844</p>
   <h2>The app, tab by tab</h2>
-  <p class="intro">Reference layouts at iPhone 15 size. Scroll sideways to see all of them. Me has the My Camino card with its Change button, a row of highlights (one round picture for each destination of the day plan: a gold ring when you posted there, a dashed circle while it is still ahead), three sub-tabs, an inbox, a two-step write flow, a share screen and a stamp pop-up. Maps has two layers: helicopter view and city view. Stays opens into Airbnb / Agoda-style detail pages for stays and cafes. Explore has a second screen for the photo marketplace. Library has a search field with a bookmarks button and a diary button on top, a banner and the tabs Bible, Books and Music, with a gold note button that writes a diary page; a search lists its results grouped by tab, Bookmarks lists what the pilgrim kept, and the diary has a list of pages and an editor. Settings is a screen opened from the gear at the top right of Me; it opens the business-owner flow: a welcome page, five registration steps, the review status and the owner dashboard.</p>
+  <p class="intro">Reference layouts at iPhone 15 size. Scroll sideways to see all of them. Me has the My Camino card with its Change button, a row of highlights (one round picture for each destination of the day plan: a gold ring when you posted there, a dashed circle while it is still ahead), three sub-tabs, an inbox, a two-step write flow, a share screen and a stamp pop-up. Maps has two layers: helicopter view and city view. Stays opens into Airbnb / Agoda-style detail pages for stays and cafes. Explore has a second screen for the photo marketplace. Library has a search field with a bookmarks button on top and directly under it the tabs Bible, Books and Notes, each with its banner except Notes; Bible has three choices at the bottom (Old Testament, Deuterocanon, New Testament) and Notes a gold button that writes a note; a search lists its results grouped by tab, Bookmarks lists what the pilgrim kept, and the diary has a list of pages and an editor. Settings is a screen opened from the gear at the top right of Me; it opens the business-owner flow: a welcome page, five registration steps, the review status and the owner dashboard.</p>
 
   <div class="phones">
 
@@ -2638,35 +2729,38 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     </div>
 
     <div class="phone-wrap">
-      <p class="phone-label"><b>Library</b>Search · bookmarks · diary · Bible, Books, Music</p>
+      <p class="phone-label"><b>Library</b>Bible · today's reading · three parts at the bottom</p>
       <div class="phone">
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
         <div class="scroll">
           <div class="lib-head">
             <div class="lib-search"><svg class="cp-icon"><use href="#i-search"/></svg><span class="t">Search the Library</span></div>
             <button class="cp-icon-btn flat" aria-label="Bookmarks"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button>
-            <button class="cp-icon-btn flat" aria-label="My diary"><svg class="cp-icon"><use href="#i-diary"/></svg></button>
           </div>
-          <div class="cp-banner" style="margin-top:16px">
+          <div class="cp-subtabs" style="margin:16px 0"><span class="on">Bible</span><span>Books</span><span>Notes</span></div>
+          <div class="cp-banner lib" role="button" aria-label="Read today. Today's reading and a short reflection. Sunday 8 November">
             <span class="art"><svg class="cp-icon"><use href="#i-book"/></svg></span>
-            <div class="ey">Preview · Bible</div>
-            <h4>Scripture for the long road</h4>
-            <button class="cp-btn sm">See the Bible tab</button>
+            <div class="ey">Today · Daily reading</div>
+            <h4>Today's reading and a short reflection</h4>
+            <p class="line">Sunday 8 November</p>
+            <span class="cp-btn sm">Read today</span>
           </div>
-          <div class="cp-dots"><i class="on"></i><i></i><i></i></div>
-          <div class="cp-subtabs" style="margin:16px 0"><span class="on">Bible</span><span>Books</span><span>Music</span></div>
-          <div class="lib-notice">
+          <div class="lib-notice" style="margin-top:16px">
             <svg class="cp-icon"><use href="#i-flag"/></svg>
-            <div><div class="h">Preview</div><div class="p">The Bible text is not in the app yet. We are choosing a translation we are allowed to include. This tab shows how reading will look.</div></div>
+            <div><div class="h">Preview</div><div class="p">The Bible text is not in the app yet. We are choosing a translation we are allowed to include.</div></div>
           </div>
+          <div class="lib-hrow" style="margin-top:16px"><h4 class="lib-h">Books of the Bible</h4><span class="cnt" aria-label="Old Testament, 39 books">39 books</span></div>
           <div class="cp-card" style="margin-top:16px;padding:4px">
-            <div class="lib-row"><svg class="cp-icon"><use href="#i-book"/></svg><div style="flex:1;min-width:0;display:flex;flex-direction:column"><div class="t">Psalms for walking</div><div class="n">Short, for a rest by the road</div><span class="lib-chip soon" style="margin-top:6px">Soon</span></div><button class="lib-mark" aria-label="Bookmark: Psalms for walking"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
-            <div class="lib-row"><svg class="cp-icon"><use href="#i-book"/></svg><div style="flex:1;min-width:0;display:flex;flex-direction:column"><div class="t">The Gospels</div><div class="n">One chapter a day</div><span class="lib-chip soon" style="margin-top:6px">Soon</span></div><button class="lib-mark on" aria-label="Remove bookmark: The Gospels"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
-            <div class="lib-row"><svg class="cp-icon"><use href="#i-book"/></svg><div style="flex:1;min-width:0;display:flex;flex-direction:column"><div class="t">Prayers for the road</div><div class="n">Morning, evening and the pilgrim blessing</div><span class="lib-chip soon" style="margin-top:6px">Soon</span></div><button class="lib-mark" aria-label="Bookmark: Prayers for the road"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
-            <div class="lib-row"><svg class="cp-icon"><use href="#i-book"/></svg><div style="flex:1;min-width:0;display:flex;flex-direction:column"><div class="t">Reading plans</div><div class="n">One reading for each stage of your Camino</div><span class="lib-chip soon" style="margin-top:6px">Soon</span></div><button class="lib-mark" aria-label="Bookmark: Reading plans"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+            <div class="lib-row"><div class="lib-tx"><div class="t">Genesis</div><div class="lib-sub"><span class="n">50 chapters</span><span class="lib-chip soon">Soon</span></div></div><button class="lib-mark" aria-label="Bookmark: Genesis"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+            <div class="lib-row"><div class="lib-tx"><div class="t">Exodus</div><div class="lib-sub"><span class="n">40 chapters</span><span class="lib-chip soon">Soon</span></div></div><button class="lib-mark on" aria-label="Remove bookmark: Exodus"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+            <div class="lib-row"><div class="lib-tx"><div class="t">Leviticus</div><div class="lib-sub"><span class="n">27 chapters</span><span class="lib-chip soon">Soon</span></div></div><button class="lib-mark" aria-label="Bookmark: Leviticus"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
           </div>
         </div>
-        <div class="fab-slot"><button class="cp-fab-write" aria-label="Write in your diary"><svg class="cp-icon "><use href="#i-compose"/></svg></button></div>
+        <div class="lib-bar" role="radiogroup" aria-label="Part of the Bible">
+          <button role="radio" aria-checked="true" aria-label="Old Testament" class="on">Old<br>Testament</button>
+          <button role="radio" aria-checked="false" aria-label="Deuterocanon" class="mid">Deuterocanon</button>
+          <button role="radio" aria-checked="false" aria-label="New Testament">New<br>Testament</button>
+        </div>
         <div class="tabdock"><nav class="cp-tabbar">
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
@@ -2679,33 +2773,105 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     </div>
 
     <div class="phone-wrap">
-      <p class="phone-label"><b>Library · Search</b>All three tabs at once · grouped by tab</p>
+      <p class="phone-label"><b>Library · Deuterocanon</b>The middle choice · two added passages · a note</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll">
+          <div style="margin-top:-250px">
+          <div class="lib-hrow"><h4 class="lib-h">Books of the Bible</h4><span class="cnt" aria-label="Deuterocanon, 7 books and 2 added passages">7 books and 2 added passages</span></div>
+          <div class="cp-card" style="margin-top:16px;padding:4px">
+            <div class="lib-row"><div class="lib-tx"><div class="t">Tobit</div><div class="lib-sub"><span class="n">14 chapters</span><span class="lib-chip soon">Soon</span></div></div><button class="lib-mark" aria-label="Bookmark: Tobit"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+            <div class="lib-row"><div class="lib-tx"><div class="t">Judith</div><div class="lib-sub"><span class="n">16 chapters</span><span class="lib-chip soon">Soon</span></div></div><button class="lib-mark" aria-label="Bookmark: Judith"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+            <div class="lib-row"><div class="lib-tx"><div class="t">Wisdom</div><div class="lib-sub"><span class="n">19 chapters</span><span class="lib-chip soon">Soon</span></div></div><button class="lib-mark" aria-label="Bookmark: Wisdom"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+            <div class="lib-row"><div class="lib-tx"><div class="t">Sirach</div><div class="lib-sub"><span class="n">51 chapters</span><span class="lib-chip soon">Soon</span></div></div><button class="lib-mark" aria-label="Bookmark: Sirach"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+            <div class="lib-row"><div class="lib-tx"><div class="t">Baruch</div><div class="lib-sub stack"><span class="n">6 chapters · With the Letter of Jeremiah</span><span class="lib-chip soon">Soon</span></div></div><button class="lib-mark" aria-label="Bookmark: Baruch"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+            <div class="lib-row"><div class="lib-tx"><div class="t">1 Maccabees</div><div class="lib-sub"><span class="n">16 chapters</span><span class="lib-chip soon">Soon</span></div></div><button class="lib-mark" aria-label="Bookmark: 1 Maccabees"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+            <div class="lib-row"><div class="lib-tx"><div class="t">2 Maccabees</div><div class="lib-sub"><span class="n">15 chapters</span><span class="lib-chip soon">Soon</span></div></div><button class="lib-mark" aria-label="Bookmark: 2 Maccabees"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+            <div class="lib-row"><div class="lib-tx"><div class="t">Additions to Esther</div><div class="lib-sub"><span class="n">Added passages</span><span class="lib-chip soon">Soon</span></div></div><button class="lib-mark" aria-label="Bookmark: Additions to Esther"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+            <div class="lib-row"><div class="lib-tx"><div class="t">Additions to Daniel</div><div class="lib-sub stack"><span class="n">Susanna; Prayer of Azariah and Song of the Three; Bel and the Dragon</span><span class="lib-chip soon">Soon</span></div></div><button class="lib-mark" aria-label="Bookmark: Additions to Daniel"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+          </div>
+          <p class="note" style="margin:16px 0 0">Orthodox Bibles include a few more books.</p>
+          </div>
+        </div>
+        <div class="lib-bar" role="radiogroup" aria-label="Part of the Bible">
+          <button role="radio" aria-checked="false" aria-label="Old Testament">Old<br>Testament</button>
+          <button role="radio" aria-checked="true" aria-label="Deuterocanon" class="mid on">Deuterocanon</button>
+          <button role="radio" aria-checked="false" aria-label="New Testament">New<br>Testament</button>
+        </div>
+        <div class="tabdock"><nav class="cp-tabbar">
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Discover</div>
+          <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-library"/></svg></span>Library</div>
+        </nav></div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Library · Books</b>Twelve free books · no button on the banner</p>
       <div class="phone">
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
         <div class="scroll">
           <div class="lib-head">
-            <div class="lib-search"><svg class="cp-icon"><use href="#i-search"/></svg><span class="t typed">pray</span><span class="x"><svg class="cp-icon"><use href="#i-x"/></svg></span></div>
+            <div class="lib-search"><svg class="cp-icon"><use href="#i-search"/></svg><span class="t">Search the Library</span></div>
             <button class="cp-icon-btn flat" aria-label="Bookmarks"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button>
-            <button class="cp-icon-btn flat" aria-label="My diary"><svg class="cp-icon"><use href="#i-diary"/></svg></button>
+          </div>
+          <div class="cp-subtabs" style="margin:16px 0"><span>Bible</span><span class="on">Books</span><span>Notes</span></div>
+          <div class="cp-banner lib">
+            <span class="art"><svg class="cp-icon"><use href="#i-library"/></svg></span>
+            <div class="ey">Preview · Books</div>
+            <h4>Twelve free companions for the road</h4>
+            <p class="line">Classics to read on the way. Free to read.</p>
           </div>
           <div class="lib-notice" style="margin-top:16px">
             <svg class="cp-icon"><use href="#i-flag"/></svg>
-            <div><div class="h">Preview</div><div class="p">These results are examples. The Bible text, books and music are not in the app yet.</div></div>
+            <div><div class="h">Preview</div><div class="p">Books are not in the app yet. We are checking the editions before we add them.</div></div>
           </div>
-          <p class="note" style="margin:16px 0 0">2 results for “pray”</p>
-          <div class="lib-label" style="margin-top:24px">Bible · 1</div>
           <div class="cp-card" style="margin-top:16px;padding:4px">
-            <div class="lib-row"><svg class="cp-icon"><use href="#i-book"/></svg><div style="flex:1;min-width:0;display:flex;flex-direction:column"><div class="t">Prayers for the road</div><div class="n">Morning, evening and the pilgrim blessing</div><span class="lib-chip soon" style="margin-top:6px">Soon</span></div><button class="lib-mark on" aria-label="Remove bookmark: Prayers for the road"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
-          </div>
-          <div class="lib-label" style="margin-top:24px">Books · 1</div>
-          <div class="lib-covers" style="margin-top:16px">
-            <div>
-              <div class="lib-cover" style="background:var(--cp-success-wash)"><svg class="cp-icon"><use href="#i-book"/></svg>Prayers and blessings<button class="lib-mark" aria-label="Bookmark: Prayers and blessings"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
-              <div class="lib-kind"><span>Prayer</span><span class="lib-chip sample">Sample</span></div>
-            </div>
+            <div class="lib-book"><div class="top"><span class="cv" style="background:var(--cp-color-gold-soft)"><svg class="cp-icon"><use href="#i-shell"/></svg></span><div class="tt"><div class="t">The Way of a Pilgrim</div><div class="a">Anonymous · 19th century</div></div><button class="lib-mark" aria-label="Bookmark: The Way of a Pilgrim"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div><p>A Russian wanderer walks and prays the Jesus Prayer.</p><div class="chips"><span class="lib-chip free">Free</span><span class="lib-chip soon">Soon</span></div></div>
+            <div class="lib-book"><div class="top"><span class="cv" style="background:var(--cp-color-blue-100)"><svg class="cp-icon"><use href="#i-heart"/></svg></span><div class="tt"><div class="t">The Life of St. Teresa of Jesus</div><div class="a">Teresa of Ávila · 1565</div></div><button class="lib-mark" aria-label="Bookmark: The Life of St. Teresa of Jesus"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div><p>Her own story, written in Spain: prayer, struggle and courage.</p><div class="chips"><span class="lib-chip free">Free</span><span class="lib-chip soon">Soon</span></div></div>
+            <div class="lib-book"><div class="top"><span class="cv" style="background:var(--cp-success-wash)"><svg class="cp-icon"><use href="#i-sun"/></svg></span><div class="tt"><div class="t">The Little Flowers of Saint Francis</div><div class="a">Anonymous · 14th century</div></div><button class="lib-mark" aria-label="Bookmark: The Little Flowers of Saint Francis"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div><p>Simple, warm stories of Francis and his brothers on the road.</p><div class="chips"><span class="lib-chip free">Free</span><span class="lib-chip soon">Soon</span></div></div>
           </div>
         </div>
-        <div class="fab-slot"><button class="cp-fab-write" aria-label="Write in your diary"><svg class="cp-icon "><use href="#i-compose"/></svg></button></div>
+        <div class="tabdock"><nav class="cp-tabbar">
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Discover</div>
+          <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-library"/></svg></span>Library</div>
+        </nav></div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Library · Search</b>Bible and Books at once · grouped by tab</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll">
+          <div class="lib-head">
+            <div class="lib-search"><svg class="cp-icon"><use href="#i-search"/></svg><span class="t typed">john</span><span class="x"><svg class="cp-icon"><use href="#i-x"/></svg></span></div>
+            <button class="cp-icon-btn flat" aria-label="Bookmarks"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button>
+          </div>
+          <div class="lib-notice" style="margin-top:16px">
+            <svg class="cp-icon"><use href="#i-flag"/></svg>
+            <div><div class="h">Preview</div><div class="p">These results are examples. The Bible text and books are not in the app yet.</div></div>
+          </div>
+          <p class="note" style="margin:16px 0 0">5 results for “john”</p>
+          <div class="lib-label" style="margin-top:24px">Bible · 4</div>
+          <div class="cp-card" style="margin-top:16px;padding:4px">
+            <div class="lib-row"><div class="lib-tx"><div class="t">John</div><div class="lib-sub stack"><span class="n">New Testament · 21 chapters</span><span class="lib-chip soon">Soon</span></div></div><button class="lib-mark" aria-label="Bookmark: John"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+            <div class="lib-row"><div class="lib-tx"><div class="t">1 John</div><div class="lib-sub stack"><span class="n">New Testament · 5 chapters</span><span class="lib-chip soon">Soon</span></div></div><button class="lib-mark" aria-label="Bookmark: 1 John"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+            <div class="lib-row"><div class="lib-tx"><div class="t">2 John</div><div class="lib-sub stack"><span class="n">New Testament · 1 chapter</span><span class="lib-chip soon">Soon</span></div></div><button class="lib-mark" aria-label="Bookmark: 2 John"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+            <div class="lib-row"><div class="lib-tx"><div class="t">3 John</div><div class="lib-sub stack"><span class="n">New Testament · 1 chapter</span><span class="lib-chip soon">Soon</span></div></div><button class="lib-mark" aria-label="Bookmark: 3 John"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+          </div>
+          <div class="lib-label" style="margin-top:24px">Books · 1</div>
+          <div class="cp-card" style="margin-top:16px;padding:4px">
+            <div class="lib-book"><div class="top"><span class="cv" style="background:var(--cp-color-red-100)"><svg class="cp-icon"><use href="#i-moon"/></svg></span><div class="tt"><div class="t">Dark Night of the Soul</div><div class="a">John of the Cross · 16th century</div></div><button class="lib-mark on" aria-label="Remove bookmark: Dark Night of the Soul"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div><p>For lonely or doubting days: a poem and its guide, from Spain.</p><div class="chips"><span class="lib-chip free">Free</span><span class="lib-chip soon">Soon</span></div></div>
+          </div>
+        </div>
         <div class="tabdock"><nav class="cp-tabbar">
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
@@ -2726,11 +2892,10 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
             <div class="lib-head">
               <div class="lib-search"><svg class="cp-icon"><use href="#i-search"/></svg><span class="t typed">zzz</span><span class="x"><svg class="cp-icon"><use href="#i-x"/></svg></span></div>
               <button class="cp-icon-btn flat" aria-label="Bookmarks"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button>
-              <button class="cp-icon-btn flat" aria-label="My diary"><svg class="cp-icon"><use href="#i-diary"/></svg></button>
             </div>
             <div class="lib-notice">
               <svg class="cp-icon"><use href="#i-flag"/></svg>
-              <div><div class="h">Preview</div><div class="p">These results are examples. The Bible text, books and music are not in the app yet.</div></div>
+              <div><div class="h">Preview</div><div class="p">These results are examples. The Bible text and books are not in the app yet.</div></div>
             </div>
             <div class="cp-card" style="padding:32px 20px;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center">
               <span style="width:64px;height:64px;border-radius:50%;background:var(--cp-surface-sunken);display:grid;place-items:center"><svg class="cp-icon" style="width:30px;height:30px;color:var(--cp-text-muted)"><use href="#i-search"/></svg></span>
@@ -2740,7 +2905,6 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
             </div>
           </div>
         </div>
-        <div class="fab-slot"><button class="cp-fab-write" aria-label="Write in your diary"><svg class="cp-icon "><use href="#i-compose"/></svg></button></div>
         <div class="tabdock"><nav class="cp-tabbar">
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
@@ -2765,13 +2929,14 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
               <svg class="cp-icon"><use href="#i-flag"/></svg>
               <div><div class="h">Preview</div><div class="p">These are examples from the Library preview. They are kept only on this phone, and logging out clears them.</div></div>
             </div>
-            <div class="lib-label">Bible · 1</div>
+            <div class="lib-label">Bible · 2</div>
             <div class="cp-card" style="padding:4px">
-              <div class="lib-row"><svg class="cp-icon"><use href="#i-book"/></svg><div style="flex:1;min-width:0;display:flex;flex-direction:column"><div class="t">The Gospels</div><div class="n">One chapter a day</div><span class="lib-chip soon" style="margin-top:6px">Soon</span></div><button class="lib-mark on" aria-label="Remove bookmark: The Gospels"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+              <div class="lib-row"><div class="lib-tx"><div class="t">Psalms</div><div class="lib-sub stack"><span class="n">Old Testament · 150 chapters</span><span class="lib-chip soon">Soon</span></div></div><button class="lib-mark on" aria-label="Remove bookmark: Psalms"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+              <div class="lib-row"><div class="lib-tx"><div class="t">Genesis</div><div class="lib-sub stack"><span class="n">Old Testament · 50 chapters</span><span class="lib-chip soon">Soon</span></div></div><button class="lib-mark on" aria-label="Remove bookmark: Genesis"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
             </div>
-            <div class="lib-label">Music · 1</div>
+            <div class="lib-label">Books · 1</div>
             <div class="cp-card" style="padding:4px">
-              <div class="lib-row"><span style="width:44px;height:44px;border-radius:50%;background:var(--cp-surface-sunken);display:grid;place-items:center;flex:none"><svg class="cp-icon" style="color:var(--cp-text-muted)"><use href="#i-music"/></svg></span><div style="flex:1;min-width:0;display:flex;flex-direction:column"><div class="t">Chants for the road</div><div class="n">Slow, simple chants for the road</div><span class="lib-chip soon" style="margin-top:6px">Soon</span></div><button class="lib-mark on" aria-label="Remove bookmark: Chants for the road"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+              <div class="lib-book"><div class="top"><span class="cv" style="background:var(--cp-color-sand-300)"><svg class="cp-icon"><use href="#i-building"/></svg></span><div class="tt"><div class="t">The Interior Castle</div><div class="a">Teresa of Ávila · 1577</div></div><button class="lib-mark on" aria-label="Remove bookmark: The Interior Castle"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div><p>The soul as a castle of seven rooms, to read a chapter at a time.</p><div class="chips"><span class="lib-chip free">Free</span><span class="lib-chip soon">Soon</span></div></div>
             </div>
             <h4 class="lib-h" style="margin-top:8px">Posts</h4>
             <div class="cp-card" style="padding:16px 6px 16px 20px;display:flex;align-items:center;gap:4px">
@@ -2900,6 +3065,214 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
       </div>
     </div>
 
+<!-- Library · Notes phones (start) -->
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Library · Notes</b>The diary's pages as a feed · only on this phone</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="nt-top">
+          <div class="lib-head">
+            <div class="lib-search"><svg class="cp-icon"><use href="#i-search"/></svg><span class="t">Search the Library</span></div>
+            <button class="cp-icon-btn flat" aria-label="Bookmarks"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button>
+          </div>
+          <div class="cp-subtabs"><span>Bible</span><span>Books</span><span class="on">Notes</span></div>
+        </div>
+        <div class="scroll nt-feed">
+          <div class="nt-compose">
+            <span class="nt-av" aria-hidden="true">AG</span>
+            <div class="nt-body">
+              <div class="nt-prompt">What's happening on your Camino?</div>
+              <div class="nt-short"><span aria-label="Write a new note, then add a photo"><svg class="cp-icon"><use href="#i-image"/></svg></span><span aria-label="Write a new note, then add a place"><svg class="cp-icon"><use href="#i-pin"/></svg></span></div>
+            </div>
+          </div>
+          <p class="nt-private">Notes stay on this phone.</p>
+          <div class="nt-filters" role="tablist"><span class="on" role="tab" aria-selected="true">All</span><span class="" role="tab" aria-selected="false">Photos and videos</span><span class="" role="tab" aria-selected="false">Places</span></div>
+          <article class="nt-row">
+            <span class="nt-av" aria-hidden="true">AG</span>
+            <div class="nt-main">
+              <div class="nt-hd"><span class="who">Ana García <i>@ana.camina</i></span><span class="tm"> · 3m</span><span class="more" aria-label="More: edit or delete this note"><svg class="cp-icon"><use href="#i-dots"/></svg></span></div>
+              <h4 class="nt-title">Hontanas</h4><div class="dy-read nt-words"><p>A long, flat day across the meseta. <b>Wind in my face</b> from the first step and <i>no shade</i> at all.</p></div><div class="nt-place"><svg class="cp-icon"><use href="#i-pin"/></svg>Hontanas, Castilla y León</div><div class="nt-acts"><span aria-label="Share the words of this note"><svg class="cp-icon"><use href="#i-share"/></svg></span></div>
+            </div>
+          </article>
+          <article class="nt-row">
+            <span class="nt-av" aria-hidden="true">AG</span>
+            <div class="nt-main">
+              <div class="nt-hd"><span class="who">Ana García <i>@ana.camina</i></span><span class="tm"> · Yesterday</span><span class="more" aria-label="More: edit or delete this note"><svg class="cp-icon"><use href="#i-dots"/></svg></span></div>
+              <h4 class="nt-title">Two of us</h4><div class="nt-grid"><div class="col"><div class="nt-tile"><div class="cp-img v5"></div></div></div><div class="col"><div class="nt-tile"><div class="cp-img v4"></div></div></div></div><div class="nt-acts"><span aria-label="Share the words of this note"><svg class="cp-icon"><use href="#i-share"/></svg></span></div>
+            </div>
+          </article>
+        </div>
+        <div class="fab-slot"><button class="cp-fab-write" aria-label="Write in your diary"><svg class="cp-icon"><use href="#i-compose"/></svg></button></div>
+        <div class="tabdock"><nav class="cp-tabbar">
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Discover</div>
+          <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-library"/></svg></span>Library</div>
+        </nav></div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Library · Notes, scrolled</b>Eight lines, then Show more · a hairline between notes</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="nt-top">
+          <div class="lib-head">
+            <div class="lib-search"><svg class="cp-icon"><use href="#i-search"/></svg><span class="t">Search the Library</span></div>
+            <button class="cp-icon-btn flat" aria-label="Bookmarks"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button>
+          </div>
+          <div class="cp-subtabs"><span>Bible</span><span>Books</span><span class="on">Notes</span></div>
+        </div>
+        <div class="scroll nt-feed">
+          <article class="nt-row">
+            <span class="nt-av" aria-hidden="true">AG</span>
+            <div class="nt-main">
+              <div class="nt-hd"><span class="who">Ana García <i>@ana.camina</i></span><span class="tm"> · 5h</span><span class="more" aria-label="More: edit or delete this note"><svg class="cp-icon"><use href="#i-dots"/></svg></span></div>
+              <div class="dy-read nt-words cut"><p>Left Burgos in the dark. The cathedral stayed lit behind me for a long time. I met a Dutch woman who has walked the Camino three times and she told me to slow down: the road, she said, is not a race and the albergues will not run out of beds if you arrive at four instead of two.</p><div class="gap"></div><p>I laughed, and then I did slow down. The sun came up over the meseta and the whole plain turned gold for ten minutes.</p></div><div class="nt-showmore">Show more</div><div class="nt-acts"><span aria-label="Share the words of this note"><svg class="cp-icon"><use href="#i-share"/></svg></span></div>
+            </div>
+          </article>
+          <article class="nt-row">
+            <span class="nt-av" aria-hidden="true">AG</span>
+            <div class="nt-main">
+              <div class="nt-hd"><span class="who">Ana García <i>@ana.camina</i></span><span class="tm"> · 30 Oct</span><span class="more" aria-label="More: edit or delete this note"><svg class="cp-icon"><use href="#i-dots"/></svg></span></div>
+              <h4 class="nt-title">San Juan de Ortega</h4><div class="dy-read nt-words"><p>Soup at the monastery.</p></div><div class="nt-grid"><div class="col"><div class="nt-tile"><div class="cp-img v4"></div></div></div></div><div class="nt-place"><svg class="cp-icon"><use href="#i-pin"/></svg>42.4172° N, 4.2477° W</div><div class="nt-acts"><span aria-label="Share the words of this note"><svg class="cp-icon"><use href="#i-share"/></svg></span></div>
+            </div>
+          </article>
+        </div>
+        <div class="fab-slot"><button class="cp-fab-write" aria-label="Write in your diary"><svg class="cp-icon"><use href="#i-compose"/></svg></button></div>
+        <div class="tabdock"><nav class="cp-tabbar">
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Discover</div>
+          <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-library"/></svg></span>Library</div>
+        </nav></div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Library · Notes, photo grids</b>One wide tile, two, three, four · a clip shows its length · “+3” for the rest</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="nt-top">
+          <div class="lib-head">
+            <div class="lib-search"><svg class="cp-icon"><use href="#i-search"/></svg><span class="t">Search the Library</span></div>
+            <button class="cp-icon-btn flat" aria-label="Bookmarks"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button>
+          </div>
+          <div class="cp-subtabs"><span>Bible</span><span>Books</span><span class="on">Notes</span></div>
+        </div>
+        <div class="scroll nt-feed">
+          <article class="nt-row noacts">
+            <span class="nt-av" aria-hidden="true">AG</span>
+            <div class="nt-main">
+              <div class="nt-hd"><span class="who">Ana García <i>@ana.camina</i></span><span class="tm"> · 28 Oct</span><span class="more" aria-label="More: edit or delete this note"><svg class="cp-icon"><use href="#i-dots"/></svg></span></div>
+              <h4 class="nt-title">The three of us</h4><div class="nt-grid"><div class="col"><div class="nt-tile"><div class="cp-img "></div></div></div><div class="col"><div class="nt-tile"><div class="cp-img v3"></div></div><div class="nt-tile"><div class="cp-img v2"></div></div></div></div>
+            </div>
+          </article>
+          <article class="nt-row noacts">
+            <span class="nt-av" aria-hidden="true">AG</span>
+            <div class="nt-main">
+              <div class="nt-hd"><span class="who">Ana García <i>@ana.camina</i></span><span class="tm"> · 2 Oct</span><span class="more" aria-label="More: edit or delete this note"><svg class="cp-icon"><use href="#i-dots"/></svg></span></div>
+              <h4 class="nt-title">A day in pictures</h4><div class="nt-grid"><div class="col"><div class="nt-tile"><div class="cp-img "></div></div><div class="nt-tile clip"><span class="play"><svg class="cp-icon"><use href="#i-play"/></svg></span><span class="len">0:42</span></div></div><div class="col"><div class="nt-tile"><div class="cp-img v3"></div></div><div class="nt-tile"><div class="cp-img v5"></div><span class="plus">+3</span></div></div></div>
+            </div>
+          </article>
+        </div>
+        <div class="fab-slot"><button class="cp-fab-write" aria-label="Write in your diary"><svg class="cp-icon"><use href="#i-compose"/></svg></button></div>
+        <div class="tabdock"><nav class="cp-tabbar">
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Discover</div>
+          <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-library"/></svg></span>Library</div>
+        </nav></div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Library · Notes, empty</b>No note yet · a button to write the first</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="nt-top">
+          <div class="lib-head">
+            <div class="lib-search"><svg class="cp-icon"><use href="#i-search"/></svg><span class="t">Search the Library</span></div>
+            <button class="cp-icon-btn flat" aria-label="Bookmarks"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button>
+          </div>
+          <div class="cp-subtabs"><span>Bible</span><span>Books</span><span class="on">Notes</span></div>
+        </div>
+        <div class="scroll nt-feed">
+          <div class="nt-compose">
+            <span class="nt-av" aria-hidden="true">AG</span>
+            <div class="nt-body">
+              <div class="nt-prompt">What's happening on your Camino?</div>
+              <div class="nt-short"><span aria-label="Write a new note, then add a photo"><svg class="cp-icon"><use href="#i-image"/></svg></span><span aria-label="Write a new note, then add a place"><svg class="cp-icon"><use href="#i-pin"/></svg></span></div>
+            </div>
+          </div>
+          <p class="nt-private">Notes stay on this phone.</p>
+          <div class="nt-filters" role="tablist"><span class="on" role="tab" aria-selected="true">All</span><span class="" role="tab" aria-selected="false">Photos and videos</span><span class="" role="tab" aria-selected="false">Places</span></div>
+          <div class="nt-empty">
+            <span class="badge"><svg class="cp-icon"><use href="#i-compose"/></svg></span>
+            <h4>No notes yet</h4>
+            <p>Write a few lines about your day on the Way: what you saw, who you met, how you feel.</p>
+            <button class="cp-btn cp-btn-primary block" style="height:68px;font-size:22px;margin-top:8px">Write your first note</button>
+          </div>
+        </div>
+        <div class="fab-slot"><button class="cp-fab-write" aria-label="Write in your diary"><svg class="cp-icon"><use href="#i-compose"/></svg></button></div>
+        <div class="tabdock"><nav class="cp-tabbar">
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Discover</div>
+          <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-library"/></svg></span>Library</div>
+        </nav></div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Library · Notes, menu</b>The … on a note: Edit, Delete · Delete asks first</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="nt-top">
+          <div class="lib-head">
+            <div class="lib-search"><svg class="cp-icon"><use href="#i-search"/></svg><span class="t">Search the Library</span></div>
+            <button class="cp-icon-btn flat" aria-label="Bookmarks"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button>
+          </div>
+          <div class="cp-subtabs"><span>Bible</span><span>Books</span><span class="on">Notes</span></div>
+        </div>
+        <div class="scroll nt-feed">
+          <div class="nt-compose">
+            <span class="nt-av" aria-hidden="true">AG</span>
+            <div class="nt-body">
+              <div class="nt-prompt">What's happening on your Camino?</div>
+              <div class="nt-short"><span aria-label="Write a new note, then add a photo"><svg class="cp-icon"><use href="#i-image"/></svg></span><span aria-label="Write a new note, then add a place"><svg class="cp-icon"><use href="#i-pin"/></svg></span></div>
+            </div>
+          </div>
+          <p class="nt-private">Notes stay on this phone.</p>
+          <div class="nt-filters" role="tablist"><span class="on" role="tab" aria-selected="true">All</span><span class="" role="tab" aria-selected="false">Photos and videos</span><span class="" role="tab" aria-selected="false">Places</span></div>
+          <article class="nt-row">
+            <span class="nt-av" aria-hidden="true">AG</span>
+            <div class="nt-main">
+              <div class="nt-hd"><span class="who">Ana García <i>@ana.camina</i></span><span class="tm"> · 3m</span><span class="more" aria-label="More: edit or delete this note"><svg class="cp-icon"><use href="#i-dots"/></svg></span></div>
+              <h4 class="nt-title">Hontanas</h4><div class="dy-read nt-words"><p>A long, flat day across the meseta. <b>Wind in my face</b> from the first step and <i>no shade</i> at all.</p></div><div class="nt-place"><svg class="cp-icon"><use href="#i-pin"/></svg>Hontanas, Castilla y León</div><div class="nt-acts"><span aria-label="Share the words of this note"><svg class="cp-icon"><use href="#i-share"/></svg></span></div>
+            </div>
+          </article>
+        </div>
+        <div class="nt-scrim"></div>
+        <div class="nt-sheet" role="dialog" aria-label="Menu of the note Hontanas">
+          <div class="what">Hontanas</div>
+          <div class="item"><svg class="cp-icon"><use href="#i-pencil"/></svg>Edit</div>
+          <div class="item danger"><svg class="cp-icon"><use href="#i-trash"/></svg>Delete</div>
+          <button class="cp-btn">Cancel</button>
+        </div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+<!-- Library · Notes phones (end) -->
     <div class="phone-wrap">
       <p class="phone-label"><b>Settings</b>Gear on Me · billing · smartwatch · business</p>
       <div class="phone">
@@ -3128,6 +3501,175 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     </div>
 
   </div>
+
+
+  <h3 id="daily-reading">Library · Daily reading</h3>
+  <p class="note" style="margin:-8px 0 20px;max-width:760px">The Bible banner in Library opens <b>Daily reading</b>: a month calendar and, under it, the reading of the day you pick, today when it opens.
+  The weeks start on Monday and a month is always six rows, so nothing under the calendar moves when the month changes. <b>Today</b> has a ring, the day you picked is filled
+  (today and picked: filled, with a thin ring inside). The arrows go five years back and five years ahead and switch off at the ends (the last phone); <b>Today</b> brings you back.
+  Every day is at least 44 × 44 and says its whole date to a screen reader. There are no real readings yet: every day shows the same sample (Psalm 121:1–4 in the World English Bible,
+  which is in the public domain, and a short reflection written for this preview), and the Preview notice says so. On a 320 phone seven days of 44 are 308, more than fits between
+  the margins, so there the card reaches 10 px into each margin; from a 340 phone up it stays inside them.</p>
+
+  <style>
+  /* Library > Bible > Daily reading. Mirrors mobile/src/features/library/daily (MonthCalendar.tsx, DayReading.tsx). */
+  .dr-cal { background: var(--cp-surface); border-radius: var(--cp-radius-lg); box-shadow: var(--cp-shadow-sm); padding: 8px; }
+  .dr-cal.fit { margin: 0 -10px; padding: 8px 0; } /* a 320 phone: seven days of 44 are 308, so the card reaches 10 px into each margin */
+  .dr-head { display: flex; align-items: center; min-height: 44px; }
+  .dr-head .m { flex: 1; min-width: 0; padding-left: 8px; font-weight: 600; font-size: 17px; line-height: 22px; }
+  .dr-today { height: 36px; margin: 4px 0; padding: 0 10px; display: inline-flex; align-items: center; border: 0; border-radius: var(--cp-radius-pill); background: none; box-shadow: inset 0 0 0 1px var(--cp-border); font: inherit; font-weight: 600; font-size: 17px; line-height: 22px; color: var(--cp-action); }
+  .dr-arrow { width: 44px; height: 44px; padding: 0; display: grid; place-items: center; border: 0; background: none; color: var(--cp-text); }
+  .dr-arrow[disabled] { color: var(--cp-text-placeholder); } /* switched off: quieter, still 3 : 1 */
+  .dr-week { display: flex; height: 28px; align-items: center; }
+  .dr-week span { flex: 1; text-align: center; font-size: 15px; line-height: 21px; letter-spacing: .4px; font-weight: 500; color: var(--cp-text-muted); }
+  .dr-row { display: flex; }
+  .dr-d { flex: 1; height: 44px; padding: 0; display: grid; place-items: center; border: 0; background: none; font: inherit; color: var(--cp-text); }
+  .dr-d .k { position: relative; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; font-size: 17px; line-height: 25px; }
+  .dr-d.today .k { box-shadow: inset 0 0 0 2px var(--cp-action); font-weight: 600; line-height: 22px; }
+  .dr-d.sel .k { background: var(--cp-action); color: var(--cp-on-action); font-weight: 600; line-height: 22px; }
+  .dr-d.sel.today .k::after { content: ""; position: absolute; inset: 3px; border-radius: 50%; box-shadow: inset 0 0 0 2px var(--cp-on-action); }
+  .dr-eyebrow { font-family: var(--cp-font-mono); font-size: 12px; line-height: 22px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--cp-text-muted); }
+  .dr-title { font-family: var(--cp-font-title); font-weight: 600; font-size: 24px; line-height: 30px; }
+  .dr-card { padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+  .dr-top { display: flex; align-items: center; justify-content: space-between; }
+  .dr-cap { font-size: 15px; line-height: 21px; letter-spacing: .4px; font-weight: 500; color: var(--cp-text-muted); }
+  .dr-verses { display: flex; flex-direction: column; gap: 8px; }
+  .dr-v { margin: 0; font-size: 19px; line-height: 28px; }
+  .dr-v i { font-style: normal; font-size: 15px; line-height: 21px; letter-spacing: .4px; font-weight: 500; color: var(--cp-text-muted); }
+  .dr-text { margin: 0; font-size: 17px; line-height: 25px; }
+  /* The same screens in dark mode: the dark palette of tokens.json (the roles and the gold of the notice), nothing else changes. */
+  .phone.dk { --cp-bg:#0F1A2B;--cp-surface:#17263B;--cp-surface-sunken:#1E3047;--cp-surface-inverse:#1E4A7A;--cp-border:#2B405C;--cp-border-strong:#44607F;--cp-text:#F6EFE2;--cp-text-muted:#A9B6C8;--cp-text-placeholder:#8D9BB0;--cp-text-inverse:#F6EFE2;--cp-text-accent:#E8B53A;--cp-action:#8FB3E0;--cp-on-action:#0F1A2B;--cp-highlight:#D9A21B;--cp-on-highlight:#14365D;--cp-danger:#E07868;--cp-on-danger:#17263B;--cp-color-gold-ink:#E8B53A;--cp-color-gold-soft:#5A4915;--cp-color-gold-wash:#2A2413; color: var(--cp-text); }
+  </style>
+
+  <div class="phones">
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Daily reading</b>Library · Bible banner · opens on today, selected</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll">
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div class="biz-top"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon "><use href="#i-back"/></svg></button></div>
+            <h1 class="scr-title" style="margin:0">Daily reading</h1>
+            <div class="dr-cal"><div class="dr-head"><span class="m" role="heading" aria-level="3">November 2026</span><button class="dr-today" aria-label="Today">Today</button><button class="dr-arrow" aria-label="Previous month, October 2026"><svg class="cp-icon"><use href="#i-back"/></svg></button><button class="dr-arrow" aria-label="Next month, December 2026"><svg class="cp-icon"><use href="#i-chev"/></svg></button></div><div class="dr-week" aria-hidden="true"><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span><span>Su</span></div><div class="dr-row"><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span><button class="dr-d" aria-label="Sunday 1 November 2026"><span class="k">1</span></button></div><div class="dr-row"><button class="dr-d" aria-label="Monday 2 November 2026"><span class="k">2</span></button><button class="dr-d" aria-label="Tuesday 3 November 2026"><span class="k">3</span></button><button class="dr-d" aria-label="Wednesday 4 November 2026"><span class="k">4</span></button><button class="dr-d" aria-label="Thursday 5 November 2026"><span class="k">5</span></button><button class="dr-d" aria-label="Friday 6 November 2026"><span class="k">6</span></button><button class="dr-d" aria-label="Saturday 7 November 2026"><span class="k">7</span></button><button class="dr-d sel today" aria-label="Sunday 8 November 2026, today, selected"><span class="k">8</span></button></div><div class="dr-row"><button class="dr-d" aria-label="Monday 9 November 2026"><span class="k">9</span></button><button class="dr-d" aria-label="Tuesday 10 November 2026"><span class="k">10</span></button><button class="dr-d" aria-label="Wednesday 11 November 2026"><span class="k">11</span></button><button class="dr-d" aria-label="Thursday 12 November 2026"><span class="k">12</span></button><button class="dr-d" aria-label="Friday 13 November 2026"><span class="k">13</span></button><button class="dr-d" aria-label="Saturday 14 November 2026"><span class="k">14</span></button><button class="dr-d" aria-label="Sunday 15 November 2026"><span class="k">15</span></button></div><div class="dr-row"><button class="dr-d" aria-label="Monday 16 November 2026"><span class="k">16</span></button><button class="dr-d" aria-label="Tuesday 17 November 2026"><span class="k">17</span></button><button class="dr-d" aria-label="Wednesday 18 November 2026"><span class="k">18</span></button><button class="dr-d" aria-label="Thursday 19 November 2026"><span class="k">19</span></button><button class="dr-d" aria-label="Friday 20 November 2026"><span class="k">20</span></button><button class="dr-d" aria-label="Saturday 21 November 2026"><span class="k">21</span></button><button class="dr-d" aria-label="Sunday 22 November 2026"><span class="k">22</span></button></div><div class="dr-row"><button class="dr-d" aria-label="Monday 23 November 2026"><span class="k">23</span></button><button class="dr-d" aria-label="Tuesday 24 November 2026"><span class="k">24</span></button><button class="dr-d" aria-label="Wednesday 25 November 2026"><span class="k">25</span></button><button class="dr-d" aria-label="Thursday 26 November 2026"><span class="k">26</span></button><button class="dr-d" aria-label="Friday 27 November 2026"><span class="k">27</span></button><button class="dr-d" aria-label="Saturday 28 November 2026"><span class="k">28</span></button><button class="dr-d" aria-label="Sunday 29 November 2026"><span class="k">29</span></button></div><div class="dr-row"><button class="dr-d" aria-label="Monday 30 November 2026"><span class="k">30</span></button><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span></div></div>
+            <div role="heading" aria-level="2" aria-label="Today, Sunday 8 November 2026"><div class="dr-eyebrow">Today · Sunday</div><div class="dr-title">8 November 2026</div></div><div class="lib-notice"><svg class="cp-icon"><use href="#i-flag"/></svg><div><div class="h">Preview</div><div class="p">This is a sample. Daily readings and reflections are not in the app yet; every day shows the same example while we choose texts we are allowed to include.</div></div></div><div class="cp-card dr-card"><div class="dr-top"><span class="dr-eyebrow">Sample reading</span><span class="lib-chip sample">Sample</span></div><div><div class="dr-title" role="heading" aria-level="3">Psalm 121:1–4</div><div class="dr-cap">World English Bible · public&nbsp;domain</div></div><div class="note">A Song of Ascents.</div><div class="dr-verses"><p class="dr-v"><i>1</i> I will lift up my eyes to the hills. Where does my help come from?</p><p class="dr-v"><i>2</i> My help comes from the LORD, who made heaven and earth.</p><p class="dr-v"><i>3</i> He will not allow your foot to be moved. He who keeps you will not slumber.</p><p class="dr-v"><i>4</i> Behold, he who keeps Israel will neither slumber nor sleep.</p></div></div><div class="cp-card dr-card"><div class="dr-top"><span class="dr-eyebrow">Sample reflection</span><span class="lib-chip sample">Sample</span></div><div class="dr-title" role="heading" aria-level="3">Reflection</div><p class="dr-text">Some days the whole Camino feels like the next hill. For a moment, lift your eyes: to the sky, to the road ahead, to the pilgrims walking near you. You do not have to be fast or strong to walk well. Rest when your body asks, drink some water, and take the next step when you are ready.</p></div>
+          </div>
+        </div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Daily reading · Another day</b>Today ringed · the day you picked filled · same sample</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll">
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div class="biz-top"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon "><use href="#i-back"/></svg></button></div>
+            <h1 class="scr-title" style="margin:0">Daily reading</h1>
+            <div class="dr-cal"><div class="dr-head"><span class="m" role="heading" aria-level="3">November 2026</span><button class="dr-today" aria-label="Today">Today</button><button class="dr-arrow" aria-label="Previous month, October 2026"><svg class="cp-icon"><use href="#i-back"/></svg></button><button class="dr-arrow" aria-label="Next month, December 2026"><svg class="cp-icon"><use href="#i-chev"/></svg></button></div><div class="dr-week" aria-hidden="true"><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span><span>Su</span></div><div class="dr-row"><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span><button class="dr-d" aria-label="Sunday 1 November 2026"><span class="k">1</span></button></div><div class="dr-row"><button class="dr-d" aria-label="Monday 2 November 2026"><span class="k">2</span></button><button class="dr-d" aria-label="Tuesday 3 November 2026"><span class="k">3</span></button><button class="dr-d" aria-label="Wednesday 4 November 2026"><span class="k">4</span></button><button class="dr-d" aria-label="Thursday 5 November 2026"><span class="k">5</span></button><button class="dr-d" aria-label="Friday 6 November 2026"><span class="k">6</span></button><button class="dr-d" aria-label="Saturday 7 November 2026"><span class="k">7</span></button><button class="dr-d today" aria-label="Sunday 8 November 2026, today"><span class="k">8</span></button></div><div class="dr-row"><button class="dr-d" aria-label="Monday 9 November 2026"><span class="k">9</span></button><button class="dr-d" aria-label="Tuesday 10 November 2026"><span class="k">10</span></button><button class="dr-d" aria-label="Wednesday 11 November 2026"><span class="k">11</span></button><button class="dr-d" aria-label="Thursday 12 November 2026"><span class="k">12</span></button><button class="dr-d" aria-label="Friday 13 November 2026"><span class="k">13</span></button><button class="dr-d sel" aria-label="Saturday 14 November 2026, selected"><span class="k">14</span></button><button class="dr-d" aria-label="Sunday 15 November 2026"><span class="k">15</span></button></div><div class="dr-row"><button class="dr-d" aria-label="Monday 16 November 2026"><span class="k">16</span></button><button class="dr-d" aria-label="Tuesday 17 November 2026"><span class="k">17</span></button><button class="dr-d" aria-label="Wednesday 18 November 2026"><span class="k">18</span></button><button class="dr-d" aria-label="Thursday 19 November 2026"><span class="k">19</span></button><button class="dr-d" aria-label="Friday 20 November 2026"><span class="k">20</span></button><button class="dr-d" aria-label="Saturday 21 November 2026"><span class="k">21</span></button><button class="dr-d" aria-label="Sunday 22 November 2026"><span class="k">22</span></button></div><div class="dr-row"><button class="dr-d" aria-label="Monday 23 November 2026"><span class="k">23</span></button><button class="dr-d" aria-label="Tuesday 24 November 2026"><span class="k">24</span></button><button class="dr-d" aria-label="Wednesday 25 November 2026"><span class="k">25</span></button><button class="dr-d" aria-label="Thursday 26 November 2026"><span class="k">26</span></button><button class="dr-d" aria-label="Friday 27 November 2026"><span class="k">27</span></button><button class="dr-d" aria-label="Saturday 28 November 2026"><span class="k">28</span></button><button class="dr-d" aria-label="Sunday 29 November 2026"><span class="k">29</span></button></div><div class="dr-row"><button class="dr-d" aria-label="Monday 30 November 2026"><span class="k">30</span></button><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span></div></div>
+            <div role="heading" aria-level="2" aria-label="Saturday 14 November 2026"><div class="dr-eyebrow">Saturday</div><div class="dr-title">14 November 2026</div></div><div class="lib-notice"><svg class="cp-icon"><use href="#i-flag"/></svg><div><div class="h">Preview</div><div class="p">This is a sample. Daily readings and reflections are not in the app yet; every day shows the same example while we choose texts we are allowed to include.</div></div></div><div class="cp-card dr-card"><div class="dr-top"><span class="dr-eyebrow">Sample reading</span><span class="lib-chip sample">Sample</span></div><div><div class="dr-title" role="heading" aria-level="3">Psalm 121:1–4</div><div class="dr-cap">World English Bible · public&nbsp;domain</div></div><div class="note">A Song of Ascents.</div><div class="dr-verses"><p class="dr-v"><i>1</i> I will lift up my eyes to the hills. Where does my help come from?</p><p class="dr-v"><i>2</i> My help comes from the LORD, who made heaven and earth.</p><p class="dr-v"><i>3</i> He will not allow your foot to be moved. He who keeps you will not slumber.</p><p class="dr-v"><i>4</i> Behold, he who keeps Israel will neither slumber nor sleep.</p></div></div><div class="cp-card dr-card"><div class="dr-top"><span class="dr-eyebrow">Sample reflection</span><span class="lib-chip sample">Sample</span></div><div class="dr-title" role="heading" aria-level="3">Reflection</div><p class="dr-text">Some days the whole Camino feels like the next hill. For a moment, lift your eyes: to the sky, to the road ahead, to the pilgrims walking near you. You do not have to be fast or strong to walk well. Rest when your body asks, drink some water, and take the next step when you are ready.</p></div>
+          </div>
+        </div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Daily reading · The reading</b>Scrolled down · the reading and the reflection, both samples</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll" data-scroll-card="1">
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div class="biz-top"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon "><use href="#i-back"/></svg></button></div>
+            <h1 class="scr-title" style="margin:0">Daily reading</h1>
+            <div class="dr-cal"><div class="dr-head"><span class="m" role="heading" aria-level="3">November 2026</span><button class="dr-today" aria-label="Today">Today</button><button class="dr-arrow" aria-label="Previous month, October 2026"><svg class="cp-icon"><use href="#i-back"/></svg></button><button class="dr-arrow" aria-label="Next month, December 2026"><svg class="cp-icon"><use href="#i-chev"/></svg></button></div><div class="dr-week" aria-hidden="true"><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span><span>Su</span></div><div class="dr-row"><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span><button class="dr-d" aria-label="Sunday 1 November 2026"><span class="k">1</span></button></div><div class="dr-row"><button class="dr-d" aria-label="Monday 2 November 2026"><span class="k">2</span></button><button class="dr-d" aria-label="Tuesday 3 November 2026"><span class="k">3</span></button><button class="dr-d" aria-label="Wednesday 4 November 2026"><span class="k">4</span></button><button class="dr-d" aria-label="Thursday 5 November 2026"><span class="k">5</span></button><button class="dr-d" aria-label="Friday 6 November 2026"><span class="k">6</span></button><button class="dr-d" aria-label="Saturday 7 November 2026"><span class="k">7</span></button><button class="dr-d today" aria-label="Sunday 8 November 2026, today"><span class="k">8</span></button></div><div class="dr-row"><button class="dr-d" aria-label="Monday 9 November 2026"><span class="k">9</span></button><button class="dr-d" aria-label="Tuesday 10 November 2026"><span class="k">10</span></button><button class="dr-d" aria-label="Wednesday 11 November 2026"><span class="k">11</span></button><button class="dr-d" aria-label="Thursday 12 November 2026"><span class="k">12</span></button><button class="dr-d" aria-label="Friday 13 November 2026"><span class="k">13</span></button><button class="dr-d sel" aria-label="Saturday 14 November 2026, selected"><span class="k">14</span></button><button class="dr-d" aria-label="Sunday 15 November 2026"><span class="k">15</span></button></div><div class="dr-row"><button class="dr-d" aria-label="Monday 16 November 2026"><span class="k">16</span></button><button class="dr-d" aria-label="Tuesday 17 November 2026"><span class="k">17</span></button><button class="dr-d" aria-label="Wednesday 18 November 2026"><span class="k">18</span></button><button class="dr-d" aria-label="Thursday 19 November 2026"><span class="k">19</span></button><button class="dr-d" aria-label="Friday 20 November 2026"><span class="k">20</span></button><button class="dr-d" aria-label="Saturday 21 November 2026"><span class="k">21</span></button><button class="dr-d" aria-label="Sunday 22 November 2026"><span class="k">22</span></button></div><div class="dr-row"><button class="dr-d" aria-label="Monday 23 November 2026"><span class="k">23</span></button><button class="dr-d" aria-label="Tuesday 24 November 2026"><span class="k">24</span></button><button class="dr-d" aria-label="Wednesday 25 November 2026"><span class="k">25</span></button><button class="dr-d" aria-label="Thursday 26 November 2026"><span class="k">26</span></button><button class="dr-d" aria-label="Friday 27 November 2026"><span class="k">27</span></button><button class="dr-d" aria-label="Saturday 28 November 2026"><span class="k">28</span></button><button class="dr-d" aria-label="Sunday 29 November 2026"><span class="k">29</span></button></div><div class="dr-row"><button class="dr-d" aria-label="Monday 30 November 2026"><span class="k">30</span></button><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span></div></div>
+            <div role="heading" aria-level="2" aria-label="Saturday 14 November 2026"><div class="dr-eyebrow">Saturday</div><div class="dr-title">14 November 2026</div></div><div class="lib-notice"><svg class="cp-icon"><use href="#i-flag"/></svg><div><div class="h">Preview</div><div class="p">This is a sample. Daily readings and reflections are not in the app yet; every day shows the same example while we choose texts we are allowed to include.</div></div></div><div class="cp-card dr-card"><div class="dr-top"><span class="dr-eyebrow">Sample reading</span><span class="lib-chip sample">Sample</span></div><div><div class="dr-title" role="heading" aria-level="3">Psalm 121:1–4</div><div class="dr-cap">World English Bible · public&nbsp;domain</div></div><div class="note">A Song of Ascents.</div><div class="dr-verses"><p class="dr-v"><i>1</i> I will lift up my eyes to the hills. Where does my help come from?</p><p class="dr-v"><i>2</i> My help comes from the LORD, who made heaven and earth.</p><p class="dr-v"><i>3</i> He will not allow your foot to be moved. He who keeps you will not slumber.</p><p class="dr-v"><i>4</i> Behold, he who keeps Israel will neither slumber nor sleep.</p></div></div><div class="cp-card dr-card"><div class="dr-top"><span class="dr-eyebrow">Sample reflection</span><span class="lib-chip sample">Sample</span></div><div class="dr-title" role="heading" aria-level="3">Reflection</div><p class="dr-text">Some days the whole Camino feels like the next hill. For a moment, lift your eyes: to the sky, to the road ahead, to the pilgrims walking near you. You do not have to be fast or strong to walk well. Rest when your body asks, drink some water, and take the next step when you are ready.</p></div>
+          </div>
+        </div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Daily reading · Dark</b>The same screen after sunset</p>
+      <div class="phone dk">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll">
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div class="biz-top"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon "><use href="#i-back"/></svg></button></div>
+            <h1 class="scr-title" style="margin:0">Daily reading</h1>
+            <div class="dr-cal"><div class="dr-head"><span class="m" role="heading" aria-level="3">November 2026</span><button class="dr-today" aria-label="Today">Today</button><button class="dr-arrow" aria-label="Previous month, October 2026"><svg class="cp-icon"><use href="#i-back"/></svg></button><button class="dr-arrow" aria-label="Next month, December 2026"><svg class="cp-icon"><use href="#i-chev"/></svg></button></div><div class="dr-week" aria-hidden="true"><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span><span>Su</span></div><div class="dr-row"><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span><button class="dr-d" aria-label="Sunday 1 November 2026"><span class="k">1</span></button></div><div class="dr-row"><button class="dr-d" aria-label="Monday 2 November 2026"><span class="k">2</span></button><button class="dr-d" aria-label="Tuesday 3 November 2026"><span class="k">3</span></button><button class="dr-d" aria-label="Wednesday 4 November 2026"><span class="k">4</span></button><button class="dr-d" aria-label="Thursday 5 November 2026"><span class="k">5</span></button><button class="dr-d" aria-label="Friday 6 November 2026"><span class="k">6</span></button><button class="dr-d" aria-label="Saturday 7 November 2026"><span class="k">7</span></button><button class="dr-d today" aria-label="Sunday 8 November 2026, today"><span class="k">8</span></button></div><div class="dr-row"><button class="dr-d" aria-label="Monday 9 November 2026"><span class="k">9</span></button><button class="dr-d" aria-label="Tuesday 10 November 2026"><span class="k">10</span></button><button class="dr-d" aria-label="Wednesday 11 November 2026"><span class="k">11</span></button><button class="dr-d" aria-label="Thursday 12 November 2026"><span class="k">12</span></button><button class="dr-d" aria-label="Friday 13 November 2026"><span class="k">13</span></button><button class="dr-d sel" aria-label="Saturday 14 November 2026, selected"><span class="k">14</span></button><button class="dr-d" aria-label="Sunday 15 November 2026"><span class="k">15</span></button></div><div class="dr-row"><button class="dr-d" aria-label="Monday 16 November 2026"><span class="k">16</span></button><button class="dr-d" aria-label="Tuesday 17 November 2026"><span class="k">17</span></button><button class="dr-d" aria-label="Wednesday 18 November 2026"><span class="k">18</span></button><button class="dr-d" aria-label="Thursday 19 November 2026"><span class="k">19</span></button><button class="dr-d" aria-label="Friday 20 November 2026"><span class="k">20</span></button><button class="dr-d" aria-label="Saturday 21 November 2026"><span class="k">21</span></button><button class="dr-d" aria-label="Sunday 22 November 2026"><span class="k">22</span></button></div><div class="dr-row"><button class="dr-d" aria-label="Monday 23 November 2026"><span class="k">23</span></button><button class="dr-d" aria-label="Tuesday 24 November 2026"><span class="k">24</span></button><button class="dr-d" aria-label="Wednesday 25 November 2026"><span class="k">25</span></button><button class="dr-d" aria-label="Thursday 26 November 2026"><span class="k">26</span></button><button class="dr-d" aria-label="Friday 27 November 2026"><span class="k">27</span></button><button class="dr-d" aria-label="Saturday 28 November 2026"><span class="k">28</span></button><button class="dr-d" aria-label="Sunday 29 November 2026"><span class="k">29</span></button></div><div class="dr-row"><button class="dr-d" aria-label="Monday 30 November 2026"><span class="k">30</span></button><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span></div></div>
+            <div role="heading" aria-level="2" aria-label="Saturday 14 November 2026"><div class="dr-eyebrow">Saturday</div><div class="dr-title">14 November 2026</div></div><div class="lib-notice"><svg class="cp-icon"><use href="#i-flag"/></svg><div><div class="h">Preview</div><div class="p">This is a sample. Daily readings and reflections are not in the app yet; every day shows the same example while we choose texts we are allowed to include.</div></div></div><div class="cp-card dr-card"><div class="dr-top"><span class="dr-eyebrow">Sample reading</span><span class="lib-chip sample">Sample</span></div><div><div class="dr-title" role="heading" aria-level="3">Psalm 121:1–4</div><div class="dr-cap">World English Bible · public&nbsp;domain</div></div><div class="note">A Song of Ascents.</div><div class="dr-verses"><p class="dr-v"><i>1</i> I will lift up my eyes to the hills. Where does my help come from?</p><p class="dr-v"><i>2</i> My help comes from the LORD, who made heaven and earth.</p><p class="dr-v"><i>3</i> He will not allow your foot to be moved. He who keeps you will not slumber.</p><p class="dr-v"><i>4</i> Behold, he who keeps Israel will neither slumber nor sleep.</p></div></div><div class="cp-card dr-card"><div class="dr-top"><span class="dr-eyebrow">Sample reflection</span><span class="lib-chip sample">Sample</span></div><div class="dr-title" role="heading" aria-level="3">Reflection</div><p class="dr-text">Some days the whole Camino feels like the next hill. For a moment, lift your eyes: to the sky, to the road ahead, to the pilgrims walking near you. You do not have to be fast or strong to walk well. Rest when your body asks, drink some water, and take the next step when you are ready.</p></div>
+          </div>
+        </div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Daily reading · Dark, the reading</b>Scrolled down to the reading</p>
+      <div class="phone dk">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll" data-scroll-card="1">
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div class="biz-top"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon "><use href="#i-back"/></svg></button></div>
+            <h1 class="scr-title" style="margin:0">Daily reading</h1>
+            <div class="dr-cal"><div class="dr-head"><span class="m" role="heading" aria-level="3">November 2026</span><button class="dr-today" aria-label="Today">Today</button><button class="dr-arrow" aria-label="Previous month, October 2026"><svg class="cp-icon"><use href="#i-back"/></svg></button><button class="dr-arrow" aria-label="Next month, December 2026"><svg class="cp-icon"><use href="#i-chev"/></svg></button></div><div class="dr-week" aria-hidden="true"><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span><span>Su</span></div><div class="dr-row"><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span><button class="dr-d" aria-label="Sunday 1 November 2026"><span class="k">1</span></button></div><div class="dr-row"><button class="dr-d" aria-label="Monday 2 November 2026"><span class="k">2</span></button><button class="dr-d" aria-label="Tuesday 3 November 2026"><span class="k">3</span></button><button class="dr-d" aria-label="Wednesday 4 November 2026"><span class="k">4</span></button><button class="dr-d" aria-label="Thursday 5 November 2026"><span class="k">5</span></button><button class="dr-d" aria-label="Friday 6 November 2026"><span class="k">6</span></button><button class="dr-d" aria-label="Saturday 7 November 2026"><span class="k">7</span></button><button class="dr-d today" aria-label="Sunday 8 November 2026, today"><span class="k">8</span></button></div><div class="dr-row"><button class="dr-d" aria-label="Monday 9 November 2026"><span class="k">9</span></button><button class="dr-d" aria-label="Tuesday 10 November 2026"><span class="k">10</span></button><button class="dr-d" aria-label="Wednesday 11 November 2026"><span class="k">11</span></button><button class="dr-d" aria-label="Thursday 12 November 2026"><span class="k">12</span></button><button class="dr-d" aria-label="Friday 13 November 2026"><span class="k">13</span></button><button class="dr-d sel" aria-label="Saturday 14 November 2026, selected"><span class="k">14</span></button><button class="dr-d" aria-label="Sunday 15 November 2026"><span class="k">15</span></button></div><div class="dr-row"><button class="dr-d" aria-label="Monday 16 November 2026"><span class="k">16</span></button><button class="dr-d" aria-label="Tuesday 17 November 2026"><span class="k">17</span></button><button class="dr-d" aria-label="Wednesday 18 November 2026"><span class="k">18</span></button><button class="dr-d" aria-label="Thursday 19 November 2026"><span class="k">19</span></button><button class="dr-d" aria-label="Friday 20 November 2026"><span class="k">20</span></button><button class="dr-d" aria-label="Saturday 21 November 2026"><span class="k">21</span></button><button class="dr-d" aria-label="Sunday 22 November 2026"><span class="k">22</span></button></div><div class="dr-row"><button class="dr-d" aria-label="Monday 23 November 2026"><span class="k">23</span></button><button class="dr-d" aria-label="Tuesday 24 November 2026"><span class="k">24</span></button><button class="dr-d" aria-label="Wednesday 25 November 2026"><span class="k">25</span></button><button class="dr-d" aria-label="Thursday 26 November 2026"><span class="k">26</span></button><button class="dr-d" aria-label="Friday 27 November 2026"><span class="k">27</span></button><button class="dr-d" aria-label="Saturday 28 November 2026"><span class="k">28</span></button><button class="dr-d" aria-label="Sunday 29 November 2026"><span class="k">29</span></button></div><div class="dr-row"><button class="dr-d" aria-label="Monday 30 November 2026"><span class="k">30</span></button><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span></div></div>
+            <div role="heading" aria-level="2" aria-label="Saturday 14 November 2026"><div class="dr-eyebrow">Saturday</div><div class="dr-title">14 November 2026</div></div><div class="lib-notice"><svg class="cp-icon"><use href="#i-flag"/></svg><div><div class="h">Preview</div><div class="p">This is a sample. Daily readings and reflections are not in the app yet; every day shows the same example while we choose texts we are allowed to include.</div></div></div><div class="cp-card dr-card"><div class="dr-top"><span class="dr-eyebrow">Sample reading</span><span class="lib-chip sample">Sample</span></div><div><div class="dr-title" role="heading" aria-level="3">Psalm 121:1–4</div><div class="dr-cap">World English Bible · public&nbsp;domain</div></div><div class="note">A Song of Ascents.</div><div class="dr-verses"><p class="dr-v"><i>1</i> I will lift up my eyes to the hills. Where does my help come from?</p><p class="dr-v"><i>2</i> My help comes from the LORD, who made heaven and earth.</p><p class="dr-v"><i>3</i> He will not allow your foot to be moved. He who keeps you will not slumber.</p><p class="dr-v"><i>4</i> Behold, he who keeps Israel will neither slumber nor sleep.</p></div></div><div class="cp-card dr-card"><div class="dr-top"><span class="dr-eyebrow">Sample reflection</span><span class="lib-chip sample">Sample</span></div><div class="dr-title" role="heading" aria-level="3">Reflection</div><p class="dr-text">Some days the whole Camino feels like the next hill. For a moment, lift your eyes: to the sky, to the road ahead, to the pilgrims walking near you. You do not have to be fast or strong to walk well. Rest when your body asks, drink some water, and take the next step when you are ready.</p></div>
+          </div>
+        </div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Daily reading · 320 wide</b>The smallest phone: days stay 44 wide</p>
+      <div class="phone" style="width:320px">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll">
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div class="biz-top"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon "><use href="#i-back"/></svg></button></div>
+            <h1 class="scr-title" style="margin:0">Daily reading</h1>
+            <div class="dr-cal fit"><div class="dr-head"><span class="m" role="heading" aria-level="3">November 2026</span><button class="dr-today" aria-label="Today">Today</button><button class="dr-arrow" aria-label="Previous month, October 2026"><svg class="cp-icon"><use href="#i-back"/></svg></button><button class="dr-arrow" aria-label="Next month, December 2026"><svg class="cp-icon"><use href="#i-chev"/></svg></button></div><div class="dr-week" aria-hidden="true"><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span><span>Su</span></div><div class="dr-row"><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span><button class="dr-d" aria-label="Sunday 1 November 2026"><span class="k">1</span></button></div><div class="dr-row"><button class="dr-d" aria-label="Monday 2 November 2026"><span class="k">2</span></button><button class="dr-d" aria-label="Tuesday 3 November 2026"><span class="k">3</span></button><button class="dr-d" aria-label="Wednesday 4 November 2026"><span class="k">4</span></button><button class="dr-d" aria-label="Thursday 5 November 2026"><span class="k">5</span></button><button class="dr-d" aria-label="Friday 6 November 2026"><span class="k">6</span></button><button class="dr-d" aria-label="Saturday 7 November 2026"><span class="k">7</span></button><button class="dr-d today" aria-label="Sunday 8 November 2026, today"><span class="k">8</span></button></div><div class="dr-row"><button class="dr-d" aria-label="Monday 9 November 2026"><span class="k">9</span></button><button class="dr-d" aria-label="Tuesday 10 November 2026"><span class="k">10</span></button><button class="dr-d" aria-label="Wednesday 11 November 2026"><span class="k">11</span></button><button class="dr-d" aria-label="Thursday 12 November 2026"><span class="k">12</span></button><button class="dr-d" aria-label="Friday 13 November 2026"><span class="k">13</span></button><button class="dr-d" aria-label="Saturday 14 November 2026"><span class="k">14</span></button><button class="dr-d" aria-label="Sunday 15 November 2026"><span class="k">15</span></button></div><div class="dr-row"><button class="dr-d" aria-label="Monday 16 November 2026"><span class="k">16</span></button><button class="dr-d" aria-label="Tuesday 17 November 2026"><span class="k">17</span></button><button class="dr-d" aria-label="Wednesday 18 November 2026"><span class="k">18</span></button><button class="dr-d" aria-label="Thursday 19 November 2026"><span class="k">19</span></button><button class="dr-d" aria-label="Friday 20 November 2026"><span class="k">20</span></button><button class="dr-d" aria-label="Saturday 21 November 2026"><span class="k">21</span></button><button class="dr-d" aria-label="Sunday 22 November 2026"><span class="k">22</span></button></div><div class="dr-row"><button class="dr-d" aria-label="Monday 23 November 2026"><span class="k">23</span></button><button class="dr-d" aria-label="Tuesday 24 November 2026"><span class="k">24</span></button><button class="dr-d" aria-label="Wednesday 25 November 2026"><span class="k">25</span></button><button class="dr-d" aria-label="Thursday 26 November 2026"><span class="k">26</span></button><button class="dr-d" aria-label="Friday 27 November 2026"><span class="k">27</span></button><button class="dr-d" aria-label="Saturday 28 November 2026"><span class="k">28</span></button><button class="dr-d" aria-label="Sunday 29 November 2026"><span class="k">29</span></button></div><div class="dr-row"><button class="dr-d sel" aria-label="Monday 30 November 2026, selected"><span class="k">30</span></button><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span></div></div>
+            <div role="heading" aria-level="2" aria-label="Monday 30 November 2026"><div class="dr-eyebrow">Monday</div><div class="dr-title">30 November 2026</div></div><div class="lib-notice"><svg class="cp-icon"><use href="#i-flag"/></svg><div><div class="h">Preview</div><div class="p">This is a sample. Daily readings and reflections are not in the app yet; every day shows the same example while we choose texts we are allowed to include.</div></div></div><div class="cp-card dr-card"><div class="dr-top"><span class="dr-eyebrow">Sample reading</span><span class="lib-chip sample">Sample</span></div><div><div class="dr-title" role="heading" aria-level="3">Psalm 121:1–4</div><div class="dr-cap">World English Bible · public&nbsp;domain</div></div><div class="note">A Song of Ascents.</div><div class="dr-verses"><p class="dr-v"><i>1</i> I will lift up my eyes to the hills. Where does my help come from?</p><p class="dr-v"><i>2</i> My help comes from the LORD, who made heaven and earth.</p><p class="dr-v"><i>3</i> He will not allow your foot to be moved. He who keeps you will not slumber.</p><p class="dr-v"><i>4</i> Behold, he who keeps Israel will neither slumber nor sleep.</p></div></div><div class="cp-card dr-card"><div class="dr-top"><span class="dr-eyebrow">Sample reflection</span><span class="lib-chip sample">Sample</span></div><div class="dr-title" role="heading" aria-level="3">Reflection</div><p class="dr-text">Some days the whole Camino feels like the next hill. For a moment, lift your eyes: to the sky, to the road ahead, to the pilgrims walking near you. You do not have to be fast or strong to walk well. Rest when your body asks, drink some water, and take the next step when you are ready.</p></div>
+          </div>
+        </div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Daily reading · The last month</b>Five years ahead: the forward arrow is off · the reading stays on today</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll">
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div class="biz-top"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon "><use href="#i-back"/></svg></button></div>
+            <h1 class="scr-title" style="margin:0">Daily reading</h1>
+            <div class="dr-cal"><div class="dr-head"><span class="m" role="heading" aria-level="3">November 2031</span><button class="dr-today" aria-label="Today">Today</button><button class="dr-arrow" aria-label="Previous month, October 2031"><svg class="cp-icon"><use href="#i-back"/></svg></button><button class="dr-arrow" disabled aria-label="Next month"><svg class="cp-icon"><use href="#i-chev"/></svg></button></div><div class="dr-week" aria-hidden="true"><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span><span>Su</span></div><div class="dr-row"><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span><button class="dr-d" aria-label="Saturday 1 November 2031"><span class="k">1</span></button><button class="dr-d" aria-label="Sunday 2 November 2031"><span class="k">2</span></button></div><div class="dr-row"><button class="dr-d" aria-label="Monday 3 November 2031"><span class="k">3</span></button><button class="dr-d" aria-label="Tuesday 4 November 2031"><span class="k">4</span></button><button class="dr-d" aria-label="Wednesday 5 November 2031"><span class="k">5</span></button><button class="dr-d" aria-label="Thursday 6 November 2031"><span class="k">6</span></button><button class="dr-d" aria-label="Friday 7 November 2031"><span class="k">7</span></button><button class="dr-d" aria-label="Saturday 8 November 2031"><span class="k">8</span></button><button class="dr-d" aria-label="Sunday 9 November 2031"><span class="k">9</span></button></div><div class="dr-row"><button class="dr-d" aria-label="Monday 10 November 2031"><span class="k">10</span></button><button class="dr-d" aria-label="Tuesday 11 November 2031"><span class="k">11</span></button><button class="dr-d" aria-label="Wednesday 12 November 2031"><span class="k">12</span></button><button class="dr-d" aria-label="Thursday 13 November 2031"><span class="k">13</span></button><button class="dr-d" aria-label="Friday 14 November 2031"><span class="k">14</span></button><button class="dr-d" aria-label="Saturday 15 November 2031"><span class="k">15</span></button><button class="dr-d" aria-label="Sunday 16 November 2031"><span class="k">16</span></button></div><div class="dr-row"><button class="dr-d" aria-label="Monday 17 November 2031"><span class="k">17</span></button><button class="dr-d" aria-label="Tuesday 18 November 2031"><span class="k">18</span></button><button class="dr-d" aria-label="Wednesday 19 November 2031"><span class="k">19</span></button><button class="dr-d" aria-label="Thursday 20 November 2031"><span class="k">20</span></button><button class="dr-d" aria-label="Friday 21 November 2031"><span class="k">21</span></button><button class="dr-d" aria-label="Saturday 22 November 2031"><span class="k">22</span></button><button class="dr-d" aria-label="Sunday 23 November 2031"><span class="k">23</span></button></div><div class="dr-row"><button class="dr-d" aria-label="Monday 24 November 2031"><span class="k">24</span></button><button class="dr-d" aria-label="Tuesday 25 November 2031"><span class="k">25</span></button><button class="dr-d" aria-label="Wednesday 26 November 2031"><span class="k">26</span></button><button class="dr-d" aria-label="Thursday 27 November 2031"><span class="k">27</span></button><button class="dr-d" aria-label="Friday 28 November 2031"><span class="k">28</span></button><button class="dr-d" aria-label="Saturday 29 November 2031"><span class="k">29</span></button><button class="dr-d" aria-label="Sunday 30 November 2031"><span class="k">30</span></button></div><div class="dr-row"><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span><span class="dr-d"></span></div></div>
+            <div role="heading" aria-level="2" aria-label="Today, Sunday 8 November 2026"><div class="dr-eyebrow">Today · Sunday</div><div class="dr-title">8 November 2026</div></div><div class="lib-notice"><svg class="cp-icon"><use href="#i-flag"/></svg><div><div class="h">Preview</div><div class="p">This is a sample. Daily readings and reflections are not in the app yet; every day shows the same example while we choose texts we are allowed to include.</div></div></div><div class="cp-card dr-card"><div class="dr-top"><span class="dr-eyebrow">Sample reading</span><span class="lib-chip sample">Sample</span></div><div><div class="dr-title" role="heading" aria-level="3">Psalm 121:1–4</div><div class="dr-cap">World English Bible · public&nbsp;domain</div></div><div class="note">A Song of Ascents.</div><div class="dr-verses"><p class="dr-v"><i>1</i> I will lift up my eyes to the hills. Where does my help come from?</p><p class="dr-v"><i>2</i> My help comes from the LORD, who made heaven and earth.</p><p class="dr-v"><i>3</i> He will not allow your foot to be moved. He who keeps you will not slumber.</p><p class="dr-v"><i>4</i> Behold, he who keeps Israel will neither slumber nor sleep.</p></div></div><div class="cp-card dr-card"><div class="dr-top"><span class="dr-eyebrow">Sample reflection</span><span class="lib-chip sample">Sample</span></div><div class="dr-title" role="heading" aria-level="3">Reflection</div><p class="dr-text">Some days the whole Camino feels like the next hill. For a moment, lift your eyes: to the sky, to the road ahead, to the pilgrims walking near you. You do not have to be fast or strong to walk well. Rest when your body asks, drink some water, and take the next step when you are ready.</p></div>
+          </div>
+        </div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+  /* The phones marked data-scroll-card show the screen scrolled down to the reading, as it is after a swipe up. */
+  (function () {
+    var go = function () {
+      document.querySelectorAll('[data-scroll-card]').forEach(function (el) {
+        var card = el.querySelector('.dr-card');
+        if (card) el.scrollTop = card.offsetTop - 4;
+      });
+    };
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(go);
+    window.addEventListener('load', go);
+  })();
+  </script>
 </section>
 
 <!-- =================================================================== ICONS -->
