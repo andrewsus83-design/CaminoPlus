@@ -41,7 +41,6 @@ const SCREENS = {
   'Discover': 'discover',
   'Discover · Photos of you': 'discover-photos',
   'Library': 'library',
-  'Library · Books': 'library-books',
   'Diary': 'diary',
   'Diary · page': 'diary-page',
   'Diary · read': 'diary-read',

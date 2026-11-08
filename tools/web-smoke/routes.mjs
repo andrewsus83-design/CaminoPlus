@@ -30,8 +30,8 @@ export const SAMPLE_OVERRIDES = {
   '/library/bible/[code]': 'PSA',
   '/library/bible/[code]/[chapter]': { code: 'PSA', chapter: '121' },
   // a book of the Books tab: its page, and its reader (which opens at the first chapter), so that the sweep draws the real screens and not "That book is not in the Library"
-  '/library/book/[id]': 'imitation-of-christ',
-  '/library/book/[id]/read': 'imitation-of-christ',
+  '/library/book/[id]': 'camino-frances-guide',
+  '/library/book/[id]/read': 'camino-frances-guide',
 };
 
 // ---------------------------------------------------------------- files -> routes

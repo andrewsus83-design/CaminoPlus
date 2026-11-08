@@ -52,10 +52,10 @@ test('the real plan: all routes, all modes, and the scenarios the owner asked fo
     // the Bible: the grid of books, the chapters, the reader, Next and Previous across a boundary, a verse bookmarked, a link to a verse, the search of verses, Continue reading
     /daily reading banner is compact/, /73 book names fits its square tile/, /a tile opens the numbers of the chapters/, /Next and Previous cross the books/, /touching a verse chooses it/,
     /a link to a verse/, /verses are found after the keystroke/, /card "Continue reading"/, /leads nowhere/,
-    // the Books: twelve A5 covers in two columns, a cover opens its page, the reader (Next and Previous across a part), the place and the size of the text kept, a book with no
-    // text, links, the ribbon bookmark with Bookmarks and the search, and all of it with no signal
-    /twelve A5 covers in two columns/, /cover opens the book page/, /reader opens at the first chapter, Next and Previous/, /remembers where you stopped/,
-    /book with no text says Soon/, /links go where they say/, /ribbon of a cover bookmarks the book/, /Books with no signal/,
+    // the Books: the covers, A5 in two columns on a shelf for each kind, a cover opens its page with the notice of its kind, every kind has its notice, the reader (Next and Previous),
+    // the place and the size of the text kept, links, the ribbon bookmark with Bookmarks and the search, and all of it with no signal
+    /covers, A5 in two columns, on a shelf for each kind of book/, /cover opens the book page/, /every kind of book has its notice on its page/, /reader opens at the first chapter, Next and Previous/, /remembers where you stopped/,
+    /links go where they say/, /ribbon of a cover bookmarks the book/, /Books with no signal/,
   ]) assert.match(names, must);
 });
 

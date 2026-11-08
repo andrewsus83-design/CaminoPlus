@@ -38,9 +38,9 @@ Then the **scenarios** ([scenarios.mjs](scenarios.mjs)), each in light and dark,
 - the gear on Me opens `/settings` (no tab bar there) and Back returns to `/me`, also when Settings was opened from a link;
 - switching light/dark on Settings returns to Settings, and Back goes to Me;
 - Library: its top row is a search field and the Bookmarks button (no title, no diary button); directly under it, before any banner, the tabs
-  Bible, Books and Notes, in that order; Bible and Books each have a banner, Books has a notice for the books that say Soon,
-  Bible has none (its text is real), Notes has none; the Books tab lists twelve covers, free or soon, and shows nothing that is only
-  data (links, licence notes, groups); the gold pen shows only on Notes and opens `/diary/new`; the banner of the Bible tab (the whole card
+  Bible, Books and Notes, in that order; Bible and Books each have a banner, neither has a notice (the text of the Bible is real, and every book is in the app),
+  Notes has none; the Books tab lists a cover for every book of the bundle, and shows nothing that is only
+  data (rights, links, the id of a source); the gold pen shows only on Notes and opens `/diary/new`; the banner of the Bible tab (the whole card
   and its "Read today" button) opens `/library/daily`; a search lists what it finds in Bible, Books and Verses (and says "Nothing found
   for ..." with a way back); the Bookmarks button opens `/library/bookmarks` with the bookmarked rows of both tabs, a verse and the
   bookmarked post (the full account has one bookmarked post); bookmarks kept before the tabs changed (a Music row, the old example rows, the
@@ -58,16 +58,17 @@ Then the **scenarios** ([scenarios.mjs](scenarios.mjs)), each in light and dark,
   and an address that leads nowhere is a calm "Not found"; the search finds verses after the keystroke (typing is never blocked), marks the
   match and offers "Go to" for a typed reference; "Continue reading" shows only when something was read, reopens that chapter and is ignored
   when the place kept no longer exists;
-- Books ([books.scenarios.mjs](books.scenarios.mjs)): the Books tab is a compact banner, a notice and twelve A5 covers (148 by 210) in two columns, 16 from
-  the edge and 12 apart (173 by 245 on a 390 phone, 138 by 196 on 320, 193 by 274 on 430, never wider than the screen), each ONE button named "title, author,
-  free" (or "soon") with its own ribbon, a 44 by 44 button that bookmarks the book, in the four fonts of the brand (Fraunces, Inter, JetBrains Mono, and at most
-  one handwritten Caveat note on the screen); a cover opens the book page (the cover, the title, the blurb, "Start reading", the contents under their parts, the
-  credit of the edition) and Back returns to the tab; the reader opens at chapter 1, Next and Previous (named by where they go) go through the chapters and across
-  a part, are off at the first and at the last chapter, Back goes to the page and not through the chapters, and Contents goes back to the page; the reader keeps
-  where you stopped (Continue on the page and "Continue reading" on the tab, the same line) and the size of the text (five steps), and a damaged place opens the
-  book at its start; a book with no text says Soon, "Not in the app yet" and why, and has no button; a link with `?c=`, a chapter and a book that do not exist; the
-  ribbon, Bookmarks and the search; and the same with no signal. Which books have a text is read from `mobile/assets/books/index.json` (0 to 12), so every
-  scenario works with any of them (with none, the tab says plainly that the texts are being checked, and the scenarios that need a text say so and stop);
+- Books ([books.scenarios.mjs](books.scenarios.mjs)): the Books tab is a compact banner and the covers, A5 (148 by 210) in two columns, 16 from the edge and 12 apart (173 by
+  245 on a 390 phone, 138 by 196 on 320, 193 by 274 on 430, never wider than the screen), on a shelf for each kind of book (Pilgrim's guides, Readings for the Way) with its
+  heading, each ONE button named "title, kind of book, time" with its own ribbon, a 44 by 44 button that bookmarks the book, in the four fonts of the brand (Fraunces,
+  Inter, JetBrains Mono, and at most one handwritten Caveat note on the screen); no cover says Soon or Free; a cover opens the book page (the cover, the title, the subtitle,
+  the kind, the facts, THE NOTICE OF ITS KIND above the button, "Start reading", the contents with the minutes of each chapter, the credit) and Back returns to the tab; the
+  first and the last book of each kind show the wording of `notices.ts`; the reader opens at chapter 1, Next and Previous (named by where they go, in the bar at the bottom)
+  go through the chapters, are off at the first and at the last chapter, Back goes to the page and not through the chapters, and Contents goes back to the page; the reader keeps
+  where you stopped (Continue on the page and "Continue reading" on the tab, the same line, with the time) and the size of the text (five steps), and a damaged place opens
+  the book at its start; a link with `?c=`, a chapter and a book that do not exist (and one of the twelve classics of an earlier plan); the ribbon, Bookmarks and the search
+  (title, subtitle, chapters); and the same with no signal. The books are read from `mobile/assets/library/catalog.json` (the bundle of `tools/build_books.py`), so every
+  scenario works with however many there are;
 - Stays lists the stays of the stage and one opens with its details;
 - logging out from Settings lands on Welcome;
 - launching the app lands on Welcome (signed out), Onboarding (signed in, no journey) or Me;
