@@ -17,6 +17,7 @@ const read = (p: string) => fs.readFileSync(path.join(root, p), 'utf8');
 const code = (src: string) => src.split('\n').filter((l) => !/^\s*(\/\/|\/?\*)/.test(l)).join('\n'); // without comment lines
 import './notes.test'; // the Notes tab (src/features/library/notes): its logic and its wiring, run here so no script has to name it
 import './readerWiring.test'; // the Bible screens: the book grid, the chapters, the reader, the search of verses
+import './booksWiring.test'; // the Books screens: the covers, the banner, the book page, the reader and the places kept on the phone
 
 const DIR = 'src/features/library';
 // The files of this feature: the folder itself, the Bible and Books folders, and the screens of app/library (the Bible screens too). Not notes/ and daily/,

@@ -11,6 +11,7 @@ import assert from 'node:assert/strict';
 import { UID } from './fixtures.mjs';
 import { domQuiet, eventually, pathOf } from './harness.mjs';
 import { BIBLE_SCENARIOS } from './bible.scenarios.mjs';
+import { BOOKS_SCENARIOS } from './books.scenarios.mjs';
 
 const TABS = ['Me', 'Stays', 'Maps', 'Discover', 'Library'];
 const TAB_PATH = { Me: '/me', Stays: '/stays', Maps: '/maps', Discover: '/explore', Library: '/library' };
@@ -121,16 +122,13 @@ export const SCENARIOS = [
       await page.getByText('World English Bible, Catholic edition · public domain', { exact: true }).waitFor();
       await eventually(() => page.getByText('Preview', { exact: true }).count(), (n) => n === 0, { what: 'the number of Preview notices on the Bible tab' });
       await eventually(() => page.getByText(/The Bible text is not in the app yet/).count(), (n) => n === 0, { what: 'the number of "not in the app yet" lines on the Bible tab' });
-      step('Books: its own banner without a button, the notice, twelve books');
+      step('Books: its own compact banner, twelve covers (each one button, free or soon); the banner, the notice and the covers are checked in books.scenarios.mjs');
       await strip('Books').click();
-      await page.getByText('Twelve free companions for the road', { exact: true }).waitFor();
-      await page.getByText('Classics to read on the way. Free to read.', { exact: true }).waitFor();
-      await page.getByText(/Books are not in the app yet/).first().waitFor();
+      await page.getByText('Books for the road', { exact: true }).waitFor();
+      await eventually(() => page.getByRole('button', { name: /, (free|soon)$/ }).count(), (n) => n === 12, { what: 'the number of covers on Books' });
       await eventually(() => page.getByRole('button', { name: /^Read today/ }).count(), (n) => n === 0, { what: 'the number of "Read today" buttons on Books' });
-      await eventually(() => page.getByLabel('Free to read').count(), (n) => n === 12, { what: 'the number of books marked Free' });
-      await eventually(() => page.getByLabel('Coming soon').count(), (n) => n === 12, { what: 'the number of books marked Soon' });
-      await page.getByText('The Way of a Pilgrim', { exact: true }).waitFor();
-      await page.getByText('The Story of a Soul', { exact: true }).waitFor();
+      await page.getByRole('button', { name: /^The Way of a Pilgrim, Anonymous, (free|soon)$/ }).waitFor();
+      await page.getByRole('button', { name: /^The Story of a Soul, Thérèse of Lisieux, (free|soon)$/ }).waitFor();
       step('Books: what is only data for later (links, licence notes, groups) is nowhere on the screen');
       const text = (await page.locator('body').innerText()).replace(/\s+/g, ' ');
       assert(!/gutenberg|ccel\.org|licen[cs]e|translator|public domain|check-edition|Pilgrims on foot|Spanish and contemplative|Reflection and inner peace|Great classics/i.test(text), `the Books tab shows data that is not meant for the screen: ${text.slice(0, 200)}`);
@@ -141,7 +139,7 @@ export const SCENARIOS = [
       for (const [what, before, now] of [['the search field', search, search2], ['the Bible tab', bible, bible2], ['the Books tab', books, books2], ['the Notes tab', notes, notes2]]) {
         assert(Math.abs(before.x - now.x) < 1.5 && Math.abs(before.y - now.y) < 1.5 && Math.abs(before.width - now.width) < 1.5, `${what} moved when Notes was chosen: ${JSON.stringify(before)} -> ${JSON.stringify(now)}`);
       }
-      for (const gone of ['Daily reading', 'Twelve free companions for the road', 'Preview']) {
+      for (const gone of ['Daily reading', 'Books for the road', 'Preview']) {
         await eventually(() => page.getByText(gone, { exact: true }).filter({ visible: true }).count(), (n) => n === 0, { what: `the number of "${gone}" texts on Notes` });
       }
     },
@@ -157,7 +155,7 @@ export const SCENARIOS = [
       await page.getByText('Daily reading', { exact: true }).first().waitFor();
       await eventually(() => pen.count(), (n) => n === 0, { what: 'the number of pens on Bible' });
       await strip('Books').click();
-      await page.getByText('Twelve free companions for the road', { exact: true }).waitFor();
+      await page.getByText('Books for the road', { exact: true }).waitFor();
       await eventually(() => pen.count(), (n) => n === 0, { what: 'the number of pens on Books' });
       step('Notes has it');
       await strip('Notes').click();
@@ -216,7 +214,11 @@ export const SCENARIOS = [
       await page.getByText('Dark Night of the Soul', { exact: true }).waitFor();
       step('the tabs and the banner give way to the results');
       await eventually(() => page.getByText('Daily reading', { exact: true }).count(), (n) => n === 0, { what: 'the number of banners while searching' });
-      await page.getByText('The twelve books are examples: they are not in the app yet. The Bible text is.', { exact: true }).waitFor();
+      // the notice comes with a book that says Soon, and only with one: whether Dark Night of the Soul does is read from its row (the texts are added one at a time)
+      const darkNight = await page.getByRole('button', { name: /^Dark Night of the Soul, John of the Cross, (free|soon)$/ }).getAttribute('aria-label');
+      const soonNotice = page.getByText('Books marked Soon are not in the app yet: we are still checking their editions. The Bible text and the books marked Free are.', { exact: true });
+      if (/soon$/.test(darkNight)) await soonNotice.waitFor();
+      else await eventually(() => soonNotice.count(), (n) => n === 0, { what: 'the number of Soon notices when the only book found has a text' });
       step('type something in the Deuterocanon, then an author');
       await field.fill('maccabees');
       await page.getByText('2 results for “maccabees”', { exact: true }).waitFor();
@@ -303,6 +305,7 @@ export const SCENARIOS = [
     },
   },
   ...BIBLE_SCENARIOS,
+  ...BOOKS_SCENARIOS,
   {
     name: 'Stays: the stays of the stage are listed, and one opens with its details',
     persona: 'in',

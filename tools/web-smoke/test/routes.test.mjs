@@ -171,6 +171,11 @@ test('the real app: no problems, and the routes sit in the account states the gu
     assert.equal(personas(pattern), 'in', pattern);
     assert.equal(routes.find((r) => r.pattern === pattern)?.url, url, pattern);
   }
+  // the Books screens (the page of a book, and its reader) are swept as the real screens too: with the Imitation of Christ, not with a made-up id that would be "That book is not in the Library"
+  for (const [pattern, url] of [['/library/book/[id]', '/library/book/imitation-of-christ'], ['/library/book/[id]/read', '/library/book/imitation-of-christ/read']]) {
+    assert.equal(personas(pattern), 'in', pattern);
+    assert.equal(routes.find((r) => r.pattern === pattern)?.url, url, pattern);
+  }
   // open to every state
   for (const p of ['/', '/licences', '/auth-callback', '/reset-password']) assert.equal(personas(p), 'out,new,in', p);
   assert.ok(routes.length >= 30, `only ${routes.length} routes found`);

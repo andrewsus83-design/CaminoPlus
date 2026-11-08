@@ -577,13 +577,15 @@ check('the banner offers "Start reading" for the first book that has a text, and
   assert.equal(booksBanner(books, () => true, null).kind === 'start' && (booksBanner(books, () => true, null) as { bookId: string }).bookId, 'way-of-a-pilgrim');
 });
 
-check('the notice under the banner: the old preview words with no text, how many are in the app with some, nothing when all twelve are', () => {
-  assert.deepEqual(booksNotice(0, 12), { title: 'Preview', text: 'Books are not in the app yet. We are checking the editions before we add them.' });
+check('the notice under the banner: the old preview words in a card with no text, one quiet line saying how many are in the app with some, nothing when all twelve are', () => {
+  assert.deepEqual(booksNotice(0, 12), { kind: 'card', title: 'Preview', text: 'Books are not in the app yet. We are checking the editions before we add them.' });
   const some = booksNotice(3, 12)!;
-  assert.equal(some.title, 'More books are coming');
-  assert.match(some.text, /^3 of the 12 books are in the app and can be read with no signal\. The others say Soon/);
-  assert.match(booksNotice(1, 12)!.text, /^1 of the 12 books is in the app/);
+  assert.equal(some.kind, 'line');
+  assert.equal(some.text, '3 of the 12 books are in the app and can be read with no signal. The others say Soon: we are still checking their editions.');
+  assert.equal(booksNotice(1, 12)!.text.slice(0, 40), '1 of the 12 books is in the app and can ');
+  assert.equal(booksNotice(11, 12)!.kind, 'line');
   assert.equal(booksNotice(12, 12), null);
+  assert.equal(booksNotice(13, 12), null);
   assert.doesNotMatch(JSON.stringify([booksNotice(0, 12), booksNotice(5, 12)]), /verified|official|certified/i);
 });
 

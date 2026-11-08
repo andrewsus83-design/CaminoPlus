@@ -55,16 +55,17 @@ export function booksBanner(books: readonly BannerBook[], has: (id: string) => b
   return { kind: 'start', label: first.title, title: BOOKS_BANNER_TITLE, note: START_NOTE, cta: START_CTA, hint: `Opens ${first.title}`, bookId: first.id };
 }
 
-export type BooksNoticeView = { title: string; text: string };
+/** What stands under the banner of the Books tab: a card (the Preview notice) while no book has a text, one quiet line while some have, nothing when all have. */
+export type BooksNoticeView = { kind: 'card'; title: string; text: string } | { kind: 'line'; text: string };
 
-/** The notice under the banner: none once every book has its text, what is still missing otherwise. `readable` of `total` have a text. */
+/** The notice under the banner: what is still missing, said honestly. `readable` of `total` books have a text. */
 export function booksNotice(readable: number, total: number): BooksNoticeView | null {
   if (readable >= total) return null;
-  if (readable <= 0) return { title: 'Preview', text: BOOKS_NOTICE };
+  if (readable <= 0) return { kind: 'card', title: 'Preview', text: BOOKS_NOTICE };
   const are = readable === 1 ? 'is' : 'are';
   return {
-    title: 'More books are coming',
-    text: `${readable} of the ${total} books ${are} in the app and can be read with no signal. The others say Soon: we are still checking their editions before we add them.`,
+    kind: 'line',
+    text: `${readable} of the ${total} books ${are} in the app and can be read with no signal. The others say Soon: we are still checking their editions.`,
   };
 }
 

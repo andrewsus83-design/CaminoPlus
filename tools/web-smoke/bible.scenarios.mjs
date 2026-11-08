@@ -134,7 +134,7 @@ export const BIBLE_SCENARIOS = [
       await eventually(() => shown(page, 'Orthodox Bibles include a few more books.').count(), (n) => n === 0, { what: 'the number of Orthodox notes on the New Testament' });
       step('the choices belong to the Bible tab: gone on Books and on Notes, back on Bible with the choice kept, and gone while something is typed in the search');
       await shown(page, 'Books').click();
-      await shown(page, 'Twelve free companions for the road').waitFor();
+      await shown(page, 'Books for the road').waitFor();
       await eventually(() => page.getByRole('radio').count(), (n) => n === 0, { what: 'the number of choices on Books' });
       await shown(page, 'Notes').click();
       await page.getByRole('button', { name: 'Write a note', exact: true }).waitFor();
@@ -395,7 +395,7 @@ export const BIBLE_SCENARIOS = [
       await row.waitFor({ timeout: 15_000 });
       const marked = await row.evaluate((r) => [...r.querySelectorAll('*')].filter((e) => getComputedStyle(e).textDecorationLine.includes('underline') && getComputedStyle(e).backgroundColor !== 'rgba(0, 0, 0, 0)').map((e) => (e.textContent || '').toLowerCase()));
       assert(marked.some((m) => m.startsWith('lord')) && marked.some((m) => m.startsWith('keeper')), `the matched words are marked: ${JSON.stringify(marked)}`);
-      await eventually(() => page.getByText(/The twelve books are examples/).count(), (n) => n === 0, { what: 'the number of Preview notices when no example book is among the results' });
+      await eventually(() => page.getByText(/Books marked Soon are not in the app yet/).count(), (n) => n === 0, { what: 'the number of Soon notices when no book is among the results' });
       step('tap the verse: the reader opens at it, chosen');
       await row.click();
       await waitPath(page, '/library/bible/PSA/121', 'the address after tapping a verse of the results');

@@ -38,14 +38,24 @@ Then the **scenarios** ([scenarios.mjs](scenarios.mjs)), each in light and dark,
 - the gear on Me opens `/settings` (no tab bar there) and Back returns to `/me`, also when Settings was opened from a link;
 - switching light/dark on Settings returns to Settings, and Back goes to Me;
 - Library: its top row is a search field and the Bookmarks button (no title, no diary button); directly under it, before any banner, the tabs
-  Bible, Books and Notes, in that order; Bible and Books each have a banner and a Preview notice, Notes has neither; the Books tab lists twelve
-  books marked Free and Soon and shows nothing that is only data (links, licence notes, groups); the gold pen shows only on Notes and opens
+  Bible, Books and Notes, in that order; Bible and Books each have a banner, Notes has none; the Books tab lists twelve covers, free or soon, and
+  shows nothing that is only data (links, licence notes, groups); the gold pen shows only on Notes and opens
   `/diary/new`; the three choices at the bottom of Bible (Old Testament, Deuterocanon, New Testament) float above the tab bar, list that
   part with its count, and are gone on Books, on Notes and while something is typed in the search; the banner of the Bible tab (the whole card
   and its "Read today" button) opens `/library/daily`; a search lists what it finds in Bible and Books grouped by tab (and says "Nothing found
   for ..." with a way back); the Bookmarks button opens `/library/bookmarks` with the bookmarked rows of both tabs and the bookmarked post (the
   full account has one bookmarked post); bookmarks kept before the tabs changed (a Music row, the old example rows) are ignored without an
   error;
+- Books ([books.scenarios.mjs](books.scenarios.mjs)): the Books tab is a compact banner, a notice and twelve A5 covers (148 by 210) in two columns, 16 from
+  the edge and 12 apart (173 by 245 on a 390 phone, 138 by 196 on 320, 193 by 274 on 430, never wider than the screen), each ONE button named "title, author,
+  free" (or "soon") with its own ribbon, a 44 by 44 button that bookmarks the book, in the four fonts of the brand (Fraunces, Inter, JetBrains Mono, and at most
+  one handwritten Caveat note on the screen); a cover opens the book page (the cover, the title, the blurb, "Start reading", the contents under their parts, the
+  credit of the edition) and Back returns to the tab; the reader opens at chapter 1, Next and Previous (named by where they go) go through the chapters and across
+  a part, are off at the first and at the last chapter, Back goes to the page and not through the chapters, and Contents goes back to the page; the reader keeps
+  where you stopped (Continue on the page and "Continue reading" on the tab, the same line) and the size of the text (five steps), and a damaged place opens the
+  book at its start; a book with no text says Soon, "Not in the app yet" and why, and has no button; a link with `?c=`, a chapter and a book that do not exist; the
+  ribbon, Bookmarks and the search; and the same with no signal. Which books have a text is read from `mobile/assets/books/index.json` (0 to 12), so every
+  scenario works with any of them (with none, the tab says plainly that the texts are being checked, and the scenarios that need a text say so and stop);
 - Stays lists the stays of the stage and one opens with its details;
 - logging out from Settings lands on Welcome;
 - launching the app lands on Welcome (signed out), Onboarding (signed in, no journey) or Me;
@@ -154,6 +164,7 @@ Chromium; a test checks they agree). Bump both on purpose, with the tests looked
 | [routes.mjs](routes.mjs) | routes from `mobile/app`, account states from the guards |
 | [plan.mjs](plan.mjs) | which checks exist (route x state x scheme x mode, then the scenarios), the redirect list |
 | [scenarios.mjs](scenarios.mjs) | the walks a person does |
+| [books.scenarios.mjs](books.scenarios.mjs) | the walks of the Books tab: the covers, a book page, the reader, the place kept on the phone, a book with no text |
 | [fixtures.mjs](fixtures.mjs) | the Supabase project, the saved state of the phone, the realtime socket |
 | [collector.mjs](collector.mjs) | what counts as a failure; the console allow-list |
 | [server.mjs](server.mjs) | a static server with single-page-app fallback, on a free port |
