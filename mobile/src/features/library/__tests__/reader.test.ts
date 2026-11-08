@@ -17,6 +17,7 @@ import { LAST_READ_NAME, CONTINUE_TITLE, continueLabel, packLastRead, parseLastR
 import {
   bookHref, chapterTitle, isPlace, nextLabel, nextPlace, placeFromParams, placeKey, placeLabel, previousLabel, previousPlace, readerHref, refLabel, type Place,
 } from '../bible/order';
+import { INTER_400, THIN_SPACE_EM, HANG_EM, MONO_ADVANCE as NUMBER_ADVANCE, WRAP_SAFETY, textWidth, wrapPoem, wrapWords } from '../bible/wrap';
 import { bookOfTyped, formatRef, labelHolds, parseRef, parseRefKey, refKey, refName, refOfVerse, verseRange, type Ref } from '../bible/ref';
 import {
   COUNT_FLOOR, COUNT_MAX, FIT_SAFETY, FRAUNCES_600, MONO_ADVANCE, NAME_FLOOR, NAME_MAX, TEXT_SCALE_CAP, fitCount, fitName, lineWidth, nameLines,
@@ -280,6 +281,156 @@ check('the words of a verse as one line, and the number as raised digits (a dash
   assert.equal(superscript('15-16'), '¹⁵–¹⁶');
   assert.equal(superscript('0'), '⁰');
   assert.equal(superscript('1a'), '1a', 'a label that is not made of digits is left as it is');
+});
+
+/* ================================================================ the whole text, as the reader draws it, and the breaks of the lines of poetry (wrap.ts) */
+
+const NBSP = String.fromCharCode(0xa0);
+const ASSETS = join(root, 'assets', 'bible', 'webc');
+const HAVE_TEXT = existsSync(join(ASSETS, 'PSA.json')); // the files of the text are there (a partial checkout has none)
+const bookText = (code: string): BookText => JSON.parse(readFileSync(join(ASSETS, `${code}.json`), 'utf8')) as BookText;
+
+check('the table of letter widths of the words is the font file: every character of the text of the Bible, read again from Inter Regular, to 0.0006 em', () => {
+  const file = join(root, 'node_modules', '@expo-google-fonts', 'inter', '400Regular', 'Inter_400Regular.ttf');
+  if (existsSync(file)) {
+    const real = advances(file);
+    for (const [ch, w] of Object.entries(INTER_400)) assert.ok(Math.abs((real(ch) ?? NaN) - w) <= 0.0006, `"${ch}": the table says ${w}, the font ${real(ch)}`);
+  }
+  if (HAVE_TEXT) {
+    const used = new Set<string>();
+    for (const b of BIBLE_BOOKS) for (const c of bookText(b.code).chapters) for (const verse of c.verses) for (const ch of verse.t.replace(/[\t\n]/g, '')) used.add(ch);
+    for (const ch of used) assert.ok(ch in INTER_400, `the text has the character ${JSON.stringify(ch)} (U+${ch.codePointAt(0)!.toString(16)}) and the table has no width for it`);
+  }
+  assert.equal(NUMBER_ADVANCE, 0.6);
+  assert.ok(THIN_SPACE_EM > 0.15 && THIN_SPACE_EM < 0.2);
+});
+
+check('a line is cut at spaces only, the first part with its own room and the others with theirs, a word wider than the room stands alone, and a no-break space is no place to cut', () => {
+  const text = 'He will not allow your foot to be moved.';
+  const em = textWidth(text);
+  assert.deepEqual(wrapWords(text, em * 2, em * 2), [text], 'room enough: one line');
+  const cut = wrapWords(text, 14, 14);
+  assert.ok(cut.length >= 2, 'it has to be cut');
+  assert.equal(cut.join(' '), text, 'nothing is lost, nothing is cut inside a word');
+  for (const line of cut) assert.ok(textWidth(line) * WRAP_SAFETY <= 14 + 1e-9, `"${line}" is ${textWidth(line)} em`);
+  assert.deepEqual(wrapWords('Internationalization is long', 3, 3), ['Internationalization', 'is', 'long'], 'a word that does not fit stands alone');
+  assert.deepEqual(wrapWords('one two', 100, 100), ['one two']);
+  assert.deepEqual(wrapWords('', 10, 10), []);
+  assert.deepEqual(wrapWords('   ', 10, 10), []);
+  assert.deepEqual(wrapWords(`a${NBSP}b c`, 2, 2), [`a${NBSP}b`, 'c'], 'the no-break space holds "a" and "b" together');
+  const first = wrapWords(text, 8, 20);
+  assert.ok(textWidth(first[0]) < textWidth(first[1] ?? ''), 'the first part has less room than the rest here, so it is the shorter');
+  assert.equal(textWidth(' '), INTER_400[' ']);
+});
+
+const SIZES = { size: 19, numberSize: 17, numberOf: superscript };
+type Logical = { verse: string; n: string | null; indent: 0 | 1 | 2 | 3; text: string };
+const draw = (lines: Logical[], width: number, scale = 1) => wrapPoem(lines, { ...SIZES, width, scale });
+
+check('a long line of poetry goes on in the line under it one em further in; a line that fits is as it was; the number of a verse stays on the first line of it and takes room there', () => {
+  const fits: Logical = { verse: '1', n: '1', indent: 1, text: 'I will lift up my eyes' };
+  const long: Logical = { verse: '1', n: null, indent: 2, text: 'Where does my help come from, who made heaven and earth and everything in them' };
+  const wide = draw([fits, long], 1000);
+  assert.deepEqual(wide, [{ verse: '1', n: '1', indent: 1, text: fits.text, cont: false }, { verse: '1', n: null, indent: 2, text: long.text, cont: false }], 'on a page that is wide enough nothing is cut');
+  const narrow = draw([fits, long], 358);
+  assert.equal(narrow[0].text, fits.text);
+  assert.ok(narrow.length > 2, 'the long line is cut');
+  assert.deepEqual(narrow.slice(1).map((l) => l.indent), narrow.slice(1).map((_, k) => (k === 0 ? 2 : 3)), 'the first part of the long line is at its own indent (2), the rest one em further (3)');
+  assert.equal(narrow.slice(1).map((l) => l.text).join(' '), long.text);
+  assert.ok(narrow.every((l) => l.verse === '1'));
+  assert.deepEqual(narrow.map((l) => l.n), ['1', ...narrow.slice(1).map(() => null)], 'the number is on the first line only');
+  // a number of three digits and a joined label take more room on the first line
+  const text = 'Your word is a lamp to my feet and a light for my path in the dark night';
+  const one = draw([{ verse: '5', n: '5', indent: 1, text }], 358);
+  const three = draw([{ verse: '105', n: '105', indent: 1, text }], 358);
+  assert.ok(one[0].text.length >= three[0].text.length, 'a longer number leaves less room for the words');
+  assert.deepEqual(draw([], 358), []);
+  assert.deepEqual(draw([{ verse: '1', n: '1', indent: 0, text: '' }], 358), [], 'a line with no words draws nothing');
+});
+
+check('in every line of poetry of the whole Bible, at 320, 390, 430 and 768 wide and at text sizes 1 and 1.6, no part is wider than the page by the real widths of the font, none breaks a word, and together the parts are the line', () => {
+  const file = join(root, 'node_modules', '@expo-google-fonts', 'inter', '400Regular', 'Inter_400Regular.ttf');
+  if (!existsSync(file) || !HAVE_TEXT) return;
+  const real = advances(file);
+  const cache = new Map<string, number>();
+  const realInter = (t: string): number => [...t].reduce((sum, ch) => {
+    let w = cache.get(ch);
+    if (w === undefined) { w = real(ch) ?? 0.7; cache.set(ch, w); }
+    return sum + w;
+  }, 0);
+  let lines = 0;
+  let cut = 0;
+  for (const width of [320, 390, 430, 768]) {
+    for (const scale of [1, 1.6]) {
+      const page = (width - 2 * 16) / (19 * scale); // em of the body text across the page
+      for (const b of BIBLE_BOOKS) {
+        for (const c of bookText(b.code).chapters) {
+          for (const block of buildBlocks(c)) {
+            if (block.kind !== 'poem') continue;
+            const drawn = draw(block.lines, width - 2 * 16, scale); // the page is the screen less its two margins
+            let at = 0;
+            for (const line of block.lines) {
+              const parts: typeof drawn = [];
+              while (at < drawn.length && (parts.length === 0 || drawn[at].cont)) parts.push(drawn[at++]);
+              assert.ok(parts.length >= 1, `${b.code} ${c.c}: a line is lost`);
+              assert.equal(parts.map((p) => p.text).join(' '), line.text, `${b.code} ${c.c}: the parts are not the line`);
+              assert.equal(parts[0].indent, line.indent);
+              assert.equal(parts[0].n, line.n);
+              assert.ok(parts.slice(1).every((p) => p.indent === line.indent + HANG_EM && p.n === null && p.verse === line.verse), `${b.code} ${c.c}: the parts after the first go in one em further and have no number`);
+              lines += 1;
+              if (parts.length > 1) cut += 1;
+              parts.forEach((p, k) => {
+                const room = page - p.indent - (k === 0 && p.n !== null ? (superscript(p.n).length * 0.6 * 17) / 19 + THIN_SPACE_EM : 0);
+                const alone = p.text.split(' ').length === 1; // a word that is wider than the page cannot be helped
+                assert.ok(alone || realInter(p.text) <= room, `${b.code} ${c.c}:${p.verse} at ${width}/${scale}: "${p.text}" is ${realInter(p.text).toFixed(2)} em in ${room.toFixed(2)}`);
+              });
+            }
+            assert.equal(at, drawn.length, `${b.code} ${c.c}: parts left over`);
+          }
+        }
+      }
+    }
+  }
+  assert.ok(lines > 100000, `${lines} lines were checked`);
+  assert.ok(cut > 10000, `${cut} of them were cut`);
+});
+
+check('every chapter of the whole Bible, as the reader draws it: each verse that has words is drawn once with its number, none is lost or doubled, the words are the words, headings are the headings, and the first block has nothing above it', () => {
+  if (!HAVE_TEXT) return;
+  let chapters = 0;
+  let verses = 0;
+  for (const b of BIBLE_BOOKS) {
+    const text = bookText(b.code);
+    assert.equal(text.chapters.length, b.chapters, `${b.code}: the chapters of the file are the chapters of the list`);
+    text.chapters.forEach((c, i) => assert.equal(c.c, i + 1, `${b.code}: the chapters are numbered one after the other`));
+    for (const c of text.chapters) {
+      const blocks = buildBlocks(c);
+      chapters += 1;
+      const wanted = c.verses.filter((x) => /\S/.test(x.t));
+      verses += wanted.length;
+      const numbers: string[] = [];
+      const words: string[] = [];
+      let headings = 0;
+      for (const block of blocks) {
+        if (block.kind === 'heading') { headings += 1; assert.ok(block.text.length > 0); continue; }
+        const pieces = block.kind === 'prose' ? block.spans : block.lines;
+        assert.ok(pieces.length > 0, `${b.code} ${c.c}: a block with nothing in it`);
+        for (const p of pieces) {
+          if (p.n !== null) numbers.push(p.n);
+          assert.ok(p.text.length > 0 && p.text === p.text.trim(), `${b.code} ${c.c}: a piece of words that is empty or has blanks around it`);
+          words.push(p.text);
+        }
+      }
+      assert.deepEqual(numbers, wanted.map((x) => x.n), `${b.code} ${c.c}: every verse with words has its number once, in order`);
+      assert.equal(words.join(' '), wanted.map((x) => verseText(x)).join(' '), `${b.code} ${c.c}: the words are the words`);
+      assert.equal(headings, c.verses.filter((x) => x.h).length, `${b.code} ${c.c}: the headings are the headings`);
+      assert.deepEqual(verseLabels(c), wanted.map((x) => x.n));
+      if (blocks.length > 0 && blocks[0].kind !== 'heading') assert.equal(blocks[0].gap, 'none');
+      for (const x of wanted) assert.ok(blocksOfVerse(blocks, x.n).length >= 1 && locateVerse(blocks, x.n) !== null, `${b.code} ${c.c}:${x.n} is somewhere`);
+    }
+  }
+  assert.equal(chapters, 1328);
+  assert.ok(verses > 35000 && verses <= 35408, `${verses} verses have words`);
 });
 
 /* ================================================================ the order of a straight read and the addresses (order.ts) */

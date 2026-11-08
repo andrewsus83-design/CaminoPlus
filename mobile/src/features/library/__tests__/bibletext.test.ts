@@ -151,18 +151,19 @@ check('the index lists the 73 books in the order of the app, with the name the t
   assert.deepEqual(manifest.translation, index.translation);
 });
 
-check('the chapters of the app list (bible/books.ts) are the chapters of the files, but for Daniel (12 there, 14 here: Susanna and Bel and the Dragon are chapters 13 and 14) and the two rows of added passages, which the files hold inside Esther and Daniel', () => {
-  const by = new Map(BIBLE_BOOKS.map((b) => [b.name, b]));
-  const appName: Record<string, string> = { 'Song of Solomon': 'Song of Songs', 'Esther (Greek)': 'Esther', 'Daniel (Greek)': 'Daniel', Wisdom: 'Wisdom' };
+check('the app list (bible/books.ts) is the list of the files: the same 73 books in the same order with the same code and the same number of chapters; Esther and Daniel are the Greek books of 10 and 14 chapters and the two added passages are no rows', () => {
+  const by = new Map(BIBLE_BOOKS.map((b) => [b.code, b]));
+  assert.deepEqual(BIBLE_BOOKS.map((b) => b.code), ORDER, 'the same books, in the same order');
   const differs: string[] = [];
   for (const t of table) {
-    const name = NAMES[ORDER.indexOf(t.code)];
-    const row = by.get(appName[name] ?? name);
-    assert.ok(row, `the app list has a row for ${name}`);
-    if (row!.chapters !== t.chapters) differs.push(`${name} ${row!.chapters} / ${t.chapters}`);
+    const row = by.get(t.code);
+    assert.ok(row, `the app list has a row for ${t.code}`);
+    if (row!.chapters !== t.chapters) differs.push(`${t.code} ${row!.chapters} / ${t.chapters}`);
   }
-  assert.deepEqual(differs, ['Daniel (Greek) 12 / 14']);
-  assert.deepEqual(BIBLE_BOOKS.filter((b) => b.chapters === null).map((b) => b.name), ['Additions to Esther', 'Additions to Daniel']);
+  assert.deepEqual(differs, [], 'the chapters of the app list are the chapters of the files');
+  assert.equal(BIBLE_BOOKS.filter((b) => /^Additions to/.test(b.name)).length, 0, 'the added passages are inside Esther and Daniel, not rows of their own');
+  assert.equal(by.get('DAG')!.chapters, 14);
+  assert.equal(by.get('ESG')!.chapters, 10);
 });
 
 // ------------------------------------------------------------------------------------------------------------- what the files are

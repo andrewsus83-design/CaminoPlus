@@ -1,8 +1,10 @@
 import { memo, useMemo } from 'react';
-import { Text, View, type LayoutChangeEvent } from 'react-native';
+import { Text, View, useWindowDimensions, type LayoutChangeEvent } from 'react-native';
 import { AppText } from '@/components/AppText';
 import { c, role } from '@/theme';
 import { blocksOfVerse, superscript, type Block, type Gap, type PoemBlock, type ProseBlock } from './blocks';
+import { SIDE } from './gridMath';
+import { wrapPoem } from './wrap';
 
 /** The most the phone's own text size may enlarge the words of the Bible: a person who needs it large gets it large, up to this. */
 export const READER_MAX_FONT_SCALE = 1.6;
@@ -64,15 +66,22 @@ function Prose({ block, selected, onSelect }: { block: ProseBlock; selected: str
   );
 }
 
-/** A stanza is ONE text, a line after the other: a screen reader reads it as it reads a paragraph, and a Psalm of 176 verses is 22 texts, not 350. */
+/**
+ * A stanza is ONE text, a line after the other: a screen reader reads it as it reads a paragraph, and a Psalm of 176 verses is 22 texts, not 350. A line that is
+ * too long for the phone is cut by the reader (wrap.ts) and its rest goes in one em further than the line itself: a hanging indent, which React Native does not
+ * have, so that a long line of a psalm never comes back to the margin looking like a line of its own.
+ */
 function Poem({ block, selected, onSelect }: { block: PoemBlock; selected: string | null; onSelect: Select }) {
+  const { width, fontScale } = useWindowDimensions();
+  const scale = Math.min(fontScale, READER_MAX_FONT_SCALE);
+  const lines = useMemo(() => wrapPoem(block.lines, { width: width - 2 * SIDE, size: BODY_SIZE, scale, numberSize: NUMBER_SIZE, numberOf: superscript }), [block, width, scale]);
   return (
     <AppText maxFontSizeMultiplier={READER_MAX_FONT_SCALE} style={{ fontSize: BODY_SIZE, lineHeight: BODY_LINE }}>
-      {block.lines.map((l, k) => (
+      {lines.map((l, k) => (
         <Text key={k}>
           {INDENT.repeat(l.indent)}
           <Words verse={l.verse} number={l.n} text={l.text} on={l.verse === selected} onSelect={onSelect} />
-          {k < block.lines.length - 1 ? '\n' : ''}
+          {k < lines.length - 1 ? '\n' : ''}
         </Text>
       ))}
     </AppText>
