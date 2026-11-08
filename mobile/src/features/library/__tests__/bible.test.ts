@@ -28,6 +28,7 @@ const parse = (list: string) => list.split(', ').map((entry) => {
 const sum = (rows: readonly { chapters: number | null }[]) => rows.reduce((total, r) => total + (r.chapters ?? 0), 0);
 const slug = (name: string) => name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 const shape = (rows: readonly BibleBook[]) => rows.map((b) => ({ name: b.name, chapters: b.chapters }));
+const plain = (text: string) => text.replace(/\u00a0/g, ' '); // the lines under a name use no-break spaces, so that a wrapping line never splits "50 chapters"
 
 check('Old Testament: the 39 books of the list, in order, each with its chapters, 929 in all', () => {
   const rows = booksOf('old');
@@ -95,15 +96,17 @@ check('the words: the choices of the selector, the count of a part, "1 chapter",
   assert.equal(countLine('old'), '39 books');
   assert.equal(countLine('deutero'), '7 books and 2 added passages');
   assert.equal(countLine('new'), '27 books');
-  assert.equal(chaptersLabel(50), '50 chapters');
-  assert.equal(chaptersLabel(1), '1 chapter');
+  assert.equal(chaptersLabel(50), '50\u00a0chapters', 'a no-break space: a line wraps before "50 chapters", never between 50 and "chapters"');
+  assert.equal(plain(chaptersLabel(50)), '50 chapters');
+  assert.equal(plain(chaptersLabel(1)), '1 chapter');
   assert.equal(chaptersLabel(null), '');
   const by = (id: string) => BIBLE_BOOKS.find((b) => b.id === id)!;
-  assert.equal(bookLine(by('bible-genesis')), '50 chapters');
-  assert.equal(bookLine(by('bible-jude')), '1 chapter');
-  assert.equal(bookLine(by('bible-genesis'), true), 'Old Testament · 50 chapters');
-  assert.equal(bookLine(by('bible-baruch')), '6 chapters · With the Letter of Jeremiah');
-  assert.equal(bookLine(by('bible-baruch'), true), 'Deuterocanon · 6 chapters · With the Letter of Jeremiah');
+  assert.equal(plain(bookLine(by('bible-genesis'))), '50 chapters');
+  assert.equal(plain(bookLine(by('bible-jude'))), '1 chapter');
+  assert.equal(plain(bookLine(by('bible-genesis'), true)), 'Old Testament · 50 chapters');
+  assert.equal(bookLine(by('bible-genesis'), true), 'Old\u00a0Testament · 50\u00a0chapters', 'the part and the chapters do not break inside: only the dots are places to wrap');
+  assert.equal(plain(bookLine(by('bible-baruch'))), '6 chapters · With the Letter of Jeremiah');
+  assert.equal(plain(bookLine(by('bible-baruch'), true)), 'Deuterocanon · 6 chapters · With the Letter of Jeremiah');
   assert.equal(bookLine(by('bible-additions-to-esther')), 'Added passages', 'no chapter count: the line is what it is');
   assert.equal(bookLine(by('bible-additions-to-daniel')), 'Susanna; Prayer of Azariah and Song of the Three; Bel and the Dragon');
   const single = BIBLE_BOOKS.filter((b) => b.chapters === 1).map((b) => b.name);

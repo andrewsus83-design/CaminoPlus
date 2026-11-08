@@ -137,10 +137,12 @@ export function countLine(t: Testament): string {
   return added === 0 ? bookWords : `${bookWords} and ${added} added ${added === 1 ? 'passage' : 'passages'}`;
 }
 
-/** "50 chapters", "1 chapter"; empty for a row that has no chapters of its own. */
-export const chaptersLabel = (chapters: number | null): string => (chapters === null ? '' : `${chapters} ${chapters === 1 ? 'chapter' : 'chapters'}`);
+const NO_BREAK_SPACE = '\u00a0';
 
-/** The line under a name: its chapters, then its detail ("6 chapters · With the Letter of Jeremiah"). `withPart` puts the part first, for a list that mixes the three (search, Bookmarks). */
+/** "50 chapters", "1 chapter"; empty for a row that has no chapters of its own. The space is a no-break space: a line that has to wrap does it before "50 chapters", not between 50 and "chapters". */
+export const chaptersLabel = (chapters: number | null): string => (chapters === null ? '' : `${chapters}${NO_BREAK_SPACE}${chapters === 1 ? 'chapter' : 'chapters'}`);
+
+/** The line under a name: its chapters, then its detail ("6 chapters · With the Letter of Jeremiah"). `withPart` puts the part first, for a list that mixes the three (search, Bookmarks). The part and the chapters never break inside: only the dots are places to wrap. */
 export function bookLine(b: BibleBook, withPart = false): string {
-  return [withPart ? TESTAMENT_LABEL[b.testament] : '', chaptersLabel(b.chapters), b.detail ?? ''].filter(Boolean).join(' · ');
+  return [withPart ? TESTAMENT_LABEL[b.testament].replace(/ /g, NO_BREAK_SPACE) : '', chaptersLabel(b.chapters), b.detail ?? ''].filter(Boolean).join(' · ');
 }
