@@ -60,7 +60,6 @@ export type BookContent = {
   subtitle: string;
   author: string | null;
   rights?: string | null;
-  ai_disclosure?: string | null;
   chapters: BookChapter[];
   sources?: BookSource[];
   /** One line of credit: the edition the passages were taken from, or who made the book. */
