@@ -30,7 +30,7 @@ Do not take "contemplate in silence rather than search" as a ban on asking quest
 
 And do not skip over "no reason why here rather than there." There is a vertigo in the idea that your place and time are accidents. Some readers will find that bleak, and some will find it a relief, and some will answer it differently from Pascal. He answers it with his faith. You may not.
 
-What does it ask of an ordinary day? A minute of wonder without a verdict. Look at something large, or something very small, and do not explain it. The day is full of such things, and most of them go by while we are working out what to have for supper.
+In practice: a minute of wonder without a verdict. Look at something large, or something very small, and do not explain it. The day is full of such things, and most of them go by while we are working out what to have for supper.
 
 This is the book's title seen from the other side. On the first day the quiet was a room you could leave. Here it is the sky, and you cannot. The nearest you can come to peace with it, Pascal suggests, is to stop arguing with its size.
 
@@ -49,7 +49,7 @@ If it went the other way, and the size felt like a threat, that is his feeling t
 
 There is a gentler version of his line about kingdoms: "How many kingdoms know nothing of us!" It applies to the road. You passed a great many houses today, and in each of them, from the inside, the day was the whole world. Someone was making soup. Someone was waiting for a phone call. None of them needed you, and none of them was a backdrop. They were the other half of the infinite, the half you can see.
 
-And a word on tiredness. The body is a small thing, it has done a lot, and it wants a bed. Do not ask it for a metaphysics tonight. Questions about why we are here do not go away, and they will be as large in the morning.
+The tiredness has a say, too. The body is a small thing, it has done a lot, and it wants a bed. Do not ask it for a metaphysics tonight. Questions about why we are here do not go away, and they will be as large in the morning.
 
 The end of a day is also the hour of small bright rectangles. A minute of sky is a different use of the same eyes, and it asks nothing of them.
 

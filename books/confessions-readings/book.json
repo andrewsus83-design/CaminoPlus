@@ -6,12 +6,37 @@
   "subtitle": "Thirteen Days with Augustine's Confessions for the Camino Primitivo",
   "route_slug": "camino-primitivo",
   "days": 13,
-  "description_short": "x",
-  "description_long": "x",
-  "keywords": ["a"],
-  "categories": ["a"],
-  "cover": {"colour": "red100", "icon": "book"},
+  "description_short": "Thirteen days with Augustine's Confessions, one for each of its thirteen books: a morning reading and an evening reflection for the demanding Camino Primitivo. Slow, honest and quiet.",
+  "description_long": "The Confessions was written by Augustine of Hippo, a teacher of rhetoric who became a bishop, about the year 400. It is part life story and part prayer, and it opens with a sentence about the restless heart. It has thirteen books, and this book takes one of them each day for thirteen days.\n\nThe Restless Heart is made to go with the Camino Primitivo, the demanding road from Oviedo to Santiago de Compostela, about 320 km, which climbs through the mountains of Asturias before it crosses into Galicia. Augustine's book climbs too: from a child, a stolen pear and a mother's tears, through a lost friend, a teacher who disappointed, a glimpse that would not stay and a garden, to a window at Ostia, memory, time and rest. Every day has a morning reading of about five minutes and an evening reflection of about three. The morning begins with a short passage from the Confessions, quoted word for word from E. B. Pusey's English translation, first published in 1838 and in the public domain. Then comes a reflection that starts from something on the road, and a question and a small practice to carry for the next hour. The evening looks back over the day with two or three gentle questions and ends with a short original prayer, open enough to be said as a wish by a reader who prays differently, or who does not pray.\n\nThe Confessions is a Christian book and a book of its time, and this book says so plainly. Where Augustine writes about the body, desire and sin in the terms of his century, or where his thinking about memory, time and creation is hard, the reflection says so and does not argue with him. It invites and does not push. Read it on a bench, in a pilgrim hostel bunk, or at your own kitchen table once the walking is done.",
+  "keywords": [
+    "Camino de Santiago",
+    "Camino Primitivo",
+    "Augustine of Hippo",
+    "The Confessions",
+    "pilgrimage reflections",
+    "daily readings",
+    "prayer"
+  ],
+  "categories": [
+    "Religion / Christian Living / Spiritual Growth",
+    "Religion / Christianity / Devotional",
+    "Travel / Special Interest / Pilgrimages"
+  ],
+  "cover": {
+    "colour": "red100",
+    "icon": "book"
+  },
   "version": "1.0.0",
   "date": "2026-11",
-  "sources": [{"id": "gutenberg-3296", "work": "The Confessions of St. Augustine", "author": "Augustine of Hippo", "translator": "E. B. Pusey", "year": "1838", "licence": "Public domain", "url": "https://www.gutenberg.org/ebooks/3296"}]
+  "sources": [
+    {
+      "id": "gutenberg-3296",
+      "work": "The Confessions of St. Augustine",
+      "author": "Augustine of Hippo",
+      "translator": "E. B. Pusey",
+      "year": "1838",
+      "licence": "Public domain",
+      "url": "https://www.gutenberg.org/ebooks/3296"
+    }
+  ]
 }

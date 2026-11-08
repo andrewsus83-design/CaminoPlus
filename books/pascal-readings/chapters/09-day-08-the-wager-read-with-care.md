@@ -30,7 +30,7 @@ The second is that the argument sees two sides: "God is, or he is not." Readers 
 
 The third is the advice: "making believe that they believed, taking the holy water, having masses said". These are Catholic practices, and to many readers they will sound like pretending. Day 4 is the background. For Pascal, custom trains the automaton, and the likeliest reading is that he is not asking for a lie. But it is fair to say that this line is hard to hear. And the objector's fear, of losing his "acuteness", is brushed aside with a question. Some readers will feel that the fear is worth more than that.
 
-What does it ask of an ordinary day? Not belief on command. If you have a faith, it asks you to be honest about whether it is held by the heart or only by habit. If you have none, it asks only that you not treat the question as settled before you have looked at it. And for a reader who finds the whole thing unconvincing, closing the book at this page is allowed. This may be the day of the ten most likely to irritate, and being irritated by it is a respectable way to spend a day.
+What is being asked of you? Not belief on command. If you have a faith, it asks you to be honest about whether it is held by the heart or only by habit. If you have none, it asks only that you not treat the question as settled before you have looked at it. And for a reader who finds the whole thing unconvincing, closing the book at this page is allowed. This may be the day of the ten most likely to irritate, and being irritated by it is a respectable way to spend a day.
 
 ## For the walk
 

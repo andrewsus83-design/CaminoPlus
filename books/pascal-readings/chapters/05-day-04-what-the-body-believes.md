@@ -18,7 +18,7 @@ Then he applies the point to belief, and this is where he is most practical. Onc
 
 You can try this out on something much smaller than faith. You may be quite convinced that patience is worth having, and still snap at the person rustling a bag at six in the morning. The mind agreed. The automaton had not been told. Or you may be quite sure that you should drink water through a hot day, and forget until your head aches. What gets it done is not the conviction. It is the habit of a sip at every stop, repeated until it needs no one's agreement.
 
-There are some difficulties.
+Some of this is awkward, and it is better to say where.
 
 The list in the middle of the passage reads oddly now. It says that it is "custom that makes so many men Christians, custom that makes them Turks, heathen, artisans, soldiers". These are the translation's words, from its century, and the thought underneath them can unsettle anyone. If belief comes from upbringing, is it only upbringing? Pascal does not say so. He does not say that custom proves anything or disproves it. He says that custom carries what the mind has already seen, and that without it a belief wobbles.
 
@@ -28,7 +28,7 @@ Then there is this: a habit can be a way of not being there. A walker can do a w
 
 One more thing is worth saying before it comes up. This is the quieter cousin of Day 8, where Pascal makes the same move with more force and more risk, and invites a reader to begin with practices before the belief arrives. If you are comfortable with today's passage and not with that one, it is worth noticing why.
 
-What does this ask of an ordinary day? Choose one small repeated act and give it your whole attention each time. The road offers plenty: putting the pack on, taking it off, stepping over the threshold of the place where you will sleep, the first drink of water in the morning. Pick one, and let it be the place where you wake up. The mind decided once. Now let the body practise, slowly enough that you are there for it.
+Which leaves what to do with it. Choose one small repeated act and give it your whole attention each time. The road offers plenty: putting the pack on, taking it off, stepping over the threshold of the place where you will sleep, the first drink of water in the morning. Pick one, and let it be the place where you wake up. The mind decided once. Now let the body practise, slowly enough that you are there for it.
 
 ## For the walk
 

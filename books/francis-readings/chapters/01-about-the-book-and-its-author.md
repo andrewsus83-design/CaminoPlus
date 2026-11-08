@@ -2,7 +2,7 @@
 
 ## The saint
 
-Francis of Assisi lived from about 1181 to 1226. The edition we use gives no dates, apart from saying that he was not fifty when he died, so these are the well-known ones, and the first is approximate. He was born in Assisi, a walled town on the hills of Umbria, in central Italy, the son of a cloth merchant. As a young man he gave up the merchant's life, took to the roads in a rough brown tunic tied with a rope, and gathered a band of followers that came to be called the Friars Minor, or, as Chesterton prefers, the Little Brothers. He is a saint of the Catholic Church. He left some writings of his own, among them his song in praise of the creatures. This book is not one of them.
+Francis of Assisi lived from about 1181 to 1226. The edition we use gives no dates, only that he was not fifty when he died, so these are the well-known ones, and the first is approximate. He was born in Assisi, a walled town on the hills of Umbria, in central Italy, the son of a cloth merchant. As a young man he gave up the merchant's life, took to the roads in a rough brown tunic tied with a rope, and gathered a band of followers that came to be called the Friars Minor, or, as Chesterton prefers, the Little Brothers. He is a saint of the Catholic Church. He left some writings of his own, among them his song in praise of the creatures. This book is not one of them.
 
 ## The author
 
@@ -10,9 +10,9 @@ Gilbert Keith Chesterton lived from 1874 to 1936. He was an English journalist, 
 
 ## The book
 
-The book is a short life of Francis, about 44,000 words by our count, in ten chapters: the problem of St. Francis; the world he found; Francis the fighter; Francis the builder; *Le Jongleur de Dieu*, the minstrel and jester of God; the little poor man; the three orders; the mirror of Christ; miracles and death; and his testament.
+The book is a short life of Francis, about 44,000 words by our count, in ten chapters. Their titles run from "The Problem of St. Francis" and "Francis the Fighter" through *Le Jongleur de Dieu* (the minstrel and jester of God) and "The Little Poor Man" to "Miracles and Death" and "The Testament of St. Francis".
 
-Chesterton tells you in the first pages what kind of book it is. A life of Francis, he says, can be written as secular history, as a devout work, or from the standpoint of an outsider who admires the man and cannot quite follow him. He chooses the third. He writes, he says, for "the ordinary modern man, sympathetic but sceptical". His key is a simple one: that "to this great mystic his religion was not a thing like a theory but a thing like a love-affair". He calls his own work "this thin and scratchy sketch".
+Chesterton tells you at once what kind of book it is. A life of Francis, he says, can be written as secular history, as a devout work, or by an outsider who admires the man and cannot quite follow him. He chooses the third, and writes, he says, for "the ordinary modern man, sympathetic but sceptical". His key is a simple one: that "to this great mystic his religion was not a thing like a theory but a thing like a love-affair". He calls his own work "this thin and scratchy sketch".
 
 It is also a book by someone in love with his subject. Chesterton tells us that the figure in the brown habit stands above the hearth in the room where he writes. That affection is the best thing in it, and it is something to be aware of.
 

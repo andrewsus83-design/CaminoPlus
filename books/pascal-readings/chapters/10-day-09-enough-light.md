@@ -26,7 +26,7 @@ The picture itself is also hard: a God who arranges partial darkness so that som
 
 And the passage cannot tell you how to see better. It says only that looking is rewarded. That may be unsatisfying, and it may also be the only honest thing to say.
 
-What does it ask of an ordinary day? To walk the stretch you can see, without demanding the whole map. You do this constantly. You set out expecting the day to be the same sort of day as yesterday, and you trust people you have never met to have told you the truth about a path. Most of living is done by half-light, and it works well enough. The practice is only to notice that, and to let the half-light be what it is without treating it as a failure.
+On an ordinary day it comes to this: walk the stretch you can see, without demanding the whole map. You do this constantly. You set out expecting the day to be the same sort of day as yesterday, and you trust people you have never met to have told you the truth about a path. Most of living is done by half-light, and it works well enough. The practice is only to notice that, and to let the half-light be what it is without treating it as a failure.
 
 A safety word. This is for the mind and not for the route. If you do not know which way to go at a junction, stop and check a map, or ask someone. That is the right use of the light you have.
 
@@ -45,7 +45,7 @@ Then ask where you wanted more certainty than you needed. It is a strange habit.
 
 There are two ways to end the half-light early, and both are tempting. One is a settled certainty, the other a settled cynicism. Each is a way of switching off the uncomfortable in-between, and each lets you stop looking. Pascal says plainly that he might love the total dark. Notice, without scolding yourself, where you reached for a simple yes or a simple no today, simply because the middle was tiring.
 
-A word about tiredness. Doubt is heavier at night. The half-light seems darker than it is, and the largest questions come at the hour you are least equipped to carry them. If the dark feels heavy tonight, it may be partly the hour. The same question at six in the morning is often a smaller thing. Do not take a night's mood as a verdict on anything.
+The hour is against you here. Doubt is heavier at night. The half-light seems darker than it is, and the largest questions come at the hour you are least equipped to carry them. If the dark feels heavy tonight, it may be partly the hour. The same question at six in the morning is often a smaller thing. Do not take a night's mood as a verdict on anything.
 
 Last, think about who has been a light for you. A small one is enough: someone who pointed the way without being asked, a sign at the right bend, a message that arrived when you needed it. Light is often something that someone else has done. The same goes for how you saw the people you met. You saw a fraction of each of them, a face at a counter, a back on the path ahead. Everyone is in half-light to everyone else, and a little charity is the right response to knowing it. If you have not yet said thank you, there is still tomorrow.
 

@@ -99,6 +99,8 @@ stages are today), and then the pointer would be false. Read the comment of the 
 - **One tilde per number.** "about 175, 170, 280 and 220 km" marks only the first: write "~175, ~170, ~280 and ~220 km". The ledger's last column is plain `yes`, `computed` or `removed`
   (put "the repo" in the source column, not in the last).
 - **Keep the welcome to about 500 words**, and give a long route's days about 100 to 160 words each: with 35 or more days the stage chapters alone take about 4,000 words.
+- **Questions to the reader say "you".** The first-person rule applies to lists of questions in the inner-Way chapter too: write "What are you carrying that you could leave behind?",
+  never "What am I carrying...?".
 - **Say when the sources disagree.** Official pages often disagree with each other by a kilometre or two. Say so once per stage in a plain sentence, as a good guide does.
 
 ## Fact ledger format (`facts.md`, not published)

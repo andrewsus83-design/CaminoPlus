@@ -26,7 +26,7 @@ Pascal is not offering a technique, either. These days there are many schools of
 
 And hope is not a vice. A person who did not hope to arrive, or to see someone, or to get better, would be in trouble. Read his last sentence as a warning about the balance and not as a ban. The clause about "a time at which we have no certainty of arriving" is blunt, too. You can take it as a fright, or as a quiet reason to enjoy the plain fact that you are, so far, here.
 
-What does it ask of an ordinary day? To come back, many times. Nobody can stay in the present for a whole morning, and the aim is not to. The aim is to notice that you have left and to return. It helps to have somewhere to return to: the sound of your steps, the weight of the pack on your shoulders, the temperature of the air on your face. One more word of ordinary prudence. On any stretch with traffic, the present is not optional. Keep your eyes and ears on it.
+The practice is to come back, many times. Nobody can stay in the present for a whole morning, and the aim is not to. The aim is to notice that you have left and to return. It helps to have somewhere to return to: the sound of your steps, the weight of the pack on your shoulders, the temperature of the air on your face. One more word of ordinary prudence. On any stretch with traffic, the present is not optional. Keep your eyes and ears on it.
 
 ## For the walk
 
@@ -45,7 +45,7 @@ Think about what you were always getting ahead of. For many people it is rehears
 
 The past needs the same look. Did you call something back today, a remark you wish you had not made, an hour at home that went badly, a face? For tonight it is finished. You cannot change it by carrying it. You can only decide whether it goes to bed with you. Hand it over, in whatever way you like, to someone bigger than you, or just to the night.
 
-A word about tiredness. A tired body makes the present compulsory: a heel, a shoulder, a hunger. You are present by default tonight, and it is fine to let that be restful. The one temptation at the end of a day is to plan tomorrow's stage in minute detail. Once is enough. The plan is made, and the plan can wait where it is until the morning.
+Tiredness helps here, for once. A tired body makes the present compulsory: a heel, a shoulder, a hunger. You are present by default tonight, and it is fine to let that be restful. The one temptation at the end of a day is to plan tomorrow's stage in minute detail. Once is enough. The plan is made, and the plan can wait where it is until the morning.
 
 If there is a meal tonight, try one small thing: take the first three mouthfuls with nothing else going on. No screen, no conversation, no planning. It is a modest way of being in the only place you have been all day.
 

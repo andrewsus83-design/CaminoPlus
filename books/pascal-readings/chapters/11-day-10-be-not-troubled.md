@@ -32,7 +32,7 @@ The meditation around these lines is a great deal sterner than these three, and 
 
 And the peace Pascal wrote of did not make his life easy. The preface to our edition describes his last years as years of pain and self-denial. Peace and pain were in the same house.
 
-What does it ask of an ordinary day? Something very small. To stop treating the searching as the problem. If you are still looking, for a faith, for a reason, for the next stretch of your life, then it is all right to be a person who is still looking. You can take that to a bench and sit with it. You do not have to arrive anywhere first. It also asks you to go easy on the other people who are still looking, and on the ones who have stopped. You will not always know which is which.
+The ask is very small. To stop treating the searching as the problem. If you are still looking, for a faith, for a reason, for the next stretch of your life, then it is all right to be a person who is still looking. You can take that to a bench and sit with it. You do not have to arrive anywhere first. It also asks you to go easy on the other people who are still looking, and on the ones who have stopped. You will not always know which is which.
 
 ## For the walk
 

@@ -18,13 +18,13 @@ The picture he draws for this is a reed, "weakest in nature", but "a reed which 
 
 It helps to be clear what he does not mean. He does not mean cleverness. The last line of the passage is not "think much" but "think well", and he calls that the starting-point of morals. As we read it, thinking well is closer to attention than to intelligence: deciding what to put your mind on, and doing it honestly. His phrase for this is "the ruling of my thought". You cannot rule what happens to you. You can rule, a little, where your mind goes. Every walker does it a dozen times a day without noticing: turning from the pain in a heel to the person walking ahead, from a grievance to the next bend, from a number to a hill.
 
-Now the difficulties.
+Two things deserve a second look.
 
 A dignity that rests on thought can sound like a good deal for the clever and a poor one for everyone else. Pascal knows the worry. A little later in the same section he writes "But what is this thought? how foolish it is!" and, a little further, "How great it is in essence, how vile in defects!" He is not boasting about the mind. What he points to is a kind of knowing that needs no cleverness: knowing that you are small, that you are fragile, that you will die. A very plain mind can know that. Even so, if the passage leaves you cold on behalf of people who cannot think straight, from illness or age or exhaustion, that is a fair reaction, and the passage itself does not answer it.
 
 The other hard point is the bare line near the end. "The Universe knows nothing of this." The reed's nobility is lonely: a thing that knows it is dying, in a universe that does not notice. Pascal is a believer, and in other places he sets the reed inside a larger story. Here he leaves it standing in the open, and it is worth letting it stand there for a while before reaching for any comfort.
 
-What does it ask of an ordinary day? To stop letting the number tell you who you are. The day's worth is not its distance. A day on which you walked less far may have been the day you paid the best attention. A day when you covered a lot of ground may have been spent mostly in a mental argument with someone who is not there. Neither of those shows up on the count.
+In practice, it asks you to stop letting the number tell you who you are. The day's worth is not its distance. A day on which you walked less far may have been the day you paid the best attention. A day when you covered a lot of ground may have been spent mostly in a mental argument with someone who is not there. Neither of those shows up on the count.
 
 It also asks you to notice what bends. If the day is windy, find something in the verge that moves and watch how it takes the wind: it gives, and it stays rooted. Pascal chose the reed for its weakness. The part of us that thinks is not strong. It can be thrown by a hunger, a draught, a bad night. It is still the part that knows what is happening to the rest.
 

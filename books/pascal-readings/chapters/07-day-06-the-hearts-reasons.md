@@ -22,7 +22,7 @@ For him, faith belongs on the same side: "God sensible to the heart, not to the 
 
 The last line is the most useful, and it is the least quoted. "Men often mistake their imagination for their heart, and they believe they are converted as soon as they think of being converted." It is a brake on the first sentence. A strong feeling is not a conviction, and a fine thought about change is not change.
 
-Here are the difficulties.
+A few snags, then.
 
 The first sentence is easily used as a licence: follow any feeling, it is the heart. Pascal's last line warns against exactly that, and he does not say how to tell the two apart in this passage. There is one clue. He says that we must place our faith in the heart "or it will be always vacillating." On that reading, the heart is the part that holds. A mood that comes and goes with the weather, with a good lunch or a bad night, is probably not what he means.
 
@@ -30,7 +30,7 @@ Then there is the sound of the first claim, that reason "slumbers". It can be he
 
 And there is the matter of what is left for readers who do not share his faith. A good deal. The passage about the heart's reasons does not require a creed to be true of friendship, of home, of the stubborn conviction that a person is worth trusting. Only the last move, the one about God, is specifically his.
 
-What does it ask of an ordinary day? To be honest about where your reasons run out. When someone asks why you are walking, or when you ask yourself, give the first answer that comes. Do not improve it. Then listen to it, and notice whether it was an answer of reasons or an answer of love. Neither is wrong. But it is useful to know which one you gave.
+For an ordinary day, that comes to this: be honest about where your reasons run out. When someone asks why you are walking, or when you ask yourself, give the first answer that comes. Do not improve it. Then listen to it, and notice whether it was an answer of reasons or an answer of love. Neither is wrong. But it is useful to know which one you gave.
 
 ## For the walk
 

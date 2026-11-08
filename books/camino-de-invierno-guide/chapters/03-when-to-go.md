@@ -24,7 +24,7 @@ The name does not make this the easy season. In Ponferrada the average January a
 
 On the road itself, the Xunta offers a shorter alternative to the climb of Monte Faro, from Penasillás, that in its words avoids the snow in winter. In Santiago the average January afternoon is ~12 °C and January brings ~196 mm of rain.
 
-Days are short. By a standard solar calculation, daylight at Ponferrada and Santiago is ~9 hours at the December solstice, with sunrise near nine in the morning and sunset near six in the evening, Spanish time. At the June solstice it is ~15 hours, with sunset after ten at night. A winter walker has little time to waste, and a road with few services leaves little room for a late start. Many places that serve pilgrims may be shut, so ask before you rely on one.
+Days are short. By a standard solar calculation, daylight at Ponferrada and Santiago is ~9 hours at the December solstice, with sunrise near nine in the morning and sunset near six in the evening, Spanish time. At the June solstice it is ~15 hours, with sunset after ten at night. A winter walker has little time to waste, and a road with few services leaves little room for a late start. Places that serve pilgrims may be shut in the cold months, so ask before you rely on one.
 
 ## Crowds
 

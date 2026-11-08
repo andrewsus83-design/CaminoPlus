@@ -32,7 +32,7 @@ And the passage is silent on a practical point. It does not say where the vilene
 
 Pascal does not mention feet. But if the angel and the brute are both mistakes about what a person is, the body is a good place to see it. A body is not an enemy to be beaten, and it is not an excuse to be indulged. It is the part of you that is doing the walking, and it has reasonable requests.
 
-What does it ask of an ordinary day? Body first, then self. At the next stop, do one kind thing for the body. Then do one honest thing for the rest of you. In that order. A blister seen to early is a small matter. A pain that is sharp, that grows, or that worries you deserves a doctor, and 112 is the European emergency number.
+The order of things, then: body first, then self. At the next stop, do one kind thing for the body. Then do one honest thing for the rest of you. In that order. A blister seen to early is a small matter. A pain that is sharp, that grows, or that worries you deserves a doctor, and 112 is the European emergency number.
 
 ## For the walk
 
@@ -51,7 +51,7 @@ Try a different test, too. Imagine a friend telling you the story of today, with
 
 Then, to balance it, there is the other half of the passage, which is easily forgotten. Pascal says: love yourself, because you have a nature capable of good. So name something good that you did today, and name it specifically. Not "I was all right." A particular act, however small. A sentence you did not say. A bag you carried. A pace you slowed for someone else.
 
-A word about tiredness. Self-judgement is at its harshest and least accurate at the end of a long day. If the verdict you are giving yourself is a severe one, hold it over until morning. Judgements delivered at nine at night by a person who has been on the road since dawn are best treated as weather reports.
+The hour matters, too. Self-judgement is at its harshest and least accurate at the end of a long day. If the verdict you are giving yourself is a severe one, hold it over until morning. Judgements delivered at nine at night by a person who has been on the road since dawn are best treated as weather reports.
 
 The angel forgets to eat. If you have not had enough to eat or drink since the afternoon, that comes before any reflection. The questions will keep.
 
