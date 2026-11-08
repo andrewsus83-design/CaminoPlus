@@ -29,7 +29,8 @@ import { useLibraryBookmarks } from '@/features/library/useLibraryBookmarks';
 //
 // The Bible tab, top to bottom: the compact daily reading banner, the choice of the part (Old Testament, Deuterocanon, New Testament: a segmented pill in the
 // page, not a floating bar) and the books of that part as tiles. A tile opens the chapters of the book (/library/bible/<code>), and a chapter opens the reader
-// (/library/bible/<code>/<chapter>). The Bible is real, and so are the books of the Books tab (features/library/books). There is no gold pen here, writing is on Me.
+// (/library/bible/<code>/<chapter>). The Bible is real, and so are the books of the Books tab (features/library/books). Nothing writes from the Library: the cards
+// that write a note or a journey post, and the gold chat button, are on Me.
 //
 // "Continue reading" is not in the page any more: the bar that goes back to the place read last, in the Bible or in a book, floats above the tab bar
 // (features/library/continueBar), on the Bible tab and on the Books tab, and has a close button. It is mounted by ONE line, the `overlay` of the Screen below, and brings
