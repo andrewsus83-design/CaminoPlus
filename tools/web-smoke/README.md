@@ -56,15 +56,23 @@ Then the **scenarios** ([scenarios.mjs](scenarios.mjs)), each in light and dark,
   SemiBold, each at least 88 by 68, the reference 17) at 320, 390 and 430 wide, the bar clears the bottom edge, and a verse touched low on a
   short phone (568 high) is brought above the bar; a link to a verse (`?v=105`) opens the chapter with that verse chosen,
   and an address that leads nowhere is a calm "Not found"; the search finds verses after the keystroke (typing is never blocked), marks the
-  match and offers "Go to" for a typed reference; "Continue reading" shows only when something was read, reopens that chapter and is ignored
-  when the place kept no longer exists;
+  match and offers "Go to" for a typed reference;
+- Continue reading ([continue.scenarios.mjs](continue.scenarios.mjs)): one bar floats above the tab bar of the Library, on the Bible tab and the Books tab and nowhere
+  else (not on the readers, not on Me). It shows only when something was read, names the place ("Continue reading, Psalm 121", "Continue reading, <book>,
+  Chapter 7") and follows the most recent of the Bible's last chapter and the books' last place, and it is the only "Continue reading" on the screen (no card in the page,
+  none on the banner of the Books tab). It is 64 high, 8 above the pill of the tab bar with the same side margins, it never covers the last row of the page, it is a
+  hero card in Fraunces and Inter with no handwriting and readable in light and dark (4.5 : 1 for its words, 3 : 1 for its glyphs), and its X is a button of its own,
+  at least 44 by 44, after it. A tap opens the reader at the place. It steps aside while the search field has the focus (the keyboard would be under it), the X hides it
+  and the choice is kept on the phone: it stays hidden after the app is started again until the saved place changes (another chapter or book, or the same chapter
+  saved again later), a stored mark that does not read hides nothing, and a place that no longer exists gives no bar. At 320 wide a long title is cut on one line and
+  the X stays in the bar;
 - Books ([books.scenarios.mjs](books.scenarios.mjs)): the Books tab is a compact banner, a notice and twelve A5 covers (148 by 210) in two columns, 16 from
   the edge and 12 apart (173 by 245 on a 390 phone, 138 by 196 on 320, 193 by 274 on 430, never wider than the screen), each ONE button named "title, author,
   free" (or "soon") with its own ribbon, a 44 by 44 button that bookmarks the book, in the four fonts of the brand (Fraunces, Inter, JetBrains Mono, and at most
   one handwritten Caveat note on the screen); a cover opens the book page (the cover, the title, the blurb, "Start reading", the contents under their parts, the
   credit of the edition) and Back returns to the tab; the reader opens at chapter 1, Next and Previous (named by where they go) go through the chapters and across
   a part, are off at the first and at the last chapter, Back goes to the page and not through the chapters, and Contents goes back to the page; the reader keeps
-  where you stopped (Continue on the page and "Continue reading" on the tab, the same line) and the size of the text (five steps), and a damaged place opens the
+  where you stopped (Continue on the page and the "Continue reading" bar above the tab bar, the same book and chapter) and the size of the text (five steps), and a damaged place opens the
   book at its start; a book with no text says Soon, "Not in the app yet" and why, and has no button; a link with `?c=`, a chapter and a book that do not exist; the
   ribbon, Bookmarks and the search; and the same with no signal. Which books have a text is read from `mobile/assets/books/index.json` (0 to 12), so every
   scenario works with any of them (with none, the tab says plainly that the texts are being checked, and the scenarios that need a text say so and stop);
@@ -180,6 +188,7 @@ Chromium; a test checks they agree). Bump both on purpose, with the tests looked
 | [scenarios.mjs](scenarios.mjs) | the walks a person does |
 | [bible.scenarios.mjs](bible.scenarios.mjs) | the walks of the Bible tab and the reader (kept apart so the other walks stay short) |
 | [books.scenarios.mjs](books.scenarios.mjs) | the walks of the Books tab: the covers, a book page, the reader, the place kept on the phone, a book with no text |
+| [continue.scenarios.mjs](continue.scenarios.mjs) | the walks of the Continue reading bar above the tab bar: where it sits, what it opens, closing it and bringing it back, the most recent place of the Bible and the books |
 | [fixtures.mjs](fixtures.mjs) | the Supabase project, the saved state of the phone, the realtime socket |
 | [collector.mjs](collector.mjs) | what counts as a failure; the console allow-list |
 | [server.mjs](server.mjs) | a static server with single-page-app fallback, on a free port |

@@ -6,12 +6,13 @@
 // The diary screens and the Notes tab (mobile/app/diary, mobile/src/features/diary, mobile/src/features/library/notes) belong to the diary: the
 // route sweep checks that they load without errors, and the Library scenarios below only check WHERE the pen goes and that Notes has no banner,
 // never what is in the notes. The daily reading (/library/daily) is the same: the scenarios check that the banner leads there, not what is on it.
-// The Bible side of the Library (the grid of books, the chapters, the reader, the search of verses, Continue reading) is in bible.scenarios.mjs.
+// The Bible side of the Library (the grid of books, the chapters, the reader, the search of verses) is in bible.scenarios.mjs; the Continue reading bar that floats above the tab bar is in continue.scenarios.mjs.
 import assert from 'node:assert/strict';
 import { UID } from './fixtures.mjs';
 import { domQuiet, eventually, pathOf } from './harness.mjs';
 import { BIBLE_SCENARIOS } from './bible.scenarios.mjs';
 import { BOOKS_SCENARIOS } from './books.scenarios.mjs';
+import { CONTINUE_SCENARIOS } from './continue.scenarios.mjs';
 
 const TABS = ['Me', 'Stays', 'Maps', 'Discover', 'Library'];
 const TAB_PATH = { Me: '/me', Stays: '/stays', Maps: '/maps', Discover: '/explore', Library: '/library' };
@@ -306,6 +307,7 @@ export const SCENARIOS = [
   },
   ...BIBLE_SCENARIOS,
   ...BOOKS_SCENARIOS,
+  ...CONTINUE_SCENARIOS,
   {
     name: 'Stays: the stays of the stage are listed, and one opens with its details',
     persona: 'in',

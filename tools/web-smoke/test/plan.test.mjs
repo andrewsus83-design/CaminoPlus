@@ -49,9 +49,11 @@ test('the real plan: all routes, all modes, and the scenarios the owner asked fo
   for (const must of [
     /Tab bar/, /gear on Me opens Settings/, /switching light and dark/i, /Library: the tabs Bible, Books and Notes/, /gold pen shows only on Notes/,
     /three choices under the banner/, /banner of the Bible tab opens \/library\/daily/, /bookmarks kept before the tabs changed/,
-    // the Bible: the grid of books, the chapters, the reader, Next and Previous across a boundary, a verse bookmarked, a link to a verse, the search of verses, Continue reading
+    // the Bible: the grid of books, the chapters, the reader, Next and Previous across a boundary, a verse bookmarked, a link to a verse, the search of verses
     /daily reading banner is compact/, /73 book names fits its square tile/, /a tile opens the numbers of the chapters/, /Next and Previous cross the books/, /touching a verse chooses it/,
-    /a link to a verse/, /verses are found after the keystroke/, /card "Continue reading"/, /leads nowhere/,
+    /a link to a verse/, /verses are found after the keystroke/, /leads nowhere/,
+    // the Continue reading bar above the tab bar: where it sits and what it opens, closing it and bringing it back, the most recent place of the Bible and the books, a stored mark that does not read
+    /bar "Continue reading" floats above the tab bar/, /bar "Continue reading" continues the most recent place/, /closed bar is told apart by the place and its time/,
     // the Books: twelve A5 covers in two columns, a cover opens its page, the reader (Next and Previous across a part), the place and the size of the text kept, a book with no
     // text, links, the ribbon bookmark with Bookmarks and the search, and all of it with no signal
     /twelve A5 covers in two columns/, /cover opens the book page/, /reader opens at the first chapter, Next and Previous/, /remembers where you stopped/,

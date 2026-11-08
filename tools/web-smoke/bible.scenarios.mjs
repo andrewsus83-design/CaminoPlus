@@ -1,5 +1,5 @@
 // Scenarios of the Bible side of the Library: the books as a grid of square tiles, the chapters of a book, the reader with Previous and Next, a verse chosen and
-// bookmarked, a link to a verse, the search of verses, the card that continues the chapter read last, and the addresses that lead nowhere. Same rules as
+// bookmarked, a link to a verse, the search of verses and the addresses that lead nowhere (the Continue reading bar is in continue.scenarios.mjs). Same rules as
 // scenarios.mjs (each runs in light and dark, in a browser of its own, and anything that goes wrong in the page fails it); they wait for what a person would wait
 // for, never for a fixed time. They use only what exists in the real text: Psalm 121 and John 1 are the chapters they read, Malachi 4 and Tobit 1 the pair across
 // a boundary, Genesis 1 and Revelation 22 the two ends of the Bible. scenarios.mjs puts them in its list.
@@ -484,49 +484,6 @@ export const BIBLE_SCENARIOS = [
       await button(page, 'Go to John 3').waitFor();
       await search(page).fill('john 22');
       await eventually(() => page.getByRole('button', { name: /^Go to/ }).count(), (n) => n === 0, { what: 'the number of "Go to" cards for a chapter the book does not have' });
-    },
-  },
-  {
-    name: 'Library: the card "Continue reading" appears only when something was read, opens that chapter, follows the last chapter read, and is ignored when the place kept no longer exists',
-    persona: 'in',
-    async run({ page, step, go }) {
-      const card = (name) => page.getByRole('button', { name, exact: true });
-      step('nothing read: no card');
-      await go('/library');
-      await page.getByRole('radiogroup', { name: 'Part of the Bible' }).waitFor();
-      await eventually(() => page.getByText('Continue reading', { exact: true }).count(), (n) => n === 0, { what: 'the number of continue cards before anything was read' });
-      step('read Psalm 121 (the place is kept on the phone, under a key of this person)');
-      await go('/library/bible/PSA/121');
-      await page.getByRole('heading', { name: 'Psalm 121', exact: true }).waitFor();
-      await eventually(() => readKey(page, 'lastRead'), (v) => !!v && JSON.parse(v).code === 'PSA' && JSON.parse(v).chapter === 121, { what: 'the chapter kept on the phone' });
-      step('the card is on the Bible tab, above the banner, and opens the chapter');
-      await go('/library');
-      await card('Continue reading, Psalm 121').waitFor();
-      const c = await box(card('Continue reading, Psalm 121'), 'the card');
-      const banner = await box(page.getByRole('button', { name: /^Read today/ }), 'the banner');
-      assert(c.height >= 56 && c.y < banner.y, `the card (${c.height} high) is above the banner`);
-      await page.getByText('Psalm 121', { exact: true }).first().waitFor();
-      await card('Continue reading, Psalm 121').click();
-      await waitPath(page, '/library/bible/PSA/121', 'the address after the continue card');
-      step('read another chapter: the card follows it');
-      await go('/library/bible/JHN/3');
-      await go('/library');
-      await card('Continue reading, John 3').waitFor();
-      await eventually(() => card('Continue reading, Psalm 121').count(), (n) => n === 0, { what: 'the number of cards for the older chapter' });
-      step('the card is only on the Bible tab and goes while searching');
-      await shown(page, 'Books').click();
-      await eventually(() => page.getByText('Continue reading', { exact: true }).count(), (n) => n === 0, { what: 'the number of continue cards on Books' });
-      await shown(page, 'Bible').click();
-      await card('Continue reading, John 3').waitFor();
-      await search(page).fill('john');
-      await eventually(() => page.getByText('Continue reading', { exact: true }).count(), (n) => n === 0, { what: 'the number of continue cards while searching' });
-      step('a place that no longer exists is ignored, without an error: a book that is gone, a chapter past the last, a damaged value');
-      for (const bad of [{ v: 1, code: 'ZZZ', chapter: 1, at: 1 }, { v: 1, code: 'PSA', chapter: 151, at: 1 }, { v: 2, code: 'PSA', chapter: 1 }, 'x', { v: 1, code: 'bible-additions-to-esther', chapter: 1 }]) {
-        await setKey(page, 'lastRead', bad);
-        await go('/library');
-        await page.getByRole('radiogroup', { name: 'Part of the Bible' }).waitFor();
-        await eventually(() => page.getByText('Continue reading', { exact: true }).count(), (n) => n === 0, { what: `the number of continue cards for ${JSON.stringify(bad)}` });
-      }
     },
   },
 ];
