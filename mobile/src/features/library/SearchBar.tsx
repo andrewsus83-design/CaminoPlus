@@ -21,9 +21,10 @@ export const CLEAR_LABEL = 'Clear search';
  * Colours are roles only: typed text role.text, placeholder and the x role.muted (both well over 4.5:1 on role.surface in light and
  * dark), border role.border and gold while it has focus. Focus makes the border 2 instead of 1 thick and takes the same from the
  * padding, so nothing in the row moves. The phone's own keyboard key says "search" and closes the keyboard; there is no
- * autocorrect, no capital letter and no spell check, because what is typed is a few letters of a title.
+ * autocorrect, no capital letter and no spell check, because what is typed is a few letters of a title. `onFocus` tells the screen the field was touched: it is
+ * the moment to get the search ready (the first search of the Bible reads and folds its words), a beat before the first letter arrives.
  */
-export function SearchBar({ value, onChangeText }: { value: string; onChangeText: (text: string) => void }) {
+export function SearchBar({ value, onChangeText, onFocus }: { value: string; onChangeText: (text: string) => void; onFocus?: () => void }) {
   const [focus, setFocus] = useState(false);
   const input = useRef<ComponentRef<typeof TextInput>>(null);
   const narrow = useWindowDimensions().width < NARROW_UNDER;
@@ -40,7 +41,7 @@ export function SearchBar({ value, onChangeText }: { value: string; onChangeText
         ref={input}
         value={value}
         onChangeText={onChangeText}
-        onFocus={() => setFocus(true)}
+        onFocus={() => { setFocus(true); onFocus?.(); }}
         onBlur={() => setFocus(false)}
         placeholder={narrow ? SEARCH_PLACEHOLDER_NARROW : SEARCH_PLACEHOLDER}
         placeholderTextColor={role.muted}

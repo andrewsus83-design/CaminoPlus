@@ -1,0 +1,1048 @@
+{
+ "books": [
+  {
+   "bytes": 221807,
+   "chapters": 50,
+   "code": "GEN",
+   "file": "GEN.json",
+   "name": "Genesis",
+   "sha256": "d31446cfdc7e11a83fff7b54e6cb75d5afb08b8443fb706f0e773ff292943e79",
+   "sourceFile": "02-GENeng-web-c.usfm",
+   "sourceSha256": "96456dccbea6cdbf6d96bbb45b5d7880cb8f14410b9cc8bf0d3041de730810ef",
+   "verses": 1533
+  },
+  {
+   "bytes": 186871,
+   "chapters": 40,
+   "code": "EXO",
+   "file": "EXO.json",
+   "name": "Exodus",
+   "sha256": "9b6c6b6411e7b958899e1a43be088222c553fe08370f9b6d9ec516e78f1208cf",
+   "sourceFile": "03-EXOeng-web-c.usfm",
+   "sourceSha256": "6d81af19740c2e312906f7a569aac0a576e1ec4e8f0d7ce819a713b0a103c9b6",
+   "verses": 1213
+  },
+  {
+   "bytes": 139936,
+   "chapters": 27,
+   "code": "LEV",
+   "file": "LEV.json",
+   "name": "Leviticus",
+   "sha256": "ec5e36925b77a5ef658fdad09fe6c51f54652359296ac9317f7861929103358c",
+   "sourceFile": "04-LEVeng-web-c.usfm",
+   "sourceSha256": "69fe96b998bf996a8f37b64812fb09bd658ad1795e210698cae26628a191ca96",
+   "verses": 859
+  },
+  {
+   "bytes": 195171,
+   "chapters": 36,
+   "code": "NUM",
+   "file": "NUM.json",
+   "name": "Numbers",
+   "sha256": "4e31688556e82e9424773eb094c03bcb291d667e1ec094f294b2ba2982c20acb",
+   "sourceFile": "05-NUMeng-web-c.usfm",
+   "sourceSha256": "8c015e53722c339df68b14a748cbaf01c77f7c52b87fcde97e332ffb44ad06eb",
+   "verses": 1288
+  },
+  {
+   "bytes": 160779,
+   "chapters": 34,
+   "code": "DEU",
+   "file": "DEU.json",
+   "name": "Deuteronomy",
+   "sha256": "8cded26a3b38b3ce3c503ab01c6854ce97e81958889f4b25ece4a7d6543710e9",
+   "sourceFile": "06-DEUeng-web-c.usfm",
+   "sourceSha256": "e0348e548fb5384258f6ee8ef6096923f3b1c5a2d15a38274016ab7b2b2b956e",
+   "verses": 959
+  },
+  {
+   "bytes": 109213,
+   "chapters": 24,
+   "code": "JOS",
+   "file": "JOS.json",
+   "name": "Joshua",
+   "sha256": "bee8c1c63174b2b57874b68ba39aca7b4d8e4ec3353a013d747b37f07c8c8d55",
+   "sourceFile": "07-JOSeng-web-c.usfm",
+   "sourceSha256": "ce4196be171c3d169a4ee2395345d2faded380639833aafa728f5a83391b9b6b",
+   "verses": 658
+  },
+  {
+   "bytes": 108768,
+   "chapters": 21,
+   "code": "JDG",
+   "file": "JDG.json",
+   "name": "Judges",
+   "sha256": "8b8c62eb322901a7b3b9bb2b488ac25432441baee40deadfd23b95838e0078a2",
+   "sourceFile": "08-JDGeng-web-c.usfm",
+   "sourceSha256": "28396eba181d9293841703195cfa16749fe7928139d6b198f2a656e315f996bb",
+   "verses": 618
+  },
+  {
+   "bytes": 14685,
+   "chapters": 4,
+   "code": "RUT",
+   "file": "RUT.json",
+   "name": "Ruth",
+   "sha256": "470324c5f9a97f86d11f998cf55c124338c17b883f96c4723263cc51e7eff574",
+   "sourceFile": "09-RUTeng-web-c.usfm",
+   "sourceSha256": "5d018c3ee8eb9f9c064def6eb787403eccf81f528920c0ad77da32c9fb9bbdb7",
+   "verses": 85
+  },
+  {
+   "bytes": 142430,
+   "chapters": 31,
+   "code": "1SA",
+   "file": "1SA.json",
+   "name": "1 Samuel",
+   "sha256": "40d5bc44b379f7732a8e9f17f729e0cd2cfeccb76296d03320a78d86b5d4f4e5",
+   "sourceFile": "10-1SAeng-web-c.usfm",
+   "sourceSha256": "307235b40de1a5e0dc8cc83fa0364a5b91ffe209aa47cc28663d7607448db678",
+   "verses": 810
+  },
+  {
+   "bytes": 118202,
+   "chapters": 24,
+   "code": "2SA",
+   "file": "2SA.json",
+   "name": "2 Samuel",
+   "sha256": "40bb6e1517ddcfdba269525fdede8bc790d47d2a109cddf1ae6d02552b89242e",
+   "sourceFile": "11-2SAeng-web-c.usfm",
+   "sourceSha256": "d2e862e069762ae8584c1d1001037629480d32a2bafbddf42384d08dc02a1eb3",
+   "verses": 695
+  },
+  {
+   "bytes": 138959,
+   "chapters": 22,
+   "code": "1KI",
+   "file": "1KI.json",
+   "name": "1 Kings",
+   "sha256": "65115afb460721c45261e8ffbc3074c4650167e581fdb0e1d766bd0f945ce8da",
+   "sourceFile": "12-1KIeng-web-c.usfm",
+   "sourceSha256": "78354cf82c146694938787257566e3c6cd1fa3abc801faabfae4795dc1e4e738",
+   "verses": 816
+  },
+  {
+   "bytes": 132713,
+   "chapters": 25,
+   "code": "2KI",
+   "file": "2KI.json",
+   "name": "2 Kings",
+   "sha256": "d84f6dbadac9e985893f99ad9f9313bfe6831915e7ca6eafeb8ad78189e89aa8",
+   "sourceFile": "13-2KIeng-web-c.usfm",
+   "sourceSha256": "c312e76181019c4fa40fdc9a59ed3ba9a494e496b6c79cb900f57d21cdf29ced",
+   "verses": 719
+  },
+  {
+   "bytes": 125293,
+   "chapters": 29,
+   "code": "1CH",
+   "file": "1CH.json",
+   "name": "1 Chronicles",
+   "sha256": "b4d9bcb93430a9da5ca1f2f411f45a7c9c7f36f7987049098052d6255dfd5a05",
+   "sourceFile": "14-1CHeng-web-c.usfm",
+   "sourceSha256": "7220aa1ae899e36020ef6f1692a3db1ddcd34fabe5caeceb4f9a791608af4fa8",
+   "verses": 942
+  },
+  {
+   "bytes": 151656,
+   "chapters": 36,
+   "code": "2CH",
+   "file": "2CH.json",
+   "name": "2 Chronicles",
+   "sha256": "85b414c40e9a262d9ea8212a72f89b072610223df7ecb91a47f8b373cab40dd6",
+   "sourceFile": "15-2CHeng-web-c.usfm",
+   "sourceSha256": "00ba9fccfe8b7f988bb30e0ef91c800f19bdcac6f4e72e82349ca78f5270fe96",
+   "verses": 822
+  },
+  {
+   "bytes": 44802,
+   "chapters": 10,
+   "code": "EZR",
+   "file": "EZR.json",
+   "name": "Ezra",
+   "sha256": "f9dd0b01752880e3a11c5dce3d544ab179497dbe4efe391d2c1cfb5e19031a33",
+   "sourceFile": "16-EZReng-web-c.usfm",
+   "sourceSha256": "b581d7c7428caa3f24f81c6f1d8cdfafa9519ada6a59c354b886603d17c71b41",
+   "verses": 280
+  },
+  {
+   "bytes": 63551,
+   "chapters": 13,
+   "code": "NEH",
+   "file": "NEH.json",
+   "name": "Nehemiah",
+   "sha256": "e7d1b3e3789228c410254f740ec006c3ef1c8f005a6d8a6e619e359dbe9a60da",
+   "sourceFile": "17-NEHeng-web-c.usfm",
+   "sourceSha256": "d1f0ccbee5cd2606d2dd7419b91203d5624b649bba731e9ebfd133609d96921d",
+   "verses": 406
+  },
+  {
+   "bytes": 43259,
+   "chapters": 10,
+   "code": "ESG",
+   "file": "ESG.json",
+   "name": "Esther (Greek)",
+   "sha256": "bdccd1ae7bbeca4287c5e12ca19e8fc1d9a6e95cc162220c1ffb16da983a4be6",
+   "sourceFile": "43-ESGeng-web-c.usfm",
+   "sourceSha256": "b7214cfd140cbfee0b0d5809413cc9ee042650fd6087a146bb8faa6b9fb9a576",
+   "verses": 205
+  },
+  {
+   "bytes": 119675,
+   "chapters": 42,
+   "code": "JOB",
+   "file": "JOB.json",
+   "name": "Job",
+   "sha256": "c95ee48cddb8ae00a73b4887717a5ba19721021667f5a5418df6fba9b3990fcf",
+   "sourceFile": "19-JOBeng-web-c.usfm",
+   "sourceSha256": "5968d2dd13ca68cc86246857fc386648dbdf892c24959c84ff11f63c92945437",
+   "verses": 1070
+  },
+  {
+   "bytes": 288001,
+   "chapters": 150,
+   "code": "PSA",
+   "file": "PSA.json",
+   "name": "Psalms",
+   "sha256": "b272eb06da1e55cdd66a562799d66ce88705fdebc861d607fa753169a198446a",
+   "sourceFile": "20-PSAeng-web-c.usfm",
+   "sourceSha256": "e329aea93a8df962fca31db62031c9ca0df65e020f6fdaccb227b1af3da2fb40",
+   "verses": 2461
+  },
+  {
+   "bytes": 100671,
+   "chapters": 31,
+   "code": "PRO",
+   "file": "PRO.json",
+   "name": "Proverbs",
+   "sha256": "40708056ef7c1e2064815a7ea852db419092127a09ba695d994084a8dd6600cc",
+   "sourceFile": "21-PROeng-web-c.usfm",
+   "sourceSha256": "2ec35eab223a617c4d9a0d7b185c8e447be9f23fe2d78ddfe82159e580a5e8c6",
+   "verses": 915
+  },
+  {
+   "bytes": 32619,
+   "chapters": 12,
+   "code": "ECC",
+   "file": "ECC.json",
+   "name": "Ecclesiastes",
+   "sha256": "c6a671980d1b1e14034a3f8f695c8c65f8ba97d52cc2d2285ba01c69600888e0",
+   "sourceFile": "22-ECCeng-web-c.usfm",
+   "sourceSha256": "4575fb749b3ae05116e0882f890e50844356e94e8fec7321b5e0f7274043c61b",
+   "verses": 222
+  },
+  {
+   "bytes": 17514,
+   "chapters": 8,
+   "code": "SNG",
+   "file": "SNG.json",
+   "name": "Song of Solomon",
+   "sha256": "ae2b8f386f9827f8344d9300eaf6abe4a9418226b8e1df9067e954099226a865",
+   "sourceFile": "23-SNGeng-web-c.usfm",
+   "sourceSha256": "40b63469a9746ab27c2ebccaa4529278a61b792c61f466fdd1fc30bd5795745a",
+   "verses": 117
+  },
+  {
+   "bytes": 225289,
+   "chapters": 66,
+   "code": "ISA",
+   "file": "ISA.json",
+   "name": "Isaiah",
+   "sha256": "ea1d00c0810eb24a06e52aec11285a10e04c724596d950529381c04f6078a7e3",
+   "sourceFile": "24-ISAeng-web-c.usfm",
+   "sourceSha256": "cfa0739b86fdfd43a01d979f7db7e6aa14deeedbaa0dadd5f0864d5f6ab3a20c",
+   "verses": 1292
+  },
+  {
+   "bytes": 255611,
+   "chapters": 52,
+   "code": "JER",
+   "file": "JER.json",
+   "name": "Jeremiah",
+   "sha256": "d9e820d303831e7ecbedad1b87a6331af8956a20cac6b49eafd2539611247c92",
+   "sourceFile": "25-JEReng-web-c.usfm",
+   "sourceSha256": "e49960f42f335e486cb01d7d3fc39a07142c6eba542cb77933b9f68c535db372",
+   "verses": 1364
+  },
+  {
+   "bytes": 23266,
+   "chapters": 5,
+   "code": "LAM",
+   "file": "LAM.json",
+   "name": "Lamentations",
+   "sha256": "72ec059b264e50463b90e881279cba5f49f0895cf1e38574e5ea9342e5123794",
+   "sourceFile": "26-LAMeng-web-c.usfm",
+   "sourceSha256": "9ab2734fe86159c4ad3e4d553c454524e28f590096f5e92e2ecb52e523b879cf",
+   "verses": 154
+  },
+  {
+   "bytes": 227410,
+   "chapters": 48,
+   "code": "EZK",
+   "file": "EZK.json",
+   "name": "Ezekiel",
+   "sha256": "f4884d682f1676b9df569b7fd34974db695cda63f9ea16fe5672a359fa7c4e18",
+   "sourceFile": "27-EZKeng-web-c.usfm",
+   "sourceSha256": "7c3ee30188d8f4621a07d306aa2847670646c60997a1627f93d2953357a89209",
+   "verses": 1273
+  },
+  {
+   "bytes": 91931,
+   "chapters": 14,
+   "code": "DAG",
+   "file": "DAG.json",
+   "name": "Daniel (Greek)",
+   "sha256": "fd46c5977cf5c0b6092c3ca92a394896e0c94e6eccb9e19e394922ec148ee718",
+   "sourceFile": "66-DAGeng-web-c.usfm",
+   "sourceSha256": "63c4a832841484f50516ea452cb17c056011a2c7387cd1cdc7e3040031e5325a",
+   "verses": 530
+  },
+  {
+   "bytes": 33289,
+   "chapters": 14,
+   "code": "HOS",
+   "file": "HOS.json",
+   "name": "Hosea",
+   "sha256": "c666a38242abe6cf222a030b783067db1a02e8fcb4830c045b7bf28f1cfaad9c",
+   "sourceFile": "29-HOSeng-web-c.usfm",
+   "sourceSha256": "c89f60e383b8ab0e67007b4bf0c0f0a8c3d68c86a5f435059533505c806def78",
+   "verses": 197
+  },
+  {
+   "bytes": 12790,
+   "chapters": 3,
+   "code": "JOL",
+   "file": "JOL.json",
+   "name": "Joel",
+   "sha256": "4658d779b3bca766c8bf9f46ed4429d42f9540b94308b635bcb4f37e6ab72d27",
+   "sourceFile": "30-JOLeng-web-c.usfm",
+   "sourceSha256": "0410c6759a9858d26a9dec750093129aa6c826efb33134fadad3153a2ee3b9dd",
+   "verses": 73
+  },
+  {
+   "bytes": 25696,
+   "chapters": 9,
+   "code": "AMO",
+   "file": "AMO.json",
+   "name": "Amos",
+   "sha256": "ae29dccfa0d6968fad096bb8802ab6f1e24c75d9ac0796cdfb04f6c1e5c6546a",
+   "sourceFile": "31-AMOeng-web-c.usfm",
+   "sourceSha256": "cbf0fcc8b87b95adb0a987a4bd6a9c5bb540260a85ac7f1b7c60f6236d7605c6",
+   "verses": 146
+  },
+  {
+   "bytes": 3771,
+   "chapters": 1,
+   "code": "OBA",
+   "file": "OBA.json",
+   "name": "Obadiah",
+   "sha256": "8f94783dfcf6bd3171d1876ba043c30616a0eadc222e157dd2437621c9704528",
+   "sourceFile": "32-OBAeng-web-c.usfm",
+   "sourceSha256": "3884dc9565b4857594e0dac381fc5e4be025b7847d9cd7a249d6110da50cf1b2",
+   "verses": 21
+  },
+  {
+   "bytes": 7723,
+   "chapters": 4,
+   "code": "JON",
+   "file": "JON.json",
+   "name": "Jonah",
+   "sha256": "4a5ab6a8a1d00a9934d14536b9ec33db4491d9732df172ec2e653eb5e5e214e8",
+   "sourceFile": "33-JONeng-web-c.usfm",
+   "sourceSha256": "9b9fa075f10c33707073bae43b0ea2b7883488b17acb3de854229a53fdac6e9c",
+   "verses": 48
+  },
+  {
+   "bytes": 19126,
+   "chapters": 7,
+   "code": "MIC",
+   "file": "MIC.json",
+   "name": "Micah",
+   "sha256": "d2bb037e93d09da1743bcaedda3454e86205bbd2734625d4f81eb2276cca1857",
+   "sourceFile": "34-MICeng-web-c.usfm",
+   "sourceSha256": "05ddf0b982e9f269611958a9a58d36233c26b0ed81a09aa6023153be496ed812",
+   "verses": 105
+  },
+  {
+   "bytes": 7503,
+   "chapters": 3,
+   "code": "NAM",
+   "file": "NAM.json",
+   "name": "Nahum",
+   "sha256": "54efda5b93d9890533c51166582800a2471d77cf9122e1b7666888c16ed95e14",
+   "sourceFile": "35-NAMeng-web-c.usfm",
+   "sourceSha256": "ee6ec3653610590fbdd72872209fa069a52c1143937fdd2600fff4e8d3c23c52",
+   "verses": 47
+  },
+  {
+   "bytes": 8799,
+   "chapters": 3,
+   "code": "HAB",
+   "file": "HAB.json",
+   "name": "Habakkuk",
+   "sha256": "dcb82574563160f8cfcb2636f2c55108e369acacd07abee22a88edca54fc9c06",
+   "sourceFile": "36-HABeng-web-c.usfm",
+   "sourceSha256": "342afef7c008a12838d173dd59e5d3f89f55f0f863bd7eecdbd29e0a9e760c73",
+   "verses": 56
+  },
+  {
+   "bytes": 9421,
+   "chapters": 3,
+   "code": "ZEP",
+   "file": "ZEP.json",
+   "name": "Zephaniah",
+   "sha256": "06e4082ae634457f10a4e8b2840e389da5b031c860219336d0eae967d078db6d",
+   "sourceFile": "37-ZEPeng-web-c.usfm",
+   "sourceSha256": "e4a02e7f6b5b69120b39063d9279421bfa02029466fce79af948df0a07bc463e",
+   "verses": 53
+  },
+  {
+   "bytes": 6488,
+   "chapters": 2,
+   "code": "HAG",
+   "file": "HAG.json",
+   "name": "Haggai",
+   "sha256": "31b826dd24f3c62f1c914391f098d83e8f949ebf62c36b88ec50cdb0addcdffe",
+   "sourceFile": "38-HAGeng-web-c.usfm",
+   "sourceSha256": "c2c043ea4575e087a486b542d85d2306a3e239bbe3ab72308aebcd47e49e085d",
+   "verses": 38
+  },
+  {
+   "bytes": 36886,
+   "chapters": 14,
+   "code": "ZEC",
+   "file": "ZEC.json",
+   "name": "Zechariah",
+   "sha256": "3c85bdc032433e9e882d3d510a62b41107a93aafa35586dc335d91068df9bd96",
+   "sourceFile": "39-ZECeng-web-c.usfm",
+   "sourceSha256": "20cf14a3b945b0c344bc8dc066aa2adbae3fcb9be081f6b2dbf96a8132a8b22e",
+   "verses": 211
+  },
+  {
+   "bytes": 10396,
+   "chapters": 4,
+   "code": "MAL",
+   "file": "MAL.json",
+   "name": "Malachi",
+   "sha256": "05fafde6cefaff52f75d20c59db195bebcc845c406ded08c4c0f5ee1de450997",
+   "sourceFile": "40-MALeng-web-c.usfm",
+   "sourceSha256": "96fba3370643ecddcd51f49cffec7716ab0eb0b8f604cb2b5621b69951dd3afb",
+   "verses": 55
+  },
+  {
+   "bytes": 40482,
+   "chapters": 14,
+   "code": "TOB",
+   "file": "TOB.json",
+   "name": "Tobit",
+   "sha256": "ac933b58fc155b05fb2dd42bef2820a4c527405431877e98cbc29902a81f392a",
+   "sourceFile": "41-TOBeng-web-c.usfm",
+   "sourceSha256": "39da13000df54b460e003894be05575a70f03cb9cfdccd1e845a9b09dccbd35d",
+   "verses": 244
+  },
+  {
+   "bytes": 65197,
+   "chapters": 16,
+   "code": "JDT",
+   "file": "JDT.json",
+   "name": "Judith",
+   "sha256": "4664ef21802e7aad4f8188826c643097da3cdf6cfd900ca3ec7aece5db5bf216",
+   "sourceFile": "42-JDTeng-web-c.usfm",
+   "sourceSha256": "d8d450dec5bd9cce8e05d77a788e69f94962772f6d773b766b7424548c5cdde8",
+   "verses": 339
+  },
+  {
+   "bytes": 69533,
+   "chapters": 19,
+   "code": "WIS",
+   "file": "WIS.json",
+   "name": "Wisdom",
+   "sha256": "46f5478daeda76138e5ddeef6caeb59a5655d344239483d8b62204408bfab1bb",
+   "sourceFile": "45-WISeng-web-c.usfm",
+   "sourceSha256": "b321297021d38bb793568f461a67de5a17f4617b1d2a218bf0a8d75eaa7e5bc3",
+   "verses": 436
+  },
+  {
+   "bytes": 177399,
+   "chapters": 51,
+   "code": "SIR",
+   "file": "SIR.json",
+   "name": "Sirach",
+   "sha256": "bd1c133c6d8176adab52b5a1504b76148894b2833e5a324ad9ba4cf4f44faced",
+   "sourceFile": "46-SIReng-web-c.usfm",
+   "sourceSha256": "102424b55c3e48a2880cad8deafd0a2bd8bf8a0dba79f774e801fb41cd599549",
+   "verses": 1383
+  },
+  {
+   "bytes": 30229,
+   "chapters": 6,
+   "code": "BAR",
+   "file": "BAR.json",
+   "name": "Baruch",
+   "sha256": "cb8232d343adead092c3fb5154472fc41dcc3cfbcdbab7c0e4f00fc8070d359c",
+   "sourceFile": "47-BAReng-web-c.usfm",
+   "sourceSha256": "59488efac7bfd4cf8b8964f7e638e9f994ddff8620f927d4ca6f2add2b64a061",
+   "verses": 213
+  },
+  {
+   "bytes": 138732,
+   "chapters": 16,
+   "code": "1MA",
+   "file": "1MA.json",
+   "name": "1 Maccabees",
+   "sha256": "9eaa1553bf90cfcc8a175a5d7bbeb53d27f7b0ec52f2ef1c9e099d69f70dab82",
+   "sourceFile": "52-1MAeng-web-c.usfm",
+   "sourceSha256": "52f0d64bfec70780fab11cb4cc438c9c0c1fd7eac8edc0ec6c108a6aa0e0d09e",
+   "verses": 924
+  },
+  {
+   "bytes": 104073,
+   "chapters": 15,
+   "code": "2MA",
+   "file": "2MA.json",
+   "name": "2 Maccabees",
+   "sha256": "0b2761f34fda81bafb04b358bceab0f6a3428a3e6efa737824bb35c44f664365",
+   "sourceFile": "53-2MAeng-web-c.usfm",
+   "sourceSha256": "3792c7d6be137930b5fce43a2ebc5d704edcda68da39b3ab722c0b1270d31f73",
+   "verses": 555
+  },
+  {
+   "bytes": 145530,
+   "chapters": 28,
+   "code": "MAT",
+   "file": "MAT.json",
+   "name": "Matthew",
+   "sha256": "109245a376964db088431e54514ac5e5c0b69780614241d3613f2c1013178ed5",
+   "sourceFile": "70-MATeng-web-c.usfm",
+   "sourceSha256": "759b627e78b1daddfc3fdbf3ed7cdeade97bde3acf264f75467572de79f35bcc",
+   "verses": 1071
+  },
+  {
+   "bytes": 91209,
+   "chapters": 16,
+   "code": "MRK",
+   "file": "MRK.json",
+   "name": "Mark",
+   "sha256": "331588613da522dac9b687c4f857ca07eca431225bac57de4a85c707a171b913",
+   "sourceFile": "71-MRKeng-web-c.usfm",
+   "sourceSha256": "8b681a5cbc47cfc72b00be669f3c64d3a85ce3e93e4d72db48c86068979be4eb",
+   "verses": 678
+  },
+  {
+   "bytes": 154480,
+   "chapters": 24,
+   "code": "LUK",
+   "file": "LUK.json",
+   "name": "Luke",
+   "sha256": "242bf6919e32216f3ccc0e9e1380ce305600ddd237f6cd6f8a4977e9f59faf6b",
+   "sourceFile": "72-LUKeng-web-c.usfm",
+   "sourceSha256": "a95f66e24daf0f1f993bd6b5b897a476d6b7f951e4339b8bd9481b29f7184ea0",
+   "verses": 1151
+  },
+  {
+   "bytes": 117083,
+   "chapters": 21,
+   "code": "JHN",
+   "file": "JHN.json",
+   "name": "John",
+   "sha256": "9fc1f181ec29bc1f68d45a5ef2421356abe5a3470fffe2a766e2c3bc9c9bcca7",
+   "sourceFile": "73-JHNeng-web-c.usfm",
+   "sourceSha256": "a94f67ede545be83cf1fe2f4be3dfc05ed4af64068df469a495394e0fe68913e",
+   "verses": 879
+  },
+  {
+   "bytes": 146373,
+   "chapters": 28,
+   "code": "ACT",
+   "file": "ACT.json",
+   "name": "Acts",
+   "sha256": "ac217e09d9bc55d5f755897875862399676e2d44513e5bbb3d842ad95979b98b",
+   "sourceFile": "74-ACTeng-web-c.usfm",
+   "sourceSha256": "2ac13ba79066eae7da62e9d8fdd0670c99bad0ee2516e9ce0db8d269330426d0",
+   "verses": 1007
+  },
+  {
+   "bytes": 59415,
+   "chapters": 16,
+   "code": "ROM",
+   "file": "ROM.json",
+   "name": "Romans",
+   "sha256": "03b818bde8900f49b9b85ab8582a42747db90a20b7bdfecd9755672c8e3b81a6",
+   "sourceFile": "75-ROMeng-web-c.usfm",
+   "sourceSha256": "58f59c51e0962d88ca255670b9ab675593b5a6619e39244cc51c55c39035b3c1",
+   "verses": 434
+  },
+  {
+   "bytes": 57750,
+   "chapters": 16,
+   "code": "1CO",
+   "file": "1CO.json",
+   "name": "1 Corinthians",
+   "sha256": "28cf566456537605bb969238f4bc6c714d72ac56a65d7d8c115323725f5d5c28",
+   "sourceFile": "76-1COeng-web-c.usfm",
+   "sourceSha256": "65be55d397f0920d431275773b45ab06d6f5f82e199ce5a0e37c59c3e4c68641",
+   "verses": 437
+  },
+  {
+   "bytes": 37306,
+   "chapters": 13,
+   "code": "2CO",
+   "file": "2CO.json",
+   "name": "2 Corinthians",
+   "sha256": "1409e142f657fceff2dec7f3a834dbfd14daa6d323159a037f660e48f4c7c11f",
+   "sourceFile": "77-2COeng-web-c.usfm",
+   "sourceSha256": "31502a5d8d115128bc8632c28f42d81d12ea3c2368a2ee1cad2f95d22ea8e890",
+   "verses": 257
+  },
+  {
+   "bytes": 19521,
+   "chapters": 6,
+   "code": "GAL",
+   "file": "GAL.json",
+   "name": "Galatians",
+   "sha256": "4aa6dd279af71ba025eeed76977d025205013c1198910daee43a3deb8e0452a2",
+   "sourceFile": "78-GALeng-web-c.usfm",
+   "sourceSha256": "405c854b879cf4867a3813400637c3bad4b58db8dff01614dbc0e4fcc80fb755",
+   "verses": 149
+  },
+  {
+   "bytes": 19491,
+   "chapters": 6,
+   "code": "EPH",
+   "file": "EPH.json",
+   "name": "Ephesians",
+   "sha256": "6ac3e3cea7fff25ea318f54cb8df8baa82c5df67f43f15b61107d6b2e7e9b56a",
+   "sourceFile": "79-EPHeng-web-c.usfm",
+   "sourceSha256": "73e511a6518ba49a021fe59e4ab445960bce8caccc14aef02296e8b70c44a12e",
+   "verses": 155
+  },
+  {
+   "bytes": 13718,
+   "chapters": 4,
+   "code": "PHP",
+   "file": "PHP.json",
+   "name": "Philippians",
+   "sha256": "0f0d2584afc3e831dbd594d53dcacdf81c094ccfbc206d3ebc495a6090112e01",
+   "sourceFile": "80-PHPeng-web-c.usfm",
+   "sourceSha256": "c82dbbc9303ec17ecae9a4c1c2fea5802c00a4871323ac81b3871914944f1732",
+   "verses": 104
+  },
+  {
+   "bytes": 12752,
+   "chapters": 4,
+   "code": "COL",
+   "file": "COL.json",
+   "name": "Colossians",
+   "sha256": "4bb1ef18d3710dff2f4bb7eec70497c45020686e28437a13dbeae01840293be8",
+   "sourceFile": "81-COLeng-web-c.usfm",
+   "sourceSha256": "913d21f4db4a375c6e53c97da9a2b101a0a8a8332b190ff7924115601669da0f",
+   "verses": 95
+  },
+  {
+   "bytes": 11489,
+   "chapters": 5,
+   "code": "1TH",
+   "file": "1TH.json",
+   "name": "1 Thessalonians",
+   "sha256": "8be7a7e4c69e69a14757eaa8bb93c27e1009188ea3fd4ffa11c2bf299e642a97",
+   "sourceFile": "82-1THeng-web-c.usfm",
+   "sourceSha256": "4810c1ffe1ab6e0092ea8a769d7cedd2dab4c5ab29011ed8e30068348aa1ce71",
+   "verses": 89
+  },
+  {
+   "bytes": 6458,
+   "chapters": 3,
+   "code": "2TH",
+   "file": "2TH.json",
+   "name": "2 Thessalonians",
+   "sha256": "07e356910cc40e0385b3333636a6e9bc84263c7de1c8677a6a69b39777e005e1",
+   "sourceFile": "83-2THeng-web-c.usfm",
+   "sourceSha256": "6bb4ca756f37e0b8732aa741f6af692e552a37f43cd2dad2eac4676ec2c23a45",
+   "verses": 47
+  },
+  {
+   "bytes": 15085,
+   "chapters": 6,
+   "code": "1TI",
+   "file": "1TI.json",
+   "name": "1 Timothy",
+   "sha256": "3739d9ec2377d6366425df712e761e006abfe9efe1543074776727fb8d51bd4e",
+   "sourceFile": "84-1TIeng-web-c.usfm",
+   "sourceSha256": "a8816653744eba95bb15f8c032c5501de244461f987bd686f0a796d24b8bd6a6",
+   "verses": 113
+  },
+  {
+   "bytes": 10645,
+   "chapters": 4,
+   "code": "2TI",
+   "file": "2TI.json",
+   "name": "2 Timothy",
+   "sha256": "138ebd56821bbac970a7f4a260c38e70a078684eaa837f57bb82491fd9b36c69",
+   "sourceFile": "85-2TIeng-web-c.usfm",
+   "sourceSha256": "178bed1d3908c98a2aaf4839faba1fd8ff04ed306083105a82b70a458e165922",
+   "verses": 83
+  },
+  {
+   "bytes": 6143,
+   "chapters": 3,
+   "code": "TIT",
+   "file": "TIT.json",
+   "name": "Titus",
+   "sha256": "be19335d8aa3150e38ee8c9faab7c196bbddfdd746c2c7fc64446524ac62a5cf",
+   "sourceFile": "86-TITeng-web-c.usfm",
+   "sourceSha256": "9a808c6274f8757de24dc8706840f95638f989f10f9671f6b1d1f5ebadfd36d0",
+   "verses": 46
+  },
+  {
+   "bytes": 2848,
+   "chapters": 1,
+   "code": "PHM",
+   "file": "PHM.json",
+   "name": "Philemon",
+   "sha256": "7d7408e3f5ec9d47f289fed053166f889e0f094963ffb19b867498d3285105cc",
+   "sourceFile": "87-PHMeng-web-c.usfm",
+   "sourceSha256": "9c9148cf45eee6558410a74f58804de3793eb5d26c394e291634a47fb9b50a47",
+   "verses": 25
+  },
+  {
+   "bytes": 44072,
+   "chapters": 13,
+   "code": "HEB",
+   "file": "HEB.json",
+   "name": "Hebrews",
+   "sha256": "e239f033a4f1597573d7145b2dbdd801c8918ac1ea70a93c8562c38eacd39bfe",
+   "sourceFile": "88-HEBeng-web-c.usfm",
+   "sourceSha256": "97bab4cd15ff069333956068dc805d9ec6b8fd8aae3ee48a6e4e2ba60cb26d4e",
+   "verses": 303
+  },
+  {
+   "bytes": 14199,
+   "chapters": 5,
+   "code": "JAS",
+   "file": "JAS.json",
+   "name": "James",
+   "sha256": "17cb0ab0660ce175a155b8b6d2a0655ad2b8a63a3a0c9d496a36df0e6e2431b4",
+   "sourceFile": "89-JASeng-web-c.usfm",
+   "sourceSha256": "d75f6fe5e8eab84bd30c10748cdc0b5627b057251fa2c407b4281d31eb192321",
+   "verses": 108
+  },
+  {
+   "bytes": 15493,
+   "chapters": 5,
+   "code": "1PE",
+   "file": "1PE.json",
+   "name": "1 Peter",
+   "sha256": "6287be973c5e5f8b282f348474bc08c76e7ffbaa154e3504c75ba7e0cb1a9e6b",
+   "sourceFile": "90-1PEeng-web-c.usfm",
+   "sourceSha256": "b9474211c11cd03c4892b811941002a4f6b689d604250bfddbb3dfeecfbe9dc5",
+   "verses": 105
+  },
+  {
+   "bytes": 9746,
+   "chapters": 3,
+   "code": "2PE",
+   "file": "2PE.json",
+   "name": "2 Peter",
+   "sha256": "7c265de83abf1306483cc5c190d316ee05496788d8ea48ea1d38a422c853caa2",
+   "sourceFile": "91-2PEeng-web-c.usfm",
+   "sourceSha256": "d00464b8de85e827128d1aa07640121c1ff8060043aebec457e9f14a1caac849",
+   "verses": 61
+  },
+  {
+   "bytes": 14712,
+   "chapters": 5,
+   "code": "1JN",
+   "file": "1JN.json",
+   "name": "1 John",
+   "sha256": "84ea3269aed57ab3a0cdda5ed7f65fc7600923e942838aa2264458a4d4ae4f43",
+   "sourceFile": "92-1JNeng-web-c.usfm",
+   "sourceSha256": "671935cbfe966350a92afd4709caba46a25e57afcbba0116848b0a927f83fdf4",
+   "verses": 105
+  },
+  {
+   "bytes": 1878,
+   "chapters": 1,
+   "code": "2JN",
+   "file": "2JN.json",
+   "name": "2 John",
+   "sha256": "dd5a24e3fe66743dac65c0d99c67ba0d765d8743140dd3de07183d0d0660d43a",
+   "sourceFile": "93-2JNeng-web-c.usfm",
+   "sourceSha256": "f133c182769331642613b90a810c774762c4118c34e175f38270cdde608ae74d",
+   "verses": 13
+  },
+  {
+   "bytes": 1894,
+   "chapters": 1,
+   "code": "3JN",
+   "file": "3JN.json",
+   "name": "3 John",
+   "sha256": "faf405afd9293d8cd8c58b092b7763255e893e83dd114ac967dcdf0253a3d5c2",
+   "sourceFile": "94-3JNeng-web-c.usfm",
+   "sourceSha256": "a73d98c134fdd6f658470ef53515e0463bcef0bca9b4a65bdd7d6a8ee19b3495",
+   "verses": 14
+  },
+  {
+   "bytes": 4041,
+   "chapters": 1,
+   "code": "JUD",
+   "file": "JUD.json",
+   "name": "Jude",
+   "sha256": "2e743c3d3d00d5606bffba12f585f73d69aa0f48f8bea467af8d0cf1ac4bcbd8",
+   "sourceFile": "95-JUDeng-web-c.usfm",
+   "sourceSha256": "5cc5f1b0605e4dbc5522589a7cd448dcd1ef96763785386bb2c9754be99b9366",
+   "verses": 25
+  },
+  {
+   "bytes": 68071,
+   "chapters": 22,
+   "code": "REV",
+   "file": "REV.json",
+   "name": "Revelation",
+   "sha256": "07a842a0fbe00f27dfac5837e3a86f5782266d63aa6becbdd6073493c647eaf3",
+   "sourceFile": "96-REVeng-web-c.usfm",
+   "sourceSha256": "1caf1c64c198a8e0522f52d54a22aaabd3c8a26b5dc3e514c5b123043c55b565",
+   "verses": 404
+  }
+ ],
+ "dropped": {
+  "blankLinesAtChapterEnd": 104,
+  "blankLinesAtChapterStart": 12,
+  "bookHeaders": 284,
+  "bookTitles": 117,
+  "chapterLabels": 1,
+  "crossReferences": 343,
+  "footnotes": 1678,
+  "frontMatter": {
+   "bytes": 9459,
+   "file": "00-FRTeng-web-c.usfm",
+   "lines": 37
+  },
+  "headingsInTheMiddleOfAVerse": {
+   "dropped": [
+    {
+     "before": "SNG 1:5",
+     "line": 23,
+     "text": "Friends"
+    },
+    {
+     "before": "SNG 5:2",
+     "line": 294,
+     "text": "Friends"
+    }
+   ],
+   "movedToTheNextVerse": [
+    {
+     "before": "SNG 1:5",
+     "line": 26,
+     "text": "Beloved"
+    },
+    {
+     "before": "SNG 7:1",
+     "line": 421,
+     "text": "Lover"
+    },
+    {
+     "before": "SNG 8:6",
+     "line": 501,
+     "text": "Beloved"
+    }
+   ]
+  },
+  "introductions": {
+   "byBook": {
+    "1MA": {
+     "lines": 1,
+     "words": 21
+    },
+    "2MA": {
+     "lines": 1,
+     "words": 21
+    },
+    "BAR": {
+     "lines": 1,
+     "words": 48
+    },
+    "ESG": {
+     "lines": 3,
+     "words": 170
+    },
+    "JDT": {
+     "lines": 1,
+     "words": 16
+    },
+    "SIR": {
+     "lines": 3,
+     "words": 347
+    },
+    "TOB": {
+     "lines": 1,
+     "words": 16
+    },
+    "WIS": {
+     "lines": 1,
+     "words": 19
+    }
+   },
+   "lines": 12,
+   "words": 658
+  },
+  "references": 0,
+  "separatorLines": 1,
+  "strongsTags": 669389
+ },
+ "emptyVerses": [
+  {
+   "note": "Verse 5 is omitted by the best authorities: The source of wisdom is God’s word in the highest heaven, and her ways are the eternal commandments.",
+   "verse": "SIR 1:5"
+  },
+  {
+   "note": "Verse 7 is omitted by the best authorities: To whom was the knowledge of wisdom manifested? Who has understood her abundant experience?",
+   "verse": "SIR 1:7"
+  },
+  {
+   "note": "Verse 21 is omitted by the best authorities: The fear of the Lord drives away sins. Where it resides, it will turn away all anger.",
+   "verse": "SIR 1:21"
+  },
+  {
+   "note": "Some manuscripts add Many are lofty and renowned, but he reveals his secrets to the humble.",
+   "verse": "SIR 3:19"
+  },
+  {
+   "note": "Verse 21 is omitted by the best authorities: Fear of the Lord is the beginning of acceptance, but obstinance and pride are the beginning of rejection.",
+   "verse": "SIR 10:21"
+  },
+  {
+   "note": "Verses 15 and 16 are omitted by the best authorities.",
+   "verse": "SIR 11:15-16"
+  },
+  {
+   "note": "The remainder of verse 13, and verse 14, are omitted by the best authorities.",
+   "verse": "SIR 13:14"
+  },
+  {
+   "note": "Verses 15 and 16 are omitted by the best authorities.",
+   "verse": "SIR 16:15-16"
+  },
+  {
+   "note": "Verse 5 is omitted by the best authorities.",
+   "verse": "SIR 17:5"
+  },
+  {
+   "note": "Verse 9 is omitted by the best authorities.",
+   "verse": "SIR 17:9"
+  },
+  {
+   "note": "Verses 16, 18, and 21 are omitted by the best authorities.",
+   "verse": "SIR 17:16"
+  },
+  {
+   "note": "Verses 16, 18, and 21 are omitted by the best authorities.",
+   "verse": "SIR 17:18"
+  },
+  {
+   "note": "Verses 16, 18, and 21 are omitted by the best authorities.",
+   "verse": "SIR 17:21"
+  },
+  {
+   "note": "The remainder of verse 2, and verse 3, are omitted by the best authorities.",
+   "verse": "SIR 18:3"
+  },
+  {
+   "note": "Verses 18 and 19 are omitted by the best authorities.",
+   "verse": "SIR 19:18-19"
+  },
+  {
+   "note": "The remainder of verse 20 and verse 21 are omitted by the best authorities.",
+   "verse": "SIR 19:21"
+  },
+  {
+   "note": "Verse 3 is omitted by the best authorities.",
+   "verse": "SIR 20:3"
+  },
+  {
+   "note": "Verse 32 is omitted by the best authorities.",
+   "verse": "SIR 20:32"
+  },
+  {
+   "note": "Verses 9 and 10 are omitted by the best authorities.",
+   "verse": "SIR 22:9-10"
+  },
+  {
+   "note": "Verse 28 is omitted by the best authorities.",
+   "verse": "SIR 23:28"
+  },
+  {
+   "note": "Verse 18 is omitted by the best authorities.",
+   "verse": "SIR 24:18"
+  },
+  {
+   "note": "Verse 24 is omitted by the best authorities.",
+   "verse": "SIR 24:24"
+  },
+  {
+   "note": "Verse 12 is omitted by the best authorities.",
+   "verse": "SIR 25:12"
+  },
+  {
+   "note": "Verses 19-27 are omitted by the best authorities.",
+   "verse": "SIR 26:19-27"
+  },
+  {
+   "note": "Some Greek manuscripts add: “Two will be in the field: the one taken, and the other left.”",
+   "verse": "LUK 17:36"
+  },
+  {
+   "note": "TR adds Philip said, “If you believe with all your heart, you may.” He answered, “I believe that Jesus Christ is the Son of God.”",
+   "verse": "ACT 8:37"
+  },
+  {
+   "note": "Some manuscripts add: But it seemed good to Silas to stay there.",
+   "verse": "ACT 15:34"
+  },
+  {
+   "note": "TR adds “but the commanding officer, Lysias, came by and with great violence took him out of our hands,”",
+   "verse": "ACT 24:7"
+  },
+  {
+   "note": "TR places Romans 14:24-26 at the end of Romans instead of at the end of chapter 14, and numbers these verses 16:25-27.",
+   "verse": "ROM 16:25"
+  }
+ ],
+ "files": {
+  "index.json": {
+   "bytes": 4638,
+   "sha256": "521cbda20ae3ba944754d67884df8c97463913455b36c16c41f7ddcd5661c289"
+  }
+ },
+ "format": 1,
+ "generator": "tools/bible/import_webc.py",
+ "kept": {
+  "bookNames": 10,
+  "selah": 74,
+  "wordsOfJesus": 2290
+ },
+ "source": {
+  "bytes": 3090996,
+  "date": "2026-11-08",
+  "licencePage": {
+   "file": "copr.htm",
+   "sha256": "03cd45dc1cf88454eb29d61c386705b69e51480a45dc8095392ed7f257f40265"
+  },
+  "sha256": "85a6599ccd65c8d71a62fb0d7e1739e4c776a970e05f25d5f881684550e7620c",
+  "url": "https://ebible.org/Scriptures/eng-web-c_usfm.zip"
+ },
+ "totals": {
+  "books": 73,
+  "bytes": 5389017,
+  "chapters": 1328,
+  "verses": 35408
+ },
+ "translation": {
+  "credit": "World English Bible, Catholic edition (eBible.org). Public domain. The name \"World English Bible\" is a trademark of eBible.org.",
+  "id": "eng-web-c",
+  "licence": "Public domain",
+  "name": "World English Bible, Catholic edition",
+  "short": "WEB",
+  "source": "https://ebible.org/eng-web-c/"
+ }
+}

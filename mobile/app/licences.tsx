@@ -21,6 +21,13 @@ const DATA: Item[] = [
   { name: 'AI-generated sample pictures and clips', what: 'The sample journey shown before you have posts of your own', licence: 'Made by CaminoPlus with Google Nano Banana 2 and Veo 3.1 through OpenArt. AI-generated, not photographs of real places or people', url: 'https://openart.ai/' },
 ];
 
+// The text of the Bible in the Library (mobile/assets/bible/webc, made by tools/bible/import_webc.py). It is public domain, but the name
+// "World English Bible" is a trademark of eBible.org: the name goes with the words as they are, so what is left out is said here too. This
+// entry, the credit in assets/bible/webc/index.json and the list on the website (tools/build_web.py) say the same; bibletext.test.ts reads all three.
+const TEXT: Item[] = [
+  { name: 'World English Bible, Catholic edition', what: 'The text of the Bible in the Library: 73 books, kept in the app, so it reads without a signal. Strong’s numbers, footnotes and cross references are not included.', licence: 'Public domain. The name “World English Bible” is a trademark of eBible.org.', url: 'https://ebible.org/eng-web-c/' },
+];
+
 const SOFTWARE: Item[] = [
   { name: 'Noto Sans', what: 'Map label glyphs, bundled so labels work offline', licence: 'SIL Open Font License 1.1', url: 'https://openfontlicense.org/' },
   { name: 'Fraunces, Inter, JetBrains Mono, Caveat', what: 'App fonts', licence: 'SIL Open Font License 1.1', url: 'https://fonts.google.com/' },
@@ -60,6 +67,7 @@ export default function Licences() {
           <AppText variant="lead" muted>CaminoPlus stands on the shoulders of many open projects. Thank you to everyone who maps the Way.</AppText>
         </View>
         <Group title="MAPS AND DATA" items={DATA} />
+        <Group title="THE BIBLE TEXT" items={TEXT} />
         <Group title="FONTS AND SOFTWARE" items={SOFTWARE} />
         <AppText variant="caption" muted>Map data and places © OpenStreetMap contributors · © OpenMapTiles. Packs are rebuilt every month from fresh OpenStreetMap data. Places from OpenStreetMap are shown as they are, with where they came from and how far they were checked.</AppText>
       </ScrollView>

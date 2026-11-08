@@ -166,6 +166,11 @@ test('the real app: no problems, and the routes sit in the account states the gu
   assert.equal(personas('/onboarding'), 'new');
   // the app proper needs an account and a journey
   for (const p of ['/me', '/stays', '/maps', '/explore', '/library', '/settings', '/diary', '/stay/[id]', '/chat/[id]']) assert.equal(personas(p), 'in', p);
+  // the Bible screens (the chapters of a book, and the reader) are swept as the real screens: with the Psalms and Psalm 121, not with a made-up id that would be "Not found"
+  for (const [pattern, url] of [['/library/bible/[code]', '/library/bible/PSA'], ['/library/bible/[code]/[chapter]', '/library/bible/PSA/121']]) {
+    assert.equal(personas(pattern), 'in', pattern);
+    assert.equal(routes.find((r) => r.pattern === pattern)?.url, url, pattern);
+  }
   // open to every state
   for (const p of ['/', '/licences', '/auth-callback', '/reset-password']) assert.equal(personas(p), 'out,new,in', p);
   assert.ok(routes.length >= 30, `only ${routes.length} routes found`);

@@ -46,7 +46,14 @@ test('the real plan: all routes, all modes, and the scenarios the owner asked fo
   for (const mode of [true, false]) for (const scheme of SCHEMES) assert.ok(loads.some((t) => t.offline === mode && t.scheme === scheme), `no page load with offline=${mode} in ${scheme}`);
   for (const persona of ['out', 'new', 'in']) assert.ok(loads.some((t) => t.persona === persona), `no page load signed ${persona}`);
   const names = SCENARIOS.map((s) => s.name).join('\n');
-  for (const must of [/Tab bar/, /gear on Me opens Settings/, /switching light and dark/i, /Library: the tabs Bible and Books/, /Me: the strip is Notes, Journey, Plan, Health/, /Me: Notes is the first sub-tab and shows the feed with one gold pen/, /three choices at the bottom of Bible/, /banner of the Bible tab opens \/library\/daily/, /bookmarks kept before the tabs changed/]) assert.match(names, must);
+  for (const must of [
+    /Tab bar/, /gear on Me opens Settings/, /switching light and dark/i, /Library: the tabs Bible and Books/, /Me: the strip is Notes, Journey, Plan, Health/,
+    /Me: Notes is the first sub-tab and shows the feed with one gold pen/,
+    /three choices under the banner/, /banner of the Bible tab opens \/library\/daily/, /bookmarks kept before the tabs changed/,
+    // the Bible: the grid of books, the chapters, the reader, Next and Previous across a boundary, a verse bookmarked, a link to a verse, the search of verses, Continue reading
+    /daily reading banner is compact/, /73 book names fits its square tile/, /a tile opens the numbers of the chapters/, /Next and Previous cross the books/, /touching a verse chooses it/,
+    /a link to a verse/, /verses are found after the keystroke/, /card "Continue reading"/, /leads nowhere/,
+  ]) assert.match(names, must);
 });
 
 test('redirects on purpose are listed with a reason, and only for the account states named', () => {
