@@ -65,8 +65,8 @@ export function BlockBody({ block, italicReady }: { block: Block; italicReady: b
   switch (block.t) {
     case 'h':
       return block.level <= 2
-        ? <AppText variant="h4" accessibilityRole="header" style={[{ marginTop: 28 }, breakAnywhere]}><Spans spans={block.spans} italicReady={italicReady} /></AppText>
-        : <AppText variant="label" accessibilityRole="header" style={[{ marginTop: 16, fontSize: 19, lineHeight: 26 }, breakAnywhere]}><Spans spans={block.spans} italicReady={italicReady} /></AppText>;
+        ? <AppText variant="h4" accessibilityRole="header" style={[{ marginTop: 10 }, breakAnywhere]}><Spans spans={block.spans} italicReady={italicReady} /></AppText>
+        : <AppText variant="label" accessibilityRole="header" style={[{ marginTop: 2, fontSize: 19, lineHeight: 26 }, breakAnywhere]}><Spans spans={block.spans} italicReady={italicReady} /></AppText>;
     case 'p':
       return <AppText style={[READING, breakAnywhere]}><Spans spans={block.spans} italicReady={italicReady} /></AppText>;
     case 'ul':
@@ -95,7 +95,7 @@ export function BlockBody({ block, italicReady }: { block: Block; italicReady: b
         </View>
       );
     case 'hr':
-      return <View accessibilityElementsHidden importantForAccessibility="no" style={{ height: 1, backgroundColor: role.border, marginVertical: 12 }} />;
+      return <View accessibilityElementsHidden importantForAccessibility="no" style={{ height: 1, backgroundColor: role.border, marginVertical: 4 }} />;
     default:
       return null;
   }

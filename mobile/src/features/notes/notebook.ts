@@ -1,7 +1,7 @@
 // The Notebook as data: the notes grouped by what they are about (a book, then a chapter or day of it) and searched with the Library's own
 // word matching. A pure module (no React, no React Native; plain node tests cover it, npm run test:notes). There is no timeline here: the
 // groups follow the order of the books and of their chapters, never the date.
-import type { CatalogBook } from '../library/books';
+import { findBook, findChapter, type CatalogBook } from '../library/books';
 import { matchesWords, wordsOf } from '../library/search';
 import { bookPlaceOf } from './anchor';
 import type { Note } from './notes';
@@ -71,4 +71,25 @@ export function searchNotes(notes: readonly Note[], query: string, catalog: read
   const q = wordsOf(query);
   if (q.length === 0) return [];
   return notes.filter((n) => matchesWords(q, noteWords(n, catalog)));
+}
+
+/** The names that title a Diary page grown from a note, and the sheet of the note: its book and its chapter or day, when the catalog has them. */
+export function titlesOf(n: Pick<Note, 'anchor'>, catalog: readonly CatalogBook[]): { book: string | null; chapter: string | null } {
+  const a = bookPlaceOf(n.anchor);
+  const book = a ? findBook(catalog, a.bookId) : null;
+  const chapter = book && a?.chapterId ? findChapter(book.chapters, a.chapterId) : null;
+  return { book: book?.title ?? null, chapter: chapter?.title ?? null };
+}
+
+/**
+ * Where a note is in the app: the reader at its chapter (and its paragraph), or the book's own screen for a note on the whole book. Null for a
+ * note that is not on a book, or on a book or a chapter the app does not have: there is nowhere to go.
+ */
+export function noteRoute(n: Pick<Note, 'anchor'>, catalog: readonly CatalogBook[]): string | null {
+  const a = bookPlaceOf(n.anchor);
+  const book = a ? findBook(catalog, a.bookId) : null;
+  if (!a || !book) return null;
+  if (a.chapterId === null) return `/library/book/${book.id}`;
+  if (!findChapter(book.chapters, a.chapterId)) return null;
+  return `/library/book/${book.id}/${a.chapterId}${a.block === null ? '' : `?block=${a.block}`}`;
 }

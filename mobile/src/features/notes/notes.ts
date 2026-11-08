@@ -60,7 +60,7 @@ export type Note = {
 export type StoredNotes = { v: 1; items: Note[] };
 
 /** Why a note was not written. Never thrown: it is an answer, and the screen words it gently (present.ts). */
-export type NoteProblem = 'empty' | 'too-long' | 'too-many' | 'full' | 'bad-anchor' | 'not-found' | 'not-saved';
+export type NoteProblem = 'empty' | 'too-long' | 'too-many' | 'full' | 'bad-anchor' | 'not-found' | 'blocked' | 'not-saved';
 
 const squash = (s: string) => s.replace(/\s+/g, ' ').trim();
 const validTime = (v: unknown): v is string => typeof v === 'string' && v.length > 0 && v.length <= 40 && !Number.isNaN(Date.parse(v));

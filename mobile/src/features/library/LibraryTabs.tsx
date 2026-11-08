@@ -3,20 +3,23 @@ import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
 import { SampleNotice, SampleTag } from '@/components/SampleNotice';
 import { Card, SectionLabel } from '@/components/ui';
-import { fixed, radius, role } from '@/theme';
+import { radius, role } from '@/theme';
+import type { LibraryBook } from './books';
+import { BookCovers } from './BookShelf';
 import { BookmarkToggle } from './BookmarkToggle';
-import { LibraryTab, PREVIEW_NOTICE, SAMPLE_BOOKS, SAMPLE_PLAYLISTS, SAMPLE_SHELVES, type Book, type Playlist, type Shelf } from './sample';
+import { PREVIEW_NOTICE, SAMPLE_PLAYLISTS, SAMPLE_SHELVES, type ExampleTab, type LibraryTab, type Playlist, type Shelf } from './sample';
 import { hitTabs, itemKey, type Hits } from './search';
 import type { LibraryMarks } from './useLibraryBookmarks';
 
-// The three Library tabs. There is no real content yet (see sample.ts), so each tab starts with an honest notice and
-// then shows, with example rows, where the content will go. Colours are read while drawing, never at import.
+// The three Library tabs. The Bible and Music tabs have no real content yet (see sample.ts), so each starts with an honest notice and then
+// shows, with example rows, where the content will go. The Books tab is real: its covers are the books of the bundle (BookShelf.tsx), they
+// open the book, and there is no notice because nothing on it is an example. Colours are read while drawing, never at import.
 //
-// A row can carry a bookmark button (when `marks` is given): the button is its own component, so a row stays a plain picture of
+// An example row can carry a bookmark button (when `marks` is given): the button is its own component, so a row stays a plain picture of
 // what will be there. The rows of one tab are also what a search result and the Bookmarks screen draw (LibraryGroups), so a row
 // looks the same wherever it is.
 
-const Notice = ({ tab }: { tab: LibraryTab }) => <SampleNotice title="Preview">{PREVIEW_NOTICE[tab]}</SampleNotice>;
+const Notice = ({ tab }: { tab: ExampleTab }) => <SampleNotice title="Preview">{PREVIEW_NOTICE[tab]}</SampleNotice>;
 
 /** A small chip that says a row is not available yet. */
 const Soon = () => (
@@ -52,29 +55,6 @@ export function BibleShelves({ items, marks }: { items: readonly Shelf[]; marks?
         </View>
       ))}
     </Card>
-  );
-}
-
-export function BookCovers({ items, marks }: { items: readonly Book[]; marks?: LibraryMarks }) {
-  return (
-    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
-      {items.map((b) => (
-        <View key={b.id} accessibilityLabel={`${b.title}, sample cover`} style={{ flexBasis: '47%', flexGrow: 1, gap: 8 }}>
-          {/* A cover is a pale picture colour that does not change with light/dark, so what is on it is the fixed navy. */}
-          <View style={{ aspectRatio: 3 / 4, borderRadius: radius.md, backgroundColor: fixed[b.colour], padding: 14, justifyContent: 'space-between' }}>
-            <Icon name={b.icon} color={fixed.blue} size={28} />
-            <AppText variant="h4" color={fixed.blue}>{b.title}</AppText>
-            {!!marks && <View style={{ position: 'absolute', top: 4, right: 4 }}><Mark marks={marks} tab="Books" id={b.id} title={b.title} color={fixed.blue} /></View>}
-          </View>
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-            <AppText variant="caption" muted>{b.kind}</AppText>
-            <SampleTag />
-          </View>
-        </View>
-      ))}
-      {/* An odd last cover keeps its half of the row instead of growing to fill it. */}
-      {items.length % 2 === 1 && <View style={{ flexBasis: '47%', flexGrow: 1 }} />}
-    </View>
   );
 }
 
@@ -134,11 +114,22 @@ export function BibleTab({ marks }: { marks?: LibraryMarks }) {
   );
 }
 
-export function BooksTab({ marks }: { marks?: LibraryMarks }) {
+/** The line under the Books tab's covers' heading: how many books there are, and that they are in the app. */
+export const booksLine = (n: number) => `${n} ${n === 1 ? 'book' : 'books'} in the app. They are saved on this phone, so they read without a signal.`;
+/** The Books tab when the bundle has no book (a build made before the books were added). */
+export const BOOKS_NONE = 'No books are in this version of the app yet.';
+
+export function BooksTab({ books, marks }: { books: readonly LibraryBook[]; marks?: LibraryMarks }) {
   return (
     <View style={{ gap: 16 }}>
-      <Notice tab="Books" />
-      <BookCovers items={SAMPLE_BOOKS} marks={marks} />
+      {books.length > 0 ? (
+        <>
+          <AppText variant="small" muted>{booksLine(books.length)}</AppText>
+          <BookCovers items={books} marks={marks} />
+        </>
+      ) : (
+        <Card><AppText variant="small" muted>{BOOKS_NONE}</AppText></Card>
+      )}
     </View>
   );
 }

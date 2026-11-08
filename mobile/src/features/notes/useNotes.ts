@@ -80,14 +80,17 @@ export function useNotes(): NotesApi {
     });
   }, []);
 
-  const usable = useCallback((): Read | null => {
+  // The state a change can start from, or why it cannot: not read yet (a change could write over what is saved), or something unreadable is stored.
+  const usable = useCallback((): { cur: Read } | { reason: NoteProblem } => {
     const cur = latest.current;
-    return key && cur && cur.key === key && !cur.blocked ? cur : null;
+    if (!key || !cur || cur.key !== key) return { reason: 'not-saved' };
+    return cur.blocked ? { reason: 'blocked' } : { cur };
   }, [key]);
 
   const add = useCallback<NotesApi['add']>(async (input) => {
-    const cur = usable();
-    if (!cur) return { ok: false, reason: 'not-saved' };
+    const start = usable();
+    if (!('cur' in start)) return { ok: false, reason: start.reason };
+    const cur = start.cur;
     const now = new Date();
     const res = addNote(cur.list, { id: uuid(), anchor: input.anchor, quote: input.quote, text: input.text, type: input.type, context: contextFor(now, journeyRef.current) }, now);
     if (!res.ok) return res;
@@ -95,16 +98,18 @@ export function useNotes(): NotesApi {
   }, [commit, usable]);
 
   const edit = useCallback<NotesApi['edit']>(async (id, text) => {
-    const cur = usable();
-    if (!cur) return { ok: false, reason: 'not-saved' };
+    const start = usable();
+    if (!('cur' in start)) return { ok: false, reason: start.reason };
+    const cur = start.cur;
     const res = editNote(cur.list, id, text, new Date());
     if (!res.ok) return res;
     return (await commit(cur, cur.list, res.notes)) ? { ok: true, note: res.note } : { ok: false, reason: 'not-saved' };
   }, [commit, usable]);
 
   const remove = useCallback(async (id: string): Promise<boolean> => {
-    const cur = usable();
-    if (!cur) return false;
+    const start = usable();
+    if (!('cur' in start)) return false;
+    const cur = start.cur;
     if (!cur.list.some((n) => n.id === id)) return true;
     return commit(cur, cur.list, removeNote(cur.list, id));
   }, [commit, usable]);

@@ -133,3 +133,12 @@ export function snippet(text: string, max: number): string {
 
 /** The chapter of a book's text by its id, or null. */
 export const findChapter = <C extends { id: string }>(chapters: readonly C[], id: string | undefined): C | null => (id ? chapters.find((c) => c.id === id) : undefined) ?? null;
+
+/** How many days a reflection book has: its chapters titled "Day 1. ...", "Day 2. ...". Zero for a book that has none (a guide). */
+export const dayCount = (book: Pick<CatalogBook, 'chapters'>): number => book.chapters.filter((c) => /^day\s+\d+\b/i.test(c.title)).length;
+
+/** "Readings · 2 h 45 min · 21 days": the line under the title of a book on its own screen; a guide has no days. */
+export function bookLine(book: Pick<CatalogBook, 'kind' | 'minutes' | 'chapters'>): string {
+  const days = dayCount(book);
+  return days > 0 ? `${coverCaption(book)} · ${days} ${days === 1 ? 'day' : 'days'}` : coverCaption(book);
+}

@@ -7,22 +7,25 @@ import { SampleNotice } from '@/components/SampleNotice';
 import { Card } from '@/components/ui';
 import { radius, role } from '@/theme';
 import { LibraryGroups } from './LibraryTabs';
-import { SEARCH_NOTICE } from './sample';
-import { resultsLine, searchLibrary } from './search';
+import type { LibraryBook } from './books';
+import { searchNotice } from './sample';
+import { hitTabs, resultsLine, searchLibrary } from './search';
 import type { LibraryMarks } from './useLibraryBookmarks';
 
 export const NOTHING_FOUND_HINT = 'Check the spelling, try a shorter word, or clear the search to browse the tabs.';
 
 /**
- * What the Library shows while something is typed in the search field, in place of the banner and the tabs: one Preview notice
- * (the results are the examples of the tabs, and it says so), how many were found, and the rows grouped by tab. Nothing found is a
- * calm sentence with a way back (Clear search), never a blank. The search is a pure function (search.ts), run again for every letter.
+ * What the Library shows while something is typed in the search field, in place of the banner and the tabs: how many were found, and the
+ * rows grouped by tab. The books are real; the Bible and Music rows are still examples, so a Preview notice shows only while one of those is
+ * in the results, and says which. Nothing found is a calm sentence with a way back (Clear search), never a blank. The search is a pure
+ * function (search.ts), run again for every letter.
  */
-export function SearchResults({ query, marks, onClear }: { query: string; marks: LibraryMarks; onClear: () => void }) {
-  const found = useMemo(() => searchLibrary(query), [query]);
+export function SearchResults({ query, books, marks, onClear }: { query: string; books: readonly LibraryBook[]; marks: LibraryMarks; onClear: () => void }) {
+  const found = useMemo(() => searchLibrary(query, books), [query, books]);
+  const notice = searchNotice(hitTabs(found.hits));
   return (
     <>
-      <SampleNotice title="Preview">{SEARCH_NOTICE}</SampleNotice>
+      {!!notice && <SampleNotice title="Preview">{notice}</SampleNotice>}
       {found.total > 0 ? (
         <>
           {/* A polite live region: a screen reader says the new count as the list narrows. */}

@@ -1,5 +1,6 @@
 // The words of the notes, as plain constants and pure functions (no React): what the screens say, so one test can read them all against the
 // brand voice (calm, plain, honest, "pilgrim" not "user") and against what the app really does.
+import { shownQuery } from '../library/search';
 import { NOTE_TEXT_MAX, NOTES_MAX, type NoteProblem } from './notes';
 
 /** Said where the notes are listed (the Notebook), honestly: where they are, what that means, and what clears them. */
@@ -16,6 +17,9 @@ export const READER_HINT = 'Tap a paragraph to bookmark it or add a note beside 
 
 export const thousands = (n: number) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
+/** When the stored notes could not be read: nothing is changed, and it says so. */
+export const NOTES_BLOCKED = 'Your notes could not be read on this phone, so nothing was changed. What is stored there is untouched.';
+
 /** The gentle sentence for a note that was not written. */
 export function noteProblemMessage(p: NoteProblem): string {
   switch (p) {
@@ -25,12 +29,11 @@ export function noteProblemMessage(p: NoteProblem): string {
     case 'full': return 'Your notes are full. Your words are still here, so copy them, delete an old note, then add them again.';
     case 'bad-anchor': return 'This note could not be attached to its place. Nothing was changed.';
     case 'not-found': return 'That note is not here any more.';
+    case 'blocked': return NOTES_BLOCKED;
     default: return 'This note could not be saved. Your phone may be full. Your words are still here, so copy them before you leave.';
   }
 }
 
-/** When the stored notes could not be read: nothing is changed, and it says so. */
-export const NOTES_BLOCKED = 'Your notes could not be read on this phone, so nothing was changed. Your notes are untouched.';
 /** When a change could not be written to the phone and was undone. */
 export const NOTES_NOT_SAVED = 'That note could not be saved on this phone. Please try again.';
 
@@ -50,3 +53,10 @@ export const notesLabel = (n: number) => `${n} ${n === 1 ? 'note' : 'notes'}`;
 export const GROW_LABEL = 'Grow into a Diary page';
 export const GROW_DONE_HINT = 'Opens the new page in your Diary.';
 export const GROW_NOTE = 'A Diary page is yours to keep: logging out leaves the pages of your Diary.';
+
+/** "3 notes for “road”", "1 note for “psalms”", "Nothing found for “zzz”": the line over a search of the Notebook. */
+export function notesResultsLine(count: number, query: string): string {
+  const q = shownQuery(query);
+  return count === 0 ? `Nothing found for “${q}”` : `${notesLabel(count)} for “${q}”`;
+}
+export const NOTES_NOTHING_FOUND_HINT = 'Check the spelling, try a shorter word, or clear the search to see all your notes.';
