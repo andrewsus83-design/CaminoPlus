@@ -5,7 +5,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { GRID_COLUMNS, GRID_EDGE, GRID_GAP, LEADING_CELLS, TILE_RATIO, cellOfPost, gridCellRows, gridMetrics, gridRows, postOfCell, shownPosts, type GridCell } from '../gridLayout';
+import { GRID_COLUMNS, GRID_EDGE, GRID_GAP, LEADING_CELLS, TILE_RATIO, cellOfPost, gridCellRows, gridMetrics, gridRows, postOfCell, shownPosts, withoutCard, type GridCell } from '../gridLayout';
 import { SAMPLE_JOURNEY } from '../sampleJourney';
 
 let n = 0;
@@ -186,6 +186,33 @@ check('the screen uses the one gap for the space between rows and between column
   assert.match(src, /shownPosts\(posts, only\)/, 'the filter is the pure one tested above');
   assert.match(src, /key="write" width=\{colW\} height=\{tileH\}/, 'the card is exactly the size of a post tile');
   assert.match(src, /style=\{\{ width: colW, height: tileH, overflow: 'hidden', backgroundColor: c\.sand200 \}\}/, 'and the post tile is as it was');
+});
+
+// ---- another pilgrim's journey: the same grid and viewer, without the card that writes a post (only your own journey has it)
+
+check('withoutCard: the cells of a journey with no card are the posts alone, in full rows from the top left, each keeping its own index', () => {
+  const posts = (rows: GridCell[][]) => rows.map((row) => row.map((cell) => (cell.kind === 'post' ? cell.post : 'card')));
+  assert.deepEqual(withoutCard(gridCellRows(0)), [], 'no post and no card: nothing');
+  assert.deepEqual(posts(withoutCard(gridCellRows(1))), [[0]]);
+  assert.deepEqual(posts(withoutCard(gridCellRows(2))), [[0, 1]], 'with the card the second post would have been alone on the next row');
+  assert.deepEqual(posts(withoutCard(gridCellRows(3))), [[0, 1], [2]]);
+  assert.deepEqual(posts(withoutCard(gridCellRows(5))), [[0, 1], [2, 3], [4]]);
+  for (const count of [0, 1, 2, 3, 4, 7, 30]) {
+    const rows = withoutCard(gridCellRows(count));
+    const flat = rows.flat();
+    assert.ok(flat.every((cell) => cell.kind === 'post'), `${count}: never a card`);
+    assert.deepEqual(flat.map((cell) => (cell as { post: number }).post), Array.from({ length: count }, (_, i) => i), `${count}: every post once, in reading order, at its own index`);
+    assert.ok(rows.every((row, i) => row.length === GRID_COLUMNS || i === rows.length - 1), `${count}: only the last row can be short`);
+    assert.equal(rows.length, Math.ceil(count / GRID_COLUMNS), `${count}: the fewest rows`);
+  }
+});
+
+check('withoutCard follows a destination filter too, and leaves the rows it was given alone', () => {
+  const shown = shownPosts(['a', 'b', 'c', 'd', 'e'].map((id) => ({ id })), new Set(['b', 'd', 'e']));
+  const rows = gridCellRows(shown.length);
+  const before = JSON.stringify(rows);
+  assert.deepEqual(withoutCard(rows).flat().map((cell) => (cell.kind === 'post' ? shown[cell.post].id : 'card')), ['b', 'd', 'e']);
+  assert.equal(JSON.stringify(rows), before, 'the input is not changed');
 });
 
 console.log(`${n} of ${n} passed`);

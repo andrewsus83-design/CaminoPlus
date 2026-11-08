@@ -84,6 +84,17 @@ export function gridCellRows(postCount: number): GridCell[][] {
   }));
 }
 
+/**
+ * The same cells without the card in front. Another pilgrim's journey is their posts and nothing else: only your own journey has the card that writes one.
+ * Every post keeps its index among the posts shown (the viewer opens at that index), and the posts flow into full rows, the first one top left.
+ */
+export function withoutCard(rows: GridCell[][]): GridCell[][] {
+  const posts = rows.flat().filter((cell) => cell.kind === 'post');
+  const out: GridCell[][] = [];
+  for (let i = 0; i < posts.length; i += GRID_COLUMNS) out.push(posts.slice(i, i + GRID_COLUMNS));
+  return out;
+}
+
 /** The posts the grid shows: all of them, or only the ones whose id is in `only` (the destination picked in the highlights), in their own order. */
 export function shownPosts<T extends { id: string }>(posts: readonly T[], only?: ReadonlySet<string> | null): readonly T[] {
   return only ? posts.filter((p) => only.has(p.id)) : posts;

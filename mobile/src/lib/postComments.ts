@@ -11,8 +11,8 @@ export type PostComment = {
   author: { username: string | null; display_name: string | null } | null;
 };
 
-/** A comment as the sheet draws it. `pending`: sent, not confirmed yet. */
-export type SheetComment = { id: string; user: string; text: string; pending?: boolean; mine?: boolean };
+/** A comment as the sheet draws it. `pending`: sent, not confirmed yet. `userId`: who wrote it, so their name can open their profile (a comment that lives only on this phone has none). */
+export type SheetComment = { id: string; user: string; text: string; pending?: boolean; mine?: boolean; userId?: string };
 
 /** The database allows 1 to 1000 characters (post_comments.body). */
 export const COMMENT_MAX = 1000;
@@ -63,5 +63,5 @@ export function toSheetComments(rows: PostComment[], meId: string | null): Sheet
   return rows
     .slice()
     .sort((a, b) => (a.created_at < b.created_at ? -1 : a.created_at > b.created_at ? 1 : 0))
-    .map((c) => ({ id: c.id, user: commentAuthor(c), text: c.body, mine: meId !== null && c.user_id === meId }));
+    .map((c) => ({ id: c.id, user: commentAuthor(c), text: c.body, mine: meId !== null && c.user_id === meId, userId: c.user_id }));
 }
