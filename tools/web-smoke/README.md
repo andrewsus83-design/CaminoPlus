@@ -34,7 +34,7 @@ in light. Offline, the empty account has only the account saved, the Me tab neve
 
 Then the **scenarios** ([scenarios.mjs](scenarios.mjs)), each in light and dark, written the way a person would use the app:
 
-- the tab bar shows Me, Stays, Maps, Discover and Library, and each tab opens; an inactive tab is thin and Light and its icon is drawn as thick as the stem of its label (0.8 of 24 units at 28 px, 0.93 px, within 10 percent of the 0.93 px of Inter Light at 14), the active tab heavier (the numbers of `tokens.tab`);
+- the tab bar shows Me, Stays, Maps, Discover and Library, and each tab opens; an inactive tab is thin and its icon is drawn as thick as the stem of its label (dark mode: Inter Light and 0.8 of 24 units at 28 px, 0.93 px; light mode: Inter Regular and 1.05, 1.225 px against a stem of 1.23 px; within 10 percent), the active tab heavier (the numbers of `tokens.tab`);
 - the gear on Me opens `/settings` (no tab bar there) and Back returns to `/me`, also when Settings was opened from a link;
 - switching light/dark on Settings returns to Settings, and Back goes to Me;
 - Library: its top row is a search field and the Bookmarks button (no title, no diary button); directly under it, before any banner, the two tabs
