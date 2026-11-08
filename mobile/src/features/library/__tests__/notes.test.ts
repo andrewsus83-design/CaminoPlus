@@ -10,9 +10,9 @@ import type { DiaryMedia } from '../../diary/media';
 import type { DiaryPlace } from '../../diary/place';
 import { AVATAR_TINTS } from '../../social/logic';
 import {
-  BLANK_NOTE, BODY_CLAMP_PX, BODY_LINES, BODY_LINE_PX, COMPOSER_PLACEHOLDER, DELETE_FAILED, EMPTY_BUTTON, FALLBACK_NAME, FEED_CHARS, FILTER_EMPTY, FILTER_LABEL, MEDIA_GAP, MEDIA_RATIO,
-  MEDIA_SHOWN_MAX, NOTES_PRIVACY, NOTE_FILTERS, TOUCH_MIN, feedBody, feedState, filterLabel, filterNotes, hasMedia, hasPlace, identity, matchesFilter, mediaPlan, needsMore, noteCounts,
-  noteRow, noteTime, rowLabel, shareText, tileLabel, toggled, type NoteFilter, type NoteLike,
+  BLANK_NOTE, BODY_CLAMP_PX, BODY_LINES, BODY_LINE_PX, COMPOSER_PLACEHOLDER, DELETE_FAILED, EMPTY_BUTTON, FALLBACK_NAME, FEED_CHARS, FILTER_EMPTY, FILTER_LABEL, MAPS_FAILED, MEDIA_GAP, MEDIA_RATIO,
+  MEDIA_SHOWN_MAX, NOTES_PAGE, NOTES_PRIVACY, NOTE_FILTERS, SHARE_FAILED, TOUCH_MIN, feedBody, feedState, filterLabel, filterNotes, hasMedia, hasPlace, identity, matchesFilter, mediaPlan, moreNotesLabel,
+  needsMore, nextLimit, noteCounts, noteRow, noteTime, notesLeft, pageOf, rowLabel, shareText, tileLabel, toggled, type NoteFilter, type NoteLike,
 } from '../notes/timeline';
 
 let n = 0;
@@ -83,7 +83,8 @@ check('the words the owner asked for are exactly these', () => {
   assert.equal(EMPTY_BUTTON, 'Write your first note');
   assert.deepEqual(NOTE_FILTERS, ['all', 'media', 'places']);
   assert.deepEqual(NOTE_FILTERS.map((f) => FILTER_LABEL[f]), ['All', 'Photos and videos', 'Places']);
-  assert.match(DELETE_FAILED, /could not be deleted/);
+  assert.match(DELETE_FAILED.text, /could not be deleted/);
+  for (const m of [DELETE_FAILED, SHARE_FAILED, MAPS_FAILED]) assert.ok(m.title.length > 0 && m.text.length > 0 && !/error|exception|failed/i.test(m.title + m.text), 'calm words, no jargon');
 });
 
 check('what a filter that is empty says is its own: it says what goes there, not that the diary is empty', () => {
@@ -482,6 +483,38 @@ check('the rows that are opened out are a set that is changed by copying: the on
   assert.deepEqual([...two].sort(), ['a', 'b']);
 });
 
+check('a page of notes at a time (in the page of the host): 30, a button for 30 more, never past the end; 2,000 notes take 66 presses', () => {
+  const list = Array.from({ length: 2000 }, (_, i) => i);
+  assert.equal(NOTES_PAGE, 30);
+  assert.deepEqual(pageOf(list, 30), list.slice(0, 30));
+  assert.equal(pageOf(list, 5000), list, 'the very list when it is not longer');
+  assert.equal(pageOf(list, 2000), list);
+  assert.deepEqual(pageOf(list, 0), []);
+  assert.deepEqual(pageOf(list, -4), []);
+  assert.deepEqual(pageOf(list, Number.NaN), []);
+  assert.deepEqual(pageOf(list, 2.9), [0, 1]);
+  assert.equal(notesLeft(2000, 30), 1970);
+  assert.equal(notesLeft(10, 30), 0);
+  assert.equal(notesLeft(10, -5), 10);
+  let limit = NOTES_PAGE;
+  let presses = 0;
+  while (notesLeft(2000, pageOf(list, limit).length) > 0) { const next = nextLimit(limit, 2000); assert.ok(next > limit && next <= 2000); limit = next; presses += 1; }
+  assert.equal(presses, 66);
+  assert.equal(limit, 2000);
+  assert.equal(nextLimit(1990, 2000), 2000);
+  assert.equal(nextLimit(2000, 2000), 2000);
+  assert.equal(nextLimit(30, 0), 0);
+  assert.equal(moreNotesLabel(1970), 'Show 30 more notes');
+  assert.equal(moreNotesLabel(30), 'Show 30 more notes');
+  assert.equal(moreNotesLabel(12), 'Show 12 more notes');
+  assert.equal(moreNotesLabel(1), 'Show 1 more note');
+  for (let total = 0; total < 200; total += 7) {
+    let l = NOTES_PAGE;
+    for (let k = 0; k < 20 && notesLeft(total, pageOf(list.slice(0, total), l).length) > 0; k++) l = nextLimit(l, total);
+    assert.equal(pageOf(list.slice(0, total), l).length, total, `${total} notes: all are reached by the button`);
+  }
+});
+
 check('a thing to touch is at least 44 pixels', () => {
   assert.ok(TOUCH_MIN >= 44);
 });
@@ -503,20 +536,26 @@ check('the Notes tab is the files this test expects, so a new one is looked at (
   assert.deepEqual(files, ['NoteMedia.tsx', 'NoteMenu.tsx', 'NoteRow.tsx', 'NotesHeader.tsx', 'NotesTab.tsx', 'timeline.ts']);
 });
 
-check('the shell gets what was agreed: a named export NotesTab, with no props, and no gold pen of its own (the shell draws it)', () => {
+check('the shell gets what was agreed: a named export NotesTab that works with no props (in the page of the host), one optional prop for a list of its own, and no gold pen (the shell draws it)', () => {
   const src = code('NotesTab.tsx');
-  assert.match(src, /export function NotesTab\(\) \{/);
+  assert.match(src, /export function NotesTab\(\{ ownScroll = false \}: \{ ownScroll\?: boolean \}\) \{/);
   for (const f of files) assert.doesNotMatch(code(f), /\bFab\b/, `${f}: the gold pen belongs to the shell`);
   assert.doesNotMatch(src, /\bScreen\b/, 'the tab does not bring a screen of its own: it fills what the shell gives it');
 });
 
-check('the tab owns its scroll, and it is a virtualised list: a FlatList, never the notes mapped into a view', () => {
+check('with a list of its own the tab is a virtualised list: a FlatList of every note, only the rows on screen drawn; in the page of the host the notes come a page at a time, never all of them mapped into a view', () => {
   const src = code('NotesTab.tsx');
   assert.match(src, /<FlatList\b/);
+  assert.match(src, /data=\{shown\}/, 'the list of its own has every note, and draws the ones on screen');
   assert.match(src, /keyExtractor=\{keyOf\}/);
   assert.match(src, /initialNumToRender=\{6\}/);
   assert.match(src, /windowSize=\{7\}/);
-  assert.doesNotMatch(src, /entries\.map\(|data\.map\(|shown\.map\(/, 'no row is drawn by mapping over the notes');
+  assert.doesNotMatch(src, /entries\.map\(|data\.map\(|shown\.map\(/, 'no row is drawn by mapping over all the notes');
+  assert.match(src, /const drawn = useMemo\(\(\) => \(ownScroll \? shown : pageOf\(shown, limit\)\), \[ownScroll, shown, limit\]\);/, 'what is mapped is one page of them');
+  assert.match(src, /\{drawn\.map\(\(e, i\) => \(/);
+  assert.match(src, /if \(!ownScroll\) \{\s*return \(\s*<View style=\{\{ marginHorizontal: -layout\.screenMargin, backgroundColor: role\.bg \}\}>/, 'in the page of the host it runs from edge to edge: the margin of the Screen it sits in');
+  assert.match(src, /<Pill variant="ghost" label=\{moreNotesLabel\(left\)\} onPress=\{\(\) => setLimit\(\(n\) => nextLimit\(n, shown\.length\)\)\} \/>/, 'and a button brings the next page');
+  assert.match(src, /const chooseFilter = useCallback\(\(f: NoteFilter\) => \{ setFilter\(f\); setLimit\(NOTES_PAGE\); \}, \[\]\);/, 'another filter starts from its first page');
   assert.match(src, /keyboardShouldPersistTaps="handled"/, 'a tap on a note works while the keyboard of the search field is up');
   assert.match(src, /keyboardDismissMode="on-drag"/);
   assert.match(src, /<RefreshControl\b[^>]*refreshing=\{refreshing\}[^>]*onRefresh=\{refresh\}/, 'pull to refresh');
@@ -536,7 +575,7 @@ check('Delete is the diary\'s own flow: the same question first (confirmDelete, 
   const src = code('NotesTab.tsx');
   assert.match(src, /import \{ confirmDelete \} from '@\/features\/diary\/confirm';/);
   assert.match(src, /confirmDelete\(pageTitle\(e\), async \(\) => \{[\s\S]*?await remove\(e\.id\)[\s\S]*?\}, metaLine\(e\) !== ''\)/);
-  assert.match(src, /DELETE_FAILED/);
+  assert.match(src, /const ok = await remove\(e\.id\);\s*if \(!ok\) tell\(DELETE_FAILED\);/, 'a delete that did not go through says so');
   const menu = code('NoteMenu.tsx');
   assert.doesNotMatch(menu, /remove\(|confirmDelete|deleteEntry/, 'the menu only says which one was chosen; it deletes nothing itself');
   assert.match(read('src/features/diary/confirm.ts'), /Its photos, videos and place are deleted with it\./);
@@ -549,6 +588,7 @@ check('Share gives the share sheet the text of the note and nothing else, and co
   assert.doesNotMatch(src, /record:/);
   assert.doesNotMatch(src, /Share\.share\(\{[^}]*\b(url|title)\b/, 'only the message: no link, no title');
   assert.match(src, /if \(!text\) return;/, 'a note with no text has nothing to share');
+  assert.match(src, /if \(res\.outcome === 'failed'\) tell\(SHARE_FAILED\);/, 'a share that failed says so; one that was closed says nothing');
   assert.match(code('NoteRow.tsx'), /row\.share !== ''/, 'and the button is only there when there is text');
 });
 
@@ -562,6 +602,14 @@ check('a tap on a row opens the page (Read view), the composer and its shortcuts
   assert.match(header, /label="Write a new note, then add a place"/, 'the labels say what really happens: the page opens, the person adds the photo or the place there');
   assert.match(header, /<AppText[^>]*>\{COMPOSER_PLACEHOLDER\}<\/AppText>/);
   assert.match(header, /\{NOTES_PRIVACY\}/);
+});
+
+check('a failure is told in the system dialog (like the question before a delete), seen wherever the list is scrolled to, and a tap on a row, and Edit, open the page', () => {
+  const tab = code('NotesTab.tsx');
+  assert.match(tab, /function tell\(m: Telling\) \{[\s\S]*?window\.alert\(`\$\{m\.title\}\\n\\n\$\{m\.text\}`\)[\s\S]*?Alert\.alert\(m\.title, m\.text\);/);
+  assert.doesNotMatch(tab, /FormMessage|position: 'absolute'/, 'no message that floats at the top of a list that may be scrolled away from it');
+  assert.match(code('NoteRow.tsx'), /onPress=\{\(\) => actions\.open\(entry\.id\)\}/, 'a tap on the row opens the page');
+  assert.match(tab, /edit: open,/, 'Edit opens the page as well: the editor is not changed, so it is the page that opens, and Edit is on it');
 });
 
 check('the filter row is tabs: a tablist, each one a tab with its selected state and a label that holds the count', () => {
@@ -708,8 +756,7 @@ check('the place is a chip that opens the maps app through the diary\'s own devi
   const row = code('NoteRow.tsx');
   assert.match(row, /accessibilityLabel=\{`Place: \$\{row\.placeText\}\. Opens it in your maps app`\}/);
   const tab = code('NotesTab.tsx');
-  assert.match(tab, /device\.openMaps\(/);
-  assert.match(tab, /MAPS_FAILED/);
+  assert.match(tab, /if \(!\(await device\.openMaps\(p\)\)\) tell\(MAPS_FAILED\);/);
 });
 
 check('the text of a note is the diary\'s RichText, clamped to eight lines by its measured height, and opened out with "Show more", which says what it does', () => {

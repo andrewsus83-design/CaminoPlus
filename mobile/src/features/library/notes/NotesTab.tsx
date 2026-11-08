@@ -1,11 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, AppState, FlatList, RefreshControl, Share, View, type ListRenderItemInfo } from 'react-native';
+import { ActivityIndicator, Alert, AppState, FlatList, Platform, RefreshControl, Share, View, type ListRenderItemInfo } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
 import { Pill } from '@/components/Pill';
-import { FormMessage } from '@/components/auth/Field';
 import { confirmDelete } from '@/features/diary/confirm';
 import { device } from '@/features/diary/device';
 import { MediaViewer } from '@/features/diary/MediaTiles';
@@ -21,18 +20,23 @@ import { NoteMenu } from './NoteMenu';
 import { NoteRow, type NoteActions, type NoteWho } from './NoteRow';
 import { NotesHeader } from './NotesHeader';
 import {
-  DELETE_FAILED, EMPTY_BUTTON, EMPTY_TEXT, EMPTY_TITLE, FILTER_EMPTY, LOADING_LABEL, MAPS_FAILED, SHARE_FAILED, SHOW_ALL,
-  feedState, filterNotes, identity, noteCounts, toggled, type NoteFilter,
+  DELETE_FAILED, EMPTY_BUTTON, EMPTY_TEXT, EMPTY_TITLE, FILTER_EMPTY, LOADING_LABEL, MAPS_FAILED, NOTES_PAGE, SHARE_FAILED, SHOW_ALL,
+  feedState, filterNotes, identity, moreNotesLabel, nextLimit, noteCounts, notesLeft, pageOf, toggled, type NoteFilter, type Telling,
 } from './timeline';
 
 // The Library's Notes tab: the pages of the diary as a feed, like a timeline. They are the same pages as My diary (features/diary), private,
 // only on this phone: this tab reads them through useDiary and deletes through the same call; it writes nothing and sends nothing anywhere.
 // The only thing that can leave is the words of a note, when the person taps Share and chooses where in the system's share sheet.
 //
-// HOW THE SHELL HOSTS IT: <NotesTab /> owns the scroll of the screen (it is a virtualised list, so a diary of 2,000 notes draws only the rows that
-// are on screen, and pull to refresh belongs to it). Mount it in a box that has a height of its own (flex: 1 under the search row and the tab
-// strip, not inside a ScrollView) and that is as wide as the screen: the rows run from edge to edge and are parted by a hairline. It leaves room
-// at the bottom for the floating tab bar and for the gold pen, which the shell draws (this tab draws no pen of its own).
+// HOW THE SHELL HOSTS IT. Two ways, one component:
+//   <NotesTab />            in the page that holds it: inside the Library screen's own scroll view, right under the tab strip. The notes are drawn
+//                           a page at a time (30, then a button for 30 more), so a diary of 2,000 notes never draws them all at once. It runs from
+//                           edge to edge (a margin of -layout.screenMargin: the Screen's own), and leaves a little room for the gold pen. No pull to
+//                           refresh here (that belongs to the scroll view); the list is read again whenever the tab comes back into view.
+//   <NotesTab ownScroll />  the tab is the scroller: a virtualised list that draws only the rows on screen, with pull to refresh and the search row
+//                           and the tab strip standing still above it. Mount it in a box that has a height of its own (flex: 1 below them, never
+//                           inside a ScrollView) and as wide as the screen. It leaves room at the bottom for the floating tab bar and the gold pen.
+// The gold pen is the shell's: this tab draws none.
 
 const keyOf = (e: DiaryEntry) => e.id;
 
@@ -53,7 +57,17 @@ function useNow(): [Date, () => void] {
   return [now, tick];
 }
 
-type Notice = { tone: 'error' | 'info'; text: string };
+/**
+ * Tells the person that something did not work, in the system's own dialog (like the question before a delete): it is seen wherever the list
+ * has been scrolled to, and in either way of hosting the tab. The browser's alert on the web.
+ */
+function tell(m: Telling) {
+  if (Platform.OS === 'web') {
+    if (typeof window !== 'undefined' && typeof window.alert === 'function') window.alert(`${m.title}\n\n${m.text}`);
+    return;
+  }
+  Alert.alert(m.title, m.text);
+}
 
 /** The friendly page the feed shows when there is nothing to list: the diary has no note, or the filter holds none. */
 function Empty({ title, text, button, ghost, onPress }: { title: string; text: string; button: string; ghost?: boolean; onPress: () => void }) {
@@ -71,7 +85,7 @@ function Empty({ title, text, button, ghost, onPress }: { title: string; text: s
   );
 }
 
-export function NotesTab() {
+export function NotesTab({ ownScroll = false }: { ownScroll?: boolean }) {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { profile } = useAuth();
@@ -79,24 +93,20 @@ export function NotesTab() {
   const owner = uid ?? '';
   const [now, tick] = useNow();
   const [filter, setFilter] = useState<NoteFilter>('all');
+  const [limit, setLimit] = useState(NOTES_PAGE);
   const [opened, setOpened] = useState<ReadonlySet<string>>(() => new Set());
   const [menuFor, setMenuFor] = useState<DiaryEntry | null>(null);
   const [viewing, setViewing] = useState<{ id: string; start: number } | null>(null);
-  const [notice, setNotice] = useState<Notice | null>(null);
   const [refreshing, setRefreshing] = useState(false);
 
   const who = useMemo<NoteWho>(() => ({ ...identity(profile), photo: profile?.avatar_url ?? null, seed: uid ?? 'me' }), [profile, uid]);
   const counts = useMemo(() => noteCounts(entries), [entries]);
   const shown = useMemo(() => filterNotes(entries, filter), [entries, filter]);
+  // In the page of the host the notes come a page at a time; in a list of its own all of them are in it, and only those on screen are drawn.
+  const drawn = useMemo(() => (ownScroll ? shown : pageOf(shown, limit)), [ownScroll, shown, limit]);
+  const left = notesLeft(shown.length, drawn.length);
   const state = feedState({ ready, total: entries.length, shown: shown.length });
-
-  // A message (a delete that did not go through, a share that failed) floats over the list, so it is seen wherever the person has scrolled to.
-  const say = useCallback((n: Notice | null) => setNotice(n), []);
-  useEffect(() => {
-    if (!notice) return undefined;
-    const t = setTimeout(() => setNotice(null), 10_000);
-    return () => clearTimeout(t);
-  }, [notice]);
+  const chooseFilter = useCallback((f: NoteFilter) => { setFilter(f); setLimit(NOTES_PAGE); }, []);
 
   const write = useCallback(() => router.push('/diary/new'), [router]);
   const open = useCallback((id: string) => router.push(`/diary/${id}`), [router]);
@@ -104,20 +114,20 @@ export function NotesTab() {
   const askDelete = useCallback((e: DiaryEntry) => {
     confirmDelete(pageTitle(e), async () => {
       const ok = await remove(e.id);
-      say(ok ? null : { tone: 'error', text: DELETE_FAILED });
+      if (!ok) tell(DELETE_FAILED);
     }, metaLine(e) !== '');
-  }, [remove, say]);
+  }, [remove]);
 
   const share = useCallback(async (text: string) => {
     if (!text) return;
     // No `record`: nothing is counted and nothing is sent to a server. The share sheet is the phone's; what goes where is the person's choice.
     const res = await shareAndRecord({ share: () => Share.share({ message: text }) });
-    if (res.outcome === 'failed') say({ tone: 'error', text: SHARE_FAILED });
-  }, [say]);
+    if (res.outcome === 'failed') tell(SHARE_FAILED);
+  }, []);
 
   const openPlace = useCallback(async (p: DiaryPlace) => {
-    if (!(await device.openMaps(p))) say({ tone: 'info', text: MAPS_FAILED });
-  }, [say]);
+    if (!(await device.openMaps(p))) tell(MAPS_FAILED);
+  }, []);
 
   const actions = useMemo<NoteActions>(() => ({
     open,
@@ -149,20 +159,49 @@ export function NotesTab() {
   useEffect(() => { if (viewing && viewed.length === 0) setViewing(null); }, [viewing, viewed.length]);
 
   const extra = useMemo(() => ({ owner, now, who, opened, actions }), [owner, now, who, opened, actions]);
-  const renderItem = useCallback(({ item }: ListRenderItemInfo<DiaryEntry>) => (
+  const renderRow = useCallback((item: DiaryEntry) => (
     <NoteRow entry={item} uid={owner} now={now} who={who} open={opened.has(item.id)} actions={actions} />
   ), [owner, now, who, opened, actions]);
+  const renderItem = useCallback(({ item }: ListRenderItemInfo<DiaryEntry>) => renderRow(item), [renderRow]);
 
   const header = (
-    <NotesHeader name={who.name} photo={who.photo} seed={who.seed} onWrite={write} filter={filter} counts={counts} onFilter={setFilter} />
+    <NotesHeader name={who.name} photo={who.photo} seed={who.seed} onWrite={write} filter={filter} counts={counts} onFilter={chooseFilter} />
   );
   const empty = state === 'loading' ? (
     <ActivityIndicator accessibilityLabel={LOADING_LABEL} color={role.action} style={{ marginTop: 40 }} />
   ) : state === 'empty' ? (
     <Empty title={EMPTY_TITLE} text={EMPTY_TEXT} button={EMPTY_BUTTON} onPress={write} />
   ) : state === 'none-for-filter' && filter !== 'all' ? (
-    <Empty title={FILTER_EMPTY[filter].title} text={FILTER_EMPTY[filter].text} button={SHOW_ALL} ghost onPress={() => setFilter('all')} />
+    <Empty title={FILTER_EMPTY[filter].title} text={FILTER_EMPTY[filter].text} button={SHOW_ALL} ghost onPress={() => chooseFilter('all')} />
   ) : undefined;
+  const overlays = (
+    <>
+      {menuFor !== null && <NoteMenu title={pageTitle(menuFor)} onClose={() => setMenuFor(null)} onEdit={() => chooseEdit(menuFor)} onDelete={() => chooseDelete(menuFor)} />}
+      {viewing !== null && viewed.length > 0 && <MediaViewer uid={owner} items={viewed} start={viewing.start} onClose={() => setViewing(null)} />}
+    </>
+  );
+
+  if (!ownScroll) {
+    return (
+      <View style={{ marginHorizontal: -layout.screenMargin, backgroundColor: role.bg }}>
+        {header}
+        {empty}
+        {drawn.map((e, i) => (
+          <View key={e.id}>
+            {i > 0 && <Separator />}
+            {renderRow(e)}
+          </View>
+        ))}
+        {left > 0 && (
+          <View style={{ paddingHorizontal: layout.screenMargin, paddingTop: 16 }}>
+            <Pill variant="ghost" label={moreNotesLabel(left)} onPress={() => setLimit((n) => nextLimit(n, shown.length))} />
+          </View>
+        )}
+        <View style={{ height: 16 }} />
+        {overlays}
+      </View>
+    );
+  }
 
   return (
     <View style={{ flex: 1, backgroundColor: role.bg }}>
@@ -183,13 +222,7 @@ export function NotesTab() {
         contentContainerStyle={{ paddingBottom: layout.tabbarHeight + insets.bottom + 96 }}
         style={{ flex: 1 }}
       />
-      {notice !== null && (
-        <View pointerEvents="none" accessibilityLiveRegion="polite" style={{ position: 'absolute', left: layout.screenMargin, right: layout.screenMargin, top: 8 }}>
-          <FormMessage tone={notice.tone}>{notice.text}</FormMessage>
-        </View>
-      )}
-      {menuFor !== null && <NoteMenu title={pageTitle(menuFor)} onClose={() => setMenuFor(null)} onEdit={() => chooseEdit(menuFor)} onDelete={() => chooseDelete(menuFor)} />}
-      {viewing !== null && viewed.length > 0 && <MediaViewer uid={owner} items={viewed} start={viewing.start} onClose={() => setViewing(null)} />}
+      {overlays}
     </View>
   );
 }
