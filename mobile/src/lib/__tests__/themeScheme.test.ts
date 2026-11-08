@@ -197,8 +197,10 @@ check('the tab bar draws the active tab in role.tabActive and the inactive ones 
   assert.doesNotMatch(src, /#[0-9a-fA-F]{3,8}\b|rgba?\(/, 'no colour of its own in the tab bar: a role from design/tokens.json');
 });
 
-check('the inactive tabs are thinner and lighter than the active one in weight as well as colour: a thin stroke and a Light label against a thick stroke and a SemiBold or Bold label', () => {
+check('the inactive tabs are thinner and lighter than the active one in weight as well as colour: a thin stroke and a Light (dark) or Regular (light) label against a thick stroke and a SemiBold or Bold label', () => {
   // The owner asked (2026-11-08) for inactive tabs that are lighter and more transparent in light and dark mode; colour alone did not say it all.
+  // Then the owner saw them in light mode as far too thin next to dark mode: the ink is the same in both modes, the eye is not (dark on light looks
+  // thinner), so light mode is one step heavier, as the active tab is: Regular, and a stroke as thick as the stem of Regular.
   const src = read(join('src', 'components', 'TabBar.tsx'));
   assert.match(src, /const weight = focused \? tabActiveWeight : tabInactiveWeight;/, 'the weight of a tab is the one of tokens.tab for its state');
   assert.match(src, /strokeWidth=\{weight\.stroke\}/, 'the icon is drawn as heavy as tokens.tab says (the inactive ones: inactiveStroke)');
@@ -206,13 +208,15 @@ check('the inactive tabs are thinner and lighter than the active one in weight a
   assert.doesNotMatch(src, /strokeWidth=\{[^}]*\b\d+(\.\d+)?\}/, 'no stroke written into the tab bar: it is in tokens.tab');
   assert.equal(fonts.bodyLight, 'Inter_300Light');
   const t = tokens.tab as { activeStroke: Record<string, number>; inactiveStroke: Record<string, number>; inactiveLabelWeight: Record<string, number> };
+  const inactiveFont = { light: fonts.body, dark: fonts.bodyLight } as const;
   for (const scheme of ['light', 'dark'] as const) {
     applyScheme(scheme);
     assert.equal(tabInactiveWeight.stroke, t.inactiveStroke[scheme], `${scheme}: the inactive stroke is the token`);
-    assert.equal(tabInactiveWeight.font, fonts.bodyLight, `${scheme}: the inactive label is Inter Light (the owner wants the inactive tabs thin and Light)`);
-    assert.equal(t.inactiveLabelWeight[scheme], 300);
+    assert.equal(tabInactiveWeight.font, inactiveFont[scheme], `${scheme}: the inactive label is Inter Light in dark mode and Inter Regular in light mode`);
+    assert.equal(t.inactiveLabelWeight[scheme], scheme === 'light' ? 400 : 300);
     assert.ok(tabActiveWeight.stroke >= 1.5 * tabInactiveWeight.stroke, `${scheme}: the active icon is much heavier than the inactive one`);
   }
+  assert.ok(t.inactiveStroke.light > t.inactiveStroke.dark && t.inactiveStroke.light < 1.3, 'light mode: heavier than dark mode, still thinner than the 1.3 the owner found too thick');
   applyScheme('light');
   const layoutSrc = read(join('app', '_layout.tsx'));
   assert.match(layoutSrc, /import \{[^}]*\bInter_300Light\b[^}]*\} from '@expo-google-fonts\/inter'/, 'Inter Light is imported');
@@ -251,9 +255,9 @@ check('the inactive icon is exactly as thin as its label: the stroke it is drawn
       const off = strokePx / stemPx - 1;
       measured.push(`${scheme} ${what}: stem ${stemPx.toFixed(3)} px, stroke ${strokePx.toFixed(3)} px`);
       assert.ok(Math.abs(off) <= 0.1, `${scheme}: the icon is drawn ${strokePx.toFixed(3)} px thick and the ${what} stem of its label is ${stemPx.toFixed(3)} px (${(off * 100).toFixed(1)} percent): they must be within 10 percent, or one looks thicker than the other`);
-      // and the old stroke would have failed it: 1.3 is 1.517 px, more than 1.5 times the stem
+      // and the old stroke would have failed it: 1.3 is 1.517 px, more than 1.5 times the stem of Light (dark mode) and 1.17 times the stem of Regular (light)
       const old = (1.3 * iconSize) / box;
-      assert.ok(old / stemPx > 1.5, 'the stroke of 1.3 that the tab bar used to draw is a failure of this check');
+      assert.ok(Math.abs(old / stemPx - 1) > 0.1, 'the stroke of 1.3 that the tab bar used to draw is a failure of this check');
     }
   }
   applyScheme('light');
