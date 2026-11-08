@@ -23,6 +23,7 @@ import { BIBLE_SCENARIOS } from './bible.scenarios.mjs';
 import { BOOKS_SCENARIOS, CATALOG, COVER_LABEL } from './books.scenarios.mjs';
 import { CONTINUE_SCENARIOS } from './continue.scenarios.mjs';
 import { ME_SCENARIOS } from './me.scenarios.mjs';
+import { PILGRIM_SCENARIOS } from './pilgrim.scenarios.mjs';
 
 /** design/tokens.json: the weights of the tabs of the tab bar (section tab) are read from it, as the app reads them. */
 const TAB_TOKENS = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'design', 'tokens.json'), 'utf8')).tab;
@@ -277,6 +278,7 @@ export const SCENARIOS = [
     },
   },
   ...ME_SCENARIOS,
+  ...PILGRIM_SCENARIOS,
   {
     name: 'Notes: a page is a draft until it is published. The marks are inside the text box; Read (a third) and Publish (two thirds) are one row at the bottom; Save draft is at the top right and keeps a note with a Draft tag; Publish takes the tag away',
     persona: 'in',

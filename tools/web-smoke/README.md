@@ -101,6 +101,17 @@ Then the **scenarios** ([scenarios.mjs](scenarios.mjs)), each in light and dark,
   row; Read is a third and Publish two thirds of one row at the bottom (margin to margin, at least 48 high); Read turns into Edit in the same place; Save draft
   goes back to the feed with a Draft tag on the note; opened again the draft is read, with Edit and Publish; Publish takes the tag away; a published note that
   is read has Edit alone across the row, and written it has Read and Done and no Save draft;
+- Pilgrim profile ([pilgrim.scenarios.mjs](pilgrim.scenarios.mjs), the profile of ANOTHER pilgrim and their journey, `/pilgrim/<id>`): a friend opens from the friends list (the picture and
+  the name; the round chat button and the three dots stay on the row) with Back at the left and the three dots at the right (both at least 48), the card (name, @username, what they wrote, km,
+  posts, stamps), Message (56 high) and their journey as the grid of Me with NO card that writes a post (the first tile top left and the second on its row, 9:16, 2 px apart); a tile opens the
+  viewer with the action rail (love, bookmark, comments, share) and their name beside the close button, which closes it; Message opens the chat, and Back returns to the profile and then to the
+  list. **Nothing private**: no tab, no text or button named Notes, Plan or Health and no write card on the profile or in its viewer (the check is proved to fail on Me, where they are). The share
+  button of the viewer sends the invitation to the app, never their words, and counts nothing. The three dots: Unfriend, Report (with the reasons of the chat) and Block for a friend, no Unfriend
+  for anybody else; blocking makes the profile "not available" at once. A stranger found in the Find tab: Add friend (the request goes out, the button says Requested), and the journey says
+  "Journeys shared with friends are not shown here". A private stranger is a minimal card: the name and the button, none of the numbers or the words they wrote, no journey. An id nobody has, a link
+  that is not an id: one calm card, "This profile is not available", with Go to Friends; your own id goes to Me. With no signal it says you are offline, with Try again. The name of the author
+  of a comment opens that pilgrim (here Lucas, whose request is waiting: Accept and Decline), and the name in the header of a direct chat opens the friend. The route sweep draws the profile of
+  the friend in `routes.mjs` (SAMPLE_OVERRIDES); the people are in fixtures.mjs (Hannah the friend with three posts, Lucas with a request, Marta a public stranger, Ines a private one);
 - Stays lists the stays of the stage and one opens with its details;
 - logging out from Settings lands on Welcome;
 - launching the app lands on Welcome (signed out), Onboarding (signed in, no journey) or Me;
@@ -225,6 +236,7 @@ Chromium; a test checks they agree). Bump both on purpose, with the tests looked
 | [plan.mjs](plan.mjs) | which checks exist (route x state x scheme x mode, then the scenarios), the redirect list |
 | [scenarios.mjs](scenarios.mjs) | the walks a person does |
 | [me.scenarios.mjs](me.scenarios.mjs) | the walks of Me: the header with the gear alone, the chat button and where it opens, the card of Journey (also in the sample journey), the card of Notes |
+| [pilgrim.scenarios.mjs](pilgrim.scenarios.mjs) | the walks of the profile of another pilgrim: a friend, a stranger, a private one, one that is not there, no signal, the name of a comment author, and that nothing private is on it |
 | [bible.scenarios.mjs](bible.scenarios.mjs) | the walks of the Bible tab and the reader (kept apart so the other walks stay short) |
 | [books.scenarios.mjs](books.scenarios.mjs) | the walks of the Books tab: the covers, a book page, the reader, the place kept on the phone, the notice of each kind |
 | [continue.scenarios.mjs](continue.scenarios.mjs) | the walks of the Continue reading bar above the tab bar of the Library: where it sits, closing it, the most recent place, a mark that does not read |
