@@ -3,10 +3,10 @@
 //
 // The tab bar is Me, Stays, Maps, Discover, Library. Settings is not a tab: it is a screen of its own, opened from the
 // gear at the top right of Me. Library has no title: its top row is a search field and the round Bookmarks button in the corner
-// (the size of Me's bell and gear); directly under it the two tabs Bible and Books, then the banner of the tab (both have one). On Bible three
+// (the size of Me's gear); directly under it the two tabs Bible and Books, then the banner of the tab (both have one). On Bible three
 // choices sit in the page under the compact banner (Old Testament, Deuterocanon, New Testament, a segmented pill) and the books of that part are
-// square tiles. The diary is not in the Library: it is the first sub-tab of Me (Notes, Journey, Plan, Health), and the one gold pen of Me follows
-// the sub-tab. These checks fail when someone brings a tab back without its icon (the tab bar would crash on it), when a route file and the tab
+// compact tiles, two in a row. The diary is not in the Library: it is the first sub-tab of Me (Notes, Journey, Plan, Health), and the one gold button of Me is the chat
+// button, the same on every sub-tab (it opens the inbox; the bell is gone, the header keeps only the gear). These checks fail when someone brings a tab back without its icon (the tab bar would crash on it), when a route file and the tab
 // list disagree, when a link still points at the old Settings tab, or when the Library or Me drift from the design page.
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
@@ -16,13 +16,21 @@ import { BOOK_CATALOG } from '../../features/library/books/catalog';
 import { shelves } from '../../features/library/books/copy';
 import { coverLabel } from '../../features/library/books/cover';
 import { BIBLE_SOURCE_LINE, LIBRARY_TABS, ROW_TABS } from '../../features/library/sample';
-import { ME_FAB, ME_TABS } from '../../features/me/tabs';
+import { ME_FAB } from '../../features/me/tabs';
 
 let n = 0;
 const check = (name: string, fn: () => void) => { fn(); n += 1; console.log(`ok   ${name}`); };
 const root = process.cwd(); // npm test runs from mobile/
 const read = (p: string) => readFileSync(join(root, p), 'utf8');
 const exists = (p: string) => existsSync(join(root, p));
+/** One phone of the design page: from its label to the next phone's label, and nothing of the phones around it. */
+const designPhone = (label: string): string => {
+  const design = readFileSync(join(root, '..', 'design', 'index.html'), 'utf8');
+  const start = design.indexOf(`<p class="phone-label"><b>${label}</b>`);
+  assert.ok(start > 0, `the design page has no phone "${label}"`);
+  const next = design.indexOf('<p class="phone-label">', start + 10);
+  return design.slice(start, next > 0 ? next : undefined);
+};
 
 function sources(dir: string): string[] {
   const out: string[] = [];
@@ -93,17 +101,18 @@ check('Settings is a screen of its own, not a tab, and the old tab route is gone
 check('Settings has Back, light/dark and log out, and keeps no room for a tab bar it does not have', () => {
   const src = read(join('app', 'settings.tsx'));
   assert.match(src, /<Screen tabBar=\{false\}>/);
-  assert.match(src, /name="back"/);
+  assert.match(src, /<BackButton fallback="\/me" \/>/);
   assert.match(src, /<ThemeToggle \/>/);
   assert.match(src, /<LogoutButton \/>/);
   assert.match(read(join('src', 'components', 'Screen.tsx')), /tabBar = true/);
 });
 
-check('Me opens Settings from a gear at the top right: after the inbox bell, in the same header row', () => {
+check('Me opens Settings from a gear at the top right, the only button there: the inbox is the chat button at the bottom right, and there is no bell in the header', () => {
   const src = read(join('app', '(tabs)', 'me.tsx'));
-  const bell = src.indexOf('<IconButton name="bell"');
   const gear = src.indexOf('<IconButton name="settings"');
-  assert.ok(bell > 0 && gear > bell, 'the gear comes after the bell, so it is the right-most button');
+  assert.ok(gear > 0, 'the gear is there');
+  assert.doesNotMatch(src, /<IconButton name="bell"/, 'the bell is gone: its job moved to the chat button');
+  assert.equal((src.match(/<IconButton\b/g) ?? []).length, 1, 'the gear is the only IconButton of Me: nothing else sits at the top right');
   assert.match(src.slice(gear, gear + 200), /router\.push\('\/settings'\)/);
   assert.match(src.slice(gear, gear + 200), /label="Settings"/);
 });
@@ -114,8 +123,7 @@ check('the My Camino card stays on Me, with its Change button, in the app and in
   assert.match(me, /My Camino/);
   assert.match(me, /<AppText variant="label" color=\{role\.onHighlight\}>Change<\/AppText>/);
   assert.match(me, /router\.push\('\/change-camino'\)/);
-  const design = readFileSync(join(root, '..', 'design', 'index.html'), 'utf8');
-  const phone = design.slice(design.indexOf('<b>Me · Journey</b>'), design.indexOf('<b>Me · Write · Pick photos</b>'));
+  const phone = designPhone('Me · Journey'); // exactly that phone: Me · Journey, grid, after it, has its own copy of the card and its own handwritten note
   assert.ok(phone.length > 1000, 'the Me · Journey phone was not found in design/index.html');
   assert.match(phone, />My Camino</, 'the design page lost the My Camino card');
   assert.match(phone, />Change</, 'the design page lost the Change button');
@@ -127,8 +135,7 @@ check('"My Camino" on the card is set in Fraunces, the brand title font, in the 
   assert.match(line, /variant="h4"/, 'the My Camino label is not an h4 (Fraunces 600) AppText');
   assert.doesNotMatch(line, /textTransform|fontFamily/, 'the My Camino label carries a font of its own');
   assert.match(read(join('src', 'theme', 'index.ts')), /title: 'Fraunces_600SemiBold'/);
-  const design = readFileSync(join(root, '..', 'design', 'index.html'), 'utf8');
-  const phone = design.slice(design.indexOf('<b>Me · Journey</b>'), design.indexOf('<b>Me · Write · Pick photos</b>'));
+  const phone = designPhone('Me · Journey'); // exactly that phone: Me · Journey, grid, after it, has its own copy of the card and its own handwritten note
   assert.match(phone, /font-family:var\(--cp-font-title\);[^"]*">My Camino</, 'the design card label is not Fraunces');
 });
 
@@ -141,11 +148,10 @@ check('Buen Camino! is Caveat Bold, as the brand design system says: the accent 
   }
   assert.match(read(join('src', 'theme', 'index.ts')), /accent: 'Caveat_700Bold'/);
   // design page: the card uses the accent font at weight 700, and the phone has no second Caveat (brand: max one per design)
-  const design = readFileSync(join(root, '..', 'design', 'index.html'), 'utf8');
-  const phone = design.slice(design.indexOf('<b>Me · Journey</b>'), design.indexOf('<b>Me · Write · Pick photos</b>'));
+  const phone = designPhone('Me · Journey'); // exactly that phone: Me · Journey, grid, after it, has its own copy of the card and its own handwritten note
   assert.match(phone, /font-family:var\(--cp-font-accent\);font-weight:700;[^"]*">Buen Camino!</, 'the design card is not Caveat Bold');
   assert.equal((phone.match(/--cp-font-accent/g) ?? []).length, 1, 'more than one Caveat note on the Me phone');
-  assert.match(design, /--cp-font-accent|tokens\.css/);
+  assert.match(readFileSync(join(root, '..', 'design', 'index.html'), 'utf8'), /--cp-font-accent|tokens\.css/);
 });
 
 check('after a light/dark switch the app returns to Settings with Me underneath, so Back still works', () => {
@@ -153,20 +159,15 @@ check('after a light/dark switch the app returns to Settings with Me underneath,
   assert.match(layout, /consumeReturnToSettings\(\)\) return;\n\s+setTimeout\(\(\) => \{ try \{ router\.replace\('\/me'\); router\.push\('\/settings'\); \} catch/);
 });
 
-check('one Fab for every floating gold button, and Me draws exactly one at a time: a note on Notes, a journey post on Journey, none on Plan and Health; the Library has none; both sit just above the tab bar', () => {
+check('one Fab for every floating gold button, and Me draws exactly one, the chat button, on every sub-tab (it opens the inbox); the Library has none; it sits just above the tab bar', () => {
   const fab = read(join('src', 'components', 'Fab.tsx'));
   const bar = read(join('src', 'components', 'TabBar.tsx'));
   const me = read(join('app', '(tabs)', 'me.tsx'));
   assert.equal((me.match(/<Fab\b/g) ?? []).length, 1, 'one Fab element in the whole of Me: never two at once');
-  assert.match(me, /const fab = ME_FAB\[tab\];/);
-  assert.match(me, /\{fab && <Fab label=\{fab\.label\} icon=\{fab\.icon\} onPress=\{\(\) => router\.push\(fab\.href\)\} \/>\}/, 'the label, the icon and the route come from the table of the sub-tabs');
-  assert.deepEqual(ME_FAB.Notes, { label: 'Write a note', icon: 'compose', href: '/diary/new' });
-  assert.deepEqual(ME_FAB.Journey, { label: 'Write a journey post', icon: 'pen', href: '/write' });
-  assert.equal(ME_FAB.Plan, null);
-  assert.equal(ME_FAB.Health, null);
-  assert.deepEqual(Object.keys(ME_FAB), [...ME_TABS], 'every sub-tab has an entry, so none is forgotten');
-  assert.equal(Object.values(ME_FAB).filter(Boolean).length, 2, 'two sub-tabs have a button and each has one');
-  assert.doesNotMatch(read(join('app', '(tabs)', 'library.tsx')), /<Fab\b|\bFab\b/, 'the Library has no gold pen: writing is on Me');
+  assert.match(me, /<Fab label=\{inboxLabel\(unread\.total\)\} icon=\{ME_FAB\.icon\} hint=\{ME_FAB\.hint\} badge=\{badgeText\(unread\.total\)\} onPress=\{openInbox\} \/>/, 'the label, the badge and the route come from features/me/tabs.ts, and the button has no condition');
+  assert.doesNotMatch(me, /ME_FAB\[|const fab = |\{fab &&/, 'one button for every sub-tab: no table by sub-tab, none that could be missing');
+  assert.deepEqual(ME_FAB, { icon: 'chat', href: '/inbox', label: 'Inbox', hint: 'Opens your notifications, messages and groups' });
+  assert.doesNotMatch(read(join('app', '(tabs)', 'library.tsx')), /<Fab\b|\bFab\b/, 'the Library has no gold button: the chat button is on Me');
   // the FAB's offset is the tab bar's own numbers: bottom Math.max(inset - 14, 10), height 88, and 8 above it
   assert.match(bar, /Math\.max\(insets\.bottom - 14, 10\)/);
   assert.match(bar, /height: 88/);
@@ -191,7 +192,7 @@ check('Library has no title and no diary button: its first row is the search fie
   assert.ok(hidden > 0 && header > hidden, 'the hidden heading comes first, then the header row');
   // where the button leads: decided by the screen, in one place
   assert.match(screen, /<LibraryHeader query=\{query\} onQuery=\{setQuery\} onBookmarks=\{\(\) => router\.push\('\/library\/bookmarks'\)\} onSearchFocus=\{prepareSearch\} \/>/);
-  // the row: search field, then Bookmarks and nothing else; the button is the size of Me's bell and gear (52) and labelled with a hint
+  // the row: search field, then Bookmarks and nothing else; the button is the size of Me's gear (52) and labelled with a hint
   const row = read(join('src', 'features', 'library', 'LibraryHeader.tsx'));
   const search = row.indexOf('<SearchBar ');
   const bookmarks = row.indexOf('<IconButton name="bookmark"');
@@ -202,7 +203,7 @@ check('Library has no title and no diary button: its first row is the search fie
   assert.match(row, /import \{ IconButton \} from '@\/components\/ui';/, 'the same button as Me\'s');
   assert.match(row, /flexDirection: 'row', alignItems: 'center', gap: 8/);
   const me = read(join('app', '(tabs)', 'me.tsx'));
-  assert.match(me.slice(me.indexOf('<IconButton name="bell"')), /size=\{52\}/, 'Me\'s buttons are 52 too');
+  assert.match(me.slice(me.indexOf('<IconButton name="settings"')), /size=\{52\}/, 'Me\'s gear is 52 too');
   assert.match(read(join('src', 'components', 'ui.tsx')), /accessibilityHint=\{hint\}/);
   // the glyphs stay: the diary's spiral notebook is its own drawing, not the Bible's closed book with a cross, not the open book of the tab,
   // and not the bookmark next to it (the Notes feed of Me, or anything else, may use it)
@@ -217,7 +218,7 @@ check('Library: directly under the search row the two tabs Bible and Books, and 
   assert.deepEqual([...ROW_TABS], ['Bible', 'Books']);
   assert.equal(BIBLE_SOURCE_LINE, 'World English Bible, Catholic edition · public domain');
   const screen = read(join('app', '(tabs)', 'library.tsx'));
-  assert.match(screen, /<Screen keyboard>/, 'a button can be tapped while the keyboard is up');
+  assert.match(screen, /<Screen keyboard overlay=\{<ContinueBar \/>\}>/, 'a button can be tapped while the keyboard is up, and the Continue reading bar is the one thing that floats over this screen');
   assert.doesNotMatch(screen, /PromoBanner/, 'the carousel with dots is gone from Library: one banner for each of two tabs');
   assert.doesNotMatch(screen, /MusicTab|'Music'/);
   // the Notes tab is gone from the screen for good: no tab, no feed, no host, no pen, no keyboard special case
@@ -233,15 +234,16 @@ check('Library: directly under the search row the two tabs Bible and Books, and 
   assert.ok(header < strip, 'the search row comes first, the tab strip directly after it');
   assert.match(screen, /\{!searching && <SubTabs tabs=\{LIBRARY_TABS\} value=\{tab\} onChange=\{setTab\} \/>\}/, 'the tab strip is drawn unless something is typed, and it is drawn before any banner or content');
   assert.equal((screen.match(/\{top\}/g) ?? []).length, 1, 'the top is drawn once, in the screen\'s own scroll');
-  // Bible and Books and the results: rows in the screen's own scroll, after the top: on Bible the card that continues the chapter, the compact banner, then the Bible tab (the choice of the part, the tiles)
+  // Bible and Books and the results: rows in the screen's own scroll, after the top: on Bible the compact banner, then the Bible tab (the choice of the part, the tiles). There is no continue card among them: "Continue reading" floats above the tab bar instead (the bar, mounted as the overlay of this Screen)
   const screenAt = at('<Screen keyboard');
-  const card = at('<ContinueCard', screenAt), daily = at('<DailyBanner', screenAt), bible = at('<BibleTab', screenAt), books = at('<BooksBanner reading={booksReading} />', screenAt), booksTab = at('<BooksTab', screenAt);
-  assert.ok(at('{top}', screenAt) < card && card < daily && daily < bible && bible < books && books < booksTab, 'the top, the continue card, the Bible banner, Bible, the Books banner, Books');
-  assert.match(screen, /\{searching \? \(\s*<SearchResults[^]*?\/>\s*\) : \(\s*<>\s*\{tab === 'Bible' && lastRead\.place && <ContinueCard/, 'the results take the place of the banners and the tab content, and clearing the field brings them back');
+  const daily = at('<DailyBanner', screenAt), bible = at('<BibleTab', screenAt), books = at('<BooksBanner />', screenAt), booksTab = at('<BooksTab', screenAt);
+  assert.ok(at('{top}', screenAt) < daily && daily < bible && bible < books && books < booksTab, 'the top, the Bible banner, Bible, the Books banner, Books');
+  assert.doesNotMatch(screen, /ContinueCard/, 'the continue card is gone from the page: the bar above the tab bar replaced it');
+  assert.match(screen, /\{searching \? \(\s*<SearchResults[^]*?\/>\s*\) : \(\s*<>\s*\{tab === 'Bible' && <DailyBanner/, 'the results take the place of the banners and the tab content, and clearing the field brings them back');
   assert.match(screen, /const searching = isSearching\(query\);/);
   // each banner is shown under its own tab only
   assert.match(screen, /\{tab === 'Bible' && <DailyBanner onOpen=\{\(\) => router\.push\('\/library\/daily'\)\} \/>\}/);
-  assert.match(screen, /\{tab === 'Books' && <BooksBanner reading=\{booksReading\} \/>\}/);
+  assert.match(screen, /\{tab === 'Books' && <BooksBanner \/>\}/);
   assert.equal((screen.match(/<DailyBanner/g) ?? []).length + (screen.match(/<BooksBanner/g) ?? []).length, 2, 'two banners, one for each tab that has one');
   // neither tab has a notice: the text of the Bible is in the app (one quiet source line instead) and so are the books (each book page says how they were written, notices.ts)
   const tabsSrc = read(join('src', 'features', 'library', 'LibraryTabs.tsx'));
@@ -253,9 +255,10 @@ check('Library: directly under the search row the two tabs Bible and Books, and 
   assert.match(read(join('src', 'components', 'Screen.tsx')), /keyboardShouldPersistTaps=\{keyboard \? 'handled' : 'never'\}/);
 });
 
-check('what floats at the bottom of the Library: nothing. The three choices of the Bible are in the page, directly under the banner, and the gold pen moved to Me', () => {
+check('what floats at the bottom of the Library: the one Continue reading bar above the tab bar and nothing else (no gold pen: it moved to Me); the three choices of the Bible are in the page, directly under the banner, and nothing of them floats', () => {
   const screen = read(join('app', '(tabs)', 'library.tsx'));
   assert.equal((screen.match(/<Fab\b/g) ?? []).length, 0, 'the gold pen moved to Me: one pen there, following the sub-tab');
+  assert.equal((screen.match(/<ContinueBar\b/g) ?? []).length, 1, 'one bar, mounted once');
   assert.equal((screen.match(/<TestamentBar\b/g) ?? []).length, 0, 'the screen draws no bar of its own: the Bible tab draws the choices in the page');
   // Default: the Old Testament
   assert.match(screen, /useState<Testament>\('old'\)/);
@@ -355,20 +358,51 @@ check('the design page shows the same Library: the two tabs Bible and Books, the
   assert.deepEqual(radios(deutero), ['Old Testament:false', 'Deuterocanon:true', 'New Testament:false']);
   assert.deepEqual(radios(cont), ['Old Testament:false', 'Deuterocanon:false', 'New Testament:true']);
   assert.equal(count(bible, /class="lib-tile"/g), 39, 'the 39 books of the Old Testament, as tiles');
-  assert.match(bible, /aria-label="Genesis, 50 chapters"><span class="nm" style="font-size:24px;line-height:29px;letter-spacing:-0\.48px">Genesis<\/span><span class="ct" style="font-size:12px;line-height:17px">50&nbsp;chapters<\/span>/, 'the name is the hero of the tile: 24 where it fits, set a little closer');
-  assert.match(bible, /aria-label="Deuteronomy, 34 chapters"><span class="nm" style="font-size:15px/, 'a long name is drawn smaller to fit the tile, and never under 15 on a phone of 390');
-  assert.match(design, /\.lib-tile \{ width: 111px; height: 111px; padding: 7px 4px;/, 'the padding of a tile is the app\'s: 3 across and 6 down, and the border of 1');
-  assert.doesNotMatch(bible, /font-size:(1[0-4](\.5)?|[0-9](\.5)?)px;line-height:\d+px;letter-spacing:-0\.\d+px">/, 'no name on a tile of the Bible is drawn under 15 on a phone of 390');
-  assert.match(bible, /aria-label="1 Samuel, 31 chapters"><span class="nm" style="[^"]*">1<br>Samuel<\/span>/, 'a number stands on a line of its own');
-  assert.match(bible, /aria-label="Song of Songs, 8 chapters"><span class="nm" style="[^"]*">Song of<br>Songs<\/span>/);
+  assert.match(bible, /aria-label="Genesis, 50 chapters"><span class="nm h4">Genesis<\/span><span class="ct">50&nbsp;chapters<\/span>/, 'the name is the hero of the tile: 24 (h4) where it fits, the count is the mono token');
+  assert.match(bible, /aria-label="Deuteronomy, 34 chapters"><span class="nm h5">Deuteronomy<\/span>/, 'a long name comes down to 17 (h5) to fit the tile, never under the scale: no 11, no 14');
+  assert.match(design, /\.lib-grid \{ --tp: var\(--cp-space-4\); --tg: var\(--cp-space-3\); display: grid; grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/, 'two tiles in a row, the padding space.4 and the gap space.3: tokens, not numbers');
+  assert.match(design, /\.lib-tile \{ height: calc\(2 \* var\(--cp-text-h4-lh\) \+ var\(--cp-space-2\) \+ var\(--cp-text-mono-lh\) \+ 2 \* \(var\(--tp\) \+ var\(--cp-border-width\)\)\); padding: calc\(var\(--tp\) \+ var\(--cp-border-width\)\);/, 'the padding of a tile is the app\'s: space.4 and the border of 1, 17 from the outline; the height is that of its words');
+  assert.doesNotMatch(bible, /class="nm"|font-size:\d|style="font/, 'no tile of the Bible has a size of its own: the class is the variant (h4, h5, h6)');
+  assert.doesNotMatch(bible, /class="nm h(?!4|5|6)/, 'a name is h4, h5 or h6');
+  assert.match(bible, /aria-label="1 Samuel, 31 chapters"><span class="nm h4">1<br>Samuel<\/span>/, 'a number stands on a line of its own');
+  assert.match(bible, /aria-label="Song of Songs, 8 chapters"><span class="nm h4">Song of<br>Songs<\/span>/);
   assert.equal(count(bible, /class="hw"/g), 1, 'one handwritten note on the screen');
 
-  // Continue: the card above the banner, with the chapter in JetBrains Mono; the New Testament chosen, 27 tiles
-  assert.match(cont, /<div class="cont-card" role="button" aria-label="Continue reading, Psalm 121">\s*<span class="ic">[^]*?<div class="k">Continue reading<\/div><div class="r">Psalm 121<\/div>/);
-  assert.ok(cont.indexOf('class="cont-card"') > cont.indexOf('class="cp-subtabs"') && cont.indexOf('class="cont-card"') < cont.indexOf('class="cp-banner cmp"'), 'the card is under the tabs and above the banner');
+  // Continue: no card in the page (the banner is right under the tabs), and the Continue reading bar floats above the tab bar, drawn over the dock's fade (its z-index is above the dock's) and before the scroll in the markup;
+  // the place is drawn in two pieces, the name and the chapter; the New Testament chosen, 27 tiles
+  assert.doesNotMatch(cont, /cont-card/, 'the card is gone from the page');
+  assert.match(cont, /<div class="cont-bar">\s*<div class="main" role="button" aria-label="Continue reading, Psalm 121"><svg class="cp-icon ic"><use href="#i-book"\/><\/svg><div class="t"><div class="k">Continue reading<\/div><div class="r"><span class="h">Psalm<\/span><span class="c">121<\/span><\/div><\/div><\/div>\s*<button class="x" aria-label="Hide Continue reading"><svg class="cp-icon"><use href="#i-x"\/><\/svg><\/button>\s*<\/div>/);
+  assert.ok(cont.indexOf('class="cp-subtabs"') < cont.indexOf('class="cp-banner cmp"'), 'the banner is right under the tabs, with no card between');
+  assert.ok(cont.indexOf('class="cont-bar"') < cont.indexOf('class="scroll"'), 'the bar is not inside the scroll: it floats, and the cover grid of a phone ends before anything of it');
+  assert.equal(count(cont, /class="cont-bar"/g), 1, 'one bar on the screen');
+  assert.equal(count(cont, /class="hw"/g), 1, 'the bar adds no handwriting: the banner has the one note');
   assert.equal(count(cont, /class="lib-tile"/g), 27);
-  assert.match(cont, /aria-label="1 Thessalonians, 5 chapters"><span class="nm" style="font-size:14px;/, 'the longest word of all comes down to 14 on a phone of 390: the fit counts every letter rounded up to a pixel, as a browser that hints the glyphs draws it');
-  assert.equal(count(bible, /cont-card/g), 0, 'without a chapter read there is no card');
+  assert.match(cont, /aria-label="1 Thessalonians, 5 chapters"><span class="nm h5">1<br>Thessalonians<\/span>/, 'the longest word of all comes down to 17 (h5) on a phone of 390: the fit counts every letter rounded up to a pixel, as a browser that hints the glyphs draws it');
+  assert.equal(count(bible, /cont-bar|cont-card/g), 0, 'without a chapter read there is no bar and no card');
+  // the list keeps the bar's room at its end, as Screen does: what a list keeps for the tab bar (130 on the page) and the room the bar says it takes (64 and 8)
+  const layoutOfBar = read(join('src', 'features', 'library', 'continueBar', 'barLayout.ts'));
+  const barRoom = Number(/export const BAR_HEIGHT = (\d+);/.exec(layoutOfBar)?.[1]) + Number(/export const BAR_GAP = (\d+);/.exec(layoutOfBar)?.[1]);
+  const listEnd = Number(/\.phone \.scroll \{[^}]*padding: [^;}]*? (\d+)px;/.exec(design)?.[1]);
+  assert.equal(listEnd, 130, 'what a list of the page keeps free at its end for the tab bar');
+  assert.equal(barRoom, 72);
+  assert.equal(count(cont, new RegExp(`<div class="scroll" style="padding-bottom:${listEnd + barRoom}px">`, 'g')), 1, 'the list of the phone keeps the bar\'s room at its end: 130 for the tab bar and 72 for the bar');
+  // the bar's numbers are the tab dock's: the pill is 26 above the bottom and 88 high, so the bar is 26 + 88 + 8 = 122 up, with the pill's side margins, 64 high, a pill, the hero card colours and the tab bar's shadow
+  const css = (selector: string) => new RegExp(`${selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')} \\{([^}]*)\\}`).exec(design)?.[1] ?? '';
+  const dockCss = css('.phone .tabdock'), pillCss = css('.cp-tabbar'), barCss = css('.cont-bar');
+  const px = (rule: string, prop: string) => Number(new RegExp(`(?:^|[; ])${prop}: (\\d+)px`).exec(rule)?.[1]);
+  assert.equal(px(barCss, 'bottom'), px(dockCss, 'padding-bottom') + px(pillCss, 'height') + 8, 'the bar is 8 above the pill');
+  assert.equal(px(barCss, 'min-height'), 64);
+  assert.ok(Number(/z-index: (\d+)/.exec(barCss)?.[1]) > Number(/z-index: (\d+)/.exec(dockCss)?.[1]), 'drawn over the fade of the tab dock');
+  assert.match(pillCss, /margin: 0 (\d+)px/);
+  assert.equal(px(barCss, 'left'), Number(/margin: 0 (\d+)px/.exec(pillCss)?.[1]), 'the pill\'s side margin');
+  assert.equal(px(barCss, 'right'), px(barCss, 'left'));
+  assert.match(barCss, /border-radius: var\(--cp-radius-pill\)/);
+  assert.match(barCss, /background: var\(--cp-surface-inverse\); color: var\(--cp-text-inverse\); box-shadow: var\(--cp-shadow-lg\)/);
+  assert.match(css('.cont-bar .x'), /width: 48px; height: 48px/, 'the X is at least 44 by 44');
+  assert.match(css('.cont-bar .ic'), /color: var\(--cp-highlight\)/, 'a gold glyph');
+  assert.match(css('.cont-bar .r'), /font-family: var\(--cp-font-title\)/, 'the place is Fraunces');
+  assert.match(css('.cont-bar .r .h'), /flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis/, 'the name gives way, with an ellipsis');
+  assert.match(css('.cont-bar .r .c'), /flex: none/, 'the chapter does not');
   // Dark: the same screen in the dark palette
   assert.match(dark, /^[^]*?<div class="phone dk">/);
   assert.equal(count(dark, /class="lib-tile"/g), 39);
@@ -376,7 +410,7 @@ check('the design page shows the same Library: the two tabs Bible and Books, the
   assert.match(deutero, /<span class="cnt" aria-label="Deuterocanon, 7 books">7 books<\/span>/);
   assert.equal(count(deutero, /class="lib-tile"/g), 7);
   assert.match(deutero, /aria-label="Baruch, 6 chapters"/);
-  assert.match(deutero, /aria-label="2 Maccabees, 15 chapters"><span class="nm" style="[^"]*">2<br>Maccabees<\/span>/);
+  assert.match(deutero, /aria-label="2 Maccabees, 15 chapters"><span class="nm h[456]">2<br>Maccabees<\/span>/);
   assert.match(deutero, /<p class="lib-note">Esther and Daniel, in the Old Testament, include their Greek additions: Daniel 3 holds the Prayer of Azariah and the Song of the Three, 13 is Susanna and 14 is Bel and the Dragon\.<\/p>\s*<p class="lib-note">Orthodox Bibles include a few more books\.<\/p>/);
   assert.doesNotMatch(deutero, /Additions to|Added passages/);
 
@@ -468,12 +502,16 @@ check('the design page shows the same Library: the two tabs Bible and Books, the
   assert.doesNotMatch(all, /music|playlist/i, 'Music is gone from the Library phones');
   assert.doesNotMatch(all, /aria-label="My diary"|>My diary</);
   assert.doesNotMatch(all, /<span>Notes<\/span>|<span class="on">Notes<\/span>/, 'no phone of the Library has a Notes tab: the diary is the first sub-tab of Me');
-  assert.equal(count(all, /class="cp-subtabs"/g), 5, 'five Library phones have the tab strip (Library, Continue, Dark, Deuterocanon, Books), and each of them has the two tabs Bible and Books');
-  assert.equal(count(all, /<div class="cp-subtabs"[^>]*>(?:<span class="on">Bible<\/span><span>Books<\/span>|<span>Bible<\/span><span class="on">Books<\/span>)<\/div>/g), 5);
+  assert.equal(count(all, /class="cp-subtabs"/g), 6, 'six Library phones have the tab strip (Library, Continue, Dark, Deuterocanon, 320 wide, Books), and each of them has the two tabs Bible and Books');
+  assert.equal(count(all, /<div class="cp-subtabs"[^>]*>(?:<span class="on">Bible<\/span><span>Books<\/span>|<span>Bible<\/span><span class="on">Books<\/span>)<\/div>/g), 6);
   assert.doesNotMatch(all, /verified|official/i, 'nothing says verified or official');
-  // the gold pen is on Me (the Me · Notes phones are checked below); the Fab note on the design page says where it is
-  assert.match(design, /Me: one pen at a time, and it follows the sub-tab: on Notes the note icon writes a note, on Journey the pen writes a journey post, on Plan and Health there is none\./);
+  // the gold button is on Me, and it is the chat button (the Me phones are checked below); the Fab note on the design page says where it is
+  assert.match(design, /Me: ONE gold button floats and it is the same on every sub-tab, Notes, Journey, Plan and Health: the chat button\./);
+  assert.match(design, /Writing does not float: the first tile of the Journey grid is the card Write a journey post, and the card Write a note tops the Notes feed\./);
+  assert.match(design, /It opens from the gear at the top right of Me, the only button there, as a screen of its own/);
+  assert.match(design, /One gold button floats over all four, the chat button at the bottom right: it opens the inbox \(notifications, messages and groups\) and carries the unread badge, so the header keeps only the gear\./);
   assert.doesNotMatch(design, /Library: on the Notes tab/, 'the design page no longer sends the pen to the Library');
+  assert.doesNotMatch(design, /inbox bell|Tap the bell|one pen at a time|the pen writes a journey post/, 'no word of the design page still sends anyone to a bell or a pen on Me');
   const sprite = /<symbol id="i-diary"[^>]*>(.*?)<\/symbol>/.exec(design);
   assert.ok(sprite, 'the sprite of the design page has no i-diary');
   assert.deepEqual([...sprite![1].matchAll(/ d="([^"]+)"/g)].map((m) => m[1]), iconPaths('diary'), 'the diary glyph of the design page and of the app are the same drawing');
@@ -484,25 +522,39 @@ check('the design page shows the same Library: the two tabs Bible and Books, the
   for (const b of BOOK_CATALOG) assert.ok(new RegExp(`<symbol id="i-${b.cover.icon}"`).test(design), `the design page sprite has no glyph for the cover of ${b.id}`);
 });
 
-check('the design page shows Me with the strip Notes, Journey, Plan, Health (Notes first), and the Me · Notes phones: one pen that writes a note, Me on in the tab bar, a dark twin, and no Library tab strip', () => {
+check('the design page shows Me with the strip Notes, Journey, Plan, Health (Notes first); the header has the gear alone and no bell; one chat button floats on every sub-tab; the first tile of Journey is the card that writes a post; Notes has one card that writes a note and no filter tabs; a dark twin', () => {
   const design = readFileSync(join(root, '..', 'design', 'index.html'), 'utf8');
-  const phoneOf = (label: string): string => {
-    const start = design.indexOf(`<p class="phone-label"><b>${label}</b>`);
-    assert.ok(start > 0, `the design page has no phone "${label}"`);
-    const next = design.indexOf('<p class="phone-label">', start + 10);
-    return design.slice(start, next > 0 ? next : undefined);
-  };
+  const phoneOf = designPhone;
   const strip = (on: string) => ['Notes', 'Journey', 'Plan', 'Health'].map((t) => (t === on ? `<span class="on">${t}</span>` : `<span>${t}</span>`)).join('');
   const journey = phoneOf('Me · Journey');
+  const grid = phoneOf('Me · Journey, grid');
   const plan = phoneOf('Me · Plan');
   assert.ok(journey.includes(`<div class="cp-subtabs" style="margin:22px -24px 20px;padding:0 12px">${strip('Journey')}</div>`), 'Me · Journey: the four labels, Journey on');
+  assert.ok(grid.includes(`<div class="cp-subtabs" style="margin:22px -24px 20px;padding:0 12px">${strip('Journey')}</div>`), 'Me · Journey, grid: the four labels, Journey on');
   assert.ok(plan.includes(`<div class="cp-subtabs" style="margin:22px -24px 20px;padding:0 12px">${strip('Plan')}</div>`), 'Me · Plan: the four labels, Plan on');
   assert.ok(design.includes(`<div class="cp-subtabs" style="margin:0">${strip('Journey')}</div>`), 'the component sample of the strip');
-  assert.match(journey, /aria-label="Write a journey post"/, 'on Journey the pen writes a journey post');
-  assert.equal((journey.match(/cp-fab-write/g) ?? []).length, 1);
-  assert.doesNotMatch(plan, /cp-fab-write/, 'Plan has no pen');
+  const CHAT = (label: string, badge: string) => `<div class="fab-slot"><button class="cp-fab-write" aria-label="${label}"><svg class="cp-icon"><use href="#i-chat"/></svg>${badge ? `<span class="cp-fab-badge" aria-hidden="true">${badge}</span>` : ''}</button></div>`;
+  const GEAR = '<button class="cp-icon-btn flat" style="width:44px;height:44px;margin-left:auto" aria-label="Settings"><svg class="cp-icon "><use href="#i-settings"/></svg></button>';
+  // Journey: the card is the first tile of the grid, the chat button floats with its badge, the header is the gear alone
+  for (const [label, phone] of [['Me · Journey', journey], ['Me · Journey, grid', grid]] as const) {
+    assert.equal((phone.match(/<div class="jg">/g) ?? []).length, 1, `${label}: one grid`);
+    assert.match(phone, /<div class="jg">\s*<button class="jt write" aria-label="Write a journey post"><span class="ico"><svg class="cp-icon"><use href="#i-pen"\/><\/svg><\/span>Write a journey post<\/button>\s*<div class="jt">/, `${label}: the card that writes a post is the first tile of the grid, and the posts follow`);
+    assert.equal((phone.match(/aria-label="Write a journey post"/g) ?? []).length, 1, `${label}: one card, and no second way to write on the screen`);
+    assert.equal((phone.match(/cp-fab-write/g) ?? []).length, 1, `${label}: one gold button`);
+    assert.ok(phone.includes(CHAT('Inbox, 3 unread', '3')), `${label}: the chat button floats with its badge`);
+    assert.doesNotMatch(phone, /class="cp-post"|aria-label="Write a journey post"><svg class="cp-icon "><use href="#i-pencil"/, `${label}: no timeline post and no pen button`);
+    assert.ok(phone.includes(GEAR), `${label}: the gear alone at the top right`);
+    assert.doesNotMatch(phone, /Notifications \(|cp-bell|#i-bell/, `${label}: no bell`);
+  }
+  assert.match(grid, /<div class="scroll" data-scroll-strip="1">/, 'Me · Journey, grid is shown scrolled to the strip: the card and the posts are what it is about');
+  assert.match(design, /el\.querySelector\('\.nt-metop \.cp-subtabs'\) \|\| el\.querySelector\('\.cp-subtabs'\)/, 'and the script that scrolls it knows its strip');
+  // Plan: the same chat button, nothing unread there (no badge), no pen
+  assert.equal((plan.match(/cp-fab-write/g) ?? []).length, 1, 'Plan: one gold button');
+  assert.ok(plan.includes(CHAT('Inbox', '')), 'Plan: the chat button, with no badge when nothing is unread');
+  assert.doesNotMatch(plan, /Write a|#i-pencil|#i-compose/, 'Plan has no pen');
   // the Me · Notes phones
   const labels = ['Me · Notes', 'Me · Notes, dark', 'Me · Notes, scrolled', 'Me · Notes, photo grids', 'Me · Notes, empty', 'Me · Notes, menu'];
+  const card = '<div class="nt-write" role="button" tabindex="0" aria-label="Write a note">\n            <span class="ico"><svg class="cp-icon"><use href="#i-compose"/></svg></span>\n            <span class="tx"><b>Write a note</b><span>Notes stay on this phone.</span></span>\n            <svg class="cp-icon"><use href="#i-chev"/></svg>\n          </div>';
   for (const label of labels) {
     const phone = phoneOf(label);
     assert.ok(phone.length > 3000, `${label} is too short to be a screen`);
@@ -510,21 +562,42 @@ check('the design page shows Me with the strip Notes, Journey, Plan, Health (Not
     assert.match(phone, /<div class="nt-metop">/, `${label}: it is the Me header over the feed, not the Library's search row`);
     assert.doesNotMatch(phone, /class="lib-search"|aria-label="Bookmarks"/, `${label}: no Library search row`);
     assert.doesNotMatch(phone, /<span>Bible<\/span>|<span>Books<\/span>/, `${label}: no Library tab strip`);
-    assert.ok((phone.match(/cp-fab-write/g) ?? []).length <= 1, `${label}: never two pens`);
+    assert.ok((phone.match(/cp-fab-write/g) ?? []).length <= 1, `${label}: never two gold buttons`);
+    assert.ok(phone.includes(GEAR), `${label}: the header has the gear alone at the top right`);
+    assert.doesNotMatch(phone, /Notifications \(|cp-bell|#i-bell/, `${label}: no bell`);
+    // no filter tabs, and nothing of the composer row that the card replaced
+    assert.doesNotMatch(phone, /nt-filters|role="tablist"|role="tab"|Photos and videos|>All<\/span>|>Places<\/span>/, `${label}: no filter tabs (All, Photos and videos, Places)`);
+    assert.doesNotMatch(phone, /nt-compose|nt-prompt|nt-short|nt-private|What's happening on your Camino|then add a photo|then add a place|Write your first note/, `${label}: the composer row and the second write button are gone`);
+    // the card that writes a note is the first thing of the feed, once
+    assert.equal((phone.match(/class="nt-write"/g) ?? []).length, 1, `${label}: one card that writes a note`);
+    assert.ok(phone.includes(`<div class="nt-feedbody" style="padding-top:16px">\n          ${card}\n`), `${label}: the card is the first thing under the strip`);
+    assert.equal((phone.match(/Notes stay on this phone\./g) ?? []).length, 1, `${label}: the quiet line is in the card, once`);
     if (label !== 'Me · Notes, menu') {
-      assert.equal((phone.match(/cp-fab-write/g) ?? []).length, 1, `${label}: one pen`);
-      assert.match(phone, /<button class="cp-fab-write" aria-label="Write a note"><svg class="cp-icon"><use href="#i-compose"\/><\/svg><\/button>/, `${label}: the pen writes a note`);
+      assert.equal((phone.match(/cp-fab-write/g) ?? []).length, 1, `${label}: one gold button`);
+      assert.ok(phone.includes(CHAT('Inbox, 3 unread', '3')), `${label}: the gold button is the chat button, with its badge`);
       assert.match(phone, /<div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-me"\/>/, `${label}: Me is the tab that is on`);
     }
-    assert.doesNotMatch(phone, /Write in your diary|Library · Notes/);
+    assert.doesNotMatch(phone, /Write in your diary|Library · Notes|aria-label="Write a note"><svg class="cp-icon"><use href="#i-compose"/);
   }
   assert.match(phoneOf('Me · Notes, dark'), /<div class="phone dk">/, 'the dark twin');
   assert.match(phoneOf('Me · Notes, empty'), /<h4>No notes yet<\/h4>/);
+  assert.doesNotMatch(phoneOf('Me · Notes, empty'), /cp-btn/, 'the empty diary has no button of its own: the card above it is the way in');
   assert.match(phoneOf('Me · Notes'), /Notes stay on this phone\./);
   assert.doesNotMatch(design, /<b>Library · Notes/, 'no Notes phone is labelled as a Library phone');
   const all = labels.map((l) => design.indexOf(`<b>${l}</b>`));
   assert.ok(all.every((i) => i > 0), 'every Me · Notes phone is on the page');
   assert.equal(new Set([...design.matchAll(/<p class="phone-label"><b>([^<]+)<\/b>/g)].map((m) => m[1])).size, [...design.matchAll(/<p class="phone-label"><b>([^<]+)<\/b>/g)].length, 'no two phones share a label');
+  // the sprite has the glyphs of the chat button and of the two cards, the same drawings as the app's
+  for (const name of ['chat', 'pen', 'compose']) {
+    const sym = new RegExp(`<symbol id="i-${name}"[^>]*>(.*?)</symbol>`).exec(design);
+    assert.ok(sym, `the sprite of the design page has no i-${name}`);
+    assert.deepEqual([...sym![1].matchAll(/ d="([^"]+)"/g)].map((m) => m[1]), iconPaths(name), `the ${name} glyph of the design page and of the app are the same drawing`);
+  }
+  // the CSS of the bell is gone with the bell, and the CSS of the badge and the cards is there
+  assert.doesNotMatch(design, /cp-bellwrap|cp-bell-badge|nt-filters|\.nt-compose|\.nt-prompt|\.nt-short/, 'the CSS of what was taken out is gone');
+  assert.match(design, /\.cp-fab-badge \{ position: absolute; top: -4px; right: -4px; box-sizing: border-box; min-width: 26px; height: 26px;/, 'the badge is 26 round on the rim, as in the app');
+  assert.match(design, /background: var\(--cp-danger\); color: var\(--cp-on-danger\); border: 2px solid var\(--cp-bg\);/, 'in the roles danger and onDanger, ringed in the page colour');
+  assert.match(design, /\.nt-write \{ display: flex; align-items: center; gap: 16px; min-height: 64px;/, 'the Notes card is at least 64 high');
 });
 
 check('the sample content never claims to be real: no price, no rating, no "available", no download, nothing in the data or the rows of the books that acts when touched', () => {
@@ -537,14 +610,15 @@ check('the sample content never claims to be real: no price, no rating, no "avai
   assert.match(lib('LibraryBanner.tsx'), /export const DAILY_CTA = 'Read today';/);
 });
 
-check('the diary is reachable: its routes exist and are registered, the Notes sub-tab of Me is where it is, and the one pen of Me on that sub-tab opens a blank page', () => {
+check('the diary is reachable: its routes exist and are registered, the Notes sub-tab of Me is where it is, and the one card of that sub-tab opens a blank page', () => {
   assert.ok(exists(join('app', 'diary', 'index.tsx')));
   assert.ok(exists(join('app', 'diary', '[id].tsx')));
   const layout = read(join('app', '_layout.tsx'));
   assert.match(layout, /<Stack\.Screen name="diary\/index" \/>/);
   assert.match(layout, /<Stack\.Screen name="diary\/\[id\]" \/>/);
   const me = read(join('app', '(tabs)', 'me.tsx'));
-  assert.equal(ME_FAB.Notes?.href, '/diary/new', 'the pen of the Notes sub-tab opens a blank page');
+  assert.match(read(join('src', 'features', 'notes', 'NotesTab.tsx')), /const write = useCallback\(\(\) => router\.push\('\/diary\/new'\), \[router\]\);/, 'the card of the Notes sub-tab opens a blank page');
+  assert.match(read(join('src', 'features', 'notes', 'NotesHeader.tsx')), /onPress=\{onWrite\}/, 'and the card is what calls it');
   assert.match(me, /import \{ NotesTab \} from '@\/features\/notes\/NotesTab';/, 'the diary\'s feed is the Notes sub-tab of Me');
   assert.match(me, /\{onNotes \? \(/);
   assert.doesNotMatch(me, /router\.push\('\/diary'\)/, 'no button of Me opens the list of pages: that list is the Notes sub-tab');
@@ -609,8 +683,7 @@ check('Bookmarks is a screen of its own: the file exists, it is registered next 
   assert.ok(guard > 0 && at > guard && layout.indexOf('</Stack.Protected>', guard) > at, 'registered inside the block of screens for someone who has a journey');
   const src = read(join('app', 'library', 'bookmarks.tsx'));
   assert.match(src, /<Screen tabBar=\{false\}>/);
-  assert.match(src, /<IconButton name="back" label="Back" onPress=\{goBack\} \/>/);
-  assert.match(src, /router\.canGoBack\(\) \? router\.back\(\) : router\.replace\('\/library'\)/);
+  assert.match(src, /<BackButton fallback="\/library" \/>/);
   assert.match(src, /<AppText variant="h2" accessibilityRole="header">Bookmarks<\/AppText>/);
   assert.match(src, /<AppText variant="h4" accessibilityRole="header">Library<\/AppText>/);
   assert.match(src, /<AppText variant="h4" accessibilityRole="header" style=\{\{ marginTop: 8 \}\}>Posts<\/AppText>/);
@@ -634,7 +707,7 @@ check('the four fonts by role on the Bible side of the Library: Fraunces for nam
   assert.match(theme, /mono: 'JetBrainsMono_400Regular'/);
   assert.match(theme, /accent: 'Caveat_700Bold'/);
   const fontOf = (variant: string) => (tokens as unknown as { text: Record<string, { font: string }> }).text[variant].font;
-  for (const v of ['display', 'h1', 'h2', 'h3', 'h4']) assert.equal(fontOf(v), 'title', `${v} is the title font`);
+  for (const v of ['display', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6']) assert.equal(fontOf(v), 'title', `${v} is the title font`);
   for (const v of ['lead', 'body', 'small', 'label', 'caption']) assert.equal(fontOf(v), 'body', `${v} is the body font`);
   assert.equal(fontOf('mono'), 'mono');
   assert.equal(fontOf('accent'), 'accent');
@@ -645,7 +718,7 @@ check('the four fonts by role on the Bible side of the Library: Fraunces for nam
   // the roles, element by element: [file, what must be there, what it says]
   const L = join('src', 'features', 'library');
   const roles: Array<[string, RegExp, string]> = [
-    [join(L, 'bible', 'BookGrid.tsx'), /<AppText\s+variant="h4"[^>]*numberOfLines=\{name\.lines\.length\}/, 'the name of a book on a tile is Fraunces (h4)'],
+    [join(L, 'bible', 'BookGrid.tsx'), /<AppText\s+variant=\{name\.variant\}[^>]*numberOfLines=\{name\.lines\.length\}/, 'the name of a book on a tile is Fraunces (h4, h5 or h6: the variant the fit chose)'],
     [join(L, 'bible', 'BookGrid.tsx'), /<AppText\s+variant="mono"\s+muted[^>]*numberOfLines=\{1\}/, 'the count on a tile is JetBrains Mono'],
     [join(L, 'bible', 'ChapterGrid.tsx'), /<AppText variant="mono" maxFontSizeMultiplier=\{1\.3\}[^>]*>\{n\}<\/AppText>/, 'a chapter number is JetBrains Mono'],
     [join(L, 'LibraryTabs.tsx'), /<AppText variant="h4" accessibilityRole="header">Books of the Bible<\/AppText>/, 'the heading of the Bible tab is Fraunces'],
@@ -658,8 +731,9 @@ check('the four fonts by role on the Bible side of the Library: Fraunces for nam
     [join(L, 'LibraryBanner.tsx'), /<AppText variant="h4"[^>]*>\{title\}<\/AppText>/, 'the title of the banner is Fraunces'],
     [join(L, 'LibraryBanner.tsx'), /<AppText variant="accent"[^>]*>\{note\}<\/AppText>/, 'the one note of the banner is Caveat'],
     [join(L, 'LibraryBanner.tsx'), /<AppText variant="label"[^>]*>\{cta\}<\/AppText>/, 'the label of the gold pill is Inter, never the handwriting'],
-    [join(L, 'bible', 'ContinueCard.tsx'), /<AppText variant="mono"[^>]*>\{placeLabel\(place\)\}<\/AppText>/, 'the chapter on the continue card is a reference: JetBrains Mono'],
-    [join(L, 'bible', 'ContinueCard.tsx'), /<AppText variant="label" muted[^>]*>\{CONTINUE_TITLE\}<\/AppText>/, 'the words over it are Inter'],
+    [join(L, 'continueBar', 'ContinueBar.tsx'), /<AppText variant="h4"[^>]*>\{view\.head\}<\/AppText>/, 'the name of the place on the Continue reading bar is Fraunces (h4)'],
+    [join(L, 'continueBar', 'ContinueBar.tsx'), /<AppText variant="h4"[^>]*>\{view\.tail\}<\/AppText>/, 'and so is its chapter: the one piece of it that is never cut'],
+    [join(L, 'continueBar', 'ContinueBar.tsx'), /<AppText variant="label"[^>]*>\{CONTINUE_TITLE\}<\/AppText>/, 'the words over it are Inter'],
     [join(L, 'bible', 'Reader.tsx'), /<AppText variant="h4" color=\{role\.accentText\}[^>]*>\{book\.name\}<\/AppText>/, 'the name of the book over the chapter is Fraunces'],
     [join(L, 'bible', 'Reader.tsx'), /<AppText variant="h2" accessibilityRole="header"[^>]*>\{chapterTitle\(place\)\}<\/AppText>/, 'the title of the chapter is Fraunces'],
     [join(L, 'bible', 'Reader.tsx'), /\{!!chapter\.title && <AppText variant="h4" muted /, 'the title of a psalm is Fraunces'],
@@ -690,7 +764,7 @@ check('the four fonts by role on the Bible side of the Library: Fraunces for nam
   // Caveat: ONE short note per screen, never more (the brand: max one per design), counted over the files each screen draws
   const accent = (files: string[]) => files.reduce((sum, f) => sum + (strip(read(f)).match(/variant="accent"/g) ?? []).length, 0);
   const screens: Record<string, { files: string[]; notes: number }> = {
-    'the Bible tab': { files: [join('app', '(tabs)', 'library.tsx'), join(L, 'LibraryBanner.tsx'), join(L, 'LibraryTabs.tsx'), join(L, 'bible', 'BookGrid.tsx'), join(L, 'bible', 'TestamentBar.tsx'), join(L, 'bible', 'ContinueCard.tsx')], notes: 1 },
+    'the Bible tab': { files: [join('app', '(tabs)', 'library.tsx'), join(L, 'LibraryBanner.tsx'), join(L, 'LibraryTabs.tsx'), join(L, 'bible', 'BookGrid.tsx'), join(L, 'bible', 'TestamentBar.tsx'), join(L, 'continueBar', 'ContinueBar.tsx')], notes: 1 },
     'the chapters of a book': { files: [join('app', 'library', 'bible', '[code]', 'index.tsx'), join(L, 'bible', 'ChapterGrid.tsx')], notes: 1 },
     'the reader': { files: [join(L, 'bible', 'Reader.tsx'), join(L, 'bible', 'ReaderText.tsx'), join(L, 'bible', 'ChapterNav.tsx'), join(L, 'bible', 'VerseActions.tsx')], notes: 1 },
     'the results of a search': { files: [join(L, 'SearchResults.tsx'), join(L, 'bible', 'VerseRows.tsx')], notes: 0 },
@@ -721,6 +795,78 @@ check('every screen registered in the root layout is a file, so the stack never 
     const candidates = [`${name}.tsx`, join(name, 'index.tsx'), join(name, '_layout.tsx')];
     assert.ok(candidates.some((c) => exists(join('app', c))), `app/${name} does not exist`);
   }
+});
+
+// ---- ONE Back button. The owner saw a Back that was a pill ("Contents"), a bare chevron of 30, a button of 44 and a button without its hairline, on different screens
+// (2026-11-08): the Back button of the app is components/BackButton.tsx, the round 48 IconButton with the back chevron, and no other file draws the chevron as a way back.
+
+/** The files that draw the back chevron and are NOT a way back, each with the reason: a "Previous" arrow moves along a series (it replaces the screen or changes what it shows), it does not leave the screen. */
+const CHEVRON_THAT_IS_NOT_BACK: Record<string, string> = {
+  'src/features/library/bible/ChapterNav.tsx': 'the arrow of "Previous: Psalm 120", the chapter before in the Bible, which replaces the screen',
+  'src/features/library/books/ChapterFooter.tsx': 'the arrow of "Previous" at the end of a chapter of a book, which replaces the screen',
+  'src/features/library/books/ReaderBar.tsx': 'the Previous button of the bar at the bottom of the reader (named by the chapter it goes to), which replaces the screen',
+  'src/features/library/daily/WeekStrip.tsx': 'the arrow to the week before, which changes the strip',
+  'src/features/library/daily/MonthCalendar.tsx': 'the arrow to the month before, which changes the calendar',
+};
+/** The files with a text button that says "Back" in a form that has steps: Back next to Continue, the previous step of the form (the Back button of the app is at the top of the screen as well, where there is one). */
+const TEXT_BACK_OF_A_FORM: Record<string, string> = {
+  'app/business/register.tsx': 'the footer of the form of a business: Back and Continue, the previous step',
+  'app/onboarding.tsx': 'the footer of the first steps: Back and Continue, the previous step (there is no screen before the first step to go back to)',
+  'app/diary/[id].tsx': 'the page that says "This page is not here": its one big button is the way out, as well as the Back button of the app at its top',
+};
+const chevron = /\b(?:name|icon|direction)=(["'])back\1|\bname: ['"]back['"]/;
+const BACK_BUTTON = join('src', 'components', 'BackButton.tsx');
+
+check('ONE Back button: the round 48 IconButton of components/BackButton.tsx is the only file that draws the back chevron as a way back; the others that draw it are a "Previous" arrow, each on a list with its reason', () => {
+  const offenders = files.filter((f) => f !== BACK_BUTTON && chevron.test(read(f)) && !(f in CHEVRON_THAT_IS_NOT_BACK));
+  assert.deepEqual(offenders, [], `these files draw the back chevron: the Back button of a screen is <BackButton /> (components/BackButton.tsx); a "Previous" arrow goes on the list of this test with its reason`);
+  for (const f of Object.keys(CHEVRON_THAT_IS_NOT_BACK)) {
+    assert.ok(exists(f), `${f} is on the list of the chevrons that are not Back and it does not exist`);
+    assert.match(read(f), chevron, `${f} no longer draws the back chevron: take it off the list`);
+  }
+  // none of those draws it as a way back: each is named by where it goes (Previous, an arrow of a week or a month), never "Back"
+  for (const f of Object.keys(CHEVRON_THAT_IS_NOT_BACK)) assert.doesNotMatch(read(f), /(?:label|accessibilityLabel)=["']Back["']/, `${f}: an arrow that is not Back is not called Back`);
+  // and nobody makes a Back of their own out of other parts: no control labelled "Back" outside the one component, but the buttons of a form's footer, on their own list
+  const handMade = files.filter((f) => f !== BACK_BUTTON && /(?:\blabel|accessibilityLabel)=["']Back["']/.test(read(f)));
+  assert.deepEqual(handMade.filter((f) => !(f in TEXT_BACK_OF_A_FORM)), [], 'a control labelled "Back" that is not the BackButton of the app');
+  for (const [f, why] of Object.entries(TEXT_BACK_OF_A_FORM)) {
+    assert.ok(handMade.includes(f), `${f} (${why}) has no Back of a form any more: take it off the list`);
+    assert.match(read(f), /<Pill\b[^>]*label="Back"/, `${f}: its Back is a Pill with the word, a button of a form, not a copy of the round Back button`);
+    assert.doesNotMatch(read(f), /<(?:Pressable|IconButton)\b[^>]*(?:label|accessibilityLabel)="Back"/, `${f}`);
+  }
+});
+
+check('the Back button of the app is the IconButton of the app and nothing else: round, 48, labelled "Back", with a hint only when it goes somewhere other than the screen before; the same on every screen', () => {
+  const src = read(BACK_BUTTON);
+  const body = src.split('\n').filter((l) => !/^\s*\/\//.test(l)).join('\n');
+  assert.equal((body.match(/<IconButton\b/g) ?? []).length, 1, 'one IconButton');
+  assert.match(body, /<IconButton name="back" label="Back" hint=\{hint\} onPress=\{onPress \?\? \(\(\) => \(router\.canGoBack\(\) \? router\.back\(\) : router\.replace\(fallback\)\)\)\} \/>/, 'the IconButton of the app with the back chevron, and by default the screen before, or the home of the screen when there is none');
+  assert.doesNotMatch(body, /\bsize=|\bflat\b|\bbadge=|\bactive=/, 'no size, no flat: it is the same on every screen');
+  assert.match(body, /type Props = \{ onPress\?: \(\) => void; fallback\?: Href; hint\?: string \};/, 'three props: what it does, where to go when there is nothing behind, what a screen reader adds');
+  assert.match(read(join('src', 'components', 'ui.tsx')), /size = 48/, 'the IconButton is 48 unless it is asked for another size (the top rows of the tabs ask for 52: Back never does)');
+  // every use passes nothing but those three props
+  for (const f of files) {
+    for (const m of read(f).matchAll(/<BackButton\b([^>]*?)\/>/g)) {
+      const props = [...m[1].matchAll(/\b(\w+)=/g)].map((x) => x[1]);
+      for (const prop of props) assert.ok(['onPress', 'fallback', 'hint'].includes(prop), `${f}: <BackButton ${prop}=...>: the Back button has no ${prop}`);
+    }
+  }
+  const users = files.filter((f) => /<BackButton\b/.test(read(f)));
+  assert.ok(users.length >= 30, `${users.length} files draw the Back button`);
+  for (const f of users) assert.match(read(f), /import \{ BackButton \} from '(?:@\/components|\.\.?)\/BackButton';/, `${f} imports it from components/BackButton`);
+  // ScreenHeader (the headers of the inbox, the friends, the chats) draws it too, and so do the sign-in screens
+  assert.match(read(join('src', 'features', 'social', 'components', 'primitives.tsx')), /\{onBack && <BackButton onPress=\{onBack\} \/>\}/);
+  assert.match(read(join('src', 'components', 'auth', 'AuthShell.tsx')), /\{back && <BackButton \/>\}/);
+});
+
+check('the two readers: the Books reader has the Back button of the app at the top (it goes to the contents and says so), the Bible reader the Back button and "All chapters" as a ghost pill of the app; the title of a book in the bar is the type scale\'s body', () => {
+  const books = read(join('src', 'features', 'library', 'books', 'ReaderHeader.tsx'));
+  assert.match(books, /<BackButton onPress=\{onContents\} hint="Back to the contents of this book" \/>/);
+  const bible = read(join('src', 'features', 'library', 'bible', 'Reader.tsx'));
+  assert.match(bible, /<BackButton fallback=\{bookHref\(place\.code\)\} \/>/);
+  assert.match(bible, /<Pill variant="ghost" compact label="All chapters" accessibilityLabel="All chapters of this book"/);
+  assert.match(read(join('src', 'components', 'Pill.tsx')), /minHeight: large \? 68 : compact \? 48 : layout\.touchPrimary/, 'a compact pill is 48 high, like the Back button next to it');
+  assert.match(read(join('src', 'features', 'library', 'books', 'ReaderBar.tsx')), /const TITLE = \{ fontSize: textStyle\('body'\)\.fontSize, lineHeight: textStyle\('body'\)\.lineHeight \};/);
 });
 
 console.log(`${n} of ${n} passed`);

@@ -28,7 +28,7 @@ const { chromium } = require('playwright');
 
 // The label above each phone in design/index.html -> the file name the website uses.
 const SCREENS = {
-  'Me · Journey': 'me-journey',
+  'Me · Journey, grid': 'me-journey', // scrolled to the strip: the first tile is the card that writes a post, and the posts follow (the phone before it, Me · Journey, is the top of the screen)
   'Me · Write · Caption & Post': 'me-write-caption',
   'Me · Passport': 'me-passport',
   'Me · Plan': 'me-plan',

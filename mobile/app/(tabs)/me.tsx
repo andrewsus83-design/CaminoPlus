@@ -20,8 +20,11 @@ import { planProgress } from '@/features/me/plan';
 import { JourneyGrid } from '@/features/me/JourneyGrid';
 import { SampleJourney } from '@/features/me/SampleJourney';
 import { Highlights, ShowAllBar } from '@/features/me/Highlights';
+import { AllPlaces, PlaceHeader } from '@/features/me/AllPlaces';
 import { buildHighlights } from '@/features/me/highlights';
-import { DEFAULT_ME_TAB, ME_FAB, ME_TABS, type MeTab } from '@/features/me/tabs';
+import { buildRoutePlaces, emptyPlaceLine, visitedCount } from '@/features/me/routePoints';
+import { POSTS_VIEW, resolveJourney, stepBack, tapAll, tapDestination, tapPlace, type JourneyView } from '@/features/me/journeyView';
+import { DEFAULT_ME_TAB, ME_FAB, ME_TABS, badgeText, inboxLabel, inboxTab, type MeTab } from '@/features/me/tabs';
 import { usePostMedia } from '@/features/me/usePostMedia';
 import { NotesTab } from '@/features/notes/NotesTab';
 import { updateProfile } from '@/lib/api';
@@ -76,7 +79,7 @@ function PlanTracker({ days }: { days: DayT[] }) {
             <View key={d.id} style={{ flexDirection: 'row', gap: 16 }}>
               <View style={{ alignItems: 'center', width: 36 }}>
                 <View style={{ width: 36, height: 36, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center', backgroundColor: done ? c.success : isNext ? c.gold : role.surface, borderWidth: done || isNext ? 0 : 2, borderColor: c.sand300 }}>
-                  {done ? <Icon name="check" color={c.white} size={20} /> : <AppText variant="caption" color={isNext ? c.blue : role.muted} style={{ fontFamily: 'Inter_600SemiBold' }}>{d.day_number}</AppText>}
+                  {done ? <Icon name="check" color={c.white} size={20} /> : <AppText variant="caption" color={isNext ? role.onHighlight : role.muted} style={{ fontFamily: 'Inter_600SemiBold' }}>{d.day_number}</AppText>}
                 </View>
                 {i < days.length - 1 && <View style={{ width: 3, flex: 1, minHeight: 28, backgroundColor: done ? c.success : c.sand300 }} />}
               </View>
@@ -123,14 +126,24 @@ export default function Me() {
   // every place would look "not visited yet". The pictures are read once (usePostMedia) and shared by the row and the grid.
   const media = usePostMedia(posts);
   const highlights = useMemo(() => (days && posts ? buildHighlights(days, posts) : []), [days, posts]);
-  const [filterKey, setFilterKey] = useState<string | null>(null);
-  // The destination the Journey grid is showing. A key that is no longer a visited destination (the data was reloaded) is no filter.
-  const active = filterKey ? highlights.find((h) => h.key === filterKey && h.state === 'visited') ?? null : null;
-  const onlyIds = useMemo(() => (active ? new Set(active.posts.map((p) => p.id)) : null), [active]);
+  // The places of the whole route (not only the plan) with the posts at each: the stamps of the All view, the first item of the row. Also only once the posts are known.
+  const places = useMemo(() => (posts ? buildRoutePlaces(stages, posts) : []), [stages, posts]);
+  // What the Journey area shows: all the posts, one destination of the row, the stamps of the All view, or one place of them (features/me/journeyView.ts). A key that
+  // names nothing any more (the data was reloaded) is no filter.
+  const [view, setView] = useState<JourneyView>(POSTS_VIEW);
+  const shown = useMemo(() => resolveJourney(view, highlights, places), [view, highlights, places]);
+  const onlyIds = shown.kind === 'destination' || shown.kind === 'place' ? shown.ids : null;
+  const activeKey = shown.kind === 'destination' && view.view === 'posts' ? view.destination : null; // the highlight whose posts the grid shows
+  const onJourney = tab === 'Journey';
   const pickHighlight = (h: { key: string }) => {
-    // From the Plan or Health tab it brings you to the Journey grid with that destination; on the grid the same one again clears it.
-    if (tab !== 'Journey') { setTab('Journey'); setFilterKey(h.key); return; }
-    setFilterKey((k) => (k === h.key ? null : h.key));
+    // From the Plan, Health or Notes tab it brings you to the Journey grid with that destination; on the grid the same one again clears it.
+    setTab('Journey');
+    setView((v) => tapDestination(v, h.key, onJourney));
+  };
+  // The All item: from another tab it brings you to the stamps; on the grid it opens them, and on the stamps it closes them.
+  const pickAll = () => {
+    setTab('Journey');
+    setView((v) => tapAll(v, onJourney));
   };
   const changePhoto = async () => {
     if (!session) return;
@@ -191,13 +204,14 @@ export default function Me() {
   const loading = <ActivityIndicator color={role.action} style={{ marginTop: 24 }} />;
 
   const onNotes = tab === 'Notes';
-  // The one floating button follows the sub-tab (features/me/tabs.ts): a note on Notes, a journey post on Journey, none on Plan and Health.
-  const fab = ME_FAB[tab];
-  // Everything above the content of a sub-tab: the header (handle, bell and gear, avatar and stats, name and bio, the My Camino card, the highlights) and the strip
+  // The one floating button is the chat button, the same on Notes, Journey, Plan and Health (features/me/tabs.ts). It opens the inbox on the tab where
+  // something waits (Messages, else Notifications, else Messages) and carries the unread badge that the bell used to carry.
+  const openInbox = () => router.push({ pathname: ME_FAB.href, params: { tab: inboxTab(unread) } });
+  // Everything above the content of a sub-tab: the header (handle and gear, avatar and stats, name and bio, the My Camino card, the highlights) and the strip
   // of sub-tabs. Both hosts below draw it, so it looks the same on every sub-tab.
   const top = (
     <>
-      {/* Header follows the design system: handle pill + bell, avatar with stats, name and bio. */}
+      {/* Header follows the design system: handle pill + gear, avatar with stats, name and bio. */}
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 52 }}>
         <AppText variant="h4" numberOfLines={1} style={{ flexShrink: 1 }}>{profile?.username ?? name}</AppText>
         {!!profile?.username && (
@@ -205,9 +219,8 @@ export default function Me() {
             <Icon name={copied ? 'check' : 'copy'} color={copied ? c.success : role.muted} size={16} />
           </Pressable>
         )}
-        {/* Top right: the inbox, and Settings last, in the corner. Settings is a screen of its own, no longer a tab. */}
+        {/* Top right: Settings only, in the corner. The inbox is the chat button at the bottom right. Settings is a screen of its own, no longer a tab. */}
         <View style={{ marginLeft: 'auto', flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-          <IconButton name="bell" label={unread.total ? `Inbox, ${unread.total} unread` : 'Inbox'} badge={Math.min(unread.total, 99)} onPress={() => router.push('/inbox')} size={52} />
           <IconButton name="settings" label="Settings" onPress={() => router.push('/settings')} size={52} />
         </View>
       </View>
@@ -269,7 +282,7 @@ export default function Me() {
             </View>
           </Pressable>
         ) : <AppText variant="accent" color={role.accentText}>Buen Camino!</AppText>}
-        <Highlights key={session?.user.id ?? 'none'} items={highlights} days={days ?? []} media={media} activeKey={active?.key ?? null} userId={session?.user.id} onPick={pickHighlight} />
+        <Highlights key={session?.user.id ?? 'none'} items={highlights} days={days ?? []} media={media} activeKey={activeKey} userId={session?.user.id} onPick={pickHighlight} all={places.length > 0 ? { visited: visitedCount(places), total: places.length, on: shown.kind === 'stamps' || shown.kind === 'place', onPress: pickAll } : null} />
       </View>
       <SubTabs tabs={ME_TABS} value={tab} onChange={setTab} />
     </>
@@ -288,14 +301,20 @@ export default function Me() {
           {(offline || stale) && <FormMessage tone="info">You are offline. Showing what is saved on this phone.</FormMessage>}
           {!!error && <FormMessage>{`Could not load your data. ${error}`}</FormMessage>}
 
-          {tab === 'Journey' && !!active && <ShowAllBar name={active.name} onPress={() => setFilterKey(null)} />}
-          {tab === 'Journey' && (!posts ? (offline ? <Empty text="You are offline. Your journey posts will show up when you are back online." /> : loading) : posts.length === 0
+          {/* Over the grid while it shows one place, the way back: from a destination of the row (the bar) to all the posts, from a place of the All view (Back) to the stamps. */}
+          {tab === 'Journey' && shown.kind === 'destination' && <ShowAllBar name={shown.name} onPress={() => setView(stepBack)} />}
+          {tab === 'Journey' && shown.kind === 'place' && <PlaceHeader name={shown.name} onBack={() => setView(stepBack)} />}
+          {tab === 'Journey' && shown.kind === 'place' && shown.empty && <Empty text={emptyPlaceLine(shown.name)} />}
+          {tab === 'Journey' && shown.kind === 'stamps' && <AllPlaces places={places} onPick={(p) => setView(tapPlace(p.key))} />}
+          {tab === 'Journey' && shown.kind !== 'stamps' && (!posts ? (offline ? <Empty text="You are offline. Your journey posts will show up when you are back online." /> : loading) : posts.length === 0 && shown.kind === 'grid'
             ? <SampleJourney />
             : <JourneyGrid posts={posts} media={media} only={onlyIds} />)}
 
           {tab === 'Plan' && (!days ? (offline ? <Empty text="You are offline and your plan is not saved on this phone yet. Open it once with a connection." /> : loading) : <PlanTracker days={days} />)}
 
           {tab === 'Health' && <Health />}
+          {/* Room under the last thing for the chat button over the corner: with the gap above it, 56 more, so the room is the one the Notes feed leaves (the bar, the button, a margin). */}
+          <View style={{ height: 40 }} />
         </Screen>
       )}
       <Modal visible={editBio} transparent animationType="slide" onRequestClose={() => setEditBio(false)}>
@@ -311,7 +330,7 @@ export default function Me() {
           </View>
         </KeyboardAvoidingView>
       </Modal>
-      {fab && <Fab label={fab.label} icon={fab.icon} onPress={() => router.push(fab.href)} />}
+      <Fab label={inboxLabel(unread.total)} icon={ME_FAB.icon} hint={ME_FAB.hint} badge={badgeText(unread.total)} onPress={openInbox} />
     </View>
   );
 }

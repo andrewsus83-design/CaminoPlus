@@ -1,5 +1,6 @@
-// Scenarios of the Bible side of the Library: the books as a grid of square tiles, the chapters of a book, the reader with Previous and Next, a verse chosen and
-// bookmarked, a link to a verse, the search of verses, the card that continues the chapter read last, and the addresses that lead nowhere. Same rules as
+// Scenarios of the Bible side of the Library: the books as compact tiles, two in a row, the chapters of a book, the reader with Previous and Next, a verse chosen and
+// bookmarked, a link to a verse, the search of verses and the addresses that lead nowhere (going back to the chapter read last is the Continue reading bar, in
+// continue.scenarios.mjs). Same rules as
 // scenarios.mjs (each runs in light and dark, in a browser of its own, and anything that goes wrong in the page fails it); they wait for what a person would wait
 // for, never for a fixed time. They use only what exists in the real text: Psalm 121 and John 1 are the chapters they read, Malachi 4 and Tobit 1 the pair across
 // a boundary, Genesis 1 and Revelation 22 the two ends of the Bible. scenarios.mjs puts them in its list.
@@ -14,16 +15,21 @@ const shown = (page, text) => page.getByText(text, { exact: true }).filter({ vis
 const box = async (locator, what) => { const b = await locator.boundingBox(); if (!b) throw new Error(`${what} has no box (it is not on the screen)`); return b; };
 const search = (page) => page.getByRole('textbox', { name: 'Search the library' });
 const keyOf = (name) => `kv:u.${UID}.library.${name}`;
-const setKey = (page, name, value) => page.evaluate(([k, v]) => localStorage.setItem(k, JSON.stringify(v)), [keyOf(name), value]);
 const readKey = (page, name) => page.evaluate((k) => localStorage.getItem(k), keyOf(name));
 
 /** The books of the Bible by part, as a person counts them. */
 const COUNTS = { 'Old Testament': 39, Deuterocanon: 7, 'New Testament': 27 };
 
-/** The names that are the hero of a tile at 390 wide: every one fits at 22 or more (Genesis, Exodus ... Judith). */
+/** The names that are the hero of a tile: every one is the full 24 (h4) from the narrowest phone up (Genesis, Exodus ... Judith). */
 const SHORT_NAMES = ['Genesis', 'Exodus', 'Numbers', 'Joshua', 'Judges', 'Ruth', 'Job', 'Psalms', 'Isaiah', 'Amos', 'Jonah', 'Micah', 'Mark', 'Luke', 'John', 'Acts', 'Romans', 'James', 'Jude', 'Tobit', 'Judith'];
 
-/** What the page says about every book tile that is on it: its box, and whether its name and its count are cut (read from the DOM, in the page). */
+/** The type scale of design/tokens.json that a tile uses, and the sums of gridMath.ts: a name is h4 24, h5 17 or h6 15 in Fraunces, the count is mono 15 in JetBrains Mono, a tile is as high as
+ *  two lines of h4 (30), space.2 (8) and the mono line (22) plus twice its padding and hairline (16 + 1 each side, 12 + 1 under 352 wide), two in a row, 12 apart (8 under 352). */
+const NAME_SIZES = [24, 17, 15];
+const COUNT_SIZE = 15;
+const tileSums = (width) => { const narrow = width < 352; const pad = narrow ? 12 : 16; const gap = narrow ? 8 : 12; return { pad, gap, edge: pad + 1, height: 60 + 8 + 22 + 2 * (pad + 1), tile: Math.floor((width - 32 - gap) / 2) }; };
+
+/** What the page says about every book tile that is on it: its box, the room between its outline and its words, and whether its name and its count are cut (read from the DOM, in the page). */
 const readTiles = (page) => page.evaluate(() => {
   const lines = (el) => { const r = document.createRange(); r.selectNodeContents(el); return new Set([...r.getClientRects()].map((x) => Math.round(x.top))).size; };
   const out = [];
@@ -33,10 +39,13 @@ const readTiles = (page) => page.evaluate(() => {
     const rect = b.getBoundingClientRect();
     if (!m || rect.width === 0) continue;
     const [name, count] = [b.children[0], b.children[1]];
+    const [nr, cr] = [name.getBoundingClientRect(), count.getBoundingClientRect()];
     out.push({
       label, name: m[1], x: rect.x, y: rect.y, w: rect.width, h: rect.height,
-      nameLines: lines(name), nameSize: parseFloat(getComputedStyle(name).fontSize), nameCut: name.scrollWidth > name.clientWidth + 1 || name.scrollHeight > name.clientHeight + 1,
-      countLines: lines(count), countSize: parseFloat(getComputedStyle(count).fontSize), countCut: count.scrollWidth > count.clientWidth + 1 || count.scrollHeight > count.clientHeight + 1,
+      padLeft: nr.left - rect.left, padTop: nr.top - rect.top, padBottom: rect.bottom - cr.bottom, padCountLeft: cr.left - rect.left,
+      nameLines: lines(name), nameSize: parseFloat(getComputedStyle(name).fontSize), nameFont: getComputedStyle(name).fontFamily, nameCut: name.scrollWidth > name.clientWidth + 1 || name.scrollHeight > name.clientHeight + 1,
+      nameWidest: Math.max(...[...name.childNodes].filter((n) => n.nodeType === 3).flatMap((n) => { const r = document.createRange(); r.selectNodeContents(n); return [...r.getClientRects()].map((q) => q.width); }), 0),
+      countLines: lines(count), countSize: parseFloat(getComputedStyle(count).fontSize), countFont: getComputedStyle(count).fontFamily, countCut: count.scrollWidth > count.clientWidth + 1 || count.scrollHeight > count.clientHeight + 1,
     });
   }
   return out;
@@ -52,7 +61,7 @@ const scrollPage = (page, y) => page.evaluate((to) => {
 
 export const BIBLE_SCENARIOS = [
   {
-    name: 'Library: the daily reading banner is compact (at most 120 high at 390 wide, 140 at 320), ONE button, and the banner, the three choices, the heading and the first row of tiles are all on the first screen',
+    name: 'Library: the daily reading banner is compact (at most 120 high at 390 wide, 140 at 320), ONE button, and the banner, the three choices, the heading and the first row of tiles (two) are all on the first screen, clear of the tab bar',
     persona: 'in',
     async run({ page, step, go }) {
       step('open Library at 390 x 844');
@@ -75,6 +84,10 @@ export const BIBLE_SCENARIOS = [
       assert(heading.y >= group.y + group.height - 1, 'the heading is under the choices');
       assert(first.y >= heading.y + heading.height - 1, 'the tiles are under the heading');
       assert(first.y + first.height <= tabs.y + 1, `the first row of tiles (bottom ${first.y + first.height}) is clear of the tab bar (top ${tabs.y}) on the first screen`);
+      const second = await box(button(page, 'Exodus, 40 chapters'), 'the Exodus tile');
+      assert(Math.abs(second.y - first.y) <= 1 && second.x > first.x + first.width, 'Genesis and Exodus are the two tiles of the first row');
+      assert(Math.abs(first.height - tileSums(390).height) <= 1, `a tile is ${tileSums(390).height} high at 390 (${first.height})`);
+      assert(second.y + second.height <= tabs.y + 1, 'and so is the second tile of the row');
       step('at 320 x 640 the banner is at most 140 high');
       await page.setViewportSize({ width: 320, height: 640 });
       await domQuiet(page, 300);
@@ -88,7 +101,7 @@ export const BIBLE_SCENARIOS = [
     },
   },
   {
-    name: 'Library: the three choices under the banner (Old Testament, Deuterocanon, New Testament) are an inline segmented control, move with the page, and show that part as a grid of three square tiles',
+    name: 'Library: the three choices under the banner (Old Testament, Deuterocanon, New Testament) are an inline segmented control, move with the page, and show that part as compact tiles, two in a row',
     persona: 'in',
     async run({ page, step, go }) {
       const group = page.getByRole('radiogroup', { name: 'Part of the Bible' });
@@ -109,14 +122,27 @@ export const BIBLE_SCENARIOS = [
       const after = await box(group, 'the choices after scrolling');
       assert(Math.abs((before.y - after.y) - went) < 3, `the choices moved with the page: ${before.y} -> ${after.y} after scrolling ${went}`);
       await scrollPage(page, 0);
-      step('the Old Testament is a grid of three square tiles, 39 of them: Genesis first, Malachi last, no "Soon"');
+      step('the Old Testament is a grid of compact tiles, two in a row, 39 of them: Genesis first, Malachi last, no "Soon"');
       await eventually(() => readTiles(page).then((t) => t.length), (n) => n === 39, { what: 'the number of tiles of the Old Testament' });
       const tiles = await readTiles(page);
       assert.equal(tiles[0].name, 'Genesis');
       assert.equal(tiles[38].name, 'Malachi');
       const xs = [...new Set(tiles.slice(0, 9).map((t) => Math.round(t.x)))];
-      assert.equal(xs.length, 3, `three columns (x: ${xs})`);
-      for (const t of tiles) assert(Math.abs(t.w - t.h) <= 1 && t.w >= 44, `${t.label} is a square of at least 44 (${t.w} x ${t.h})`);
+      assert.equal(xs.length, 2, `two columns (x: ${xs})`);
+      const sums = tileSums(390);
+      for (const t of tiles) {
+        assert(Math.abs(t.w - sums.tile) <= 1 && Math.abs(t.h - sums.height) <= 1, `${t.label} is a compact tile of ${sums.tile} by ${sums.height} at 390 (${t.w} x ${t.h})`);
+        assert(t.w > t.h, `${t.label} is wider than it is high (${t.w} x ${t.h}): not a square any more`);
+      }
+      step('the words are 17 from the outline (the hairline and space.4), on the left, at the top and at the bottom: the first letter used to be 4 from it');
+      for (const t of tiles) {
+        assert(Math.abs(t.padLeft - sums.edge) <= 0.6, `${t.label}: the name is ${t.padLeft} from the left of its tile, not ${sums.edge}`);
+        assert(Math.abs(t.padCountLeft - sums.edge) <= 0.6, `${t.label}: the count is ${t.padCountLeft} from the left of its tile, not ${sums.edge}`);
+        assert(Math.abs(t.padTop - sums.edge) <= 0.6, `${t.label}: the name is ${t.padTop} from the top of its tile, not ${sums.edge}`);
+        assert(Math.abs(t.padBottom - sums.edge) <= 0.6, `${t.label}: the count is ${t.padBottom} from the bottom of its tile, not ${sums.edge}`);
+      }
+      assert(Math.abs(tiles[2].y - tiles[0].y - sums.height - sums.gap) <= 1, `the rows are ${sums.gap} apart (${tiles[2].y - tiles[0].y - sums.height})`);
+      assert(Math.abs(tiles[1].x - tiles[0].x - sums.tile - sums.gap) <= 1, `the tiles of a row are ${sums.gap} apart`);
       await eventually(() => page.getByText(/^soon$/i).count(), (n) => n === 0, { what: 'the number of "Soon" chips on the Bible tab' });
       step('Deuterocanon: seven tiles, the note about the Greek additions of Esther and Daniel, the note about the Orthodox Bibles, and no row of added passages');
       await radio(page, 'Deuterocanon').click();
@@ -151,14 +177,15 @@ export const BIBLE_SCENARIOS = [
     },
   },
   {
-    name: 'Library: every one of the 73 book names fits its square tile without being cut, in 320, 390 and 430 wide, in the three parts, as a browser lays them out whether it hints the glyphs or not: the name is the hero (24, the long words down to 15 and the two Thessalonians to 14 from 390 up), the count small',
+    name: 'Library: every one of the 73 book names fits its tile without being cut, in 320, 360, 390 and 430 wide, in the three parts, as a browser lays them out whether it hints the glyphs or not: only the sizes of the type scale (the name 24, 17 or 15 in Fraunces, the short names the full 24, the count 15 in JetBrains Mono), 17 or more from 390 up, the words 17 from the outline (13 under 352)',
     persona: 'in',
     async run({ page, step, go }) {
       step('open Library');
       await go('/library');
-      for (const width of [320, 390, 430]) {
+      for (const width of [320, 360, 390, 430]) {
         await page.setViewportSize({ width, height: 900 });
         await domQuiet(page, 300);
+        const sums = tileSums(width);
         for (const [part, count] of Object.entries(COUNTS)) {
           step(`${width} wide, ${part}`);
           await radio(page, part).click();
@@ -168,13 +195,17 @@ export const BIBLE_SCENARIOS = [
             const lines = /^[1-3] /.test(t.name) || t.name === 'Song of Songs' ? 2 : 1;
             assert.equal(t.nameLines, lines, `${where}: the name is drawn in ${t.nameLines} line(s), not ${lines}`);
             assert(!t.nameCut, `${where}: the name is cut`);
+            assert(t.nameWidest <= t.w - 2 * sums.edge + 0.5, `${where}: the name is ${t.nameWidest.toFixed(1)} wide in ${t.w - 2 * sums.edge}`);
             assert.equal(t.countLines, 1, `${where}: the count is on one line`);
             assert(!t.countCut, `${where}: the count is cut`);
-            assert(t.nameSize >= 11 && t.nameSize <= 24, `${where}: the name is drawn at ${t.nameSize}`);
-            if (width >= 390) assert(t.nameSize >= (/Thessalonians/.test(t.name) ? 14 : 15), `${where}: the name is drawn at ${t.nameSize}, under ${/Thessalonians/.test(t.name) ? 14 : 15}`);
-            if (width >= 390 && SHORT_NAMES.includes(t.name)) assert(t.nameSize >= 22, `${where}: a short name is the hero of its tile and is drawn at ${t.nameSize}`);
-            assert(t.countSize >= 10 && t.countSize <= 12, `${where}: the count is drawn at ${t.countSize}`);
-            assert(Math.abs(t.w - t.h) <= 1 && t.w >= 44, `${where}: the tile is ${t.w} x ${t.h}`);
+            assert(NAME_SIZES.includes(t.nameSize), `${where}: the name is drawn at ${t.nameSize}, which is no size of the title tokens (24, 17, 15)`);
+            if (width >= 390) assert(t.nameSize >= 17, `${where}: the name is drawn at ${t.nameSize}, under 17`);
+            if (SHORT_NAMES.includes(t.name)) assert.equal(t.nameSize, 24, `${where}: a short name is the hero of its tile and is the full 24 (${t.nameSize})`);
+            assert.equal(t.countSize, COUNT_SIZE, `${where}: the count is the mono token, ${COUNT_SIZE} (${t.countSize})`);
+            assert(/Fraunces/.test(t.nameFont), `${where}: the name is Fraunces (${t.nameFont})`);
+            assert(/JetBrains/.test(t.countFont), `${where}: the count is JetBrains Mono (${t.countFont})`);
+            assert(Math.abs(t.w - sums.tile) <= 1 && Math.abs(t.h - sums.height) <= 1, `${where}: the tile is ${sums.tile} by ${sums.height}, not ${t.w} x ${t.h}`);
+            assert(Math.abs(t.padLeft - sums.edge) <= 0.6 && Math.abs(t.padTop - sums.edge) <= 0.6 && Math.abs(t.padBottom - sums.edge) <= 0.6, `${where}: the words are ${sums.edge} from the outline (left ${t.padLeft}, top ${t.padTop}, bottom ${t.padBottom})`);
           }
         }
       }
@@ -486,49 +517,6 @@ export const BIBLE_SCENARIOS = [
       await button(page, 'Go to John 3').waitFor();
       await search(page).fill('john 22');
       await eventually(() => page.getByRole('button', { name: /^Go to/ }).count(), (n) => n === 0, { what: 'the number of "Go to" cards for a chapter the book does not have' });
-    },
-  },
-  {
-    name: 'Library: the card "Continue reading" appears only when something was read, opens that chapter, follows the last chapter read, and is ignored when the place kept no longer exists',
-    persona: 'in',
-    async run({ page, step, go }) {
-      const card = (name) => page.getByRole('button', { name, exact: true });
-      step('nothing read: no card');
-      await go('/library');
-      await page.getByRole('radiogroup', { name: 'Part of the Bible' }).waitFor();
-      await eventually(() => page.getByText('Continue reading', { exact: true }).count(), (n) => n === 0, { what: 'the number of continue cards before anything was read' });
-      step('read Psalm 121 (the place is kept on the phone, under a key of this person)');
-      await go('/library/bible/PSA/121');
-      await page.getByRole('heading', { name: 'Psalm 121', exact: true }).waitFor();
-      await eventually(() => readKey(page, 'lastRead'), (v) => !!v && JSON.parse(v).code === 'PSA' && JSON.parse(v).chapter === 121, { what: 'the chapter kept on the phone' });
-      step('the card is on the Bible tab, above the banner, and opens the chapter');
-      await go('/library');
-      await card('Continue reading, Psalm 121').waitFor();
-      const c = await box(card('Continue reading, Psalm 121'), 'the card');
-      const banner = await box(page.getByRole('button', { name: /^Read today/ }), 'the banner');
-      assert(c.height >= 56 && c.y < banner.y, `the card (${c.height} high) is above the banner`);
-      await page.getByText('Psalm 121', { exact: true }).first().waitFor();
-      await card('Continue reading, Psalm 121').click();
-      await waitPath(page, '/library/bible/PSA/121', 'the address after the continue card');
-      step('read another chapter: the card follows it');
-      await go('/library/bible/JHN/3');
-      await go('/library');
-      await card('Continue reading, John 3').waitFor();
-      await eventually(() => card('Continue reading, Psalm 121').count(), (n) => n === 0, { what: 'the number of cards for the older chapter' });
-      step('the card is only on the Bible tab and goes while searching');
-      await shown(page, 'Books').click();
-      await eventually(() => page.getByText('Continue reading', { exact: true }).count(), (n) => n === 0, { what: 'the number of continue cards on Books' });
-      await shown(page, 'Bible').click();
-      await card('Continue reading, John 3').waitFor();
-      await search(page).fill('john');
-      await eventually(() => page.getByText('Continue reading', { exact: true }).count(), (n) => n === 0, { what: 'the number of continue cards while searching' });
-      step('a place that no longer exists is ignored, without an error: a book that is gone, a chapter past the last, a damaged value');
-      for (const bad of [{ v: 1, code: 'ZZZ', chapter: 1, at: 1 }, { v: 1, code: 'PSA', chapter: 151, at: 1 }, { v: 2, code: 'PSA', chapter: 1 }, 'x', { v: 1, code: 'bible-additions-to-esther', chapter: 1 }]) {
-        await setKey(page, 'lastRead', bad);
-        await go('/library');
-        await page.getByRole('radiogroup', { name: 'Part of the Bible' }).waitFor();
-        await eventually(() => page.getByText('Continue reading', { exact: true }).count(), (n) => n === 0, { what: `the number of continue cards for ${JSON.stringify(bad)}` });
-      }
     },
   },
   {

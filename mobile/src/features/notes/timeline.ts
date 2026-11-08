@@ -1,30 +1,34 @@
 // The Notes feed of Me: the pages of the diary as a feed, like a timeline. This file is the logic of it and nothing else: no
-// React, no React Native, so plain node can import it (npm run test:me). It decides which notes a filter shows, what time a row
-// says ("now", "5m", "2h", "Yesterday", "6 Nov", "6 Nov 2025"), how the photos and videos of a note are laid out in the grid, what the
-// share sheet is given, what a screen reader says for a row, and the words of the tab.
+// React, no React Native, so plain node can import it (npm run test:me). It decides what the feed shows (loading, an empty diary or the
+// notes), what time a row says ("now", "5m", "2h", "Yesterday", "6 Nov", "6 Nov 2025"), how the photos and videos of a note are laid out in
+// the grid, what the share sheet is given, what a screen reader says for a row, and the words of the tab. There is no filter: every note is
+// in the one list, newest first, under the card that writes a new one.
 //
 // Notes are the pages of the diary (features/diary), private and only on this phone. Nothing here reads or writes the store: the
 // screen gets the pages from useDiary and hands them in. Nothing here touches the network.
 import { mediaOf, type DiaryMedia } from '../diary/media';
 import { normalizePlace, placeLabel, type DiaryPlace } from '../diary/place';
-import { clip, metaLine } from '../diary/present';
+import { DRAFT_TAG, clip, metaLine } from '../diary/present';
 import { parseRich, plainText } from '../diary/richtext';
-import type { DiaryEntry } from '../diary/store';
+import { isDraft, type DiaryEntry } from '../diary/store';
 
 /** What a note needs from a page. A page of the diary is one; so is a smaller thing a test builds. */
-export type NoteLike = Pick<DiaryEntry, 'id' | 'createdAt' | 'title' | 'body'> & Partial<Pick<DiaryEntry, 'media' | 'place'>>;
+export type NoteLike = Pick<DiaryEntry, 'id' | 'createdAt' | 'title' | 'body'> & Partial<Pick<DiaryEntry, 'media' | 'place' | 'status'>>;
 
 /* ------------------------------------------------------------------------------------------------ the words */
 
-/** The prompt in the composer row on top of the feed: a tap on it opens a new page. */
-export const COMPOSER_PLACEHOLDER = "What's happening on your Camino?";
-/** The one quiet line under the composer. It is true: the pages are kept only on this phone. */
+/** The title of the card on top of the feed, and what a screen reader says for it: the whole card is one button that opens a blank page. */
+export const WRITE_NOTE = 'Write a note';
+/** What a screen reader adds to the card: where it leads. */
+export const WRITE_NOTE_HINT = 'Opens a blank page';
+/** The card is at least this tall, in pixels (a thing to touch that is easy to find, more than TOUCH_MIN). */
+export const WRITE_CARD_MIN = 64;
+/** The one quiet line under the title of the card. It is true: the pages are kept only on this phone. */
 export const NOTES_PRIVACY = 'Notes stay on this phone.';
+/** The empty diary says this under the card, which is the way in: there is no second button to write. */
 export const EMPTY_TITLE = 'No notes yet';
 export const EMPTY_TEXT = 'Write a few lines about your day on the Way: what you saw, who you met, how you feel.';
-export const EMPTY_BUTTON = 'Write your first note';
 export const LOADING_LABEL = 'Loading your notes';
-export const SHOW_ALL = 'Show all notes';
 export const SHOW_MORE = 'Show more';
 export const SHOW_LESS = 'Show less';
 /** What the person is told when something did not work: the title and the sentence of the system's own dialog. */
@@ -37,54 +41,13 @@ export const BLANK_NOTE = 'Nothing written yet';
 /** The name a person has when they have set neither a display name nor a username. */
 export const FALLBACK_NAME = 'Pilgrim';
 
-/* ------------------------------------------------------------------------------------------------ the filter */
+/* ------------------------------------------------------------------------------------------------ what the list shows */
 
-export const NOTE_FILTERS = ['all', 'media', 'places'] as const;
-export type NoteFilter = (typeof NOTE_FILTERS)[number];
-
-export const FILTER_LABEL: Record<NoteFilter, string> = { all: 'All', media: 'Photos and videos', places: 'Places' };
-
-/** What a filter says when it has nothing to show though the diary has notes. */
-export const FILTER_EMPTY: Record<'media' | 'places', { title: string; text: string }> = {
-  media: { title: 'No photos or videos yet', text: 'Notes that have a photo or a video are shown here.' },
-  places: { title: 'No places yet', text: 'Notes that have a place are shown here.' },
-};
-
-export const hasMedia = (e: NoteLike): boolean => mediaOf(e).length > 0;
-export const hasPlace = (e: NoteLike): boolean => normalizePlace(e.place) !== null;
-
-export function matchesFilter(e: NoteLike, filter: NoteFilter): boolean {
-  if (filter === 'media') return hasMedia(e);
-  if (filter === 'places') return hasPlace(e);
-  return true;
-}
-
-/** The notes a filter shows, in the order they came (newest first). "All" answers the very list it was given. */
-export function filterNotes<T extends NoteLike>(entries: readonly T[], filter: NoteFilter): readonly T[] {
-  return filter === 'all' ? entries : entries.filter((e) => matchesFilter(e, filter));
-}
-
-export type NoteCounts = Record<NoteFilter, number>;
-
-export function noteCounts(entries: readonly NoteLike[]): NoteCounts {
-  let media = 0;
-  let places = 0;
-  for (const e of entries) {
-    if (hasMedia(e)) media += 1;
-    if (hasPlace(e)) places += 1;
-  }
-  return { all: entries.length, media, places };
-}
-
-/** What a screen reader says for a tab of the filter: its name, how many notes it holds, and (said by the tab role) whether it is on. */
-export const filterLabel = (filter: NoteFilter, count: number): string => `${FILTER_LABEL[filter]}, ${count} ${count === 1 ? 'note' : 'notes'}`;
-
-/** What the list under the filter row is showing: nothing yet, an empty diary, a filter with nothing in it, or the notes. */
-export type FeedState = 'loading' | 'empty' | 'none-for-filter' | 'list';
-export function feedState(o: { ready: boolean; total: number; shown: number }): FeedState {
+/** What the list under the card is showing: nothing yet, an empty diary, or the notes. */
+export type FeedState = 'loading' | 'empty' | 'list';
+export function feedState(o: { ready: boolean; total: number }): FeedState {
   if (!o.ready) return 'loading';
-  if (o.total === 0) return 'empty';
-  return o.shown === 0 ? 'none-for-filter' : 'list';
+  return o.total === 0 ? 'empty' : 'list';
 }
 
 /* ------------------------------------------------------------------------------------------------ the time of a row */
@@ -255,6 +218,8 @@ export type NoteRow = {
   share: string;
   /** Nothing in it at all. */
   blank: boolean;
+  /** Still a draft: the row carries a "Draft" tag, and a screen reader says so. */
+  draft: boolean;
   /** What a screen reader reads for the whole row. */
   label: string;
 };
@@ -262,8 +227,8 @@ export type NoteRow = {
 const stop = (s: string) => (/[.!?…]$/.test(s) ? s : `${s}.`);
 
 /** The sentence a screen reader reads for a row: who, when, the title, the first words, and what is attached (photos, videos, the place). */
-export function rowLabel(o: { name: string; time: TimeParts | null; title: string; text: string; meta: string }): string {
-  return [o.name, o.time?.spoken ?? '', o.title, o.text, o.meta].filter((p) => p !== '').map(stop).join(' ');
+export function rowLabel(o: { name: string; time: TimeParts | null; title: string; text: string; meta: string; draft?: boolean }): string {
+  return [o.name, o.time?.spoken ?? '', o.draft ? DRAFT_TAG : '', o.title, o.text, o.meta].filter((p) => p !== '').map(stop).join(' ');
 }
 
 /** Everything a row draws, from a page. `now` and the person are given; nothing is read from anywhere else. */
@@ -276,6 +241,7 @@ export function noteRow(e: NoteLike, now: Date, who: { name: string }): NoteRow 
   const time = noteTime(e.createdAt, now);
   const blank = title === '' && words === '' && media.length === 0 && place === null;
   const meta = metaLine({ media: e.media, place: e.place });
+  const draft = isDraft(e);
   return {
     id: e.id,
     title,
@@ -287,7 +253,8 @@ export function noteRow(e: NoteLike, now: Date, who: { name: string }): NoteRow 
     time,
     share: shareText(e),
     blank,
-    label: rowLabel({ name: who.name, time, title, text: blank ? BLANK_NOTE : clip(words, 160), meta }),
+    draft,
+    label: rowLabel({ name: who.name, time, title, text: blank ? BLANK_NOTE : clip(words, 160), meta, draft }),
   };
 }
 

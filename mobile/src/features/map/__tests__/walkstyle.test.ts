@@ -1,4 +1,5 @@
 // Plain-node checks for the Walk view style, overlay layers and the preview scene. Run: npm run test:map
+import './lineShim'; // first: it lets the compiled sampleRoute find the OSM lines in assets/map/lines
 import assert from 'node:assert/strict';
 import { OSM_ATTRIBUTION } from '../config';
 import { C, DAY, NIGHT, buildStyle, firstLabelLayerId, paletteFor } from '../style';

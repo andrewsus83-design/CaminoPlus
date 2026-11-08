@@ -603,8 +603,8 @@ check('every control has a label for a screen reader, says it is a button, and i
   assert.match(cal, /\{ flex: 1, height: TOUCH,/, 'a day is as wide as its seventh of the card and 44 high');
   assert.match(cal, /minHeight: TOUCH, justifyContent: 'center'/, 'Today is 44 high');
   assert.match(cal, /accessibilityState=\{\{ disabled: !enabled \}\}\s+disabled=\{!enabled\}/, 'an arrow at the limit is off, and says so');
-  assert.match(source(`${DIR}/DailyHeader.tsx`), /<HeaderButton name="back" label="Back" onPress=\{onBack\} \/>/);
-  assert.match(source(ROUTE), /<DailyHeader onBack=\{goBack\} /);
+  assert.match(source(`${DIR}/DailyHeader.tsx`), /<BackButton fallback="\/library" \/>/, 'Back is the Back button of the app, which goes to the Library when the screen was opened by a link');
+  assert.match(source(ROUTE), /<DailyHeader onCalendar=\{openCalendar\} /);
   // and what each one does: a day selects itself, the arrows go back and forward (and look it), Today goes to today
   assert.match(cal, /onPress=\{\(\) => onSelect\(day\)\}/, 'a day selects itself');
   assert.match(cal, /<Arrow direction="back" label=\{previousMonthLabel\(shown, range\)\} enabled=\{canGoBack\} onPress=\{onPrevious\} \/>/, 'the left arrow goes to the month before');
@@ -641,7 +641,7 @@ check('the calendar: ring for today, fill for the chosen day, a ring inside the 
 check('the screen is a stack screen like Bookmarks: one row (Back, the title, the calendar, the bookmark), the week strip, then the reading of the picked day', () => {
   const src = source(ROUTE);
   assert.match(src, /<Screen tabBar=\{false\}>/);
-  assert.match(src, /router\.canGoBack\(\) \? router\.back\(\) : router\.replace\('\/library'\)/);
+  assert.doesNotMatch(src, /\brouter\.|useRouter|goBack\(/, 'the way back is the Back button of the header, the app\'s: the screen has no router and no goBack of its own');
   assert.match(src, /const daily = useDailyReading\(undefined, parseDateKey\(Array\.isArray\(date\) \? date\[0\] : date\)\);/, 'the clock is the phone\'s, and the date param is read, anything that is not a day meaning today');
   assert.ok(src.indexOf('<DailyHeader') < src.indexOf('<WeekStrip') && src.indexOf('<WeekStrip') < src.indexOf('<DayReading') && src.indexOf('<DayReading') < src.indexOf('<CalendarSheet'), 'order: header, strip, reading, the sheet');
   assert.match(src, /<DayReading day=\{daily\.selected\} \/>/);
@@ -649,12 +649,12 @@ check('the screen is a stack screen like Bookmarks: one row (Back, the title, th
   assert.match(src, /export default function DailyReading\(\)/);
   // the header: the title is next to Back, in the same row, with the calendar and the bookmark at the right edge, each at least 44
   const header = source(`${DIR}/DailyHeader.tsx`);
-  assert.ok(header.indexOf('name="back"') < header.indexOf('>Daily reading</AppText>') && header.indexOf('>Daily reading</AppText>') < header.indexOf('name="calendar"') && header.indexOf('name="calendar"') < header.indexOf('name="bookmark"'), 'order in the row: Back, title, calendar, bookmark');
+  assert.ok(header.indexOf('<BackButton') < header.indexOf('>Daily reading</AppText>') && header.indexOf('>Daily reading</AppText>') < header.indexOf('name="calendar"') && header.indexOf('name="calendar"') < header.indexOf('name="bookmark"'), 'order in the row: Back, title, calendar, bookmark');
   assert.match(header, /flexDirection: 'row', alignItems: 'center'/);
   assert.match(header, /<AppText variant="h3" accessibilityRole="header" numberOfLines=\{2\}/, 'the Fraunces title, a header, which wraps to a second line rather than run under a button');
-  assert.match(header, /const SIZE = 44;/);
+  assert.match(header, /const SIZE = 48;/, 'the two buttons are as big as the Back button next to them');
   assert.match(header, /width: SIZE, height: SIZE/);
-  assert.equal((header.match(/<HeaderButton /g) ?? []).length, 3, 'Back, calendar, bookmark');
+  assert.equal((header.match(/<HeaderButton /g) ?? []).length, 2, 'calendar and bookmark: Back is the BackButton of the app');
   assert.match(header, /label="Open calendar"/);
   assert.match(header, /label=\{bookmarked \? UNBOOKMARK_DAY : BOOKMARK_DAY\} selected=\{bookmarked\}/, 'the bookmark button says what a tap will do and exposes whether the day is bookmarked');
   // NEW RULE: selected and expanded are exposed with the aria props of React Native (aria-selected, aria-expanded), because the web does not draw the older accessibilityState object
@@ -680,7 +680,7 @@ check('the screen is a stack screen like Bookmarks: one row (Back, the title, th
   assert.match(src, /bookmarked=\{marks\.has\(key\)\} onBookmark=\{\(\) => marks\.toggle\(key\)\}/);
   assert.match(src, /\{marks\.failed && <FormMessage>\{BOOKMARK_NOT_SAVED\}<\/FormMessage>\}/, 'a bookmark that could not be saved says so');
   const bookmarks = source('app/library/bookmarks.tsx');
-  for (const shared of [/<Screen tabBar=\{false\}>/, /router\.canGoBack\(\) \? router\.back\(\) : router\.replace\('\/library'\)/, /<IconButton name="back" label="Back" onPress=\{goBack\} \/>/]) assert.match(bookmarks, shared, 'Bookmarks still has what this screen copies');
+  for (const shared of [/<Screen tabBar=\{false\}>/, /<BackButton fallback="\/library" \/>/]) assert.match(bookmarks, shared, 'Bookmarks still has what this screen copies');
 });
 
 check('a bookmarked day is a row on the Bookmarks screen: "Daily reading" as the heading, the date and the liturgical name in the row, opening the Daily reading on that day, with a bookmark that takes it off', () => {
@@ -1009,7 +1009,7 @@ check('the 320 phone is drawn as the app draws it there: the card reaches 10 px 
   assert.match(group, /\.dr-cal\.fit \{ margin: 0 -10px; padding: 8px 0; \}/, 'and the month calendar of the sheet the same');
   assert.match(group, /\.dr-c \{ flex: 1; min-height: 84px;/, 'a day of the strip is a seventh of the card and 84 high');
   assert.match(group, /\.dr-arrow \{ width: 44px; height: 44px;/);
-  assert.match(group, /\.dr-hb \{ width: 44px; height: 44px;/, 'the three buttons of the header');
+  assert.match(group, /\.dr-hb \{ width: 48px; height: 48px;/, 'the three buttons of the header, as big as the Back button of every screen');
   assert.match(group, /\.dr-sh \{ display: flex; align-items: center; min-height: 44px; \}/);
   assert.match(group, /\.dr-d \{ flex: 1; height: 44px;/, 'a day of the month calendar is 44 high in the page too');
   assert.match(group, /\.dr-rb \{ width: 100%; min-height: 64px;/);

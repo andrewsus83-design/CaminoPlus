@@ -1,5 +1,5 @@
 // The Books phones of design/index.html, drawn from the REAL catalog and the real text of the bundle (mobile/assets/library), with the functions the app itself uses to
-// work out what a cover, a page and a chapter say: the covers (cover.ts: the A5 size, how the title is broken into lines, the kind and the time), the shelves, the banner
+// work out what a cover, a page and a chapter say: the covers (cover.ts: the A5 size, how the title is broken into lines and the size it is set at, and the time; the kind of book is not on the cover), the shelves, the banner
 // and the words (copy.ts), the notice of each kind (notices.ts), the contents, the facts and the reader's layout (reading.ts), the type scale of the reader (readerType.ts),
 // the passages (passages.ts) and the search (search.ts). Nothing here is typed by hand that the app knows, so the page cannot say a number, a title or a notice that the
 // app does not: designBooks.test.ts draws the page again on every run and fails when design/index.html is not what this file makes of the bundle.
@@ -30,6 +30,8 @@ import {
 } from '../books/reading';
 import { DEFAULT_STEP, LAST_STEP, readerType } from '../books/readerType';
 import { safeText } from '../books/safeText';
+import { BAR_ROOM } from '../continueBar/barLayout';
+import { CONTINUE_TITLE, HIDE_LABEL, describeBook, type SpotView } from '../continueBar/spot';
 import { BOOKMARKS_KEPT } from '../sample';
 import { itemKey, resultsLine, searchLibrary } from '../search';
 
@@ -121,7 +123,6 @@ export function coverHtml(b: CatalogBook, width: number, o: { bookmarked?: boole
     + `<span class="bk-face" style="left:${m.spine + m.padX}px;right:${m.edge + m.padX}px;top:${m.padTop}px;bottom:${m.padBottom}px">`
     + `<span class="bk-ring" style="width:${m.medallion}px;height:${m.medallion}px">${svg(b.cover.icon, `width:${m.glyph}px;height:${m.glyph}px;stroke-width:1.5px`)}</span>`
     + `<span class="bk-t"><span style="font-size:${t.title.size}px;line-height:${t.title.lineHeight}px">${t.title.lines.map(esc).join('<br>')}</span></span>`
-    + `<span class="bk-kind" style="font-size:${t.kind.size}px;line-height:${t.kind.lineHeight}px;letter-spacing:${t.kind.spacing}px">${t.kind.lines.map(esc).join('<br>')}</span>`
     + `<span class="bk-time" style="font-size:${m.time.size}px;line-height:${m.time.lineHeight}px">${esc(t.time)}</span>`
     + '</span></div>'
     + `<button class="bk-ribbon${on ? ' on' : ''}" aria-label="${esc(bookmarkWords(on, b.title))}" style="right:${ribbonRight}px;width:${m.ribbon.touch}px;height:${m.ribbon.touch}px">`
@@ -157,17 +158,36 @@ function shelfHtml(shelf: Shelf<CatalogBook>, screen: number, marked: readonly s
 </div>`;
 }
 
-type TabOptions = { title: string; sub: string; dark?: boolean; width?: number; last?: string | null; marked?: readonly string[]; limit?: number; only?: 'second' };
+/**
+ * The Continue reading bar as the page draws it (continueBar/ContinueBar.tsx): it floats above the tab dock, so it comes before the scroll in the markup; the glyph of the Bible or of a
+ * book, "Continue reading" over the place, which is drawn in two pieces (the name gives way, the chapter does not), and the close button, a button of its own beside the bar.
+ * `view` is what the app works out for a place (spot.ts), so the words, the glyph and the label a screen reader hears are the app's.
+ */
+export function barHtml(view: SpotView): string {
+  return `<div class="cont-bar">
+  <div class="main" role="button" aria-label="${esc(view.spoken)}"><svg class="cp-icon ic"><use href="#i-${view.icon}"/></svg><div class="t"><div class="k">${esc(CONTINUE_TITLE)}</div><div class="r"><span class="h">${esc(view.head)}</span>${view.tail ? `<span class="c">${esc(view.tail)}</span>` : ''}</div></div></div>
+  <button class="x" aria-label="${esc(HIDE_LABEL)}">${svg('x')}</button>
+</div>`;
+}
 
-/** The Books tab: the banner and the first shelf (the phone is cut short there), or only the second shelf, as the tab looks scrolled down to it. */
+/** What a list keeps free at its end for the tab bar on the page (the .scroll of a phone has 130), and what it keeps once the bar floats over it: the room the bar says it takes. */
+export const SCROLL_END = 130;
+export const SCROLL_END_WITH_BAR = SCROLL_END + BAR_ROOM;
+
+type TabOptions = { title: string; sub: string; dark?: boolean; width?: number; bar?: SpotView | null; marked?: readonly string[]; limit?: number; only?: 'second' };
+
+/**
+ * The Books tab: the banner and the first shelf (the phone is cut short there), or only the second shelf, as the tab looks scrolled down to it. The banner is always the one
+ * that starts a book: going back to the place read last is the bar above the tab bar (`bar`), which a phone shows when it has a place to go back to.
+ */
 function booksTabPhone(o: TabOptions): string {
   const width = o.width ?? 390;
-  const view = booksBanner(BOOK_CATALOG, o.last ? { id: o.last } : null);
+  const view = booksBanner(BOOK_CATALOG, null);
   const on = shelves(BOOK_CATALOG);
   const marked = o.marked ?? [];
   const inner = o.only === 'second'
     ? `<div class="scroll" style="padding-top:8px">\n${indent(shelfHtml(on[1], width, marked), 2)}\n</div>\n${DOCK}`
-    : `<div class="scroll">
+    : `${o.bar ? `${barHtml(o.bar)}\n` : ''}<div class="scroll"${o.bar ? ` style="padding-bottom:${SCROLL_END_WITH_BAR}px"` : ''}>
 ${indent(LIB_HEAD, 2)}
   ${bannerHtml(view)}
   <div style="margin-top:24px">
@@ -227,7 +247,7 @@ function bookPagePhone(b: CatalogBook, o: PageOptions): string {
   const toc = groups.map((g, gi) => `${g.part ? `<h5 class="part"${gi === 0 ? '' : ' style="margin-top:8px"'}>${esc(partName(g.part))}</h5>${partSubtitle(g.part) ? `<p class="ps">${esc(partSubtitle(g.part))}</p>` : ''}` : ''}<div class="cp-card bk-toc">${g.entries.map((e, i) => tocRowHtml(e.index, e.title, minutes.get(e.id), { read: read.has(e.id), here: !!place && place.c === e.id, first: i === 0 })).join('')}</div>`).join('');
   const inner = `<div class="scroll" style="padding-bottom:40px">
   <div class="bk-pg">
-    <div class="biz-top"><button class="cp-icon-btn" aria-label="Back">${svg('back')}</button></div>
+    <div class="biz-top"><button class="cp-icon-btn flat" aria-label="Back">${svg('back')}</button></div>
     <div class="bk-head">${coverHtml(b, coverWidth, { bookmarked: !!o.marked })}
       <h3>${esc(b.title)}</h3>${b.subtitle ? `<div class="su">${esc(b.subtitle)}</div>` : ''}
       <span class="kind" aria-label="${esc(kindName(b.kind))}">${esc(kindName(b.kind).toUpperCase())}</span>
@@ -328,7 +348,7 @@ function readerPhone(o: ReaderOptions): string {
     : '';
   const progress = Math.round((o.progress ?? (o.end ? 0.97 : from > 0 ? 0.3 : 0.05)) * 100);
   const inner = `<div class="bk-rhead">
-  <div class="r1"><span class="bk-back" role="button" aria-label="Contents">${svg('back')}<span>Contents</span></span><span class="sz"><span class="a s" role="button" aria-label="Smaller text"><i>A</i></span><span class="a l" role="button" aria-label="Larger text"><i>A</i></span></span></div>
+  <div class="r1"><button class="cp-icon-btn flat" aria-label="Back" title="Back to the contents of this book">${svg('back')}</button><span class="sz"><span class="a s" role="button" aria-label="Smaller text"><i>A</i></span><span class="a l" role="button" aria-label="Larger text"><i>A</i></span></span></div>
 </div>
 <div class="scroll bk-rscroll${o.chosen !== undefined ? ' pa' : ''}"${o.end ? ' data-bk-end' : ''}>
   <div class="bk-rtx" style="max-width:${t.measure}px">
@@ -385,6 +405,14 @@ function placeIn(text: BookContent): BookPlace {
   return { id: text.id, c: text.chapters[2].id, y: 0.35, at: 0, read: [text.chapters[0].id, text.chapters[1].id] };
 }
 
+/** The bar that the "Continue" phones show for the same place: what the app works out for it (spot.ts), so the page says "Chapter 3" where the book page's button and line do. */
+export function barOf(text: BookContent): SpotView {
+  const p = placeIn(text);
+  const view = describeBook({ kind: 'book', id: p.id, c: p.c, y: p.y, at: 1731068400000 }, text.chapters);
+  if (!view) throw new Error(`${text.id} is not a book of the catalog`);
+  return view;
+}
+
 const STYLE = `<style>
   /* Library > Books: the shelves of covers (A5, two in a row), the book page and the reader. This page is DRAWN by mobile/src/features/library/__tests__/designBooks.ts from the books of the
      bundle and from the functions of the app (cover.ts, copy.ts, notices.ts, reading.ts, readerType.ts, passages.ts): do not edit what is between the marks, draw it again. */
@@ -401,8 +429,7 @@ const STYLE = `<style>
   .bk-face { position: absolute; display: flex; flex-direction: column; align-items: center; }
   .bk-ring { flex: none; display: grid; place-items: center; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(20, 54, 93, .45); }
   .bk-t { flex: 1; align-self: stretch; display: flex; align-items: center; justify-content: center; text-align: center; font-family: var(--cp-font-title); font-weight: 600; }
-  .bk-kind { text-align: center; font-family: var(--cp-font-body); font-weight: 600; }
-  .bk-time { margin-top: 4px; text-align: center; font-family: var(--cp-font-mono); white-space: nowrap; }
+  .bk-time { text-align: center; font-family: var(--cp-font-mono); white-space: nowrap; }
   .bk-ribbon { position: absolute; top: 0; padding: 0; border: 0; background: none; display: flex; flex-direction: column; align-items: center; cursor: pointer; }
   .bk-ribbon .rb { display: grid; place-items: center; background: var(--bk-ink); color: var(--bk-parchment); padding-bottom: 2px; }
   .bk-ribbon .rb .cp-icon { stroke-width: 1.75px; }
@@ -460,15 +487,13 @@ const STYLE = `<style>
   .bk-row .rt .mn { font-family: var(--cp-font-mono); font-size: 13px; line-height: 20px; color: var(--cp-text-muted); }
   .bk-edition .k { font-family: var(--cp-font-mono); font-size: 12px; line-height: 16px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--cp-text-muted); }
   .bk-edition .v { font-size: 15px; line-height: 21px; letter-spacing: .4px; font-weight: 500; color: var(--cp-text-muted); }
-  /* the reader: a header at the top that stays (one row: the way back and the size of the text), the chapter under it, and a bar at the bottom that stays (the thin line, Previous, the title of the book with the place, Next) */
+  /* the reader: a header at the top that stays (one row: the Back button of the app, which goes to the contents, and the size of the text, three round buttons of 48, 16 from the edge like the Back button of every screen), the chapter under it, and a bar at the bottom that stays (the thin line, Previous, the title of the book with the place, Next) */
   .bk-rhead { position: absolute; top: 54px; left: 0; right: 0; z-index: 4; background: var(--cp-bg); padding-top: 8px; }
-  .bk-rhead .r1 { display: flex; align-items: center; justify-content: space-between; padding: 0 8px; }
+  .bk-rhead .r1 { display: flex; align-items: center; justify-content: space-between; padding: 0 16px; }
   .bk-rbar .r2 { display: flex; align-items: center; justify-content: space-between; padding: 4px 8px; }
   .bk-rbar { position: absolute; left: 0; right: 0; bottom: 0; z-index: 4; background: var(--cp-bg); padding-bottom: 34px; }
-  .bk-back { min-height: 44px; display: inline-flex; align-items: center; gap: 4px; padding: 0 14px 0 6px; font-weight: 600; font-size: 16px; line-height: 22px; }
-  .bk-back .cp-icon { width: 24px; height: 24px; }
   .bk-rhead .sz { display: flex; gap: 8px; }
-  .bk-rhead .a { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: var(--cp-surface); box-shadow: inset 0 0 0 1px var(--cp-border); font-family: var(--cp-font-title); font-weight: 600; }
+  .bk-rhead .a { width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; background: var(--cp-surface); box-shadow: inset 0 0 0 1px var(--cp-border); font-family: var(--cp-font-title); font-weight: 600; }
   .bk-rhead .a i { font-style: normal; }
   .bk-rhead .a.s i { font-size: 15px; line-height: 20px; }
   .bk-rhead .a.l i { font-size: 24px; line-height: 28px; }
@@ -476,11 +501,11 @@ const STYLE = `<style>
   .bk-ic { width: 56px; height: 56px; display: grid; place-items: center; border-radius: 50%; flex: none; }
   .bk-ic .cp-icon { width: 31px; height: 31px; }
   .bk-rbar .mid { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; padding: 0 4px; }
-  .bk-rbar .bt { max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; font-size: 18px; line-height: 24px; }
+  .bk-rbar .bt { max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; font-size: 19px; line-height: 28px; }
   .bk-rbar .ps { font-family: var(--cp-font-mono); font-size: 14px; line-height: 20px; color: var(--cp-text-muted); }
   .bk-prog { height: 4px; background: var(--cp-border); }
   .bk-prog i { display: block; height: 4px; background: var(--cp-action); }
-  .phone .scroll.bk-rscroll { top: 106px; bottom: 102px; padding: 20px 20px 48px; }
+  .phone .scroll.bk-rscroll { top: 110px; bottom: 102px; padding: 20px 20px 48px; }
   /* a passage that is chosen: the gold ground and underline of a verse; the bar of actions (the Bible's, 138 high) takes its own room above the bar at the bottom, and the chapter has that much less */
   .bk-rtx .on { background: var(--cp-color-gold-soft); text-decoration: underline; }
   .phone .scroll.bk-rscroll.pa { bottom: 248px; }
@@ -535,13 +560,15 @@ function groupNotes(): string {
   <p class="note" style="margin:-4px 0 20px;max-width:760px">The Books tab shows its books as <b>covers</b> on one <b>shelf</b> for each kind of book (Pilgrim's guides, then Readings for the Way), each shelf with its heading, the number of its books and one quiet line.
   A cover is an A5 page, portrait (148 by 210 mm, so as high as 210/148 of its width), two in a row, 16 from the edge and 12 apart (${cover390.tile} by ${cover390.height} on a 390 phone, ${cover320.tile} by ${cover320.height} on 320, ${cover430.tile} by ${cover430.height} on 430).
   Each is drawn like a book: a spine with a groove and the shade of the hinge, the edges of the pages on the right, a small radius, a soft shadow, the glyph of the book in a ring, the title set like a cover in Fraunces
-  (as large as fits, never a word cut: "${esc(first.title.lines.join(' '))}" is set at ${first.title.size}), the kind of book in small spaced capitals (Inter) and how long it takes in JetBrains Mono. There is no mark of free or soon: every book is in the app.
+  (as large as fits, at a size of the type scale and never a word cut: "${esc(first.title.lines.join(' '))}" is set at ${first.title.size}) and how long it takes in JetBrains Mono at the mono token (${first.m.time.size}). Inside a cover the space is 12 at the sides and at the bottom and 16 at the top.
+  The cover does not print the kind of book: the book page shows it and the label below says it. There is no mark of free or soon: every book is in the app.
   The paper does not change with light and dark, nor does the navy printed on it. A cover is <b>one button</b> ("${esc(coverLabel(GUIDE!))}") and the ribbon at its top right is <b>another</b>, 44 by 44, that bookmarks the book (the key is <code>books:id</code>).
-  The banner is the compact one of the Bible tab: a label (the first book, or the one read last), a title, one short handwritten note and a gold pill: <b>Start reading</b> or, once something was read, <b>Continue reading</b>, which goes on at the line where you stopped.
+  The banner is the compact one of the Bible tab: a label (the first book), a title, one short handwritten note and a gold pill: <b>Start reading</b>. It does not continue a book: going back to the place read last, in a book or in the Bible,
+  is the <b>Continue reading</b> bar that floats above the tab bar (the same bar on both tabs of the Library, with a close button of its own, and room kept for it at the end of the lists): a book is named by its title and the chapter the reader will open ("${esc(barOf(SHOWN.guide).label)}").
   A cover opens the <b>book page</b>: a larger cover, the title, the subtitle, the kind, the chapters, the words and the time, the description, <b>the notice of its kind</b> (what was written with AI assistance and what has not been checked: <code>notices.ts</code>) above the gold button
   (<b>${esc(readButtonLabel(SHOWN.guide.chapters, null))}</b> or <b>${esc(readButtonLabel(SHOWN.guide.chapters, placeIn(SHOWN.guide)))}</b>), the table of contents with the minutes of each chapter, the ones read ticked and the place where you stopped marked, and the credit.
-  The <b>reader</b> keeps a header at the top while the chapter scrolls under it, with one row as on a Kindle: the way back to the contents and two buttons for smaller and larger text (five steps, kept on the phone). At the bottom it keeps a bar: a thin line that shows how far down you are,
-  and under it Previous and Next named by where they go (off at the first and the last chapter) with the title of the book and "${esc(positionLine({ position: 3, total: SHOWN.guide.chapters.length }))}" between them. It sets paragraphs, headings, <b>lists</b> and <b>quotations</b> (the passage of a book of readings is one, with a rule at its left and a line that says whose words they are).
+  The <b>reader</b> keeps a header at the top while the chapter scrolls under it, with one row as on a Kindle: the <b>Back button</b> of every screen (round, 48, with the chevron: here it goes to the contents of the book) and two round buttons of the same size for smaller and larger text (five steps, kept on the phone). At the bottom it keeps a bar: a thin line that shows how far down you are,
+  and under it Previous and Next named by where they go (off at the first and the last chapter) with the title of the book (19 on 28, the body of the type scale, in SemiBold, on one line, cut with an ellipsis where it does not fit) and "${esc(positionLine({ position: 3, total: SHOWN.guide.chapters.length }))}" between them. It sets paragraphs, headings, <b>lists</b> and <b>quotations</b> (the passage of a book of readings is one, with a rule at its left and a line that says whose words they are).
   A touch on a paragraph, a list or a quotation <b>chooses that passage</b>, as a touch on a verse of the Bible does, and raises Bookmark, Copy and Share; a bookmarked passage is a row of Bookmarks that opens the reader at it.
   Where you stopped, the chapters you read and the size of the text stay on the phone and nothing is fetched: the books work with no signal.</p>`;
 }
@@ -552,8 +579,8 @@ function groupPhones(): string {
   const second = shelves(BOOK_CATALOG)[1];
   const place = placeIn(guide);
   const out: string[] = [
-    booksTabPhone({ title: 'Books · second shelf', sub: `The tab scrolled down to ${esc(second.title)}: ${second.books.length} books, every cover with its kind and its time`, only: 'second' }),
-    booksTabPhone({ title: 'Books · dark', sub: 'Continue reading · the covers are paper: they do not change', dark: true, last: GUIDE!.id, limit: 6 }),
+    booksTabPhone({ title: 'Books · second shelf', sub: `The tab scrolled down to ${esc(second.title)}: ${second.books.length} books, every cover with its title and its time`, only: 'second' }),
+    booksTabPhone({ title: 'Books · dark', sub: 'The Continue reading bar names a book and its chapter · the banner still starts the first book · the covers are paper: they do not change', dark: true, bar: barOf(guide), limit: 6 }),
     booksTabPhone({ title: 'Books · 320 wide', sub: `The smallest phone: ${cover320.tile} by ${cover320.height} covers, titles fitted`, width: 320, limit: 6 }),
     bookPagePhone(GUIDE!, { title: 'Book page · guide', sub: 'Cover and ribbon · the notice of a guide above the button · Start reading · the minutes of each chapter', marked: true }),
     bookPagePhone(READINGS!, { title: 'Book page · readings', sub: 'The notice of a book of readings: the passages are word for word, the reflections are original' }),

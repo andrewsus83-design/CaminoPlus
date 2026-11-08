@@ -9,8 +9,9 @@ import { coverLabel, coverText, a5Height, withAlpha, type CoverMetrics } from '.
 
 // A book of the Books tab, drawn as a book: an A5 page, portrait (cover.ts says how big, and how its words are made to fit), with a spine on the left (a
 // darker band and a groove), the edges of the pages on the right (a thin pale strip), a small corner radius, a soft shadow under it, the glyph of the book in
-// a ring at the top, the title typeset like a cover (Fraunces), the kind of book in small spaced capitals (Inter: "PILGRIM'S GUIDE", "READINGS FOR THE WAY"), how
-// long it takes in JetBrains Mono, and a ribbon hanging from the top right that is the bookmark button.
+// a ring at the top, the title typeset like a cover (Fraunces, at a size of the type scale), how long it takes in JetBrains Mono at the mono token (15), and a ribbon
+// hanging from the top right that is the bookmark button. The kind of book ("Pilgrim's guide", "Readings for the Way") is not printed on the cover: the book page shows it,
+// and the label of the cover says it. Inside the cover the space is 12 at the sides and at the bottom and 16 at the top (cover.ts: space.3 and space.4).
 //
 // The colour and the glyph are the book's own (catalog.json: one of the six pale colours of the FIXED palette and one of three glyphs). A cover is paper and does not
 // change with light and dark, so what is printed on it (the navy of the brand) does not change either. Every shade (the spine, the page edges, the groove) is one of
@@ -108,13 +109,7 @@ export const BookCover = memo(function BookCover({ book, width, onOpen, bookmark
               {text.title.lines.join('\n')}
             </AppText>
           </View>
-          <AppText
-            variant="label" maxFontSizeMultiplier={1} numberOfLines={text.kind.lines.length} adjustsFontSizeToFit minimumFontScale={0.85} color={INK}
-            style={{ fontSize: text.kind.size, lineHeight: text.kind.lineHeight, letterSpacing: text.kind.spacing, textAlign: 'center' }}
-          >
-            {text.kind.lines.join('\n')}
-          </AppText>
-          <AppText variant="mono" maxFontSizeMultiplier={1} numberOfLines={1} color={INK} style={{ fontSize: m.time.size, lineHeight: m.time.lineHeight, marginTop: 4, textAlign: 'center' }}>{text.time}</AppText>
+          <AppText variant="mono" maxFontSizeMultiplier={1} numberOfLines={1} color={INK} style={{ textAlign: 'center' }}>{text.time}</AppText>
         </View>
       )}
     </View>

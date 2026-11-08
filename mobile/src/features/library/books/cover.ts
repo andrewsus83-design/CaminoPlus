@@ -6,8 +6,13 @@
 // 193 by 274. On a tablet or a browser window the covers stop growing at 232 and the pair is centred.
 //
 // A cover has a fixed size, so its text is made to fit before it is drawn (typeMetrics.ts says how wide a text is): the title is set as large
-// as it can be in at most four lines, without ever cutting a word, and the kind of book ("PILGRIM'S GUIDE") in at most two. Under it is how long the book takes, in
-// JetBrains Mono. A title that cannot be made to fit at the smallest size is reported (`fits: false`) so that a test fails, instead of a phone cutting it off.
+// as it can be in at most four lines, without ever cutting a word, at one of the sizes of the type scale (24, 22, 19, 17 or 15, never between them and never under 15).
+// Under it is how long the book takes, in JetBrains Mono at the mono token (15). The kind of book ("Pilgrim's guide") is not on the cover (the book page shows it, and a
+// screen reader still hears it in the label of the cover). A title that cannot be made to fit at the smallest size is reported (`fits: false`) so that a test fails, instead
+// of a phone cutting it off.
+//
+// The space inside a cover is the space scale of design/tokens.json, read from the file: 12 (space.3) at the sides and at the bottom, 16 (space.4) at the top.
+import tokens from '../../../theme/tokens.json';
 import { kindName } from './copy';
 import { formatMinutes, spokenMinutes } from './reading';
 import { textWidth, wrap } from './typeMetrics';
@@ -18,10 +23,18 @@ export const A5_HEIGHT_MM = 210;
 /** Width over height of an A5 page, portrait. */
 export const A5_RATIO = A5_WIDTH_MM / A5_HEIGHT_MM;
 
+const { space } = tokens;
+
+/** The sizes of the type scale (design/tokens.json "text"), each once, largest first: 64 48 36 30 28 24 22 19 17 15. A title on a cover is set at one of them. */
+export const SCALE_SIZES: readonly number[] = [...new Set(Object.values(tokens.text).map((t) => t.size))].sort((a, b) => b - a);
+/** The smallest a title is set: the smallest size of the scale. */
+export const TITLE_MIN: number = SCALE_SIZES[SCALE_SIZES.length - 1];
+
 export const GRID_COLUMNS = 2;
 /** The widest a cover gets. */
 export const TILE_MAX = 232;
-export const GRID_GAP = 12;
+/** Between two covers across: space.3. */
+export const GRID_GAP: number = space['3'];
 
 export type CoverGrid = {
   columns: typeof GRID_COLUMNS;
@@ -59,7 +72,7 @@ export type CoverMetrics = {
   /** The narrow darker band on the left, and the pale strip of page edges on the right. */
   spine: number;
   edge: number;
-  /** The space inside the text area, at the sides, at the top and at the bottom. */
+  /** The space inside the text area, at the sides, at the top and at the bottom: space.3, space.4 and space.3 (12, 16, 12), the same on every cover. */
   padX: number;
   padTop: number;
   padBottom: number;
@@ -68,14 +81,14 @@ export type CoverMetrics = {
   /** The glyph and the ring around it. */
   glyph: number;
   medallion: number;
-  /** The gap between the ring and the title, and between the title and the lines under it. */
+  /** The gap between the ring and the title, and between the title and the time under it: the same, so the title sits in the middle between them (space.2 on a small cover, space.3 on the others). */
   gapTop: number;
   gapTitle: number;
   /** The ribbon: its width, the notch at its foot, and its distance from the right edge. It is 44 high, and its button is 44 by 44. */
   ribbon: { width: number; height: number; notch: number; right: number; touch: number };
+  /** The largest and the smallest size a title is set at: sizes of the type scale, the largest that is no more than an eighth of the width, and 15. */
   title: { max: number; min: number };
-  /** The kind of book, in small capitals (Inter), and the reading time under it (JetBrains Mono, one line). */
-  kind: { size: number; lineHeight: number; spacing: number; maxLines: number };
+  /** The reading time under the title (JetBrains Mono, one line): the mono token, 15 on a line of 22, on every cover. */
   time: { size: number; lineHeight: number };
   /** The height the title may use: what is left between the ring and the lines under it. */
   titleBox: number;
@@ -87,30 +100,28 @@ export function coverMetrics(width: number): CoverMetrics {
   const small = w < 150;
   const spine = clamp(Math.round(w * 0.07), 8, 16);
   const edge = small ? 3 : 4;
-  const padX = Math.round(w * 0.075);
-  const padTop = Math.round(w * 0.09);
-  const padBottom = Math.round(w * 0.07);
+  const padX = space['3'];
+  const padTop = space['4'];
+  const padBottom = space['3'];
   const glyph = Math.round(w * 0.14);
   const medallion = glyph + 12;
-  const gapTop = small ? 8 : 10;
-  const kindSize = clamp(Math.round(w * 0.06 * 2) / 2, 9.5, 11);
-  const kind = { size: kindSize, lineHeight: Math.round(kindSize * 1.3), spacing: small ? 0.8 : 1, maxLines: 2 };
-  const timeSize = clamp(Math.round(w * 0.064), 10, 12);
-  const time = { size: timeSize, lineHeight: Math.round(timeSize * 1.35) };
-  const gapKind = small ? 4 : 6;
-  const gapTitle = small ? 6 : 8;
+  const gapTop = small ? space['2'] : space['3'];
+  const gapTitle = gapTop;
+  const time = { size: tokens.text.mono.size, lineHeight: tokens.text.mono.lineHeight };
   const height = a5Height(w);
-  const bottom = padBottom + time.lineHeight + gapKind + kind.maxLines * kind.lineHeight;
+  const bottom = padBottom + time.lineHeight;
   const top = padTop + medallion + gapTop;
   const ribbonWidth = clamp(Math.round(w * 0.16), 22, 30);
+  const wanted = clamp(Math.round(w * 0.125), 14, 26);
   return {
     width: w, height, radius: small ? 3 : 4, spine, edge, padX, padTop, padBottom,
     text: w - spine - edge - 2 * padX,
     glyph, medallion, gapTop, gapTitle,
     ribbon: { width: ribbonWidth, height: 44, notch: 8, right: edge + 10, touch: 44 },
-    title: { max: clamp(Math.round(w * 0.125), 14, 26), min: 11 },
-    kind, time,
-    titleBox: height - top - bottom - gapTitle,
+    title: { max: Math.max(TITLE_MIN, SCALE_SIZES.find((s) => s <= wanted) ?? TITLE_MIN), min: TITLE_MIN },
+    time,
+    // the hairline round the cover (border.width) is inside the height, on both sides
+    titleBox: height - 2 * tokens.border.width - top - bottom - gapTitle,
   };
 }
 
@@ -131,16 +142,17 @@ export const FEWER_LINES_COST = 0.85;
 
 /**
  * The size of a title and the lines it is broken in, for a text area `width` wide and at most `height` high, from the cover's own maximum
- * size down to its minimum. Every candidate has at most four lines, no word cut, and lines that together fit the height. The largest size wins,
- * unless fewer lines are possible at a size within 15 % of it, because a title in two or three balanced lines looks like a cover and one in four
- * short ones looks like a list. The cover draws the title at that size, in those lines. When nothing fits, `fits` is false (a test fails on it).
+ * size down to its minimum, over the sizes of the type scale only (never a size between two of them). Every candidate has at most four lines, no word cut, and lines
+ * that together fit the height. The largest size wins, unless fewer lines are possible at a size within 15 % of it, because a title in two or three balanced lines looks
+ * like a cover and one in four short ones looks like a list. The cover draws the title at that size, in those lines. When nothing fits, `fits` is false (a test fails on it).
  */
 export function fitTitle(title: string, width: number, height: number, max: number, min: number): TitleFit {
   const best: (TitleFit | null)[] = [];
   let last: TitleFit | null = null;
   for (let limit = 1; limit <= TITLE_MAX_LINES; limit += 1) {
     best[limit] = null;
-    for (let size = max; size >= min; size -= 1) {
+    for (const size of SCALE_SIZES) {
+      if (size > max || size < min) continue;
       const { lines, fits } = wrap('fraunces', title, width, size);
       const lineHeight = Math.round(size * TITLE_LINE_RATIO);
       last = { size, lineHeight, lines, fits: fits && lines.length <= limit && lines.length * lineHeight <= height };
@@ -156,29 +168,15 @@ export function fitTitle(title: string, width: number, height: number, max: numb
   return largest;
 }
 
-export type KindFit = { text: string; size: number; lineHeight: number; spacing: number; lines: string[]; fits: boolean };
-
-/** The kind of book in capitals, as large as the cover's size for it allows, and smaller (to 8.5) if it needs more than two lines. */
-export function fitKind(kind: string, width: number, m: CoverMetrics): KindFit {
-  const text = kind.toUpperCase();
-  let last: KindFit | null = null;
-  for (let size = m.kind.size; size >= 8.5; size -= 0.5) {
-    const { lines, fits } = wrap('inter', text, width, size, m.kind.spacing);
-    last = { text, size, lineHeight: Math.round(size * 1.3), spacing: m.kind.spacing, lines, fits: fits && lines.length <= m.kind.maxLines };
-    if (last.fits) return last;
-  }
-  return last ?? { text, size: 8.5, lineHeight: 11, spacing: m.kind.spacing, lines: [text], fits: false };
-}
-
 /** The time line must be one line: "2 h 29 min" in mono at this size is this wide. */
 export const timeWidth = (time: string, m: CoverMetrics): number => textWidth('mono', time, m.time.size);
 
-/** Everything the text of one cover is drawn with, at this width. */
+/** Everything the text of one cover is drawn with, at this width: the title in its lines and its size, and the time. (The kind of book is not drawn: coverLabel says it.) */
 export function coverText(book: { title: string; kind: string; minutes: number }, width: number) {
   const m = coverMetrics(width);
   const time = formatMinutes(book.minutes);
-  return { m, title: fitTitle(book.title, m.text, m.titleBox, m.title.max, m.title.min), kind: fitKind(kindName(book.kind), m.text, m), time, timeFits: timeWidth(time, m) <= m.text };
+  return { m, title: fitTitle(book.title, m.text, m.titleBox, m.title.max, m.title.min), time, timeFits: timeWidth(time, m) <= m.text };
 }
 
-/** What a screen reader says for a cover: "The French Way, Pilgrim's guide, 51 minutes". It says all that the cover shows. */
+/** What a screen reader says for a cover: "The French Way, Pilgrim's guide, 51 minutes". It says all that the cover shows, and the kind of book, which the cover leaves to the book page. */
 export const coverLabel = (b: { title: string; kind: string; minutes: number }): string => `${b.title}, ${kindName(b.kind)}, ${spokenMinutes(b.minutes)}`;

@@ -67,6 +67,8 @@
   --cp-tab-bar-border:   var(--cp-color-white);      /* its hairline: invisible in light mode (the shadow separates it), a lighter navy in dark mode */
   --cp-tab-active-stroke: 3px;                       /* the active tab icon: a little heavier in light mode, because dark on light looks thinner */
   --cp-tab-active-weight: 700;                       /* the active tab label (dark mode: 600) */
+  --cp-tab-inactive-stroke: 0.8px;                   /* the inactive tab icon: as thick as the stem of its Light label (0.8 of 24 units at 28 px = 0.93 px) */
+  --cp-tab-inactive-weight: 300;                     /* the inactive tab label (Inter Light, stem 136 of 2048 units = 0.93 px at 14 px) */
   --cp-text-inverse:     var(--cp-color-parchment);
   --cp-text-accent:      var(--cp-color-gold-ink);
 
@@ -104,6 +106,8 @@
   --cp-text-h2-size:      36px;  --cp-text-h2-lh:      42px;  --cp-text-h2-ls:      -0.5px;
   --cp-text-h3-size:      28px;  --cp-text-h3-lh:      34px;  --cp-text-h3-ls:      -0.25px;
   --cp-text-h4-size:      24px;  --cp-text-h4-lh:      30px;  --cp-text-h4-ls:      0;
+  --cp-text-h5-size:      17px;  --cp-text-h5-lh:      22px;  --cp-text-h5-ls:      0;   /* a small title in Fraunces (the name of a book on a Bible tile that is too long for h4) */
+  --cp-text-h6-size:      15px;  --cp-text-h6-lh:      21px;  --cp-text-h6-ls:      0;   /* the smallest title in Fraunces, as small as the scale goes (15) */
   --cp-text-lead-size:    22px;  --cp-text-lead-lh:    32px;
   --cp-text-body-size:    19px;  --cp-text-body-lh:    28px;
   --cp-text-small-size:   17px;  --cp-text-small-lh:   25px;
@@ -142,7 +146,9 @@
   --cp-web-gutter:         32px;
   --cp-mobile-width:       390px; /* reference frame (iPhone 15)              */
   --cp-tabbar-height:      100px;  /* incl. 34px home indicator                 */
-  --cp-touch-min:          56px;  /* minimum tap target                        */
+  --cp-touch-min:          56px;  /* the old name of --cp-touch-primary, same value; kept so nothing breaks */
+  --cp-touch-hard:         48px;  /* HARD minimum tap target: nothing tappable is drawn smaller (hitSlop counts) */
+  --cp-touch-primary:      56px;  /* target for primary actions: buttons, fields, list rows */
 
   /* ------------------------------------------------------------------------
      5. RADIUS (pill-first)
@@ -183,7 +189,9 @@
      9. ICONS & Z-INDEX
      ------------------------------------------------------------------------ */
   --cp-icon-sm: 18px;
-  --cp-icon-md: 24px;
+  --cp-icon-sm-plus: 20px;
+  --cp-icon-md: 24px;      /* the default */
+  --cp-icon-md-plus: 28px;
   --cp-icon-lg: 32px;
   --cp-icon-stroke: 1.75px;
 

@@ -16,7 +16,8 @@ export type LastRead = {
 /**
  * The chapter this person read last: kept only on this phone, under `u.<userId>.library.lastRead` (see lastRead.ts). Read again every time the screen
  * comes into view, because the reader changes it while the Bible tab stays under it. Nothing here uses the network and nothing throws: a value that cannot
- * be read is no place, a write that fails is dropped (the card is only a convenience).
+ * be read is no place, a write that fails is dropped (the Continue reading bar is only a convenience). The reader is what writes it (`remember`); the bar reads it
+ * itself, with the places of the books, so that one bar can go back to whichever was read last (features/library/continueBar).
  */
 export function useLastRead(): LastRead {
   const { session } = useAuth();

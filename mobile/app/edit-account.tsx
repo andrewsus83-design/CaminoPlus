@@ -3,7 +3,7 @@ import { Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, TextInput
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '@/components/AppText';
-import { IconButton } from '@/components/ui';
+import { BackButton } from '@/components/BackButton';
 import { useAuth } from '@/lib/auth';
 import { updateProfile } from '@/lib/api';
 import { supabase } from '@/lib/supabase';
@@ -59,7 +59,7 @@ export default function EditAccount() {
   return (
     <KeyboardAvoidingView style={{ flex: 1, backgroundColor: role.bg }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingTop: insets.top + layout.screenTop, paddingHorizontal: layout.screenMargin, paddingBottom: insets.bottom + 40, gap: 16 }}>
-        <IconButton name="back" label="Back" onPress={() => router.back()} />
+        <BackButton fallback="/settings" />
         <AppText variant="h2">Edit account</AppText>
         <View style={{ gap: 6 }}>
           <AppText variant="label">Name</AppText>

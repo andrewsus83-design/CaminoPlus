@@ -4,7 +4,8 @@ import { Screen } from '@/components/Screen';
 import { AppText } from '@/components/AppText';
 import { Pill } from '@/components/Pill';
 import { SampleNotice } from '@/components/SampleNotice';
-import { IconButton, Photo } from '@/components/ui';
+import { BackButton } from '@/components/BackButton';
+import { Photo } from '@/components/ui';
 import { Badge, Highlight } from '@/features/business/ui';
 import { tints } from '@/data/mock';
 import { radius } from '@/theme';
@@ -14,7 +15,7 @@ export default function BusinessWelcome() {
   const router = useRouter();
   return (
     <Screen>
-      <IconButton name="back" label="Back" onPress={() => router.back()} />
+      <BackButton fallback="/stays" />
       <Badge label="For business owners" tone="gold" icon="briefcase" />
       <SampleNotice title="Listings open soon">Look around and try the steps. At the end we email your details to the team, and we write to you the day business listings open.</SampleNotice>
       <AppText variant="h1">Welcome pilgrims to your door</AppText>

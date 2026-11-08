@@ -9,7 +9,8 @@ Pilot: **Camino Francés stage 1, Saint-Jean-Pied-de-Port to Roncesvalles**
 (same stage file as `tools/offline-maps`). Any stage file works, on any route.
 
 The same folder holds the importer that turns the OSM places along a stage into database rows
-(`import_osm.py`): see [Import to Supabase](#import-to-supabase-osm-importer).
+(`import_osm.py`): see [Import to Supabase](#import-to-supabase-osm-importer), and the generator of the route line
+the Maps tab draws (`build_route_lines.py`): see [Route lines for the Maps tab](#route-lines-for-the-maps-tab-build_route_linespy).
 
 ```
  OSM (Overpass) ─┐
@@ -457,6 +458,48 @@ who edited a place in OSM (the `user`, `uid` and `changeset` of an element). Thi
 * **Verification.** Every row is `unverified`; `data_confidence` is only a copy of the audit score, and only when a row is created.
 * **Deleting.** Nothing is ever removed or hidden (see above), and a place that moved is a new row only if OSM gave it a new id.
 * **Variants.** A place along a variant (the Valcarlos route) is not linked to the main stage; a variant needs its own stage row.
+
+## Route lines for the Maps tab (build_route_lines.py)
+
+The line the Maps tab draws for a stage is the line the importer measures that stage's places against: the OSM route ways of the
+stage's search box (`audit.load_route`: the walking-route relations whose name matches the stage file's regex), joined into one
+ordered line from the start town to the end town (`route.build_stage_line`: the shortest way through those ways). `build_route_lines.py`
+runs exactly that, thins the line, and writes the files the app bundles, so the red pin, the stays and the line agree.
+
+```
+ stage file ─► audit.load_route (the importer's Overpass request and cache) ─► route.build_stage_line: ONE ordered line
+        ─► Douglas-Peucker, 5 m: first and last point kept, every kept point is an OSM node, nothing moved or rounded
+        ─► the end of stage N and the start of stage N+1 made one point
+        ─► mobile/assets/map/lines/camino-frances-NN.json (a GeoJSON LineString, [lng, lat]) + manifest.json
+```
+
+```bash
+cd tools/poi-audit
+python build_route_lines.py                                   # stages 1-3 into mobile/assets/map/lines
+python build_route_lines.py --stages 1-3 --offline            # replay the Overpass answers in cache/ (the importer's cache)
+python build_route_lines.py --overpass https://overpass.openstreetmap.fr/api/interpreter   # ask one server instead of the three mirrors
+python build_route_lines.py --verify                          # only check the bundled files against their manifest
+python -m unittest discover -s tests                          # offline tests, among them test_route_lines.py
+```
+
+**What comes out.** One file a stage on a single line (a GeoJSON `LineString`, 5 to 7 kB for the first three stages, where the
+unthinned lines are 25 to 30 kB) and `manifest.json`: the date of the OSM data (`timestamp_osm_base` of the Overpass answer: no clock is
+written, so the same answers give the same bytes), per stage the relations the line runs along (id, name, share of the line), points and
+bytes before and after thinning, length before and after, how far the first and last point are from the two towns, the gaps between
+OSM ways that were closed, and the sha256 of the file, and the joins between stages. `generator_version` is raised whenever the same OSM
+answer would give other files; a test (`BundledFiles`) and the app's `routeLines.test.ts` fail when a bundled file is not what the
+manifest says, so a line cannot be edited by hand or the generator changed without the files being made again.
+
+**The rules.** An end of the line more than 200 m from its town, a gap of more than 200 m between the end of a stage and the start of the
+next, a thinning that changes the length by more than 3 percent, an Overpass answer with a runtime-error remark, and no OSM route at all
+are errors (exit code 1): the hand-drawn fallback line the audit would fall back to is never written. A gap of up to 50 m between two
+stages is closed (the end of the stage before is put in front of the next stage, so every OSM point stays); one between 50 and 200 m is
+left and reported as not closed. The first three stages meet exactly (0 m), because the importer snaps the town two stages share to the same OSM node.
+The OSM data the mirror reachable from a sandbox serves can be old (the tool warns above 60 days): another mirror may be fresher.
+
+**Attribution.** The files are a derived database of OpenStreetMap: data © OpenStreetMap contributors, [ODbL](https://opendatacommons.org/licenses/odbl/1-0/).
+The manifest says so, the app's Licences screen lists OpenStreetMap for "routes" and the route sheet of the Maps tab names OpenStreetMap
+and carries the credit. See [Data from OpenStreetMap: attribution and ODbL](#data-from-openstreetmap-attribution-and-odbl).
 
 ## Pilot result (stage 1, CI run 42194220473, 2026-11-06)
 

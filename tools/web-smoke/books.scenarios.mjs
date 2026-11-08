@@ -32,6 +32,24 @@ const strip = (page, label) => page.getByText(label, { exact: true }).filter({ v
 const box = async (locator, what) => { const b = await locator.boundingBox(); if (!b) throw new Error(`${what} has no box (it is not on the screen)`); return b; };
 const near = (a, b, by, what) => assert(Math.abs(a - b) <= by, `${what}: ${a} is not within ${by} of ${b}`);
 
+/** What the page says about the reading time printed on every cover that is on it: its text, size, font and the room between it and the sides of its cover (read from the DOM, in the page). */
+const readTimes = (page) => page.evaluate(() => {
+  const time = /^(\d+ min|\d+ h( \d+ min)?)$/;
+  const out = [];
+  for (const b of document.querySelectorAll('[role="button"]')) {
+    if (!/, (Pilgrim's guide|Readings for the Way), /.test(b.getAttribute('aria-label') || '')) continue;
+    const cover = b.getBoundingClientRect();
+    if (cover.width === 0) continue;
+    const el = [...b.querySelectorAll('div')].find((d) => d.children.length === 0 && time.test(d.textContent.trim()));
+    if (!el) continue;
+    const r = document.createRange();
+    r.selectNodeContents(el);
+    const t = r.getBoundingClientRect();
+    out.push({ label: b.getAttribute('aria-label'), text: el.textContent, size: parseFloat(getComputedStyle(el).fontSize), font: getComputedStyle(el).fontFamily, left: t.left - cover.left, right: cover.right - t.right, bottom: cover.bottom - t.bottom, lines: new Set([...r.getClientRects()].map((q) => Math.round(q.top))).size });
+  }
+  return out;
+});
+
 /** Library, the Books tab, with the covers drawn. */
 async function openBooks({ page, go }) {
   await go('/library');
@@ -75,7 +93,7 @@ export const BOOKS_SCENARIOS = [
       await page.getByRole('heading', { name: 'Readings for the Way', exact: true }).waitFor();
       await page.getByText(`${guides} books`, { exact: true }).first().waitFor();
       step('a banner with a button, no notice above the covers, and no book that says Soon or Free');
-      const banner = page.getByRole('button', { name: /^(Start|Continue) reading\. Books for the road/ });
+      const banner = page.getByRole('button', { name: /^Start reading\. Books for the road/ }); // it never continues a book: the Continue reading bar above the tab bar does (continue.scenarios.mjs)
       await banner.waitFor();
       const b = await box(banner, 'the banner');
       assert(b.height <= 120, `the banner is ${b.height} high (at most 120 on a 390 phone)`);
@@ -102,6 +120,17 @@ export const BOOKS_SCENARIOS = [
         const c = boxes[i];
         assert(r.x >= c.x && r.y >= c.y - 1 && r.x + r.width <= c.x + c.width + 0.5 && r.y + r.height <= c.y + c.height, `ribbon ${i + 1} is inside its cover`);
       }
+      step('a cover prints no kind of book (a screen reader still hears it in the label), and its time is JetBrains Mono at the mono token, 15, on one line, clear of the sides and the bottom of the cover');
+      for (const word of ["PILGRIM'S GUIDE", 'READINGS FOR THE WAY']) await eventually(() => page.getByText(word, { exact: true }).count(), (n) => n === 0, { what: `the number of "${word}" lines printed on the covers` });
+      const times = await readTimes(page);
+      assert(times.length >= 2, `the covers on the screen print their time (${times.length})`);
+      for (const t of times) {
+        assert.equal(t.size, 15, `${t.label}: the time is drawn at ${t.size}, not the mono token 15`);
+        assert(/JetBrains/.test(t.font), `${t.label}: the time is JetBrains Mono (${t.font})`);
+        assert.equal(t.lines, 1, `${t.label}: the time is on one line`);
+        assert(t.left >= 12 + 8 && t.right >= 12 + 3, `${t.label}: the time is ${t.left} from the left and ${t.right} from the right of its cover, the sides are 12 inside the spine and the page edges`);
+        assert(t.bottom >= 12, `${t.label}: the time is ${t.bottom} from the bottom of its cover, the bottom is 12`);
+      }
       step('the four fonts of the brand: Fraunces for the title of a cover, JetBrains Mono for its time, and at most one handwritten (Caveat) note on the screen');
       const fonts = await page.evaluate((time) => {
         const family = (text) => { const el = [...document.querySelectorAll('div')].find((d) => d.children.length === 0 && d.textContent === text && d.getBoundingClientRect().width > 0); return el ? getComputedStyle(el).fontFamily : null; };
@@ -122,6 +151,11 @@ export const BOOKS_SCENARIOS = [
         near(a.width / a.height, A5, 0.01, `width over height at ${width}`);
         assert(c.x > a.x + a.width && Math.abs(c.y - a.y) < 2, `two in a row at ${width}`);
         assert(c.x + c.width <= width - 16 + 1, `inside the right margin at ${width}`);
+        for (const t of await readTimes(page)) {
+          assert.equal(t.size, 15, `${t.label} at ${width}: the time is drawn at ${t.size}`);
+          assert.equal(t.lines, 1, `${t.label} at ${width}: the time is on one line`);
+          assert(t.left >= 12 && t.right >= 12, `${t.label} at ${width}: the time is ${t.left} from the left and ${t.right} from the right of its cover`);
+        }
       }
     },
   },
@@ -161,7 +195,7 @@ export const BOOKS_SCENARIOS = [
       await go(`/library/book/${readings.id}`);
       await page.getByRole('heading', { name: readings.title, exact: true }).first().waitFor();
       await page.getByText(NOTICE.reflection, { exact: true }).waitFor();
-      await page.getByText('READINGS FOR THE WAY', { exact: true }).first().waitFor(); // on the cover and in the mark under the title
+      await page.getByText('READINGS FOR THE WAY', { exact: true }).first().waitFor(); // in the mark under the title (the cover prints no kind)
       await page.getByText('A little each day', { exact: true }).waitFor();
       await eventually(() => page.getByText(NOTICE.guide, { exact: true }).count(), (n) => n === 0, { what: 'the number of guide notices on a book of readings' });
       await page.getByText(readBook(readings.id).credit.slice(0, 40), { exact: false }).first().waitFor();
@@ -189,7 +223,7 @@ export const BOOKS_SCENARIOS = [
     },
   },
   {
-    name: 'Books: the reader opens at the first chapter, Next and Previous go through the chapters (their labels name where they go), at the first chapter Previous is off and at the last Next is, and Contents goes back to the page',
+    name: 'Books: the reader opens at the first chapter, Next and Previous go through the chapters (their labels name where they go), at the first chapter Previous is off and at the last Next is, and Back (the same round 48 button as on every screen) goes to the contents, the page of the book',
     persona: 'in',
     async run(ctx) {
       const { page, step, go } = ctx;
@@ -208,10 +242,18 @@ export const BOOKS_SCENARIOS = [
       const height = await page.evaluate(() => window.innerHeight);
       const titleBox = await title.first().boundingBox();
       assert(titleBox && titleBox.y > height * 0.75, `the title of the book is at the bottom of the screen, as on a Kindle (it is at ${titleBox?.y} of ${height})`);
-      const contents = page.getByRole('button', { name: 'Contents', exact: true });
+      const contents = page.getByRole('button', { name: 'Back', exact: true });
       await contents.waitFor();
       const contentsBox = await contents.boundingBox();
       assert(contentsBox && contentsBox.y < height * 0.25, `the way back is at the top (it is at ${contentsBox?.y} of ${height})`);
+      step('the header is one row of three round buttons of 48 by 48, Back at 16 from the left edge like the Back of every other screen, no pill that says "Contents"');
+      for (const [what, button] of [['Back', contents], ['Smaller text', page.getByRole('button', { name: 'Smaller text', exact: true })], ['Larger text', page.getByRole('button', { name: 'Larger text', exact: true })]]) {
+        const r = await button.boundingBox();
+        assert(r && Math.abs(r.width - 48) <= 0.5 && Math.abs(r.height - 48) <= 0.5, `${what} is 48 by 48 (it is ${r?.width} by ${r?.height})`);
+        assert(Math.abs(r.y - contentsBox.y) <= 0.5, `${what} is in the row of Back`);
+      }
+      assert(Math.abs(contentsBox.x - 16) <= 0.5, `Back is 16 from the edge (it is at ${contentsBox.x})`);
+      assert.equal(await page.getByRole('button', { name: 'Contents', exact: true }).count(), 0, 'no button called Contents: Back goes there');
       step('at the first chapter Previous is dimmed and disabled (in the bar and at the end), and Next is not');
       const previous = page.getByRole('button', { name: /^Previous chapter\. This is the first chapter$/ });
       await eventually(() => previous.count(), (n) => n === 2, { what: 'the number of Previous buttons at the first chapter' });
@@ -247,14 +289,59 @@ export const BOOKS_SCENARIOS = [
       await page.getByRole('heading', { name: 'End of the book', exact: true }).waitFor();
       await page.getByText(book.credit.slice(0, 40), { exact: false }).first().waitFor();
       await page.getByText('Buen Camino!', { exact: true }).waitFor();
-      step('Contents goes back to the page of the book');
-      await page.getByRole('button', { name: 'Contents', exact: true }).click();
-      await eventually(() => pathOf(page), (p) => p === `/library/book/${id}`, { what: 'the address after Contents' });
+      step('Back goes to the contents, the page of the book');
+      await page.getByRole('button', { name: 'Back', exact: true }).click();
+      await eventually(() => pathOf(page), (p) => p === `/library/book/${id}`, { what: 'the address after Back' });
       await page.getByRole('button', { name: /^(Start reading|Continue: )/ }).first().waitFor();
     },
   },
   {
-    name: 'Books: the reader remembers where you stopped (Continue on the page and on the Books tab, the same line), the size of the text (five steps, kept), and a damaged place opens the book at its start',
+    name: 'Books: the title of the book in the bar of the reader is one line of 19 px: the longest title is whole on a phone 390 wide and 430, cut with an ellipsis on 320, and the bar is as tall for every book',
+    persona: 'in',
+    async run(ctx) {
+      const { page, step, go } = ctx;
+      // the longest titles of the catalog by the number of characters (the widest in Inter SemiBold of all 26 is checked on every run of the unit tests, with the real advances), and a short one
+      const byLength = [...CATALOG].sort((a, b) => b.title.length - a.title.length);
+      const long = byLength[0];
+      const short = byLength[byLength.length - 1];
+      const bar = async (book) => {
+        await go(`/library/book/${book.id}/read`);
+        const title = page.getByText(book.title, { exact: true }).filter({ visible: true }).last();
+        await title.waitFor();
+        return page.evaluate((text) => {
+          const el = [...document.querySelectorAll('div[dir]')].filter((d) => d.textContent === text && d.getBoundingClientRect().top > window.innerHeight * 0.6).pop();
+          const cs = getComputedStyle(el);
+          const place = el.nextElementSibling?.getBoundingClientRect();
+          const buttons = [...document.querySelectorAll('[role="button"]')].filter((b) => b.getBoundingClientRect().top > window.innerHeight * 0.6 && b.getBoundingClientRect().width < 60 && /^(Previous|Next)/.test(b.getAttribute('aria-label') || '')).map((b) => b.getBoundingClientRect());
+          return { size: cs.fontSize, line: cs.lineHeight, family: cs.fontFamily, whole: el.scrollWidth <= el.clientWidth, box: el.getBoundingClientRect().toJSON(), placeTop: place?.top, buttons: buttons.map((r) => ({ w: r.width, h: r.height, top: r.top })) };
+        }, book.title);
+      };
+      step(`on a phone 390 wide the longest title ("${long.title}") is whole, one line, in the body size of the scale (19 on 28), SemiBold, between two buttons of 56`);
+      await page.setViewportSize({ width: 390, height: 844 });
+      const a = await bar(long);
+      assert.equal(a.size, '19px', 'the title is 19 px');
+      assert.equal(a.line, '28px', 'on a line of 28');
+      assert(/Inter_600SemiBold/.test(a.family), `in Inter SemiBold (it is ${a.family})`);
+      assert(a.whole, `"${long.title}" is whole on a phone 390 wide: it is not cut`);
+      for (const book of byLength.slice(1, 3)) assert((await bar(book)).whole, `"${book.title}" is whole on a phone 390 wide`);
+      assert(a.box.height <= 28.5, `one line (it is ${a.box.height} high)`);
+      assert.equal(a.buttons.length, 2, 'Previous and Next are in the bar');
+      for (const b of a.buttons) assert(Math.abs(b.w - 56) <= 0.5 && Math.abs(b.h - 56) <= 0.5, `the buttons of the bar are 56 by 56 (${b.w} by ${b.h})`);
+      step('on a phone 320 wide the same title is cut on one line, not wrapped, and the bar is as tall as for a short title');
+      await page.setViewportSize({ width: 320, height: 700 });
+      const b = await bar(long);
+      assert(!b.whole, `"${long.title}" does not fit on a phone 320 wide: it is cut with an ellipsis`);
+      assert(b.box.height <= 28.5, `and still one line (it is ${b.box.height} high)`);
+      const c = await bar(short);
+      assert(c.whole, `"${short.title}" is whole on 320`);
+      assert(Math.abs(c.buttons[0].top - b.buttons[0].top) <= 0.5, 'the bar is as tall for a short title as for a long one: its buttons are at the same height');
+      step('and on 430 every title of that size is whole');
+      await page.setViewportSize({ width: 430, height: 900 });
+      assert((await bar(long)).whole, 'the longest title is whole on 430');
+    },
+  },
+  {
+    name: 'Books: the reader remembers where you stopped (Continue on the page and the Continue reading bar above the tab bar, the same line), the size of the text (five steps, kept), and a damaged place opens the book at its start',
     persona: 'in',
     async run(ctx) {
       const { page, step, go } = ctx;
@@ -269,15 +356,15 @@ export const BOOKS_SCENARIOS = [
       await scrollTo(page, 0.5);
       step('the place is written a moment later, only on the phone, under the person\'s own key, with the time');
       await eventually(() => saved(page, UID), (v) => !!v && JSON.parse(v).items.some((p) => p.id === id && p.c === chapter.id && Math.abs(p.y - 0.5) < 0.03 && p.at > 0), { what: 'the saved place', timeout: 10000 });
-      step('the page of the book says "Continue: …" and the Books tab "Continue reading", for this book');
+      step('the page of the book says "Continue: …" and the bar above the tab bar of the Books tab "Continue reading", for this book and this chapter');
       await go(`/library/book/${id}`);
       await page.getByRole('button', { name: /^Continue: / }).first().waitFor();
       assert(!(await page.getByRole('button', { name: /^Start reading$/ }).count()), 'no "Start reading" once something was read');
       await page.getByText('LAST READ', { exact: true }).first().waitFor();
       await openBooks(ctx);
-      await page.getByRole('button', { name: new RegExp(`^Continue reading\\. Books for the road\\. ${esc(book.title)}`) }).waitFor();
-      step('"Continue" opens the same chapter at the same line');
-      await page.getByRole('button', { name: /^Continue reading/ }).click();
+      await page.getByRole('button', { name: `Continue reading, ${book.title}, Chapter ${longest + 1}`, exact: true }).waitFor();
+      step('"Continue reading" opens the same chapter at the same line');
+      await page.getByRole('button', { name: /^Continue reading, / }).click();
       await eventually(() => new URL(page.url()).pathname, (p) => p === `/library/book/${id}/read`, { what: 'the address of the reader' });
       await eventually(() => scroller(page), (s) => s && Math.abs(s.top / (s.height - s.client) - 0.5) < 0.03, { what: 'the line where the person stopped', timeout: 10000 });
       step('the text size: Larger makes it bigger, five steps, the buttons stop at the ends, and the size is kept when the reader is opened again');

@@ -1,39 +1,40 @@
 // How a book name fits its tile. Pure: no React, no React Native, no fonts to load (plain node tests cover it, npm run test:library).
 //
-// The Bible tab shows the books as square tiles, three in a row, so a tile is as narrow as 90 on a 320 wide phone and "1 Thessalonians" has to
-// fit it without being cut and without being drawn smaller than it can be read. A name is set in Fraunces SemiBold, the title font of the brand;
-// how wide a line of it is drawn is known exactly: the width of each letter below is the advance width of the font file the app ships
-// (@expo-google-fonts/fraunces, 600SemiBold, in em), and src/features/library/__tests__/bible.test.ts reads that file again and fails if one
-// of them differs. From the widths a name gets its lines and the largest size that fits (never above MAX, never under FLOOR), and the same for
-// the count under it, which is set in JetBrains Mono (every letter 0.6 em wide).
-//
-// The name is the hero of the tile: as large as the tile allows, up to NAME_MAX. The short names are all at that size; a long word comes down just
-// enough to fit (and never breaks inside the word), and the letters of a name are set a little closer than the font's own spacing (NAME_TRACKING,
-// the way a display face is set).
+// The Bible tab shows the books as compact tiles, two in a row (gridMath.ts), so a tile is as narrow as 140 on a 320 wide phone and "1 Thessalonians" has to fit it
+// without being cut. A name is set in Fraunces SemiBold, the title font of the brand, and only at the sizes of the type scale: 24 (h4), 17 (h5) or 15 (h6), the three
+// title tokens of design/tokens.json, whichever is the largest that fits; the letters are not tracked (the tokens have letterSpacing 0), and a name is never drawn under 15.
+// How wide a line of it is drawn is known exactly: the width of each letter below is the advance width of the font file the app ships (@expo-google-fonts/fraunces,
+// 600SemiBold, in em), and src/features/library/__tests__/reader.test.ts reads that file again and fails if one of them differs. The count under the name ("150 chapters")
+// is JetBrains Mono at the mono token (15), every letter 0.6 em wide.
 //
 // How wide a line is drawn depends on the browser, and the web smoke found it out: a Chromium that hints the glyphs (the runners of CI, or any with full hinting) gives
 // every letter a whole number of pixels, and "Corinthians" came out 3 px wider than the font file says and broke into two lines. So the width of a line is counted with every
 // letter rounded UP to whole pixels at the size it is drawn (inkPx): never narrower than any layout of this font (measured in Chromium with hinting none, slight, medium and
-// full: no line, at any size from 11 to 24, was wider than that by more than 0.02 px), and a phone that does not hint (iOS, Android) draws it narrower, never wider.
+// full: no line was wider than that by more than 0.02 px), and a phone that does not hint (iOS, Android) draws it narrower, never wider.
 //
-// The size is for the phone's own text size too: a person who has made the text larger gets names that stay as wide as the tile (the size
-// is reduced by what the system adds, up to CAP, which the text itself is held to with maxFontSizeMultiplier) and never under the floor.
+// The words of a tile do not grow with the phone's text size (the screen gives them maxFontSizeMultiplier 1): a tile is as high as its words and as wide as its half of the
+// screen, so a name that has been made larger could not be kept inside it; the smallest name is 15 and the count is 15 already, the size of the body of the app at its least.
+import tokens from '../../../theme/tokens.json';
 
-/** The largest a name is drawn, and the smallest. Both are the size as drawn, with the phone's text size in it. */
-export const NAME_MAX = 24;
-export const NAME_FLOOR = 11;
-/** What every name reaches from a phone of 390 wide up (only the two Thessalonians come down to it and no further there; everything else is 15 or more); on a phone of 320 a tile is only 90 wide and "Thessalonians" is 11. */
-export const NAME_WANTED = 14;
-/** The letters of a name are set this much closer than the font spaces them, in em of the size they are drawn at. */
-export const NAME_TRACKING = -0.02;
-/** The largest the phone's own text size counts for a tile (the text is held to it with maxFontSizeMultiplier). */
-export const TEXT_SCALE_CAP = 1.3;
+/** The title tokens a name may be drawn with, the largest first: h4 24 / 30, h5 17 / 22, h6 15 / 21 (Fraunces 600, letterSpacing 0). */
+export const NAME_VARIANTS = ['h4', 'h5', 'h6'] as const;
+export type NameVariant = (typeof NAME_VARIANTS)[number];
+
+export const NAME_SIZES: ReadonlyArray<{ variant: NameVariant; size: number; lineHeight: number; letterSpacing: number }> = NAME_VARIANTS.map((variant) => ({
+  variant, size: tokens.text[variant].size, lineHeight: tokens.text[variant].lineHeight, letterSpacing: tokens.text[variant].letterSpacing,
+}));
+
+/** The largest and the smallest a name is drawn: 24 and 15. */
+export const NAME_MAX: number = NAME_SIZES[0].size;
+export const NAME_MIN: number = NAME_SIZES[NAME_SIZES.length - 1].size;
+
+/** The count under a name: JetBrains Mono at the mono token, 15 on a line of 22, whose letters are all 0.6 em wide. */
+export const COUNT_SIZE: number = tokens.text.mono.size;
+export const COUNT_LINE: number = tokens.text.mono.lineHeight;
+export const MONO_ADVANCE = 0.6;
+
 /** A line is taken to be this much wider than the sum of its letters rounded up, for what a phone adds that no table has (kerning goes the other way): a pixel in a hundred. */
 export const FIT_SAFETY = 1.01;
-/** The count under a name: drawn at most so large, at least so small, in JetBrains Mono, whose letters are all 0.6 em wide. */
-export const COUNT_MAX = 12;
-export const COUNT_FLOOR = 10;
-export const MONO_ADVANCE = 0.6;
 
 /** Fraunces SemiBold, the advance width of each character a book name has, in em. */
 export const FRAUNCES_600: Readonly<Record<string, number>> = {
@@ -47,20 +48,17 @@ export const FRAUNCES_600: Readonly<Record<string, number>> = {
 /** The width of a line of a name in em. A character that is not in the table counts as a wide one (0.8 em), so that a surprise is never too narrow. */
 export const lineWidth = (line: string): number => [...line].reduce((sum, ch) => sum + (FRAUNCES_600[ch] ?? 0.8), 0);
 
-/** The width of the ink of a line of a name in em, with the letters set closer by NAME_TRACKING (between the letters: the gap after the last one is not ink). Unhinted. */
-export const inkWidth = (line: string): number => lineWidth(line) + ([...line].length - 1) * NAME_TRACKING;
-
-/** The table above is the font file to a quarter of this much (em; it is rounded to 0.0005 and bible.test.ts reads the file again): a letter is rounded up with it counted in. */
+/** The table above is the font file to a quarter of this much (em; it is rounded to 0.0005 and reader.test.ts reads the file again): a letter is rounded up with it counted in. */
 export const TABLE_TOLERANCE = 0.0003;
 
 /** Rounded up to a whole number, with a hair of room for the sums that come out a billionth over a whole number. */
 const up = (x: number): number => Math.ceil(x - 1e-9);
 
 /**
- * The width in px of a line of a name drawn at `size` (as drawn), as a browser that hints the glyphs lays it out: every letter takes a whole number of pixels, rounded up, and the
- * letters are set NAME_TRACKING closer (between the letters, as inkWidth). The unhinted layout of the font file is never wider than this.
+ * The width in px of a line of a name drawn at `size`, as a browser that hints the glyphs lays it out: every letter takes a whole number of pixels, rounded up, and `tracking`
+ * px (the letterSpacing of the token, 0) between the letters. The unhinted layout of the font file is never wider than this.
  */
-export const inkPx = (line: string, size: number): number => [...line].reduce((sum, ch) => sum + up(((FRAUNCES_600[ch] ?? 0.8) + TABLE_TOLERANCE) * size), 0) + ([...line].length - 1) * NAME_TRACKING * size;
+export const inkPx = (line: string, size: number, tracking = 0): number => [...line].reduce((sum, ch) => sum + up(((FRAUNCES_600[ch] ?? 0.8) + TABLE_TOLERANCE) * size), 0) + ([...line].length - 1) * tracking;
 
 /**
  * The lines of a name. A name with a number in front ("1 Samuel") breaks after the number, in every numbered book alike, so the number is a
@@ -82,43 +80,30 @@ export function nameLines(name: string): string[] {
   return best;
 }
 
-const held = (fontScale: number): number => Math.min(Math.max(fontScale, 1), TEXT_SCALE_CAP);
-
 export type NameFit = {
   lines: string[];
-  /** The fontSize to give the text (the phone multiplies it by its own text size, held to TEXT_SCALE_CAP). */
+  /** The variant of AppText that draws the name: h4, h5 or h6. */
+  variant: NameVariant;
+  /** Its size and line height, the ones of the token. */
   size: number;
   lineHeight: number;
-  /** The letterSpacing to give the text, in the same px as the size (NAME_TRACKING of it). */
-  tracking: number;
-  /** Whether the widest line is as wide as the tile or narrower once drawn. false only if the floor is not small enough: no name does that on a phone of 320 or more. */
+  /** Whether the widest line is as wide as the room of the tile or narrower once drawn. false only if even h6 is too wide: no name does that on a phone of 320 or more. */
   fits: boolean;
 };
 
-/** The lines and the size of a name in a tile whose text may be `inner` wide, for a phone whose text is `fontScale` times the normal. */
-export function fitName(name: string, inner: number, fontScale = 1): NameFit {
-  const m = held(fontScale);
+/** The lines and the variant of a name in a tile whose words may be `inner` wide: the largest of h4, h5 and h6 that fits, the letters of every line counted as a browser that hints the glyphs sets them. */
+export function fitName(name: string, inner: number): NameFit {
   const lines = nameLines(name);
-  const widest = (drawn: number): number => Math.max(...lines.map((line) => inkPx(line, drawn))) * FIT_SAFETY;
-  // the size as it is drawn, in half pixels: the largest the tile allows (up to NAME_MAX) and never under NAME_FLOOR; the size to give the text is that less what the phone adds
-  let drawn = NAME_MAX;
-  while (drawn > NAME_FLOOR && widest(drawn) > inner) drawn -= 0.5;
-  const size = drawn / m;
-  return { lines, size, lineHeight: Math.round(size * 1.2), tracking: NAME_TRACKING * size, fits: widest(drawn) <= inner + 1e-9 };
+  const widest = (size: number, tracking: number): number => Math.max(...lines.map((line) => inkPx(line, size, tracking))) * FIT_SAFETY;
+  for (const { variant, size, lineHeight, letterSpacing } of NAME_SIZES) {
+    if (widest(size, letterSpacing) <= inner + 1e-9) return { lines, variant, size, lineHeight, fits: true };
+  }
+  const { variant, size, lineHeight } = NAME_SIZES[NAME_SIZES.length - 1];
+  return { lines, variant, size, lineHeight, fits: false };
 }
 
-export type CountFit = { size: number; lineHeight: number; fits: boolean };
+/** The width in px of the count drawn at `size` in JetBrains Mono: every letter takes a whole number of pixels there too when the browser hints (9 at 15), so letters times the advance rounded up. */
+export const countPx = (text: string, size: number = COUNT_SIZE): number => [...text].length * up(MONO_ADVANCE * size) * FIT_SAFETY;
 
-/**
- * The same for the count under a name ("150 chapters"), which is one line in JetBrains Mono. Every letter takes a whole number of pixels there too when the browser hints
- * (6.6 becomes 7 at 11), so the width is the number of letters times the advance rounded up, as drawn.
- */
-export function fitCount(text: string, inner: number, fontScale = 1): CountFit {
-  const m = held(fontScale);
-  const letters = [...text].length;
-  const widest = (drawn: number): number => letters * up(MONO_ADVANCE * drawn) * FIT_SAFETY;
-  let drawn = COUNT_MAX;
-  while (drawn > COUNT_FLOOR && widest(drawn) > inner) drawn -= 0.5;
-  const size = drawn / m;
-  return { size, lineHeight: Math.round(size * 1.4), fits: widest(drawn) <= inner + 1e-9 };
-}
+/** Whether the count under a name ("150 chapters") is as wide as the room of the tile or narrower. It is drawn at the mono token and never smaller. */
+export const countFits = (text: string, inner: number): boolean => countPx(text) <= inner + 1e-9;

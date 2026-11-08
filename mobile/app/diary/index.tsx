@@ -5,11 +5,12 @@ import { Screen } from '@/components/Screen';
 import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
 import { Pill } from '@/components/Pill';
+import { BackButton } from '@/components/BackButton';
 import { Card, IconButton } from '@/components/ui';
 import { FormMessage } from '@/components/auth/Field';
 import { confirmDelete } from '@/features/diary/confirm';
-import { PRIVACY_LINE, dateLine, mediaUsageLine, metaLine, pagePreview, pageTitle, pagesLabel } from '@/features/diary/present';
-import type { DiaryEntry } from '@/features/diary/store';
+import { PRIVACY_LINE, dateLine, dateWithDraft, mediaUsageLine, metaLine, pagePreview, pageTitle, pagesLabel } from '@/features/diary/present';
+import { isDraft, type DiaryEntry } from '@/features/diary/store';
 import { useDiary } from '@/features/diary/useDiary';
 import { radius, role } from '@/theme';
 
@@ -18,14 +19,13 @@ export default function DiaryList() {
   const router = useRouter();
   const { ready, entries, remove } = useDiary();
   const [deleteFailed, setDeleteFailed] = useState(false);
-  const goBack = () => (router.canGoBack() ? router.back() : router.replace('/me'));
   const write = () => router.push('/diary/new');
   const ask = (e: DiaryEntry) => confirmDelete(pageTitle(e), async () => setDeleteFailed(!(await remove(e.id))), metaLine(e) !== '');
   const usage = mediaUsageLine(entries);
 
   return (
     <Screen tabBar={false}>
-      <IconButton name="back" label="Back" onPress={goBack} />
+      <BackButton fallback="/me" />
       <View style={{ gap: 8 }}>
         <AppText variant="h2" accessibilityRole="header">My diary</AppText>
         {entries.length > 0 && <AppText variant="label" muted>{pagesLabel(entries.length)}</AppText>}
@@ -55,7 +55,8 @@ export default function DiaryList() {
             {entries.map((e) => {
               const name = pageTitle(e);
               const preview = pagePreview(e);
-              const date = dateLine(e.createdAt);
+              const draft = isDraft(e);
+              const date = dateWithDraft(dateLine(e.createdAt), draft);
               const attached = metaLine(e);
               return (
                 <Card key={e.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingRight: 8 }}>

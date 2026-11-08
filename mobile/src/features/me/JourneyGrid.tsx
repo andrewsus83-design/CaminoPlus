@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { FlatList, Image, Modal, PixelRatio, Pressable, View, useWindowDimensions } from 'react-native';
+import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ActionRail, RAIL_CIRCLE } from '@/components/ActionRail';
 import { AppText } from '@/components/AppText';
@@ -7,11 +8,13 @@ import { CommentsSheet } from '@/components/CommentsSheet';
 import { FIXED } from '@/components/fixedColors';
 import { Icon } from '@/components/Icon';
 import { Post, PostMediaUrl, listPostMediaUrls } from '@/lib/api';
-import { gridMetrics, gridRows } from '@/lib/gridLayout';
+import { gridCellRows, gridMetrics, shownPosts } from '@/lib/gridLayout';
 import { SAMPLE_VIEWER_LABEL } from '@/lib/sampleJourney';
 import { NativeName, hasNativeModule } from '@/lib/optionalNative';
 import { c, fixed, fonts, radius, layout } from '@/theme';
+import { JOURNEY_WRITE } from './tabs';
 import { PostRail, usePostRail } from './usePostRail';
+import { WriteCard } from './WriteCard';
 
 // My journey: 9:16 tiles in an even two-column grid, square corners, 2 px between tiles (sideways and downwards) and
 // 2 px from the left and right screen edge (the TikTok / Reels profile grid; the maths is in lib/gridLayout.ts).
@@ -19,6 +22,9 @@ import { PostRail, usePostRail } from './usePostRail';
 // app's one action rail (love, bookmark, comments, share), the same component and comments sheet as Discover. The rail
 // places itself (components/ActionRail.tsx), so it sits exactly where Discover's does: the viewer never gives it numbers.
 // The colour of a text card belongs to the post, not to the mode the viewer is in: always the light palette.
+// The first tile, top left, is the "Write a journey post" card (WriteCard.tsx), in the grid of every journey: the sample, a real one, and one filtered to a
+// destination. It is a cell of the grid and not a post: the viewer, the rail, `only`, the likes and the bookmarks work on `posts` alone, so the post in cell k
+// is post k - 1 (lib/gridLayout.ts: gridCellRows) and the viewer opens at the index of the post among the posts shown, never at the cell.
 const CARD_COLORS = [
   { bg: fixed.blue, fg: fixed.parchment },
   { bg: fixed.gold, fg: fixed.blue },
@@ -93,6 +99,7 @@ export function JourneyGrid({ posts, margin = layout.screenMargin, sample, media
   const [own, setOwn] = useState<Record<string, Visual[]>>(sample ?? {});
   const media = given ?? own;
   const [openAt, setOpenAt] = useState<number | null>(null);
+  const router = useRouter();
   const { width } = useWindowDimensions();
   // The rail's state lives here, not in the viewer: the grid stays while the viewer opens and closes, so a like keeps its count.
   const rail = usePostRail({ posts, sample: !!sample });
@@ -107,16 +114,18 @@ export function JourneyGrid({ posts, margin = layout.screenMargin, sample, media
 
   // `only`: show just these posts (the destination picked in the highlights). The rail and the pictures above keep working on
   // all of `posts`, so picking a destination, and going back to all, asks the network for nothing. The viewer pages through what is shown.
-  const shown = useMemo(() => (only ? posts.filter((p) => only.has(p.id)) : posts), [posts, only]);
-  // Even rows of two tiles. The only space between tiles is `gap` (2 px, sideways and downwards); the page background shows through it.
-  const rows = useMemo(() => gridRows(shown.length), [shown.length]);
+  const shown = useMemo(() => shownPosts(posts, only), [posts, only]);
+  // Even rows of two tiles, the write card first and then the posts. The only space between tiles is `gap` (2 px, sideways and downwards); the page background shows through it.
+  const rows = useMemo(() => gridCellRows(shown.length), [shown.length]);
 
   return (
     <>
       <View style={{ marginHorizontal, gap }}>
         {rows.map((row, r) => (
           <View key={r} style={{ flexDirection: 'row', gap }}>
-            {row.map((i) => {
+            {row.map((cell) => {
+              if (cell.kind === 'write') return <WriteCard key="write" width={colW} height={tileH} onPress={() => router.push(JOURNEY_WRITE.href)} />;
+              const i = cell.post;
               const p = shown[i];
               const first = media[p.id]?.[0];
               const count = Math.max(media[p.id]?.length ?? 0, p.media_count);
@@ -144,7 +153,7 @@ export function JourneyGrid({ posts, margin = layout.screenMargin, sample, media
 
 const CLOSE_SIZE = 52;
 
-function Viewer({ posts, media, start, rail, onClose, sampleLabel }: { posts: Post[]; media: Record<string, Visual[]>; start: number; rail: PostRail; onClose: () => void; sampleLabel?: string }) {
+function Viewer({ posts, media, start, rail, onClose, sampleLabel }: { posts: readonly Post[]; media: Record<string, Visual[]>; start: number; rail: PostRail; onClose: () => void; sampleLabel?: string }) {
   const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const [cur, setCur] = useState(start);

@@ -64,19 +64,19 @@ check('the Books tab on the page: the strip with Books on, the compact banner wi
   }
 });
 
-check('a cover on the page is a cover of the app: each book once, ONE button named "title, kind, time" with its own ribbon beside it (not inside), the kind and the time under the title, in the sizes of cover.ts', () => {
+check('a cover on the page is a cover of the app: each book once, ONE button named "title, kind, time" with its own ribbon beside it (not inside), the time under the title and no kind line, in the sizes of cover.ts', () => {
   const shelvesText = `${phoneOf('Library · Books')}${phoneOf('Books · second shelf')}`;
   const g = coverGrid(390, 16);
   for (const b of BOOK_CATALOG) {
     const label = `aria-label="${esc(coverLabel(b))}"`;
     assert.equal(count(shelvesText, new RegExp(label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')), 1, `${b.id}: its cover is on the page once`);
     const t = coverText(b, g.tile);
-    assert.ok(shelvesText.includes(`<span class="bk-time" style="font-size:${t.m.time.size}px;line-height:${t.m.time.lineHeight}px">${esc(formatMinutes(b.minutes))}</span>`), `${b.id}: the time under the kind`);
-    assert.ok(shelvesText.includes(t.kind.lines.map(esc).join('<br>')), `${b.id}: the kind of book`);
+    assert.ok(shelvesText.includes(`<span class="bk-time" style="font-size:${t.m.time.size}px;line-height:${t.m.time.lineHeight}px">${esc(formatMinutes(b.minutes))}</span>`), `${b.id}: the time under the title, the mono token (15 on 22)`);
     assert.ok(shelvesText.includes(t.title.lines.map(esc).join('<br>')), `${b.id}: the title broken where cover.ts measured it`);
     assert.ok(shelvesText.includes(`aria-label="Bookmark: ${esc(b.title)}"`) || shelvesText.includes(`aria-label="Remove bookmark: ${esc(b.title)}"`), `${b.id}: the ribbon`);
   }
   assert.equal(count(shelvesText, /class="bk-cover"/g), BOOK_CATALOG.length);
+  assert.doesNotMatch(shelvesText, /bk-kind|PILGRIM'S GUIDE|READINGS FOR THE WAY/, 'no cover has the kind of book printed on it (the book page has it, and the label of the cover says it)');
   assert.equal(count(shelvesText, /<\/div><button class="bk-ribbon/g), BOOK_CATALOG.length, 'the ribbon is next to the button of the cover, not inside it');
   assert.equal(count(shelvesText, /width:44px;height:44px"><span class="rb"/g), BOOK_CATALOG.length, 'every ribbon is a 44 by 44 button');
   assert.match(shelvesText, new RegExp(`width:${g.tile}px;height:${g.height}px`), `a cover is ${g.tile} by ${g.height} on a 390 phone`);
@@ -84,7 +84,22 @@ check('a cover on the page is a cover of the app: each book once, ONE button nam
   assert.match(phoneOf('Books · 320 wide'), /<div class="phone" style="width:320px">/);
   const dark = phoneOf('Books · dark');
   assert.match(dark, /<div class="phone dk">/);
-  assert.match(dark, new RegExp(`aria-label="${CONTINUE_CTA}\\. ${BOOKS_BANNER_TITLE}\\. `), 'once something was read the banner says Continue reading');
+  // once something was read the bar above the tab bar says so: it names a book of the catalog and the chapter, in the app's own words (spot.ts), and has a close button of its own
+  const bar = /<div class="cont-bar">\s*<div class="main" role="button" aria-label="Continue reading, ([^"]+), Chapter (\d+)"><svg class="cp-icon ic"><use href="#i-library"\/><\/svg><div class="t"><div class="k">Continue reading<\/div><div class="r"><span class="h">([^<]+)<\/span><span class="c">· Chapter (\d+)<\/span><\/div><\/div><\/div>\s*<button class="x" aria-label="Hide Continue reading"><svg class="cp-icon"><use href="#i-x"\/><\/svg><\/button>\s*<\/div>/.exec(dark);
+  assert.ok(bar, 'Books · dark: the bar above the tab bar');
+  assert.equal(bar[1], bar[3], 'what a screen reader says names the book the bar draws');
+  assert.equal(bar[2], bar[4], 'and its chapter');
+  const barBook = BOOK_CATALOG.find((b) => esc(b.title) === bar[1]);
+  assert.ok(barBook, 'the bar names a book of the catalog, by the title its cover has');
+  assert.ok(dark.includes(`aria-label="${esc(coverLabel(barBook))}"`) || BOOK_CATALOG.indexOf(barBook) >= 6, 'the cover of that book is in the same phone when the phone is long enough to show it');
+  assert.ok(dark.indexOf('class="cont-bar"') < dark.indexOf('class="scroll"'), 'the bar floats: it is not inside the scroll');
+  assert.match(dark, /<div class="scroll" style="padding-bottom:202px">/, 'the list keeps the bar\'s room at its end: 130 for the tab bar and 72 for the bar');
+  assert.equal(count(dark, /class="cont-bar"/g), 1, 'one bar');
+  assert.equal(count(dark, /class="hw"/g), 1, 'the bar adds no handwriting: the banner has the one note');
+  assert.doesNotMatch(dark, new RegExp(`aria-label="${CONTINUE_CTA}\\. |Onward!`), 'the banner of the Books tab does not continue a book any more');
+  assert.match(dark, new RegExp(`aria-label="${START_CTA}\\. ${BOOKS_BANNER_TITLE}\\. ${esc(BOOK_CATALOG[0].title)}"`), 'it starts the first book');
+  // a phone with nothing read has no bar: the bar is there only for a place to go back to
+  for (const label of ['Library · Books', 'Books · second shelf', 'Books · 320 wide']) assert.doesNotMatch(phoneOf(label), /cont-bar|Continue reading/, `${label}: nothing read, no bar`);
 });
 
 check('the page of a book on the page: the notice of its kind above the gold button (the words of notices.ts, nothing else), the kind, the facts, the description, the contents with the minutes of every chapter, the credit', () => {
