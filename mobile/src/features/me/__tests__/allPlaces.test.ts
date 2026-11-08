@@ -79,6 +79,12 @@ check('the points follow the stage numbers, not the order the stages came in; a 
   assert.deepEqual(names(routePoints([{ name: 'Leon to Astorga' }, { name: 'Astorga to Ponferrada' }])), ['Leon', 'Astorga', 'Ponferrada'], 'no numbers: the order given');
 });
 
+check('the points are the first start and the ends, nothing else: a stage that does not start where the one before ended adds no point of its own', () => {
+  const gap = routePoints([{ stage_number: 1, name: 'Burgos to Hornillos del Camino' }, { stage_number: 2, name: 'Itero to Castrojeriz' }]); // stage 2 starts somewhere else
+  assert.deepEqual(names(gap), ['Burgos', 'Hornillos del Camino', 'Castrojeriz'], 'the passport builds its towns the same way (app/passport.tsx)');
+  assert.deepEqual(stageEnds({ name: 'Villafranca to Triacastela to Sarria' }), { from: 'Villafranca to Triacastela', to: 'Sarria' }, 'the cut is at the LAST " to ", as the destination of a day is');
+});
+
 check('a point with a post is visited, the others are dashed, and the line says how many of how many: "5 of 33 places"', () => {
   const posts = [post('p1', 'Zubiri'), post('p2', 'Pamplona'), post('p3', 'Burgos'), post('p4', 'León'), post('p5', 'Santiago de Compostela'), post('p6', 'Zubiri')];
   const places = buildRoutePlaces(ROUTE, posts);
@@ -217,6 +223,8 @@ check('the row of destinations opens at the next destination, and keeps clear of
   assert.equal(rowStartOffset({ ...o, nextAt: 2, pinned: true }), 0, '2 x 88 + 72 = 248 <= 270');
   assert.equal(rowStartOffset({ ...o, nextAt: 3, pinned: true }), 3 * 88 - 52, '3 x 88 + 72 = 336 > 270: it scrolls');
   assert.equal(rowStartOffset({ ...o, nextAt: 12, pinned: true }), 12 * 88 - 52);
+  assert.equal(rowStartOffset({ ...o, width: 360, nextAt: 2, pinned: true }), 2 * 88 - 52, 'on a 360 phone the destinations have 360 - 16 - 88 = 256: 2 x 88 + 72 = 248 does not fit before the margin (240)');
+  assert.equal(rowStartOffset({ ...o, width: 360, nextAt: 1, pinned: true }), 0, '1 x 88 + 72 = 160 does');
   // what is shown never starts a destination under the All item: the offset leaves the previous one half visible (36 of 72) at most
   const x = rowStartOffset({ ...o, nextAt: 12, pinned: true });
   assert.equal(12 * 88 - x, 52, 'the next destination is 52 from the left of the scrolling part: half of the one before (36) and a gap (16)');
