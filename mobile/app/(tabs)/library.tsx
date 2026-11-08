@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Screen } from '@/components/Screen';
@@ -10,6 +10,7 @@ import { FormMessage } from '@/components/auth/Field';
 import { ContinueCard } from '@/features/library/bible/ContinueCard';
 import type { Testament } from '@/features/library/bible/books';
 import { bookHref, readerHref } from '@/features/library/bible/order';
+import type { Ref } from '@/features/library/bible/ref';
 import { useLastRead } from '@/features/library/bible/useLastRead';
 import { BooksBanner } from '@/features/library/books/BooksBanner';
 import { useBooksReading } from '@/features/library/books/useBooksReading';
@@ -55,6 +56,9 @@ export default function Library() {
   // Where the person has got to in the books: read here, with the screen, so that the banner of the Books tab says "Continue" from its first frame.
   const booksReading = useBooksReading();
   const searching = isSearching(query);
+  // What a result of the Bible opens, the same in both hosts (the results are drawn on Notes too): a book its chapters, a verse the reader at it.
+  const openBook = (code: string) => router.push(bookHref(code));
+  const openVerse = (ref: Ref) => router.push(readerHref(ref));
   // The top of the screen, the same in both hosts: the heading for a screen reader, the search row, a message when a bookmark could not be kept, the tabs.
   const top = (
     <>
@@ -74,7 +78,7 @@ export default function Library() {
         <View style={{ paddingTop: insets.top + layout.screenTop, paddingHorizontal: layout.screenMargin, paddingBottom: 16, gap: 16 }}>{top}</View>
         {searching ? (
           <ScrollView keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag" contentContainerStyle={{ paddingHorizontal: layout.screenMargin, paddingBottom: layout.tabbarHeight + insets.bottom + 40, gap: 16 }}>
-            <SearchResults query={query} marks={marks} onClear={() => setQuery('')} />
+            <SearchResults query={query} marks={marks} onClear={() => setQuery('')} onOpenBook={openBook} onOpenVerse={openVerse} />
           </ScrollView>
         ) : (
           <View style={{ flex: 1 }}><NotesTab /></View>
@@ -87,13 +91,7 @@ export default function Library() {
     <Screen keyboard>
       {top}
       {searching ? (
-        <SearchResults
-          query={query}
-          marks={marks}
-          onClear={() => setQuery('')}
-          onOpenBook={(code) => router.push(bookHref(code))}
-          onOpenVerse={(ref) => router.push(readerHref(ref))}
-        />
+        <SearchResults query={query} marks={marks} onClear={() => setQuery('')} onOpenBook={openBook} onOpenVerse={openVerse} />
       ) : (
         <>
           {tab === 'Bible' && lastRead.place && <ContinueCard place={lastRead.place} onOpen={() => router.push(readerHref({ code: lastRead.place!.code, chapter: lastRead.place!.chapter }))} />}

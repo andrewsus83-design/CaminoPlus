@@ -200,11 +200,9 @@ textarea.cp-input { height: 120px; border-radius: var(--cp-radius-lg); padding: 
 .lib-cover > .cp-icon { width: 28px; height: 28px; }
 .lib-cover .lib-mark { position: absolute; top: 4px; right: 4px; color: var(--cp-color-blue); }
 .lib-kind { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; font-size: 15px; line-height: 21px; letter-spacing: .4px; font-weight: 500; color: var(--cp-text-muted); }
-/* Library tabs (features/library): under the tab strip, Bible and Books each have one banner, a single card with no dots, in the look of the promo
-   banner (.cp-banner) with a line under the title. The Bible banner is one button (the gold pill is its look). The rows of the two tabs: a Bible row is the
-   name, then "50 chapters" with the Soon chip beside it (under it when the line carries the part, or a detail); a book is a cover, the title and
-   "author · era", the bookmark, and under them the blurb and the chips Free and Soon. The three choices of the Bible tab float above the tab bar,
-   where the gold pen sits on Notes (8 clear of the bar, which here is 26 from the bottom of the phone): 56 high with 3 of padding, the chosen one filled, the middle one keeps the width of its word. */
+/* Library tabs (features/library): under the tab strip, Bible and Books each have a banner. The rows of a list of results or of Bookmarks: a book of the Bible is its name in Fraunces
+   with "Old Testament · 150 chapters" under it (the count in JetBrains Mono) and its bookmark at the end; one of the twelve example books is a cover, the title and "author · era",
+   the bookmark, and under them the blurb and the chips Free and Soon. The Bible tab itself shows its books as tiles (see the Bible side below). */
 .cp-banner.lib { padding: 24px; min-height: 190px; display: flex; flex-direction: column; justify-content: space-between; }
 .cp-banner.lib .ey, .cp-banner.lib h4, .cp-banner.lib .line { position: relative; }
 .cp-banner.lib .ey { font-size: 15px; line-height: 22px; color: var(--cp-color-gold-soft); }
@@ -217,7 +215,7 @@ textarea.cp-input { height: 120px; border-radius: var(--cp-radius-lg); padding: 
 .lib-sub .n { font-size: 15px; line-height: 21px; letter-spacing: .4px; font-weight: 500; color: var(--cp-text-muted); }
 .lib-chip.free { background: var(--cp-success-wash); color: var(--cp-success); }
 .lib-hrow { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; column-gap: 12px; row-gap: 2px; }
-.lib-hrow .cnt { font-size: 17px; line-height: 25px; color: var(--cp-text-muted); }
+.lib-hrow .cnt { font-family: var(--cp-font-mono); font-size: 14px; line-height: 20px; color: var(--cp-text-muted); }
 .lib-book { display: flex; flex-direction: column; gap: 10px; padding: 14px 6px 14px 16px; border-top: 1px solid var(--cp-border); }
 .lib-book:first-child { border-top: 0; }
 .lib-book .top { display: flex; align-items: flex-start; gap: 14px; }
@@ -228,10 +226,76 @@ textarea.cp-input { height: 120px; border-radius: var(--cp-radius-lg); padding: 
 .lib-book .a { font-size: 15px; line-height: 21px; letter-spacing: .4px; font-weight: 500; color: var(--cp-text-muted); }
 .lib-book p { margin: 0; padding-right: 10px; font-size: 17px; line-height: 25px; }
 .lib-book .chips { display: flex; gap: 8px; }
-.lib-bar { position: absolute; left: 16px; right: 16px; bottom: 122px; z-index: 7; height: 56px; display: flex; gap: 2px; padding: 3px; border-radius: var(--cp-radius-pill); background: var(--cp-surface); box-shadow: inset 0 0 0 1px var(--cp-border), var(--cp-shadow-md); }
-.lib-bar button { flex: 1 1 0; min-width: 0; border: 0; padding: 0 8px; border-radius: var(--cp-radius-pill); background: none; color: var(--cp-text); font: 600 14px/18px var(--cp-font-body); text-align: center; cursor: pointer; }
-.lib-bar button.mid { flex: 0 0 auto; }
-.lib-bar button.on { background: var(--cp-action); color: var(--cp-on-action); }
+/* Library, the Bible side (mobile/src/features/library/bible). The daily reading banner is compact: a dark blue card no taller than 120 (116 here) with the date in
+   JetBrains Mono, the title in Fraunces, one handwritten note in Caveat and the gold pill in Inter, ONE button for a screen reader. The three parts are a segmented pill in the
+   page, directly under the banner (a sunken track, the chosen one filled), not a bar that floats. The books are square tiles, three in a row (111 on a 390 wide phone, 90 on
+   320): the name in Fraunces, as large as fits (never under 11), the count in JetBrains Mono. A book opens its numbers (square tiles, five in a row at 390), a number opens the
+   reader: Fraunces for the title, Inter for the words, JetBrains Mono for the raised numbers and for every reference; a chosen verse is a gold ground and an underline. */
+.cp-banner.cmp { --acc: #F3DFA6; padding: 12px 16px; min-height: 0; border-radius: 28px; background: var(--cp-surface-inverse); color: var(--cp-text-inverse); display: flex; flex-direction: column; gap: 2px; }
+.cp-banner.cmp .ey { font-family: var(--cp-font-mono); font-size: 12px; line-height: 16px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--acc); }
+.cp-banner.cmp h4 { font-family: var(--cp-font-title); font-weight: 600; font-size: 24px; line-height: 28px; margin: 0; max-width: none; color: var(--cp-text-inverse); }
+.cp-banner.cmp .row { display: flex; align-items: center; gap: 12px; margin-top: 2px; }
+.cp-banner.cmp .hw { flex: 1; min-width: 0; font-size: 24px; line-height: 28px; color: var(--acc); white-space: nowrap; }
+.cp-banner.cmp .pill { height: 44px; padding: 0 16px; border-radius: var(--cp-radius-pill); background: var(--cp-color-gold); color: var(--cp-on-highlight); font: 600 16px/20px var(--cp-font-body); display: inline-flex; align-items: center; }
+.hw { font-family: var(--cp-font-accent); font-weight: 700; font-size: 30px; line-height: 34px; color: var(--cp-text-accent); }
+.lib-seg { height: 56px; display: flex; gap: 2px; padding: 4px; border-radius: var(--cp-radius-pill); background: var(--cp-surface-sunken); }
+.lib-seg button { flex: 1 1 0; min-width: 0; border: 0; padding: 0 6px; border-radius: var(--cp-radius-pill); background: none; color: var(--cp-text); font: 600 14px/18px var(--cp-font-body); text-align: center; cursor: pointer; }
+.lib-seg button.mid { flex: 0 0 auto; }
+.lib-seg button.on { background: var(--cp-action); color: var(--cp-on-action); }
+.lib-src { margin: 4px 0 0; font-size: 15px; line-height: 21px; letter-spacing: .4px; font-weight: 500; color: var(--cp-text-muted); }
+.lib-note { margin: 16px 0 0; font-size: 15px; line-height: 21px; letter-spacing: .4px; font-weight: 500; color: var(--cp-text-muted); }
+.lib-count { font-size: 17px; line-height: 25px; color: var(--cp-text-muted); }
+.lib-grid { display: grid; grid-template-columns: repeat(3, 111px); gap: 12px; }
+.lib-tile { width: 111px; height: 111px; padding: 6px; display: flex; flex-direction: column; justify-content: space-between; align-items: flex-start; text-align: left; border: 0; border-radius: var(--cp-radius-md); background: var(--cp-surface); box-shadow: inset 0 0 0 1px var(--cp-border), var(--cp-shadow-sm); color: var(--cp-text); font: inherit; cursor: pointer; }
+.lib-tile .nm { font-family: var(--cp-font-title); font-weight: 600; letter-spacing: 0; }
+.lib-tile .ct { font-family: var(--cp-font-mono); font-weight: 400; letter-spacing: 0; color: var(--cp-text-muted); white-space: nowrap; }
+.cont-card { min-height: 64px; display: flex; align-items: center; gap: 14px; padding: 10px 12px 10px 16px; border-radius: var(--cp-radius-lg); background: var(--cp-surface); box-shadow: inset 0 0 0 1px var(--cp-border), var(--cp-shadow-sm); }
+.cont-card .ic { width: 40px; height: 40px; flex: none; border-radius: 50%; display: grid; place-items: center; background: var(--cp-surface-sunken); color: var(--cp-action); }
+.cont-card .ic .cp-icon { width: 22px; height: 22px; }
+.cont-card .k { font-size: 14px; line-height: 18px; font-weight: 600; color: var(--cp-text-muted); }
+.cont-card .r { font-family: var(--cp-font-mono); font-size: 17px; line-height: 24px; }
+.cont-card > .cp-icon { width: 22px; height: 22px; color: var(--cp-text-muted); flex: none; }
+.rd-count { margin: 2px 0 0; font-family: var(--cp-font-mono); font-size: 15px; line-height: 22px; color: var(--cp-text-muted); }
+.ch-grid { display: grid; grid-template-columns: repeat(5, 65px); gap: 8px; }
+.ch-tile { width: 65px; height: 65px; display: grid; place-items: center; border: 0; padding: 0; border-radius: var(--cp-radius-sm); background: var(--cp-surface); box-shadow: inset 0 0 0 1px var(--cp-border), var(--cp-shadow-sm); color: var(--cp-text); font: 400 20px/26px var(--cp-font-mono); cursor: pointer; }
+.rd-kick { margin: 0; font-family: var(--cp-font-title); font-weight: 600; font-size: 24px; line-height: 30px; color: var(--cp-text-accent); }
+.rd-title { margin: 2px 0 0; font-family: var(--cp-font-title); font-weight: 600; font-size: 36px; line-height: 42px; letter-spacing: -0.5px; }
+.rd-sub { margin: 2px 0 0; font-family: var(--cp-font-title); font-weight: 600; font-size: 20px; line-height: 26px; color: var(--cp-text-muted); }
+.rd-all { min-height: 48px; display: inline-flex; align-items: center; gap: 6px; padding: 0 16px; border: 0; border-radius: var(--cp-radius-pill); background: var(--cp-surface); box-shadow: inset 0 0 0 1px var(--cp-border); color: var(--cp-text); font: 600 15px/20px var(--cp-font-body); }
+.rd-all .cp-icon { width: 18px; height: 18px; color: var(--cp-action); }
+.rd-nav { display: flex; flex-wrap: wrap; gap: 8px; }
+.rd-step { min-height: 48px; flex: 1 0 auto; display: flex; align-items: center; gap: 8px; padding: 0 14px; border: 0; border-radius: var(--cp-radius-pill); background: var(--cp-surface); box-shadow: inset 0 0 0 1px var(--cp-border), var(--cp-shadow-sm); color: var(--cp-text); font: 400 14px/20px var(--cp-font-mono); }
+.rd-step.next { justify-content: flex-end; }
+.rd-step .cp-icon { width: 20px; height: 20px; color: var(--cp-action); flex: none; }
+.rd-step.foot { flex-basis: 100%; font: 600 15px/22px var(--cp-font-body); }
+.rd-step.foot .m { font-family: var(--cp-font-mono); font-weight: 400; }
+.rd-text .rd-p { margin: 0; font-size: 19px; line-height: 32px; white-space: pre-wrap; }
+.rd-text .g-p { margin-top: 16px; }
+.rd-text .g-s { margin-top: 26px; }
+.rd-text .rd-h { margin: 28px 0 6px; font-family: var(--cp-font-title); font-weight: 600; font-size: 22px; line-height: 28px; }
+.rd-n { font-family: var(--cp-font-mono); font-size: 17px; line-height: 32px; color: var(--cp-text-muted); }
+.rd-v.sel { background: var(--cp-color-gold-soft); text-decoration: underline; }
+.rd-v.sel .rd-n { color: var(--cp-text); }
+.rd-credit p { margin: 16px 0 0; font-size: 15px; line-height: 21px; letter-spacing: .4px; font-weight: 500; color: var(--cp-text-muted); }
+.rd-credit p + p { margin-top: 6px; }
+.rd-act { position: absolute; left: 16px; right: 16px; bottom: 26px; z-index: 8; padding: 6px 8px; border-radius: var(--cp-radius-lg); background: var(--cp-surface); box-shadow: inset 0 0 0 1px var(--cp-border), var(--cp-shadow-lg); }
+.rd-act .top { display: flex; align-items: center; min-height: 44px; padding-left: 8px; }
+.rd-act .pl { flex: 1; font-family: var(--cp-font-mono); font-size: 16px; line-height: 24px; color: var(--cp-text-accent); }
+.rd-act .x { width: 44px; height: 44px; border: 0; background: none; display: grid; place-items: center; color: var(--cp-text-muted); }
+.rd-act .x .cp-icon { width: 22px; height: 22px; }
+.rd-act .btns { display: flex; gap: 4px; }
+.rd-act .btns button { flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border: 0; border-radius: var(--cp-radius-sm); background: none; color: var(--cp-text); font: 600 13px/17px var(--cp-font-body); }
+.rd-act .btns .cp-icon { width: 22px; height: 22px; color: var(--cp-action); }
+.lib-bk { font-family: var(--cp-font-title); font-weight: 600; font-size: 20px; line-height: 26px; }
+.lib-line { font-size: 15px; line-height: 21px; letter-spacing: .4px; font-weight: 500; color: var(--cp-text-muted); }
+.lib-line .mn { font-family: var(--cp-font-mono); font-size: 14px; letter-spacing: 0; font-weight: 400; }
+.lib-vrow .vl { font-family: var(--cp-font-mono); font-size: 14px; line-height: 20px; color: var(--cp-text-accent); }
+.lib-vrow .vt { font-size: 17px; line-height: 25px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.lib-vrow mark { background: var(--cp-color-gold-soft); color: inherit; text-decoration: underline; }
+.lib-goto { min-height: 64px; display: flex; align-items: center; gap: 12px; margin-top: 16px; padding: 10px 14px 10px 20px; border-radius: var(--cp-radius-lg); background: var(--cp-surface); box-shadow: inset 0 0 0 1px var(--cp-border), var(--cp-shadow-sm); }
+.lib-goto .g { flex: 1; font-weight: 600; font-size: 17px; line-height: 22px; }
+.lib-goto .m { font-family: var(--cp-font-mono); font-weight: 400; font-size: 17px; line-height: 24px; }
+.lib-goto > .cp-icon { width: 22px; height: 22px; color: var(--cp-text-muted); }
 .cp-switch { width: 52px; height: 32px; border-radius: var(--cp-radius-pill); background: var(--cp-border-strong); position: relative; flex: none; }
 .cp-switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 26px; height: 26px; border-radius: 50%; background: var(--cp-surface); box-shadow: var(--cp-shadow-sm); transition: left var(--cp-duration-base); }
 .cp-switch.on { background: var(--cp-color-blue); }
@@ -1799,7 +1863,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     <div class="panel" style="padding:12px 24px 0"><div class="cp-subtabs" style="margin:0"><span class="on"><svg class="cp-icon sm"><use href="#i-steps"/></svg>Journey</span><span class=""><svg class="cp-icon sm"><use href="#i-shell"/></svg>Passport</span><span class=""><svg class="cp-icon sm"><use href="#i-flag"/></svg>Plan</span></div><p class="spec" style="margin:16px 0 20px">.cp-subtabs · 15/600 · 3px blue underline</p></div>
   </div>
   <p class="spec" style="margin-top:16px">.cp-tabbar · height 72 · radius pill · shadow-lg · icon 24 in 52×32 pill · label 12/500 (active 700)</p>
-  <p class="note" style="margin-top:12px;max-width:760px"><b>Settings is not a tab.</b> It opens from the gear at the top right of Me, next to the inbox bell, as a screen of its own: a back button on the left, light/dark and log out on the right, and no tab bar under it. <b>Library</b> is the fifth tab. It has no title: the row on top is a search field and the round Bookmarks button in the corner (the same size as the bell and the gear on Me), and directly under it the tabs Bible, Books and Notes, then the banner of the tab. Bible has a banner for the daily reading and Books one for its twelve books; Notes, which is the diary, has none. Until we have chosen what we may include, Bible and Books show example rows and say so. At the bottom of Bible three choices float above the tab bar (Old Testament, Deuterocanon, New Testament); on Notes the gold button writes a note, and the search row and the tabs stay at the top while the notes scroll under them. <b>The diary</b> (Library, Notes) keeps its pages only on the phone: the list says so, nothing is uploaded, logging out keeps the pages, deleting the account deletes them, and a page is saved as it is typed, so there is no Save button.</p>
+  <p class="note" style="margin-top:12px;max-width:760px"><b>Settings is not a tab.</b> It opens from the gear at the top right of Me, next to the inbox bell, as a screen of its own: a back button on the left, light/dark and log out on the right, and no tab bar under it. <b>Library</b> is the fifth tab. It has no title: the row on top is a search field and the round Bookmarks button in the corner (the same size as the bell and the gear on Me), and directly under it the tabs Bible, Books and Notes, then the banner of the tab. The Bible tab is real: the World English Bible, Catholic edition, all 73 books, in the app. It starts with a compact daily reading banner (one handwritten note and a gold pill), then a segmented pill that chooses the part (Old Testament, Deuterocanon, New Testament; it is in the page and scrolls with it), then the books of that part as square tiles, three in a row. A tile opens the numbers of the chapters of the book, a number opens the words, and Previous and Next name where they go and carry on across the books. Books shows twelve example rows and says so. On Notes, which is the diary, the gold button writes a note, and the search row and the tabs stay at the top while the notes scroll under them. <b>The diary</b> (Library, Notes) keeps its pages only on the phone: the list says so, nothing is uploaded, logging out keeps the pages, deleting the account deletes them, and a page is saved as it is typed, so there is no Save button.</p>
   <p class="note" style="margin-top:12px;max-width:760px"><b>Library search</b> looks through the Bible and Books tabs at once, as you type (every book of the Bible and the twelve books; Notes are not searched here), and lists what it finds grouped by tab (Bible, Books) under one Preview notice. A word counts when it starts a word of a row (a name or title, the author, the part of the Bible, the line under it, or the name of the tab), so "new testament" lists the 27 books of the New Testament. With nothing found it says "Nothing found for ..." and offers Clear search; clearing the field brings the tabs and the banner back. <b>Bookmarks</b> is a screen of its own, opened from the round button in the corner: a back button, no tab bar, then two parts. Library lists the rows bookmarked from the tabs; they stay only on the phone and logging out clears them, and each is still an example. Posts lists the posts bookmarked in the journey viewer; they stay with the account, and with no signal the list from the last visit is shown, with a line that says so. A row that is taken off stays in place, with an empty bookmark, until the screen is left, so a slip can be put back with one tap.</p>
 </section>
 
@@ -2729,7 +2793,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     </div>
 
     <div class="phone-wrap">
-      <p class="phone-label"><b>Library</b>Bible · today's reading · three parts at the bottom</p>
+      <p class="phone-label"><b>Library</b>Bible · compact banner · the three parts under it · books as tiles</p>
       <div class="phone">
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
         <div class="scroll">
@@ -2738,28 +2802,60 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
             <button class="cp-icon-btn flat" aria-label="Bookmarks"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button>
           </div>
           <div class="cp-subtabs" style="margin:16px 0"><span class="on">Bible</span><span>Books</span><span>Notes</span></div>
-          <div class="cp-banner lib" role="button" aria-label="Read today. Today's reading and a short reflection. Sunday 8 November">
-            <span class="art"><svg class="cp-icon"><use href="#i-book"/></svg></span>
-            <div class="ey">Today · Daily reading</div>
-            <h4>Today's reading and a short reflection</h4>
-            <p class="line">Sunday 8 November</p>
-            <span class="cp-btn sm">Read today</span>
+          <div class="cp-banner cmp" role="button" aria-label="Read today. Daily reading. Sunday 8 November">
+            <div class="ey">Sunday 8 November</div>
+            <h4>Daily reading</h4>
+            <div class="row"><span class="hw">Buen Camino!</span><span class="pill">Read today</span></div>
           </div>
-          <div class="lib-notice" style="margin-top:16px">
-            <svg class="cp-icon"><use href="#i-flag"/></svg>
-            <div><div class="h">Preview</div><div class="p">The Bible text is not in the app yet. We are choosing a translation we are allowed to include.</div></div>
+          <div style="height:16px"></div>
+          <div class="lib-seg" role="radiogroup" aria-label="Part of the Bible">
+            <button role="radio" aria-checked="true" aria-label="Old Testament" class="on">Old<br>Testament</button>
+            <button role="radio" aria-checked="false" aria-label="Deuterocanon" class="mid">Deuterocanon</button>
+            <button role="radio" aria-checked="false" aria-label="New Testament">New<br>Testament</button>
           </div>
           <div class="lib-hrow" style="margin-top:16px"><h4 class="lib-h">Books of the Bible</h4><span class="cnt" aria-label="Old Testament, 39 books">39 books</span></div>
-          <div class="cp-card" style="margin-top:16px;padding:4px">
-            <div class="lib-row"><div class="lib-tx"><div class="t">Genesis</div><div class="lib-sub"><span class="n">50 chapters</span><span class="lib-chip soon">Soon</span></div></div><button class="lib-mark" aria-label="Bookmark: Genesis"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
-            <div class="lib-row"><div class="lib-tx"><div class="t">Exodus</div><div class="lib-sub"><span class="n">40 chapters</span><span class="lib-chip soon">Soon</span></div></div><button class="lib-mark on" aria-label="Remove bookmark: Exodus"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
-            <div class="lib-row"><div class="lib-tx"><div class="t">Leviticus</div><div class="lib-sub"><span class="n">27 chapters</span><span class="lib-chip soon">Soon</span></div></div><button class="lib-mark" aria-label="Bookmark: Leviticus"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+          <p class="lib-src">World English Bible, Catholic edition · public&nbsp;domain</p>
+          <div class="lib-grid" style="margin-top:16px">
+            <button class="lib-tile" aria-label="Genesis, 50 chapters"><span class="nm" style="font-size:18px;line-height:22px">Genesis</span><span class="ct" style="font-size:12px;line-height:17px">50&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Exodus, 40 chapters"><span class="nm" style="font-size:18px;line-height:22px">Exodus</span><span class="ct" style="font-size:12px;line-height:17px">40&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Leviticus, 27 chapters"><span class="nm" style="font-size:18px;line-height:22px">Leviticus</span><span class="ct" style="font-size:12px;line-height:17px">27&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Numbers, 36 chapters"><span class="nm" style="font-size:18px;line-height:22px">Numbers</span><span class="ct" style="font-size:12px;line-height:17px">36&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Deuteronomy, 34 chapters"><span class="nm" style="font-size:14px;line-height:17px">Deuteronomy</span><span class="ct" style="font-size:12px;line-height:17px">34&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Joshua, 24 chapters"><span class="nm" style="font-size:18px;line-height:22px">Joshua</span><span class="ct" style="font-size:12px;line-height:17px">24&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Judges, 21 chapters"><span class="nm" style="font-size:18px;line-height:22px">Judges</span><span class="ct" style="font-size:12px;line-height:17px">21&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Ruth, 4 chapters"><span class="nm" style="font-size:18px;line-height:22px">Ruth</span><span class="ct" style="font-size:12px;line-height:17px">4&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="1 Samuel, 31 chapters"><span class="nm" style="font-size:18px;line-height:22px">1<br>Samuel</span><span class="ct" style="font-size:12px;line-height:17px">31&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="2 Samuel, 24 chapters"><span class="nm" style="font-size:18px;line-height:22px">2<br>Samuel</span><span class="ct" style="font-size:12px;line-height:17px">24&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="1 Kings, 22 chapters"><span class="nm" style="font-size:18px;line-height:22px">1<br>Kings</span><span class="ct" style="font-size:12px;line-height:17px">22&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="2 Kings, 25 chapters"><span class="nm" style="font-size:18px;line-height:22px">2<br>Kings</span><span class="ct" style="font-size:12px;line-height:17px">25&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="1 Chronicles, 29 chapters"><span class="nm" style="font-size:17.5px;line-height:21px">1<br>Chronicles</span><span class="ct" style="font-size:12px;line-height:17px">29&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="2 Chronicles, 36 chapters"><span class="nm" style="font-size:17.5px;line-height:21px">2<br>Chronicles</span><span class="ct" style="font-size:12px;line-height:17px">36&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Ezra, 10 chapters"><span class="nm" style="font-size:18px;line-height:22px">Ezra</span><span class="ct" style="font-size:12px;line-height:17px">10&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Nehemiah, 13 chapters"><span class="nm" style="font-size:18px;line-height:22px">Nehemiah</span><span class="ct" style="font-size:12px;line-height:17px">13&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Esther, 10 chapters"><span class="nm" style="font-size:18px;line-height:22px">Esther</span><span class="ct" style="font-size:12px;line-height:17px">10&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Job, 42 chapters"><span class="nm" style="font-size:18px;line-height:22px">Job</span><span class="ct" style="font-size:12px;line-height:17px">42&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Psalms, 150 chapters"><span class="nm" style="font-size:18px;line-height:22px">Psalms</span><span class="ct" style="font-size:12px;line-height:17px">150&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Proverbs, 31 chapters"><span class="nm" style="font-size:18px;line-height:22px">Proverbs</span><span class="ct" style="font-size:12px;line-height:17px">31&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Ecclesiastes, 12 chapters"><span class="nm" style="font-size:16px;line-height:19px">Ecclesiastes</span><span class="ct" style="font-size:12px;line-height:17px">12&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Song of Songs, 8 chapters"><span class="nm" style="font-size:18px;line-height:22px">Song of<br>Songs</span><span class="ct" style="font-size:12px;line-height:17px">8&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Isaiah, 66 chapters"><span class="nm" style="font-size:18px;line-height:22px">Isaiah</span><span class="ct" style="font-size:12px;line-height:17px">66&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Jeremiah, 52 chapters"><span class="nm" style="font-size:18px;line-height:22px">Jeremiah</span><span class="ct" style="font-size:12px;line-height:17px">52&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Lamentations, 5 chapters"><span class="nm" style="font-size:14px;line-height:17px">Lamentations</span><span class="ct" style="font-size:12px;line-height:17px">5&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Ezekiel, 48 chapters"><span class="nm" style="font-size:18px;line-height:22px">Ezekiel</span><span class="ct" style="font-size:12px;line-height:17px">48&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Daniel, 14 chapters"><span class="nm" style="font-size:18px;line-height:22px">Daniel</span><span class="ct" style="font-size:12px;line-height:17px">14&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Hosea, 14 chapters"><span class="nm" style="font-size:18px;line-height:22px">Hosea</span><span class="ct" style="font-size:12px;line-height:17px">14&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Joel, 3 chapters"><span class="nm" style="font-size:18px;line-height:22px">Joel</span><span class="ct" style="font-size:12px;line-height:17px">3&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Amos, 9 chapters"><span class="nm" style="font-size:18px;line-height:22px">Amos</span><span class="ct" style="font-size:12px;line-height:17px">9&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Obadiah, 1 chapter"><span class="nm" style="font-size:18px;line-height:22px">Obadiah</span><span class="ct" style="font-size:12px;line-height:17px">1&nbsp;chapter</span></button>
+            <button class="lib-tile" aria-label="Jonah, 4 chapters"><span class="nm" style="font-size:18px;line-height:22px">Jonah</span><span class="ct" style="font-size:12px;line-height:17px">4&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Micah, 7 chapters"><span class="nm" style="font-size:18px;line-height:22px">Micah</span><span class="ct" style="font-size:12px;line-height:17px">7&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Nahum, 3 chapters"><span class="nm" style="font-size:18px;line-height:22px">Nahum</span><span class="ct" style="font-size:12px;line-height:17px">3&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Habakkuk, 3 chapters"><span class="nm" style="font-size:18px;line-height:22px">Habakkuk</span><span class="ct" style="font-size:12px;line-height:17px">3&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Zephaniah, 3 chapters"><span class="nm" style="font-size:18px;line-height:22px">Zephaniah</span><span class="ct" style="font-size:12px;line-height:17px">3&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Haggai, 2 chapters"><span class="nm" style="font-size:18px;line-height:22px">Haggai</span><span class="ct" style="font-size:12px;line-height:17px">2&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Zechariah, 14 chapters"><span class="nm" style="font-size:18px;line-height:22px">Zechariah</span><span class="ct" style="font-size:12px;line-height:17px">14&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Malachi, 4 chapters"><span class="nm" style="font-size:18px;line-height:22px">Malachi</span><span class="ct" style="font-size:12px;line-height:17px">4&nbsp;chapters</span></button>
           </div>
-        </div>
-        <div class="lib-bar" role="radiogroup" aria-label="Part of the Bible">
-          <button role="radio" aria-checked="true" aria-label="Old Testament" class="on">Old<br>Testament</button>
-          <button role="radio" aria-checked="false" aria-label="Deuterocanon" class="mid">Deuterocanon</button>
-          <button role="radio" aria-checked="false" aria-label="New Testament">New<br>Testament</button>
         </div>
         <div class="tabdock"><nav class="cp-tabbar">
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
@@ -2773,30 +2869,185 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     </div>
 
     <div class="phone-wrap">
-      <p class="phone-label"><b>Library · Deuterocanon</b>The middle choice · two added passages · a note</p>
+      <p class="phone-label"><b>Library · Continue</b>The card that reopens the chapter read last · New Testament chosen</p>
       <div class="phone">
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
         <div class="scroll">
-          <div style="margin-top:-250px">
-          <div class="lib-hrow"><h4 class="lib-h">Books of the Bible</h4><span class="cnt" aria-label="Deuterocanon, 7 books and 2 added passages">7 books and 2 added passages</span></div>
-          <div class="cp-card" style="margin-top:16px;padding:4px">
-            <div class="lib-row"><div class="lib-tx"><div class="t">Tobit</div><div class="lib-sub"><span class="n">14 chapters</span><span class="lib-chip soon">Soon</span></div></div><button class="lib-mark" aria-label="Bookmark: Tobit"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
-            <div class="lib-row"><div class="lib-tx"><div class="t">Judith</div><div class="lib-sub"><span class="n">16 chapters</span><span class="lib-chip soon">Soon</span></div></div><button class="lib-mark" aria-label="Bookmark: Judith"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
-            <div class="lib-row"><div class="lib-tx"><div class="t">Wisdom</div><div class="lib-sub"><span class="n">19 chapters</span><span class="lib-chip soon">Soon</span></div></div><button class="lib-mark" aria-label="Bookmark: Wisdom"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
-            <div class="lib-row"><div class="lib-tx"><div class="t">Sirach</div><div class="lib-sub"><span class="n">51 chapters</span><span class="lib-chip soon">Soon</span></div></div><button class="lib-mark" aria-label="Bookmark: Sirach"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
-            <div class="lib-row"><div class="lib-tx"><div class="t">Baruch</div><div class="lib-sub stack"><span class="n">6 chapters · With the Letter of Jeremiah</span><span class="lib-chip soon">Soon</span></div></div><button class="lib-mark" aria-label="Bookmark: Baruch"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
-            <div class="lib-row"><div class="lib-tx"><div class="t">1 Maccabees</div><div class="lib-sub"><span class="n">16 chapters</span><span class="lib-chip soon">Soon</span></div></div><button class="lib-mark" aria-label="Bookmark: 1 Maccabees"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
-            <div class="lib-row"><div class="lib-tx"><div class="t">2 Maccabees</div><div class="lib-sub"><span class="n">15 chapters</span><span class="lib-chip soon">Soon</span></div></div><button class="lib-mark" aria-label="Bookmark: 2 Maccabees"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
-            <div class="lib-row"><div class="lib-tx"><div class="t">Additions to Esther</div><div class="lib-sub"><span class="n">Added passages</span><span class="lib-chip soon">Soon</span></div></div><button class="lib-mark" aria-label="Bookmark: Additions to Esther"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
-            <div class="lib-row"><div class="lib-tx"><div class="t">Additions to Daniel</div><div class="lib-sub stack"><span class="n">Susanna; Prayer of Azariah and Song of the Three; Bel and the Dragon</span><span class="lib-chip soon">Soon</span></div></div><button class="lib-mark" aria-label="Bookmark: Additions to Daniel"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+          <div class="lib-head">
+            <div class="lib-search"><svg class="cp-icon"><use href="#i-search"/></svg><span class="t">Search the Library</span></div>
+            <button class="cp-icon-btn flat" aria-label="Bookmarks"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button>
           </div>
-          <p class="note" style="margin:16px 0 0">Orthodox Bibles include a few more books.</p>
+          <div class="cp-subtabs" style="margin:16px 0"><span class="on">Bible</span><span>Books</span><span>Notes</span></div>
+          <div class="cont-card" role="button" aria-label="Continue reading, Psalm 121">
+            <span class="ic"><svg class="cp-icon"><use href="#i-book"/></svg></span>
+            <div style="flex:1;min-width:0"><div class="k">Continue reading</div><div class="r">Psalm 121</div></div>
+            <svg class="cp-icon"><use href="#i-chev"/></svg>
+          </div>
+          <div style="height:16px"></div>
+          <div class="cp-banner cmp" role="button" aria-label="Read today. Daily reading. Sunday 8 November">
+            <div class="ey">Sunday 8 November</div>
+            <h4>Daily reading</h4>
+            <div class="row"><span class="hw">Buen Camino!</span><span class="pill">Read today</span></div>
+          </div>
+          <div style="height:16px"></div>
+          <div class="lib-seg" role="radiogroup" aria-label="Part of the Bible">
+            <button role="radio" aria-checked="false" aria-label="Old Testament">Old<br>Testament</button>
+            <button role="radio" aria-checked="false" aria-label="Deuterocanon" class="mid">Deuterocanon</button>
+            <button role="radio" aria-checked="true" aria-label="New Testament" class="on">New<br>Testament</button>
+          </div>
+          <div class="lib-hrow" style="margin-top:16px"><h4 class="lib-h">Books of the Bible</h4><span class="cnt" aria-label="New Testament, 27 books">27 books</span></div>
+          <p class="lib-src">World English Bible, Catholic edition · public&nbsp;domain</p>
+          <div class="lib-grid" style="margin-top:16px">
+            <button class="lib-tile" aria-label="Matthew, 28 chapters"><span class="nm" style="font-size:18px;line-height:22px">Matthew</span><span class="ct" style="font-size:12px;line-height:17px">28&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Mark, 16 chapters"><span class="nm" style="font-size:18px;line-height:22px">Mark</span><span class="ct" style="font-size:12px;line-height:17px">16&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Luke, 24 chapters"><span class="nm" style="font-size:18px;line-height:22px">Luke</span><span class="ct" style="font-size:12px;line-height:17px">24&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="John, 21 chapters"><span class="nm" style="font-size:18px;line-height:22px">John</span><span class="ct" style="font-size:12px;line-height:17px">21&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Acts, 28 chapters"><span class="nm" style="font-size:18px;line-height:22px">Acts</span><span class="ct" style="font-size:12px;line-height:17px">28&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Romans, 16 chapters"><span class="nm" style="font-size:18px;line-height:22px">Romans</span><span class="ct" style="font-size:12px;line-height:17px">16&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="1 Corinthians, 16 chapters"><span class="nm" style="font-size:16px;line-height:19px">1<br>Corinthians</span><span class="ct" style="font-size:12px;line-height:17px">16&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="2 Corinthians, 13 chapters"><span class="nm" style="font-size:16px;line-height:19px">2<br>Corinthians</span><span class="ct" style="font-size:12px;line-height:17px">13&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Galatians, 6 chapters"><span class="nm" style="font-size:18px;line-height:22px">Galatians</span><span class="ct" style="font-size:12px;line-height:17px">6&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Ephesians, 6 chapters"><span class="nm" style="font-size:18px;line-height:22px">Ephesians</span><span class="ct" style="font-size:12px;line-height:17px">6&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Philippians, 4 chapters"><span class="nm" style="font-size:16.5px;line-height:20px">Philippians</span><span class="ct" style="font-size:12px;line-height:17px">4&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Colossians, 4 chapters"><span class="nm" style="font-size:18px;line-height:22px">Colossians</span><span class="ct" style="font-size:12px;line-height:17px">4&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="1 Thessalonians, 5 chapters"><span class="nm" style="font-size:13.5px;line-height:16px">1<br>Thessalonians</span><span class="ct" style="font-size:12px;line-height:17px">5&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="2 Thessalonians, 3 chapters"><span class="nm" style="font-size:13.5px;line-height:16px">2<br>Thessalonians</span><span class="ct" style="font-size:12px;line-height:17px">3&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="1 Timothy, 6 chapters"><span class="nm" style="font-size:18px;line-height:22px">1<br>Timothy</span><span class="ct" style="font-size:12px;line-height:17px">6&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="2 Timothy, 4 chapters"><span class="nm" style="font-size:18px;line-height:22px">2<br>Timothy</span><span class="ct" style="font-size:12px;line-height:17px">4&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Titus, 3 chapters"><span class="nm" style="font-size:18px;line-height:22px">Titus</span><span class="ct" style="font-size:12px;line-height:17px">3&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Philemon, 1 chapter"><span class="nm" style="font-size:18px;line-height:22px">Philemon</span><span class="ct" style="font-size:12px;line-height:17px">1&nbsp;chapter</span></button>
+            <button class="lib-tile" aria-label="Hebrews, 13 chapters"><span class="nm" style="font-size:18px;line-height:22px">Hebrews</span><span class="ct" style="font-size:12px;line-height:17px">13&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="James, 5 chapters"><span class="nm" style="font-size:18px;line-height:22px">James</span><span class="ct" style="font-size:12px;line-height:17px">5&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="1 Peter, 5 chapters"><span class="nm" style="font-size:18px;line-height:22px">1<br>Peter</span><span class="ct" style="font-size:12px;line-height:17px">5&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="2 Peter, 3 chapters"><span class="nm" style="font-size:18px;line-height:22px">2<br>Peter</span><span class="ct" style="font-size:12px;line-height:17px">3&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="1 John, 5 chapters"><span class="nm" style="font-size:18px;line-height:22px">1<br>John</span><span class="ct" style="font-size:12px;line-height:17px">5&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="2 John, 1 chapter"><span class="nm" style="font-size:18px;line-height:22px">2<br>John</span><span class="ct" style="font-size:12px;line-height:17px">1&nbsp;chapter</span></button>
+            <button class="lib-tile" aria-label="3 John, 1 chapter"><span class="nm" style="font-size:18px;line-height:22px">3<br>John</span><span class="ct" style="font-size:12px;line-height:17px">1&nbsp;chapter</span></button>
+            <button class="lib-tile" aria-label="Jude, 1 chapter"><span class="nm" style="font-size:18px;line-height:22px">Jude</span><span class="ct" style="font-size:12px;line-height:17px">1&nbsp;chapter</span></button>
+            <button class="lib-tile" aria-label="Revelation, 22 chapters"><span class="nm" style="font-size:18px;line-height:22px">Revelation</span><span class="ct" style="font-size:12px;line-height:17px">22&nbsp;chapters</span></button>
           </div>
         </div>
-        <div class="lib-bar" role="radiogroup" aria-label="Part of the Bible">
-          <button role="radio" aria-checked="false" aria-label="Old Testament">Old<br>Testament</button>
-          <button role="radio" aria-checked="true" aria-label="Deuterocanon" class="mid on">Deuterocanon</button>
-          <button role="radio" aria-checked="false" aria-label="New Testament">New<br>Testament</button>
+        <div class="tabdock"><nav class="cp-tabbar">
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Discover</div>
+          <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-library"/></svg></span>Library</div>
+        </nav></div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Library · Dark</b>The same screen after sunset</p>
+      <div class="phone dk">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll">
+          <div class="lib-head">
+            <div class="lib-search"><svg class="cp-icon"><use href="#i-search"/></svg><span class="t">Search the Library</span></div>
+            <button class="cp-icon-btn flat" aria-label="Bookmarks"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button>
+          </div>
+          <div class="cp-subtabs" style="margin:16px 0"><span class="on">Bible</span><span>Books</span><span>Notes</span></div>
+          <div class="cp-banner cmp" role="button" aria-label="Read today. Daily reading. Sunday 8 November">
+            <div class="ey">Sunday 8 November</div>
+            <h4>Daily reading</h4>
+            <div class="row"><span class="hw">Buen Camino!</span><span class="pill">Read today</span></div>
+          </div>
+          <div style="height:16px"></div>
+          <div class="lib-seg" role="radiogroup" aria-label="Part of the Bible">
+            <button role="radio" aria-checked="true" aria-label="Old Testament" class="on">Old<br>Testament</button>
+            <button role="radio" aria-checked="false" aria-label="Deuterocanon" class="mid">Deuterocanon</button>
+            <button role="radio" aria-checked="false" aria-label="New Testament">New<br>Testament</button>
+          </div>
+          <div class="lib-hrow" style="margin-top:16px"><h4 class="lib-h">Books of the Bible</h4><span class="cnt" aria-label="Old Testament, 39 books">39 books</span></div>
+          <p class="lib-src">World English Bible, Catholic edition · public&nbsp;domain</p>
+          <div class="lib-grid" style="margin-top:16px">
+            <button class="lib-tile" aria-label="Genesis, 50 chapters"><span class="nm" style="font-size:18px;line-height:22px">Genesis</span><span class="ct" style="font-size:12px;line-height:17px">50&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Exodus, 40 chapters"><span class="nm" style="font-size:18px;line-height:22px">Exodus</span><span class="ct" style="font-size:12px;line-height:17px">40&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Leviticus, 27 chapters"><span class="nm" style="font-size:18px;line-height:22px">Leviticus</span><span class="ct" style="font-size:12px;line-height:17px">27&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Numbers, 36 chapters"><span class="nm" style="font-size:18px;line-height:22px">Numbers</span><span class="ct" style="font-size:12px;line-height:17px">36&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Deuteronomy, 34 chapters"><span class="nm" style="font-size:14px;line-height:17px">Deuteronomy</span><span class="ct" style="font-size:12px;line-height:17px">34&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Joshua, 24 chapters"><span class="nm" style="font-size:18px;line-height:22px">Joshua</span><span class="ct" style="font-size:12px;line-height:17px">24&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Judges, 21 chapters"><span class="nm" style="font-size:18px;line-height:22px">Judges</span><span class="ct" style="font-size:12px;line-height:17px">21&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Ruth, 4 chapters"><span class="nm" style="font-size:18px;line-height:22px">Ruth</span><span class="ct" style="font-size:12px;line-height:17px">4&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="1 Samuel, 31 chapters"><span class="nm" style="font-size:18px;line-height:22px">1<br>Samuel</span><span class="ct" style="font-size:12px;line-height:17px">31&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="2 Samuel, 24 chapters"><span class="nm" style="font-size:18px;line-height:22px">2<br>Samuel</span><span class="ct" style="font-size:12px;line-height:17px">24&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="1 Kings, 22 chapters"><span class="nm" style="font-size:18px;line-height:22px">1<br>Kings</span><span class="ct" style="font-size:12px;line-height:17px">22&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="2 Kings, 25 chapters"><span class="nm" style="font-size:18px;line-height:22px">2<br>Kings</span><span class="ct" style="font-size:12px;line-height:17px">25&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="1 Chronicles, 29 chapters"><span class="nm" style="font-size:17.5px;line-height:21px">1<br>Chronicles</span><span class="ct" style="font-size:12px;line-height:17px">29&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="2 Chronicles, 36 chapters"><span class="nm" style="font-size:17.5px;line-height:21px">2<br>Chronicles</span><span class="ct" style="font-size:12px;line-height:17px">36&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Ezra, 10 chapters"><span class="nm" style="font-size:18px;line-height:22px">Ezra</span><span class="ct" style="font-size:12px;line-height:17px">10&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Nehemiah, 13 chapters"><span class="nm" style="font-size:18px;line-height:22px">Nehemiah</span><span class="ct" style="font-size:12px;line-height:17px">13&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Esther, 10 chapters"><span class="nm" style="font-size:18px;line-height:22px">Esther</span><span class="ct" style="font-size:12px;line-height:17px">10&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Job, 42 chapters"><span class="nm" style="font-size:18px;line-height:22px">Job</span><span class="ct" style="font-size:12px;line-height:17px">42&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Psalms, 150 chapters"><span class="nm" style="font-size:18px;line-height:22px">Psalms</span><span class="ct" style="font-size:12px;line-height:17px">150&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Proverbs, 31 chapters"><span class="nm" style="font-size:18px;line-height:22px">Proverbs</span><span class="ct" style="font-size:12px;line-height:17px">31&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Ecclesiastes, 12 chapters"><span class="nm" style="font-size:16px;line-height:19px">Ecclesiastes</span><span class="ct" style="font-size:12px;line-height:17px">12&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Song of Songs, 8 chapters"><span class="nm" style="font-size:18px;line-height:22px">Song of<br>Songs</span><span class="ct" style="font-size:12px;line-height:17px">8&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Isaiah, 66 chapters"><span class="nm" style="font-size:18px;line-height:22px">Isaiah</span><span class="ct" style="font-size:12px;line-height:17px">66&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Jeremiah, 52 chapters"><span class="nm" style="font-size:18px;line-height:22px">Jeremiah</span><span class="ct" style="font-size:12px;line-height:17px">52&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Lamentations, 5 chapters"><span class="nm" style="font-size:14px;line-height:17px">Lamentations</span><span class="ct" style="font-size:12px;line-height:17px">5&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Ezekiel, 48 chapters"><span class="nm" style="font-size:18px;line-height:22px">Ezekiel</span><span class="ct" style="font-size:12px;line-height:17px">48&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Daniel, 14 chapters"><span class="nm" style="font-size:18px;line-height:22px">Daniel</span><span class="ct" style="font-size:12px;line-height:17px">14&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Hosea, 14 chapters"><span class="nm" style="font-size:18px;line-height:22px">Hosea</span><span class="ct" style="font-size:12px;line-height:17px">14&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Joel, 3 chapters"><span class="nm" style="font-size:18px;line-height:22px">Joel</span><span class="ct" style="font-size:12px;line-height:17px">3&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Amos, 9 chapters"><span class="nm" style="font-size:18px;line-height:22px">Amos</span><span class="ct" style="font-size:12px;line-height:17px">9&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Obadiah, 1 chapter"><span class="nm" style="font-size:18px;line-height:22px">Obadiah</span><span class="ct" style="font-size:12px;line-height:17px">1&nbsp;chapter</span></button>
+            <button class="lib-tile" aria-label="Jonah, 4 chapters"><span class="nm" style="font-size:18px;line-height:22px">Jonah</span><span class="ct" style="font-size:12px;line-height:17px">4&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Micah, 7 chapters"><span class="nm" style="font-size:18px;line-height:22px">Micah</span><span class="ct" style="font-size:12px;line-height:17px">7&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Nahum, 3 chapters"><span class="nm" style="font-size:18px;line-height:22px">Nahum</span><span class="ct" style="font-size:12px;line-height:17px">3&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Habakkuk, 3 chapters"><span class="nm" style="font-size:18px;line-height:22px">Habakkuk</span><span class="ct" style="font-size:12px;line-height:17px">3&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Zephaniah, 3 chapters"><span class="nm" style="font-size:18px;line-height:22px">Zephaniah</span><span class="ct" style="font-size:12px;line-height:17px">3&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Haggai, 2 chapters"><span class="nm" style="font-size:18px;line-height:22px">Haggai</span><span class="ct" style="font-size:12px;line-height:17px">2&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Zechariah, 14 chapters"><span class="nm" style="font-size:18px;line-height:22px">Zechariah</span><span class="ct" style="font-size:12px;line-height:17px">14&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Malachi, 4 chapters"><span class="nm" style="font-size:18px;line-height:22px">Malachi</span><span class="ct" style="font-size:12px;line-height:17px">4&nbsp;chapters</span></button>
+          </div>
+        </div>
+        <div class="tabdock"><nav class="cp-tabbar">
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Discover</div>
+          <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-library"/></svg></span>Library</div>
+        </nav></div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Library · Deuterocanon</b>The middle choice · seven books · where the Greek additions are · a note</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll">
+          <div class="lib-head">
+            <div class="lib-search"><svg class="cp-icon"><use href="#i-search"/></svg><span class="t">Search the Library</span></div>
+            <button class="cp-icon-btn flat" aria-label="Bookmarks"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button>
+          </div>
+          <div class="cp-subtabs" style="margin:16px 0"><span class="on">Bible</span><span>Books</span><span>Notes</span></div>
+          <div class="cp-banner cmp" role="button" aria-label="Read today. Daily reading. Sunday 8 November">
+            <div class="ey">Sunday 8 November</div>
+            <h4>Daily reading</h4>
+            <div class="row"><span class="hw">Buen Camino!</span><span class="pill">Read today</span></div>
+          </div>
+          <div style="height:16px"></div>
+          <div class="lib-seg" role="radiogroup" aria-label="Part of the Bible">
+            <button role="radio" aria-checked="false" aria-label="Old Testament">Old<br>Testament</button>
+            <button role="radio" aria-checked="true" aria-label="Deuterocanon" class="mid on">Deuterocanon</button>
+            <button role="radio" aria-checked="false" aria-label="New Testament">New<br>Testament</button>
+          </div>
+          <div class="lib-hrow" style="margin-top:16px"><h4 class="lib-h">Books of the Bible</h4><span class="cnt" aria-label="Deuterocanon, 7 books">7 books</span></div>
+          <p class="lib-src">World English Bible, Catholic edition · public&nbsp;domain</p>
+          <div class="lib-grid" style="margin-top:16px">
+            <button class="lib-tile" aria-label="Tobit, 14 chapters"><span class="nm" style="font-size:18px;line-height:22px">Tobit</span><span class="ct" style="font-size:12px;line-height:17px">14&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Judith, 16 chapters"><span class="nm" style="font-size:18px;line-height:22px">Judith</span><span class="ct" style="font-size:12px;line-height:17px">16&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Wisdom, 19 chapters"><span class="nm" style="font-size:18px;line-height:22px">Wisdom</span><span class="ct" style="font-size:12px;line-height:17px">19&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Sirach, 51 chapters"><span class="nm" style="font-size:18px;line-height:22px">Sirach</span><span class="ct" style="font-size:12px;line-height:17px">51&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="Baruch, 6 chapters"><span class="nm" style="font-size:18px;line-height:22px">Baruch</span><span class="ct" style="font-size:12px;line-height:17px">6&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="1 Maccabees, 16 chapters"><span class="nm" style="font-size:17.5px;line-height:21px">1<br>Maccabees</span><span class="ct" style="font-size:12px;line-height:17px">16&nbsp;chapters</span></button>
+            <button class="lib-tile" aria-label="2 Maccabees, 15 chapters"><span class="nm" style="font-size:17.5px;line-height:21px">2<br>Maccabees</span><span class="ct" style="font-size:12px;line-height:17px">15&nbsp;chapters</span></button>
+          </div>
+          <p class="lib-note">Esther and Daniel, in the Old Testament, include their Greek additions: Daniel 3 holds the Prayer of Azariah and the Song of the Three, 13 is Susanna and 14 is Bel and the Dragon.</p>
+          <p class="lib-note">Orthodox Bibles include a few more books.</p>
         </div>
         <div class="tabdock"><nav class="cp-tabbar">
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
@@ -2836,8 +3087,266 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     </div>
     <!-- Library · Books phone (end) -->
 
+
     <div class="phone-wrap">
-      <p class="phone-label"><b>Library · Search</b>Bible and Books at once · grouped by tab</p>
+      <p class="phone-label"><b>Library · Chapters</b>A book opens its numbers · the Psalms: 150 tiles, five in a row · the bookmark of the book</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll">
+          <div class="biz-top" style="justify-content:space-between"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon"><use href="#i-back"/></svg></button><button class="lib-mark" aria-label="Bookmark: Psalms"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+          <div style="margin-top:16px"><h1 class="scr-title" style="margin:0">Psalms</h1><p class="rd-count">150&nbsp;chapters</p><p class="hw" style="margin:0">Pick a chapter</p></div>
+          <div class="ch-grid" style="margin-top:16px"><button class="ch-tile" aria-label="Psalm 1">1</button><button class="ch-tile" aria-label="Psalm 2">2</button><button class="ch-tile" aria-label="Psalm 3">3</button><button class="ch-tile" aria-label="Psalm 4">4</button><button class="ch-tile" aria-label="Psalm 5">5</button><button class="ch-tile" aria-label="Psalm 6">6</button><button class="ch-tile" aria-label="Psalm 7">7</button><button class="ch-tile" aria-label="Psalm 8">8</button><button class="ch-tile" aria-label="Psalm 9">9</button><button class="ch-tile" aria-label="Psalm 10">10</button><button class="ch-tile" aria-label="Psalm 11">11</button><button class="ch-tile" aria-label="Psalm 12">12</button><button class="ch-tile" aria-label="Psalm 13">13</button><button class="ch-tile" aria-label="Psalm 14">14</button><button class="ch-tile" aria-label="Psalm 15">15</button><button class="ch-tile" aria-label="Psalm 16">16</button><button class="ch-tile" aria-label="Psalm 17">17</button><button class="ch-tile" aria-label="Psalm 18">18</button><button class="ch-tile" aria-label="Psalm 19">19</button><button class="ch-tile" aria-label="Psalm 20">20</button><button class="ch-tile" aria-label="Psalm 21">21</button><button class="ch-tile" aria-label="Psalm 22">22</button><button class="ch-tile" aria-label="Psalm 23">23</button><button class="ch-tile" aria-label="Psalm 24">24</button><button class="ch-tile" aria-label="Psalm 25">25</button><button class="ch-tile" aria-label="Psalm 26">26</button><button class="ch-tile" aria-label="Psalm 27">27</button><button class="ch-tile" aria-label="Psalm 28">28</button><button class="ch-tile" aria-label="Psalm 29">29</button><button class="ch-tile" aria-label="Psalm 30">30</button><button class="ch-tile" aria-label="Psalm 31">31</button><button class="ch-tile" aria-label="Psalm 32">32</button><button class="ch-tile" aria-label="Psalm 33">33</button><button class="ch-tile" aria-label="Psalm 34">34</button><button class="ch-tile" aria-label="Psalm 35">35</button><button class="ch-tile" aria-label="Psalm 36">36</button><button class="ch-tile" aria-label="Psalm 37">37</button><button class="ch-tile" aria-label="Psalm 38">38</button><button class="ch-tile" aria-label="Psalm 39">39</button><button class="ch-tile" aria-label="Psalm 40">40</button><button class="ch-tile" aria-label="Psalm 41">41</button><button class="ch-tile" aria-label="Psalm 42">42</button><button class="ch-tile" aria-label="Psalm 43">43</button><button class="ch-tile" aria-label="Psalm 44">44</button><button class="ch-tile" aria-label="Psalm 45">45</button><button class="ch-tile" aria-label="Psalm 46">46</button><button class="ch-tile" aria-label="Psalm 47">47</button><button class="ch-tile" aria-label="Psalm 48">48</button><button class="ch-tile" aria-label="Psalm 49">49</button><button class="ch-tile" aria-label="Psalm 50">50</button><button class="ch-tile" aria-label="Psalm 51">51</button><button class="ch-tile" aria-label="Psalm 52">52</button><button class="ch-tile" aria-label="Psalm 53">53</button><button class="ch-tile" aria-label="Psalm 54">54</button><button class="ch-tile" aria-label="Psalm 55">55</button><button class="ch-tile" aria-label="Psalm 56">56</button><button class="ch-tile" aria-label="Psalm 57">57</button><button class="ch-tile" aria-label="Psalm 58">58</button><button class="ch-tile" aria-label="Psalm 59">59</button><button class="ch-tile" aria-label="Psalm 60">60</button><button class="ch-tile" aria-label="Psalm 61">61</button><button class="ch-tile" aria-label="Psalm 62">62</button><button class="ch-tile" aria-label="Psalm 63">63</button><button class="ch-tile" aria-label="Psalm 64">64</button><button class="ch-tile" aria-label="Psalm 65">65</button><button class="ch-tile" aria-label="Psalm 66">66</button><button class="ch-tile" aria-label="Psalm 67">67</button><button class="ch-tile" aria-label="Psalm 68">68</button><button class="ch-tile" aria-label="Psalm 69">69</button><button class="ch-tile" aria-label="Psalm 70">70</button><button class="ch-tile" aria-label="Psalm 71">71</button><button class="ch-tile" aria-label="Psalm 72">72</button><button class="ch-tile" aria-label="Psalm 73">73</button><button class="ch-tile" aria-label="Psalm 74">74</button><button class="ch-tile" aria-label="Psalm 75">75</button><button class="ch-tile" aria-label="Psalm 76">76</button><button class="ch-tile" aria-label="Psalm 77">77</button><button class="ch-tile" aria-label="Psalm 78">78</button><button class="ch-tile" aria-label="Psalm 79">79</button><button class="ch-tile" aria-label="Psalm 80">80</button><button class="ch-tile" aria-label="Psalm 81">81</button><button class="ch-tile" aria-label="Psalm 82">82</button><button class="ch-tile" aria-label="Psalm 83">83</button><button class="ch-tile" aria-label="Psalm 84">84</button><button class="ch-tile" aria-label="Psalm 85">85</button><button class="ch-tile" aria-label="Psalm 86">86</button><button class="ch-tile" aria-label="Psalm 87">87</button><button class="ch-tile" aria-label="Psalm 88">88</button><button class="ch-tile" aria-label="Psalm 89">89</button><button class="ch-tile" aria-label="Psalm 90">90</button><button class="ch-tile" aria-label="Psalm 91">91</button><button class="ch-tile" aria-label="Psalm 92">92</button><button class="ch-tile" aria-label="Psalm 93">93</button><button class="ch-tile" aria-label="Psalm 94">94</button><button class="ch-tile" aria-label="Psalm 95">95</button><button class="ch-tile" aria-label="Psalm 96">96</button><button class="ch-tile" aria-label="Psalm 97">97</button><button class="ch-tile" aria-label="Psalm 98">98</button><button class="ch-tile" aria-label="Psalm 99">99</button><button class="ch-tile" aria-label="Psalm 100">100</button><button class="ch-tile" aria-label="Psalm 101">101</button><button class="ch-tile" aria-label="Psalm 102">102</button><button class="ch-tile" aria-label="Psalm 103">103</button><button class="ch-tile" aria-label="Psalm 104">104</button><button class="ch-tile" aria-label="Psalm 105">105</button><button class="ch-tile" aria-label="Psalm 106">106</button><button class="ch-tile" aria-label="Psalm 107">107</button><button class="ch-tile" aria-label="Psalm 108">108</button><button class="ch-tile" aria-label="Psalm 109">109</button><button class="ch-tile" aria-label="Psalm 110">110</button><button class="ch-tile" aria-label="Psalm 111">111</button><button class="ch-tile" aria-label="Psalm 112">112</button><button class="ch-tile" aria-label="Psalm 113">113</button><button class="ch-tile" aria-label="Psalm 114">114</button><button class="ch-tile" aria-label="Psalm 115">115</button><button class="ch-tile" aria-label="Psalm 116">116</button><button class="ch-tile" aria-label="Psalm 117">117</button><button class="ch-tile" aria-label="Psalm 118">118</button><button class="ch-tile" aria-label="Psalm 119">119</button><button class="ch-tile" aria-label="Psalm 120">120</button><button class="ch-tile" aria-label="Psalm 121">121</button><button class="ch-tile" aria-label="Psalm 122">122</button><button class="ch-tile" aria-label="Psalm 123">123</button><button class="ch-tile" aria-label="Psalm 124">124</button><button class="ch-tile" aria-label="Psalm 125">125</button><button class="ch-tile" aria-label="Psalm 126">126</button><button class="ch-tile" aria-label="Psalm 127">127</button><button class="ch-tile" aria-label="Psalm 128">128</button><button class="ch-tile" aria-label="Psalm 129">129</button><button class="ch-tile" aria-label="Psalm 130">130</button><button class="ch-tile" aria-label="Psalm 131">131</button><button class="ch-tile" aria-label="Psalm 132">132</button><button class="ch-tile" aria-label="Psalm 133">133</button><button class="ch-tile" aria-label="Psalm 134">134</button><button class="ch-tile" aria-label="Psalm 135">135</button><button class="ch-tile" aria-label="Psalm 136">136</button><button class="ch-tile" aria-label="Psalm 137">137</button><button class="ch-tile" aria-label="Psalm 138">138</button><button class="ch-tile" aria-label="Psalm 139">139</button><button class="ch-tile" aria-label="Psalm 140">140</button><button class="ch-tile" aria-label="Psalm 141">141</button><button class="ch-tile" aria-label="Psalm 142">142</button><button class="ch-tile" aria-label="Psalm 143">143</button><button class="ch-tile" aria-label="Psalm 144">144</button><button class="ch-tile" aria-label="Psalm 145">145</button><button class="ch-tile" aria-label="Psalm 146">146</button><button class="ch-tile" aria-label="Psalm 147">147</button><button class="ch-tile" aria-label="Psalm 148">148</button><button class="ch-tile" aria-label="Psalm 149">149</button><button class="ch-tile" aria-label="Psalm 150">150</button></div>
+        </div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Library · Chapters, dark</b>The same screen after sunset</p>
+      <div class="phone dk">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll">
+          <div class="biz-top" style="justify-content:space-between"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon"><use href="#i-back"/></svg></button><button class="lib-mark" aria-label="Bookmark: Psalms"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+          <div style="margin-top:16px"><h1 class="scr-title" style="margin:0">Psalms</h1><p class="rd-count">150&nbsp;chapters</p><p class="hw" style="margin:0">Pick a chapter</p></div>
+          <div class="ch-grid" style="margin-top:16px"><button class="ch-tile" aria-label="Psalm 1">1</button><button class="ch-tile" aria-label="Psalm 2">2</button><button class="ch-tile" aria-label="Psalm 3">3</button><button class="ch-tile" aria-label="Psalm 4">4</button><button class="ch-tile" aria-label="Psalm 5">5</button><button class="ch-tile" aria-label="Psalm 6">6</button><button class="ch-tile" aria-label="Psalm 7">7</button><button class="ch-tile" aria-label="Psalm 8">8</button><button class="ch-tile" aria-label="Psalm 9">9</button><button class="ch-tile" aria-label="Psalm 10">10</button><button class="ch-tile" aria-label="Psalm 11">11</button><button class="ch-tile" aria-label="Psalm 12">12</button><button class="ch-tile" aria-label="Psalm 13">13</button><button class="ch-tile" aria-label="Psalm 14">14</button><button class="ch-tile" aria-label="Psalm 15">15</button><button class="ch-tile" aria-label="Psalm 16">16</button><button class="ch-tile" aria-label="Psalm 17">17</button><button class="ch-tile" aria-label="Psalm 18">18</button><button class="ch-tile" aria-label="Psalm 19">19</button><button class="ch-tile" aria-label="Psalm 20">20</button><button class="ch-tile" aria-label="Psalm 21">21</button><button class="ch-tile" aria-label="Psalm 22">22</button><button class="ch-tile" aria-label="Psalm 23">23</button><button class="ch-tile" aria-label="Psalm 24">24</button><button class="ch-tile" aria-label="Psalm 25">25</button><button class="ch-tile" aria-label="Psalm 26">26</button><button class="ch-tile" aria-label="Psalm 27">27</button><button class="ch-tile" aria-label="Psalm 28">28</button><button class="ch-tile" aria-label="Psalm 29">29</button><button class="ch-tile" aria-label="Psalm 30">30</button><button class="ch-tile" aria-label="Psalm 31">31</button><button class="ch-tile" aria-label="Psalm 32">32</button><button class="ch-tile" aria-label="Psalm 33">33</button><button class="ch-tile" aria-label="Psalm 34">34</button><button class="ch-tile" aria-label="Psalm 35">35</button><button class="ch-tile" aria-label="Psalm 36">36</button><button class="ch-tile" aria-label="Psalm 37">37</button><button class="ch-tile" aria-label="Psalm 38">38</button><button class="ch-tile" aria-label="Psalm 39">39</button><button class="ch-tile" aria-label="Psalm 40">40</button><button class="ch-tile" aria-label="Psalm 41">41</button><button class="ch-tile" aria-label="Psalm 42">42</button><button class="ch-tile" aria-label="Psalm 43">43</button><button class="ch-tile" aria-label="Psalm 44">44</button><button class="ch-tile" aria-label="Psalm 45">45</button><button class="ch-tile" aria-label="Psalm 46">46</button><button class="ch-tile" aria-label="Psalm 47">47</button><button class="ch-tile" aria-label="Psalm 48">48</button><button class="ch-tile" aria-label="Psalm 49">49</button><button class="ch-tile" aria-label="Psalm 50">50</button><button class="ch-tile" aria-label="Psalm 51">51</button><button class="ch-tile" aria-label="Psalm 52">52</button><button class="ch-tile" aria-label="Psalm 53">53</button><button class="ch-tile" aria-label="Psalm 54">54</button><button class="ch-tile" aria-label="Psalm 55">55</button><button class="ch-tile" aria-label="Psalm 56">56</button><button class="ch-tile" aria-label="Psalm 57">57</button><button class="ch-tile" aria-label="Psalm 58">58</button><button class="ch-tile" aria-label="Psalm 59">59</button><button class="ch-tile" aria-label="Psalm 60">60</button><button class="ch-tile" aria-label="Psalm 61">61</button><button class="ch-tile" aria-label="Psalm 62">62</button><button class="ch-tile" aria-label="Psalm 63">63</button><button class="ch-tile" aria-label="Psalm 64">64</button><button class="ch-tile" aria-label="Psalm 65">65</button><button class="ch-tile" aria-label="Psalm 66">66</button><button class="ch-tile" aria-label="Psalm 67">67</button><button class="ch-tile" aria-label="Psalm 68">68</button><button class="ch-tile" aria-label="Psalm 69">69</button><button class="ch-tile" aria-label="Psalm 70">70</button><button class="ch-tile" aria-label="Psalm 71">71</button><button class="ch-tile" aria-label="Psalm 72">72</button><button class="ch-tile" aria-label="Psalm 73">73</button><button class="ch-tile" aria-label="Psalm 74">74</button><button class="ch-tile" aria-label="Psalm 75">75</button><button class="ch-tile" aria-label="Psalm 76">76</button><button class="ch-tile" aria-label="Psalm 77">77</button><button class="ch-tile" aria-label="Psalm 78">78</button><button class="ch-tile" aria-label="Psalm 79">79</button><button class="ch-tile" aria-label="Psalm 80">80</button><button class="ch-tile" aria-label="Psalm 81">81</button><button class="ch-tile" aria-label="Psalm 82">82</button><button class="ch-tile" aria-label="Psalm 83">83</button><button class="ch-tile" aria-label="Psalm 84">84</button><button class="ch-tile" aria-label="Psalm 85">85</button><button class="ch-tile" aria-label="Psalm 86">86</button><button class="ch-tile" aria-label="Psalm 87">87</button><button class="ch-tile" aria-label="Psalm 88">88</button><button class="ch-tile" aria-label="Psalm 89">89</button><button class="ch-tile" aria-label="Psalm 90">90</button><button class="ch-tile" aria-label="Psalm 91">91</button><button class="ch-tile" aria-label="Psalm 92">92</button><button class="ch-tile" aria-label="Psalm 93">93</button><button class="ch-tile" aria-label="Psalm 94">94</button><button class="ch-tile" aria-label="Psalm 95">95</button><button class="ch-tile" aria-label="Psalm 96">96</button><button class="ch-tile" aria-label="Psalm 97">97</button><button class="ch-tile" aria-label="Psalm 98">98</button><button class="ch-tile" aria-label="Psalm 99">99</button><button class="ch-tile" aria-label="Psalm 100">100</button><button class="ch-tile" aria-label="Psalm 101">101</button><button class="ch-tile" aria-label="Psalm 102">102</button><button class="ch-tile" aria-label="Psalm 103">103</button><button class="ch-tile" aria-label="Psalm 104">104</button><button class="ch-tile" aria-label="Psalm 105">105</button><button class="ch-tile" aria-label="Psalm 106">106</button><button class="ch-tile" aria-label="Psalm 107">107</button><button class="ch-tile" aria-label="Psalm 108">108</button><button class="ch-tile" aria-label="Psalm 109">109</button><button class="ch-tile" aria-label="Psalm 110">110</button><button class="ch-tile" aria-label="Psalm 111">111</button><button class="ch-tile" aria-label="Psalm 112">112</button><button class="ch-tile" aria-label="Psalm 113">113</button><button class="ch-tile" aria-label="Psalm 114">114</button><button class="ch-tile" aria-label="Psalm 115">115</button><button class="ch-tile" aria-label="Psalm 116">116</button><button class="ch-tile" aria-label="Psalm 117">117</button><button class="ch-tile" aria-label="Psalm 118">118</button><button class="ch-tile" aria-label="Psalm 119">119</button><button class="ch-tile" aria-label="Psalm 120">120</button><button class="ch-tile" aria-label="Psalm 121">121</button><button class="ch-tile" aria-label="Psalm 122">122</button><button class="ch-tile" aria-label="Psalm 123">123</button><button class="ch-tile" aria-label="Psalm 124">124</button><button class="ch-tile" aria-label="Psalm 125">125</button><button class="ch-tile" aria-label="Psalm 126">126</button><button class="ch-tile" aria-label="Psalm 127">127</button><button class="ch-tile" aria-label="Psalm 128">128</button><button class="ch-tile" aria-label="Psalm 129">129</button><button class="ch-tile" aria-label="Psalm 130">130</button><button class="ch-tile" aria-label="Psalm 131">131</button><button class="ch-tile" aria-label="Psalm 132">132</button><button class="ch-tile" aria-label="Psalm 133">133</button><button class="ch-tile" aria-label="Psalm 134">134</button><button class="ch-tile" aria-label="Psalm 135">135</button><button class="ch-tile" aria-label="Psalm 136">136</button><button class="ch-tile" aria-label="Psalm 137">137</button><button class="ch-tile" aria-label="Psalm 138">138</button><button class="ch-tile" aria-label="Psalm 139">139</button><button class="ch-tile" aria-label="Psalm 140">140</button><button class="ch-tile" aria-label="Psalm 141">141</button><button class="ch-tile" aria-label="Psalm 142">142</button><button class="ch-tile" aria-label="Psalm 143">143</button><button class="ch-tile" aria-label="Psalm 144">144</button><button class="ch-tile" aria-label="Psalm 145">145</button><button class="ch-tile" aria-label="Psalm 146">146</button><button class="ch-tile" aria-label="Psalm 147">147</button><button class="ch-tile" aria-label="Psalm 148">148</button><button class="ch-tile" aria-label="Psalm 149">149</button><button class="ch-tile" aria-label="Psalm 150">150</button></div>
+        </div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Reader · Psalm 121</b>Poetry: lines gone in by their tabs, the rest of a long line one em further · the title of the psalm · Previous and Next at the top</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll">
+          <div class="biz-top" style="justify-content:space-between"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon"><use href="#i-back"/></svg></button><button class="rd-all" aria-label="All chapters of this book">All chapters<svg class="cp-icon sm"><use href="#i-chev"/></svg></button></div>
+          <div style="margin-top:16px"><p class="rd-kick">Psalms</p><h1 class="rd-title">Psalm 121</h1><p class="rd-sub">A Song of Ascents.</p></div>
+          <div class="rd-nav" style="margin:16px 0"><button class="rd-step previous" aria-label="Previous: Psalm 120"><svg class="cp-icon"><use href="#i-back"/></svg><span>Psalm 120</span></button><button class="rd-step next" aria-label="Next: Psalm 122"><span>Psalm 122</span><svg class="cp-icon"><use href="#i-chev"/></svg></button></div>
+          <div class="rd-text"><p class="rd-p"> <span class="rd-v"><span class="rd-n">¹</span> I will lift up my eyes to the hills.</span>
+  <span class="rd-v">Where does my help come from?</span>
+ <span class="rd-v"><span class="rd-n">²</span> My help comes from the LORD,</span>
+  <span class="rd-v">who made heaven and earth.</span></p>
+<p class="rd-p g-s"> <span class="rd-v"><span class="rd-n">³</span> He will not allow your foot to be</span>
+  <span class="rd-v">moved.</span>
+  <span class="rd-v">He who keeps you will not</span>
+   <span class="rd-v">slumber.</span>
+ <span class="rd-v"><span class="rd-n">⁴</span> Behold, he who keeps Israel</span>
+  <span class="rd-v">will neither slumber nor sleep.</span>
+ <span class="rd-v"><span class="rd-n">⁵</span> The LORD is your keeper.</span>
+  <span class="rd-v">The LORD is your shade on your</span>
+   <span class="rd-v">right hand.</span>
+ <span class="rd-v"><span class="rd-n">⁶</span> The sun will not harm you by day,</span>
+  <span class="rd-v">nor the moon by night.</span>
+ <span class="rd-v"><span class="rd-n">⁷</span> The LORD will keep you from all</span>
+  <span class="rd-v">evil.</span>
+  <span class="rd-v">He will keep your soul.</span>
+ <span class="rd-v"><span class="rd-n">⁸</span> The LORD will keep your going out</span>
+  <span class="rd-v">and your coming in,</span>
+  <span class="rd-v">from this time forward, and forever</span>
+   <span class="rd-v">more.</span></p></div>
+          <div class="rd-nav" style="margin-top:24px"><button class="rd-step previous foot" aria-label="Previous: Psalm 120"><svg class="cp-icon"><use href="#i-back"/></svg><span>Previous: <span class="m">Psalm 120</span></span></button><button class="rd-step next foot" aria-label="Next: Psalm 122"><span>Next: <span class="m">Psalm 122</span></span><svg class="cp-icon"><use href="#i-chev"/></svg></button></div>
+          <p class="hw" style="margin:16px 0 0">Peace on the road</p>
+          <div class="rd-credit"><p>World English Bible, Catholic edition (eBible.org). Public domain. The name &quot;World English Bible&quot; is a trademark of eBible.org.</p><p>This is not the translation read at Mass.</p></div>
+        </div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Reader · Verse chosen</b>A touch chooses a verse: a gold ground and an underline · Bookmark, Copy, Share</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll">
+          <div class="biz-top" style="justify-content:space-between"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon"><use href="#i-back"/></svg></button><button class="rd-all" aria-label="All chapters of this book">All chapters<svg class="cp-icon sm"><use href="#i-chev"/></svg></button></div>
+          <div style="margin-top:16px"><p class="rd-kick">Psalms</p><h1 class="rd-title">Psalm 121</h1><p class="rd-sub">A Song of Ascents.</p></div>
+          <div class="rd-nav" style="margin:16px 0"><button class="rd-step previous" aria-label="Previous: Psalm 120"><svg class="cp-icon"><use href="#i-back"/></svg><span>Psalm 120</span></button><button class="rd-step next" aria-label="Next: Psalm 122"><span>Psalm 122</span><svg class="cp-icon"><use href="#i-chev"/></svg></button></div>
+          <div class="rd-text"><p class="rd-p"> <span class="rd-v"><span class="rd-n">¹</span> I will lift up my eyes to the hills.</span>
+  <span class="rd-v">Where does my help come from?</span>
+ <span class="rd-v"><span class="rd-n">²</span> My help comes from the LORD,</span>
+  <span class="rd-v">who made heaven and earth.</span></p>
+<p class="rd-p g-s"> <span class="rd-v sel"><span class="rd-n">³</span> He will not allow your foot to be</span>
+  <span class="rd-v sel">moved.</span>
+  <span class="rd-v sel">He who keeps you will not</span>
+   <span class="rd-v sel">slumber.</span>
+ <span class="rd-v"><span class="rd-n">⁴</span> Behold, he who keeps Israel</span>
+  <span class="rd-v">will neither slumber nor sleep.</span>
+ <span class="rd-v"><span class="rd-n">⁵</span> The LORD is your keeper.</span>
+  <span class="rd-v">The LORD is your shade on your</span>
+   <span class="rd-v">right hand.</span>
+ <span class="rd-v"><span class="rd-n">⁶</span> The sun will not harm you by day,</span>
+  <span class="rd-v">nor the moon by night.</span>
+ <span class="rd-v"><span class="rd-n">⁷</span> The LORD will keep you from all</span>
+  <span class="rd-v">evil.</span>
+  <span class="rd-v">He will keep your soul.</span>
+ <span class="rd-v"><span class="rd-n">⁸</span> The LORD will keep your going out</span>
+  <span class="rd-v">and your coming in,</span>
+  <span class="rd-v">from this time forward, and forever</span>
+   <span class="rd-v">more.</span></p></div>
+          <div class="rd-nav" style="margin-top:24px"><button class="rd-step previous foot" aria-label="Previous: Psalm 120"><svg class="cp-icon"><use href="#i-back"/></svg><span>Previous: <span class="m">Psalm 120</span></span></button><button class="rd-step next foot" aria-label="Next: Psalm 122"><span>Next: <span class="m">Psalm 122</span></span><svg class="cp-icon"><use href="#i-chev"/></svg></button></div>
+          <p class="hw" style="margin:16px 0 0">Peace on the road</p>
+          <div class="rd-credit"><p>World English Bible, Catholic edition (eBible.org). Public domain. The name &quot;World English Bible&quot; is a trademark of eBible.org.</p><p>This is not the translation read at Mass.</p></div>
+        </div>
+        <div class="rd-act" role="toolbar" aria-label="Actions for Psalm 121:3">
+          <div class="top"><span class="pl">Psalm 121:3</span><button class="x" aria-label="Close the verse actions"><svg class="cp-icon"><use href="#i-x"/></svg></button></div>
+          <div class="btns"><button aria-label="Bookmark: Psalm 121:3"><svg class="cp-icon"><use href="#i-bookmark"/></svg><span>Bookmark</span></button><button aria-label="Copy: Psalm 121:3"><svg class="cp-icon"><use href="#i-copy"/></svg><span>Copy</span></button><button aria-label="Share: Psalm 121:3"><svg class="cp-icon"><use href="#i-share"/></svg><span>Share</span></button></div>
+        </div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Reader · Verse bookmarked</b>The same verse after Bookmark: the button says so</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll">
+          <div class="biz-top" style="justify-content:space-between"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon"><use href="#i-back"/></svg></button><button class="rd-all" aria-label="All chapters of this book">All chapters<svg class="cp-icon sm"><use href="#i-chev"/></svg></button></div>
+          <div style="margin-top:16px"><p class="rd-kick">Psalms</p><h1 class="rd-title">Psalm 121</h1><p class="rd-sub">A Song of Ascents.</p></div>
+          <div class="rd-nav" style="margin:16px 0"><button class="rd-step previous" aria-label="Previous: Psalm 120"><svg class="cp-icon"><use href="#i-back"/></svg><span>Psalm 120</span></button><button class="rd-step next" aria-label="Next: Psalm 122"><span>Psalm 122</span><svg class="cp-icon"><use href="#i-chev"/></svg></button></div>
+          <div class="rd-text"><p class="rd-p"> <span class="rd-v"><span class="rd-n">¹</span> I will lift up my eyes to the hills.</span>
+  <span class="rd-v">Where does my help come from?</span>
+ <span class="rd-v"><span class="rd-n">²</span> My help comes from the LORD,</span>
+  <span class="rd-v">who made heaven and earth.</span></p>
+<p class="rd-p g-s"> <span class="rd-v sel"><span class="rd-n">³</span> He will not allow your foot to be</span>
+  <span class="rd-v sel">moved.</span>
+  <span class="rd-v sel">He who keeps you will not</span>
+   <span class="rd-v sel">slumber.</span>
+ <span class="rd-v"><span class="rd-n">⁴</span> Behold, he who keeps Israel</span>
+  <span class="rd-v">will neither slumber nor sleep.</span>
+ <span class="rd-v"><span class="rd-n">⁵</span> The LORD is your keeper.</span>
+  <span class="rd-v">The LORD is your shade on your</span>
+   <span class="rd-v">right hand.</span>
+ <span class="rd-v"><span class="rd-n">⁶</span> The sun will not harm you by day,</span>
+  <span class="rd-v">nor the moon by night.</span>
+ <span class="rd-v"><span class="rd-n">⁷</span> The LORD will keep you from all</span>
+  <span class="rd-v">evil.</span>
+  <span class="rd-v">He will keep your soul.</span>
+ <span class="rd-v"><span class="rd-n">⁸</span> The LORD will keep your going out</span>
+  <span class="rd-v">and your coming in,</span>
+  <span class="rd-v">from this time forward, and forever</span>
+   <span class="rd-v">more.</span></p></div>
+          <div class="rd-nav" style="margin-top:24px"><button class="rd-step previous foot" aria-label="Previous: Psalm 120"><svg class="cp-icon"><use href="#i-back"/></svg><span>Previous: <span class="m">Psalm 120</span></span></button><button class="rd-step next foot" aria-label="Next: Psalm 122"><span>Next: <span class="m">Psalm 122</span></span><svg class="cp-icon"><use href="#i-chev"/></svg></button></div>
+          <p class="hw" style="margin:16px 0 0">Peace on the road</p>
+          <div class="rd-credit"><p>World English Bible, Catholic edition (eBible.org). Public domain. The name &quot;World English Bible&quot; is a trademark of eBible.org.</p><p>This is not the translation read at Mass.</p></div>
+        </div>
+        <div class="rd-act" role="toolbar" aria-label="Actions for Psalm 121:3">
+          <div class="top"><span class="pl">Psalm 121:3</span><button class="x" aria-label="Close the verse actions"><svg class="cp-icon"><use href="#i-x"/></svg></button></div>
+          <div class="btns"><button aria-label="Remove bookmark: Psalm 121:3"><svg class="cp-icon"><use href="#i-bookmark"/></svg><span>Bookmarked</span></button><button aria-label="Copy: Psalm 121:3"><svg class="cp-icon"><use href="#i-copy"/></svg><span>Copy</span></button><button aria-label="Share: Psalm 121:3"><svg class="cp-icon"><use href="#i-share"/></svg><span>Share</span></button></div>
+        </div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Reader · John 1</b>Prose: paragraphs, small raised numbers in JetBrains Mono · Previous and Next across the books</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll">
+          <div class="biz-top" style="justify-content:space-between"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon"><use href="#i-back"/></svg></button><button class="rd-all" aria-label="All chapters of this book">All chapters<svg class="cp-icon sm"><use href="#i-chev"/></svg></button></div>
+          <div style="margin-top:16px"><p class="rd-kick">John</p><h1 class="rd-title">Chapter 1</h1></div>
+          <div class="rd-nav" style="margin:16px 0"><button class="rd-step previous" aria-label="Previous: Luke 24"><svg class="cp-icon"><use href="#i-back"/></svg><span>Luke 24</span></button><button class="rd-step next" aria-label="Next: John 2"><span>John 2</span><svg class="cp-icon"><use href="#i-chev"/></svg></button></div>
+          <div class="rd-text"><p class="rd-p"><span class="rd-v"><span class="rd-n">¹</span> In the beginning was the Word, and the Word was with God, and the Word was God.</span> <span class="rd-v"><span class="rd-n">²</span> The same was in the beginning with God.</span> <span class="rd-v"><span class="rd-n">³</span> All things were made through him. Without him, nothing was made that has been made.</span> <span class="rd-v"><span class="rd-n">⁴</span> In him was life, and the life was the light of men.</span> <span class="rd-v"><span class="rd-n">⁵</span> The light shines in the darkness, and the darkness hasn’t overcome it.</span></p>
+<p class="rd-p g-p"><span class="rd-v"><span class="rd-n">⁶</span> There came a man sent from God, whose name was John.</span> <span class="rd-v"><span class="rd-n">⁷</span> The same came as a witness, that he might testify about the light, that all might believe through him.</span> <span class="rd-v"><span class="rd-n">⁸</span> He was not the light, but was sent that he might testify about the light.</span> <span class="rd-v"><span class="rd-n">⁹</span> The true light that enlightens everyone was coming into the world.</span></p>
+<p class="rd-p g-p"><span class="rd-v"><span class="rd-n">¹⁰</span> He was in the world, and the world was made through him, and the world didn’t recognize him.</span> <span class="rd-v"><span class="rd-n">¹¹</span> He came to his own, and those who were his own didn’t receive him.</span> <span class="rd-v"><span class="rd-n">¹²</span> But as many as received him, to them he gave the right to become God’s children, to those who believe in his name:</span> <span class="rd-v"><span class="rd-n">¹³</span> who were born, not of blood, nor of the will of the flesh, nor of the will of man, but of God.</span></p>
+<p class="rd-p g-p"><span class="rd-v"><span class="rd-n">¹⁴</span> The Word became flesh and lived among us. We saw his glory, such glory as of the only born Son of the Father, full of grace and truth.</span> <span class="rd-v"><span class="rd-n">¹⁵</span> John testified about him. He cried out, saying, “This was he of whom I said, ‘He who comes after me has surpassed me, for he was before me.’”</span> <span class="rd-v"><span class="rd-n">¹⁶</span> From his fullness we all received grace upon grace.</span> <span class="rd-v"><span class="rd-n">¹⁷</span> For the law was given through Moses. Grace and truth were realized through Jesus Christ.</span> <span class="rd-v"><span class="rd-n">¹⁸</span> No one has seen God at any time. The only born Son, who is in the bosom of the Father, has declared him.</span></p>
+<p class="rd-p g-p"><span class="rd-v"><span class="rd-n">¹⁹</span> This is John’s testimony, when the Jews sent priests and Levites from Jerusalem to ask him, “Who are you?”</span></p>
+<p class="rd-p g-p"><span class="rd-v"><span class="rd-n">²⁰</span> He declared, and didn’t deny, but he declared, “I am not the Christ.”</span></p>
+<p class="rd-p g-p"><span class="rd-v"><span class="rd-n">²¹</span> They asked him, “What then? Are you Elijah?”</span></p>
+<p class="rd-p g-p"><span class="rd-v">He said, “I am not.”</span></p>
+<p class="rd-p g-p"><span class="rd-v">“Are you the prophet?”</span></p>
+<p class="rd-p g-p"><span class="rd-v">He answered, “No.”</span></p>
+<p class="rd-p g-p"><span class="rd-v"><span class="rd-n">²²</span> They said therefore to him, “Who are you? Give us an answer to take back to those who sent us. What do you say about yourself?”</span></p>
+<p class="rd-p g-p"><span class="rd-v"><span class="rd-n">²³</span> He said, “I am the voice of one crying in the wilderness, ‘Make straight the way of the Lord,’ as Isaiah the prophet said.”</span></p>
+<p class="rd-p g-p"><span class="rd-v"><span class="rd-n">²⁴</span> The ones who had been sent were from the Pharisees.</span> <span class="rd-v"><span class="rd-n">²⁵</span> They asked him, “Why then do you baptize if you are not the Christ, nor Elijah, nor the prophet?”</span></p>
+<p class="rd-p g-p"><span class="rd-v"><span class="rd-n">²⁶</span> John answered them, “I baptize in water, but among you stands one whom you don’t know.</span> <span class="rd-v"><span class="rd-n">²⁷</span> He is the one who comes after me, who is preferred before me, whose sandal strap I’m not worthy to loosen.”</span> <span class="rd-v"><span class="rd-n">²⁸</span> These things were done in Bethany beyond the Jordan, where John was baptizing.</span></p>
+<p class="rd-p g-p"><span class="rd-v"><span class="rd-n">²⁹</span> The next day, he saw Jesus coming to him, and said, “Behold, the Lamb of God, who takes away the sin of the world!</span> <span class="rd-v"><span class="rd-n">³⁰</span> This is he of whom I said, ‘After me comes a man who is preferred before me, for he was before me.’</span> <span class="rd-v"><span class="rd-n">³¹</span> I didn’t know him, but for this reason I came baptizing in water, that he would be revealed to Israel.”</span> <span class="rd-v"><span class="rd-n">³²</span> John testified, saying, “I have seen the Spirit descending like a dove out of heaven, and it remained on him.</span> <span class="rd-v"><span class="rd-n">³³</span> I didn’t recognize him, but he who sent me to baptize in water said to me, ‘On whomever you will see the Spirit descending and remaining on him is he who baptizes in the Holy Spirit.’</span> <span class="rd-v"><span class="rd-n">³⁴</span> I have seen and have testified that this is the Son of God.”</span></p>
+<p class="rd-p g-p"><span class="rd-v"><span class="rd-n">³⁵</span> Again, the next day, John was standing with two of his disciples,</span> <span class="rd-v"><span class="rd-n">³⁶</span> and he looked at Jesus as he walked, and said, “Behold, the Lamb of God!”</span> <span class="rd-v"><span class="rd-n">³⁷</span> The two disciples heard him speak, and they followed Jesus.</span> <span class="rd-v"><span class="rd-n">³⁸</span> Jesus turned and saw them following, and said to them, “What are you looking for?”</span></p>
+<p class="rd-p g-p"><span class="rd-v">They said to him, “Rabbi” (which is to say, being interpreted, Teacher), “where are you staying?”</span></p>
+<p class="rd-p g-p"><span class="rd-v"><span class="rd-n">³⁹</span> He said to them, “Come and see.”</span></p>
+<p class="rd-p g-p"><span class="rd-v">They came and saw where he was staying, and they stayed with him that day. It was about the tenth hour.</span> <span class="rd-v"><span class="rd-n">⁴⁰</span> One of the two who heard John and followed him was Andrew, Simon Peter’s brother.</span> <span class="rd-v"><span class="rd-n">⁴¹</span> He first found his own brother, Simon, and said to him, “We have found the Messiah!” (which is, being interpreted, Christ).</span> <span class="rd-v"><span class="rd-n">⁴²</span> He brought him to Jesus. Jesus looked at him and said, “You are Simon the son of Jonah. You shall be called Cephas” (which is by interpretation, Peter).</span></p>
+<p class="rd-p g-p"><span class="rd-v"><span class="rd-n">⁴³</span> On the next day, he was determined to go out into Galilee, and he found Philip. Jesus said to him, “Follow me.”</span> <span class="rd-v"><span class="rd-n">⁴⁴</span> Now Philip was from Bethsaida, the city of Andrew and Peter.</span> <span class="rd-v"><span class="rd-n">⁴⁵</span> Philip found Nathanael, and said to him, “We have found him of whom Moses in the law and also the prophets, wrote: Jesus of Nazareth, the son of Joseph.”</span></p>
+<p class="rd-p g-p"><span class="rd-v"><span class="rd-n">⁴⁶</span> Nathanael said to him, “Can any good thing come out of Nazareth?”</span></p>
+<p class="rd-p g-p"><span class="rd-v">Philip said to him, “Come and see.”</span></p>
+<p class="rd-p g-p"><span class="rd-v"><span class="rd-n">⁴⁷</span> Jesus saw Nathanael coming to him, and said about him, “Behold, an Israelite indeed, in whom is no deceit!”</span></p>
+<p class="rd-p g-p"><span class="rd-v"><span class="rd-n">⁴⁸</span> Nathanael said to him, “How do you know me?”</span></p>
+<p class="rd-p g-p"><span class="rd-v">Jesus answered him, “Before Philip called you, when you were under the fig tree, I saw you.”</span></p>
+<p class="rd-p g-p"><span class="rd-v"><span class="rd-n">⁴⁹</span> Nathanael answered him, “Rabbi, you are the Son of God! You are King of Israel!”</span></p>
+<p class="rd-p g-p"><span class="rd-v"><span class="rd-n">⁵⁰</span> Jesus answered him, “Because I told you, ‘I saw you underneath the fig tree,’ do you believe? You will see greater things than these!”</span> <span class="rd-v"><span class="rd-n">⁵¹</span> He said to him, “Most certainly, I tell you all, hereafter you will see heaven opened, and the angels of God ascending and descending on the Son of Man.”</span></p></div>
+          <div class="rd-nav" style="margin-top:24px"><button class="rd-step previous foot" aria-label="Previous: Luke 24"><svg class="cp-icon"><use href="#i-back"/></svg><span>Previous: <span class="m">Luke 24</span></span></button><button class="rd-step next foot" aria-label="Next: John 2"><span>Next: <span class="m">John 2</span></span><svg class="cp-icon"><use href="#i-chev"/></svg></button></div>
+          <p class="hw" style="margin:16px 0 0">Peace on the road</p>
+          <div class="rd-credit"><p>World English Bible, Catholic edition (eBible.org). Public domain. The name &quot;World English Bible&quot; is a trademark of eBible.org.</p><p>This is not the translation read at Mass.</p></div>
+        </div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Reader · Dark</b>John 1 after sunset</p>
+      <div class="phone dk">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll">
+          <div class="biz-top" style="justify-content:space-between"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon"><use href="#i-back"/></svg></button><button class="rd-all" aria-label="All chapters of this book">All chapters<svg class="cp-icon sm"><use href="#i-chev"/></svg></button></div>
+          <div style="margin-top:16px"><p class="rd-kick">John</p><h1 class="rd-title">Chapter 1</h1></div>
+          <div class="rd-nav" style="margin:16px 0"><button class="rd-step previous" aria-label="Previous: Luke 24"><svg class="cp-icon"><use href="#i-back"/></svg><span>Luke 24</span></button><button class="rd-step next" aria-label="Next: John 2"><span>John 2</span><svg class="cp-icon"><use href="#i-chev"/></svg></button></div>
+          <div class="rd-text"><p class="rd-p"><span class="rd-v"><span class="rd-n">¹</span> In the beginning was the Word, and the Word was with God, and the Word was God.</span> <span class="rd-v"><span class="rd-n">²</span> The same was in the beginning with God.</span> <span class="rd-v"><span class="rd-n">³</span> All things were made through him. Without him, nothing was made that has been made.</span> <span class="rd-v"><span class="rd-n">⁴</span> In him was life, and the life was the light of men.</span> <span class="rd-v sel"><span class="rd-n">⁵</span> The light shines in the darkness, and the darkness hasn’t overcome it.</span></p>
+<p class="rd-p g-p"><span class="rd-v"><span class="rd-n">⁶</span> There came a man sent from God, whose name was John.</span> <span class="rd-v"><span class="rd-n">⁷</span> The same came as a witness, that he might testify about the light, that all might believe through him.</span> <span class="rd-v"><span class="rd-n">⁸</span> He was not the light, but was sent that he might testify about the light.</span> <span class="rd-v"><span class="rd-n">⁹</span> The true light that enlightens everyone was coming into the world.</span></p>
+<p class="rd-p g-p"><span class="rd-v"><span class="rd-n">¹⁰</span> He was in the world, and the world was made through him, and the world didn’t recognize him.</span> <span class="rd-v"><span class="rd-n">¹¹</span> He came to his own, and those who were his own didn’t receive him.</span> <span class="rd-v"><span class="rd-n">¹²</span> But as many as received him, to them he gave the right to become God’s children, to those who believe in his name:</span> <span class="rd-v"><span class="rd-n">¹³</span> who were born, not of blood, nor of the will of the flesh, nor of the will of man, but of God.</span></p>
+<p class="rd-p g-p"><span class="rd-v"><span class="rd-n">¹⁴</span> The Word became flesh and lived among us. We saw his glory, such glory as of the only born Son of the Father, full of grace and truth.</span> <span class="rd-v"><span class="rd-n">¹⁵</span> John testified about him. He cried out, saying, “This was he of whom I said, ‘He who comes after me has surpassed me, for he was before me.’”</span> <span class="rd-v"><span class="rd-n">¹⁶</span> From his fullness we all received grace upon grace.</span> <span class="rd-v"><span class="rd-n">¹⁷</span> For the law was given through Moses. Grace and truth were realized through Jesus Christ.</span> <span class="rd-v"><span class="rd-n">¹⁸</span> No one has seen God at any time. The only born Son, who is in the bosom of the Father, has declared him.</span></p>
+<p class="rd-p g-p"><span class="rd-v"><span class="rd-n">¹⁹</span> This is John’s testimony, when the Jews sent priests and Levites from Jerusalem to ask him, “Who are you?”</span></p>
+<p class="rd-p g-p"><span class="rd-v"><span class="rd-n">²⁰</span> He declared, and didn’t deny, but he declared, “I am not the Christ.”</span></p>
+<p class="rd-p g-p"><span class="rd-v"><span class="rd-n">²¹</span> They asked him, “What then? Are you Elijah?”</span></p>
+<p class="rd-p g-p"><span class="rd-v">He said, “I am not.”</span></p>
+<p class="rd-p g-p"><span class="rd-v">“Are you the prophet?”</span></p>
+<p class="rd-p g-p"><span class="rd-v">He answered, “No.”</span></p>
+<p class="rd-p g-p"><span class="rd-v"><span class="rd-n">²²</span> They said therefore to him, “Who are you? Give us an answer to take back to those who sent us. What do you say about yourself?”</span></p>
+<p class="rd-p g-p"><span class="rd-v"><span class="rd-n">²³</span> He said, “I am the voice of one crying in the wilderness, ‘Make straight the way of the Lord,’ as Isaiah the prophet said.”</span></p>
+<p class="rd-p g-p"><span class="rd-v"><span class="rd-n">²⁴</span> The ones who had been sent were from the Pharisees.</span> <span class="rd-v"><span class="rd-n">²⁵</span> They asked him, “Why then do you baptize if you are not the Christ, nor Elijah, nor the prophet?”</span></p>
+<p class="rd-p g-p"><span class="rd-v"><span class="rd-n">²⁶</span> John answered them, “I baptize in water, but among you stands one whom you don’t know.</span> <span class="rd-v"><span class="rd-n">²⁷</span> He is the one who comes after me, who is preferred before me, whose sandal strap I’m not worthy to loosen.”</span> <span class="rd-v"><span class="rd-n">²⁸</span> These things were done in Bethany beyond the Jordan, where John was baptizing.</span></p>
+<p class="rd-p g-p"><span class="rd-v"><span class="rd-n">²⁹</span> The next day, he saw Jesus coming to him, and said, “Behold, the Lamb of God, who takes away the sin of the world!</span> <span class="rd-v"><span class="rd-n">³⁰</span> This is he of whom I said, ‘After me comes a man who is preferred before me, for he was before me.’</span> <span class="rd-v"><span class="rd-n">³¹</span> I didn’t know him, but for this reason I came baptizing in water, that he would be revealed to Israel.”</span> <span class="rd-v"><span class="rd-n">³²</span> John testified, saying, “I have seen the Spirit descending like a dove out of heaven, and it remained on him.</span> <span class="rd-v"><span class="rd-n">³³</span> I didn’t recognize him, but he who sent me to baptize in water said to me, ‘On whomever you will see the Spirit descending and remaining on him is he who baptizes in the Holy Spirit.’</span> <span class="rd-v"><span class="rd-n">³⁴</span> I have seen and have testified that this is the Son of God.”</span></p>
+<p class="rd-p g-p"><span class="rd-v"><span class="rd-n">³⁵</span> Again, the next day, John was standing with two of his disciples,</span> <span class="rd-v"><span class="rd-n">³⁶</span> and he looked at Jesus as he walked, and said, “Behold, the Lamb of God!”</span> <span class="rd-v"><span class="rd-n">³⁷</span> The two disciples heard him speak, and they followed Jesus.</span> <span class="rd-v"><span class="rd-n">³⁸</span> Jesus turned and saw them following, and said to them, “What are you looking for?”</span></p>
+<p class="rd-p g-p"><span class="rd-v">They said to him, “Rabbi” (which is to say, being interpreted, Teacher), “where are you staying?”</span></p>
+<p class="rd-p g-p"><span class="rd-v"><span class="rd-n">³⁹</span> He said to them, “Come and see.”</span></p>
+<p class="rd-p g-p"><span class="rd-v">They came and saw where he was staying, and they stayed with him that day. It was about the tenth hour.</span> <span class="rd-v"><span class="rd-n">⁴⁰</span> One of the two who heard John and followed him was Andrew, Simon Peter’s brother.</span> <span class="rd-v"><span class="rd-n">⁴¹</span> He first found his own brother, Simon, and said to him, “We have found the Messiah!” (which is, being interpreted, Christ).</span> <span class="rd-v"><span class="rd-n">⁴²</span> He brought him to Jesus. Jesus looked at him and said, “You are Simon the son of Jonah. You shall be called Cephas” (which is by interpretation, Peter).</span></p>
+<p class="rd-p g-p"><span class="rd-v"><span class="rd-n">⁴³</span> On the next day, he was determined to go out into Galilee, and he found Philip. Jesus said to him, “Follow me.”</span> <span class="rd-v"><span class="rd-n">⁴⁴</span> Now Philip was from Bethsaida, the city of Andrew and Peter.</span> <span class="rd-v"><span class="rd-n">⁴⁵</span> Philip found Nathanael, and said to him, “We have found him of whom Moses in the law and also the prophets, wrote: Jesus of Nazareth, the son of Joseph.”</span></p>
+<p class="rd-p g-p"><span class="rd-v"><span class="rd-n">⁴⁶</span> Nathanael said to him, “Can any good thing come out of Nazareth?”</span></p>
+<p class="rd-p g-p"><span class="rd-v">Philip said to him, “Come and see.”</span></p>
+<p class="rd-p g-p"><span class="rd-v"><span class="rd-n">⁴⁷</span> Jesus saw Nathanael coming to him, and said about him, “Behold, an Israelite indeed, in whom is no deceit!”</span></p>
+<p class="rd-p g-p"><span class="rd-v"><span class="rd-n">⁴⁸</span> Nathanael said to him, “How do you know me?”</span></p>
+<p class="rd-p g-p"><span class="rd-v">Jesus answered him, “Before Philip called you, when you were under the fig tree, I saw you.”</span></p>
+<p class="rd-p g-p"><span class="rd-v"><span class="rd-n">⁴⁹</span> Nathanael answered him, “Rabbi, you are the Son of God! You are King of Israel!”</span></p>
+<p class="rd-p g-p"><span class="rd-v"><span class="rd-n">⁵⁰</span> Jesus answered him, “Because I told you, ‘I saw you underneath the fig tree,’ do you believe? You will see greater things than these!”</span> <span class="rd-v"><span class="rd-n">⁵¹</span> He said to him, “Most certainly, I tell you all, hereafter you will see heaven opened, and the angels of God ascending and descending on the Son of Man.”</span></p></div>
+          <div class="rd-nav" style="margin-top:24px"><button class="rd-step previous foot" aria-label="Previous: Luke 24"><svg class="cp-icon"><use href="#i-back"/></svg><span>Previous: <span class="m">Luke 24</span></span></button><button class="rd-step next foot" aria-label="Next: John 2"><span>Next: <span class="m">John 2</span></span><svg class="cp-icon"><use href="#i-chev"/></svg></button></div>
+          <p class="hw" style="margin:16px 0 0">Peace on the road</p>
+          <div class="rd-credit"><p>World English Bible, Catholic edition (eBible.org). Public domain. The name &quot;World English Bible&quot; is a trademark of eBible.org.</p><p>This is not the translation read at Mass.</p></div>
+        </div>
+        <div class="rd-act" role="toolbar" aria-label="Actions for John 1:5">
+          <div class="top"><span class="pl">John 1:5</span><button class="x" aria-label="Close the verse actions"><svg class="cp-icon"><use href="#i-x"/></svg></button></div>
+          <div class="btns"><button aria-label="Bookmark: John 1:5"><svg class="cp-icon"><use href="#i-bookmark"/></svg><span>Bookmark</span></button><button aria-label="Copy: John 1:5"><svg class="cp-icon"><use href="#i-copy"/></svg><span>Copy</span></button><button aria-label="Share: John 1:5"><svg class="cp-icon"><use href="#i-share"/></svg><span>Share</span></button></div>
+        </div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Reader · Across a boundary</b>Malachi 4 goes on to Tobit 1: the buttons name where they go · the end of the chapter has the credit and says it is not the translation read at Mass</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll">
+          <div class="biz-top" style="justify-content:space-between"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon"><use href="#i-back"/></svg></button><button class="rd-all" aria-label="All chapters of this book">All chapters<svg class="cp-icon sm"><use href="#i-chev"/></svg></button></div>
+          <div style="margin-top:16px"><p class="rd-kick">Malachi</p><h1 class="rd-title">Chapter 4</h1></div>
+          <div class="rd-nav" style="margin:16px 0"><button class="rd-step previous" aria-label="Previous: Malachi 3"><svg class="cp-icon"><use href="#i-back"/></svg><span>Malachi 3</span></button><button class="rd-step next" aria-label="Next: Tobit 1"><span>Tobit 1</span><svg class="cp-icon"><use href="#i-chev"/></svg></button></div>
+          <div class="rd-text"><p class="rd-p"><span class="rd-v"><span class="rd-n">¹</span> “For behold, the day comes, burning like a furnace, when all the proud and all who work wickedness will be stubble. The day that comes will burn them up,” says the LORD of Armies, “so that it will leave them neither root nor branch.</span> <span class="rd-v"><span class="rd-n">²</span> But to you who fear my name shall the sun of righteousness arise with healing in its wings. You will go out and leap like calves of the stall.</span> <span class="rd-v"><span class="rd-n">³</span> You shall tread down the wicked; for they will be ashes under the soles of your feet in the day that I make,” says the LORD of Armies.</span></p>
+<p class="rd-p g-p"><span class="rd-v"><span class="rd-n">⁴</span> “Remember the law of Moses my servant, which I commanded to him in Horeb for all Israel, even statutes and ordinances.</span></p>
+<p class="rd-p g-p"><span class="rd-v"><span class="rd-n">⁵</span> Behold, I will send you Elijah the prophet before the great and terrible day of the LORD comes.</span> <span class="rd-v"><span class="rd-n">⁶</span> He will turn the hearts of the fathers to the children and the hearts of the children to their fathers, lest I come and strike the earth with a curse.”</span></p></div>
+          <div class="rd-nav" style="margin-top:24px"><button class="rd-step previous foot" aria-label="Previous: Malachi 3"><svg class="cp-icon"><use href="#i-back"/></svg><span>Previous: <span class="m">Malachi 3</span></span></button><button class="rd-step next foot" aria-label="Next: Tobit 1"><span>Next: <span class="m">Tobit 1</span></span><svg class="cp-icon"><use href="#i-chev"/></svg></button></div>
+          <p class="hw" style="margin:16px 0 0">Peace on the road</p>
+          <div class="rd-credit"><p>World English Bible, Catholic edition (eBible.org). Public domain. The name &quot;World English Bible&quot; is a trademark of eBible.org.</p><p>This is not the translation read at Mass.</p></div>
+        </div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Library · Search</b>Books of the Bible, the twelve books and the verses at once · the notice only when example books are among them</p>
       <div class="phone">
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
         <div class="scroll">
@@ -2845,30 +3354,63 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
             <div class="lib-search"><svg class="cp-icon"><use href="#i-search"/></svg><span class="t typed">john</span><span class="x"><svg class="cp-icon"><use href="#i-x"/></svg></span></div>
             <button class="cp-icon-btn flat" aria-label="Bookmarks"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button>
           </div>
-          <div class="lib-notice" style="margin-top:16px">
-            <svg class="cp-icon"><use href="#i-flag"/></svg>
-            <div><div class="h">Preview</div><div class="p">These results are examples. The Bible text and books are not in the app yet.</div></div>
-          </div>
-          <p class="note" style="margin:16px 0 0">5 results for “john”</p>
+          <div class="lib-notice" style="margin-top:16px"><svg class="cp-icon"><use href="#i-flag"/></svg><div><div class="h">Preview</div><div class="p">The twelve books are examples: they are not in the app yet. The Bible text is.</div></div></div>
+          <p class="lib-count" style="margin:16px 0 0">105 results for “john”</p>
           <div class="lib-label" style="margin-top:24px">Bible · 4</div>
-          <div class="cp-card" style="margin-top:16px;padding:4px">
-            <div class="lib-row"><div class="lib-tx"><div class="t">John</div><div class="lib-sub stack"><span class="n">New Testament · 21 chapters</span><span class="lib-chip soon">Soon</span></div></div><button class="lib-mark" aria-label="Bookmark: John"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
-            <div class="lib-row"><div class="lib-tx"><div class="t">1 John</div><div class="lib-sub stack"><span class="n">New Testament · 5 chapters</span><span class="lib-chip soon">Soon</span></div></div><button class="lib-mark" aria-label="Bookmark: 1 John"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
-            <div class="lib-row"><div class="lib-tx"><div class="t">2 John</div><div class="lib-sub stack"><span class="n">New Testament · 1 chapter</span><span class="lib-chip soon">Soon</span></div></div><button class="lib-mark" aria-label="Bookmark: 2 John"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
-            <div class="lib-row"><div class="lib-tx"><div class="t">3 John</div><div class="lib-sub stack"><span class="n">New Testament · 1 chapter</span><span class="lib-chip soon">Soon</span></div></div><button class="lib-mark" aria-label="Bookmark: 3 John"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+          <div class="cp-card" style="padding:4px;margin-top:16px">
+            <div class="lib-row"><div class="lib-tx"><div class="lib-bk">John</div><div class="lib-line">New&nbsp;Testament · <span class="mn">21&nbsp;chapters</span></div></div><button class="lib-mark" aria-label="Bookmark: John"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+            <div class="lib-row"><div class="lib-tx"><div class="lib-bk">1 John</div><div class="lib-line">New&nbsp;Testament · <span class="mn">5&nbsp;chapters</span></div></div><button class="lib-mark on" aria-label="Remove bookmark: 1 John"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+            <div class="lib-row"><div class="lib-tx"><div class="lib-bk">2 John</div><div class="lib-line">New&nbsp;Testament · <span class="mn">1&nbsp;chapter</span></div></div><button class="lib-mark" aria-label="Bookmark: 2 John"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+            <div class="lib-row"><div class="lib-tx"><div class="lib-bk">3 John</div><div class="lib-line">New&nbsp;Testament · <span class="mn">1&nbsp;chapter</span></div></div><button class="lib-mark" aria-label="Bookmark: 3 John"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
           </div>
           <div class="lib-label" style="margin-top:24px">Books · 1</div>
-          <div class="cp-card" style="margin-top:16px;padding:4px">
+          <div class="cp-card" style="padding:4px;margin-top:16px">
             <div class="lib-book"><div class="top"><span class="cv" style="background:var(--cp-color-red-100)"><svg class="cp-icon"><use href="#i-moon"/></svg></span><div class="tt"><div class="t">Dark Night of the Soul</div><div class="a">John of the Cross · 16th century</div></div><button class="lib-mark on" aria-label="Remove bookmark: Dark Night of the Soul"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div><p>For lonely or doubting days: a poem and its guide, from Spain.</p><div class="chips"><span class="lib-chip free">Free</span><span class="lib-chip soon">Soon</span></div></div>
           </div>
+          <div class="lib-label" style="margin-top:24px">Verses · 100+</div>
+          <div class="cp-card" style="padding:4px;margin-top:16px">
+            <div class="lib-row lib-vrow"><div class="lib-tx" role="button" aria-label="1 Maccabees 2:1. In those days Mattathias the son of John, the son of Simeon, a priest of the sons of Joarib, from Jerusalem rose up; and he lived at Modin."><div class="vl">1 Maccabees 2:1</div><div class="vt">In those days Mattathias the son of <mark>John</mark>, the son of Simeon, a priest of the sons of Joarib, from Jerusalem rose up; and he lived at Modin.</div></div><button class="lib-mark" aria-label="Bookmark: 1 Maccabees 2:1"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+            <div class="lib-row lib-vrow"><div class="lib-tx" role="button" aria-label="1 Maccabees 2:2. And he had five sons: John, who was surnamed Gaddis;"><div class="vl">1 Maccabees 2:2</div><div class="vt">And he had five sons: <mark>John</mark>, who was surnamed Gaddis;</div></div><button class="lib-mark" aria-label="Bookmark: 1 Maccabees 2:2"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+          </div>
         </div>
-        <div class="tabdock"><nav class="cp-tabbar">
-          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
-          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
-          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
-          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Discover</div>
-          <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-library"/></svg></span>Library</div>
-        </nav></div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Library · Search, verses</b>A search of the verses: the place in JetBrains Mono, the words in Inter, the match marked by a ground and an underline · no notice: the Bible is real</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll">
+          <div class="lib-head">
+            <div class="lib-search"><svg class="cp-icon"><use href="#i-search"/></svg><span class="t typed">love one another</span><span class="x"><svg class="cp-icon"><use href="#i-x"/></svg></span></div>
+            <button class="cp-icon-btn flat" aria-label="Bookmarks"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button>
+          </div>
+          <p class="lib-count" style="margin:16px 0 0">20 results for “love one another”</p>
+          <div class="lib-label" style="margin-top:24px">Verses · 20</div>
+          <div class="cp-card" style="padding:4px;margin-top:16px">
+            <div class="lib-row lib-vrow"><div class="lib-tx" role="button" aria-label="John 13:34. A new commandment I give to you, that you love one another. Just as I have loved you, you also love one another."><div class="vl">John 13:34</div><div class="vt">A new commandment I give to you, that you <mark>love</mark> <mark>one</mark> <mark>another</mark>. Just as I have <mark>love</mark>d you, you also <mark>love</mark> <mark>one</mark> <mark>another</mark>.</div></div><button class="lib-mark" aria-label="Bookmark: John 13:34"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+            <div class="lib-row lib-vrow"><div class="lib-tx" role="button" aria-label="John 13:35. By this everyone will know that you are my disciples, if you have love for one another.”"><div class="vl">John 13:35</div><div class="vt">By this everyone will know that you are my disciples, if you have <mark>love</mark> for <mark>one</mark> <mark>another</mark>.”</div></div><button class="lib-mark" aria-label="Bookmark: John 13:35"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+            <div class="lib-row lib-vrow"><div class="lib-tx" role="button" aria-label="John 15:12. “This is my commandment, that you love one another, even as I have loved you."><div class="vl">John 15:12</div><div class="vt">“This is my commandment, that you <mark>love</mark> <mark>one</mark> <mark>another</mark>, even as I have <mark>love</mark>d you.</div></div><button class="lib-mark" aria-label="Bookmark: John 15:12"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+            <div class="lib-row lib-vrow"><div class="lib-tx" role="button" aria-label="John 15:17. “I command these things to you, that you may love one another."><div class="vl">John 15:17</div><div class="vt">“I command these things to you, that you may <mark>love</mark> <mark>one</mark> <mark>another</mark>.</div></div><button class="lib-mark" aria-label="Bookmark: John 15:17"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+          </div>
+        </div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Library · Go to</b>A typed reference is offered first: "ps 121:3" goes straight to Psalm 121:3</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll">
+          <div class="lib-head">
+            <div class="lib-search"><svg class="cp-icon"><use href="#i-search"/></svg><span class="t typed">ps 121:3</span><span class="x"><svg class="cp-icon"><use href="#i-x"/></svg></span></div>
+            <button class="cp-icon-btn flat" aria-label="Bookmarks"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button>
+          </div>
+          <div class="lib-goto" role="button" aria-label="Go to Psalm 121:3"><span class="g">Go to <span class="m">Psalm 121:3</span></span><svg class="cp-icon"><use href="#i-chev"/></svg></div>
+          <p class="lib-count" style="margin:16px 0 0">Searching…</p>
+        </div>
         <span class="home-ind"></span>
       </div>
     </div>
@@ -2882,10 +3424,6 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
             <div class="lib-head">
               <div class="lib-search"><svg class="cp-icon"><use href="#i-search"/></svg><span class="t typed">zzz</span><span class="x"><svg class="cp-icon"><use href="#i-x"/></svg></span></div>
               <button class="cp-icon-btn flat" aria-label="Bookmarks"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button>
-            </div>
-            <div class="lib-notice">
-              <svg class="cp-icon"><use href="#i-flag"/></svg>
-              <div><div class="h">Preview</div><div class="p">These results are examples. The Bible text and books are not in the app yet.</div></div>
             </div>
             <div class="cp-card" style="padding:32px 20px;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center">
               <span style="width:64px;height:64px;border-radius:50%;background:var(--cp-surface-sunken);display:grid;place-items:center"><svg class="cp-icon" style="width:30px;height:30px;color:var(--cp-text-muted)"><use href="#i-search"/></svg></span>
@@ -2906,27 +3444,29 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
       </div>
     </div>
 
+
     <div class="phone-wrap">
-      <p class="phone-label"><b>Library · Bookmarks</b>Library rows on this phone · bookmarked posts</p>
+      <p class="phone-label"><b>Library · Bookmarks</b>A book, verses and an example book kept on this phone · a verse opens the reader at it · bookmarked posts</p>
       <div class="phone">
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
         <div class="scroll">
           <div style="display:flex;flex-direction:column;gap:16px">
-            <div class="biz-top"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon "><use href="#i-back"/></svg></button></div>
+            <div class="biz-top"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon"><use href="#i-back"/></svg></button></div>
             <h1 class="scr-title" style="margin:0">Bookmarks</h1>
             <h4 class="lib-h">Library</h4>
-            <div class="lib-notice">
-              <svg class="cp-icon"><use href="#i-flag"/></svg>
-              <div><div class="h">Preview</div><div class="p">These are examples from the Library preview. They are kept only on this phone, and logging out clears them.</div></div>
-            </div>
-            <div class="lib-label">Bible · 2</div>
+            <div class="lib-notice"><svg class="cp-icon"><use href="#i-flag"/></svg><div><div class="h">Preview</div><div class="p">The twelve books are examples: they are not in the app yet. Bookmarks are kept only on this phone, and logging out clears them.</div></div></div>
+            <div class="lib-label">Bible · 1</div>
             <div class="cp-card" style="padding:4px">
-              <div class="lib-row"><div class="lib-tx"><div class="t">Psalms</div><div class="lib-sub stack"><span class="n">Old Testament · 150 chapters</span><span class="lib-chip soon">Soon</span></div></div><button class="lib-mark on" aria-label="Remove bookmark: Psalms"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
-              <div class="lib-row"><div class="lib-tx"><div class="t">Genesis</div><div class="lib-sub stack"><span class="n">Old Testament · 50 chapters</span><span class="lib-chip soon">Soon</span></div></div><button class="lib-mark on" aria-label="Remove bookmark: Genesis"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+              <div class="lib-row"><div class="lib-tx"><div class="lib-bk">Psalms</div><div class="lib-line">Old&nbsp;Testament · <span class="mn">150&nbsp;chapters</span></div></div><button class="lib-mark on" aria-label="Remove bookmark: Psalms"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
             </div>
             <div class="lib-label">Books · 1</div>
             <div class="cp-card" style="padding:4px">
               <div class="lib-book"><div class="top"><span class="cv" style="background:var(--cp-color-sand-300)"><svg class="cp-icon"><use href="#i-building"/></svg></span><div class="tt"><div class="t">The Interior Castle</div><div class="a">Teresa of Ávila · 1577</div></div><button class="lib-mark on" aria-label="Remove bookmark: The Interior Castle"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div><p>The soul as a castle of seven rooms, to read a chapter at a time.</p><div class="chips"><span class="lib-chip free">Free</span><span class="lib-chip soon">Soon</span></div></div>
+            </div>
+            <div class="lib-label">Verses · 2</div>
+            <div class="cp-card" style="padding:4px">
+              <div class="lib-row lib-vrow"><div class="lib-tx" role="button" aria-label="Psalm 121:3. He will not allow your foot to be moved. He who keeps you will not slumber."><div class="vl">Psalm 121:3</div><div class="vt">He will not allow your foot to be moved. He who keeps you will not slumber.</div></div><button class="lib-mark on" aria-label="Remove bookmark: Psalm 121:3"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+              <div class="lib-row lib-vrow"><div class="lib-tx" role="button" aria-label="John 3:16. For God so loved the world, that he gave his only born Son, that whoever believes in him should not perish, but have eternal life."><div class="vl">John 3:16</div><div class="vt">For God so loved the world, that he gave his only born Son, that whoever believes in him should not perish, but have eternal life.</div></div><button class="lib-mark on" aria-label="Remove bookmark: John 3:16"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
             </div>
             <h4 class="lib-h" style="margin-top:8px">Posts</h4>
             <div class="cp-card" style="padding:16px 6px 16px 20px;display:flex;align-items:center;gap:4px">
@@ -2956,6 +3496,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
         <span class="home-ind"></span>
       </div>
     </div>
+
 
     <div class="phone-wrap">
       <p class="phone-label"><b>Diary</b>Library · My diary · only on this phone</p>

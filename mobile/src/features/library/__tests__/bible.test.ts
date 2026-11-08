@@ -162,7 +162,7 @@ check('the date line of the daily reading banner: "Sunday 8 November", in the ph
 });
 
 check('the data files are pure: no React, no React Native, no theme, nothing that could not run in plain node', () => {
-  const pure = ['books.ts', 'today.ts', 'ref.ts', 'blocks.ts', 'order.ts', 'gridMath.ts', 'tileFit.ts', 'lastRead.ts', 'verseRows.ts', 'verseActions.ts', 'credit.ts', 'textTypes.ts'];
+  const pure = ['books.ts', 'today.ts', 'ref.ts', 'blocks.ts', 'order.ts', 'gridMath.ts', 'tileFit.ts', 'lastRead.ts', 'verseRows.ts', 'verseActions.ts', 'credit.ts', 'wrap.ts', 'textTypes.ts'];
   for (const f of pure) assert.doesNotMatch(read(`src/features/library/bible/${f}`), /from '(react|react-native|expo|@\/)/, `${f} is pure`);
 });
 
