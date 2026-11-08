@@ -6,7 +6,7 @@
 
 > “Strive, My Son, to do another’s will rather than thine own. Choose always to have less rather than more. Seek always after the lowest place, and to be subject to all. Wish always and pray that the will of God be fulfilled in thee. Behold, such a man as this entereth into the inheritance of peace and quietness.” … O my Lord, this Thy short discourse hath in itself much of perfectness. It is short in words but full of meaning, and abundant in fruit.
 >
-> — Thomas à Kempis, *The Imitation of Christ*, Book 3, chapter 23 (tr. William Benham, 1886)
+> — Thomas à Kempis, *The Imitation of Christ*, Book 3, chapter 23 (tr. William Benham)
 
 ## Reflection
 

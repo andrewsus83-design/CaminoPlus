@@ -6,7 +6,7 @@
 
 > Without charity no work profiteth, but whatsoever is done in charity, however small and of no reputation it be, bringeth forth good fruit; for God verily considereth what a man is able to do, more than the greatness of what he doth. … He doth much who loveth much. He doth much who doth well. … He envieth none, because he longeth for no selfish joy; nor doth he desire to rejoice in himself, but longeth to be blessed in God as the highest good.
 >
-> — Thomas à Kempis, *The Imitation of Christ*, Book 1, chapter 15 (tr. William Benham, 1886)
+> — Thomas à Kempis, *The Imitation of Christ*, Book 1, chapter 15 (tr. William Benham)
 
 ## Reflection
 

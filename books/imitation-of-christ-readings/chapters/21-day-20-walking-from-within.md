@@ -6,7 +6,7 @@
 
 > He who knoweth things as they are and not as they are said or seem to be, he truly is wise, and is taught of God more than of men. … He who knoweth how to walk from within, and to set little value upon outward things, requireth not places nor waiteth for seasons, for holding his intercourse with God. The inward man quickly recollecteth himself, because he is never entirely given up to outward things. No outward labour and no necessary occupations stand in his way, but as events fall out, so doth he fit himself to them.
 >
-> — Thomas à Kempis, *The Imitation of Christ*, Book 2, chapter 1 (tr. William Benham, 1886)
+> — Thomas à Kempis, *The Imitation of Christ*, Book 2, chapter 1 (tr. William Benham)
 
 ## Reflection
 

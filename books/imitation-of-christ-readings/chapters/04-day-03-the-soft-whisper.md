@@ -6,7 +6,7 @@
 
 > Blessed is the soul which heareth the Lord speaking within it, and receiveth the word of consolation from His mouth. Blessed are the ears which receive the echoes of the soft whisper of God, and turn not aside to the whisperings of this world. Blessed truly are the ears which listen not to the voice that soundeth without, but to that which teacheth truth inwardly.
 >
-> — Thomas à Kempis, *The Imitation of Christ*, Book 3, chapter 1 (tr. William Benham, 1886)
+> — Thomas à Kempis, *The Imitation of Christ*, Book 3, chapter 1 (tr. William Benham)
 
 ## Reflection
 

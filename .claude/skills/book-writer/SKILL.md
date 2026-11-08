@@ -76,7 +76,7 @@ per classic, which is what the checker verifies every quote against:
   "work": "The Imitation of Christ",
   "author": "Thomas à Kempis",
   "translator": "William Benham",
-  "year": "1886",
+  "year": "the year the file or its title page states, or: date not given in the file",
   "licence": "Public domain",
   "url": "https://www.gutenberg.org/ebooks/1653",
   "text_from": "optional: the first words of the work's own text, when the file starts with a long introduction"

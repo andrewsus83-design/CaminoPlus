@@ -6,7 +6,7 @@
 
 > Some who were presumptuous because of the grace of devotion within them, have destroyed themselves, because they would do more than they were able, not considering the measure of their own littleness, but rather following the impulse of the heart than the judgment of the reason. … They who are as yet new and unskilled in the way of the Lord, unless they rule themselves after the counsel of the wise, may easily be deceived and led away.
 >
-> — Thomas à Kempis, *The Imitation of Christ*, Book 3, chapter 7 (tr. William Benham, 1886)
+> — Thomas à Kempis, *The Imitation of Christ*, Book 3, chapter 7 (tr. William Benham)
 
 ## Reflection
 

@@ -6,7 +6,7 @@
 
 > A certain man being in anxiety of mind, continually tossed about between hope and fear, and being on a certain day overwhelmed with grief, cast himself down in prayer before the altar in a church, and meditated within himself, saying, “Oh! if I but knew that I should still persevere,” and presently heard within him a voice from God, “And if thou didst know it, what wouldst thou do? Do now what thou wouldst do then, and thou shalt be very secure.” And straightway being comforted and strengthened, he committed himself to the will of God and the perturbation of spirit ceased, neither had he a mind any more to search curiously to know what should befall him hereafter, but studied rather to inquire what was the good and acceptable will of God, for the beginning and perfecting of every good work.
 >
-> — Thomas à Kempis, *The Imitation of Christ*, Book 1, chapter 25 (tr. William Benham, 1886)
+> — Thomas à Kempis, *The Imitation of Christ*, Book 1, chapter 25 (tr. William Benham)
 
 ## Reflection
 

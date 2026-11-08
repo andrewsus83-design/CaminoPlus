@@ -6,7 +6,7 @@
 
 > Already thou longest to be in the glorious liberty of the children of God; already the eternal home delighteth thee, and the heavenly country full of joy; but the hour is not yet come; there remaineth still another season, even a season of warfare, a season of labour and probation. Thou desirest to be filled with the Chief Good, but thou canst not attain it immediately. I AM that Good; wait for Me, until the Kingdom of God shall come. … Thou must still be tried upon earth, and be exercised in many things. Consolation shall from time to time be given thee, but abundant satisfying shall not be granted.
 >
-> — Thomas à Kempis, *The Imitation of Christ*, Book 3, chapter 49 (tr. William Benham, 1886)
+> — Thomas à Kempis, *The Imitation of Christ*, Book 3, chapter 49 (tr. William Benham)
 
 ## Reflection
 

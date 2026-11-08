@@ -65,7 +65,7 @@ classic, the author, the translator and the year in its front matter and under e
 - Copy the passage word for word from the source file. Do not fix spelling, do not modernise, do not join sentences. Use
   `…` between separate stretches of the same passage.
 - Under every passage, an attribution line starting with an em dash: `— Thomas à Kempis, *The Imitation of Christ*, Book 3,
-  chapter 5 (tr. William Benham, 1886)`.
+  chapter 5 (tr. William Benham)`.
 - The checker (`tools/check_books.py`) rejects any blockquote that is not found in the source named in `book.json`.
 - Keep each passage short, 40 to 250 words. The reflection is yours; the classic is the guest.
 

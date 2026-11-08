@@ -12,7 +12,7 @@
 
 You come to a junction with no arrow. The phone says one thing and the ground another. A boy is walking a dog along the lane. You can go on and hope, or you can ask. Asking costs a moment of looking like someone who does not know the way, and that moment can feel surprisingly expensive.
 
-Teresa spent years paying that price in advance. In this passage the thing she does not know is small: the Breviary, the book of daily prayers, and her part in the Office, the set of prayers the sisters sang together in choir. Other novices could have taught her. She says so. But she "never asked them", she writes, "that they might not know how little I knew". It is hard to read that without a small laugh of recognition. The thing she was protecting was her reputation, and it was a flimsy thing.
+Teresa paid that price in advance. In this passage the thing she does not know is small: the Breviary, the book of daily prayers, and her part in the Office, the set of prayers the sisters sang together in choir. Other novices could have taught her. She says so. But she "never asked them", she writes, "that they might not know how little I knew". It is hard to read that without a small laugh of recognition. The thing she was protecting was her reputation, and it was a flimsy thing.
 
 Then she lets us watch what the protection cost. Her singing was bad, she says, and she felt it. The worst of it was where the pain came from. It was not that she made mistakes in front of God, "which would have been a virtue", but that she made them in front of the other nuns. She was "so full of my own reputation" that she was disturbed, and so she sang worse than she might have. Fear of being found out took her breath and her pitch.
 

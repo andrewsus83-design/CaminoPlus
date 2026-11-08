@@ -6,7 +6,7 @@
 
 > Many run to diverse places to visit the memorials of departed Saints, and rejoice to hear of their deeds and to look upon the beautiful buildings of their shrines. … Often in looking at those memorials men are moved by curiosity and novelty, and very little fruit of amendment is borne away, especially when there is so much careless trifling and so little true contrition.
 >
-> — Thomas à Kempis, *The Imitation of Christ*, Book 4, chapter 1 (tr. William Benham, 1886)
+> — Thomas à Kempis, *The Imitation of Christ*, Book 4, chapter 1 (tr. William Benham)
 
 ## Reflection
 

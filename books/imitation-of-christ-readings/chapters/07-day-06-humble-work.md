@@ -6,7 +6,7 @@
 
 > So long as thou wearest a mortal body, thou shalt feel weariness and heaviness of heart. … At such a time it is expedient for thee to flee to humble and external works, and to renew thyself with good actions; to wait for My coming and heavenly visitation with sure confidence; to bear thy exile and drought of mind with patience, until thou be visited by Me again, and be freed from all anxieties. For I will cause thee to forget thy labours, and altogether to enjoy eternal peace.
 >
-> — Thomas à Kempis, *The Imitation of Christ*, Book 3, chapter 51 (tr. William Benham, 1886)
+> — Thomas à Kempis, *The Imitation of Christ*, Book 3, chapter 51 (tr. William Benham)
 
 ## Reflection
 

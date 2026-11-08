@@ -6,7 +6,7 @@ Every day has a morning reading of about five minutes and an evening reflection 
 
 **In the morning** there are three parts.
 
-- **The passage.** A few lines from *The Imitation of Christ*, a book of the inner life written in Latin about six hundred years ago. The words are quoted exactly as the translator, William Benham, gave them in 1886, *thee* and *thou* and all. Read the passage twice, the second time aloud if you can, even under your breath. Old English slows the eye down, and that is half of its use.
+- **The passage.** A few lines from *The Imitation of Christ*, a book of the inner life written in Latin about six hundred years ago. The words are quoted exactly as the translator, William Benham, gave them, *thee* and *thou* and all. Read the passage twice, the second time aloud if you can, even under your breath. Old English slows the eye down, and that is half of its use.
 - **The reflection.** This part is ours, not Thomas's. It starts from something on the road, a bench, a bell, a blister, and lets the passage open it. It says plainly what the passage says, where it is hard, and what it might ask of an ordinary day. It is allowed to doubt.
 - **For the walk.** A question to carry for the next hour and one small practice that needs nothing but attention. You will not need a notebook. Most of them are better done on your feet.
 

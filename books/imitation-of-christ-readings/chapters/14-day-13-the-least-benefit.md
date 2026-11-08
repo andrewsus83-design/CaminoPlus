@@ -6,7 +6,7 @@
 
 > Be thankful, therefore, for the least benefit and thou shalt be worthy to receive greater. Let the least be unto thee even as the greatest, and let that which is of little account be unto thee as a special gift. If the majesty of the Giver be considered, nothing that is given shall seem small and of no worth, for that is not a small thing which is given by the Most High God.
 >
-> — Thomas à Kempis, *The Imitation of Christ*, Book 2, chapter 10 (tr. William Benham, 1886)
+> — Thomas à Kempis, *The Imitation of Christ*, Book 2, chapter 10 (tr. William Benham)
 
 ## Reflection
 
@@ -31,7 +31,7 @@ The practice is to catch the small gifts in the act. Before each stop, name thre
 ## For the walk
 
 - What is the smallest thing I have been given today, and who or what stands behind it? Try to find something you would usually pass without noticing.
-- At each stop, name three small gifts of the last hour, silently or aloud. Before the end of the day, thank one person for one small thing, and let them see that you mean it. A plain "thank you" said slowly is enough.
+- At each stop, name three small gifts of the last hour, silently or aloud. Before the end of the day, thank one person for one small thing, and let them see that you mean it. A plain "thank you" said slowly, and meant, is enough.
 
 ## At the end of the day
 

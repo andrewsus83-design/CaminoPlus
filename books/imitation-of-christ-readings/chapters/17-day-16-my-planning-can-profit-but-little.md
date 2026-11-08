@@ -6,7 +6,7 @@
 
 > “My Son, always commit thy cause to Me; I will dispose it aright in due time. Wait for My arrangement of it, and then thou shalt find it for thy profit.” … O Lord, right freely I commit all things to Thee; for my planning can profit but little. Oh that I did not dwell so much on future events, but could offer myself altogether to Thy pleasures without delay. … My Son, a man often striveth vehemently after somewhat which he desireth; but when he hath obtained it he beginneth to be of another mind, because his affections towards it are not lasting, but rather rush on from one thing to another.
 >
-> — Thomas à Kempis, *The Imitation of Christ*, Book 3, chapter 39 (tr. William Benham, 1886)
+> — Thomas à Kempis, *The Imitation of Christ*, Book 3, chapter 39 (tr. William Benham)
 
 ## Reflection
 

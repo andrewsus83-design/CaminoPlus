@@ -6,7 +6,7 @@
 
 > We ought daily to renew our vows, and to kindle our hearts to zeal, as if each day were the first day of our conversion, and to say, “Help me, O God, in my good resolutions, and in Thy holy service, and grant that this day I may make a good beginning, for hitherto I have done nothing!” … If thou canst not be always examining thyself, thou canst at certain seasons, and at least twice in the day, at evening and at morning. In the morning make thy resolves, and in the evening inquire into thy life, how thou hast sped to-day in word, deed, and thought; for in these ways thou hast often perchance offended God and thy neighbour.
 >
-> — Thomas à Kempis, *The Imitation of Christ*, Book 1, chapter 19 (tr. William Benham, 1886)
+> — Thomas à Kempis, *The Imitation of Christ*, Book 1, chapter 19 (tr. William Benham)
 
 ## Reflection
 

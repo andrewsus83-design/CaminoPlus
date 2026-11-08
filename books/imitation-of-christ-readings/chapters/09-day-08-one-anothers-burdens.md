@@ -6,7 +6,7 @@
 
 > Endeavour to be patient in bearing with other men’s faults and infirmities whatsoever they be, for thou thyself also hast many things which have need to be borne with by others. … But now hath God thus ordained, that we may learn to bear one another’s burdens, because none is without defect, none without a burden, none sufficient of himself, none wise enough of himself; but it behoveth us to bear with one another, to comfort one another, to help, instruct, admonish one another. How much strength each man hath is best proved by occasions of adversity: for such occasions do not make a man frail, but show of what temper he is.
 >
-> — Thomas à Kempis, *The Imitation of Christ*, Book 1, chapter 16 (tr. William Benham, 1886)
+> — Thomas à Kempis, *The Imitation of Christ*, Book 1, chapter 16 (tr. William Benham)
 
 ## Reflection
 

@@ -6,7 +6,7 @@
 
 > I will confess to Thee, Lord, my infirmity. It is often a small thing which casteth me down and maketh me sad. I resolve that I will act bravely, but when a little temptation cometh, immediately I am in a great strait. Wonderfully small sometimes is the matter whence a grievous temptation cometh, and whilst I imagine myself safe for a little space; when I am not considering, I find myself often almost overcome by a little puff of wind.
 >
-> — Thomas à Kempis, *The Imitation of Christ*, Book 3, chapter 20 (tr. William Benham, 1886)
+> — Thomas à Kempis, *The Imitation of Christ*, Book 3, chapter 20 (tr. William Benham)
 
 ## Reflection
 
@@ -29,7 +29,7 @@ A few small defences will help. Name the thing when it comes: "This is the puff 
 ## For the walk
 
 - What small thing is most likely to knock me off my course today, and what would a steadier answer look like?
-- Take three breaths before you react to the next small irritation, and if you can, name it silently: "puff of wind." And if there is a stone in your boot, literally or otherwise, stop and deal with it now, even though it costs a minute. It is a small act that says you take the day seriously.
+- Take three breaths before you react to the next small irritation, and if you can, name it silently: "puff of wind." And if there is a stone in your boot, literally or otherwise, stop and deal with it now, even though it costs a minute. It is a small act that says you take the day seriously, and it will not cost you the afternoon.
 
 ## At the end of the day
 

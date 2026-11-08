@@ -16,8 +16,8 @@ marked "known", the file does not state it and it is the well-documented first p
 
 | Source `id` | Famous book | Edition, translator or editor | Why it is free |
 |---|---|---|---|
-| `gutenberg-1653` | *The Imitation of Christ*, Thomas à Kempis | Translated by Rev. William Benham, 1886 | Translator and author long out of copyright |
-| `gutenberg-3296` | *The Confessions of St. Augustine* | Translated by E. B. Pusey, 1838 | Translator died in 1882 |
+| `gutenberg-1653` | *The Imitation of Christ*, Thomas à Kempis | Translated by Rev. William Benham (1831 to 1910, from the Gutenberg record). The file gives no date for the translation: an earlier note here said 1886 from memory, which nothing supports, so it was removed | Translator and author long out of copyright |
+| `gutenberg-3296` | *The Confessions of St. Augustine* | Translated by E. B. Pusey (Oxford, 1838: the first publication, per Wikipedia's list of editions; the file does not say which printing it follows) | Translator died in 1882 |
 | `gutenberg-131` | *The Pilgrim's Progress*, John Bunyan | The original English text (1678, known); no translator, no modern editor named in the file | Seventeenth-century text |
 | `gutenberg-1002` | *Divine Comedy*, Dante: *Purgatory* (the file also exists whole as 1004) | Translated by Henry Wadsworth Longfellow (1867, known) | Translator died in 1882 |
 | `gutenberg-13871` | *The Practice of the Presence of God the Best Rule of a Holy Life*, Brother Lawrence | Fleming H. Revell Company edition, "translated from the French" (an old print edition) | Old print edition, no U.S. copyright |

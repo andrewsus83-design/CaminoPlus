@@ -6,7 +6,7 @@
 
 > If thou willingly bear the Cross, it will bear thee, and will bring thee to the end which thou seekest, even where there shall be the end of suffering; though it shall not be here. If thou bear it unwillingly, thou makest a burden for thyself and greatly increaseth thy load, and yet thou must bear it. If thou cast away one cross, without doubt thou shalt find another and perchance a heavier.
 >
-> — Thomas à Kempis, *The Imitation of Christ*, Book 2, chapter 12 (tr. William Benham, 1886)
+> — Thomas à Kempis, *The Imitation of Christ*, Book 2, chapter 12 (tr. William Benham)
 
 ## Reflection
 

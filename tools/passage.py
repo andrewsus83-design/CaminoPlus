@@ -36,7 +36,7 @@ BOOK_HEADING = re.compile(
 )
 ORDINAL = r"(?:FIRST|SECOND|THIRD|FOURTH|FIFTH|SIXTH|SEVENTH|EIGHTH|NINTH|TENTH|ELEVENTH|TWELFTH|THIRTEENTH|FOURTEENTH|FIFTEENTH)"
 CHAPTER_HEADING = re.compile(
-    r"^\s*(?:CHAPTER [IVXLC\d]+\b.*|CANTO [IVXLC]+\b.*|PSALM \d+.*|[IVXLC]+\.\s*$|" + ORDINAL + r" (?:CONVERSATION|LETTER|SECTION|MEDITATION)\.?\s*)\s*$"
+    r"^\s*(?:CHAPTER [IVXLC\d]+\b.*|_?Chapter\s+[IVXLC\d]+(?![A-Za-z])[._]*.*|CANTO [IVXLC]+\b.*|PSALM \d+.*|[IVXLC]+\.\s*$|" + ORDINAL + r" (?:CONVERSATION|LETTER|SECTION|MEDITATION)\.?\s*)\s*$"
 )
 FOOTNOTE = re.compile(r"\(\d+\)|\[\d+\]")
 SECTION_NUMBER = re.compile(r"\{\d+\}")                                             # an edition's own numbering, e.g. {221}

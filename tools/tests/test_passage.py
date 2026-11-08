@@ -56,6 +56,12 @@ class Extract(unittest.TestCase):
         self.assertEqual(e.where, ["THE SECOND BOOK", "CHAPTER I"])      # the nearest book and the nearest chapter, not the chapter of the book before
         self.assertEqual(e.text, "Let us rest here, in the *quiet* of the evening.")                      # _italic_ became *italic*
 
+    def test_mixed_case_and_underscored_chapter_headings_are_recognised(self):
+        src = ("*** START OF THE PROJECT GUTENBERG EBOOK X ***\n_Chapter III_\nFrancis the Fighter\n\nHe went to the wars and came back changed.\n\n"
+               "Chapter XI.\n\nShe watered the garden four ways, and so on.\n*** END OF THE PROJECT GUTENBERG EBOOK X ***\n")
+        self.assertEqual(passage.extract(src, "He went to the wars", "changed.").where, ["_Chapter III_"])
+        self.assertEqual(passage.extract(src, "She watered the garden", "so on.").where, ["Chapter XI."])
+
     def test_conversations_and_letters_are_chapter_level_headings(self):
         src = "*** START OF THE PROJECT GUTENBERG EBOOK X ***\nFIRST CONVERSATION.\n\nHe walked a long way.\n\nSEVENTH LETTER.\n\nYou ask how to begin, and so I say: begin.\n*** END OF THE PROJECT GUTENBERG EBOOK X ***\n"
         self.assertEqual(passage.extract(src, "You ask how", "begin.").where, ["SEVENTH LETTER."])

@@ -6,13 +6,13 @@ Every day has a morning reading of about five minutes and an evening reflection 
 
 **In the morning** there are three parts.
 
-- **The passage.** A few lines from *St. Francis of Assisi*, a short life of the saint by the English writer G. K. Chesterton. The words are exactly his, in the English he wrote. Read them twice, the second time aloud if you can.
+- **The passage.** A few lines from *St. Francis of Assisi*, a short life of the saint by the English writer G. K. Chesterton. The words are exactly his, in the English he wrote.
 - **The reflection.** This part is ours, not Chesterton's. It starts from something on the road, a boardwalk, a gull, a pack, and lets the passage open it. It says plainly what the passage says, where it is hard, and what it might ask of an ordinary day. It is allowed to doubt.
 - **For the walk.** A question to carry for the next hour and one small practice that needs nothing but attention.
 
 **In the evening** there are two more.
 
-- **At the end of the day.** A look back over the day you have just lived, with the morning's passage in mind. It asks two or three gentle questions and is honest about tiredness. You do not need to write anything down.
+- **At the end of the day.** A look back over the day you have just lived, with the morning's passage in mind. It asks two or three gentle questions and is honest about tiredness.
 - **A short prayer.** If you pray, pray it. If you pray differently, change the words. If you do not pray, say it as a wish, to nobody in particular.
 
 ## Why this book for this road
@@ -33,7 +33,7 @@ It is also his portrait, not Francis's own words, and a book of its time. The ne
 
 ## The shape of the nine days
 
-The days follow Francis's life in the order Chesterton tells it, from the young man to his death. The first two chapters of his book, which explain his approach and sketch the world Francis was born into, are not drawn on.
+The days follow Francis's life in the order Chesterton tells it, from the young man to his death.
 
 - **Day 1, the boast and the turning back.** The young man of Assisi.
 - **Day 2, everything that can be called his.** The break with his father.
@@ -49,6 +49,6 @@ The days are a shape, not a timetable. Read the one that fits the day you are ha
 
 ## On the road and at home
 
-Read the morning part on a bench, in a bunk in an *albergue* (the simple hostel where pilgrims sleep), at a café table while the soup arrives. Then take the question with you for an hour. Read the evening part last, when the boots are off. At home, do the same with your tea and before bed.
+Read the morning part on a bench, in a bunk in an *albergue* (the simple hostel where pilgrims sleep), or at a café table while the soup arrives. Take the question with you for an hour. Read the evening part last, when the boots are off. At home, use your tea and your bedtime.
 
 *Buen Camino* is what walkers say to one another on the road, roughly *may your Way go well*. On the Portuguese side you may hear *Bom caminho*, which means the same.

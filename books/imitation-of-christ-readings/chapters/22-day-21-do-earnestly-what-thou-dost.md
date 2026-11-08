@@ -6,7 +6,7 @@
 
 > My Son, let not the labours which thou hast undertaken for Me break thee down, nor let tribulations cast thee down in any wise, but let my promise strengthen and comfort thee in every event. … Do earnestly what thou dost; labour faithfully in My vineyard; I will be thy reward. Write, read, sing, weep, be silent, pray, endure adversities manfully; eternal life is worthy of all these conflicts, yea, and of greater.
 >
-> — Thomas à Kempis, *The Imitation of Christ*, Book 3, chapter 47 (tr. William Benham, 1886)
+> — Thomas à Kempis, *The Imitation of Christ*, Book 3, chapter 47 (tr. William Benham)
 
 ## Reflection
 

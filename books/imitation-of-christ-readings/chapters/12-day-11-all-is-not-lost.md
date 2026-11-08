@@ -6,7 +6,7 @@
 
 > What doth care about future events bring thee, save sorrow upon sorrow? Sufficient for the day is the evil thereof. … It is vain and useless to be disturbed or lifted up about future things which perhaps will never come. … When thou thinkest thyself far removed from Me, I am often the nearer. When thou reckonest that almost all is lost, then often is greater opportunity of gain at hand. All is not lost when something goeth contrary to thy wishes.
 >
-> — Thomas à Kempis, *The Imitation of Christ*, Book 3, chapter 30 (tr. William Benham, 1886)
+> — Thomas à Kempis, *The Imitation of Christ*, Book 3, chapter 30 (tr. William Benham)
 
 ## Reflection
 

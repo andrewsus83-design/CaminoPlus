@@ -25,7 +25,7 @@ It is also a hard book, and it is a fifteenth-century book. In places Thomas is 
 
 ## The translation, the edition and the licence
 
-The English in the passages is by the Reverend William Benham, published in 1886. Benham and Thomas are both long out of copyright, so the translation is in the public domain. It is available from Project Gutenberg as ebook number 1653, and every quotation in this book was checked against that text, word for word.
+The English in the passages is by the Reverend William Benham (1831 to 1910, according to the Project Gutenberg record). The file we use does not say when this translation was published, and we have not guessed. Benham and Thomas are both long out of copyright, so the translation is in the public domain. It is available from Project Gutenberg as ebook number 1653, and every quotation in this book was checked against that text, word for word.
 
 What we changed in the passages is nothing. We kept the old spellings and endings, and even a spot or two where the text looks like a printer's slip. We left out the small footnote numbers. Where we skip a stretch inside a passage, a mark like this shows it: …. The choice of the twenty-one passages, their order, the reflections, the questions and the prayers are ours and they are original. Of the twenty-one, twelve come from the third book, five from the first, three from the second and one from the fourth.
 

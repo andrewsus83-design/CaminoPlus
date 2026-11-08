@@ -6,7 +6,7 @@
 
 > Grant unto me, above all things that I can desire, to rest in Thee, and that in Thee my heart may be at peace. Thou art the true peace of the heart, Thou alone its rest; apart from Thee all things are hard and unquiet. In Thee alone, the supreme and eternal God, *I will lay me down in peace and take my rest*.
 >
-> — Thomas à Kempis, *The Imitation of Christ*, Book 3, chapter 15 (tr. William Benham, 1886)
+> — Thomas à Kempis, *The Imitation of Christ*, Book 3, chapter 15 (tr. William Benham)
 
 ## Reflection
 

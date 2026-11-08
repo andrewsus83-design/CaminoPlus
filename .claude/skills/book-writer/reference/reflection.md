@@ -32,13 +32,13 @@ File names: `00-how-to-use-this-book.md`, `01-about-the-book-and-its-author.md`,
 
 > The passage, word for word from the source (40 to 250 words).
 >
-> — Thomas à Kempis, *The Imitation of Christ*, Book 1, chapter 7 (tr. William Benham, 1886)
+> — Thomas à Kempis, *The Imitation of Christ*, Book 1, chapter 7 (tr. William Benham)
 
 ## Reflection
 
 600 to 900 words in your own voice (longer when the passage is short, so that the morning still comes to about 1,000 to 1,100 words). Start from something concrete (a road, a blister, a bell, a bench, an early start, a stranger's
 kindness, a long flat afternoon) and let the passage open it. Say what the passage says, plainly. Say where it is hard. Say
-what it asks of an ordinary day. One or two sentences of honest doubt are worth more than a page of reassurance.
+what it might ask of a day on the road, in new words each day. One or two sentences of honest doubt are worth more than a page of reassurance.
 
 ## For the walk
 
@@ -47,7 +47,7 @@ what it asks of an ordinary day. One or two sentences of honest doubt are worth 
 
 ## At the end of the day
 
-450 to 580 words, written for the evening (an albergue bed, a bench, a quiet room): look back over the day that was lived with the
+about 450 to 540 words, written for the evening (an albergue bed, a bench, a quiet room): look back over the day that was lived with the
 passage in mind. Name what was hard and what was good. Say an honest word about tiredness. This is NOT the morning reflection again.
 
 - Two or three gentle questions, as a `-` list. The app shows exactly these as the reflection prompt, so write each as a
@@ -55,7 +55,7 @@ passage in mind. Name what was hard and what was good. Say an honest word about 
 
 ## A short prayer
 
-Three to six short sentences, in one italic paragraph (the books have no line breaks, so "lines" means short sentences). Original. Plain words, for the
+About 60 to 120 words: three to six short sentences, in one italic paragraph (the books have no line breaks, so "lines" means short sentences). Original. Plain words, for the
 end of the day. Open enough that a reader who prays differently, or who does not pray, can still say it as a wish.
 ```
 
@@ -77,6 +77,7 @@ is short of what was promised. "For the walk" is 60 to 200 words.
 - **Inside the prose, anything in quotation marks or in italics that reads as the classic's words must be exact too.** A near-miss ("if I only knew" for "if I but knew")
   is a misquotation, and the checker warns on text that is almost, but not exactly, in the source. Either copy it exactly (put it in the passage), or say it in your own
   words without quotation marks or italics. The writer's own words in quotation marks ("This is today's weight") are fine: they are not the classic's.
+- **To end a stretch inside a quotation, include the closing quotation mark in `--to`** (and the opening one in `--from` if you start at it): otherwise the tool warns that a mark is unclosed.
 - **The citation is checked by you.** The checker verifies the words, not the book and chapter named in the attribution line; read them off `tools/passage.py`.
 
 ## Keeping it fresh

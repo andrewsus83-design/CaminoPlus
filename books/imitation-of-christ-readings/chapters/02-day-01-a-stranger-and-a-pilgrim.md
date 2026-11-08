@@ -6,7 +6,7 @@
 
 > If thou wilt stand fast and wilt profit as thou oughtest, hold thyself as an exile and a pilgrim upon the earth. … Keep thyself as a stranger and a pilgrim upon the earth, to whom the things of the world appertain not. Keep thine heart free, and lifted up towards God, for here have we no continuing city.
 >
-> — Thomas à Kempis, *The Imitation of Christ*, Book 1, chapters 17 and 23 (tr. William Benham, 1886)
+> — Thomas à Kempis, *The Imitation of Christ*, Book 1, chapters 17 and 23 (tr. William Benham)
 
 ## Reflection
 

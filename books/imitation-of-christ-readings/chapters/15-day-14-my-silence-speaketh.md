@@ -6,7 +6,7 @@
 
 > O Jesus, Light of Eternal Glory, solace of the wandering soul, before Thee my mouth is without speech, and my silence speaketh to Thee. How long will my Lord delay to come unto me? Let Him come unto me, His poor and humble one, and make me glad. … “Behold, here I am! Behold, I come to thee, for thou didst call Me. Thy tears and the longing of thy soul, thy humbleness and contrition of heart have inclined Me, and brought Me to thee.”
 >
-> — Thomas à Kempis, *The Imitation of Christ*, Book 3, chapter 21 (tr. William Benham, 1886)
+> — Thomas à Kempis, *The Imitation of Christ*, Book 3, chapter 21 (tr. William Benham)
 
 ## Reflection
 

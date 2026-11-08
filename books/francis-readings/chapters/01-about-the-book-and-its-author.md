@@ -10,7 +10,7 @@ Gilbert Keith Chesterton lived from 1874 to 1936. He was an English journalist, 
 
 ## The book
 
-The book is a short life of Francis, about 44,000 words by our count, in ten chapters. Their titles run from "The Problem of St. Francis" and "Francis the Fighter" through *Le Jongleur de Dieu* (the minstrel and jester of God) and "The Little Poor Man" to "Miracles and Death" and "The Testament of St. Francis".
+The book is a short life of Francis, about 44,000 words by our count, in ten chapters. One of the chapter titles is French, *Le Jongleur de Dieu*, which means the minstrel and jester of God.
 
 Chesterton tells you at once what kind of book it is. A life of Francis, he says, can be written as secular history, as a devout work, or by an outsider who admires the man and cannot quite follow him. He chooses the third, and writes, he says, for "the ordinary modern man, sympathetic but sceptical". His key is a simple one: that "to this great mystic his religion was not a thing like a theory but a thing like a love-affair". He calls his own work "this thin and scratchy sketch".
 
@@ -32,6 +32,6 @@ Because the saint is a walker. Chesterton's Francis is, in his phrase, "a man al
 
 This is an English original, so there is no translator. We used the text published by Project Gutenberg as ebook number 63084, prepared from scans of an old printing by Hodder and Stoughton, of London and Toronto, in a series called the People's Library. It states no year, so 1923 is the well-known date and not one the file gives. Chesterton died in 1936, and the book is in the public domain. Every passage in these pages was checked against that text, word for word.
 
-The volunteers who prepared the text corrected obvious printer errors, regularised the hyphens and marked italics with underscores. We show those italics as italics, and otherwise changed nothing in the passages, not Chesterton's spelling, his punctuation, or even a *Cæsar*. Where we skip a stretch inside a passage, a mark like this shows it: …. The choice of the nine passages, their order, the reflections, the questions and the prayers are ours, and they are original. The passages come from Chapters III to X of the book, with Chapter VI used twice. Under each passage we give the chapter and its title, as they stand in the book.
+The volunteers who prepared the text corrected obvious printer errors, regularised the hyphens and marked italics with underscores. We show those italics as italics, and otherwise changed nothing in the passages, not Chesterton's spelling, his punctuation, or even a *Cæsar*. Where we skip a stretch inside a passage, a mark like this shows it: …. The choice of the nine passages, their order, the reflections, the questions and the prayers are ours, and they are original. The passages come from Chapters III to X of the book, with Chapter VI used twice.
 
 Nothing of the Project Gutenberg licence text or trademark is copied here.

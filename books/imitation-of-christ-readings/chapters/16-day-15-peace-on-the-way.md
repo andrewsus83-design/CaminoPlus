@@ -6,7 +6,7 @@
 
 > My peace is with the humble and lowly in heart. Thy peace shall be in much patience. … Yet never to feel any disquiet, nor to suffer any pain of heart or body, this belongeth not to the present life, but is the state of eternal rest. Therefore count not thyself to have found true peace, if thou hast felt no grief; nor that then all is well if thou hast no adversary; nor that this is perfect if all things fall out according to thy desire.
 >
-> — Thomas à Kempis, *The Imitation of Christ*, Book 3, chapter 25 (tr. William Benham, 1886)
+> — Thomas à Kempis, *The Imitation of Christ*, Book 3, chapter 25 (tr. William Benham)
 
 ## Reflection
 
