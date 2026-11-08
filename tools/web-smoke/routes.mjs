@@ -26,6 +26,9 @@ export const SAMPLE_PARAM = '00000000-0000-4000-8000-0000000000aa';
 export const SAMPLE_OVERRIDES = {
   // st1 is the id of a bundled sample stay (src/data/mock.ts), so the page shows a stay and not "Stay not found."
   '/stay/[id]': 'st1',
+  // the chapters of the Psalms and Psalm 121 (the reader), so that the sweep draws the real screens and not their "Not found"
+  '/library/bible/[code]': 'PSA',
+  '/library/bible/[code]/[chapter]': { code: 'PSA', chapter: '121' },
 };
 
 // ---------------------------------------------------------------- files -> routes

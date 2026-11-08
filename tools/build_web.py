@@ -282,13 +282,15 @@ TABS = [
    "Photos of you: buy shots other pilgrims took of you on the way <span class=\"tag gold\">Coming later</span>"],
   [("discover", "Discover full-screen stories"), ("discover-photos", "Photos of you marketplace")]),
  ("library", "book", "Library", "Scripture, books and notes for the road.",
-  "A search field and your bookmarks along the top, then three tabs: Bible, Books and Notes. The Bible tab opens with a banner for the daily reading and lists the books of the Bible in three parts: Old Testament, Deuterocanon and New Testament. The Books tab lists twelve free classics for the road. We are still choosing which Bible translation and which editions we are allowed to include, so those two tabs show examples today and say so. Notes is your private diary.",
-  [f"Bible and Books, one tab each, with the books of the Bible in three parts and twelve free classics {COMING}",
-   f"Search the Bible and the Books at once and bookmark what you find. Today the search looks through the examples {COMING}",
+  "A search field and your bookmarks along the top, then three tabs: Bible, Books and Notes. The Bible tab is real: all 73 books of the World English Bible, Catholic edition, a modern English translation in the public domain, are in the app, so you can read with no signal. It is not the translation read at Mass. A small banner for the daily reading comes first, then a pill to pick the part (Old Testament, Deuterocanon or New Testament) and the books of that part as square tiles. Tap a book, tap a chapter number and read; Previous and Next carry on across the books. The daily reading and the Books tab, twelve free classics for the road, are examples today, and the app says so. Notes is your private diary.",
+  ["The whole Bible in the app: 73 books of the World English Bible, Catholic edition (public domain), readable with no signal",
+   "Pick a part, tap a book, tap a chapter number and read. Previous and Next name where they go and carry on from book to book, and Continue reading takes you back to the chapter you left (remembered only on your phone)",
+   "Tap a verse to bookmark it or share it. The search finds verses by their words and opens the chapter at that verse",
+   f"The daily reading and the twelve free classics on the Books tab are examples for now {COMING}",
    "Bookmarks also keep the posts you bookmark on your journey",
    "Notes is a private diary: tap the gold button to write, and the page is saved on your phone as you type. Make words bold or italic, add headings and lists, and attach photos, videos and the place you are at",
    "Nothing in the diary is uploaded or shared, so it is not backed up either. It works without a signal and stays on your phone when you log out"],
-  [("library", "Library tab with a search field and a bookmarks button on top, the tabs Bible, Books and Notes, the banner for the daily reading, and the three parts of the Bible at the bottom"), ("diary-read", "A diary page with a heading, bold and italic text, a list, a quote, photos, a video and the place")]),
+  [("library", "Library tab with a search field and a bookmarks button on top, the tabs Bible, Books and Notes, a small banner for the daily reading, the pill that picks Old Testament, Deuterocanon or New Testament, and the books of the Bible as square tiles"), ("diary-read", "A diary page with a heading, bold and italic text, a list, a quote, photos, a video and the place")]),
 ]
 
 # The routes of the route picker, in the order of the database (supabase/migrations/..._more_caminos.sql).
@@ -867,6 +869,9 @@ LICENCES_DATA = [
  ("Wikimedia Commons", "Photos of places, where we use them", "Each file has its own licence (CC0, CC BY, CC BY-SA ...); the author and licence are credited where a photo is shown", "https://commons.wikimedia.org/wiki/Commons:Licensing"),
  ("AI-generated sample pictures and clips", "The sample journey in the app, shown before you have posts of your own", "Made by CaminoPlus with Google Nano Banana 2 and Veo 3.1 through OpenArt. AI-generated, not photographs of real places or people", "https://openart.ai/"),
 ]
+LICENCES_TEXT = [
+ ("World English Bible, Catholic edition", "The text of the Bible in the Library: 73 books, kept in the app, so it reads without a signal. Strong’s numbers, footnotes and cross references are not included", "Public domain. The name “World English Bible” is a trademark of eBible.org", "https://ebible.org/eng-web-c/"),
+]
 LICENCES_SOFTWARE = [
  ("Noto Sans", "Map label glyphs, bundled in the app so labels work offline", "SIL Open Font License 1.1", "https://openfontlicense.org/"),
  ("Fraunces", "Headlines in the app and on this website", "SIL Open Font License 1.1", "/assets/fonts/OFL-Fraunces.txt"),
@@ -894,6 +899,10 @@ def licences():
 <h2>Map and place data</h2>
 </div>
 {table(LICENCES_DATA)}
+<div class="prose">
+<h2>The Bible text</h2>
+</div>
+{table(LICENCES_TEXT)}
 <div class="prose">
 <h2>Software and fonts</h2>
 </div>
