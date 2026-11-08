@@ -158,7 +158,8 @@ check('the write card of Journey is cell 0 of the grid and nothing else changes 
   assert.match(card, /accessibilityLabel=\{JOURNEY_WRITE\.label\}/);
   assert.match(card, /export function WriteCard\(\{ width, height, onPress \}: \{ width: number; height: number; onPress: \(\) => void \}\)/, 'its size is the size of a post tile: the grid gives it');
   assert.match(card, /style=\{\(\{ pressed \}\) => \(\{ width, height, /);
-  assert.match(card, /<Icon name="pen" color=\{role\.onHighlight\}/, 'the pen on the gold circle');
+  assert.match(card, /<Icon name="pen" color=\{role\.onHighlight\} size=\{32\}/, 'the pen on the gold circle, 32 px: a step of the icon scale (it was 30, which is not one)');
+  assert.match(card, /gap: space\[4\], paddingHorizontal: space\[3\]/, 'the room inside the card is steps of the space scale (the gap was 14)');
   assert.match(card, /backgroundColor: role\.highlight/, 'a gold circle');
   assert.match(card, /<AppText variant="label" style=\{\{ textAlign: 'center' \}\}>\{JOURNEY_WRITE\.label\}<\/AppText>/, 'the words are the label style: 17 px');
   assert.deepEqual([...card.matchAll(/borderRadius: ([\w.]+)/g)].map((m) => m[1]), ['radius.pill'], 'square corners, like the post tiles: only the gold circle is round');

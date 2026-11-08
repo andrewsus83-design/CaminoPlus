@@ -5,7 +5,7 @@ import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
 import type { Post, PostMediaUrl } from '@/lib/api';
 import { localStore, userKey } from '@/lib/localStore';
-import { c, fonts, layout, radius, role } from '@/theme';
+import { fonts, layout, radius, role, space } from '@/theme';
 import { coverUrl, firstLetter, highlightLabel, nextHighlightIndex, parseSeen, rowStartOffset, type DayLike, type Highlight, type SeenSaved } from './highlights';
 import { allHint, allLabel } from './routePoints';
 
@@ -13,10 +13,12 @@ import { allHint, allLabel } from './routePoints';
 // phone: .highlights, .cp-ring, .cp-ring.seen, .add). What a highlight is and which posts belong to it is highlights.ts.
 // The first item at the left is "All": a round item with the shell, pinned there while the destinations scroll next to it. It opens the stamps, one for
 // every place of the Camino (AllPlaces.tsx, routePoints.ts). It is never "seen" or "unseen"; when its view is on, its ring is gold and its label bold.
-const RING = 66; // a 3 px ring around the 60 px picture
+// The words under a round are the caption variant (15 px, the smallest text there is) on one line of the item's width; a name that does not fit ends in "…" and
+// the item's label (the screen reader's) says it whole.
+const RING = 66; // a 3 px ring (a border, so it is a stroke and not a padding) around the 60 px picture
 const PICTURE = 60; // its outer 3 px are the page colour, so the picture sits clear of the ring, as in the design
 const ITEM_W = 72;
-const GAP = 16;
+const GAP = space[4];
 const SEEN_NAME = 'highlights.seen';
 
 /**
@@ -54,16 +56,16 @@ function useSeen(userId: string | null | undefined) {
 function AllItem({ visited, total, on, onPress }: { visited: number; total: number; on: boolean; onPress: () => void }) {
   const glyph = <Icon name="shell" color={role.action} size={28} />;
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={allLabel(visited, total)} accessibilityHint={allHint(on)} accessibilityState={{ selected: on }} aria-selected={on} onPress={onPress} style={{ width: ITEM_W, alignItems: 'center', gap: 6 }}>
+    <Pressable accessibilityRole="button" accessibilityLabel={allLabel(visited, total)} accessibilityHint={allHint(on)} accessibilityState={{ selected: on }} aria-selected={on} onPress={onPress} style={{ width: ITEM_W, alignItems: 'center', gap: space[2] }}>
       {on ? (
         // the ring of an opened highlight: gold, then the page colour, then the round itself
-        <View style={{ width: RING, height: RING, borderRadius: RING / 2, padding: 3, backgroundColor: c.gold }}>
+        <View style={{ width: RING, height: RING, borderRadius: RING / 2, borderWidth: 3, borderColor: role.highlight }}>
           <View style={{ width: PICTURE, height: PICTURE, borderRadius: PICTURE / 2, borderWidth: 3, borderColor: role.bg, backgroundColor: role.surface, alignItems: 'center', justifyContent: 'center' }}>{glyph}</View>
         </View>
       ) : (
         <View style={{ width: RING, height: RING, borderRadius: RING / 2, borderWidth: 1, borderColor: role.border, backgroundColor: role.surface, alignItems: 'center', justifyContent: 'center' }}>{glyph}</View>
       )}
-      <AppText variant="caption" numberOfLines={1} style={{ width: ITEM_W, textAlign: 'center', fontSize: 12, lineHeight: 16, letterSpacing: 0, fontFamily: on ? fonts.bodyBold : fonts.bodyMedium }}>All</AppText>
+      <AppText variant="caption" numberOfLines={1} style={{ width: ITEM_W, textAlign: 'center', fontFamily: on ? fonts.bodyBold : fonts.bodyMedium }}>All</AppText>
     </Pressable>
   );
 }
@@ -73,14 +75,14 @@ function Item({ h, cover, seen, active, onPress }: { h: Highlight<Post>; cover: 
   const [failed, setFailed] = useState<string | null>(null);
   const visited = h.state === 'visited';
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={highlightLabel(h, active)} onPress={onPress} style={{ width: ITEM_W, alignItems: 'center', gap: 6 }}>
+    <Pressable accessibilityRole="button" accessibilityLabel={highlightLabel(h, active)} onPress={onPress} style={{ width: ITEM_W, alignItems: 'center', gap: space[2] }}>
       {visited ? (
         // gold until it is opened, then the quiet strong border colour
-        <View style={{ width: RING, height: RING, borderRadius: RING / 2, padding: 3, backgroundColor: seen ? role.borderStrong : c.gold }}>
+        <View style={{ width: RING, height: RING, borderRadius: RING / 2, borderWidth: 3, borderColor: seen ? role.borderStrong : role.highlight }}>
           <View style={{ width: PICTURE, height: PICTURE, borderRadius: PICTURE / 2, borderWidth: 3, borderColor: role.bg, overflow: 'hidden', backgroundColor: role.sunken, alignItems: 'center', justifyContent: 'center' }}>
             {cover && cover !== failed
               ? <Image source={{ uri: cover }} resizeMode="cover" accessibilityIgnoresInvertColors onError={() => setFailed(cover)} style={{ width: '100%', height: '100%' }} />
-              : <AppText color={role.muted} style={{ fontFamily: fonts.title, fontSize: 24, lineHeight: 30 }}>{firstLetter(h.name)}</AppText>}
+              : <AppText variant="h4" color={role.muted}>{firstLetter(h.name)}</AppText>}
           </View>
         </View>
       ) : (
@@ -89,7 +91,7 @@ function Item({ h, cover, seen, active, onPress }: { h: Highlight<Post>; cover: 
           <Icon name="pin" color={role.muted} size={24} />
         </View>
       )}
-      <AppText variant="caption" numberOfLines={1} style={{ width: ITEM_W, textAlign: 'center', fontSize: 12, lineHeight: 16, letterSpacing: 0, fontFamily: active ? fonts.bodyBold : fonts.bodyMedium }}>{h.name}</AppText>
+      <AppText variant="caption" numberOfLines={1} style={{ width: ITEM_W, textAlign: 'center', fontFamily: active ? fonts.bodyBold : fonts.bodyMedium }}>{h.name}</AppText>
     </Pressable>
   );
 }
@@ -143,7 +145,7 @@ export function Highlights({ items, days, media, activeKey, userId, onPick, all 
 
   return (
     // reaches out to the screen edges (the screen pads its content by layout.screenMargin); next to the All item the margin on the left is the item's own
-    <View style={{ flexDirection: 'row', marginHorizontal: -layout.screenMargin, marginTop: 8, paddingLeft: pinned ? layout.screenMargin : 0 }}>
+    <View style={{ flexDirection: 'row', marginHorizontal: -layout.screenMargin, marginTop: space[2], paddingLeft: pinned ? layout.screenMargin : 0 }}>
       {pinned && <AllItem visited={all.visited} total={all.total} on={all.on} onPress={all.onPress} />}
       {items.length > 0 && (
         <ScrollView
@@ -152,7 +154,7 @@ export function Highlights({ items, days, media, activeKey, userId, onPick, all 
           showsHorizontalScrollIndicator={false}
           onContentSizeChange={placeAtNext}
           style={{ flex: 1, marginLeft: pinned ? GAP : 0 }}
-          contentContainerStyle={{ paddingLeft: pinned ? 0 : layout.screenMargin, paddingRight: layout.screenMargin, paddingVertical: 2, gap: GAP }}
+          contentContainerStyle={{ paddingLeft: pinned ? 0 : layout.screenMargin, paddingRight: layout.screenMargin, gap: GAP }}
         >
           {items.map((h) => (
             <Item key={h.key} h={h} cover={coverUrl(h.posts, media)} seen={seen.has(h.key)} active={h.key === activeKey} onPress={() => press(h)} />
@@ -166,7 +168,7 @@ export function Highlights({ items, days, media, activeKey, userId, onPick, all 
 /** The slim bar above the Journey grid while it shows one destination of the row: "Hontanas · Show all", the cross clears the filter. One button, at least 48 high. */
 export function ShowAllBar({ name, onPress }: { name: string; onPress: () => void }) {
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel="Show all posts" accessibilityHint={`Now showing ${name}`} onPress={onPress} style={{ minHeight: 48, flexDirection: 'row', alignItems: 'center', gap: 8, paddingLeft: 16, paddingRight: 14, borderRadius: radius.pill, backgroundColor: role.surface, borderWidth: 1, borderColor: role.border }}>
+    <Pressable accessibilityRole="button" accessibilityLabel="Show all posts" accessibilityHint={`Now showing ${name}`} onPress={onPress} style={{ minHeight: 48, flexDirection: 'row', alignItems: 'center', gap: space[2], paddingHorizontal: space[4], borderRadius: radius.pill, backgroundColor: role.surface, borderWidth: 1, borderColor: role.border }}>
       {/* a long name gives way (…), never the words "Show all" */}
       <AppText variant="label" numberOfLines={1} style={{ flexShrink: 1 }}>{name}</AppText>
       <AppText variant="label" color={role.accentText} numberOfLines={1} style={{ flexShrink: 0 }}>· Show all</AppText>

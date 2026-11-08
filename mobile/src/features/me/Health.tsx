@@ -1,9 +1,10 @@
+import type { ReactNode } from 'react';
 import { Pressable, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { AppText } from '@/components/AppText';
 import { Icon, IconName } from '@/components/Icon';
 import { Card } from '@/components/ui';
-import { c, radius, role } from '@/theme';
+import { c, layout, radius, role, space } from '@/theme';
 
 // Health tab: numbers from a connected smartwatch, then walking tips.
 // No watch pairing yet (needs the next native build), so metrics show a dash until then.
@@ -26,43 +27,53 @@ const TIPS = [
   { title: 'Protect your skin', body: 'Sunscreen, a hat and sunglasses, even on cloudy days. Reapply at lunch.' },
 ];
 
+/** The round behind the watch on the hero card: the cream of the card's own words (role.onInverse) at 14%, a layer of its own so that the icon above it keeps its full colour. */
+function WatchRound({ children }: { children: ReactNode }) {
+  return (
+    <View style={{ width: 56, height: 56, alignItems: 'center', justifyContent: 'center' }}>
+      <View style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, borderRadius: radius.pill, backgroundColor: role.onInverse, opacity: 0.14 }} />
+      {children}
+    </View>
+  );
+}
+
 export function Health({ watchConnected = false }: { watchConnected?: boolean }) {
   const router = useRouter();
   const tip = TIPS[Math.floor(Date.now() / 86400000) % TIPS.length];
   return (
-    <View style={{ gap: 16 }}>
+    <View style={{ gap: space[4] }}>
       {!watchConnected && (
-        <Pressable accessibilityRole="button" onPress={() => router.push('/watches')} style={{ borderRadius: radius.lg, backgroundColor: role.inverse, padding: 20, flexDirection: 'row', alignItems: 'center', gap: 16 }}>
-          <View style={{ width: 56, height: 56, borderRadius: radius.pill, backgroundColor: 'rgba(246,239,226,0.14)', alignItems: 'center', justifyContent: 'center' }}>
-            <Icon name="watch" color={c.goldBright} size={30} />
-          </View>
-          <View style={{ flex: 1, gap: 2 }}>
+        <Pressable accessibilityRole="button" onPress={() => router.push('/watches')} style={{ borderRadius: radius.lg, backgroundColor: role.inverse, padding: layout.cardPadding, flexDirection: 'row', alignItems: 'center', gap: space[4] }}>
+          <WatchRound>
+            <Icon name="watch" color={c.goldBright} size={32} />
+          </WatchRound>
+          <View style={{ flex: 1, gap: space[1] }}>
             <AppText variant="label" color={role.onInverse}>Connect your smartwatch</AppText>
             <AppText variant="small" color={role.onInverse} style={{ opacity: 0.85 }}>See your steps, heart rate and sleep here.</AppText>
           </View>
-          <Icon name="chevron" color={c.gold} size={22} />
+          <Icon name="chevron" color={role.highlight} size={24} />
         </Pressable>
       )}
 
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space[3] }}>
         {METRICS.map((m) => (
-          <Card key={m.id} style={{ width: '48%', flexGrow: 1, gap: 6, padding: 16 }}>
-            <Icon name={m.icon} color={m.id === 'hr' || m.id === 'rest' ? c.red : c.blue} size={22} />
+          <Card key={m.id} style={{ width: '48%', flexGrow: 1, gap: space[2], padding: space[4] }}>
+            <Icon name={m.icon} color={m.id === 'hr' || m.id === 'rest' ? role.danger : role.action} size={24} />
             <AppText variant="h3">–</AppText>
             <AppText variant="caption" muted>{m.label} · {m.unit}</AppText>
           </Card>
         ))}
       </View>
 
-      <Card style={{ gap: 8, backgroundColor: c.goldWash }}>
-        <AppText variant="mono" color={role.accentText} style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 1.2 }}>Tip of the day</AppText>
+      <Card style={{ gap: space[2], backgroundColor: c.goldWash }}>
+        <AppText variant="mono" color={role.accentText} style={{ textTransform: 'uppercase' }}>Tip of the day</AppText>
         <AppText variant="h4">{tip.title}</AppText>
         <AppText variant="small">{tip.body}</AppText>
       </Card>
 
       <AppText variant="label">More tips for the walk</AppText>
       {TIPS.filter((t) => t !== tip).map((t) => (
-        <Card key={t.title} style={{ gap: 4 }}>
+        <Card key={t.title} style={{ gap: space[1] }}>
           <AppText variant="label">{t.title}</AppText>
           <AppText variant="small" muted>{t.body}</AppText>
         </Card>

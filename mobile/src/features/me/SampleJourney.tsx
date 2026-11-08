@@ -1,7 +1,7 @@
 import { View } from 'react-native';
 import { AppText } from '@/components/AppText';
 import { SAMPLE_BANNER } from '@/lib/sampleJourney';
-import { c, radius, role } from '@/theme';
+import { radius, role, space } from '@/theme';
 import { JourneyGrid } from './JourneyGrid';
 import { SAMPLE } from './sampleJourneyAssets';
 
@@ -13,7 +13,7 @@ import { SAMPLE } from './sampleJourneyAssets';
 export function SampleJourney() {
   return (
     <>
-      <View accessibilityLabel="Sample journey" style={{ alignSelf: 'center', paddingHorizontal: 14, paddingVertical: 8, borderRadius: radius.pill, backgroundColor: c.sand200 }}>
+      <View accessibilityLabel="Sample journey" style={{ alignSelf: 'center', paddingHorizontal: space[4], paddingVertical: space[2], borderRadius: radius.pill, backgroundColor: role.sunken }}>
         <AppText variant="caption" color={role.text} style={{ textAlign: 'center' }}>{SAMPLE_BANNER}</AppText>
       </View>
       <JourneyGrid posts={SAMPLE.posts} sample={SAMPLE.media} />
