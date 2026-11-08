@@ -64,19 +64,19 @@ check('the Books tab on the page: the strip with Books on, the compact banner wi
   }
 });
 
-check('a cover on the page is a cover of the app: each book once, ONE button named "title, kind, time" with its own ribbon beside it (not inside), the kind and the time under the title, in the sizes of cover.ts', () => {
+check('a cover on the page is a cover of the app: each book once, ONE button named "title, kind, time" with its own ribbon beside it (not inside), the time under the title and no kind line, in the sizes of cover.ts', () => {
   const shelvesText = `${phoneOf('Library · Books')}${phoneOf('Books · second shelf')}`;
   const g = coverGrid(390, 16);
   for (const b of BOOK_CATALOG) {
     const label = `aria-label="${esc(coverLabel(b))}"`;
     assert.equal(count(shelvesText, new RegExp(label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')), 1, `${b.id}: its cover is on the page once`);
     const t = coverText(b, g.tile);
-    assert.ok(shelvesText.includes(`<span class="bk-time" style="font-size:${t.m.time.size}px;line-height:${t.m.time.lineHeight}px">${esc(formatMinutes(b.minutes))}</span>`), `${b.id}: the time under the kind`);
-    assert.ok(shelvesText.includes(t.kind.lines.map(esc).join('<br>')), `${b.id}: the kind of book`);
+    assert.ok(shelvesText.includes(`<span class="bk-time" style="font-size:${t.m.time.size}px;line-height:${t.m.time.lineHeight}px">${esc(formatMinutes(b.minutes))}</span>`), `${b.id}: the time under the title, the mono token (15 on 22)`);
     assert.ok(shelvesText.includes(t.title.lines.map(esc).join('<br>')), `${b.id}: the title broken where cover.ts measured it`);
     assert.ok(shelvesText.includes(`aria-label="Bookmark: ${esc(b.title)}"`) || shelvesText.includes(`aria-label="Remove bookmark: ${esc(b.title)}"`), `${b.id}: the ribbon`);
   }
   assert.equal(count(shelvesText, /class="bk-cover"/g), BOOK_CATALOG.length);
+  assert.doesNotMatch(shelvesText, /bk-kind|PILGRIM'S GUIDE|READINGS FOR THE WAY/, 'no cover has the kind of book printed on it (the book page has it, and the label of the cover says it)');
   assert.equal(count(shelvesText, /<\/div><button class="bk-ribbon/g), BOOK_CATALOG.length, 'the ribbon is next to the button of the cover, not inside it');
   assert.equal(count(shelvesText, /width:44px;height:44px"><span class="rb"/g), BOOK_CATALOG.length, 'every ribbon is a 44 by 44 button');
   assert.match(shelvesText, new RegExp(`width:${g.tile}px;height:${g.height}px`), `a cover is ${g.tile} by ${g.height} on a 390 phone`);

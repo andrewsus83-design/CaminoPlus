@@ -104,8 +104,8 @@ check('the four fonts keep their roles, as the brand design system says: Fraunce
 check('each text is in its role: titles and headings are the Fraunces variants (h1 to h4), the numbers, the era and the chips are mono, the running text of the reader and the page is Inter', () => {
   const cover = src['BookCover.tsx'];
   assert.match(cover, /variant="h4"[^\n]*(?:\n[^\n]*){0,2}color=\{INK\}[\s\S]{0,200}text\.title\.lines\.join/, 'the title of a cover is Fraunces');
-  assert.match(cover, /variant="label"[\s\S]{0,420}text\.kind\.lines\.join/, 'the kind of book is Inter, in small spaced capitals');
-  assert.match(cover, /variant="mono"[^\n]*>\{text\.time\}</, 'the time is JetBrains Mono');
+  assert.doesNotMatch(cover, /\.kind\b|variant="label"/, 'the kind of book is not printed on the cover: the page shows it and the label says it');
+  assert.match(cover, /<AppText variant="mono" maxFontSizeMultiplier=\{1\} numberOfLines=\{1\} color=\{INK\} style=\{\{ textAlign: 'center' \}\}>\{text\.time\}<\/AppText>/, 'the time is JetBrains Mono at the mono token, with no size of its own');
   const page = src['BookPage.tsx'];
   assert.match(page, /<AppText variant="h3" accessibilityRole="header" style=\{\{ textAlign: 'center' \}\}>\{book\.title\}<\/AppText>/, 'the title of the book is Fraunces');
   assert.match(page, /<AppText variant="mono" color=\{role\.muted\} style=\{\{ fontSize: 12, lineHeight: 16, letterSpacing: 1 \}\}>\{kindName\(kind\)\.toUpperCase\(\)\}<\/AppText>/, 'the kind of book is a mono mark');
@@ -201,8 +201,8 @@ check('the words of a cover never grow with the phone\'s text size (the cover is
   assert.equal(count(cover, /<AppText\b/g), count(cover, /maxFontSizeMultiplier=\{1\}/g), 'every text of a cover has a multiplier of 1');
   assert.match(cover, /\{text\.title\.lines\.join\('\\n'\)\}/, 'the title breaks where cover.ts measured it');
   assert.match(cover, /numberOfLines=\{text\.title\.lines\.length\} adjustsFontSizeToFit minimumFontScale=\{0\.8\}/, 'and shrinks if a phone sets a word wider than the table says');
-  assert.match(cover, /\{text\.kind\.lines\.join\('\\n'\)\}/);
   assert.match(cover, /const text = coverText\(book, width\);/);
+  assert.doesNotMatch(cover, /marginTop: 4|fontSize: m\.time|lineHeight: m\.time/, 'the time has the mono token and the gaps of cover.ts, nothing of its own');
 });
 
 check('the Books tab: the books as covers in two columns on one shelf for each kind, that open the book page, each with the ribbon that keeps the bookmark under "books:<id>"', () => {

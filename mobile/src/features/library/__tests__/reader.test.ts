@@ -945,7 +945,7 @@ check('the Bible tiles of the design page are what the app draws: five grids (th
   assert.match(tileHtml(BIBLE_BOOKS.find((b) => b.name === 'Genesis')!, 390), /^<button class="lib-tile" aria-label="Genesis, 50 chapters"><span class="nm h4">Genesis<\/span><span class="ct">50&nbsp;chapters<\/span><\/button>$/);
   assert.match(tileHtml(BIBLE_BOOKS.find((b) => b.name === 'Song of Songs')!, 390), /<span class="nm h4">Song of<br>Songs<\/span>/);
   // the style of a tile: the padding, the gap, the radius, the type and the height are tokens (var(--cp-*)) and nothing typed
-  const style = page.slice(page.indexOf('.lib-grid {'), page.indexOf('.cont-card {'));
+  const style = page.slice(page.indexOf('.lib-grid {'), page.indexOf('.phone[style*="width:320px"] .cp-tabbar'));
   assert.ok(style.includes('.lib-tile {') && style.includes('.lib-tile .ct {') && style.includes('.lib-grid.narrow {'), 'the rules of the grid and of a tile are where they were');
   assert.doesNotMatch(style, /\d(?:\.\d+)?px|\d(?:\.\d+)?rem|\d(?:\.\d+)?em\b/, 'no number of pixels in the rules of a tile: every one is a token');
   assert.match(style, /\.lib-grid \{ --tp: var\(--cp-space-4\); --tg: var\(--cp-space-3\);/, 'padding space.4 and gap space.3');
