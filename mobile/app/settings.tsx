@@ -83,6 +83,11 @@ export default function Settings() {
             <AppText variant="label" style={{ flex: 1 }}>Blocked pilgrims</AppText>
             <Icon name="chevron" color={role.action} size={20} />
           </Pressable>
+          <Pressable accessibilityRole="button" accessibilityLabel="Shared links" onPress={() => router.push('/shared-links')} style={{ minHeight: 56, flexDirection: 'row', alignItems: 'center', gap: space[4], paddingHorizontal: space[4], borderTopWidth: 1, borderTopColor: role.border }}>
+            <Icon name="share" color={role.action} size={24} />
+            <AppText variant="label" style={{ flex: 1 }}>Shared links</AppText>
+            <Icon name="chevron" color={role.action} size={20} />
+          </Pressable>
         </Card>
       </View>
       <View style={{ gap: space[2] }}>
