@@ -4,7 +4,6 @@ import { useFocusEffect, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
-import { Pill } from '@/components/Pill';
 import { confirmDelete } from '@/features/diary/confirm';
 import { device } from '@/features/diary/device';
 import { MediaViewer } from '@/features/diary/MediaTiles';
@@ -19,10 +18,7 @@ import { layout, radius, role } from '@/theme';
 import { NoteMenu } from './NoteMenu';
 import { NoteRow, type NoteActions, type NoteWho } from './NoteRow';
 import { NotesHeader } from './NotesHeader';
-import {
-  DELETE_FAILED, EMPTY_BUTTON, EMPTY_TEXT, EMPTY_TITLE, FILTER_EMPTY, LOADING_LABEL, MAPS_FAILED, SHARE_FAILED, SHOW_ALL,
-  feedState, filterNotes, identity, noteCounts, toggled, type NoteFilter, type Telling,
-} from './timeline';
+import { DELETE_FAILED, EMPTY_TEXT, EMPTY_TITLE, LOADING_LABEL, MAPS_FAILED, SHARE_FAILED, feedState, identity, toggled, type Telling } from './timeline';
 
 // The Notes feed of Me: the pages of the diary as a feed, like a timeline. They are the same pages as My diary (features/diary), private,
 // only on this phone: this tab reads them through useDiary and deletes through the same call; it writes nothing and sends nothing anywhere.
@@ -32,8 +28,8 @@ import {
 // 2,000 notes draws only the rows that are on screen, and pull to refresh belongs to it. Mount it in a box that has a height of its own (flex: 1,
 // never inside a ScrollView) and that is as wide as the screen: the rows run from edge to edge and are parted by a hairline. Everything that sits
 // above the notes on Me (the profile, the highlights, the strip of sub-tabs) is `top`: the first thing in the list, so it scrolls away with the
-// notes, and it brings its own margins. The tab leaves room at the bottom for the floating tab bar and for the gold pen, which Me draws (this
-// tab draws no pen of its own).
+// notes, and it brings its own margins. The card that writes a note comes right after it, then the notes: no filter, one list, newest first. The tab leaves
+// room at the bottom for the floating tab bar and for the chat button, which Me draws (this tab draws no floating button of its own).
 
 const keyOf = (e: DiaryEntry) => e.id;
 
@@ -66,8 +62,8 @@ function tell(m: Telling) {
   Alert.alert(m.title, m.text);
 }
 
-/** The friendly page the feed shows when there is nothing to list: the diary has no note, or the filter holds none. */
-function Empty({ title, text, button, ghost, onPress }: { title: string; text: string; button: string; ghost?: boolean; onPress: () => void }) {
+/** The friendly page the feed shows when the diary has no note. It has no button of its own: the card above it is the way in. */
+function Empty({ title, text }: { title: string; text: string }) {
   return (
     <View style={{ alignItems: 'center', gap: 12, paddingHorizontal: 32, paddingTop: 24, paddingBottom: 24 }}>
       <View style={{ width: 56, height: 56, borderRadius: radius.pill, backgroundColor: role.highlight, alignItems: 'center', justifyContent: 'center' }}>
@@ -75,9 +71,6 @@ function Empty({ title, text, button, ghost, onPress }: { title: string; text: s
       </View>
       <AppText variant="h4" accessibilityRole="header" style={{ textAlign: 'center' }}>{title}</AppText>
       <AppText variant="small" muted style={{ textAlign: 'center' }}>{text}</AppText>
-      <View style={{ alignSelf: 'stretch', marginTop: 8 }}>
-        <Pill large variant={ghost ? 'ghost' : 'primary'} label={button} onPress={onPress} />
-      </View>
     </View>
   );
 }
@@ -89,16 +82,13 @@ export function NotesTab({ top }: { top?: ReactNode }) {
   const { uid, ready, entries, remove, reload } = useDiary();
   const owner = uid ?? '';
   const [now, tick] = useNow();
-  const [filter, setFilter] = useState<NoteFilter>('all');
   const [opened, setOpened] = useState<ReadonlySet<string>>(() => new Set());
   const [menuFor, setMenuFor] = useState<DiaryEntry | null>(null);
   const [viewing, setViewing] = useState<{ id: string; start: number } | null>(null);
   const [refreshing, setRefreshing] = useState(false);
 
   const who = useMemo<NoteWho>(() => ({ ...identity(profile), photo: profile?.avatar_url ?? null, seed: uid ?? 'me' }), [profile, uid]);
-  const counts = useMemo(() => noteCounts(entries), [entries]);
-  const shown = useMemo(() => filterNotes(entries, filter), [entries, filter]);
-  const state = feedState({ ready, total: entries.length, shown: shown.length });
+  const state = feedState({ ready, total: entries.length });
 
   const write = useCallback(() => router.push('/diary/new'), [router]);
   const open = useCallback((id: string) => router.push(`/diary/${id}`), [router]);
@@ -158,15 +148,13 @@ export function NotesTab({ top }: { top?: ReactNode }) {
   const header = (
     <>
       {top}
-      <NotesHeader name={who.name} photo={who.photo} seed={who.seed} onWrite={write} filter={filter} counts={counts} onFilter={setFilter} />
+      <NotesHeader onWrite={write} />
     </>
   );
   const empty = state === 'loading' ? (
     <ActivityIndicator accessibilityLabel={LOADING_LABEL} color={role.action} style={{ marginTop: 40 }} />
   ) : state === 'empty' ? (
-    <Empty title={EMPTY_TITLE} text={EMPTY_TEXT} button={EMPTY_BUTTON} onPress={write} />
-  ) : state === 'none-for-filter' && filter !== 'all' ? (
-    <Empty title={FILTER_EMPTY[filter].title} text={FILTER_EMPTY[filter].text} button={SHOW_ALL} ghost onPress={() => setFilter('all')} />
+    <Empty title={EMPTY_TITLE} text={EMPTY_TEXT} />
   ) : undefined;
   const overlays = (
     <>
@@ -178,7 +166,7 @@ export function NotesTab({ top }: { top?: ReactNode }) {
   return (
     <View style={{ flex: 1, backgroundColor: role.bg }}>
       <FlatList
-        data={shown}
+        data={entries}
         keyExtractor={keyOf}
         renderItem={renderItem}
         extraData={extra}

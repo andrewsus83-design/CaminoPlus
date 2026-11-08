@@ -3,10 +3,10 @@
 //
 // The tab bar is Me, Stays, Maps, Discover, Library. Settings is not a tab: it is a screen of its own, opened from the
 // gear at the top right of Me. Library has no title: its top row is a search field and the round Bookmarks button in the corner
-// (the size of Me's bell and gear); directly under it the two tabs Bible and Books, then the banner of the tab (both have one). On Bible three
+// (the size of Me's gear); directly under it the two tabs Bible and Books, then the banner of the tab (both have one). On Bible three
 // choices sit in the page under the compact banner (Old Testament, Deuterocanon, New Testament, a segmented pill) and the books of that part are
-// compact tiles, two in a row. The diary is not in the Library: it is the first sub-tab of Me (Notes, Journey, Plan, Health), and the one gold pen of Me follows
-// the sub-tab. These checks fail when someone brings a tab back without its icon (the tab bar would crash on it), when a route file and the tab
+// compact tiles, two in a row. The diary is not in the Library: it is the first sub-tab of Me (Notes, Journey, Plan, Health), and the one gold button of Me is the chat
+// button, the same on every sub-tab (it opens the inbox; the bell is gone, the header keeps only the gear). These checks fail when someone brings a tab back without its icon (the tab bar would crash on it), when a route file and the tab
 // list disagree, when a link still points at the old Settings tab, or when the Library or Me drift from the design page.
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
@@ -16,13 +16,21 @@ import { BOOK_CATALOG } from '../../features/library/books/catalog';
 import { shelves } from '../../features/library/books/copy';
 import { coverLabel } from '../../features/library/books/cover';
 import { BIBLE_SOURCE_LINE, LIBRARY_TABS, ROW_TABS } from '../../features/library/sample';
-import { ME_FAB, ME_TABS } from '../../features/me/tabs';
+import { ME_FAB } from '../../features/me/tabs';
 
 let n = 0;
 const check = (name: string, fn: () => void) => { fn(); n += 1; console.log(`ok   ${name}`); };
 const root = process.cwd(); // npm test runs from mobile/
 const read = (p: string) => readFileSync(join(root, p), 'utf8');
 const exists = (p: string) => existsSync(join(root, p));
+/** One phone of the design page: from its label to the next phone's label, and nothing of the phones around it. */
+const designPhone = (label: string): string => {
+  const design = readFileSync(join(root, '..', 'design', 'index.html'), 'utf8');
+  const start = design.indexOf(`<p class="phone-label"><b>${label}</b>`);
+  assert.ok(start > 0, `the design page has no phone "${label}"`);
+  const next = design.indexOf('<p class="phone-label">', start + 10);
+  return design.slice(start, next > 0 ? next : undefined);
+};
 
 function sources(dir: string): string[] {
   const out: string[] = [];
@@ -99,11 +107,12 @@ check('Settings has Back, light/dark and log out, and keeps no room for a tab ba
   assert.match(read(join('src', 'components', 'Screen.tsx')), /tabBar = true/);
 });
 
-check('Me opens Settings from a gear at the top right: after the inbox bell, in the same header row', () => {
+check('Me opens Settings from a gear at the top right, the only button there: the inbox is the chat button at the bottom right, and there is no bell in the header', () => {
   const src = read(join('app', '(tabs)', 'me.tsx'));
-  const bell = src.indexOf('<IconButton name="bell"');
   const gear = src.indexOf('<IconButton name="settings"');
-  assert.ok(bell > 0 && gear > bell, 'the gear comes after the bell, so it is the right-most button');
+  assert.ok(gear > 0, 'the gear is there');
+  assert.doesNotMatch(src, /<IconButton name="bell"/, 'the bell is gone: its job moved to the chat button');
+  assert.equal((src.match(/<IconButton\b/g) ?? []).length, 1, 'the gear is the only IconButton of Me: nothing else sits at the top right');
   assert.match(src.slice(gear, gear + 200), /router\.push\('\/settings'\)/);
   assert.match(src.slice(gear, gear + 200), /label="Settings"/);
 });
@@ -114,8 +123,7 @@ check('the My Camino card stays on Me, with its Change button, in the app and in
   assert.match(me, /My Camino/);
   assert.match(me, /<AppText variant="label" color=\{role\.onHighlight\}>Change<\/AppText>/);
   assert.match(me, /router\.push\('\/change-camino'\)/);
-  const design = readFileSync(join(root, '..', 'design', 'index.html'), 'utf8');
-  const phone = design.slice(design.indexOf('<b>Me · Journey</b>'), design.indexOf('<b>Me · Write · Pick photos</b>'));
+  const phone = designPhone('Me · Journey'); // exactly that phone: Me · Journey, grid, after it, has its own copy of the card and its own handwritten note
   assert.ok(phone.length > 1000, 'the Me · Journey phone was not found in design/index.html');
   assert.match(phone, />My Camino</, 'the design page lost the My Camino card');
   assert.match(phone, />Change</, 'the design page lost the Change button');
@@ -127,8 +135,7 @@ check('"My Camino" on the card is set in Fraunces, the brand title font, in the 
   assert.match(line, /variant="h4"/, 'the My Camino label is not an h4 (Fraunces 600) AppText');
   assert.doesNotMatch(line, /textTransform|fontFamily/, 'the My Camino label carries a font of its own');
   assert.match(read(join('src', 'theme', 'index.ts')), /title: 'Fraunces_600SemiBold'/);
-  const design = readFileSync(join(root, '..', 'design', 'index.html'), 'utf8');
-  const phone = design.slice(design.indexOf('<b>Me · Journey</b>'), design.indexOf('<b>Me · Write · Pick photos</b>'));
+  const phone = designPhone('Me · Journey'); // exactly that phone: Me · Journey, grid, after it, has its own copy of the card and its own handwritten note
   assert.match(phone, /font-family:var\(--cp-font-title\);[^"]*">My Camino</, 'the design card label is not Fraunces');
 });
 
@@ -141,11 +148,10 @@ check('Buen Camino! is Caveat Bold, as the brand design system says: the accent 
   }
   assert.match(read(join('src', 'theme', 'index.ts')), /accent: 'Caveat_700Bold'/);
   // design page: the card uses the accent font at weight 700, and the phone has no second Caveat (brand: max one per design)
-  const design = readFileSync(join(root, '..', 'design', 'index.html'), 'utf8');
-  const phone = design.slice(design.indexOf('<b>Me · Journey</b>'), design.indexOf('<b>Me · Write · Pick photos</b>'));
+  const phone = designPhone('Me · Journey'); // exactly that phone: Me · Journey, grid, after it, has its own copy of the card and its own handwritten note
   assert.match(phone, /font-family:var\(--cp-font-accent\);font-weight:700;[^"]*">Buen Camino!</, 'the design card is not Caveat Bold');
   assert.equal((phone.match(/--cp-font-accent/g) ?? []).length, 1, 'more than one Caveat note on the Me phone');
-  assert.match(design, /--cp-font-accent|tokens\.css/);
+  assert.match(readFileSync(join(root, '..', 'design', 'index.html'), 'utf8'), /--cp-font-accent|tokens\.css/);
 });
 
 check('after a light/dark switch the app returns to Settings with Me underneath, so Back still works', () => {
@@ -153,20 +159,15 @@ check('after a light/dark switch the app returns to Settings with Me underneath,
   assert.match(layout, /consumeReturnToSettings\(\)\) return;\n\s+setTimeout\(\(\) => \{ try \{ router\.replace\('\/me'\); router\.push\('\/settings'\); \} catch/);
 });
 
-check('one Fab for every floating gold button, and Me draws exactly one at a time: a note on Notes, a journey post on Journey, none on Plan and Health; the Library has none; both sit just above the tab bar', () => {
+check('one Fab for every floating gold button, and Me draws exactly one, the chat button, on every sub-tab (it opens the inbox); the Library has none; it sits just above the tab bar', () => {
   const fab = read(join('src', 'components', 'Fab.tsx'));
   const bar = read(join('src', 'components', 'TabBar.tsx'));
   const me = read(join('app', '(tabs)', 'me.tsx'));
   assert.equal((me.match(/<Fab\b/g) ?? []).length, 1, 'one Fab element in the whole of Me: never two at once');
-  assert.match(me, /const fab = ME_FAB\[tab\];/);
-  assert.match(me, /\{fab && <Fab label=\{fab\.label\} icon=\{fab\.icon\} onPress=\{\(\) => router\.push\(fab\.href\)\} \/>\}/, 'the label, the icon and the route come from the table of the sub-tabs');
-  assert.deepEqual(ME_FAB.Notes, { label: 'Write a note', icon: 'compose', href: '/diary/new' });
-  assert.deepEqual(ME_FAB.Journey, { label: 'Write a journey post', icon: 'pen', href: '/write' });
-  assert.equal(ME_FAB.Plan, null);
-  assert.equal(ME_FAB.Health, null);
-  assert.deepEqual(Object.keys(ME_FAB), [...ME_TABS], 'every sub-tab has an entry, so none is forgotten');
-  assert.equal(Object.values(ME_FAB).filter(Boolean).length, 2, 'two sub-tabs have a button and each has one');
-  assert.doesNotMatch(read(join('app', '(tabs)', 'library.tsx')), /<Fab\b|\bFab\b/, 'the Library has no gold pen: writing is on Me');
+  assert.match(me, /<Fab label=\{inboxLabel\(unread\.total\)\} icon=\{ME_FAB\.icon\} hint=\{ME_FAB\.hint\} badge=\{badgeText\(unread\.total\)\} onPress=\{openInbox\} \/>/, 'the label, the badge and the route come from features/me/tabs.ts, and the button has no condition');
+  assert.doesNotMatch(me, /ME_FAB\[|const fab = |\{fab &&/, 'one button for every sub-tab: no table by sub-tab, none that could be missing');
+  assert.deepEqual(ME_FAB, { icon: 'chat', href: '/inbox', label: 'Inbox', hint: 'Opens your notifications, messages and groups' });
+  assert.doesNotMatch(read(join('app', '(tabs)', 'library.tsx')), /<Fab\b|\bFab\b/, 'the Library has no gold button: the chat button is on Me');
   // the FAB's offset is the tab bar's own numbers: bottom Math.max(inset - 14, 10), height 88, and 8 above it
   assert.match(bar, /Math\.max\(insets\.bottom - 14, 10\)/);
   assert.match(bar, /height: 88/);
@@ -191,7 +192,7 @@ check('Library has no title and no diary button: its first row is the search fie
   assert.ok(hidden > 0 && header > hidden, 'the hidden heading comes first, then the header row');
   // where the button leads: decided by the screen, in one place
   assert.match(screen, /<LibraryHeader query=\{query\} onQuery=\{setQuery\} onBookmarks=\{\(\) => router\.push\('\/library\/bookmarks'\)\} onSearchFocus=\{prepareSearch\} \/>/);
-  // the row: search field, then Bookmarks and nothing else; the button is the size of Me's bell and gear (52) and labelled with a hint
+  // the row: search field, then Bookmarks and nothing else; the button is the size of Me's gear (52) and labelled with a hint
   const row = read(join('src', 'features', 'library', 'LibraryHeader.tsx'));
   const search = row.indexOf('<SearchBar ');
   const bookmarks = row.indexOf('<IconButton name="bookmark"');
@@ -202,7 +203,7 @@ check('Library has no title and no diary button: its first row is the search fie
   assert.match(row, /import \{ IconButton \} from '@\/components\/ui';/, 'the same button as Me\'s');
   assert.match(row, /flexDirection: 'row', alignItems: 'center', gap: 8/);
   const me = read(join('app', '(tabs)', 'me.tsx'));
-  assert.match(me.slice(me.indexOf('<IconButton name="bell"')), /size=\{52\}/, 'Me\'s buttons are 52 too');
+  assert.match(me.slice(me.indexOf('<IconButton name="settings"')), /size=\{52\}/, 'Me\'s gear is 52 too');
   assert.match(read(join('src', 'components', 'ui.tsx')), /accessibilityHint=\{hint\}/);
   // the glyphs stay: the diary's spiral notebook is its own drawing, not the Bible's closed book with a cross, not the open book of the tab,
   // and not the bookmark next to it (the Notes feed of Me, or anything else, may use it)
@@ -473,9 +474,13 @@ check('the design page shows the same Library: the two tabs Bible and Books, the
   assert.equal(count(all, /class="cp-subtabs"/g), 6, 'six Library phones have the tab strip (Library, Continue, Dark, Deuterocanon, 320 wide, Books), and each of them has the two tabs Bible and Books');
   assert.equal(count(all, /<div class="cp-subtabs"[^>]*>(?:<span class="on">Bible<\/span><span>Books<\/span>|<span>Bible<\/span><span class="on">Books<\/span>)<\/div>/g), 6);
   assert.doesNotMatch(all, /verified|official/i, 'nothing says verified or official');
-  // the gold pen is on Me (the Me · Notes phones are checked below); the Fab note on the design page says where it is
-  assert.match(design, /Me: one pen at a time, and it follows the sub-tab: on Notes the note icon writes a note, on Journey the pen writes a journey post, on Plan and Health there is none\./);
+  // the gold button is on Me, and it is the chat button (the Me phones are checked below); the Fab note on the design page says where it is
+  assert.match(design, /Me: ONE gold button floats and it is the same on every sub-tab, Notes, Journey, Plan and Health: the chat button\./);
+  assert.match(design, /Writing does not float: the first tile of the Journey grid is the card Write a journey post, and the card Write a note tops the Notes feed\./);
+  assert.match(design, /It opens from the gear at the top right of Me, the only button there, as a screen of its own/);
+  assert.match(design, /One gold button floats over all four, the chat button at the bottom right: it opens the inbox \(notifications, messages and groups\) and carries the unread badge, so the header keeps only the gear\./);
   assert.doesNotMatch(design, /Library: on the Notes tab/, 'the design page no longer sends the pen to the Library');
+  assert.doesNotMatch(design, /inbox bell|Tap the bell|one pen at a time|the pen writes a journey post/, 'no word of the design page still sends anyone to a bell or a pen on Me');
   const sprite = /<symbol id="i-diary"[^>]*>(.*?)<\/symbol>/.exec(design);
   assert.ok(sprite, 'the sprite of the design page has no i-diary');
   assert.deepEqual([...sprite![1].matchAll(/ d="([^"]+)"/g)].map((m) => m[1]), iconPaths('diary'), 'the diary glyph of the design page and of the app are the same drawing');
@@ -486,25 +491,39 @@ check('the design page shows the same Library: the two tabs Bible and Books, the
   for (const b of BOOK_CATALOG) assert.ok(new RegExp(`<symbol id="i-${b.cover.icon}"`).test(design), `the design page sprite has no glyph for the cover of ${b.id}`);
 });
 
-check('the design page shows Me with the strip Notes, Journey, Plan, Health (Notes first), and the Me · Notes phones: one pen that writes a note, Me on in the tab bar, a dark twin, and no Library tab strip', () => {
+check('the design page shows Me with the strip Notes, Journey, Plan, Health (Notes first); the header has the gear alone and no bell; one chat button floats on every sub-tab; the first tile of Journey is the card that writes a post; Notes has one card that writes a note and no filter tabs; a dark twin', () => {
   const design = readFileSync(join(root, '..', 'design', 'index.html'), 'utf8');
-  const phoneOf = (label: string): string => {
-    const start = design.indexOf(`<p class="phone-label"><b>${label}</b>`);
-    assert.ok(start > 0, `the design page has no phone "${label}"`);
-    const next = design.indexOf('<p class="phone-label">', start + 10);
-    return design.slice(start, next > 0 ? next : undefined);
-  };
+  const phoneOf = designPhone;
   const strip = (on: string) => ['Notes', 'Journey', 'Plan', 'Health'].map((t) => (t === on ? `<span class="on">${t}</span>` : `<span>${t}</span>`)).join('');
   const journey = phoneOf('Me · Journey');
+  const grid = phoneOf('Me · Journey, grid');
   const plan = phoneOf('Me · Plan');
   assert.ok(journey.includes(`<div class="cp-subtabs" style="margin:22px -24px 20px;padding:0 12px">${strip('Journey')}</div>`), 'Me · Journey: the four labels, Journey on');
+  assert.ok(grid.includes(`<div class="cp-subtabs" style="margin:22px -24px 20px;padding:0 12px">${strip('Journey')}</div>`), 'Me · Journey, grid: the four labels, Journey on');
   assert.ok(plan.includes(`<div class="cp-subtabs" style="margin:22px -24px 20px;padding:0 12px">${strip('Plan')}</div>`), 'Me · Plan: the four labels, Plan on');
   assert.ok(design.includes(`<div class="cp-subtabs" style="margin:0">${strip('Journey')}</div>`), 'the component sample of the strip');
-  assert.match(journey, /aria-label="Write a journey post"/, 'on Journey the pen writes a journey post');
-  assert.equal((journey.match(/cp-fab-write/g) ?? []).length, 1);
-  assert.doesNotMatch(plan, /cp-fab-write/, 'Plan has no pen');
+  const CHAT = (label: string, badge: string) => `<div class="fab-slot"><button class="cp-fab-write" aria-label="${label}"><svg class="cp-icon"><use href="#i-chat"/></svg>${badge ? `<span class="cp-fab-badge" aria-hidden="true">${badge}</span>` : ''}</button></div>`;
+  const GEAR = '<button class="cp-icon-btn flat" style="width:44px;height:44px;margin-left:auto" aria-label="Settings"><svg class="cp-icon "><use href="#i-settings"/></svg></button>';
+  // Journey: the card is the first tile of the grid, the chat button floats with its badge, the header is the gear alone
+  for (const [label, phone] of [['Me · Journey', journey], ['Me · Journey, grid', grid]] as const) {
+    assert.equal((phone.match(/<div class="jg">/g) ?? []).length, 1, `${label}: one grid`);
+    assert.match(phone, /<div class="jg">\s*<button class="jt write" aria-label="Write a journey post"><span class="ico"><svg class="cp-icon"><use href="#i-pen"\/><\/svg><\/span>Write a journey post<\/button>\s*<div class="jt">/, `${label}: the card that writes a post is the first tile of the grid, and the posts follow`);
+    assert.equal((phone.match(/aria-label="Write a journey post"/g) ?? []).length, 1, `${label}: one card, and no second way to write on the screen`);
+    assert.equal((phone.match(/cp-fab-write/g) ?? []).length, 1, `${label}: one gold button`);
+    assert.ok(phone.includes(CHAT('Inbox, 3 unread', '3')), `${label}: the chat button floats with its badge`);
+    assert.doesNotMatch(phone, /class="cp-post"|aria-label="Write a journey post"><svg class="cp-icon "><use href="#i-pencil"/, `${label}: no timeline post and no pen button`);
+    assert.ok(phone.includes(GEAR), `${label}: the gear alone at the top right`);
+    assert.doesNotMatch(phone, /Notifications \(|cp-bell|#i-bell/, `${label}: no bell`);
+  }
+  assert.match(grid, /<div class="scroll" data-scroll-strip="1">/, 'Me · Journey, grid is shown scrolled to the strip: the card and the posts are what it is about');
+  assert.match(design, /el\.querySelector\('\.nt-metop \.cp-subtabs'\) \|\| el\.querySelector\('\.cp-subtabs'\)/, 'and the script that scrolls it knows its strip');
+  // Plan: the same chat button, nothing unread there (no badge), no pen
+  assert.equal((plan.match(/cp-fab-write/g) ?? []).length, 1, 'Plan: one gold button');
+  assert.ok(plan.includes(CHAT('Inbox', '')), 'Plan: the chat button, with no badge when nothing is unread');
+  assert.doesNotMatch(plan, /Write a|#i-pencil|#i-compose/, 'Plan has no pen');
   // the Me · Notes phones
   const labels = ['Me · Notes', 'Me · Notes, dark', 'Me · Notes, scrolled', 'Me · Notes, photo grids', 'Me · Notes, empty', 'Me · Notes, menu'];
+  const card = '<div class="nt-write" role="button" tabindex="0" aria-label="Write a note">\n            <span class="ico"><svg class="cp-icon"><use href="#i-compose"/></svg></span>\n            <span class="tx"><b>Write a note</b><span>Notes stay on this phone.</span></span>\n            <svg class="cp-icon"><use href="#i-chev"/></svg>\n          </div>';
   for (const label of labels) {
     const phone = phoneOf(label);
     assert.ok(phone.length > 3000, `${label} is too short to be a screen`);
@@ -512,21 +531,42 @@ check('the design page shows Me with the strip Notes, Journey, Plan, Health (Not
     assert.match(phone, /<div class="nt-metop">/, `${label}: it is the Me header over the feed, not the Library's search row`);
     assert.doesNotMatch(phone, /class="lib-search"|aria-label="Bookmarks"/, `${label}: no Library search row`);
     assert.doesNotMatch(phone, /<span>Bible<\/span>|<span>Books<\/span>/, `${label}: no Library tab strip`);
-    assert.ok((phone.match(/cp-fab-write/g) ?? []).length <= 1, `${label}: never two pens`);
+    assert.ok((phone.match(/cp-fab-write/g) ?? []).length <= 1, `${label}: never two gold buttons`);
+    assert.ok(phone.includes(GEAR), `${label}: the header has the gear alone at the top right`);
+    assert.doesNotMatch(phone, /Notifications \(|cp-bell|#i-bell/, `${label}: no bell`);
+    // no filter tabs, and nothing of the composer row that the card replaced
+    assert.doesNotMatch(phone, /nt-filters|role="tablist"|role="tab"|Photos and videos|>All<\/span>|>Places<\/span>/, `${label}: no filter tabs (All, Photos and videos, Places)`);
+    assert.doesNotMatch(phone, /nt-compose|nt-prompt|nt-short|nt-private|What's happening on your Camino|then add a photo|then add a place|Write your first note/, `${label}: the composer row and the second write button are gone`);
+    // the card that writes a note is the first thing of the feed, once
+    assert.equal((phone.match(/class="nt-write"/g) ?? []).length, 1, `${label}: one card that writes a note`);
+    assert.ok(phone.includes(`<div class="nt-feedbody" style="padding-top:16px">\n          ${card}\n`), `${label}: the card is the first thing under the strip`);
+    assert.equal((phone.match(/Notes stay on this phone\./g) ?? []).length, 1, `${label}: the quiet line is in the card, once`);
     if (label !== 'Me · Notes, menu') {
-      assert.equal((phone.match(/cp-fab-write/g) ?? []).length, 1, `${label}: one pen`);
-      assert.match(phone, /<button class="cp-fab-write" aria-label="Write a note"><svg class="cp-icon"><use href="#i-compose"\/><\/svg><\/button>/, `${label}: the pen writes a note`);
+      assert.equal((phone.match(/cp-fab-write/g) ?? []).length, 1, `${label}: one gold button`);
+      assert.ok(phone.includes(CHAT('Inbox, 3 unread', '3')), `${label}: the gold button is the chat button, with its badge`);
       assert.match(phone, /<div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-me"\/>/, `${label}: Me is the tab that is on`);
     }
-    assert.doesNotMatch(phone, /Write in your diary|Library · Notes/);
+    assert.doesNotMatch(phone, /Write in your diary|Library · Notes|aria-label="Write a note"><svg class="cp-icon"><use href="#i-compose"/);
   }
   assert.match(phoneOf('Me · Notes, dark'), /<div class="phone dk">/, 'the dark twin');
   assert.match(phoneOf('Me · Notes, empty'), /<h4>No notes yet<\/h4>/);
+  assert.doesNotMatch(phoneOf('Me · Notes, empty'), /cp-btn/, 'the empty diary has no button of its own: the card above it is the way in');
   assert.match(phoneOf('Me · Notes'), /Notes stay on this phone\./);
   assert.doesNotMatch(design, /<b>Library · Notes/, 'no Notes phone is labelled as a Library phone');
   const all = labels.map((l) => design.indexOf(`<b>${l}</b>`));
   assert.ok(all.every((i) => i > 0), 'every Me · Notes phone is on the page');
   assert.equal(new Set([...design.matchAll(/<p class="phone-label"><b>([^<]+)<\/b>/g)].map((m) => m[1])).size, [...design.matchAll(/<p class="phone-label"><b>([^<]+)<\/b>/g)].length, 'no two phones share a label');
+  // the sprite has the glyphs of the chat button and of the two cards, the same drawings as the app's
+  for (const name of ['chat', 'pen', 'compose']) {
+    const sym = new RegExp(`<symbol id="i-${name}"[^>]*>(.*?)</symbol>`).exec(design);
+    assert.ok(sym, `the sprite of the design page has no i-${name}`);
+    assert.deepEqual([...sym![1].matchAll(/ d="([^"]+)"/g)].map((m) => m[1]), iconPaths(name), `the ${name} glyph of the design page and of the app are the same drawing`);
+  }
+  // the CSS of the bell is gone with the bell, and the CSS of the badge and the cards is there
+  assert.doesNotMatch(design, /cp-bellwrap|cp-bell-badge|nt-filters|\.nt-compose|\.nt-prompt|\.nt-short/, 'the CSS of what was taken out is gone');
+  assert.match(design, /\.cp-fab-badge \{ position: absolute; top: -4px; right: -4px; box-sizing: border-box; min-width: 26px; height: 26px;/, 'the badge is 26 round on the rim, as in the app');
+  assert.match(design, /background: var\(--cp-danger\); color: var\(--cp-on-danger\); border: 2px solid var\(--cp-bg\);/, 'in the roles danger and onDanger, ringed in the page colour');
+  assert.match(design, /\.nt-write \{ display: flex; align-items: center; gap: 16px; min-height: 64px;/, 'the Notes card is at least 64 high');
 });
 
 check('the sample content never claims to be real: no price, no rating, no "available", no download, nothing in the data or the rows of the books that acts when touched', () => {
@@ -539,14 +579,15 @@ check('the sample content never claims to be real: no price, no rating, no "avai
   assert.match(lib('LibraryBanner.tsx'), /export const DAILY_CTA = 'Read today';/);
 });
 
-check('the diary is reachable: its routes exist and are registered, the Notes sub-tab of Me is where it is, and the one pen of Me on that sub-tab opens a blank page', () => {
+check('the diary is reachable: its routes exist and are registered, the Notes sub-tab of Me is where it is, and the one card of that sub-tab opens a blank page', () => {
   assert.ok(exists(join('app', 'diary', 'index.tsx')));
   assert.ok(exists(join('app', 'diary', '[id].tsx')));
   const layout = read(join('app', '_layout.tsx'));
   assert.match(layout, /<Stack\.Screen name="diary\/index" \/>/);
   assert.match(layout, /<Stack\.Screen name="diary\/\[id\]" \/>/);
   const me = read(join('app', '(tabs)', 'me.tsx'));
-  assert.equal(ME_FAB.Notes?.href, '/diary/new', 'the pen of the Notes sub-tab opens a blank page');
+  assert.match(read(join('src', 'features', 'notes', 'NotesTab.tsx')), /const write = useCallback\(\(\) => router\.push\('\/diary\/new'\), \[router\]\);/, 'the card of the Notes sub-tab opens a blank page');
+  assert.match(read(join('src', 'features', 'notes', 'NotesHeader.tsx')), /onPress=\{onWrite\}/, 'and the card is what calls it');
   assert.match(me, /import \{ NotesTab \} from '@\/features\/notes\/NotesTab';/, 'the diary\'s feed is the Notes sub-tab of Me');
   assert.match(me, /\{onNotes \? \(/);
   assert.doesNotMatch(me, /router\.push\('\/diary'\)/, 'no button of Me opens the list of pages: that list is the Notes sub-tab');
