@@ -626,7 +626,9 @@ check('the four fonts by role on the Bible side of the Library: Fraunces for nam
   assert.equal(fontOf('mono'), 'mono');
   assert.equal(fontOf('accent'), 'accent');
   assert.deepEqual(Object.keys((tokens as unknown as { font: Record<string, string> }).font).filter((k) => ['title', 'body', 'mono', 'accent'].includes(k)), ['title', 'body', 'mono', 'accent']);
-  assert.match(read(join('app', '_layout.tsx')), /Fraunces_600SemiBold, (?:Inter_300Light, )?Inter_400Regular, Inter_500Medium, Inter_600SemiBold, JetBrainsMono_400Regular, Caveat_700Bold/, 'all four are loaded: no new font file, no new package (the light cut of Inter is the inactive label of the tab bar)');
+  // all four families are loaded and nothing else: no new family, no new package. Inter is also loaded in Light (Inter_300Light, from the same
+  // package), used only for the labels of the inactive tabs of the tab bar (see themeScheme.test.ts).
+  assert.match(read(join('app', '_layout.tsx')), /Fraunces_600SemiBold, Inter_300Light, Inter_400Regular, Inter_500Medium, Inter_600SemiBold, JetBrainsMono_400Regular, Caveat_700Bold/, 'all four families are loaded (Inter also in Light for the inactive tabs): no new family, no new package');
   // the roles, element by element: [file, what must be there, what it says]
   const L = join('src', 'features', 'library');
   const roles: Array<[string, RegExp, string]> = [
@@ -649,7 +651,7 @@ check('the four fonts by role on the Bible side of the Library: Fraunces for nam
     [join(L, 'bible', 'Reader.tsx'), /<AppText variant="h2" accessibilityRole="header"[^>]*>\{chapterTitle\(place\)\}<\/AppText>/, 'the title of the chapter is Fraunces'],
     [join(L, 'bible', 'Reader.tsx'), /\{!!chapter\.title && <AppText variant="h4" muted /, 'the title of a psalm is Fraunces'],
     [join(L, 'bible', 'ReaderText.tsx'), /<AppText variant="h4" accessibilityRole="header"[^>]*>\{block\.text\}<\/AppText>/, 'a heading in the text is Fraunces'],
-    [join(L, 'bible', 'ReaderText.tsx'), /<AppText variant="mono"[^>]*>\{superscript\(label\)\}<\/AppText>/, 'the raised number of a verse is JetBrains Mono'],
+    [join(L, 'bible', 'ReaderText.tsx'), /<AppText variant="mono"[^>]*>\s+\{digits\.length > 0 && <Text style=\{\{ letterSpacing: NUMBER_TRACKING \}\}>\{digits\.join\(''\)\}<\/Text>\}\s+\{last\}\s+<\/AppText>/, 'the raised number of a verse is JetBrains Mono'],
     [join(L, 'bible', 'ReaderText.tsx'), /<AppText maxFontSizeMultiplier=\{READER_MAX_FONT_SCALE\} style=\{\{ fontSize: BODY_SIZE, lineHeight: BODY_LINE \}\}>/, 'the words of a verse are Inter (the body font of AppText)'],
     [join(L, 'bible', 'ChapterNav.tsx'), /<AppText variant="mono"[^>]*>\{placeLabel\(to\)\}<\/AppText>/, 'the chapter a button goes to is a reference: JetBrains Mono'],
     [join(L, 'bible', 'VerseActions.tsx'), /<AppText variant="mono"[^>]*color=\{role\.accentText\}[^>]*>\{place\}<\/AppText>/, 'the place of the chosen verse is a reference: JetBrains Mono'],

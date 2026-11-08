@@ -17,8 +17,9 @@ export const BODY_LINE = 32;
 export const NUMBER_SIZE = 17;
 
 /**
- * JetBrains Mono is monospaced, so the raised digits of a number of two or three figures stand far apart ("1 0"). Each digit gives back this much of its advance
- * (10.2 of them at this size). The reader (wrap.ts) still counts the whole advance of a digit when it decides where a line is cut, so a line is never cut too late.
+ * JetBrains Mono is monospaced, so the raised digits of a number of two or three figures stand far apart ("1 0"). Every digit but the last gives back this much of its
+ * advance (10.2 of them at this size): a letter-spacing is added after each character, the last one too, and the last digit has to keep its space before the words
+ * ("¹In" would run together). The reader (wrap.ts) still counts the whole advance of a digit when it decides where a line is cut, so a line is never cut too late.
  */
 export const NUMBER_TRACKING = -3;
 
@@ -39,9 +40,14 @@ const chosen = () => ({ backgroundColor: c.goldSoft, textDecorationLine: 'underl
  * the number never makes a line taller.
  */
 function VerseNumber({ label, on }: { label: string; on: boolean }) {
+  const digits = [...superscript(label)];
+  const last = digits.pop();
   return (
     <>
-      <AppText variant="mono" maxFontSizeMultiplier={READER_MAX_FONT_SCALE} color={on ? role.text : role.muted} style={{ fontSize: NUMBER_SIZE, lineHeight: BODY_LINE, letterSpacing: NUMBER_TRACKING }}>{superscript(label)}</AppText>
+      <AppText variant="mono" maxFontSizeMultiplier={READER_MAX_FONT_SCALE} color={on ? role.text : role.muted} style={{ fontSize: NUMBER_SIZE, lineHeight: BODY_LINE }}>
+        {digits.length > 0 && <Text style={{ letterSpacing: NUMBER_TRACKING }}>{digits.join('')}</Text>}
+        {last}
+      </AppText>
       {'\u2009'}
     </>
   );
