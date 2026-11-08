@@ -1,0 +1,80 @@
+{
+ "generator": "tools/poi-audit/build_route_lines.py",
+ "generator_version": 1,
+ "format": "One GeoJSON LineString per stage, [longitude, latitude] in WGS 84, from the start town to the end town of the stage.",
+ "licence": "Data (c) OpenStreetMap contributors, ODbL 1.0, https://www.openstreetmap.org/copyright",
+ "osm_timestamp": "2026-08-19T03:16:35Z",
+ "tolerance_m": 5.0,
+ "stages": [
+  {
+   "stage": 1,
+   "slug": "camino-frances-01",
+   "name": "Saint-Jean-Pied-de-Port to Roncesvalles",
+   "file": "camino-frances-01.json",
+   "osm_timestamp": "2026-08-19T03:16:35Z",
+   "relations": [
+    {"id": 2163569, "name": "Camino Francés - 01", "share": 0.997}
+   ],
+   "start": [-1.2372336, 43.1623398],
+   "end": [-1.3192037, 43.0093793],
+   "start_snap_m": 143,
+   "end_snap_m": 24,
+   "mapping_gaps_joined": 0,
+   "length_km_full": 24.116,
+   "length_km": 24.006,
+   "points_full": 1117,
+   "points": 294,
+   "bytes_full": 26604,
+   "bytes": 7032,
+   "sha256": "3bf405e3f90314b1f9687da29fec0995af6736ba9eb4031e0c789f3dc04cd73b"
+  },
+  {
+   "stage": 2,
+   "slug": "camino-frances-02",
+   "name": "Roncesvalles to Zubiri",
+   "file": "camino-frances-02.json",
+   "osm_timestamp": "2026-08-19T03:16:35Z",
+   "relations": [
+    {"id": 2163569, "name": "Camino Francés - 01", "share": 0.997}
+   ],
+   "start": [-1.3192037, 43.0093793],
+   "end": [-1.5028482, 42.9298377],
+   "start_snap_m": 24,
+   "end_snap_m": 64,
+   "mapping_gaps_joined": 0,
+   "length_km_full": 21.479,
+   "length_km": 21.376,
+   "points_full": 1067,
+   "points": 247,
+   "bytes_full": 25398,
+   "bytes": 5890,
+   "sha256": "a35ffc3d48dad0e44f4bbd1c8f1864b67aa0477755f669e1f6a928597947b5df"
+  },
+  {
+   "stage": 3,
+   "slug": "camino-frances-03",
+   "name": "Zubiri to Pamplona",
+   "file": "camino-frances-03.json",
+   "osm_timestamp": "2026-08-19T03:16:35Z",
+   "relations": [
+    {"id": 2163569, "name": "Camino Francés - 01", "share": 1.0}
+   ],
+   "start": [-1.5028482, 42.9298377],
+   "end": [-1.6442447, 42.8181118],
+   "start_snap_m": 64,
+   "end_snap_m": 159,
+   "mapping_gaps_joined": 8,
+   "length_km_full": 20.479,
+   "length_km": 20.336,
+   "points_full": 1242,
+   "points": 245,
+   "bytes_full": 29564,
+   "bytes": 5860,
+   "sha256": "2ce0f366dcb92edf022a51788cb9daedebb7d9259afd99156278901e53b1da18"
+  }
+ ],
+ "joins": [
+  {"from": 1, "to": 2, "gap_m": 0.0, "closed": true},
+  {"from": 2, "to": 3, "gap_m": 0.0, "closed": true}
+ ]
+}
