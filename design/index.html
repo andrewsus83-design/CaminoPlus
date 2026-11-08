@@ -636,8 +636,10 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
 .un { font-family: var(--cp-font-title); font-weight: 600; font-size: 24px; letter-spacing: -.3px; }
 .cp-edit-pill { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 11px; border-radius: var(--cp-radius-pill); background: var(--cp-surface); box-shadow: inset 0 0 0 1px var(--cp-border-strong); font-family: var(--cp-font-mono); font-size: 11px; line-height: 1; color: var(--cp-text-muted); white-space: nowrap; cursor: pointer; }
 .cp-edit-pill .cp-icon { width: 13px; height: 13px; stroke-width: 2.2px; color: var(--cp-text); }
-.cp-fab-write { display: inline-flex; align-items: center; justify-content: center; width: 60px; height: 60px; padding: 0; border-radius: var(--cp-radius-pill); background: var(--cp-color-gold); color: var(--cp-color-blue); border: 0; font: 700 16px/1 var(--cp-font-body); box-shadow: var(--cp-shadow-gold); cursor: pointer; }
+.cp-fab-write { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 60px; height: 60px; padding: 0; border-radius: var(--cp-radius-pill); background: var(--cp-color-gold); color: var(--cp-color-blue); border: 0; font: 700 16px/1 var(--cp-font-body); box-shadow: var(--cp-shadow-gold); cursor: pointer; }
 .cp-fab-write .cp-icon { width: 26px; height: 26px; stroke-width: 2.2px; }
+/* The unread badge of the chat button (mobile/src/components/Fab.tsx): a red round label on the top right rim, ringed in the page colour so the red and the gold never touch; "99+" above 99 */
+.cp-fab-badge { position: absolute; top: -4px; right: -4px; box-sizing: border-box; min-width: 26px; height: 26px; padding: 0 5px; border-radius: var(--cp-radius-pill); background: var(--cp-danger); color: var(--cp-on-danger); border: 2px solid var(--cp-bg); font: 600 12px/14px var(--cp-font-body); letter-spacing: 0; display: grid; place-items: center; }
 .phone .fab-slot { position: absolute; right: 20px; bottom: 116px; z-index: 6; }
 /* action rail: THE rail of Discover and of the full-screen journey viewer (mobile/src/components/ActionRail.tsx) */
 .cp-rail { display: flex; flex-direction: column; align-items: center; gap: 14px; }
@@ -741,16 +743,13 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
 .nt-top .cp-subtabs { margin-top: 16px; }
 .nt-feed.scroll { top: 181px; padding: 0 0 140px; }
 .nt-av { width: 44px; height: 44px; border-radius: 50%; flex: none; background: #C9A48A; color: var(--cp-color-blue); display: grid; place-items: center; font-weight: 600; font-size: 16px; line-height: 20px; }
-.nt-compose { display: flex; gap: 12px; padding: 12px 16px 0; }
-.nt-compose .nt-body { flex: 1; min-width: 0; }
-.nt-prompt { min-height: 48px; display: flex; align-items: center; font-size: 19px; line-height: 28px; color: var(--cp-text-muted); }
-.nt-short { display: flex; margin-left: -11px; color: var(--cp-action); }
-.nt-short span { width: 44px; height: 44px; display: grid; place-items: center; }
-.nt-short .cp-icon { width: 22px; height: 22px; }
-.nt-private { margin: 0; padding: 2px 16px 14px; font-size: 15px; line-height: 21px; letter-spacing: .4px; font-weight: 500; color: var(--cp-text-muted); }
-.nt-filters { display: flex; border-top: 1px solid var(--cp-border); border-bottom: 1px solid var(--cp-border); }
-.nt-filters span { flex: 1 1 auto; text-align: center; min-height: 44px; padding: 12px 12px 10px; font-size: 17px; line-height: 22px; font-weight: 600; color: var(--cp-text-muted); border-bottom: 3px solid transparent; margin-bottom: -1px; }
-.nt-filters span.on { color: var(--cp-text); border-color: var(--cp-color-blue); }
+.nt-write { display: flex; align-items: center; gap: 16px; min-height: 64px; margin: 0 16px 4px; padding: 14px 16px; border-radius: var(--cp-radius-lg); background: var(--cp-surface); box-shadow: inset 0 0 0 1px var(--cp-border); cursor: pointer; }
+.nt-write .ico { width: 48px; height: 48px; border-radius: 50%; flex: none; background: var(--cp-highlight); color: var(--cp-on-highlight); display: grid; place-items: center; }
+.nt-write .ico .cp-icon { width: 26px; height: 26px; stroke-width: 2.2px; }
+.nt-write .tx { flex: 1; min-width: 0; }
+.nt-write .tx b { display: block; font-family: var(--cp-font-title); font-weight: 600; font-size: 24px; line-height: 30px; }
+.nt-write .tx span { display: block; font-size: 15px; line-height: 21px; letter-spacing: .4px; font-weight: 500; color: var(--cp-text-muted); }
+.nt-write > .cp-icon { width: 22px; height: 22px; flex: none; color: var(--cp-text-muted); }
 .nt-row { display: flex; gap: 12px; padding: 12px 16px 4px; border-bottom: 1px solid var(--cp-border); }
 .nt-row.noacts { padding-bottom: 14px; }
 .nt-main { flex: 1; min-width: 0; }
@@ -796,6 +795,20 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
 .nt-me.scroll { padding: var(--cp-screen-top) 0 140px; }
 .nt-metop { display: flex; flex-direction: column; padding: 0 var(--cp-screen-margin); }
 /* ---- Me · Notes (end) ---- */
+/* ---- Me · Journey: the grid of posts, 9:16 tiles in two even columns, 2 px apart and 2 px from the screen edge; its first tile is the card that writes a post
+   (mobile/src/features/me/JourneyGrid.tsx and WriteCard.tsx). The card is a tile of the grid, not a post. ---- */
+.jg { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; margin: 0 -14px; }
+.jg .jt { position: relative; aspect-ratio: 9 / 16; overflow: hidden; border: 0; padding: 0; margin: 0; background: var(--cp-surface-sunken); font: inherit; color: inherit; }
+.jg .jt .cp-img { position: absolute; inset: 0; border-radius: 0; }
+.jg .jt .cap { position: absolute; left: 0; right: 0; bottom: 0; padding: 10px; background: rgba(0, 0, 0, .28); color: #fff; font-size: 13px; line-height: 16px; font-weight: 500; letter-spacing: .4px; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.jg .jt .n { position: absolute; top: 8px; right: 8px; box-sizing: border-box; min-width: 24px; height: 24px; padding: 0 8px; border-radius: 12px; background: rgba(0, 0, 0, .45); color: #fff; font-size: 12px; line-height: 24px; font-weight: 500; text-align: center; }
+.jg .jt.txt { display: flex; align-items: center; justify-content: center; padding: 12px; }
+.jg .jt.txt p { margin: 0; font-family: var(--cp-font-title); font-weight: 600; font-size: 16px; line-height: 22px; text-align: center; }
+.jg .jt.txt.blue { background: var(--cp-color-blue); color: var(--cp-color-parchment); }
+.jg .jt.txt.gold { background: var(--cp-color-gold); color: var(--cp-color-blue); }
+.jg .jt.write { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 0 12px; background: var(--cp-surface); box-shadow: inset 0 0 0 1px var(--cp-border); font-weight: 600; font-size: 17px; line-height: 22px; text-align: center; cursor: pointer; }
+.jg .jt.write .ico { width: 64px; height: 64px; border-radius: 50%; background: var(--cp-highlight); color: var(--cp-on-highlight); display: grid; place-items: center; }
+.jg .jt.write .ico .cp-icon { width: 30px; height: 30px; stroke-width: 2.2px; }
 .cp-toolbar { display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; background: var(--cp-surface); border-radius: var(--cp-radius-pill); box-shadow: var(--cp-shadow-lg); }
 .cp-toolbar .cp-icon-btn { box-shadow: none; background: transparent; }
 .cp-toolbar .cp-icon-btn.on { background: var(--cp-color-gold-soft); }
@@ -923,8 +936,6 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
 .cp-legend i { width: 26px; height: 0; display: block; flex: none; }
 
 /* ---- v5: inbox, notifications, Instagram-style post flow ---- */
-.cp-bellwrap { position: relative; display: inline-block; flex: none; }
-.cp-bell-badge { position: absolute; top: -3px; right: -3px; min-width: 20px; height: 20px; padding: 0 5px; border-radius: var(--cp-radius-pill); background: var(--cp-color-red); color: #fff; font-size: 11px; font-weight: 700; display: grid; place-items: center; border: 2px solid var(--cp-bg); }
 .cp-inbox-top { display: flex; align-items: center; gap: 10px; }
 .cp-inbox-top h1 { font-family: var(--cp-font-title); font-weight: 600; font-size: 32px; line-height: 38px; letter-spacing: -.5px; margin: 0; flex: 1; }
 .cp-notif-cap { font-family: var(--cp-font-mono); font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--cp-text-muted); margin: 22px 0 6px; }
@@ -1674,8 +1685,8 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
       <div style="display:flex;align-items:center;gap:10px"><span class="un">ana.camina</span><span class="cp-edit-pill"><svg class="cp-icon "><use href="#i-pencil"/></svg>camino.plus/ana</span></div>
     </div>
     <div class="panel">
-      <p class="spec" style="margin:0 0 16px">.cp-fab-write · gold, 60 round, icon only, bottom-right above the tab bar. Me: one pen at a time, and it follows the sub-tab: on Notes the note icon writes a note, on Journey the pen writes a journey post, on Plan and Health there is none. The Library has none. One component in the app (components/Fab.tsx).</p>
-      <div class="row"><button class="cp-fab-write" aria-label="Write a journey post"><svg class="cp-icon "><use href="#i-pencil"/></svg></button></div>
+      <p class="spec" style="margin:0 0 16px">.cp-fab-write · gold, 60 round, icon only, bottom-right above the tab bar. Me: ONE gold button floats and it is the same on every sub-tab, Notes, Journey, Plan and Health: the chat button. It opens the inbox (notifications, messages and groups), on Messages when a chat or a group has something unread, else on Notifications when a notification has, else on Messages, and it carries the unread badge (.cp-fab-badge: red, 99+, ringed in the page colour) that the bell used to carry: the header of Me keeps only the gear at the top right. Writing does not float: the first tile of the Journey grid is the card Write a journey post, and the card Write a note tops the Notes feed. The Library has none. One component in the app (components/Fab.tsx).</p>
+      <div class="row" style="gap:28px"><button class="cp-fab-write" aria-label="Inbox, 3 unread"><svg class="cp-icon"><use href="#i-chat"/></svg><span class="cp-fab-badge" aria-hidden="true">3</span></button><button class="cp-fab-write" aria-label="Inbox, 120 unread"><svg class="cp-icon"><use href="#i-chat"/></svg><span class="cp-fab-badge" aria-hidden="true">99+</span></button><button class="cp-fab-write" aria-label="Inbox"><svg class="cp-icon"><use href="#i-chat"/></svg></button></div>
     </div>
   </div>
 
@@ -1782,9 +1793,9 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
       <p class="spec" style="margin:12px 0 0">.cp-notif (+ .unread gold wash, blue dot) · lead avatar or icon bubble with a small type badge · optional thumbnail or action button</p>
     </div>
     <div class="panel" style="display:flex;flex-direction:column;gap:20px">
-      <div class="row" style="gap:28px"><span class="cp-bellwrap"><button class="cp-icon-btn flat"><svg class="cp-icon "><use href="#i-bell"/></svg></button><span class="cp-bell-badge">3</span></span><span class="cp-bellwrap"><button class="cp-icon-btn flat"><svg class="cp-icon "><use href="#i-bell"/></svg></button><span class="cp-bell-badge">12</span></span><span class="cp-bellwrap"><button class="cp-icon-btn flat"><svg class="cp-icon "><use href="#i-bell"/></svg></button></span></div>
+      <div class="row" style="gap:28px"><button class="cp-fab-write" aria-label="Inbox, 3 unread"><svg class="cp-icon"><use href="#i-chat"/></svg><span class="cp-fab-badge" aria-hidden="true">3</span></button><button class="cp-fab-write" aria-label="Inbox, 12 unread"><svg class="cp-icon"><use href="#i-chat"/></svg><span class="cp-fab-badge" aria-hidden="true">12</span></button><button class="cp-fab-write" aria-label="Inbox"><svg class="cp-icon"><use href="#i-chat"/></svg></button></div>
       <div style="overflow:hidden"><div class="cp-msg unread"><span class="cp-avatar" style="background:linear-gradient(150deg,#BFD0C4,#4E6B5A)"></span><div class="bd"><div class="n">María · El Puntido<span>5 min</span></div><div class="p">See you at 18:00. Dinner is at 19:30!</div></div><span class=cnt>2</span></div><div class="cp-msg"><span class="cp-avatar" style="background:linear-gradient(150deg,#D7C6E0,#6E5470)"></span><div class="bd"><div class="n">Hannah<span>Mon</span></div><div class="p">Haha, see you in Hontanas!</div></div></div></div>
-      <p class="spec" style="margin:0">.cp-bellwrap + .cp-bell-badge (red, 99+) · .cp-msg (+ .unread, .cnt)</p>
+      <p class="spec" style="margin:0">.cp-fab-badge on the chat button (red, 99+, ringed in the page colour) · .cp-msg (+ .unread, .cnt)</p>
       <table class="contrast"><tr><th>Type</th><th>Lead</th><th>Badge</th></tr>
         <tr><td>Social (likes, comments)</td><td>Avatar</td><td><span class="cp-badge red">heart</span> <span class="cp-badge blue">chat</span></td></tr>
         <tr><td>Camino alerts</td><td>Icon bubble</td><td><span class="cp-badge gold">hazard</span> <span class="cp-badge blue">crowd</span></td></tr>
@@ -1870,7 +1881,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     <div class="panel" style="padding:12px 24px 0"><div class="cp-subtabs" style="margin:0"><span>Notes</span><span class="on">Journey</span><span>Plan</span><span>Health</span></div><p class="spec" style="margin:16px 0 20px">.cp-subtabs · 17/600 · 3px blue underline · Me: Notes, Journey, Plan, Health, and it opens on Journey</p></div>
   </div>
   <p class="spec" style="margin-top:16px">.cp-tabbar · height 72 · radius pill · shadow-lg · icon 24 in 52×32 pill · label 12/500 (active 700)</p>
-  <p class="note" style="margin-top:12px;max-width:760px"><b>Settings is not a tab.</b> It opens from the gear at the top right of Me, next to the inbox bell, as a screen of its own: a back button on the left, light/dark and log out on the right, and no tab bar under it. <b>Library</b> is the fifth tab. It has no title: the row on top is a search field and the round Bookmarks button in the corner (the same size as the bell and the gear on Me), and directly under it the two tabs Bible and Books, then the banner of the tab. The Bible tab is real: the World English Bible, Catholic edition, all 73 books, in the app. It starts with a compact daily reading banner (one handwritten note and a gold pill), then a segmented pill that chooses the part (Old Testament, Deuterocanon, New Testament; it is in the page and scrolls with it), then the books of that part as square tiles, three in a row. A tile opens the numbers of the chapters of the book, a number opens the words, and Previous and Next name where they go and carry on across the books. The Books tab is real too: the books written for the app, with their text in it (Library · Books and the reader, below). There is no gold button on the Library. <b>Me</b> has four sub-tabs under the highlights, left to right Notes, Journey, Plan and Health, and it opens on Journey; one gold button floats at a time and follows the sub-tab: a note on Notes, a journey post on Journey, none on Plan and Health. <b>The diary</b> (Me, Notes) keeps its pages only on the phone: the list says so, nothing is uploaded, logging out keeps the pages, deleting the account deletes them, and a page is saved as it is typed, so there is no Save button.</p>
+  <p class="note" style="margin-top:12px;max-width:760px"><b>Settings is not a tab.</b> It opens from the gear at the top right of Me, the only button there, as a screen of its own: a back button on the left, light/dark and log out on the right, and no tab bar under it. <b>Library</b> is the fifth tab. It has no title: the row on top is a search field and the round Bookmarks button in the corner (the same size as the bell and the gear on Me), and directly under it the two tabs Bible and Books, then the banner of the tab. The Bible tab is real: the World English Bible, Catholic edition, all 73 books, in the app. It starts with a compact daily reading banner (one handwritten note and a gold pill), then a segmented pill that chooses the part (Old Testament, Deuterocanon, New Testament; it is in the page and scrolls with it), then the books of that part as square tiles, three in a row. A tile opens the numbers of the chapters of the book, a number opens the words, and Previous and Next name where they go and carry on across the books. The Books tab is real too: the books written for the app, with their text in it (Library · Books and the reader, below). There is no gold button on the Library. <b>Me</b> has four sub-tabs under the highlights, left to right Notes, Journey, Plan and Health, and it opens on Journey. One gold button floats over all four, the chat button at the bottom right: it opens the inbox (notifications, messages and groups) and carries the unread badge, so the header keeps only the gear. Writing is a card, not a button that floats: the first tile of Journey is the card Write a journey post, and the card at the top of Notes is Write a note. <b>The diary</b> (Me, Notes) keeps its pages only on the phone: the list says so, nothing is uploaded, logging out keeps the pages, deleting the account deletes them, and a page is saved as it is typed, so there is no Save button.</p>
   <p class="note" style="margin-top:12px;max-width:760px"><b>Library search</b> looks through the Bible and Books tabs at once, as you type (every book of the Bible and every book of the Library; the diary is not searched here, it is the Notes sub-tab of Me), and lists what it finds grouped by tab (Bible, Books) and then the verses. A word counts when it starts a word of a row (a name or title, the subtitle or the description of a book, a chapter title, the part of the Bible, the kind of book, or the name of the tab), so "new testament" lists the 27 books of the New Testament. With nothing found it says "Nothing found for ..." and offers Clear search; clearing the field brings the tabs and the banner back. <b>Bookmarks</b> is a screen of its own, opened from the round button in the corner: a back button, no tab bar, then two parts. Library lists the rows bookmarked from the tabs (books of the Bible, books of the Library, verses, and the passages of a book, which open the reader at them); they stay only on the phone and logging out clears them. Posts lists the posts bookmarked in the journey viewer; they stay with the account, and with no signal the list from the last visit is shown, with a line that says so. A row that is taken off stays in place, with an empty bookmark, until the screen is left, so a slip can be put back with one tap.</p>
 </section>
 
@@ -2095,19 +2106,19 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
 <section class="doc" id="screens">
   <p class="eyebrow">15 · Screens @ 390 × 844</p>
   <h2>The app, tab by tab</h2>
-  <p class="intro">Reference layouts at iPhone 15 size. Scroll sideways to see all of them. Me has the My Camino card with its Change button, a row of highlights (one round picture for each destination of the day plan: a gold ring when you posted there, a dashed circle while it is still ahead), four sub-tabs (Notes, Journey, Plan, Health), an inbox, a two-step write flow, a share screen and a stamp pop-up. Maps has two layers: helicopter view and city view. Stays opens into Airbnb / Agoda-style detail pages for stays and cafes. Explore has a second screen for the photo marketplace. Library has a search field with a bookmarks button on top and directly under it the tabs Bible and Books, each with its banner; Bible has three choices at the bottom (Old Testament, Deuterocanon, New Testament); a search lists its results grouped by tab, Bookmarks lists what the pilgrim kept, and the diary (the Notes sub-tab of Me) has a feed of pages and an editor. Settings is a screen opened from the gear at the top right of Me; it opens the business-owner flow: a welcome page, five registration steps, the review status and the owner dashboard.</p>
+  <p class="intro">Reference layouts at iPhone 15 size. Scroll sideways to see all of them. Me has the My Camino card with its Change button, a row of highlights (one round picture for each destination of the day plan: a gold ring when you posted there, a dashed circle while it is still ahead), four sub-tabs (Notes, Journey, Plan, Health), a chat button that opens the inbox, a two-step write flow, a share screen and a stamp pop-up. Maps has two layers: helicopter view and city view. Stays opens into Airbnb / Agoda-style detail pages for stays and cafes. Explore has a second screen for the photo marketplace. Library has a search field with a bookmarks button on top and directly under it the tabs Bible and Books, each with its banner; Bible has three choices at the bottom (Old Testament, Deuterocanon, New Testament); a search lists its results grouped by tab, Bookmarks lists what the pilgrim kept, and the diary (the Notes sub-tab of Me) has a feed of pages and an editor. Settings is a screen opened from the gear at the top right of Me; it opens the business-owner flow: a welcome page, five registration steps, the review status and the owner dashboard.</p>
 
   <div class="phones">
 
     <div class="phone-wrap">
-      <p class="phone-label"><b>Me · Journey</b>My Camino card · highlights per destination · timeline</p>
+      <p class="phone-label"><b>Me · Journey</b>The gear alone at the top right · My Camino card · highlights per destination · the grid starts with the card that writes a post · the chat button</p>
       <div class="phone">
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
         <div class="scroll">
           <div style="display:flex;align-items:center;gap:10px">
             <span class="un">ana.camina</span>
             <span class="cp-edit-pill" role="button" aria-label="Edit profile"><svg class="cp-icon "><use href="#i-pencil"/></svg>camino.plus/ana</span>
-            <span class="cp-bellwrap" style="margin-left:auto"><button class="cp-icon-btn flat" style="width:44px;height:44px" aria-label="Notifications (3 new)"><svg class="cp-icon "><use href="#i-bell"/></svg></button><span class="cp-bell-badge">3</span></span><button class="cp-icon-btn flat" style="width:44px;height:44px;margin-left:-4px" aria-label="Settings"><svg class="cp-icon "><use href="#i-settings"/></svg></button>
+            <button class="cp-icon-btn flat" style="width:44px;height:44px;margin-left:auto" aria-label="Settings"><svg class="cp-icon "><use href="#i-settings"/></svg></button>
           </div>
           <div class="profile-top" style="margin-top:20px">
             <span class="cp-ring"><span class="cp-avatar" style="width:86px;height:86px"></span></span>
@@ -2132,15 +2143,70 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
             <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Hornillos</div>
             <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Castrojeriz</div>
           </div><div class="cp-subtabs" style="margin:22px -24px 20px;padding:0 12px"><span>Notes</span><span class="on">Journey</span><span>Plan</span><span>Health</span></div>
-          <article class="cp-post">
-            <div class="hd"><span class="cp-avatar"></span><div style="flex:1"><div class="n">Ana García</div><div class="m">Day 12 · Burgos · 2h ago</div></div><svg class="cp-icon" style="color:var(--cp-text-muted)"><use href="#i-dots"/></svg></div>
-            <div class="tx">Reached the cathedral at sunrise. 31 km to Hontanas tomorrow, legs say no, heart says yes.</div>
-            <div class="cp-img v4"></div>
-            <div class="counts"><span>❤ 48 Buen Caminos</span><span>12 comments</span></div>
-            <div class="acts"><span><svg class="cp-icon sm"><use href="#i-heart"/></svg>Buen Camino</span><span><svg class="cp-icon sm"><use href="#i-chat"/></svg>Comment</span><span><svg class="cp-icon sm"><use href="#i-share"/></svg>Share</span></div>
-          </article>
+          <div class="jg">
+            <button class="jt write" aria-label="Write a journey post"><span class="ico"><svg class="cp-icon"><use href="#i-pen"/></svg></span>Write a journey post</button>
+            <div class="jt"><div class="cp-img v4"></div><span class="cap">Burgos</span></div>
+            <div class="jt txt blue"><p>Legs say no, heart says yes.</p><span class="cap">Hontanas</span></div>
+            <div class="jt"><div class="cp-img v5"></div><span class="n">3</span><span class="cap">Logroño</span></div>
+            <div class="jt"><div class="cp-img v2"></div><span class="cap">Pamplona</span></div>
+            <div class="jt txt gold"><p>Stamp number one in the credencial!</p><span class="cap">Albergue</span></div>
+          </div>
         </div>
-        <div class="fab-slot"><button class="cp-fab-write" aria-label="Write a journey post"><svg class="cp-icon "><use href="#i-pencil"/></svg></button></div>
+        <div class="fab-slot"><button class="cp-fab-write" aria-label="Inbox, 3 unread"><svg class="cp-icon"><use href="#i-chat"/></svg><span class="cp-fab-badge" aria-hidden="true">3</span></button></div>
+        <div class="tabdock"><nav class="cp-tabbar">
+          <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Discover</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-library"/></svg></span>Library</div>
+        </nav></div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Me · Journey, grid</b>The same screen scrolled to the strip · the first tile is the card Write a journey post, the posts follow · the chat button with its badge</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll" data-scroll-strip="1">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span class="un">ana.camina</span>
+            <span class="cp-edit-pill" role="button" aria-label="Edit profile"><svg class="cp-icon "><use href="#i-pencil"/></svg>camino.plus/ana</span>
+            <button class="cp-icon-btn flat" style="width:44px;height:44px;margin-left:auto" aria-label="Settings"><svg class="cp-icon "><use href="#i-settings"/></svg></button>
+          </div>
+          <div class="profile-top" style="margin-top:20px">
+            <span class="cp-ring"><span class="cp-avatar" style="width:86px;height:86px"></span></span>
+            <div class="pstats"><div><b>312</b><span>km</span></div><div><b>12</b><span>stamps</span></div><div><b>148</b><span>friends</span></div></div>
+          </div>
+          <div style="margin-top:14px"><div style="font-weight:600;font-size:17px">Ana García</div>
+          <div style="font-size:15px;line-height:22px">Camino Francés, day 12. Walking for my grandmother. Ultreia!</div></div>
+          <div style="margin-top:14px;display:flex;align-items:center;gap:14px;padding:14px;border-radius:var(--cp-radius-lg);background:var(--cp-surface-inverse);color:var(--cp-text-inverse);box-shadow:var(--cp-shadow-md)">
+            <span style="width:52px;height:52px;border-radius:50%;border:1.5px solid rgba(217,162,27,.55);display:grid;place-items:center;flex:none"><svg width="48" height="48" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="20" fill="#14365D"/><g transform="translate(0 -2.12)"><path d="M20 28.5L5.84 22.20A2.84 2.84 0 0 1 8.64 17.96A2.84 2.84 0 0 1 12.66 14.85A2.84 2.84 0 0 1 17.46 13.21A2.84 2.84 0 0 1 22.54 13.21A2.84 2.84 0 0 1 27.34 14.85A2.84 2.84 0 0 1 31.36 17.96A2.84 2.84 0 0 1 34.16 22.20z" fill="#D9A21B"/><path d="M20 29.0Q14.09 22.35 8.49 17.82M20 29.0Q16.22 20.86 12.56 14.67M20 29.0Q18.70 20.07 17.43 13.01M20 29.0Q21.30 20.07 22.57 13.01M20 29.0Q23.78 20.86 27.44 14.67M20 29.0Q25.91 22.35 31.51 17.82" stroke="#14365D" stroke-width="1.15" stroke-linecap="round" fill="none"/><path d="M15.2 31.4Q18 30.6 18.4 28.3H21.6Q22 30.6 24.8 31.4Q24.6 32.6 20 32.6Q15.4 32.6 15.2 31.4z" fill="#D9A21B"/></g></svg></span>
+            <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+              <div style="font-family:var(--cp-font-accent);font-weight:700;font-size:24px;line-height:28px;color:var(--cp-color-gold)">Buen Camino!</div>
+              <div style="font-family:var(--cp-font-title);font-weight:600;font-size:17px;line-height:21px;color:var(--cp-color-gold-soft)">My Camino</div>
+              <div style="font-size:17px;line-height:22px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Camino Francés</div>
+              <div style="font-size:15px;line-height:21px;font-weight:500;letter-spacing:.4px;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">From stage 1 · 11 stages done</div>
+            </div>
+            <span style="height:40px;padding:0 16px;border-radius:999px;background:var(--cp-color-gold);color:var(--cp-color-blue);font-size:17px;font-weight:600;display:inline-flex;align-items:center;flex:none">Change</span>
+          </div>
+          <div class="highlights" style="margin-top:14px">
+            <div><span class="cp-ring seen"><span class="cp-avatar" style="background:linear-gradient(150deg,#F2D8B6,#A0583F)"></span></span>Pamplona</div>
+            <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#9DB4CC,#14365D)"></span></span>Logroño</div>
+            <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#D7C6E0,#6E5470)"></span></span>Burgos</div>
+            <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Hornillos</div>
+            <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Castrojeriz</div>
+          </div><div class="cp-subtabs" style="margin:22px -24px 20px;padding:0 12px"><span>Notes</span><span class="on">Journey</span><span>Plan</span><span>Health</span></div>
+          <div class="jg">
+            <button class="jt write" aria-label="Write a journey post"><span class="ico"><svg class="cp-icon"><use href="#i-pen"/></svg></span>Write a journey post</button>
+            <div class="jt"><div class="cp-img v4"></div><span class="cap">Burgos</span></div>
+            <div class="jt txt blue"><p>Legs say no, heart says yes.</p><span class="cap">Hontanas</span></div>
+            <div class="jt"><div class="cp-img v5"></div><span class="n">3</span><span class="cap">Logroño</span></div>
+            <div class="jt"><div class="cp-img v2"></div><span class="cap">Pamplona</span></div>
+            <div class="jt txt gold"><p>Stamp number one in the credencial!</p><span class="cap">Albergue</span></div>
+          </div>
+        </div>
+        <div class="fab-slot"><button class="cp-fab-write" aria-label="Inbox, 3 unread"><svg class="cp-icon"><use href="#i-chat"/></svg><span class="cp-fab-badge" aria-hidden="true">3</span></button></div>
         <div class="tabdock"><nav class="cp-tabbar">
           <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
@@ -2322,6 +2388,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
             <div class="cp-step"><span class="dot">14</span><div class="c"><div class="t">Boadilla → Carrión<span>24.6 km</span></div><div class="m">Rest day option</div></div></div>
           </div>
         </div>
+        <div class="fab-slot"><button class="cp-fab-write" aria-label="Inbox"><svg class="cp-icon"><use href="#i-chat"/></svg></button></div>
         <div class="tabdock"><nav class="cp-tabbar">
           <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
@@ -2334,7 +2401,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     </div>
 
     <div class="phone-wrap">
-      <p class="phone-label"><b>Me · Inbox</b>Tap the bell · notifications</p>
+      <p class="phone-label"><b>Me · Inbox</b>Tap the chat button · Notifications, which it opens on when only notifications are unread</p>
       <div class="phone">
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
         <div class="scroll" style="padding-bottom:130px">
@@ -2362,7 +2429,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     </div>
 
     <div class="phone-wrap">
-      <p class="phone-label"><b>Me · Inbox · Messages</b>Hosts and pilgrims</p>
+      <p class="phone-label"><b>Me · Inbox · Messages</b>Hosts and pilgrims · the chat button opens here when a chat has something unread</p>
       <div class="phone">
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
         <div class="scroll" style="padding-bottom:130px">
@@ -3672,7 +3739,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
 
 <!-- Me · Notes phones (start) -->
     <div class="phone-wrap">
-      <p class="phone-label"><b>Me · Notes</b>The first sub-tab · the diary's pages as a feed · only on this phone · one pen</p>
+      <p class="phone-label"><b>Me · Notes</b>The first sub-tab · one card that writes a note, then the diary's pages as a feed · only on this phone · the chat button</p>
       <div class="phone">
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
         <div class="scroll nt-me" data-scroll-strip="1">
@@ -3680,7 +3747,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           <div style="display:flex;align-items:center;gap:10px">
             <span class="un">ana.camina</span>
             <span class="cp-edit-pill" role="button" aria-label="Edit profile"><svg class="cp-icon "><use href="#i-pencil"/></svg>camino.plus/ana</span>
-            <span class="cp-bellwrap" style="margin-left:auto"><button class="cp-icon-btn flat" style="width:44px;height:44px" aria-label="Notifications (3 new)"><svg class="cp-icon "><use href="#i-bell"/></svg></button><span class="cp-bell-badge">3</span></span><button class="cp-icon-btn flat" style="width:44px;height:44px;margin-left:-4px" aria-label="Settings"><svg class="cp-icon "><use href="#i-settings"/></svg></button>
+            <button class="cp-icon-btn flat" style="width:44px;height:44px;margin-left:auto" aria-label="Settings"><svg class="cp-icon "><use href="#i-settings"/></svg></button>
           </div>
           <div class="profile-top" style="margin-top:20px">
             <span class="cp-ring"><span class="cp-avatar" style="width:86px;height:86px"></span></span>
@@ -3708,15 +3775,11 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
             <div class="cp-subtabs" style="margin:22px -24px 0;padding:0 12px"><span class="on">Notes</span><span>Journey</span><span>Plan</span><span>Health</span></div>
           </div>
           <div class="nt-feedbody" style="padding-top:16px">
-          <div class="nt-compose">
-            <span class="nt-av" aria-hidden="true">AG</span>
-            <div class="nt-body">
-              <div class="nt-prompt">What's happening on your Camino?</div>
-              <div class="nt-short"><span aria-label="Write a new note, then add a photo"><svg class="cp-icon"><use href="#i-image"/></svg></span><span aria-label="Write a new note, then add a place"><svg class="cp-icon"><use href="#i-pin"/></svg></span></div>
-            </div>
+          <div class="nt-write" role="button" tabindex="0" aria-label="Write a note">
+            <span class="ico"><svg class="cp-icon"><use href="#i-compose"/></svg></span>
+            <span class="tx"><b>Write a note</b><span>Notes stay on this phone.</span></span>
+            <svg class="cp-icon"><use href="#i-chev"/></svg>
           </div>
-          <p class="nt-private">Notes stay on this phone.</p>
-          <div class="nt-filters" role="tablist"><span class="on" role="tab" aria-selected="true">All</span><span class="" role="tab" aria-selected="false">Photos and videos</span><span class="" role="tab" aria-selected="false">Places</span></div>
           <article class="nt-row">
             <span class="nt-av" aria-hidden="true">AG</span>
             <div class="nt-main">
@@ -3733,7 +3796,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           </article>
           </div>
         </div>
-        <div class="fab-slot"><button class="cp-fab-write" aria-label="Write a note"><svg class="cp-icon"><use href="#i-compose"/></svg></button></div>
+        <div class="fab-slot"><button class="cp-fab-write" aria-label="Inbox, 3 unread"><svg class="cp-icon"><use href="#i-chat"/></svg><span class="cp-fab-badge" aria-hidden="true">3</span></button></div>
         <div class="tabdock"><nav class="cp-tabbar">
           <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
@@ -3754,7 +3817,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           <div style="display:flex;align-items:center;gap:10px">
             <span class="un">ana.camina</span>
             <span class="cp-edit-pill" role="button" aria-label="Edit profile"><svg class="cp-icon "><use href="#i-pencil"/></svg>camino.plus/ana</span>
-            <span class="cp-bellwrap" style="margin-left:auto"><button class="cp-icon-btn flat" style="width:44px;height:44px" aria-label="Notifications (3 new)"><svg class="cp-icon "><use href="#i-bell"/></svg></button><span class="cp-bell-badge">3</span></span><button class="cp-icon-btn flat" style="width:44px;height:44px;margin-left:-4px" aria-label="Settings"><svg class="cp-icon "><use href="#i-settings"/></svg></button>
+            <button class="cp-icon-btn flat" style="width:44px;height:44px;margin-left:auto" aria-label="Settings"><svg class="cp-icon "><use href="#i-settings"/></svg></button>
           </div>
           <div class="profile-top" style="margin-top:20px">
             <span class="cp-ring"><span class="cp-avatar" style="width:86px;height:86px"></span></span>
@@ -3782,15 +3845,11 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
             <div class="cp-subtabs" style="margin:22px -24px 0;padding:0 12px"><span class="on">Notes</span><span>Journey</span><span>Plan</span><span>Health</span></div>
           </div>
           <div class="nt-feedbody" style="padding-top:16px">
-          <div class="nt-compose">
-            <span class="nt-av" aria-hidden="true">AG</span>
-            <div class="nt-body">
-              <div class="nt-prompt">What's happening on your Camino?</div>
-              <div class="nt-short"><span aria-label="Write a new note, then add a photo"><svg class="cp-icon"><use href="#i-image"/></svg></span><span aria-label="Write a new note, then add a place"><svg class="cp-icon"><use href="#i-pin"/></svg></span></div>
-            </div>
+          <div class="nt-write" role="button" tabindex="0" aria-label="Write a note">
+            <span class="ico"><svg class="cp-icon"><use href="#i-compose"/></svg></span>
+            <span class="tx"><b>Write a note</b><span>Notes stay on this phone.</span></span>
+            <svg class="cp-icon"><use href="#i-chev"/></svg>
           </div>
-          <p class="nt-private">Notes stay on this phone.</p>
-          <div class="nt-filters" role="tablist"><span class="on" role="tab" aria-selected="true">All</span><span class="" role="tab" aria-selected="false">Photos and videos</span><span class="" role="tab" aria-selected="false">Places</span></div>
           <article class="nt-row">
             <span class="nt-av" aria-hidden="true">AG</span>
             <div class="nt-main">
@@ -3807,7 +3866,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           </article>
           </div>
         </div>
-        <div class="fab-slot"><button class="cp-fab-write" aria-label="Write a note"><svg class="cp-icon"><use href="#i-compose"/></svg></button></div>
+        <div class="fab-slot"><button class="cp-fab-write" aria-label="Inbox, 3 unread"><svg class="cp-icon"><use href="#i-chat"/></svg><span class="cp-fab-badge" aria-hidden="true">3</span></button></div>
         <div class="tabdock"><nav class="cp-tabbar">
           <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
@@ -3828,7 +3887,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           <div style="display:flex;align-items:center;gap:10px">
             <span class="un">ana.camina</span>
             <span class="cp-edit-pill" role="button" aria-label="Edit profile"><svg class="cp-icon "><use href="#i-pencil"/></svg>camino.plus/ana</span>
-            <span class="cp-bellwrap" style="margin-left:auto"><button class="cp-icon-btn flat" style="width:44px;height:44px" aria-label="Notifications (3 new)"><svg class="cp-icon "><use href="#i-bell"/></svg></button><span class="cp-bell-badge">3</span></span><button class="cp-icon-btn flat" style="width:44px;height:44px;margin-left:-4px" aria-label="Settings"><svg class="cp-icon "><use href="#i-settings"/></svg></button>
+            <button class="cp-icon-btn flat" style="width:44px;height:44px;margin-left:auto" aria-label="Settings"><svg class="cp-icon "><use href="#i-settings"/></svg></button>
           </div>
           <div class="profile-top" style="margin-top:20px">
             <span class="cp-ring"><span class="cp-avatar" style="width:86px;height:86px"></span></span>
@@ -3856,6 +3915,11 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
             <div class="cp-subtabs" style="margin:22px -24px 0;padding:0 12px"><span class="on">Notes</span><span>Journey</span><span>Plan</span><span>Health</span></div>
           </div>
           <div class="nt-feedbody" style="padding-top:16px">
+          <div class="nt-write" role="button" tabindex="0" aria-label="Write a note">
+            <span class="ico"><svg class="cp-icon"><use href="#i-compose"/></svg></span>
+            <span class="tx"><b>Write a note</b><span>Notes stay on this phone.</span></span>
+            <svg class="cp-icon"><use href="#i-chev"/></svg>
+          </div>
           <article class="nt-row">
             <span class="nt-av" aria-hidden="true">AG</span>
             <div class="nt-main">
@@ -3872,7 +3936,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           </article>
           </div>
         </div>
-        <div class="fab-slot"><button class="cp-fab-write" aria-label="Write a note"><svg class="cp-icon"><use href="#i-compose"/></svg></button></div>
+        <div class="fab-slot"><button class="cp-fab-write" aria-label="Inbox, 3 unread"><svg class="cp-icon"><use href="#i-chat"/></svg><span class="cp-fab-badge" aria-hidden="true">3</span></button></div>
         <div class="tabdock"><nav class="cp-tabbar">
           <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
@@ -3893,7 +3957,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           <div style="display:flex;align-items:center;gap:10px">
             <span class="un">ana.camina</span>
             <span class="cp-edit-pill" role="button" aria-label="Edit profile"><svg class="cp-icon "><use href="#i-pencil"/></svg>camino.plus/ana</span>
-            <span class="cp-bellwrap" style="margin-left:auto"><button class="cp-icon-btn flat" style="width:44px;height:44px" aria-label="Notifications (3 new)"><svg class="cp-icon "><use href="#i-bell"/></svg></button><span class="cp-bell-badge">3</span></span><button class="cp-icon-btn flat" style="width:44px;height:44px;margin-left:-4px" aria-label="Settings"><svg class="cp-icon "><use href="#i-settings"/></svg></button>
+            <button class="cp-icon-btn flat" style="width:44px;height:44px;margin-left:auto" aria-label="Settings"><svg class="cp-icon "><use href="#i-settings"/></svg></button>
           </div>
           <div class="profile-top" style="margin-top:20px">
             <span class="cp-ring"><span class="cp-avatar" style="width:86px;height:86px"></span></span>
@@ -3921,6 +3985,11 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
             <div class="cp-subtabs" style="margin:22px -24px 0;padding:0 12px"><span class="on">Notes</span><span>Journey</span><span>Plan</span><span>Health</span></div>
           </div>
           <div class="nt-feedbody" style="padding-top:16px">
+          <div class="nt-write" role="button" tabindex="0" aria-label="Write a note">
+            <span class="ico"><svg class="cp-icon"><use href="#i-compose"/></svg></span>
+            <span class="tx"><b>Write a note</b><span>Notes stay on this phone.</span></span>
+            <svg class="cp-icon"><use href="#i-chev"/></svg>
+          </div>
           <article class="nt-row noacts">
             <span class="nt-av" aria-hidden="true">AG</span>
             <div class="nt-main">
@@ -3937,7 +4006,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           </article>
           </div>
         </div>
-        <div class="fab-slot"><button class="cp-fab-write" aria-label="Write a note"><svg class="cp-icon"><use href="#i-compose"/></svg></button></div>
+        <div class="fab-slot"><button class="cp-fab-write" aria-label="Inbox, 3 unread"><svg class="cp-icon"><use href="#i-chat"/></svg><span class="cp-fab-badge" aria-hidden="true">3</span></button></div>
         <div class="tabdock"><nav class="cp-tabbar">
           <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
@@ -3950,7 +4019,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     </div>
 
     <div class="phone-wrap">
-      <p class="phone-label"><b>Me · Notes, empty</b>No note yet · a button to write the first</p>
+      <p class="phone-label"><b>Me · Notes, empty</b>No note yet · the card above is the way in: there is no second button</p>
       <div class="phone">
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
         <div class="scroll nt-me" data-scroll-strip="1">
@@ -3958,7 +4027,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           <div style="display:flex;align-items:center;gap:10px">
             <span class="un">ana.camina</span>
             <span class="cp-edit-pill" role="button" aria-label="Edit profile"><svg class="cp-icon "><use href="#i-pencil"/></svg>camino.plus/ana</span>
-            <span class="cp-bellwrap" style="margin-left:auto"><button class="cp-icon-btn flat" style="width:44px;height:44px" aria-label="Notifications (3 new)"><svg class="cp-icon "><use href="#i-bell"/></svg></button><span class="cp-bell-badge">3</span></span><button class="cp-icon-btn flat" style="width:44px;height:44px;margin-left:-4px" aria-label="Settings"><svg class="cp-icon "><use href="#i-settings"/></svg></button>
+            <button class="cp-icon-btn flat" style="width:44px;height:44px;margin-left:auto" aria-label="Settings"><svg class="cp-icon "><use href="#i-settings"/></svg></button>
           </div>
           <div class="profile-top" style="margin-top:20px">
             <span class="cp-ring"><span class="cp-avatar" style="width:86px;height:86px"></span></span>
@@ -3986,24 +4055,19 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
             <div class="cp-subtabs" style="margin:22px -24px 0;padding:0 12px"><span class="on">Notes</span><span>Journey</span><span>Plan</span><span>Health</span></div>
           </div>
           <div class="nt-feedbody" style="padding-top:16px">
-          <div class="nt-compose">
-            <span class="nt-av" aria-hidden="true">AG</span>
-            <div class="nt-body">
-              <div class="nt-prompt">What's happening on your Camino?</div>
-              <div class="nt-short"><span aria-label="Write a new note, then add a photo"><svg class="cp-icon"><use href="#i-image"/></svg></span><span aria-label="Write a new note, then add a place"><svg class="cp-icon"><use href="#i-pin"/></svg></span></div>
-            </div>
+          <div class="nt-write" role="button" tabindex="0" aria-label="Write a note">
+            <span class="ico"><svg class="cp-icon"><use href="#i-compose"/></svg></span>
+            <span class="tx"><b>Write a note</b><span>Notes stay on this phone.</span></span>
+            <svg class="cp-icon"><use href="#i-chev"/></svg>
           </div>
-          <p class="nt-private">Notes stay on this phone.</p>
-          <div class="nt-filters" role="tablist"><span class="on" role="tab" aria-selected="true">All</span><span class="" role="tab" aria-selected="false">Photos and videos</span><span class="" role="tab" aria-selected="false">Places</span></div>
           <div class="nt-empty">
             <span class="badge"><svg class="cp-icon"><use href="#i-compose"/></svg></span>
             <h4>No notes yet</h4>
             <p>Write a few lines about your day on the Way: what you saw, who you met, how you feel.</p>
-            <button class="cp-btn cp-btn-primary block" style="height:68px;font-size:22px;margin-top:8px">Write your first note</button>
           </div>
           </div>
         </div>
-        <div class="fab-slot"><button class="cp-fab-write" aria-label="Write a note"><svg class="cp-icon"><use href="#i-compose"/></svg></button></div>
+        <div class="fab-slot"><button class="cp-fab-write" aria-label="Inbox, 3 unread"><svg class="cp-icon"><use href="#i-chat"/></svg><span class="cp-fab-badge" aria-hidden="true">3</span></button></div>
         <div class="tabdock"><nav class="cp-tabbar">
           <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
           <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
@@ -4024,7 +4088,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           <div style="display:flex;align-items:center;gap:10px">
             <span class="un">ana.camina</span>
             <span class="cp-edit-pill" role="button" aria-label="Edit profile"><svg class="cp-icon "><use href="#i-pencil"/></svg>camino.plus/ana</span>
-            <span class="cp-bellwrap" style="margin-left:auto"><button class="cp-icon-btn flat" style="width:44px;height:44px" aria-label="Notifications (3 new)"><svg class="cp-icon "><use href="#i-bell"/></svg></button><span class="cp-bell-badge">3</span></span><button class="cp-icon-btn flat" style="width:44px;height:44px;margin-left:-4px" aria-label="Settings"><svg class="cp-icon "><use href="#i-settings"/></svg></button>
+            <button class="cp-icon-btn flat" style="width:44px;height:44px;margin-left:auto" aria-label="Settings"><svg class="cp-icon "><use href="#i-settings"/></svg></button>
           </div>
           <div class="profile-top" style="margin-top:20px">
             <span class="cp-ring"><span class="cp-avatar" style="width:86px;height:86px"></span></span>
@@ -4052,15 +4116,11 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
             <div class="cp-subtabs" style="margin:22px -24px 0;padding:0 12px"><span class="on">Notes</span><span>Journey</span><span>Plan</span><span>Health</span></div>
           </div>
           <div class="nt-feedbody" style="padding-top:16px">
-          <div class="nt-compose">
-            <span class="nt-av" aria-hidden="true">AG</span>
-            <div class="nt-body">
-              <div class="nt-prompt">What's happening on your Camino?</div>
-              <div class="nt-short"><span aria-label="Write a new note, then add a photo"><svg class="cp-icon"><use href="#i-image"/></svg></span><span aria-label="Write a new note, then add a place"><svg class="cp-icon"><use href="#i-pin"/></svg></span></div>
-            </div>
+          <div class="nt-write" role="button" tabindex="0" aria-label="Write a note">
+            <span class="ico"><svg class="cp-icon"><use href="#i-compose"/></svg></span>
+            <span class="tx"><b>Write a note</b><span>Notes stay on this phone.</span></span>
+            <svg class="cp-icon"><use href="#i-chev"/></svg>
           </div>
-          <p class="nt-private">Notes stay on this phone.</p>
-          <div class="nt-filters" role="tablist"><span class="on" role="tab" aria-selected="true">All</span><span class="" role="tab" aria-selected="false">Photos and videos</span><span class="" role="tab" aria-selected="false">Places</span></div>
           <article class="nt-row">
             <span class="nt-av" aria-hidden="true">AG</span>
             <div class="nt-main">
@@ -5111,11 +5171,11 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
   })();
   </script>
   <script>
-  /* The Me · Notes phones are shown scrolled to the strip of sub-tabs, as the screen is after a swipe up: the notes are what the phone is about. */
+  /* The Me · Notes phones, and Me · Journey, grid, are shown scrolled to the strip of sub-tabs, as the screen is after a swipe up: the notes and the grid are what those phones are about. */
   (function () {
     var go = function () {
       document.querySelectorAll('[data-scroll-strip]').forEach(function (el) {
-        var strip = el.querySelector('.nt-metop .cp-subtabs');
+        var strip = el.querySelector('.nt-metop .cp-subtabs') || el.querySelector('.cp-subtabs');
         if (strip) el.scrollTop = strip.offsetTop - 20;
       });
     };
