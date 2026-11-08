@@ -2468,6 +2468,11 @@ def main(argv=None):
     ap.add_argument('--root', default=DEFAULT_REPO, help='the repository root (default: the one this script is in)')
     ap.add_argument('--baseline', help='the baseline file (default: tools/design-audit/baseline.json below the root)')
     a = ap.parse_args(argv)
+    for stream in (sys.stdout, sys.stderr):   # a source line with an accent must not stop the report on a terminal that is not UTF-8
+        try:
+            stream.reconfigure(errors='replace')
+        except (AttributeError, ValueError):
+            pass
     repo = os.path.abspath(a.root)
     bpath = baseline_path(repo, a.baseline)
     res = scan(repo)
