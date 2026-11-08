@@ -914,6 +914,15 @@ class Repository(unittest.TestCase):
         for path in sorted((TOOLS / "books").glob("*.py")):
             py_compile.compile(str(path), doraise=True, cfile=str(pathlib.Path(tempfile.gettempdir()) / "books_check.pyc"))
 
+    def test_every_breakage_of_the_breakage_check_still_finds_its_text_exactly_once_and_there_are_enough_of_them(self):
+        import breakage_check as BC
+        self.assertGreaterEqual(len(BC.MUTATIONS), 30)
+        self.assertEqual(len({m[0] for m in BC.MUTATIONS}), len(BC.MUTATIONS), "each breakage has its own name")
+        for name, runner, rel, old, new in BC.MUTATIONS:
+            text = (ROOT / rel).read_text(encoding="utf-8")
+            self.assertEqual(text.count(old), 1, f"{name}: the text to break is not in {rel} exactly once")
+            self.assertNotEqual(old, new, name)
+
     def test_dataclass_is_frozen(self):
         with self.assertRaises(dataclasses.FrozenInstanceError):
             R.RECIPES[0].id = "x"  # type: ignore[misc]

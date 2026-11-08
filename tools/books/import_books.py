@@ -133,7 +133,7 @@ def ordered(ids) -> list[str]:
     return sorted(ids, key=recipes.CATALOGUE_ORDER.index)
 
 
-def left_out_entries(selected_ids: set[str] | None = None) -> list[dict]:
+def left_out_entries() -> list[dict]:
     rows = [{"id": r.id, "verdict": r.verdict, "why": r.why} for r in recipes.LEFT_OUT]
     rows += [{"id": r.id, "verdict": r.verdict, "why": r.why_not} for r in recipes.RECIPES if r.verdict != recipes.PD]
     return sorted(rows, key=lambda row: recipes.CATALOGUE_ORDER.index(row["id"]))
@@ -182,6 +182,9 @@ def run(argv: list[str]) -> int:
     build_these, skipped = plan(args)
     for r in skipped:
         print(f"left out: {r.id}: {r.verdict}. {r.why_not}")
+    for x in recipes.LEFT_OUT:
+        if not args.book or x.id in args.book:
+            print(f"left out: {x.id}: {x.verdict}. {x.why}")
     existing = load_manifest(args.out)
     entries: dict[str, dict] = {i: e for i, e in existing.items() if i not in {r.id for r in build_these}}
     problems: list[str] = []
@@ -201,7 +204,7 @@ def run(argv: list[str]) -> int:
             args.out.mkdir(parents=True, exist_ok=True)
             path.write_bytes(b.data)
         print(f"{'checked' if args.check else 'wrote'} {r.id}: {b.chapters} chapters, {b.words} words, sha256 {b.sha256[:12]}"
-              + (f", dropped {b.stats}" if b.stats else ""))
+              + (f", counts {b.stats}" if b.stats else ""))
     # Only the books the manifest holds have text; the files that list them follow the catalogue order.
     ids = ordered(entries)
     index = [{"id": i, "chapters": entries[i]["chapters"], "words": entries[i]["words"]} for i in ids]
