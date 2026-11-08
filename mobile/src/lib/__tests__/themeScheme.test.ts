@@ -9,7 +9,8 @@ import assert from 'node:assert/strict';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import tokens from '../../theme/tokens.json';
-import { applyScheme, c, fixed, fonts, role, scrim, tabActiveWeight } from '../../theme';
+import { applyScheme, border, c, fixed, fonts, icon, layout, motion, radius, role, scrim, space, tabActiveWeight, text as textSizes, textStyle, z } from '../../theme';
+import type { SpaceStep, TextVariant } from '../../theme';
 
 let n = 0;
 const check = (name: string, fn: () => void) => { fn(); n += 1; console.log(`ok   ${name}`); };
@@ -307,6 +308,53 @@ check('no theme colour is read once when a file loads: it would never follow the
     }
   }
   assert.deepEqual(offenders, [], 'make it a function or a getter, or use fixed.* if the colour must not change');
+});
+
+// ---- the numeric scales the theme exports are design/tokens.json (the design lint, tools/design-audit/scan.py, reads the same file)
+check('space, icon, border, z, radius and layout are exported exactly as design/tokens.json has them', () => {
+  assert.deepEqual({ ...space }, tokens.space, 'space');
+  assert.deepEqual(Object.keys(space).map(Number), [0, 1, 2, 3, 4, 5, 6, 8, 10, 12, 16, 20, 24, 32], 'the 14 steps of the spacing scale');
+  const steps: SpaceStep[] = [0, 1, 2, 3, 4, 5, 6, 8, 10, 12, 16, 20, 24, 32];
+  assert.deepEqual(steps.map((k) => space[k]), [0, 4, 8, 12, 16, 20, 24, 32, 40, 48, 64, 80, 96, 128], 'space[n] is in pixels');
+  assert.deepEqual({ ...icon }, tokens.icon, 'icon');
+  assert.deepEqual([icon.sm, icon.smPlus, icon.md, icon.mdPlus, icon.lg], [18, 20, 24, 28, 32], 'the icon sizes are 18, 20, 24, 28 and 32');
+  assert.equal(icon.stroke, 1.75);
+  assert.deepEqual({ ...border }, tokens.border, 'border');
+  assert.deepEqual({ ...z }, tokens.z, 'z');
+  assert.deepEqual({ ...radius }, tokens.radius, 'radius');
+  assert.deepEqual({ ...layout }, tokens.layout, 'layout');
+});
+
+check('motion and the text sizes are exported as design/tokens.json has them, variant by variant', () => {
+  assert.equal(motion.fast, tokens.motion.fast);
+  assert.equal(motion.base, tokens.motion.base);
+  assert.equal(motion.slow, tokens.motion.slow);
+  assert.deepEqual([...motion.easeStandard], tokens.motion.easeStandard);
+  assert.deepEqual([...motion.easeEmphasis], tokens.motion.easeEmphasis);
+  assert.equal(motion.easeStandard.length, 4, 'a cubic-bezier has four control values');
+  assert.deepEqual(Object.keys(textSizes), Object.keys(tokens.text), 'every text variant has its sizes');
+  for (const [name, t] of Object.entries(tokens.text)) {
+    const want = t as { size: number; lineHeight: number; letterSpacing?: number };
+    const got = textSizes[name as TextVariant];
+    assert.deepEqual(got, { size: want.size, lineHeight: want.lineHeight, letterSpacing: want.letterSpacing ?? 0 }, `text.${name}`);
+    const style = textStyle(name as TextVariant);
+    assert.equal(style.fontSize, got.size, `textStyle(${name}) draws the size of text.${name}`);
+    assert.equal(style.lineHeight, got.lineHeight, `textStyle(${name}) draws the line height of text.${name}`);
+  }
+  assert.equal(textSizes.small.size, 17);
+  assert.equal(textSizes.small.lineHeight, 25);
+  assert.equal(Math.min(...Object.values(textSizes).map((t) => t.size)) >= 15, true, 'no text variant is smaller than 15');
+});
+
+check('tap targets: touchHard 48 is the hard minimum, touchPrimary 56 is the primary target, and the old touchMin keeps its 56', () => {
+  assert.equal(layout.touchHard, 48);
+  assert.equal(layout.touchPrimary, 56);
+  assert.equal(layout.touchMin, 56, 'every consumer of the old name keeps the pixels it had');
+  assert.equal(layout.touchMin, layout.touchPrimary, 'touchMin is the old name of touchPrimary');
+  assert.ok(layout.touchHard < layout.touchPrimary);
+  // the shared button and the fields are drawn at the primary target; the remove button of a photo tile is the hard minimum (it was touchMin - 8)
+  assert.match(read('src/components/Pill.tsx'), /minHeight: large \? 68 : layout\.touchPrimary/);
+  assert.match(read('src/features/diary/MediaTiles.tsx'), /width: layout\.touchHard, height: layout\.touchHard/);
 });
 
 console.log(`${n} checks passed`);

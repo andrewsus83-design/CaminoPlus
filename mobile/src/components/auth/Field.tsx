@@ -14,7 +14,7 @@ export function Field({ label, error, ...rest }: TextInputProps & { label: strin
         onBlur={(e) => { setFocus(false); rest.onBlur?.(e); }}
         {...rest}
         style={{
-          minHeight: layout.touchMin + 8, paddingHorizontal: 22, borderRadius: radius.pill,
+          minHeight: layout.touchPrimary + 8, paddingHorizontal: 22, borderRadius: radius.pill,
           backgroundColor: role.surface, borderWidth: focus ? 2 : 1,
           borderColor: error ? role.danger : focus ? c.gold : role.border,
           fontFamily: fonts.body, fontSize: 17, color: role.text,

@@ -1405,7 +1405,9 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
         <tr><td><code>--cp-card-padding</code></td><td class="mono">20</td><td>Inside standard cards</td></tr>
         <tr><td><code>--cp-card-padding-lg</code></td><td class="mono">24–28</td><td>Hero cards (journey)</td></tr>
         <tr><td><code>--cp-sheet-padding</code></td><td class="mono">24</td><td>Bottom sheets</td></tr>
-        <tr><td><code>--cp-touch-min</code></td><td class="mono">48</td><td>Minimum tap target</td></tr>
+        <tr><td><code>--cp-touch-hard</code></td><td class="mono">48</td><td>The hard minimum tap target: nothing tappable is drawn smaller (a hitSlop counts)</td></tr>
+        <tr><td><code>--cp-touch-primary</code></td><td class="mono">56</td><td>The target for primary actions: buttons, fields, list rows</td></tr>
+        <tr><td><code>--cp-touch-min</code></td><td class="mono">56</td><td>The old name of <code>--cp-touch-primary</code>, the same value; kept so nothing breaks, not for new code</td></tr>
         <tr><td><code>--cp-tabbar-height</code></td><td class="mono">72 + 26</td><td>Floating tab bar + home indicator</td></tr>
         <tr><td><code>--cp-web-max-width</code></td><td class="mono">1200</td><td>camino.plus content width</td></tr>
         <tr><td><code>--cp-web-gutter</code></td><td class="mono">32</td><td>Web side padding (16 on phones)</td></tr>
@@ -5221,6 +5223,19 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     <div class="icon-cell"><svg class="cp-icon"><use href="#i-msg"/></svg>message</div>
     <div class="icon-cell"><svg class="cp-icon"><use href="#i-bolt"/></svg>instant</div>
     <div class="icon-cell"><svg class="cp-icon"><use href="#i-sos"/></svg>sos</div><div class="icon-cell"><svg class="cp-icon"><use href="#i-heli"/></svg>helicopter</div><div class="icon-cell"><svg class="cp-icon"><use href="#i-city"/></svg>city</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-pencil"/></svg>write</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-link"/></svg>link</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-wifi"/></svg>wifi</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-utensils"/></svg>food</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-wash"/></svg>laundry</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-bike"/></svg>bike</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-plug"/></svg>charging</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-clock"/></svg>hours</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-image"/></svg>photo</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-copy"/></svg>copy</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-book"/></svg>article</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-shield"/></svg>policy</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-phone"/></svg>call</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-tagpeople"/></svg>tag people</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-briefcase"/></svg>business</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-store"/></svg>shop</div><div class="icon-cell"><svg class="cp-icon "><use href="#i-diary"/></svg>diary</div>
+  </div>
+
+  <h3>Icon sizes</h3>
+  <p class="intro">Five sizes and no others. <code>tokens.json</code> calls them <code>icon.sm</code>, <code>smPlus</code>, <code>md</code>, <code>mdPlus</code> and <code>lg</code>; in the app <code>import { icon } from '@/theme'</code> and <code>size={icon.md}</code>. The line weight is <code>icon.stroke</code> (1.75) at every size.</p>
+  <div class="panel" style="overflow-x:auto">
+    <table class="contrast">
+      <tr><th>Token</th><th>Size</th><th>Sample</th><th>Where</th></tr>
+      <tr><td><code>--cp-icon-sm</code></td><td class="mono">18</td><td><svg class="cp-icon" style="width:var(--cp-icon-sm);height:var(--cp-icon-sm)"><use href="#i-pin"/></svg></td><td>Inside a chip or a small row, beside 15 px text</td></tr>
+      <tr><td><code>--cp-icon-sm-plus</code></td><td class="mono">20</td><td><svg class="cp-icon" style="width:var(--cp-icon-sm-plus);height:var(--cp-icon-sm-plus)"><use href="#i-pin"/></svg></td><td>In a list row or a button, beside 17 px text</td></tr>
+      <tr><td><code>--cp-icon-md</code></td><td class="mono">24</td><td><svg class="cp-icon" style="width:var(--cp-icon-md);height:var(--cp-icon-md)"><use href="#i-pin"/></svg></td><td>The default: icon buttons, headers, the 24 px grid the icons are drawn on</td></tr>
+      <tr><td><code>--cp-icon-md-plus</code></td><td class="mono">28</td><td><svg class="cp-icon" style="width:var(--cp-icon-md-plus);height:var(--cp-icon-md-plus)"><use href="#i-pin"/></svg></td><td>The tab bar and other prominent single actions</td></tr>
+      <tr><td><code>--cp-icon-lg</code></td><td class="mono">32</td><td><svg class="cp-icon" style="width:var(--cp-icon-lg);height:var(--cp-icon-lg)"><use href="#i-pin"/></svg></td><td>Empty states and the largest actions</td></tr>
+    </table>
   </div>
 </section>
 

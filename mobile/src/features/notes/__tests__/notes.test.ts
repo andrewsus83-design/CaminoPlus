@@ -586,7 +586,7 @@ check('every control has a label and is at least 44 big: Pressables, buttons and
   assert.match(code('NoteRow.tsx'), /maxWidth: '100%', minHeight: TOUCH_MIN/, 'the place chip');
   assert.match(code('NotesHeader.tsx'), /minHeight: WRITE_CARD_MIN/, 'the card is at least WRITE_CARD_MIN (64) high, more than a thing to touch needs');
   assert.ok(WRITE_CARD_MIN >= TOUCH_MIN + 20);
-  assert.match(code('NoteMenu.tsx'), /minHeight: layout\.touchMin/, 'the items of the menu are 56');
+  assert.match(code('NoteMenu.tsx'), /minHeight: layout\.touchPrimary/, 'the items of the menu are 56');
 });
 
 check('the Notes tab uses no network and no console: nothing in it can send a note anywhere', () => {
