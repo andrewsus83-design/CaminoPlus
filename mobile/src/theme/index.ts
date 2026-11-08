@@ -78,10 +78,20 @@ const LITURGICAL_LIGHT = { green: '#2F6B4F', violet: '#6B3FA0', white: '#FFFDF8'
 const LITURGICAL_DARK = { green: '#6FBF98', violet: '#B79BE0', white: '#FFFDF8', red: '#E07868', rose: '#F29BB9' } as const;
 export const liturgical: Record<keyof typeof LITURGICAL_LIGHT, string> = { ...LITURGICAL_LIGHT };
 
+/**
+ * How heavy the active tab of the bottom tab bar is drawn (design/tokens.json: tab): the stroke of its icon and the font of its label. The same
+ * stroke looks thinner dark on light than light on dark, so light mode is a little heavier. Updated in place with the scheme, like `role`.
+ */
+const TAB = tokens.tab as { activeStroke: Record<Scheme, number>; activeLabelWeight: Record<Scheme, number> };
+const TAB_LABEL_FONT: Record<number, string> = { 600: 'Inter_600SemiBold', 700: 'Inter_700Bold' };
+const tabWeightFor = (scheme: Scheme) => ({ stroke: TAB.activeStroke[scheme], font: TAB_LABEL_FONT[TAB.activeLabelWeight[scheme]] });
+export const tabActiveWeight = tabWeightFor('light');
+
 export function applyScheme(scheme: Scheme) {
   Object.assign(c, LIGHT, scheme === 'dark' ? DARK : {});
   Object.assign(role, roleFor(c, scheme));
   Object.assign(liturgical, scheme === 'dark' ? LITURGICAL_DARK : LITURGICAL_LIGHT);
+  Object.assign(tabActiveWeight, tabWeightFor(scheme));
 }
 
 /** The dimming behind a sheet or a dialog. Navy at 45% over either mode's screen; it does not change with the mode. */
@@ -99,6 +109,8 @@ export const fonts = {
   body: 'Inter_400Regular',
   bodyMedium: 'Inter_500Medium',
   bodyBold: 'Inter_600SemiBold',
+  /** Only the label of the active tab of the tab bar in light mode (tokens.tab.activeLabelWeight): dark on light looks thinner. */
+  bodyStrong: 'Inter_700Bold',
   mono: 'JetBrainsMono_400Regular',
   accent: 'Caveat_700Bold',
 } as const;
