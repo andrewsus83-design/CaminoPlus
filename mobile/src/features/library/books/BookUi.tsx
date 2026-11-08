@@ -4,8 +4,9 @@ import { Icon, type IconName } from '@/components/Icon';
 import { c, radius, role } from '@/theme';
 
 // The few buttons of the book page and the reader that nothing else in the app has: the gold bar that starts or goes on reading (a screen reader says
-// the whole title of the chapter it opens), the 44 round button of the reader's header (an icon, dimmed and disabled when there is nothing to go to) and the
-// two "A" buttons that make the text smaller and larger. Colours are roles and the gold, read while drawing, so dark mode follows.
+// the whole title of the chapter it opens), the round button of the reader's bar (an icon, 56 there, dimmed and disabled when there is nothing to go to) and the
+// two "A" buttons of its header that make the text smaller and larger (48, like every round button of a header). The way back is not here: it is the Back button
+// of the app (components/BackButton.tsx). Colours are roles and the gold, read while drawing, so dark mode follows.
 
 /** The button of the book page: "Start reading" or "Continue: Chapter 7", gold, as wide as the page, at least 56 high. */
 export function ReadButton({ label, spoken, hint, onPress }: { label: string; spoken: string; hint?: string; onPress: () => void }) {
@@ -50,7 +51,10 @@ export function IconTap({ icon, label, hint, disabled, size = 44, onPress }: { i
   );
 }
 
-/** "Smaller text" and "Larger text": the letter A, small or large, in the title font of the brand. */
+/** The round buttons of a header are 48 by 48, the size of IconButton (components/ui.tsx) and so of the Back button next to these two. */
+const HEADER_BUTTON = 48;
+
+/** "Smaller text" and "Larger text": the letter A, small or large, in the title font of the brand, in the round 48 button of the header (the surface colour, a hairline, like IconButton). */
 export function SizeTap({ larger, disabled, onPress }: { larger: boolean; disabled?: boolean; onPress: () => void }) {
   return (
     <Pressable
@@ -59,7 +63,7 @@ export function SizeTap({ larger, disabled, onPress }: { larger: boolean; disabl
       accessibilityState={{ disabled: !!disabled }}
       disabled={disabled}
       onPress={onPress}
-      style={({ pressed }) => ({ width: 44, height: 44, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center', backgroundColor: pressed ? role.sunken : role.surface, borderWidth: 1, borderColor: role.border, opacity: disabled ? 0.35 : 1 })}
+      style={({ pressed }) => ({ width: HEADER_BUTTON, height: HEADER_BUTTON, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center', backgroundColor: pressed ? role.sunken : role.surface, borderWidth: 1, borderColor: role.border, opacity: disabled ? 0.35 : 1 })}
     >
       <AppText variant="h4" maxFontSizeMultiplier={1} style={{ fontSize: larger ? 24 : 15, lineHeight: larger ? 28 : 20 }}>A</AppText>
     </Pressable>

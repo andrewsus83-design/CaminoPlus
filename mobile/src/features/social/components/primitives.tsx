@@ -4,7 +4,7 @@ import { ActivityIndicator, Image, Platform, Pressable, TextInput, View, ViewSty
 import { AppText } from '@/components/AppText';
 import { FIXED } from '@/components/fixedColors';
 import { Icon, IconName } from '@/components/Icon';
-import { IconButton } from '@/components/ui';
+import { BackButton } from '@/components/BackButton';
 import { c, fonts, radius, role } from '@/theme';
 import { avatarTint, badgeLabel, initials } from '../logic';
 
@@ -131,7 +131,7 @@ export function SearchField({ value, onChangeText, placeholder, label, autoFocus
 export function ScreenHeader({ title, onBack, right, variant = 'h2' }: { title: string; onBack?: () => void; right?: ReactNode; variant?: 'h2' | 'h3' | 'h4' }) {
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-      {onBack && <IconButton name="back" label="Back" onPress={onBack} />}
+      {onBack && <BackButton onPress={onBack} />}
       <AppText variant={variant} numberOfLines={1} accessibilityRole="header" style={{ flex: 1 }}>{title}</AppText>
       {right}
     </View>

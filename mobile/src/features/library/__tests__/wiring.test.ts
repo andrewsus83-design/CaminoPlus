@@ -101,11 +101,11 @@ check('a book of the Bible in a list of results or of Bookmarks is ONE button th
   assert.match(tabs, /import \{ Pressable, View \} from 'react-native';/);
 });
 
-check('what can be pressed in the feature: the bookmark button, the search field, the banner, the three choices, the tiles, the rows of books and verses, the continue card, the covers, the book page, the readers\' buttons, and nothing else', () => {
+check('what can be pressed in the feature: the bookmark button, the search field, the banner, the three choices, the tiles, the rows of books and verses, the continue card, the covers, the book page, the readers\' buttons (the Back button and the pills of the app are components of their own), and nothing else', () => {
   const pressable = featureFiles.filter((f) => /<Pressable\b/.test(code(read(f)))).map((f) => path.basename(f)).sort();
   assert.deepEqual(pressable, [
     'BookCover.tsx', 'BookGrid.tsx', 'BookPage.tsx', 'BookRows.tsx', 'BookUi.tsx', 'BookmarkToggle.tsx', 'ChapterFooter.tsx', 'ChapterGrid.tsx', 'ChapterNav.tsx', 'ContinueCard.tsx',
-    'LibraryBanner.tsx', 'LibraryTabs.tsx', 'PassageActions.tsx', 'PassageRows.tsx', 'Reader.tsx', 'ReaderHeader.tsx', 'SearchBar.tsx', 'SearchResults.tsx', 'TestamentBar.tsx', 'VerseActions.tsx', 'VerseRows.tsx',
+    'LibraryBanner.tsx', 'LibraryTabs.tsx', 'PassageActions.tsx', 'PassageRows.tsx', 'SearchBar.tsx', 'SearchResults.tsx', 'TestamentBar.tsx', 'VerseActions.tsx', 'VerseRows.tsx',
   ]);
   // the sample content never acts like real content: no data file has a handler either
   for (const f of ['sample.ts', 'bible/books.ts', 'books/catalog.ts', 'search.ts', 'bookmarks.ts']) assert.doesNotMatch(code(read(`${DIR}/${f}`)), /onPress|Pressable|onClick|=>\s*router/, f);

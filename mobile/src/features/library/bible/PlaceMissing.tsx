@@ -3,7 +3,8 @@ import { useRouter } from 'expo-router';
 import { Screen } from '@/components/Screen';
 import { AppText } from '@/components/AppText';
 import { Pill } from '@/components/Pill';
-import { Card, IconButton } from '@/components/ui';
+import { BackButton } from '@/components/BackButton';
+import { Card } from '@/components/ui';
 import { bookByCode } from './books';
 import { bookHref } from './order';
 
@@ -17,11 +18,10 @@ export const MISSING_CHAPTER = 'This chapter is not in the Bible list.';
  */
 export function PlaceMissing({ message, code }: { message: string; code?: string }) {
   const router = useRouter();
-  const goBack = () => (router.canGoBack() ? router.back() : router.replace('/library'));
   const book = code ? bookByCode(code.toUpperCase()) : undefined;
   return (
     <Screen tabBar={false}>
-      <IconButton name="back" label="Back" onPress={goBack} />
+      <BackButton fallback="/library" />
       <AppText variant="h2" accessibilityRole="header">Not found</AppText>
       <Card style={{ gap: 16 }}>
         <AppText variant="small" accessibilityLiveRegion="polite">{message}</AppText>
