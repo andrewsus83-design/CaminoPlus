@@ -1,6 +1,6 @@
 # CaminoPlus Brand Guideline
 
-Version 1.0 · November 2026 · Scope: social media (Instagram, TikTok, Facebook, Pinterest, YouTube Shorts, Threads, X, WhatsApp Channel), also valid for ads, app store screenshots and press.
+Version 1.1 · November 2026 · Scope: social media (Instagram, TikTok, Facebook, Pinterest, YouTube Shorts, Threads, X, WhatsApp Channel), also valid for ads, app store screenshots and press.
 
 The source of truth for colours, type and spacing in code is [`design/tokens.json`](../design/tokens.json). This document explains how to use them in content.
 
@@ -11,6 +11,8 @@ The source of truth for colours, type and spacing in code is [`design/tokens.jso
 **What we are.** CaminoPlus is the offline-first companion app for the Camino de Santiago. Maps, stays, a digital pilgrim passport and a shareable journal, for every route, from wherever you start. It works when the signal doesn't.
 
 **Promise.** *Every step of the Way, even offline.*
+
+**Stance.** CaminoPlus is a Christian-rooted companion for the Way, and every walker is welcome.
 
 **Who we talk to.**
 
@@ -29,7 +31,7 @@ The source of truth for colours, type and spacing in code is [`design/tokens.jso
 |---|---|
 | Calm and reassuring | Hype, FOMO, "must-see before you die" |
 | Practical, specific (km, stages, opening times) | Vague inspiration with nothing useful |
-| Inclusive of every reason to walk (faith, sport, grief, curiosity) | Preachy or dismissive of the religious roots |
+| Rooted in the Christian pilgrimage and open to every reason to walk (faith, sport, grief, curiosity) | Preachy, pressuring, or shy about our Christian roots |
 | Respectful of pilgrims, hosts and locals | Mocking, or treating villages as backdrops |
 | Honest (approximate figures marked with "~") | Overclaiming ("the #1 Camino app") |
 
@@ -56,6 +58,7 @@ The source of truth for colours, type and spacing in code is [`design/tokens.jso
 | Community reply | Friendly, quick, personal | "Buen Camino, Marta! Which stage are you on?" |
 | Safety / weather | Calm, direct, no jokes | "Heat warning on the Meseta today. Start before 7, carry 2 L of water." |
 | Problem / complaint | Own it, move to DM | "Sorry, that's not okay. Sending you a DM to fix it now." |
+| Scripture and faith | Quiet, short, sourced | One verse at most, always with its book, chapter and verse. Use a paraphrase or the app's own translation, never one we have not cleared. |
 
 **Words we use / avoid**
 
@@ -65,6 +68,7 @@ The source of truth for colours, type and spacing in code is [`design/tokens.jso
 | offline, no signal needed, works on the trail | revolutionary, game-changing, AI-powered (unless it really is) |
 | ~ (approximate) for distances | exact claims we haven't verified |
 | "from $12 a year" | "cheap", "free" (only the free tier is free) |
+| a verse with its reference, a quiet line | "find God", "be saved", "miracle" as hype, "real pilgrim" |
 
 **Taglines and lines we can reuse**
 
@@ -221,7 +225,7 @@ The look is **natural documentary travel photography**: true-to-life colour, sof
 
 - Reply to every comment and DM within 24 h in the first months.
 - Use the pilgrim's name. End with a question when natural.
-- Faith-related comments: respectful and neutral. We serve every pilgrim.
+- Faith-related comments: warm, never debating. We are Christian-rooted and we serve every pilgrim. Offer a prayer only if someone asks.
 - Safety questions (heat, injury, lost): give clear basics and point to official help (112 in Spain and Portugal). Never give medical advice.
 - Negative reviews: acknowledge, apologise if we're wrong, move to DM. Never argue, never delete honest criticism (delete only spam, hate, or personal data).
 - Don't promise launch dates or features that aren't confirmed.
