@@ -11,6 +11,7 @@ import { ContinueCard } from '@/features/library/bible/ContinueCard';
 import type { Testament } from '@/features/library/bible/books';
 import { bookHref, readerHref } from '@/features/library/bible/order';
 import type { Ref } from '@/features/library/bible/ref';
+import { prepareSearch } from '@/features/library/bible/searchText';
 import { useLastRead } from '@/features/library/bible/useLastRead';
 import { BooksBanner, DailyBanner } from '@/features/library/LibraryBanner';
 import { LibraryHeader } from '@/features/library/LibraryHeader';
@@ -59,7 +60,7 @@ export default function Library() {
   const top = (
     <>
       <AppText accessibilityRole="header" style={VISUALLY_HIDDEN}>Library</AppText>
-      <LibraryHeader query={query} onQuery={setQuery} onBookmarks={() => router.push('/library/bookmarks')} />
+      <LibraryHeader query={query} onQuery={setQuery} onBookmarks={() => router.push('/library/bookmarks')} onSearchFocus={prepareSearch} />
       {marks.failed && <FormMessage>{BOOKMARK_NOT_SAVED}</FormMessage>}
       {!searching && <SubTabs tabs={LIBRARY_TABS} value={tab} onChange={setTab} />}
     </>

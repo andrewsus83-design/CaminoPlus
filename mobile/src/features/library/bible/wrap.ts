@@ -7,7 +7,7 @@
 // fails if one of them differs. A line is cut at the last space that keeps it inside the width of the page, and the rest goes on in the next line, one em
 // further in than the line it belongs to. Nothing is cut inside a word, and a no-break space is never a place to cut. The sums are in em of the body text, so
 // the size of the text and the text size of the phone enter only as the width of the page measured in them.
-import type { PoemLine } from './blocks';
+import type { PoemLine, PoemPart } from './blocks';
 
 /** Inter Regular, the advance width of each character the text of the Bible has (and the rest of the printable ASCII), in em. */
 export const INTER_400: Readonly<Record<string, number>> = {
@@ -69,8 +69,11 @@ export function wrapWords(text: string, first: number, rest: number): string[] {
   return lines;
 }
 
-/** A line of poetry as it is drawn: a line of the verse, gone in `indent` em (one more than its verse's own for the lines a long one is cut into). */
-export type DrawnLine = { verse: string; n: string | null; indent: number; text: string; /** This is a part of a line that was cut, not the start of a line. */ cont: boolean };
+/**
+ * A line of poetry as it is drawn: gone in `indent` em (one more than its own for the lines a long one is cut into), and the words in it: one part for the words
+ * of each verse that is in it (nearly always one; a line that two verses share has two).
+ */
+export type DrawnLine = { indent: number; /** This is a part of a line that was cut, not the start of a line. */ cont: boolean; parts: PoemPart[] };
 
 export type WrapSizes = {
   /** The width of the words of the page in px (the screen less its two margins). */
@@ -83,20 +86,57 @@ export type WrapSizes = {
   numberOf: (label: string) => string;
 };
 
+/** A word of a line of poetry, with the part it belongs to and the number of the verse that stands in front of it (only on the first word of a part). */
+type Piece = { part: number; word: string; n: string | null; lead: number };
+
+/** The words of a row, grouped by the part they belong to: a part that starts in this row has its number, one that goes on from the row above has none. */
+function partsOf(row: readonly Piece[], parts: readonly PoemPart[]): PoemPart[] {
+  const groups: Array<{ part: number; n: string | null; words: string[] }> = [];
+  for (const piece of row) {
+    const last = groups[groups.length - 1];
+    if (last && last.part === piece.part) last.words.push(piece.word);
+    else groups.push({ part: piece.part, n: piece.n, words: [piece.word] });
+  }
+  return groups.map((g) => ({ verse: parts[g.part].verse, n: g.n, text: g.words.join(' ') }));
+}
+
 /**
  * The lines a stanza is drawn in: each line of the stanza is cut where it has to be, and the parts after the first go in one em further than the line. The
- * number of a verse is on the first part of the first line of its verse, and takes room there. Every part fits the width of the page by the real widths of the
- * letters; a stanza whose lines all fit comes back as it is.
+ * number of a verse is on the first word of its first part, wherever that is in a line (a line that two verses share has the second number in the middle of it),
+ * and takes room there. Every row fits the width of the page by the real widths of the letters; a stanza whose lines all fit comes back as it is.
  */
 export function wrapPoem(lines: readonly PoemLine[], sizes: WrapSizes): DrawnLine[] {
   const em = sizes.size * sizes.scale; // px of one em of the body text, as drawn
   const total = sizes.width / em; // the page as wide as that, in em
+  const space = INTER_400[' '];
+  const numberEm = (label: string): number => ([...sizes.numberOf(label)].length * MONO_ADVANCE * sizes.numberSize) / sizes.size + THIN_SPACE_EM;
   const out: DrawnLine[] = [];
   for (const line of lines) {
-    const numberEm = line.n === null ? 0 : ([...sizes.numberOf(line.n)].length * MONO_ADVANCE * sizes.numberSize) / sizes.size + THIN_SPACE_EM;
-    const parts = wrapWords(line.text, total - line.indent - numberEm, total - line.indent - HANG_EM);
-    if (parts.length === 0) continue;
-    parts.forEach((text, k) => out.push({ verse: line.verse, n: k === 0 ? line.n : null, indent: k === 0 ? line.indent : line.indent + HANG_EM, text, cont: k > 0 }));
+    const pieces: Piece[] = [];
+    line.parts.forEach((p, k) => {
+      p.text.split(' ').filter((w) => w.length > 0).forEach((word, j) => {
+        pieces.push({ part: k, word, n: j === 0 ? p.n : null, lead: j === 0 && p.n !== null ? numberEm(p.n) : 0 });
+      });
+    });
+    const rows: Piece[][] = [];
+    let row: Piece[] = [];
+    let text = 0; // the words of the row and the spaces between them, in em
+    let lead = 0; // the numbers in the row, in em
+    for (const piece of pieces) {
+      const w = textWidth(piece.word);
+      const room = total - line.indent - (rows.length === 0 ? 0 : HANG_EM);
+      if (row.length > 0 && (text + space + w) * WRAP_SAFETY + lead + piece.lead > room) {
+        rows.push(row);
+        row = [];
+        text = 0;
+        lead = 0;
+      }
+      text += row.length === 0 ? w : space + w;
+      lead += piece.lead;
+      row.push(piece);
+    }
+    if (row.length > 0) rows.push(row);
+    rows.forEach((r, k) => out.push({ indent: k === 0 ? line.indent : line.indent + HANG_EM, cont: k > 0, parts: partsOf(r, line.parts) }));
   }
   return out;
 }
