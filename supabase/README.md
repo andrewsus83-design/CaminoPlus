@@ -34,6 +34,9 @@ supabase/
                                 (a no-op where the first migrations already made it)
     ..._stage_places.sql        list_stage_stays() / list_stage_pois(): the places of a stage, with lat and lng as numbers
                                 (Stays tab, stay page, map pins)
+    ..._camino_frances_stages.sql   stages 4 to 33 of the Camino Francés (hidden, no distance)
+    ..._camino_portugues_stages.sql the 11 stages of the Camino Portugués Central (hidden, no distance)
+    ..._camino_ingles_stages.sql    the 6 stages of the Camino Inglés from Ferrol (hidden, no distance)
   functions/               Deno edge functions: offline-pack-url (signed pack links), delete-account
   seed.sql                 reference data + a small Camino Frances sample
   dev/validate.sh          applies everything to a throwaway local Postgres, runs every dev/*smoke*.sql
@@ -199,6 +202,30 @@ erDiagram
   hazard 24 h, closed 7 days, ...; overridable in `app_config`). A "still there" vote extends it;
   a report hides once denials outnumber confirmations by 3. Realtime is enabled on this table.
 - **Weather** comes from an API through an edge function; it is not stored.
+
+### OpenStreetMap places in the live database
+
+State on 8 November 2026, read back from the live project. **None of these rows is in a migration or in `seed.sql`** (a database built from them has only the seed sample): they were written by the OSM importer
+([`tools/poi-audit/import_osm.py`](../tools/poi-audit/README.md#import-to-supabase-osm-importer)) and live in the database only.
+
+| Camino Francés stage | `list_stage_stays` | `list_stage_pois` |
+|---|---|---|
+| 1 Saint-Jean-Pied-de-Port to Roncesvalles | 84 | 111 |
+| 2 Roncesvalles to Zubiri | 71 | 71 |
+| 3 Zubiri to Pamplona (loaded last) | 498 | 374 |
+| 4 to 33 | none (hidden stages) | none |
+
+- **Rows and links.** `stays` has 628 rows and `pois` 526 (627 and 524 are from OSM; the others are seed samples); `stage_stays` has 653 links and `stage_pois` 556, which is what the table adds up to. A place near where two stages meet is
+  one row linked to both stages, which is why there are fewer rows than links. Every imported row has `source = 'osm'` and `verification_level = 'unverified'`; a re-run never lowers a trust level and never brings a deleted place back (see the
+  importer's README). The data is © OpenStreetMap contributors under the ODbL: [what that asks of us](../tools/poi-audit/README.md#data-from-openstreetmap-attribution-and-odbl).
+- **What the stage functions return.** `list_stage_stays(p_stage)` and `list_stage_pois(p_stage)` answer the places of one published stage in walking order (`km_from_stage_start`, then the shorter `detour_m`, then the name), with lat and lng as
+  numbers, and **at most 500 rows each**. They take no paging argument: a stage with more than 500 stays (or places) loses the rest from the end of the walk, without an error, and the app does not say so. **Stage 3 has 498 stays, two under the
+  cap.** Raising the limit or adding paging is a new migration (an applied one is never edited) plus a change in the app; neither is done.
+- **`stages.geom` is not the route.** Only stages 1 to 3 have one (of 50 stages): a hand-placed line of 3 points from `seed.sql`. Nothing reads it: not the app, not an edge function, not a SQL function (the GiST index `stages_geom_idx` is unused).
+  The route line the map draws comes from the app: for stages 1 to 3 it is the real OpenStreetMap route, bundled in `mobile/assets/map/lines/` (see [`mobile/docs/MAPS.md`](../mobile/docs/MAPS.md)). A migration could write those lines into this column if something ever reads it; none does.
+- **Undoing a load.** The importer only adds and refreshes; no script takes a stage's places out again. If one is ever needed, the idea is a script for one stage that works in a single transaction, first on a branch copy of the database,
+  prints its counts before it commits, and removes only what the import made and nobody touched since: the links of that stage in `stage_stays` and `stage_pois`, and then the places linked to no other stage that no pilgrim,
+  owner or editor has used (a favourite, a review, a stamp, a journey day, a business claim, a verification). A place another stage also lists keeps its row and loses only this stage's link. It is not written.
 
 ### Discover tab
 
