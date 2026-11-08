@@ -27,7 +27,8 @@ export type SampleItem = {
   video: boolean;
 };
 
-// An even number, so the two-column grid ends on a full row. Clips are mixed in between stills.
+// Ten samples. The grid starts with the write card (features/me/WriteCard.tsx), a cell that is not a sample, so the ten samples and the card are 11 cells and the last
+// sample stands alone on its row, as the last post of any journey with an even number of posts does. Clips are mixed in between stills.
 export const SAMPLE_JOURNEY: readonly SampleItem[] = [
   { key: 'cobbled-street', place: 'Start of the Camino', body: 'First yellow arrow, first cobbles. Boots on, here we go.', video: false },
   { key: 'fog-hiker', place: 'Pyrenees', body: 'Up into the fog. Legs say no, heart says yes.', video: true },
@@ -42,7 +43,7 @@ export const SAMPLE_JOURNEY: readonly SampleItem[] = [
 ];
 
 /** Above the grid. Says what this is and what to do next. */
-export const SAMPLE_BANNER = 'Sample journey: AI-generated pictures and clips. Tap the pen to write your own first post.';
+export const SAMPLE_BANNER = 'Sample journey: AI-generated pictures and clips. Tap the first card to write your own first post.';
 /** Inside the full-screen viewer, above the caption. */
 export const SAMPLE_VIEWER_LABEL = 'Sample · AI-generated';
 

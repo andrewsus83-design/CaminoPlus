@@ -700,7 +700,7 @@ const GOOD = page('g1', day(1), { title: 'Roncesvalles', body: 'Cold and clear.'
     assert.deepEqual([0, 1, 2, 3].map(pagesLabel), ['0 pages', '1 page', '2 pages', '3 pages']);
     assert.deepEqual([0, 999, 1000, 20000, 1234567].map(thousands), ['0', '999', '1,000', '20,000', '1,234,567']);
     assert.equal(PRIVACY_LINE, 'Only on this phone. Pages, photos, videos and places are not uploaded and not shared. If you delete the app or lose this phone, they are gone.');
-    assert.equal(EMPTY_CARD_LINE, 'Your diary is empty. Tap the pen to write the first page.');
+    assert.equal(EMPTY_CARD_LINE, 'Your diary is empty. Tap Write a note to write the first page.'); // the card at the top of Notes on Me (the pen that floated there is gone)
     for (const p of ['body-too-long', 'title-too-long', 'too-many-pages', 'diary-full', 'not-saved'] as const) {
       const text = problemMessage(p);
       assert.ok(text.length > 20 && /\.$/.test(text) && !/error|fail|invalid|exception/i.test(text), text);

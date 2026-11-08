@@ -26,7 +26,8 @@ export const routeName = (r) => (r.url === r.pattern ? r.pattern : `${r.pattern}
  * Every route in every account state that can reach it, in light and dark, online and offline, with a full account (every list has rows).
  * Signed-in states are also swept with an EMPTY account (nothing but the account and the journey: no days, stamps, posts, friends, stays)
  * because a screen can break on a list with nothing in it. Scheme changes colours, not data, so the empty account is swept in light only.
- * Then the scenarios, in light and dark (a scenario may narrow that with `schemes`, and may ask for offline, an expired login, or no saved account).
+ * Then the scenarios, in light and dark (a scenario may narrow that with `schemes`, and may ask for offline, an expired login, no saved account, or `data: 'empty'`:
+ * the account with nothing in it, as a new pilgrim has it; the default is the full account).
  */
 export function buildTasks({ routes, scenarios, only = null }) {
   const tasks = [];
@@ -43,7 +44,7 @@ export function buildTasks({ routes, scenarios, only = null }) {
   for (const scenario of scenarios) {
     for (const scheme of scenario.schemes ?? SCHEMES) {
       tasks.push({
-        type: 'scenario', scenario, persona: scenario.persona, scheme, offline: !!scenario.offline, expiredLogin: !!scenario.expiredLogin, savedAccount: scenario.savedAccount,
+        type: 'scenario', scenario, persona: scenario.persona, scheme, offline: !!scenario.offline, expiredLogin: !!scenario.expiredLogin, savedAccount: scenario.savedAccount, data: scenario.data,
         label: `scenario "${scenario.name}"  [${scheme}, ${scenario.offline ? 'offline' : 'online'}, ${PERSONAS[scenario.persona].label}]`,
       });
     }
