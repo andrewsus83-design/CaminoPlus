@@ -91,8 +91,9 @@ export const BOOKS_SCENARIOS = [
         near(b.width, 358, 2, 'the banner fills the margins');
         await page.getByText('Books for the road', { exact: true }).waitFor();
       }
-      if (index.length > 0 && index.length < 12) await page.getByText('More books are coming', { exact: true }).waitFor();
-      if (index.length === 12) await eventually(() => page.getByText('More books are coming', { exact: true }).count(), (n) => n === 0, { what: 'the number of notices once every book has a text' });
+      const line = `${index.length} of the 12 books ${index.length === 1 ? 'is' : 'are'} in the app and can be read with no signal. The others say Soon: we are still checking their editions.`;
+      if (index.length > 0 && index.length < 12) await page.getByText(line, { exact: true }).waitFor();
+      if (index.length === 12) await eventually(() => page.getByText(/ in the app and can be read with no signal\. The others say Soon/).count(), (n) => n === 0, { what: 'the number of notices once every book has a text' });
       step('the covers are A5 (148 by 210), two in a row, 16 from the edge and 12 apart: 173 by 245 on this 390 phone');
       const covers = page.getByRole('button', { name: COVER });
       const boxes = [];
