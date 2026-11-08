@@ -52,6 +52,11 @@ def sha256(rel: str) -> str:
     return hashlib.sha256((ROOT / rel).read_bytes()).hexdigest()
 
 
+def text_sha256(rel: str) -> str:
+    """The hash of a text file (an SVG, the exporter) the way the exporter writes it: how the checkout ends its lines does not count."""
+    return hashlib.sha256((ROOT / rel).read_bytes().replace(b"\r\n", b"\n")).hexdigest()
+
+
 class Png:
     """Header, chunks and (when asked) the pixel rows of an 8-bit PNG, read with zlib and struct."""
 
@@ -245,7 +250,7 @@ class ExportManifest(unittest.TestCase):
 
     def test_every_png_and_svg_is_the_one_the_exporter_wrote(self):
         for f in self.manifest["files"]:
-            self.assertEqual(sha256(f["svg"]), f["svgSha256"], f"{f['svg']} changed since the last export: run node tools/export_app_icons.mjs and commit the PNG files")
+            self.assertEqual(text_sha256(f["svg"]), f["svgSha256"], f"{f['svg']} changed since the last export: run node tools/export_app_icons.mjs and commit the PNG files")
             self.assertEqual(sha256(f["png"]), f["pngSha256"], f"{f['png']} is not what the exporter wrote (edited by hand?): run node tools/export_app_icons.mjs")
             png = Png(f["png"])
             self.assertEqual((png.width, png.height, png.colour_type), (f["width"], f["height"], f["colorType"]), f["png"])
@@ -253,7 +258,7 @@ class ExportManifest(unittest.TestCase):
     def test_the_exporter_has_not_changed_since_it_ran(self):
         exporter = self.manifest["exporter"]
         self.assertEqual(exporter["path"], "tools/export_app_icons.mjs")
-        self.assertEqual(sha256(exporter["path"]), exporter["sha256"], "tools/export_app_icons.mjs changed after the last export: run it again and commit the result")
+        self.assertEqual(text_sha256(exporter["path"]), exporter["sha256"], "tools/export_app_icons.mjs changed after the last export: run it again and commit the result")
 
 
 if __name__ == "__main__":

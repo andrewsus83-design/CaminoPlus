@@ -2,7 +2,7 @@
   "note": "Written by tools/export_app_icons.mjs. tools/tests/test_store_assets.py checks it.",
   "exporter": {
     "path": "tools/export_app_icons.mjs",
-    "sha256": "6323a48f191517bc6677d61ac987cf9da11c4bb92f1050b24cc3d24ae15bdc8b"
+    "sha256": "9ee47cda0ba23a75aef27ff74275fd2feb04bc9cdf670ab2848a70495c5a4335"
   },
   "files": [
     {

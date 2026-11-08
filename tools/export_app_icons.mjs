@@ -18,7 +18,9 @@
 //   mobile/assets/android-icon-monochrome.png   Android 13 themed icon: the same shell as one colour; only its alpha is used (the phone
 //                                               colours it). Same safe circle.
 //   mobile/assets/splash-icon.png               The mark for the launch screen, 1024 x 1024 RGBA, transparent around it. expo-splash-screen
-//                                               shows the whole square 200 wide (app.json, imageWidth), so the mark fills about 60 percent of it.
+//                                               shows the whole square 200 wide (app.json, imageWidth). The SVG draws the mark small (39 percent
+//                                               of the square), so it is drawn 1.5 times larger here: about 117 of the 200, which looks right on a
+//                                               phone and stays inside the 192 dp circle that Android 12 shows.
 //   brand/store/play-store-icon-512.png         Google Play's store icon: 512 x 512, 32-bit PNG with alpha, full square without rounded
 //                                               corners (Google Play puts its own mask on it). Not part of the app bundle.
 //
@@ -170,6 +172,8 @@ function loadPlaywright() {
 }
 
 const sha256 = (buf) => createHash('sha256').update(buf).digest('hex');
+// The hash of a text file ignores how the checkout ends its lines (a Windows checkout may turn LF into CRLF); the test does the same.
+const textSha256 = (buf) => sha256(Buffer.from(buf.toString('utf8').replace(/\r\n/g, '\n'), 'utf8'));
 const rel = (p) => relative(root, p).split('\\').join('/');
 const hexToRgb = (hex) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
 
@@ -271,7 +275,7 @@ async function main() {
 
   // What this run made, from what: the test (tools/tests/test_store_assets.py) fails when a PNG or an SVG is not the one written here,
   // and when this script changed without a new run (its table of sizes and colours decides what the PNG files look like).
-  const exporter = { path: rel(fileURLToPath(import.meta.url)), sha256: sha256(await readFile(fileURLToPath(import.meta.url))) };
+  const exporter = { path: rel(fileURLToPath(import.meta.url)), sha256: textSha256(await readFile(fileURLToPath(import.meta.url))) };
   const manifest = { note: 'Written by tools/export_app_icons.mjs. tools/tests/test_store_assets.py checks it.', exporter, files: [] };
   let failed = 0;
   try {
@@ -301,7 +305,7 @@ async function main() {
       }
       await mkdir(dirname(outPath), { recursive: true });
       await writeFile(outPath, png);
-      manifest.files.push({ png: asset.out, svg: `${SVG_DIR}/${asset.svg}`, width: asset.size, height: asset.size, colorType: made.channels === 4 ? 6 : 2, svgSha256: sha256(svgBytes), pngSha256: sha256(png) });
+      manifest.files.push({ png: asset.out, svg: `${SVG_DIR}/${asset.svg}`, width: asset.size, height: asset.size, colorType: made.channels === 4 ? 6 : 2, svgSha256: textSha256(svgBytes), pngSha256: sha256(png) });
       console.log(`wrote  ${label}  ${png.length} bytes  sha256 ${sha256(png).slice(0, 12)}${made.note ? `  ${made.note}` : ''}`);
     }
   } finally {
