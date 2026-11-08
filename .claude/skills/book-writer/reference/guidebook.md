@@ -56,7 +56,8 @@ public source, write `~`.
 - Catalog and route list: `supabase/migrations/20261106120000_more_caminos.sql` (route names, countries, start and end, `distance_km`).
 - **Place notes and, where the catalog has them, cited distances, per stage**: `tools/offline-maps/catalog/<route>/NN.json` (Francés, Portugués, Inglés). Look at each
   file: the Inglés files hold several named sources for a distance; the Portugués files hold **no** `distance_km` (only measured lengths and notes), so a Portuguese day's
-  length is an OpenStreetMap measure and the book says so. Read these before you search the web.
+  length is an OpenStreetMap measure and the book says so; the Francés catalog gives a cited distance for stages 1 to 3 only (stages 4 to 33 have none, and there is no stage-1
+  file), so its other distances come from public tables, each named and marked `~`. Read these before you search the web.
 - Camino Francés, 33 stages: `supabase/migrations/20261112000000_camino_frances_stages.sql` and `tools/offline-maps/stages/camino-frances-NN.json` (stage names, "A to B").
 - Camino Portugués Central, 11 to 12 stages: `supabase/migrations/20261113000000_camino_portugues_stages.sql`, `tools/offline-maps/stages/camino-portugues-NN.json`.
 - Camino Inglés, 6 stages: `supabase/migrations/20261113010000_camino_ingles_stages.sql`, `tools/offline-maps/stages/camino-ingles-NN.json`.

@@ -127,8 +127,13 @@ class Sources:
         path = self.folder / f"pg{m.group(1)}.txt"
         if not path.is_file():
             return None
-        web = "world english bible" in source.get("work", "").lower()
+        web = bool(re.search(r"world english bible", (source.get("work", "") + " " + source.get("translator", "")).lower())) or sid == "gutenberg-8294"
         text = _clean_source(path.read_text(encoding="utf-8", errors="replace"), web)
+        if source.get("text_from"):      # the work's own text starts here: an editor's introduction before it (which may quote the work, differently) is not the source
+            m = re.search(r"\s+".join(re.escape(w) for w in source["text_from"].split()), text)
+            if not m:
+                raise ValueError(f"source {sid}: text_from {source['text_from']!r} is not in the file")
+            text = text[m.start():]
         pair = (_strict(text), _loose(text))
         self._cache[sid] = pair
         return pair
@@ -415,7 +420,11 @@ def _reflection(book: bk.Book, rep: Report, sources_dir: pathlib.Path | None) ->
     srcs = Sources(sources_dir)
     loaded: list[tuple[str, str]] = []
     for s in book.meta.get("sources", []):
-        pair = srcs.get(s)
+        try:
+            pair = srcs.get(s)
+        except ValueError as err:
+            rep.error(f"book.json: {err}")
+            continue
         if pair:
             loaded.append(pair)
     if not loaded:
@@ -445,7 +454,7 @@ def _reflection(book: bk.Book, rep: Report, sources_dir: pathlib.Path | None) ->
                         rep.error(f"{ch.file}: the passage has no attribution line (a last quote paragraph starting with an em dash)")
                     else:
                         cite = bk.plain(b["cite"]).lower()
-                        if not any(any(w in cite for w in re.findall(r"[a-zà-ÿ]{5,}", (src["work"] + " " + src["author"]).lower())) for src in book.meta.get("sources", [])):
+                        if not any(any(w in cite for w in re.findall(r"[a-zà-ÿ]{5,}", (src["work"] + " " + src["author"] + " " + src.get("translator", "")).lower())) for src in book.meta.get("sources", [])):
                             rep.warn(f"{ch.file}: the attribution does not name the work or the author of a source in book.json")
                     if not 25 <= n <= 300:
                         rep.warn(f"{ch.file}: the passage is {n} words (aim for 40 to 250)")

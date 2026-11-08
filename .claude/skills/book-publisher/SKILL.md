@@ -63,7 +63,7 @@ outputs from the same chapter blocks, so the app, the EPUB and the PDF cannot di
 The bundle is built so the app can attach a pilgrim's own writing to the books. The design (decided with the owner; details of the screens belong to the app work):
 
 - **Side notes, not a feed.** A note is **anchored** to the thing it is about and shown beside it, like a note in the margin: a small mark next to the paragraph, a side sheet to read and
-  write it. There is no timeline, no likes, no comments, no followers. Notes are **private and on the phone** (like the Diary: same local store, wiped on log-out, same plain privacy line) unless the
+  write it. There is no timeline, no likes, no comments, no followers. Notes are **private and on the phone** (kept under the pilgrim's own key and cleared on log-out, like the Library's bookmarks; the Diary, by contrast, keeps its pages when you log out; the screens say which) unless the
   pilgrim presses an explicit Share, which is never automatic. Notes are listed in one quiet **Notebook**, organised by anchor (Books, Bible, Daily reading, Camino stages) and searchable.
 - **Anchors** (one scheme for everything, so the same notes can sit on books today and on the Bible, the daily reading and the Camino's stages and places later):
   `book:<bookId>/<chapterId>#<blockIndex>` (a paragraph; `chapterId` is the chapter's file name without `.md`, `blockIndex` the index of the block in the chapter's `blocks`),

@@ -2,7 +2,7 @@
 
 ## The character of these days
 
-La Rioja is small, and the Camino crosses it in three days, between Logroño and the border with Castilla y León. It is a wine country. Rioja became in 1991 Spain's first *denominación de origen calificada* (DOCa), a quality designation for wine, according to Wikipedia, and its grapes grow in La Rioja, Navarre and the Basque province of Álava. The country between Logroño and Santo Domingo is low and rolling, with vines and small towns.
+La Rioja is small, and the Camino crosses it in three days, between Logroño and the border with Castilla y León. It is a wine country. Rioja became in 1991 Spain's first *denominación de origen calificada* (DOCa), a quality designation for wine, according to Wikipedia, and its grapes grow in La Rioja, Navarre and the Basque province of Álava. The country between Logroño and Santo Domingo is low and rolling, with vines and small towns. The two Wikipedia tables used in this book agree to within a kilometre on all three days.
 
 ### Day 8: Logroño to Nájera (~29 km)
 

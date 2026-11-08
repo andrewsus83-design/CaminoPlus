@@ -93,9 +93,14 @@ def _verses(source: str, start: str, end: str) -> str | None:
     return f"{f[0]}:{f[1]} to {l[1]}" if f[0] == l[0] else f"{f[0]}:{f[1]} to {l[0]}:{l[1]}"
 
 
-def extract(source: str, start: str, end: str, web: bool = False) -> Extract:
+def extract(source: str, start: str, end: str, web: bool = False, text_from: str | None = None) -> Extract:
     """The stretch of `source` from `start` to the end of `end`, as one line of its own words."""
     body = cb._clean_source(source, web)
+    if text_from:                        # the work's own text starts here (an editor's introduction before it may quote the work differently)
+        t = _pattern(text_from).search(body)
+        if not t:
+            raise NotFound(f"--text-from not found: {text_from!r}")
+        body = body[t.start():]
     a = _pattern(start).search(body)
     if not a:
         raise NotFound(f"start not found: {start!r}")
@@ -133,6 +138,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("source", type=pathlib.Path, help="the source text, for example /tmp/book-sources/pg1653.txt")
     ap.add_argument("--from", dest="starts", action="append", required=True, metavar="WORDS", help="the first words of a stretch")
     ap.add_argument("--to", dest="ends", action="append", required=True, metavar="WORDS", help="the last words of the stretch")
+    ap.add_argument("--text-from", metavar="WORDS", help="look only in the text from these words on (the same as `text_from` of the source in book.json)")
     ap.add_argument("--web", action="store_true", help="the source is the World English Bible (drop verse numbers and headings)")
     args = ap.parse_args(argv)
     if len(args.starts) != len(args.ends):
@@ -142,7 +148,7 @@ def main(argv: list[str] | None = None) -> int:
     stretches, failed = [], False
     for start, end in zip(args.starts, args.ends):
         try:
-            e = extract(source, start, end, args.web or "world english bible" in source[:3000].lower())
+            e = extract(source, start, end, args.web or "world english bible" in source[:3000].lower(), args.text_from)
         except NotFound as err:
             print(f"error: {err}", file=sys.stderr)
             failed = True

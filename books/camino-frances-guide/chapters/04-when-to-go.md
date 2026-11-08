@@ -1,6 +1,6 @@
 # When to go
 
-The French Way crosses mountains, a high plateau and a wet green coast of hills, so "the weather" is five weathers. No month is perfect along all of it. What follows are patterns, not forecasts. Before any day, look at the local weather.
+The French Way crosses mountains, a high plateau and the green hills of Galicia, so "the weather" is several weathers. No month is perfect along all of it. What follows are patterns, not forecasts. Before any day, look at the local weather.
 
 ## How many people, and when
 
@@ -21,7 +21,7 @@ The temperatures below are monthly averages for 1991 to 2020, as listed on Wikip
 
 **Spring (March to June).** Quiet in March, busy by May. In Burgos, at ~865 m, the average June day reaches ~24 °C. Early in the season, ask about conditions on the Pyrenees and the high ground of León and Galicia.
 
-**Summer (July and August).** Hot, and on the Meseta exposed. The average July high is ~28 °C in Pamplona and ~28 °C in Burgos; the records are ~42 °C in Pamplona and ~39 °C in Burgos. Galicia is cooler (the average July high in Santiago is ~25 °C) and much drier than in winter. In Pamplona the San Fermín festival runs from 6 to 14 July, and the city fills.
+**Summer (July and August).** Hot, and on the Meseta exposed. The average July high is ~28 °C in both Pamplona and Burgos; the records are ~42 °C in Pamplona and ~39 °C in Burgos. Galicia is cooler (the average July high in Santiago is ~25 °C) and much drier than in winter. In Pamplona the San Fermín festival runs from 6 to 14 July, and the city fills.
 
 **Autumn (September and October).** The crowds thin by October and the days shorten. The rain also returns: Santiago averages ~89 mm in September and ~214 mm in October.
 

@@ -78,7 +78,8 @@ per classic, which is what the checker verifies every quote against:
   "translator": "William Benham",
   "year": "1886",
   "licence": "Public domain",
-  "url": "https://www.gutenberg.org/ebooks/1653"
+  "url": "https://www.gutenberg.org/ebooks/1653",
+  "text_from": "optional: the first words of the work's own text, when the file starts with a long introduction"
 }]
 ```
 

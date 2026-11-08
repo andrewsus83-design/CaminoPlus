@@ -2,7 +2,7 @@
 
 ## The character of these days
 
-Galicia begins at O Cebreiro, and from there the Xunta de Galicia measures ~155 km to Santiago by the San Xil route, or ~162 km by Samos. The country is greener and wetter than anything behind you, with small hamlets, oak woods and eucalyptus, and place names in Galician: *Palas de Rei* is also written *Palas de Rey*, and *A Calzada* is not *La Calzada*. Santiago receives ~1,500 mm of rain a year, so carry a waterproof whatever the month.
+Galicia begins at O Cebreiro, and from there the Xunta de Galicia measures ~155 km to Santiago by the San Xil route, or ~162 km by Samos. The country is greener and wetter than anything behind you, with small hamlets, oak woods and eucalyptus, and place names in Galician, many with the article *O* or *A* in front (O Cebreiro, A Calzada, A Salceda). Santiago receives ~1,500 mm of rain a year, so carry a waterproof whatever the month.
 
 From Sarria on you walk with many other people: about 65 per cent of those who walked the French Way in 2024 started there. Distances in this chapter come from the Xunta's stage pages, which give a difficulty rating and an estimated time for each stage. Some other tables differ by up to ~4 km, and the days say where.
 
@@ -18,7 +18,7 @@ Sarria is, according to Wikipedia, ~115 km from the cathedral. It has the 13th-c
 
 ### Day 29: Sarria to Portomarín (~22 km)
 
-The Way leaves Sarria by the bridge of A Áspera and goes towards Barbadelo, where the church of Santiago can be visited. The Xunta rates the day "Medium-High", and warns that after about a kilometre beside the railway there is the hardest hill of the stage. Then comes oak and meadow country, and the bridge over the Miño into Portomarín.
+The Way leaves Sarria by the bridge of A Áspera and goes towards Barbadelo, ~4 km on, where the church of Santiago can be visited. The Xunta rates the day "Medium-High", and warns that after about a kilometre beside the railway there is the hardest hill of the stage. Then comes oak and meadow country, and the bridge over the Miño into Portomarín.
 
 Portomarín was moved. The Belesar reservoir flooded the old town in the 1960s, and its main buildings, including the church of San Xoán, were rebuilt on higher ground.
 
@@ -40,6 +40,6 @@ O Pedrouzo, also written Arca, is in the municipality of O Pino, the last before
 
 ### Day 33: O Pedrouzo to Santiago de Compostela (~20 km)
 
-The last day: ~20 km by the Xunta's figure of ~20.2 km, which Wikipedia's example itinerary gives as ~16.5 km. After Santo Antón you climb to the municipality of Santiago, by O Amenal and San Paio, with Lavacolla about halfway.
+The Xunta gives ~20.2 km for the last day, and Wikipedia's example itinerary ~16.5 km. After Santo Antón you climb to the municipality of Santiago, by O Amenal and San Paio, with Lavacolla about halfway.
 
 Monte do Gozo, the Hill of Joy, at ~370 m and ~4.5 km from the centre, is where pilgrims traditionally cheered at the first sight of the cathedral's spires. Then the old town, and the cathedral. The chapter on arriving says what to do next.

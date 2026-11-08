@@ -31,10 +31,10 @@
   "sources": [
     {
       "id": "gutenberg-8294",
-      "work": "The Psalms of Ascent (Psalms 120 to 134), World English Bible",
+      "work": "The Psalms of Ascent (Psalms 120 to 134)",
       "author": "The psalmists (the headings name David and Solomon for some)",
-      "translator": "World English Bible contributors",
-      "year": "public domain, modern translation",
+      "translator": "World English Bible",
+      "year": "modern translation",
       "licence": "Public domain",
       "url": "https://www.gutenberg.org/ebooks/8294"
     }

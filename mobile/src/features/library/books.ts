@@ -45,6 +45,8 @@ export type BookContent = {
   author: string;
   rights: string;
   ai_disclosure: string;
+  /** One sentence crediting the source, worded by the build in one place (tools/build_books.py) for the EPUB, the PDF and the app: "The Imitation of Christ, Thomas à Kempis. Translated by William Benham (1886). Public domain." or "By CaminoPlus." */
+  credit: string;
   sources?: { work: string; author: string; translator: string; year: string; licence: string }[];
   chapters: { id: string; title: string; blocks: Block[] }[];
 };
@@ -97,10 +99,15 @@ export function chapterPlace(chapters: readonly { id: string }[], id: string | u
 /** The text of a span list without its marks (a screen reader label, a search). */
 export const spansText = (spans: readonly Span[]): string => spans.map((s) => s.t).join('');
 
-/** The first thing to say about where a book comes from: for the contents page, one line. */
-export function creditLine(book: Pick<BookContent, 'sources' | 'author'>): string {
+/**
+ * The first thing to say about where a book comes from: one line. It is the `credit` the build wrote into the bundle, never worded again here (a
+ * translator field can hold a name, "none (English original)", an edition: only the build knows how to say each). A bundle made before the build
+ * wrote it has none, and then the line is the plain facts: the work, its author and its licence, or the author of the book.
+ */
+export function creditLine(book: Partial<Pick<BookContent, 'credit'>> & Pick<BookContent, 'author'> & { sources?: Pick<NonNullable<BookContent['sources']>[number], 'work' | 'author' | 'licence'>[] }): string {
+  if (typeof book.credit === 'string' && book.credit.trim()) return book.credit.trim();
   const s = book.sources?.[0];
-  return s ? `${s.work}, ${s.author}. Translated by ${s.translator} (${s.year}). ${s.licence}.` : `By ${book.author}.`;
+  return s ? `${s.work}, ${s.author}. ${s.licence}.` : `By ${book.author}.`;
 }
 
 /** The words of a block without its marks, on one line: what a search, a screen reader label, a bookmark row and a note's quote are made of. A break has none. */
@@ -142,4 +149,21 @@ export const dayCount = (book: Pick<CatalogBook, 'chapters'>): number => book.ch
 export function bookLine(book: Pick<CatalogBook, 'kind' | 'minutes' | 'chapters'>): string {
   const days = dayCount(book);
   return days > 0 ? `${coverCaption(book)} · ${days} ${days === 1 ? 'day' : 'days'}` : coverCaption(book);
+}
+
+/**
+ * The size of the title on a cover, so that its longest word never breaks in the middle: the app's title size (24) where the word fits, smaller
+ * where it does not (a narrow phone, a long word such as "Portuguese"), never under 17. `width` is the room the words have. A word is about 0.58
+ * of the size wide in the title font, measured on the longest ones the books have; a cover that measures a little wide just wraps at a space.
+ */
+export function coverTitleSize(title: string, width: number): number {
+  const longest = title.split(/\s+/).reduce((m, w) => Math.max(m, w.length), 0);
+  if (longest === 0 || !(width > 0)) return 24;
+  return Math.max(17, Math.min(24, Math.floor(width / (longest * 0.58))));
+}
+
+/** "Readings · 2 h 29 min" with the length kept in one piece, so that a narrow cover wraps after the dot and never in the middle of "2 h 29 min". */
+export function unbreakableCaption(caption: string): string {
+  const [label, ...rest] = caption.split(' · ');
+  return rest.length ? `${label} · ${rest.join(' · ').replace(/ /g, ' ')}` : caption;
 }

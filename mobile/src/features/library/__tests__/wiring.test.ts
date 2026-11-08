@@ -73,6 +73,8 @@ check('a row of the examples has no press handler of its own, and the bookmark b
   assert.match(shelf, /position: 'absolute', top: 4, right: 4/, 'the bookmark button sits over the corner of the cover, as a sibling of the cover\'s own button');
   assert.match(shelf, /backgroundColor: fixed\[b\.colour\]/, 'a cover is a picture colour that does not change with light and dark');
   assert.match(shelf, /aspectRatio: 3 \/ 4/);
+  assert.match(shelf, /const size = coverTitleSize\(title, room\);/, 'a long word never breaks in the middle on a narrow phone');
+  assert.match(shelf, /unbreakableCaption\(b\.kind\)/);
   const toggle = code(read(`${DIR}/BookmarkToggle.tsx`));
   assert.match(toggle, /bookmarkLabel = \(on: boolean, title: string\) => `\$\{on \? 'Remove bookmark' : 'Bookmark'\}: \$\{title\}`/);
   assert.match(toggle, /accessibilityLabel=\{bookmarkLabel\(on, title\)\}/);

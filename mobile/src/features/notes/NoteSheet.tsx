@@ -99,7 +99,7 @@ export function NoteSheet({ target, notes, message, onAdd, onEdit, onDelete, onG
           </View>
         )}
 
-        {reflection && !!target.prompts && target.prompts.length > 0 && (
+        {writing !== null && reflection && !!target.prompts && target.prompts.length > 0 && (
           <View style={{ gap: 8 }}>
             <AppText variant="caption" muted>The questions for tonight</AppText>
             {target.prompts.map((q, i) => (

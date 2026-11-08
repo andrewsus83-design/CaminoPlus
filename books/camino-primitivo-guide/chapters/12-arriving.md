@@ -17,6 +17,8 @@ The Compostela is the certificate the Pilgrim's Office in Santiago gives to thos
 - A pilgrim who has already walked part of a recognised route outside Spain needs no less than seventy kilometres in Spain.
 - The Cabildo, the cathedral's governing council, reserves the right to grant the Compostela in special and exceptional cases.
 
+The Office awards the Compostela to those who walk for religious or spiritual reasons, and it describes the pilgrimage it has in mind as one made "with a Christian sentiment, even if it is only with an attitude of search". If that does not describe your reason for walking, ask the Pilgrim's Office what it can give you: it also offers a Certificate of Distance, which records the kilometres you walked from wherever you started.
+
 From Oviedo you have ~320 km ahead of you, far more than the last hundred kilometres the Office asks for. If your plan is anything other than walking the Way from Oviedo, or if you will walk it in stages, ask the Pilgrim's Office before you go. This book does not say whether any other start counts.
 
 ## At the Pilgrim's Office

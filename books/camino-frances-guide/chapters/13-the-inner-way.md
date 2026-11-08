@@ -16,12 +16,12 @@ At the Cruz de Ferro, ~1,500 m up, pilgrims leave a stone brought from home, a c
 
 Take one a day, or none.
 
-- What am I carrying that I could leave on the road?
-- What did I notice today that I would have missed in a car?
-- Who walked with me today, in the flesh or in my mind?
-- What does my body need that I have been ignoring?
-- What will I be glad to have done by the time I reach Santiago?
+- What are you carrying that you could leave on the road?
+- What did you notice today that you would have missed in a car?
+- Who walked with you today, in the flesh or in your mind?
+- What does your body need that you have been ignoring?
+- What will you be glad to have done by the time you reach Santiago?
 
 ## Walking alone, walking together
 
-The Francés is walked alone and in company, often in the same hour. Greet the people you pass. Let a silence be a silence. If you want to be alone, say so kindly, and if someone else does, respect it. A friendship made on the road may last for years or for an afternoon, and both belong to it.
+The Francés can be walked alone and in company, sometimes in the same hour. Greet the people you pass. Let a silence be a silence. If you want to be alone, say so kindly, and if someone else does, respect it. A friendship made on the road may last for years or for an afternoon, and both belong to it.

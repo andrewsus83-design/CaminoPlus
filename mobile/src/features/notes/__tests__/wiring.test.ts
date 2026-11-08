@@ -134,7 +134,7 @@ check('the sheet: framed by SheetModal, a labelled close button of 44, every act
   assert.match(src, /maxLength=\{NOTE_TEXT_MAX\}/);
   assert.match(src, /accessibilityLabel=\{reflection \? 'Your reflection' : 'Your note'\}/);
   assert.match(src, /label=\{reflection \? 'Save reflection' : 'Save note'\}/);
-  assert.match(src, /\{reflection && !!target\.prompts && target\.prompts\.length > 0 && \(/, 'a reflection shows the questions while the pilgrim writes');
+  assert.match(src, /\{writing !== null && reflection && !!target\.prompts && target\.prompts\.length > 0 && \(/, 'a reflection shows the questions while the pilgrim writes it (not while it is only read: the words come first)');
   assert.match(src, /writing === null && !reflection && \(\s*<Pill variant="ghost" label="Add another note"/, 'a day has one reflection: no "add another"');
   const confirm = code(read(`${DIR}/confirm.ts`));
   assert.match(confirm, /Platform\.OS === 'web'/);

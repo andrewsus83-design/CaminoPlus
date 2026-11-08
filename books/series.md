@@ -58,9 +58,10 @@ All twelve are free to publish: every edition was opened and its translator, edi
 
 ## Notes and bookmarks in the app
 
-The books are written so the app can anchor a pilgrim's own notes to them: every chapter, and every paragraph, has a stable place; each day's **end-of-day questions** are
-a list the app shows as the reflection prompt; a **bookmark** is a marker on a book or on a day. Notes are side notes on the text, kept private on the phone, and are not a feed.
-The design is in `.claude/skills/book-publisher/SKILL.md` ("In the app").
+Built (see the app's Library): the Books tab shows these books, a book screen and a reader, bookmarks on a book, a chapter or day and a paragraph, **anchored side notes** (private, on the phone,
+not a feed), a reflection written from each day's end-of-day questions, and a Notebook that groups notes by book and chapter. Notes are kept under the pilgrim's own key and cleared on log-out,
+as the Library's bookmarks are; the Diary, by contrast, stays. The anchor scheme is in `.claude/skills/book-publisher/SKILL.md` ("In the app"); the Bible, daily reading and stage anchors are designed in
+but have no screens yet.
 
 ## What is decided and what is yours to decide
 
@@ -68,8 +69,8 @@ Decided here (and easy to change): the choice and order of the 20 books, the day
 guides, parchment for reflection books), the format of a day.
 
 Yours to decide (the build leaves these open on purpose): who holds the rights to the original text and how it is licensed; the wording of the AI disclosure (it says today only that the books
-were written with AI assistance under CaminoPlus's direction); who checks the facts of each guide before it is sold; ISBNs and prices; and whether and where to publish. Putting a book in the app's
-Library is a product decision too: the Books tab says today that "Books are not in the app yet", and that notice has to change when the first book goes in.
+were written with AI assistance under CaminoPlus's direction); who checks the facts of each guide before it is sold; ISBNs and prices; and whether and where to publish. Putting the books in the
+app's Library is a product decision too: the Books tab now shows them (it used to say "Books are not in the app yet").
 
 ## Status
 

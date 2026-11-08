@@ -51,7 +51,7 @@ Sleep is a small rehearsal of the day's sentence. You lie down with nothing arra
 
 If you want something to say in the dark, say the sentence, and then say what it does not mean. It does not say that today was fine. It does not say that the hurt is nothing. It says that there is more to this than today. Then sleep.
 
-An honest word about tiredness: a promise is not an instruction to be cheerful. You are allowed to be flat. Being flat is not a failure to believe. It is being tired.
+Tired people hear promises badly, and a promise is not an instruction to be cheerful. You are allowed to be flat. Being flat is not a failure to believe. It is being tired.
 
 - Where did it feel today as though nothing could be well, and how did that feeling stand by evening?
 - Which small thing from today do I want to remember?

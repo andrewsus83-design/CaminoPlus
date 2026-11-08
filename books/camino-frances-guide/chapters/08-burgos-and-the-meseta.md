@@ -14,23 +14,23 @@ San Juan de Ortega is a Romanesque monastery in the hamlet of Barrios de Colina,
 
 ### Day 12: San Juan de Ortega to Burgos (~28 km)
 
-You pass Agés and Atapuerca, a UNESCO World Heritage Site since 2000, where finds at the Gran Dolina date from about 800,000 years ago, the oldest known evidence of hominid settlement in Western Europe, says Wikipedia. Then come Cardeñuela Riopico, Orbaneja Riopico and Villafría, and the long approach to the city, ~865 m up. Spanish Wikipedia's table puts this stage at ~31 km.
+You pass Agés and Atapuerca, a UNESCO World Heritage Site since 2000, where finds at the Gran Dolina date from about 800,000 years ago, the oldest known evidence of hominid settlement in Western Europe, says Wikipedia. Then come Cardeñuela Riopico, Orbaneja Riopico and Villafría, and the last ~10 km into the city, ~865 m up. Spanish Wikipedia's table puts this stage at ~31 km.
 
 Burgos Cathedral, begun in 1221 in the French Gothic style, has been a World Heritage Site since 1984 and holds a tomb of El Cid. Burgos is a good city for a rest day.
 
 ### Day 13: Burgos to Hornillos del Camino (~20 km)
 
-A short first day on the plateau. You leave Burgos by Villalbilla de Burgos and Tardajos and cross to Rabé de las Calzadas and Hornillos del Camino, at ~850 to ~890 m. Start early in summer, and carry a hat and water.
+A short first day on the plateau. You leave Burgos by Villalbilla de Burgos and Tardajos and cross to Rabé de las Calzadas and Hornillos del Camino, at ~850 to ~890 m up. Start early in summer, and carry a hat and water.
 
 ### Day 14: Hornillos del Camino to Castrojeriz (~20 km)
 
-By way of San Bol and Hontanas to the ruins of the Convent of San Antón, where an arch still stands. Alfonso VII founded the convent in 1146 for the Order of St Anthony, whose brothers cared for pilgrims suffering from St Anthony's fire.
+By way of San Bol and Hontanas, ~11 km along, to the ruins of the Convent of San Antón, ~18 km along, where an arch still stands. Alfonso VII founded the convent in 1146 for the Order of St Anthony, whose brothers cared for pilgrims suffering from St Anthony's fire.
 
-Castrojeriz is a single long street: the Camino runs through the town for more than ~1,500 m, past the ruins of a castle and the church of San Juan.
+Castrojeriz is a single long street: the Camino runs through the town for ~1,500 m or more, past the ruins of a castle and the church of San Juan.
 
 ### Day 15: Castrojeriz to Frómista (~23 km)
 
-From Castrojeriz the road crosses the Pisuerga at Puente Fitero, and with it the line between the provinces of Burgos and Palencia, then goes by Itero de la Vega and Boadilla del Camino to Frómista. Spanish Wikipedia's table gives ~25 km.
+The road crosses the Pisuerga at Puente Fitero, ~10 km from Castrojeriz, and with it the line between the provinces of Burgos and Palencia. Itero de la Vega and Boadilla del Camino (~19 km) come before Frómista. Spanish Wikipedia's table gives ~25 km for the whole day.
 
 Frómista's church of San Martín de Tours is a Romanesque church of the 11th century, built, Wikipedia says, partly with money from the widow of Sancho el Mayor of Navarre.
 
@@ -42,14 +42,14 @@ Carrión de los Condes had a pilgrims' hospital, the Hospital de la Herrada, fro
 
 ### Day 17: Carrión de los Condes to Terradillos de los Templarios (~27 km)
 
-You leave Carrión by the monastery of San Zoilo. Then comes ~17 to ~18 km with no village at all, to Calzadilla de la Cueza, so carry food and ample water, and do not start late. Ledigos and Terradillos de los Templarios follow. Many split the day at Calzadilla de la Cueza.
+You leave Carrión by the monastery of San Zoilo. Then comes ~17 to ~18 km with no village at all, to Calzadilla de la Cueza, so carry food and ample water, and do not start late. Ledigos and Terradillos de los Templarios follow. Wikipedia's example itinerary splits the day at Calzadilla de la Cueza.
 
 ### Day 18: Terradillos de los Templarios to Bercianos del Real Camino (~25 km)
 
-Past Moratinos and San Nicolás del Real Camino, on to Sahagún, in the province of León. Wikipedia says it is often considered the halfway point of the walk, and holds some of the earliest examples of Mudéjar architecture.
+Past Moratinos and San Nicolás del Real Camino, on to Sahagún, ~13 km along, in the province of León. Wikipedia says it is often considered the halfway point of the walk, and holds some of the earliest examples of Mudéjar architecture.
 
-At Calzada del Coto the Camino divides: the Camino Real Francés goes by Bercianos, as this book does, and the old Roman road, the Calzada Romana, runs to Reliegos, where the two meet again.
+At Calzada del Coto the Camino divides. This book goes by Bercianos and El Burgo Ranero. The alternative follows the old Roman road, the Vía Trajana, by Calzadilla de los Hermanillos, and German Wikipedia has the two meeting again at Reliegos.
 
 ### Day 19: Bercianos del Real Camino to Mansilla de las Mulas (~26 km)
 
-A long day across open country by El Burgo Ranero and Reliegos, with a village every ~6 to ~13 km, so you can pause often. Mansilla de las Mulas has a medieval bridge over the Esla river, which pilgrims cross on the way to León.
+A long day across open country by El Burgo Ranero and Reliegos, with a village every ~6 to ~13 km, so you can pause often: El Burgo Ranero is ~7 km from Bercianos, Reliegos ~20 km. Mansilla de las Mulas has a medieval bridge over the Esla river, which pilgrims cross on the way to León.

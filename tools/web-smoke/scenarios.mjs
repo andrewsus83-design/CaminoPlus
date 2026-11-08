@@ -245,7 +245,7 @@ export const SCENARIOS = [
       await page.getByRole('button', { name: /^Open hand, not a clenched fist\./ }).first().click();
       await page.getByRole('button', { name: 'Grow into a Diary page', exact: true }).click();
       await eventually(() => pathOf(page), (p) => /^\/diary\/[0-9a-f-]{36}$/.test(p), { what: 'the address of the new Diary page' });
-      await page.getByText('Open hand, not a clenched fist.').first().waitFor();
+      await page.getByText('Open hand, not a clenched fist.').filter({ visible: true }).first().waitFor(); // the Notebook stays mounted under the page
       await page.getByRole('button', { name: 'Back', exact: true }).first().click();
       await waitPath(page, '/library/notes', 'the address after Back from the Diary page');
       step('open the note and delete it');

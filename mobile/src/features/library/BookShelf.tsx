@@ -1,9 +1,9 @@
-import { Pressable, View } from 'react-native';
+import { Pressable, View, useWindowDimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
 import { fixed, radius } from '@/theme';
-import type { LibraryBook } from './books';
+import { coverTitleSize, unbreakableCaption, type LibraryBook } from './books';
 import { BookmarkToggle } from './BookmarkToggle';
 import { itemKey } from './search';
 import type { LibraryMarks } from './useLibraryBookmarks';
@@ -18,6 +18,8 @@ export const bookRoute = (id: string) => `/library/book/${id}`;
  */
 export function BookCovers({ items, marks }: { items: readonly LibraryBook[]; marks?: LibraryMarks }) {
   const router = useRouter();
+  // Two covers across the screen with its margins and the gap between them, and 14 of padding inside each: the room a title has.
+  const room = Math.floor((useWindowDimensions().width - 32 - 12) / 2) - 28;
   return (
     <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
       {items.map((b) => {
@@ -33,7 +35,7 @@ export function BookCovers({ items, marks }: { items: readonly LibraryBook[]; ma
                 style={({ pressed }) => ({ aspectRatio: 3 / 4, borderRadius: radius.md, backgroundColor: fixed[b.colour], padding: 14, justifyContent: 'space-between', opacity: pressed ? 0.88 : 1 })}
               >
                 <Icon name={b.icon} color={fixed.blue} size={28} />
-                <AppText variant="h4" color={fixed.blue}>{b.title}</AppText>
+                <CoverTitle title={b.title} room={room} />
               </Pressable>
               {!!marks && (
                 <View style={{ position: 'absolute', top: 4, right: 4 }}>
@@ -41,7 +43,7 @@ export function BookCovers({ items, marks }: { items: readonly LibraryBook[]; ma
                 </View>
               )}
             </View>
-            <AppText variant="caption" muted>{b.kind}</AppText>
+            <AppText variant="caption" muted>{unbreakableCaption(b.kind)}</AppText>
           </View>
         );
       })}
@@ -49,4 +51,10 @@ export function BookCovers({ items, marks }: { items: readonly LibraryBook[]; ma
       {items.length % 2 === 1 && <View style={{ flexBasis: '47%', flexGrow: 1 }} />}
     </View>
   );
+}
+
+/** The title on a cover, in the app's title style, a little smaller where its longest word would not fit. */
+function CoverTitle({ title, room }: { title: string; room: number }) {
+  const size = coverTitleSize(title, room);
+  return <AppText variant="h4" color={fixed.blue} style={{ fontSize: size, lineHeight: Math.round(size * 1.25) }}>{title}</AppText>;
 }

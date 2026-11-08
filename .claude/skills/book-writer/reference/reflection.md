@@ -109,6 +109,10 @@ without checking its licence and adding it there first. Fetch the files into a w
 not be committed); `SOURCES.md` has the command. The checker looks for `pg<number>.txt` for each source `id` of the form `gutenberg-<number>` in the
 `--sources` folder.
 
+**An edition with an introduction** (Julian, Teresa, Pascal, Ignatius and others have a long one by their editor, and it may quote the work, differently): give the source a
+`"text_from"` in book.json, the first words of the work's own text, so that the checker looks only from there; `tools/passage.py --text-from "<the same words>"` does the same
+when you extract. The checker reports an error if the phrase is not in the file.
+
 For the Bible, the checker removes the verse references (`120:001`) and the `<<...>>` headings before it compares, so quote the verses as readable text;
 say "Psalm 121:1 to 4 (WEB)" in the attribution. Use the World English Bible (free everywhere), not the King James Version (a Crown patent applies in the
 United Kingdom).

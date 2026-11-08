@@ -83,6 +83,14 @@ class Extract(unittest.TestCase):
         e = passage.extract(WEB, "I will lift up my eyes", "heaven and earth.", web=True)
         self.assertEqual(e.text, "I will lift up my eyes to the hills. Where does my help come from? My help comes from Yahweh, who made heaven and earth.")
 
+    def test_text_from_skips_an_introduction_that_quotes_the_work(self):
+        src = ("*** START OF THE PROJECT GUTENBERG EBOOK X ***\nINTRODUCTION\n\nThe editor quotes: Love was his meaning, it says.\n\nTHE WORK\n\n"
+               "Learn it well: Love was his meaning, therein we are held.\n*** END OF THE PROJECT GUTENBERG EBOOK X ***\n")
+        self.assertEqual(passage.extract(src, "Love was his meaning", "held.").text, "Love was his meaning, it says. THE WORK Learn it well: Love was his meaning, therein we are held.")
+        self.assertEqual(passage.extract(src, "Love was his meaning", "held.", text_from="Learn it well").text, "Love was his meaning, therein we are held.")
+        with self.assertRaises(passage.NotFound):
+            passage.extract(src, "Love", "held.", text_from="Nowhere in the file")
+
     def test_the_bible_stretch_says_which_verses_it_covers(self):
         self.assertEqual(passage.extract(WEB, "I will lift up my eyes", "heaven and earth.", web=True).where, ["121:1 to 2"])
         self.assertEqual(passage.extract(WEB, "My help comes from Yahweh", "heaven and earth.", web=True).where, ["121:2"])

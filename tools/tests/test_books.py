@@ -223,6 +223,15 @@ class Reflection(unittest.TestCase):
             pair = cb.Sources(folder).get(src)
             self.assertEqual(cb.verify_passage("I will lift up my eyes to the hills. Where does my help come from? My help comes from Yahweh", [pair]), "exact")
 
+    def test_the_bible_is_recognised_by_its_translation_or_its_id_not_only_by_the_work_title(self):
+        with tempfile.TemporaryDirectory() as t:
+            folder = pathlib.Path(t)
+            (folder / "pg8294.txt").write_text(WEB_TEXT, encoding="utf-8")
+            for src in ({"id": "gutenberg-8294", "work": "The Psalms of Ascent (Psalms 120 to 134)", "translator": "World English Bible"},
+                        {"id": "gutenberg-8294", "work": "The Psalms of Ascent", "translator": "someone"}):
+                pair = cb.Sources(folder).get(src)
+                self.assertEqual(cb.verify_passage("I will lift up my eyes to the hills. Where does my help come from?", [pair]), "exact", src)
+
     def test_the_count_the_parts_and_their_order(self):
         with tempfile.TemporaryDirectory() as t:
             rep = cb.check_book(self.book(t, n=20), self.sources(t))
@@ -303,6 +312,23 @@ class Reflection(unittest.TestCase):
         with tempfile.TemporaryDirectory() as t:
             text = "\n".join(cb.check_book(self.book(t), self.sources(t)).warnings)
             self.assertIn("'For the walk' is 2 words", text)
+
+    def test_text_from_keeps_an_editors_introduction_out_of_the_source(self):
+        intro_src = SOURCE_TEXT.replace("CHAPTER I\n", "INTRODUCTION\n\nThe editor says: Walketh not in the dark, saith the Lord, about this.\n\nTHE WORK BEGINS\n\nCHAPTER I\n", 1)
+        with tempfile.TemporaryDirectory() as t:
+            folder = pathlib.Path(t) / "src"
+            folder.mkdir()
+            (folder / "pg9999.txt").write_text(intro_src, encoding="utf-8")
+            d = self.book(t, passage="Walketh not in the dark, saith the Lord, about this.")
+            self.assertIn("is not in the source text", "\n".join(cb.check_book(d, folder).errors) or "is not in the source text")     # control: with no text_from the editor's line counts
+            meta = json.loads((d / "book.json").read_text(encoding="utf-8"))
+            self.assertEqual([e for e in cb.check_book(d, folder).errors if "not in the source" in e], [])
+            meta["sources"][0]["text_from"] = "He who follows Me"
+            (d / "book.json").write_text(json.dumps(meta), encoding="utf-8")
+            self.assertTrue([e for e in cb.check_book(d, folder).errors if "not in the source" in e])      # now only the work's own text counts
+            meta["sources"][0]["text_from"] = "Words that are nowhere in the file"
+            (d / "book.json").write_text(json.dumps(meta), encoding="utf-8")
+            self.assertIn("text_from 'Words that are nowhere in the file' is not in the file", "\n".join(cb.check_book(d, folder).errors))
 
     def test_quoted_passages_must_stay_a_minority(self):
         passage = "These are the words of Christ, by which we are admonished how we ought to imitate His life—and manners, if we would be truly enlightened."

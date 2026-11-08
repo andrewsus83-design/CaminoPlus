@@ -14,6 +14,8 @@ The cathedral has a Holy Door, opened only in a Holy Year, and the next is 2027.
 
 The Pilgrim's Office in Santiago issues the Compostela. The chapter on where to start gives the rule in the Office's words: the certificate is for those who come to the tomb of the Apostle for religious and/or spiritual reasons, and who have done at least the last hundred kilometres on foot or on horseback, or the last two hundred by bicycle, shown by the credencial, stamped along the route. If your walk was close to the limit, or unusual, ask the Office, which decides.
 
+The Office awards the Compostela to those who walk for religious or spiritual reasons, and it describes the pilgrimage it has in mind as one made "with a Christian sentiment, even if it is only with an attitude of search". If that does not describe your reason for walking, ask the Pilgrim's Office what it can give you: it also offers a Certificate of Distance, which records the kilometres you walked from wherever you started.
+
 Bring your credencial, stamped with the date and the place in each box. You collect a ticket with a QR code, which lets you follow your place in the queue. The Office says that in times of great influx it cannot guarantee that you will receive the Compostela the same day. Allow for that in August and in a Holy Year. The Office says that its reception service and the issue of the Compostela carry no charge. Its website gives its address and its current opening hours, which are not in this book because they change.
 
 If you walked for other reasons, or are not sure your reasons count, the Office also offers a separate certificate of distance, whatever your starting point. It records the day and starting point, the kilometres covered, the day of arrival and the route. It is sold, and the Office states the price.
@@ -26,6 +28,6 @@ The botafumeiro, the great swinging censer, is used at Masses on key dates, and 
 
 ## The next day
 
-Do not leave the morning after you arrive. A day in Santiago lets the walk settle. Wash your clothes, sleep late and look at the old town. You may like to see the Hostal dos Reis Católicos, which the Catholic Monarchs founded in the 16th century as a hospital for pilgrims, and which has been a hotel since 1954, according to the Pilgrim's Office.
+Do not leave the morning after you arrive. A day in Santiago lets the walk settle. Wash your clothes, sleep late and look at the old town. You may like to see the building on the Praza do Obradoiro that the Catholic Monarchs founded in the 16th century as the Royal Hospital for pilgrims, and which has been a hotel since 1954, according to the Pilgrim's Office.
 
 If you still have legs and time, you can walk on to the coast. In the CaminoPlus catalog the walk from Santiago to Finisterre and Muxía is ~90 km. The Confraternity of St James notes that Finisterre was once believed to be the end of the world, which is where its name comes from.

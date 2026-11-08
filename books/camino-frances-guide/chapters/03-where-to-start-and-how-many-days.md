@@ -14,6 +14,15 @@ Nobody has to walk all 33 stages. The road is the same road from every town on i
 
 Wikipedia says that a typical walk of the whole road takes at least four weeks, with a rest day or two. Pamplona, Burgos and León are the three natural places for one, and a quiet day after the Pyrenees is a kindness to your legs.
 
+## Sample plans
+
+These are sums, not prescriptions, worked out from the stage figures.
+
+- **The whole road in about five weeks:** 33 walking days, rest days at Pamplona (after day 3), Burgos (after day 12) and León (after day 20), and a last day in Santiago: 37 days.
+- **Burgos to Santiago:** 21 walking days, three weeks, and a rest day in León makes 22.
+- **León to Santiago:** 13 walking days, so about a fortnight with one rest day.
+- **Sarria to Santiago:** 5 walking days, plus a day in Santiago.
+
 ## The Compostela, in the Office's words
 
 The Compostela is the certificate issued by the Pilgrim's Office in Santiago. The Office says it is for those who come to the tomb of the Apostle for religious and/or spiritual reasons and follow the routes of the Way of St James on foot, by bicycle or on horseback.

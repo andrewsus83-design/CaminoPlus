@@ -8,8 +8,8 @@
    "title": "The French Way",
    "subtitle": "A Pilgrim's Guide to the Camino Francés",
    "description": "A calm, honest guide to the Camino Francés: 33 walking days from Saint-Jean-Pied-de-Port to Santiago, five regions, where to start, when to go, what to carry and how the Compostela works.",
-   "words": 9379,
-   "minutes": 43,
+   "words": 10803,
+   "minutes": 50,
    "cover": {
     "colour": "goldSoft",
     "icon": "library"
@@ -18,7 +18,7 @@
     {
      "id": "00-welcome",
      "title": "Welcome",
-     "minutes": 3
+     "minutes": 2
     },
     {
      "id": "01-the-way-in-brief",
@@ -84,6 +84,21 @@
      "id": "13-the-inner-way",
      "title": "The inner Way",
      "minutes": 2
+    },
+    {
+     "id": "14-arriving",
+     "title": "Arriving",
+     "minutes": 4
+    },
+    {
+     "id": "15-going-home",
+     "title": "Going home",
+     "minutes": 2
+    },
+    {
+     "id": "16-with-the-app-and-sources",
+     "title": "With the app, and sources",
+     "minutes": 3
     }
    ],
    "route_slug": "camino-frances"
@@ -95,7 +110,7 @@
    "title": "The Portuguese Way",
    "subtitle": "A Pilgrim's Guide to the Camino Portugués from Porto",
    "description": "A calm, honest guide to the Camino Portugués from Porto: eleven walking days to Santiago, the border at the Minho, when to go, what to carry, how the Compostela rule works and how to arrive.",
-   "words": 11210,
+   "words": 11204,
    "minutes": 51,
    "cover": {
     "colour": "blue100",
@@ -192,7 +207,7 @@
    "title": "The Original Way",
    "subtitle": "A Pilgrim's Guide to the Camino Primitivo",
    "description": "An honest guide to the Camino Primitivo: fourteen walking days from Oviedo over the mountains of Asturias to Santiago, the high variant, when to go, what to carry and how to arrive.",
-   "words": 11238,
+   "words": 11265,
    "minutes": 52,
    "cover": {
     "colour": "red100",
@@ -284,7 +299,7 @@
    "title": "The English Way",
    "subtitle": "A Pilgrim's Guide to the Camino Inglés",
    "description": "A calm, honest guide to the Camino Inglés: six walking days from Ferrol to Santiago, how the hundred-kilometre rule works, when to go, what to carry and how to arrive.",
-   "words": 10275,
+   "words": 10309,
    "minutes": 47,
    "cover": {
     "colour": "sand300",
@@ -294,7 +309,7 @@
     {
      "id": "00-welcome",
      "title": "Welcome",
-     "minutes": 2
+     "minutes": 3
     },
     {
      "id": "01-the-way-in-brief",
@@ -371,8 +386,8 @@
    "title": "To the End of the Earth",
    "subtitle": "A Pilgrim's Guide to Finisterre and Muxía",
    "description": "A calm, honest guide to the road from Santiago to the Atlantic: Finisterre and Muxía, how to cut the days, the sunset, the sea, and what the official sources say about the certificates.",
-   "words": 10531,
-   "minutes": 48,
+   "words": 10238,
+   "minutes": 47,
    "cover": {
     "colour": "goldWash",
     "icon": "library"
@@ -406,7 +421,7 @@
     {
      "id": "05-santiago-to-olveiroa",
      "title": "The inland days: Santiago to Olveiroa",
-     "minutes": 5
+     "minutes": 4
     },
     {
      "id": "06-olveiroa-to-fisterra",
@@ -667,7 +682,7 @@
    "title": "Songs for the Climb",
    "subtitle": "Eight Days with the Psalms of Ascent for the Camino Aragonés",
    "description": "Eight days with the fifteen Psalms of Ascent, Psalms 120 to 134: a morning reading and an evening reflection for each day on the Camino Aragonés. Slow, honest and quiet.",
-   "words": 14816,
+   "words": 14896,
    "minutes": 68,
    "cover": {
     "colour": "blue100",
@@ -682,7 +697,7 @@
     {
      "id": "01-about-the-book-and-its-author",
      "title": "About the Psalms of Ascent",
-     "minutes": 4
+     "minutes": 5
     },
     {
      "id": "02-day-01-eyes-to-the-hills",
@@ -739,8 +754,8 @@
    "title": "All Shall Be Well",
    "subtitle": "Eight Days with Julian of Norwich for the Camino de Invierno",
    "description": "Eight days with Julian of Norwich, a medieval anchoress, for the quiet Camino de Invierno: a morning reading and an evening reflection each day. Quiet and consoling.",
-   "words": 13750,
-   "minutes": 63,
+   "words": 15340,
+   "minutes": 70,
    "cover": {
     "colour": "sand300",
     "icon": "book"
@@ -759,42 +774,42 @@
     {
      "id": "02-day-01-the-size-of-a-hazelnut",
      "title": "Day 1. The size of a hazelnut",
-     "minutes": 7
+     "minutes": 8
     },
     {
      "id": "03-day-02-clothed-in-goodness",
      "title": "Day 2. Clothed in goodness",
-     "minutes": 7
+     "minutes": 8
     },
     {
      "id": "04-day-03-homely-and-courteous",
      "title": "Day 3. Homely and courteous",
-     "minutes": 7
+     "minutes": 8
     },
     {
      "id": "05-day-04-the-great-hurt",
      "title": "Day 4. The great hurt",
-     "minutes": 7
+     "minutes": 8
     },
     {
      "id": "06-day-05-all-manner-of-things",
      "title": "Day 5. All manner of things",
-     "minutes": 7
+     "minutes": 8
     },
     {
      "id": "07-day-06-prayer-that-tastes-of-nothing",
      "title": "Day 6. Prayer that tastes of nothing",
-     "minutes": 7
+     "minutes": 8
     },
     {
      "id": "08-day-07-a-light-for-the-night",
      "title": "Day 7. A light for the night",
-     "minutes": 7
+     "minutes": 8
     },
     {
      "id": "09-day-08-where-love-began",
      "title": "Day 8. Where love began",
-     "minutes": 7
+     "minutes": 8
     },
     {
      "id": "10-carry-it-with-you",
@@ -811,7 +826,7 @@
    "title": "The Pilgrim's Tale",
    "subtitle": "Seven Days with Ignatius of Loyola for the Camino Baztanes",
    "description": "Seven days with the autobiography of Ignatius of Loyola, the soldier wounded at Pamplona who became a pilgrim: a morning reading and an evening reflection for each day of the Camino Baztanes.",
-   "words": 12689,
+   "words": 12758,
    "minutes": 58,
    "cover": {
     "colour": "successWash",
@@ -846,7 +861,7 @@
     {
      "id": "05-day-04-the-sword-laid-down",
      "title": "Day 4. The sword laid down",
-     "minutes": 7
+     "minutes": 8
     },
     {
      "id": "06-day-05-beside-the-river",

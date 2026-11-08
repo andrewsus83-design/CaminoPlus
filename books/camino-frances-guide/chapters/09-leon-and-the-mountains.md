@@ -14,23 +14,23 @@ The Basilica of San Isidoro was rededicated in 1063, and the Casa Botines, by An
 
 ### Day 21: León to Villadangos del Páramo (~24 km)
 
-The way out of León runs through its suburbs, Trobajo del Camino and La Virgen del Camino, then by Valverde de la Virgen and San Miguel del Camino to Villadangos del Páramo. The first stretch is through suburbs. Spanish Wikipedia also lists an alternative by Villar de Mazarife to Hospital de Órbigo.
+The way out of León runs through its suburbs, Trobajo del Camino and La Virgen del Camino, then by Valverde de la Virgen and San Miguel del Camino to Villadangos del Páramo. Spanish Wikipedia also lists an alternative by Villar de Mazarife to Hospital de Órbigo.
 
 ### Day 22: Villadangos del Páramo to Astorga (~28 km)
 
-By San Martín del Camino to Hospital de Órbigo, which has a long medieval stone bridge, restored, and on by Villares de Órbigo, Santibáñez de Valdeiglesia and San Justo de la Vega to Astorga.
+By San Martín del Camino to Hospital de Órbigo, ~10 km along, which has a long medieval stone bridge, restored, and on ~17 km more by Villares de Órbigo, Santibáñez de Valdeiglesia and San Justo de la Vega to Astorga.
 
 Astorga began as the Roman camp of Asturica Augusta and is the seat of one of Spain's oldest dioceses. Its Episcopal Palace, built between 1889 and 1913, is by Gaudí, one of only three of his buildings outside Catalonia.
 
 ### Day 23: Astorga to Foncebadón (~26 km)
 
-The climb begins. You walk through Murias de Rechivaldo, Santa Catalina de Somoza and El Ganso to Rabanal del Camino, ~20 km from Astorga and a common place to stop, and on to Foncebadón, at ~1,430 m. The road rises from ~870 m in Astorga, a gain of ~560 m.
+The climb begins. You walk through Murias de Rechivaldo, Santa Catalina de Somoza and El Ganso to Rabanal del Camino, ~20 km from Astorga, where Wikipedia's example itinerary stops for the day, and on to Foncebadón, at ~1,430 m. The road rises from ~870 m in Astorga, a gain of ~560 m.
 
-Foncebadón flourished in the Middle Ages as a place of shelter for pilgrims. By the 1990s, Wikipedia says, only two people lived among its ruins; pilgrims have brought it back to life. Mountain weather is quick to change, so carry a waterproof layer.
+Foncebadón flourished in the Middle Ages as a place of shelter for pilgrims. By the 1990s, Wikipedia says, only two people lived among its ruins; pilgrims have brought it back to life. Weather in the mountains can change quickly, so carry a waterproof layer.
 
 ### Day 24: Foncebadón to Ponferrada (~27 km)
 
-Early on you reach the Cruz de Ferro, an iron cross on a tall wooden pole, at ~1,500 m. Many pilgrims leave a stone carried from home at its foot; accounts of the tradition's origin vary, and it is better treated as a custom than as history. Manjarín, El Acebo and Riego de Ambrós follow, then Molinaseca, at ~580 m, whose name comes from old mills on the Meruelo river.
+Early on you reach the Cruz de Ferro, an iron cross on a tall wooden pole, at ~1,500 m. By tradition, pilgrims leave a stone carried from home at its foot; accounts of the tradition's origin vary, and it is better treated as a custom than as history. Manjarín (~4 km from Foncebadón), El Acebo (~11 km) and Riego de Ambrós follow, then Molinaseca (~19 km), at ~580 m, whose name comes from old mills on the Meruelo river.
 
 The thing to watch is the descent: ~850 m in ~19 km to Molinaseca, steep and long. Poles help, and so does time. Ponferrada is the capital of El Bierzo. Its castle dates from the Knights Templar, to whom the king gave the town in the 12th century (the year usually given is 1178), to protect pilgrims on the road.
 
@@ -40,6 +40,6 @@ A flatter day, between ~465 m and ~525 m, by Columbrianos, Fuentesnuevas, Campon
 
 ### Day 26: Villafranca del Bierzo to O Cebreiro (~30 km)
 
-Up the Valcarce valley by Trabadelo, La Portela de Valcarce, Vega de Valcarce, Ruitelán, Las Herrerías and La Faba, climbing from ~505 m to ~1,300 m, a net gain of ~800 m. It is a long day, and Wikipedia's example itinerary splits it at La Faba, ~25 km from Villafranca.
+Up the Valcarce valley by Trabadelo, La Portela de Valcarce, Vega de Valcarce (~19 km from Villafranca), Ruitelán, Las Herrerías and La Faba, climbing from ~505 m to ~1,300 m, a net gain of ~800 m. It is a long day, and Wikipedia's example itinerary splits it at La Faba, ~25 km from Villafranca.
 
-O Cebreiro is a village of prehistoric origin, say the Xunta, between the mountain ranges of O Courel and Os Ancares. It keeps some *pallozas*, houses of an archaic type, and the church of Santa María la Real, built in 1965 to 1971 on the foundations of a pre-Romanesque church. A legend of a miracle of the Holy Grail clings to it. From here the Xunta measures ~155 km to Santiago.
+O Cebreiro is a village of prehistoric origin, says the Xunta, between the mountain ranges of O Courel and Os Ancares. It keeps some *pallozas*, houses of an archaic type, and the church of Santa María la Real, built in 1965 to 1971 on the foundations of a pre-Romanesque church. A legend of a miracle of the Holy Grail clings to it. From here the Xunta measures ~155 km to Santiago.

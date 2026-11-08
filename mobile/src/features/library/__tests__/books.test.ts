@@ -4,7 +4,7 @@
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
-import { blockText, bookLine, chapterPlace, coverCaption, creditLine, dayCount, findBook, findChapter, formatMinutes, kindLabel, libraryBooks, snippet, spansText, type Block, type BookContent, type CatalogBook } from '../books';
+import { blockText, bookLine, chapterPlace, coverCaption, coverTitleSize, creditLine, dayCount, findBook, findChapter, formatMinutes, kindLabel, libraryBooks, snippet, spansText, unbreakableCaption, type Block, type BookContent, type CatalogBook } from '../books';
 
 let n = 0;
 const check = (name: string, fn: () => void) => { fn(); n += 1; console.log(`ok   ${name}`); };
@@ -56,11 +56,14 @@ check('a book and a chapter are found by id, and an id that is not there is null
   assert.equal(chapterPlace([], '00-a'), null);
 });
 
-check('the credit of a reflection book names the work, the author, the translator and the licence; a guide names its author', () => {
-  assert.equal(
-    creditLine({ author: 'CaminoPlus', sources: [{ work: 'The Imitation of Christ', author: 'Thomas à Kempis', translator: 'William Benham', year: '1886', licence: 'Public domain' }] }),
-    'The Imitation of Christ, Thomas à Kempis. Translated by William Benham (1886). Public domain.');
+check('the credit of a book is the sentence the build wrote (one place words it); only a bundle without it falls back to the plain facts, or to the author of the book', () => {
+  assert.equal(creditLine({ author: 'CaminoPlus', credit: 'The Imitation of Christ, Thomas à Kempis. Translated by William Benham (1886). Public domain.' }), 'The Imitation of Christ, Thomas à Kempis. Translated by William Benham (1886). Public domain.');
+  assert.equal(creditLine({ author: 'CaminoPlus', credit: 'Walking, Henry David Thoreau. English original, 1862. Public domain.' }), 'Walking, Henry David Thoreau. English original, 1862. Public domain.', 'a modern or original edition is worded by the build, not rebuilt from a translator field');
+  assert.equal(creditLine({ author: 'CaminoPlus', credit: 'By CaminoPlus.' }), 'By CaminoPlus.');
+  assert.equal(creditLine({ author: 'CaminoPlus', credit: '  By CaminoPlus.  ' }), 'By CaminoPlus.', 'trimmed');
+  assert.equal(creditLine({ author: 'CaminoPlus', credit: '' }), 'By CaminoPlus.', 'an empty credit is no credit');
   assert.equal(creditLine({ author: 'CaminoPlus' }), 'By CaminoPlus.');
+  assert.equal(creditLine({ author: 'CaminoPlus', sources: [{ work: 'The Imitation of Christ', author: 'Thomas à Kempis', licence: 'Public domain' }] }), 'The Imitation of Christ, Thomas à Kempis. Public domain.', 'the fallback never claims a translator');
   assert.equal(spansText([{ t: 'a ' }, { t: 'b', i: 1 }, { t: '.' }]), 'a b.');
 });
 
@@ -102,6 +105,20 @@ check('a chapter is found by id, and a reflection book says how many days it has
   assert.equal(bookLine(book({ kind: 'reflection', minutes: 30, chapters: [{ id: '02-day-01', title: 'Day 1. Only one', minutes: 7 }] })), 'Readings · 30 min · 1 day');
 });
 
+check('a cover title is the app\'s title size where its longest word fits and smaller where it does not, between 17 and 24', () => {
+  assert.equal(coverTitleSize('The Quiet Road', 145), 24, 'a wide phone: the title size');
+  assert.equal(coverTitleSize('The Portuguese Way', 145), 24);
+  assert.ok(coverTitleSize('The Portuguese Way', 110) < 24, 'a narrow phone: "Portuguese" gets a smaller size');
+  assert.ok(coverTitleSize('The Portuguese Way', 110) * 10 * 0.58 <= 110, 'and then the word fits');
+  assert.equal(coverTitleSize('The Portuguese Way', 20), 17, 'never under 17');
+  assert.equal(coverTitleSize('', 100), 24);
+  assert.equal(coverTitleSize('Short', 0), 24, 'no width known: the title size');
+  assert.equal(coverTitleSize('Short', Number.NaN), 24);
+  assert.equal(unbreakableCaption('Readings · 2 h 29 min'), 'Readings · 2\u00a0h\u00a029\u00a0min');
+  assert.equal(unbreakableCaption('Guide · 47 min'), 'Guide · 47\u00a0min');
+  assert.equal(unbreakableCaption('Guide'), 'Guide');
+});
+
 check('books.ts is pure: it imports a type and nothing else', () => {
   const imports = [...read('src/features/library/books.ts').matchAll(/^import [^;]*? from '([^']+)';/gm)].map((m) => m[0]);
   assert.deepEqual(imports, ["import type { CoverColour } from './sample';"]);
@@ -141,6 +158,7 @@ check('the bundle: the catalog and the text of each book say the same about its 
     assert.ok(b.kind === 'guide' || b.kind === 'reflection');
     if (b.kind === 'guide') assert.ok(b.route_slug, `${b.id}: a guide names its route`);
     assert.ok(c.rights.length > 0 && c.ai_disclosure.length > 0, `${b.id}: the rights and the AI disclosure travel with the text`);
+    assert.ok(typeof c.credit === 'string' && c.credit.length > 0, `${b.id}: the credit sentence travels with the text`);
     if (b.kind === 'reflection') assert.ok((c.sources?.length ?? 0) > 0, `${b.id}: a reflection book credits its sources`);
   }
 });
