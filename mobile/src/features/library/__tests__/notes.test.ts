@@ -744,7 +744,7 @@ check('it shows the person who wrote the notes the way a post does (name, handle
 
 check('this test runs: wiring.test.ts runs it, and the test config compiles it', () => {
   const wiring = read('src/features/library/__tests__/wiring.test.ts');
-  assert.match(wiring, /import '\.\/notes\.test';/);
+  assert.match(wiring, /^import '\.\/notes\.test';/m, 'a line that is code, not a comment');
   assert.match(read('tsconfig.librarytest.json'), /"src\/features\/library\/__tests__\/notes\.test\.ts"/);
 });
 
