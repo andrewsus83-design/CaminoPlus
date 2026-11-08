@@ -739,6 +739,32 @@ check('the pairs the Notes tab draws keep their contrast in light and in dark, r
   assert.match(read('src/components/fixedColors.ts'), /photoChip: 'rgba\(0,0,0,0\.45\)'/, 'the chip is the 45 % black this check assumes');
 });
 
+check('the colours the contrast guard above assumes are the ones the code draws with, so the audit and the screens cannot drift apart', () => {
+  const row = code('NoteRow.tsx');
+  const header = code('NotesHeader.tsx');
+  const menu = code('NoteMenu.tsx');
+  const tab = code('NotesTab.tsx');
+  assert.match(row, /backgroundColor: pressed \? role\.sunken : 'transparent'/, 'a pressed row is the sunken colour');
+  assert.match(row, /behind=\{pressed \? role\.sunken : role\.bg\}/, 'and the fade of a cut text is the colour the row is on');
+  assert.match(row, /<AppText variant="label" color=\{role\.accentText\}>\{open \? SHOW_LESS : SHOW_MORE\}<\/AppText>/);
+  assert.match(row, /<Icon name="more" color=\{role\.muted\}/);
+  assert.match(row, /<Icon name="share" color=\{role\.muted\}/);
+  assert.match(row, /<Icon name="pin" color=\{role\.accentText\}/);
+  assert.match(row, /borderColor: role\.border, backgroundColor: role\.surface/, 'the place chip is the surface colour');
+  assert.match(row, /<Text style=\{\[textStyle\('caption'\), \{ color: role\.muted \}\]\}>/, 'the handle is muted');
+  assert.match(row, /<AppText variant="caption" muted style=\{\{ flexShrink: 0 \}\}>/, 'and so is the time');
+  assert.match(header, /borderBottomColor: on \? role\.action : 'transparent'/);
+  assert.match(header, /color=\{on \? role\.text : role\.muted\}/);
+  assert.match(header, /<Icon name=\{icon\} color=\{role\.action\}/);
+  assert.match(header, /<AppText muted numberOfLines=\{2\}>\{COMPOSER_PLACEHOLDER\}<\/AppText>/);
+  assert.match(menu, /backgroundColor: pressed \? role\.bg : 'transparent'/, 'a pressed menu item is the page colour (the sunken one is 4.50 : 1 with Delete in dark mode)');
+  assert.match(menu, /const colour = danger \? role\.danger : role\.text;/);
+  assert.match(menu, /backgroundColor: role\.surface, borderTopLeftRadius/);
+  assert.match(tab, /backgroundColor: role\.highlight/);
+  assert.match(tab, /<Icon name="compose" color=\{role\.onHighlight\}/);
+  assert.match(tab, /<Pill large variant=\{ghost \? 'ghost' : 'primary'\}/);
+});
+
 check('the photos and videos use the diary\'s own tile (the loader, the "Not on this phone" tile, the play tile) and its full-screen viewer, and say which one of how many', () => {
   const media = code('NoteMedia.tsx');
   assert.match(media, /import \{ Face \} from '@\/features\/diary\/MediaTiles';/);
