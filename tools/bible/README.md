@@ -95,7 +95,8 @@ Draw the verses in order, each with its number in front of its first line.
 - A line that starts with tabs is a line of poetry on a line of its own, indented by its tabs. A first line with tabs starts a new line.
 - A `"\n"` in `t` ends the line. A line with no tabs after a `"\n"` is a new paragraph of prose inside the verse (John 8:11; the four paragraphs of the addition
   at the start of Esther 1:1 in `ESG`).
-- `b` is a vertical space before the verse. `h` is a line of its own before the verse (and before its blank line, if it has one).
+- `b` is a vertical space before the verse. `h` is a line of its own before the verse. A verse that has both (only Song of Songs 6:4 and 8:6) has the space first and the
+  heading under it.
 
 ### Verses with no words
 

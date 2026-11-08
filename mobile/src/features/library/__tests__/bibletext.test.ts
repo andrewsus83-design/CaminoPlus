@@ -386,6 +386,8 @@ check('headings, `h` on the verse they stand before: BOOK 1 to 5 over Psalms 1, 
   assert.deepEqual(headings('DAG'), [[3, '24', 'THE SONG OF THE THREE HOLY CHILDREN'], [3, '91', 'Deliverance from the Furnace'], [13, '1', 'THE HISTORY OF SUSANNA'], [14, '1', 'Bel and the Dragon']]);
   assert.deepEqual(headings('BAR'), [[6, '1', 'The Letter of Jeremy (Jeremiah)']]);
   assert.deepEqual(ORDER.filter((c) => !['PSA', 'SNG', 'DAG', 'BAR'].includes(c)).flatMap(headings), [], 'no other book has a heading');
+  const both = [...everyVerse()].filter((v) => v.verse.b && v.verse.h).map((v) => `${v.code} ${v.chapter.c}:${v.verse.n}`);
+  assert.deepEqual(both, ['SNG 6:4', 'SNG 8:6'], 'a blank line and a heading before the same verse: only these two (the space is drawn first and the heading under it)');
 });
 
 check('a heading in the middle of a verse cannot stand there (the format has a heading before a verse): the Song of Songs has five, three are put before the next verse and two, which a verse has no room for, are left out, and the manifest says which', () => {
