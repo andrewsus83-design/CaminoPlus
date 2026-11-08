@@ -14,6 +14,7 @@ import { SavedPostCard } from '@/features/library/SavedPostCard';
 import { BOOKMARKS_KEPT, BOOKMARKS_NOTICE } from '@/features/library/sample';
 import { SAVED_EMPTY, SAVED_FAILED, SAVED_LIMIT_NOTE, SAVED_OFFLINE_EMPTY, SAVED_OFFLINE_NOTE } from '@/features/library/savedPosts';
 import { hitCount, hitsForKeys } from '@/features/library/search';
+import { DailyBookmarks } from '@/features/library/daily/DailyBookmarks';
 import { useLibraryBookmarks } from '@/features/library/useLibraryBookmarks';
 import { useSavedPosts } from '@/features/library/useSavedPosts';
 import { role } from '@/theme';
@@ -47,6 +48,7 @@ export default function Bookmarks() {
       ) : marks.ready && (
         <Card><AppText variant="small" muted>{LIBRARY_BOOKMARKS_EMPTY}</AppText></Card>
       )}
+      <DailyBookmarks marks={marks} />
 
       <AppText variant="h4" accessibilityRole="header" style={{ marginTop: 8 }}>Posts</AppText>
       {!!saved.notice && <FormMessage>{saved.notice}</FormMessage>}

@@ -5,10 +5,12 @@
 //
 // The diary screens and the Notes feed (mobile/app/diary, mobile/src/features/diary, mobile/src/features/notes) belong to the diary: the route
 // sweep checks that they load without errors, and the Me scenarios below only check that Notes is the first sub-tab, WHERE its pen goes and that one
-// note written there shows up in the feed, never what the notes look like. The daily reading (/library/daily) is the same: the scenarios check that
-// the banner leads there, not what is on it. The Bible side of the Library (the grid of books, the chapters, the reader, the search of verses,
-// Continue reading) is in bible.scenarios.mjs.
+// note written there shows up in the feed, never what the notes look like. The daily reading (/library/daily) has its own scenarios, in
+// daily.scenarios.mjs (the header, the week strip, the calendar sheet, the bookmark, the date of the address); the Library scenarios below only
+// check that the banner leads there. The Bible side of the Library (the grid of books, the chapters, the reader, the search of verses, Continue
+// reading) is in bible.scenarios.mjs.
 import assert from 'node:assert/strict';
+import { DAILY_SCENARIOS } from './daily.scenarios.mjs';
 import { UID } from './fixtures.mjs';
 import { domQuiet, eventually, pathOf } from './harness.mjs';
 import { BIBLE_SCENARIOS } from './bible.scenarios.mjs';
@@ -459,4 +461,5 @@ export const SCENARIOS = [
       await page.getByText('No signal right now', { exact: true }).waitFor({ timeout: 15_000 });
     },
   },
+  ...DAILY_SCENARIOS,
 ];
