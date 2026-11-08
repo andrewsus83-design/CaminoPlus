@@ -7,16 +7,24 @@
 // of them differs. From the widths a name gets its lines and the largest size that fits (never above MAX, never under FLOOR), and the same for
 // the count under it, which is set in JetBrains Mono (every letter 0.6 em wide).
 //
+// The name is the hero of the tile: as large as the tile allows, up to NAME_MAX. The short names are all at that size; a long word comes down just
+// enough to fit (and never breaks inside the word), and the letters of a name are set a little closer than the font's own spacing (NAME_TRACKING,
+// the way a display face is set), which is what lets "Thessalonians" be 15 on a phone of 390 instead of 14.
+//
 // The size is for the phone's own text size too: a person who has made the text larger gets names that stay as wide as the tile (the size
 // is reduced by what the system adds, up to CAP, which the text itself is held to with maxFontSizeMultiplier) and never under the floor.
 
 /** The largest a name is drawn, and the smallest. Both are the size as drawn, with the phone's text size in it. */
-export const NAME_MAX = 18;
+export const NAME_MAX = 24;
 export const NAME_FLOOR = 11;
+/** What every name reaches from a phone of 390 wide up (the longest words come down to it and no further there); on a phone of 320 a tile is only 90 wide and "Thessalonians" is 12. */
+export const NAME_WANTED = 15;
+/** The letters of a name are set this much closer than the font spaces them, in em of the size they are drawn at. */
+export const NAME_TRACKING = -0.02;
 /** The largest the phone's own text size counts for a tile (the text is held to it with maxFontSizeMultiplier). */
 export const TEXT_SCALE_CAP = 1.3;
 /** A line is taken to be this much wider than the sum of its letters, for what the phone adds (rounding, kerning goes the other way). */
-export const FIT_SAFETY = 1.03;
+export const FIT_SAFETY = 1.02;
 /** The count under a name: drawn at most so large, at least so small, in JetBrains Mono, whose letters are all 0.6 em wide. */
 export const COUNT_MAX = 12;
 export const COUNT_FLOOR = 10;
@@ -33,6 +41,9 @@ export const FRAUNCES_600: Readonly<Record<string, number>> = {
 
 /** The width of a line of a name in em. A character that is not in the table counts as a wide one (0.8 em), so that a surprise is never too narrow. */
 export const lineWidth = (line: string): number => [...line].reduce((sum, ch) => sum + (FRAUNCES_600[ch] ?? 0.8), 0);
+
+/** The width of the ink of a line of a name in em, with the letters set closer by NAME_TRACKING (between the letters: the gap after the last one is not ink). */
+export const inkWidth = (line: string): number => lineWidth(line) + ([...line].length - 1) * NAME_TRACKING;
 
 /**
  * The lines of a name. A name with a number in front ("1 Samuel") breaks after the number, in every numbered book alike, so the number is a
@@ -62,6 +73,8 @@ export type NameFit = {
   /** The fontSize to give the text (the phone multiplies it by its own text size, held to TEXT_SCALE_CAP). */
   size: number;
   lineHeight: number;
+  /** The letterSpacing to give the text, in the same px as the size (NAME_TRACKING of it). */
+  tracking: number;
   /** Whether the widest line is as wide as the tile or narrower once drawn. false only if the floor is not small enough: no name does that on a phone of 320 or more. */
   fits: boolean;
 };
@@ -70,10 +83,11 @@ export type NameFit = {
 export function fitName(name: string, inner: number, fontScale = 1): NameFit {
   const m = held(fontScale);
   const lines = nameLines(name);
-  const widest = Math.max(...lines.map(lineWidth));
-  const byWidth = inner / (widest * FIT_SAFETY * m);
-  const size = Math.max(half(Math.min(NAME_MAX / m, byWidth)), NAME_FLOOR / m);
-  return { lines, size, lineHeight: Math.round(size * 1.2), fits: widest * FIT_SAFETY * size * m <= inner + 1e-9 };
+  const widest = Math.max(...lines.map(inkWidth));
+  // the size as it is drawn, in half pixels: the largest the tile allows (up to NAME_MAX) and never under NAME_FLOOR; the size to give the text is that less what the phone adds
+  const drawn = Math.max(half(Math.min(NAME_MAX, inner / (widest * FIT_SAFETY))), NAME_FLOOR);
+  const size = drawn / m;
+  return { lines, size, lineHeight: Math.round(size * 1.2), tracking: NAME_TRACKING * size, fits: widest * FIT_SAFETY * drawn <= inner + 1e-9 };
 }
 
 export type CountFit = { size: number; lineHeight: number; fits: boolean };

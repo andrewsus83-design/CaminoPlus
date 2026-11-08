@@ -20,6 +20,9 @@ const readKey = (page, name) => page.evaluate((k) => localStorage.getItem(k), ke
 /** The books of the Bible by part, as a person counts them. */
 const COUNTS = { 'Old Testament': 39, Deuterocanon: 7, 'New Testament': 27 };
 
+/** The names that are the hero of a tile at 390 wide: every one fits at 22 or more (Genesis, Exodus ... Judith). */
+const SHORT_NAMES = ['Genesis', 'Exodus', 'Numbers', 'Joshua', 'Judges', 'Ruth', 'Job', 'Psalms', 'Isaiah', 'Amos', 'Jonah', 'Micah', 'Mark', 'Luke', 'John', 'Acts', 'Romans', 'James', 'Jude', 'Tobit', 'Judith'];
+
 /** What the page says about every book tile that is on it: its box, and whether its name and its count are cut (read from the DOM, in the page). */
 const readTiles = (page) => page.evaluate(() => {
   const lines = (el) => { const r = document.createRange(); r.selectNodeContents(el); return new Set([...r.getClientRects()].map((x) => Math.round(x.top))).size; };
@@ -150,7 +153,7 @@ export const BIBLE_SCENARIOS = [
     },
   },
   {
-    name: 'Library: every one of the 73 book names fits its square tile without being cut, in 320, 390 and 430 wide, in the three parts',
+    name: 'Library: every one of the 73 book names fits its square tile without being cut, in 320, 390 and 430 wide, in the three parts: the name is the hero (24, the long words down to 15 from 390 up), the count small',
     persona: 'in',
     async run({ page, step, go }) {
       step('open Library');
@@ -169,7 +172,9 @@ export const BIBLE_SCENARIOS = [
             assert(!t.nameCut, `${where}: the name is cut`);
             assert.equal(t.countLines, 1, `${where}: the count is on one line`);
             assert(!t.countCut, `${where}: the count is cut`);
-            assert(t.nameSize >= 11 && t.nameSize <= 18, `${where}: the name is drawn at ${t.nameSize}`);
+            assert(t.nameSize >= 11 && t.nameSize <= 24, `${where}: the name is drawn at ${t.nameSize}`);
+            if (width >= 390) assert(t.nameSize >= 15, `${where}: the name is drawn at ${t.nameSize}, under 15`);
+            if (width >= 390 && SHORT_NAMES.includes(t.name)) assert(t.nameSize >= 22, `${where}: a short name is the hero of its tile and is drawn at ${t.nameSize}`);
             assert(t.countSize >= 10 && t.countSize <= 12, `${where}: the count is drawn at ${t.countSize}`);
             assert(Math.abs(t.w - t.h) <= 1 && t.w >= 44, `${where}: the tile is ${t.w} x ${t.h}`);
           }
@@ -296,7 +301,7 @@ export const BIBLE_SCENARIOS = [
       await button(page, 'Bookmark: Psalm 121:3').waitFor();
       await button(page, 'Copy: Psalm 121:3').waitFor();
       await button(page, 'Share: Psalm 121:3').waitFor();
-      for (const name of ['Bookmark: Psalm 121:3', 'Copy: Psalm 121:3', 'Share: Psalm 121:3']) { const b = await box(button(page, name), name); assert(b.height >= 44 && b.width >= 44, `${name} is at least 44 (${b.width} x ${b.height})`); }
+      for (const name of ['Bookmark: Psalm 121:3', 'Copy: Psalm 121:3', 'Share: Psalm 121:3']) { const b = await box(button(page, name), name); assert(b.height >= 68 - 1 && b.width >= 88 - 1, `${name} is at least 88 by 68 (${b.width} x ${b.height})`); }
       step('the chosen verse is shown by a ground and an underline, not by colour alone');
       const style = await page.getByText('He will not allow your foot to be', { exact: false }).first().evaluate((e) => { const s = getComputedStyle(e); return { line: s.textDecorationLine, bg: s.backgroundColor }; });
       assert(/underline/.test(style.line) && style.bg !== 'rgba(0, 0, 0, 0)', `a chosen verse is underlined and has a ground: ${JSON.stringify(style)}`);
@@ -326,6 +331,72 @@ export const BIBLE_SCENARIOS = [
       await button(page, 'Remove bookmark: Psalm 121:3').click();
       await button(page, 'Bookmark: Psalm 121:3').waitFor();
       await eventually(() => readKey(page, 'bookmarks'), (v) => !!v && !/PSA\.121\.3/.test(v), { what: 'the bookmark kept on the phone, with the verse taken off' });
+    },
+  },
+  {
+    name: 'Bible: the actions are big (a glyph of 30, a word of 16 in Inter SemiBold, each at least 88 by 68, the reference 17) at 320, 390 and 430 wide, the bar clears the bottom edge, and a verse touched low on a short phone ends up above the bar',
+    persona: 'in',
+    async run({ page, step, go }) {
+      for (const [width, height] of [[320, 568], [390, 844], [430, 932]]) {
+        step(`${width} x ${height}: open Psalm 119 and touch a verse low on the screen`);
+        await page.setViewportSize({ width, height });
+        await go('/library/bible/PSA/119');
+        await page.getByText('Your word is a lamp to my feet', { exact: false }).first().waitFor();
+        await domQuiet(page, 300);
+        // the verse whose first line is about two thirds of the way down
+        const low = await page.evaluate((h) => {
+          const links = [...document.querySelectorAll('[role="link"]')];
+          const want = h * 0.7;
+          let best = null;
+          for (const e of links) {
+            const r = e.getClientRects()[0];
+            if (!r || r.width < 40) continue;
+            if (best === null || Math.abs(r.top - want) < Math.abs(best.top - want)) best = { top: r.top, left: r.left + 12, text: e.textContent.slice(0, 40) };
+          }
+          return best;
+        }, height);
+        assert(low, 'there is a verse on the screen');
+        await page.mouse.click(low.left, low.top + 8);
+        const bar = page.getByRole('toolbar', { name: /^Actions for Psalm 119:\d+$/ });
+        await bar.waitFor();
+        const place = (await bar.getAttribute('aria-label')).replace('Actions for ', '');
+        step(`${place} is chosen: the bar is inside the screen, 12 above the bottom edge, and its actions are big`);
+        const bb = await box(bar, 'the bar');
+        assert(bb.x >= 11 && bb.x + bb.width <= width - 11, `${width}: the bar is ${bb.x}..${bb.x + bb.width}`);
+        assert(height - (bb.y + bb.height) >= 11 && height - (bb.y + bb.height) <= 14, `${width}: the bar is ${height - (bb.y + bb.height)} above the bottom edge`);
+        const actions = [`Bookmark: ${place}`, `Copy: ${place}`, `Share: ${place}`];
+        const widths = [];
+        for (const name of actions) {
+          const b = await box(button(page, name), name);
+          widths.push(b.width);
+          assert(b.height >= 67 && b.width >= 87.5, `${width}: ${name} is ${b.width} x ${b.height}, under 88 by 68`);
+          const parts = await button(page, name).evaluate((el) => {
+            const svg = el.querySelector('svg');
+            const word = [...el.querySelectorAll('div,span')].find((x) => x.children.length === 0 && x.textContent.trim().length > 0);
+            const cs = getComputedStyle(word);
+            return { glyph: svg ? svg.getBoundingClientRect().width : 0, size: parseFloat(cs.fontSize), family: cs.fontFamily, text: word.textContent };
+          });
+          assert(parts.glyph >= 28, `${width}: the glyph of ${name} is ${parts.glyph}`);
+          assert(parts.size >= 16 && /Inter_600SemiBold/.test(parts.family), `${width}: the word "${parts.text}" is ${parts.size} in ${parts.family}`);
+        }
+        assert(Math.abs(widths[0] - widths[1]) <= 1 && Math.abs(widths[1] - widths[2]) <= 1, `${width}: the three share the bar equally (${widths})`);
+        const ref = await bar.getByText(place, { exact: true }).evaluate((el) => { const cs = getComputedStyle(el); return { size: parseFloat(cs.fontSize), family: cs.fontFamily }; });
+        assert(ref.size >= 16 && /JetBrainsMono/.test(ref.family), `${width}: the reference is ${ref.size} in ${ref.family}`);
+        step(`the chosen verse is above the bar (the page scrolled it up if it was under it)`);
+        await eventually(
+          () => page.evaluate(() => {
+            const chosen = [...document.querySelectorAll('[role="link"]')].filter((e) => /underline/.test(getComputedStyle(e).textDecorationLine));
+            const rects = chosen.flatMap((e) => [...e.getClientRects()]);
+            const bar = document.querySelector('[role="toolbar"]').getBoundingClientRect();
+            return { bottom: rects.length ? Math.max(...rects.map((r) => r.bottom)) : Infinity, top: rects.length ? Math.min(...rects.map((r) => r.top)) : -Infinity, bar: bar.top };
+          }),
+          (m) => m.bottom <= m.bar + 0.5 && m.top >= 0,
+          { what: `the chosen verse (${place}) clear of the bar at ${width} x ${height}` },
+        );
+        step('close the bar: it is gone');
+        await button(page, 'Close the verse actions').click();
+        await eventually(() => page.getByRole('toolbar').count(), (n) => n === 0, { what: 'the number of action bars after closing it' });
+      }
     },
   },
   {

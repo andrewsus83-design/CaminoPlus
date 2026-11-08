@@ -138,8 +138,13 @@ jobs:
         run: git ls-files -z 'tools/*.py' | xargs -0 python -m py_compile
       - name: POI audit tests
         run: python -m unittest discover -s tools/poi-audit/tests -v
-      - name: Tools tests (website generator, design tokens)
+      - name: Tools tests (website generator, design tokens, book tools)
         run: python -m unittest discover -s tools/tests -v
+      - name: Books pass their checks (every quoted passage is verified against its public-domain source) and are exactly the planned books
+        run: |
+          python tools/fetch_book_sources.py "$RUNNER_TEMP/book-sources"
+          python tools/check_books.py --strict --sources "$RUNNER_TEMP/book-sources"
+          python tools/check_series.py
       - name: Documentation links and anchors
         run: python tools/check_docs_links.py
 

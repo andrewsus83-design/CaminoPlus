@@ -1,0 +1,174 @@
+#!/usr/bin/env python3
+"""Copy a passage out of a source text exactly, and say where it is. For the reflection books (see .claude/skills/book-writer).
+
+    python3 tools/passage.py /tmp/book-sources/pg1653.txt --from "If thou wilt stand fast" --to "an exile and a pilgrim upon the earth."
+    python3 tools/passage.py pg1653.txt --from "We ought daily" --to "done nothing!" --from "If thou canst not" --to "thy neighbour."
+    python3 tools/passage.py pg8294.txt --web --from "I will lift up my eyes" --to "heaven and earth."
+
+Each --from/--to pair is one stretch: the text from the first words to the last words, in the source's own words. Several pairs are joined with " … ". It prints the
+passage ready to paste into a `>` blockquote, its length, and the nearest headings above it (for example "THE FIRST BOOK" and "CHAPTER XVII"), so the citation is
+read from the source and not from memory. It warns about what a copied stretch can carry that is not text:
+
+  * a footnote marker such as (3) or [3] inside the stretch (end the stretch before it, or start after it);
+  * a paragraph number such as "2.", an edition's section number such as {221}, or a marginal Scripture reference such as [Heb. 12:25] (the same);
+  * a quotation mark opened and not closed in the stretch, or the reverse (end where the quotation ends);
+  * `_italic_` marks, which are turned into *italic*.
+
+The same cleaning as tools/check_books.py is used (the Project Gutenberg header and footer are dropped; for the World English Bible the verse numbers and headings).
+The checker is still the judge: run it afterwards.
+"""
+from __future__ import annotations
+
+import argparse
+import dataclasses
+import pathlib
+import re
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+
+import book_kit as bk  # noqa: E402
+import check_books as cb  # noqa: E402
+
+BOOK_HEADING = re.compile(
+    r"^\s*(?:THE (?:FIRST|SECOND|THIRD|FOURTH|FIFTH|SIXTH|SEVENTH|EIGHTH|NINTH|TENTH) BOOK.*|BOOK [IVXLC\d]+\b.*|PART [IVXLC\d]+\b.*|"
+    r"(?:First|Second|Third|Fourth|Fifth|Sixth|Seventh|Eighth|Ninth|Tenth) (?:Book|Part).*)\s*$"
+)
+ORDINAL = r"(?:FIRST|SECOND|THIRD|FOURTH|FIFTH|SIXTH|SEVENTH|EIGHTH|NINTH|TENTH|ELEVENTH|TWELFTH|THIRTEENTH|FOURTEENTH|FIFTEENTH)"
+CHAPTER_HEADING = re.compile(
+    r"^\s*(?:CHAPTER [IVXLC\d]+\b.*|_?Chapter\s+[IVXLC\d]+(?![A-Za-z])[._]*.*|CANTO [IVXLC]+\b.*|(?:[A-Za-z]+:\s*)?Canto\s+[IVXLC]+(?![A-Za-z]).*|PSALM \d+.*|[IVXLC]+\.\s*$|" + ORDINAL + r" (?:CONVERSATION|LETTER|SECTION|MEDITATION)\.?\s*)\s*$"
+)
+FOOTNOTE = re.compile(r"\(\d+\)|\[\d+\]")
+SECTION_NUMBER = re.compile(r"\{\d+\}")                                             # an edition's own numbering, e.g. {221}
+SCRIPTURE_REF = re.compile(r"\[(?:[1-3] ?)?[A-Z][a-z]{1,9}\.? ?\d+(?::\d+)?(?:[-,–][^\]]*)?\]")   # a marginal reference such as [Heb. 12:25] or [Ps. 23]
+PARAGRAPH_NUMBER = re.compile(r"(?<=\s)\d{1,2}\. (?=[A-Z“‘\"'])")
+
+
+@dataclasses.dataclass
+class Extract:
+    text: str
+    where: list[str]
+    warnings: list[str]
+
+    @property
+    def words(self) -> int:
+        return bk.count_words(self.text)
+
+
+class NotFound(Exception):
+    pass
+
+
+def _pattern(phrase: str) -> re.Pattern[str]:
+    """The phrase with any run of white space between its words (the source is hard-wrapped)."""
+    parts = phrase.split()
+    if not parts:
+        raise NotFound("an empty phrase")
+    return re.compile(r"\s+".join(re.escape(p) for p in parts))
+
+
+VERSE = re.compile(r"(?<![\d:])(\d{1,3}):(\d{3})(?!\d)")
+
+
+def _verses(source: str, start: str, end: str) -> str | None:
+    """For the World English Bible: the chapter and verses a stretch covers, "121:1 to 4" or "120:1 to 121:2". The chapter is the Psalm number in the Psalms.
+    The verse numbers sit between the words in the raw file, so the stretch is looked for allowing them."""
+    gap = r"(?:\s+|\s+\d{1,3}:\d{3}\s+(?:<<[^>]*>>\s*)?)"
+    def find(phrase: str, pos: int = 0):
+        words = phrase.split()
+        return re.compile(gap.join(re.escape(w) for w in words)).search(source, pos) if words else None
+    a = find(start)
+    if not a:
+        return None
+    b = find(end, a.start())
+    if not b:
+        return None
+    before = list(VERSE.finditer(source[:a.start() + 1]))
+    inside = list(VERSE.finditer(source[a.start():b.end()]))
+    refs = ([before[-1]] if before else []) + inside
+    if not refs:
+        return None
+    first, last = refs[0], refs[-1]
+    f, l = (int(first.group(1)), int(first.group(2))), (int(last.group(1)), int(last.group(2)))
+    if f == l:
+        return f"{f[0]}:{f[1]}"
+    return f"{f[0]}:{f[1]} to {l[1]}" if f[0] == l[0] else f"{f[0]}:{f[1]} to {l[0]}:{l[1]}"
+
+
+def extract(source: str, start: str, end: str, web: bool = False, text_from: str | None = None) -> Extract:
+    """The stretch of `source` from `start` to the end of `end`, as one line of its own words."""
+    body = cb._clean_source(source, web)
+    if text_from:                        # the work's own text starts here (an editor's introduction before it may quote the work differently)
+        t = _pattern(text_from).search(body)
+        if not t:
+            raise NotFound(f"--text-from not found: {text_from!r}")
+        body = body[t.start():]
+    a = _pattern(start).search(body)
+    if not a:
+        raise NotFound(f"start not found: {start!r}")
+    b = _pattern(end).search(body, a.start())
+    if not b:
+        raise NotFound(f"end not found after the start: {end!r}")
+    raw = body[a.start():b.end()]
+    text = re.sub(r"\s+", " ", raw).strip()
+    warnings: list[str] = []
+    if FOOTNOTE.search(text):
+        warnings.append(f"a footnote marker inside the stretch ({FOOTNOTE.search(text).group(0)}): end the stretch before it or start after it")
+    if SECTION_NUMBER.search(text):
+        warnings.append(f"an edition's section number inside the stretch ({SECTION_NUMBER.search(text).group(0)}): end the stretch before it or start after it")
+    if SCRIPTURE_REF.search(text):
+        warnings.append(f"a marginal Scripture reference inside the stretch ({SCRIPTURE_REF.search(text).group(0)}): it is the editor's note, not the author's text; end the stretch before it")
+    if PARAGRAPH_NUMBER.search(text):
+        warnings.append(f"a paragraph number inside the stretch ({PARAGRAPH_NUMBER.search(text).group(0).strip()!r}): end the stretch before it or start after it")
+    if text.count("“") != text.count("”") or text.count('"') % 2:
+        warnings.append("a quotation mark is opened and not closed in the stretch (or the reverse): end the stretch where the quotation ends, or start before it opens")
+    text = re.sub(r"(?<![\w])_([^_]+)_(?![\w])", r"*\1*", text)
+    book = chapter = None                # the nearest book-level and chapter-level headings above the stretch
+    for line in body[:a.start()].splitlines()[::-1]:
+        if chapter is None and CHAPTER_HEADING.match(line):
+            chapter = line.strip()
+        elif book is None and BOOK_HEADING.match(line):
+            book = line.strip()
+        if book and chapter:
+            break
+    where = [h for h in (book, chapter) if h]
+    if web:
+        ref = _verses(source, start, end)
+        if ref:
+            where = [ref]
+    return Extract(text, where, warnings)
+
+
+def main(argv: list[str] | None = None) -> int:
+    ap = argparse.ArgumentParser(description="Copy a passage out of a source text exactly, and say where it is.")
+    ap.add_argument("source", type=pathlib.Path, help="the source text, for example /tmp/book-sources/pg1653.txt")
+    ap.add_argument("--from", dest="starts", action="append", required=True, metavar="WORDS", help="the first words of a stretch")
+    ap.add_argument("--to", dest="ends", action="append", required=True, metavar="WORDS", help="the last words of the stretch")
+    ap.add_argument("--text-from", metavar="WORDS", help="look only in the text from these words on (the same as `text_from` of the source in book.json)")
+    ap.add_argument("--web", action="store_true", help="the source is the World English Bible (drop verse numbers and headings)")
+    args = ap.parse_args(argv)
+    if len(args.starts) != len(args.ends):
+        print("every --from needs a --to", file=sys.stderr)
+        return 2
+    source = args.source.read_text(encoding="utf-8", errors="replace")
+    stretches, failed = [], False
+    for start, end in zip(args.starts, args.ends):
+        try:
+            e = extract(source, start, end, args.web or "world english bible" in source[:3000].lower(), args.text_from)
+        except NotFound as err:
+            print(f"error: {err}", file=sys.stderr)
+            failed = True
+            continue
+        stretches.append(e)
+        for w in e.warnings:
+            print(f"warning: {w}", file=sys.stderr)
+    if failed:
+        return 1
+    text = " … ".join(e.text for e in stretches)
+    print(f"> {text}")
+    print(f"\n({bk.count_words(text)} words; from: {' / '.join(stretches[0].where) or 'no heading found above it'})", file=sys.stderr)
+    return 1 if any(e.warnings for e in stretches) else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

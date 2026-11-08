@@ -16,6 +16,13 @@ export const BODY_LINE = 32;
 /** The number of a verse is drawn at this size: the raised digits of JetBrains Mono are 0.43 of it high (7.3 here), as small as a number can be and still be read. */
 export const NUMBER_SIZE = 17;
 
+/**
+ * JetBrains Mono is monospaced, so the raised digits of a number of two or three figures stand far apart ("1 0"). Every digit but the last gives back this much of its
+ * advance (10.2 of them at this size): a letter-spacing is added after each character, the last one too, and the last digit has to keep its space before the words
+ * ("¹In" would run together). The reader (wrap.ts) still counts the whole advance of a digit when it decides where a line is cut, so a line is never cut too late.
+ */
+export const NUMBER_TRACKING = -3;
+
 /** A line of poetry goes in by an em space for each tab at its start (Inter has one: 19 wide at this size). */
 export const INDENT = '\u2003';
 
@@ -33,20 +40,26 @@ const chosen = () => ({ backgroundColor: c.goldSoft, textDecorationLine: 'underl
  * the number never makes a line taller.
  */
 function VerseNumber({ label, on }: { label: string; on: boolean }) {
+  const digits = [...superscript(label)];
+  const last = digits.pop();
   return (
     <>
-      <AppText variant="mono" maxFontSizeMultiplier={READER_MAX_FONT_SCALE} color={on ? role.text : role.muted} style={{ fontSize: NUMBER_SIZE, lineHeight: BODY_LINE }}>{superscript(label)}</AppText>
+      <AppText variant="mono" maxFontSizeMultiplier={READER_MAX_FONT_SCALE} color={on ? role.text : role.muted} style={{ fontSize: NUMBER_SIZE, lineHeight: BODY_LINE }}>
+        {digits.length > 0 && <Text style={{ letterSpacing: NUMBER_TRACKING }}>{digits.join('')}</Text>}
+        {last}
+      </AppText>
       {'\u2009'}
     </>
   );
 }
 
-type Select = (verse: string) => void;
+/** A touch on a verse: which one, and how far down the screen it was (the reader keeps the verse above the bar of actions, actionBar.ts). */
+type Select = (verse: string, pageY?: number) => void;
 
 /** The words of one verse (or of the part of it that is in this block), a text of its own that a touch chooses. A link for a screen reader (its rotor lists the verses). */
 function Words({ verse, number, text, on, onSelect }: { verse: string; number: string | null; text: string; on: boolean; onSelect: Select }) {
   return (
-    <Text accessibilityRole="link" onPress={() => onSelect(verse)} style={on ? chosen() : undefined}>
+    <Text accessibilityRole="link" onPress={(e) => onSelect(verse, e.nativeEvent.pageY)} style={on ? chosen() : undefined}>
       {number !== null && <VerseNumber label={number} on={on} />}
       {text}
     </Text>

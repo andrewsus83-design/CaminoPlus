@@ -1,0 +1,26 @@
+{
+  "id": "camino-finisterre-muxia-guide",
+  "kind": "guide",
+  "order": 7,
+  "title": "To the End of the Earth",
+  "subtitle": "A Pilgrim's Guide to Finisterre and Muxía",
+  "route_slug": "camino-finisterre-muxia",
+  "description_short": "A calm, honest guide to the road from Santiago to the Atlantic: Finisterre and Muxía, how to cut the days, the sunset, the sea, and what the official sources say about the certificates.",
+  "description_long": "Every other Camino ends in Santiago de Compostela. This one begins there. The road to Finisterre and Muxía leaves the cathedral square and runs west for about 90 km to the Atlantic: over the Tambre at Ponte Maceira, through Negreira and Olveiroa, to the sea at Cee and Corcubión, to the lighthouse at Cape Finisterre, which the Romans took for the end of the earth, and on to the sanctuary of the Virxe da Barca at Muxía, beside the water.\n\nThis guide is written for the Planner first and the Walker's evenings second. It helps you decide whether this is your Camino, shape the walk, pack, and know what to check locally. It says plainly that this is not a Compostela route, and what the official sources do and do not say about the Fisterrana and the Muxiana, the certificates of the coast.\n\nYou will find the road day by day, from the oak woods of the inland stages to the cliffs of the cape; a chapter on the sunset and on the old custom of burning boots, which the town of Fisterra asks pilgrims to leave alone; and a chapter on the many ways to split the days, since the sources do not agree on how many there are. There are chapters on sleeping, eating and resting, on weather, wind and the sea, on the inner side of walking away from the cathedral, and on going home.\n\nEvery distance is marked approximate, and the book says where sources differ. It names no hostels, cafes or prices, because they change; it sends you to the CaminoPlus app and to local information for the live answer. Its facts come from named public sources, which the book credits.",
+  "keywords": [
+    "Camino Finisterre",
+    "Camino Muxía",
+    "Fisterra",
+    "Camino de Santiago",
+    "Costa da Morte",
+    "pilgrim guidebook",
+    "Finisterrana"
+  ],
+  "categories": [
+    "Travel / Special Interest / Pilgrimages",
+    "Travel / Europe / Spain"
+  ],
+  "cover": { "colour": "goldWash", "icon": "library" },
+  "version": "1.0.0",
+  "date": "2026-11"
+}

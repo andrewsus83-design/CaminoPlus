@@ -1,0 +1,43 @@
+{
+  "id": "teresa-life-readings",
+  "kind": "reflection",
+  "order": 16,
+  "title": "The Road to Ávila",
+  "subtitle": "Ten Days with The Life of St. Teresa of Jesus for the Camino de Madrid",
+  "route_slug": "camino-de-madrid",
+  "days": 10,
+  "description_short": "Ten days with Teresa of Ávila's own account of her life, for the Camino de Madrid: a morning reading and an evening reflection each day. Slow, honest, and a little funny.",
+  "description_long": "Teresa of Ávila was born in Ávila in 1515, became a Carmelite nun, and helped begin a small, poor and strict house of nuns in her home town. She wrote the story of her soul, The Life of St. Teresa of Jesus, at the command of her confessors. It was examined with great care in her own lifetime, and it was first printed in 1588, after her death. It is the book of a woman who was often ill, often tired, often laughed at, and who kept going in.\n\nThe Road to Ávila is made to go with the Camino de Madrid, the road in the CaminoPlus catalogue that runs from Madrid to Sahagún, about 320 km. It has ten days. Every day has a morning reading of about five minutes and an evening reflection of about three. The morning begins with a short passage from Teresa, quoted word for word from David Lewis's English translation, in the edition of 1904, which is in the public domain. Then comes a reflection that starts from something on the road: a phone checked once too often, a junction with no arrow, a dry afternoon on the plains. Then two small things to carry for the next hour, a question and a practice that needs nothing but attention. The evening looks back over the day with two or three gentle questions and ends with a short original prayer, open enough to be said as a wish by a reader who prays differently, or who does not pray.\n\nThe days follow the shape of her life: a child and her family, the struggle to pray, the turn, her picture of a garden watered four ways, friends and thanks, humility and plain truth, a long road and its trials, courage and trust, the dark and the dry, and coming home to the work of each day. Teresa was a Catholic of the sixteenth century and writes as one. The book says so plainly, invites and does not push, and is honest where she is hard to follow, in her visions, her harsh words about herself and her strict way of life. It asks nobody to copy a penance. Read it on a bench, in a pilgrim hostel bunk, or at your own kitchen table once the walking is done.",
+  "keywords": [
+    "Camino de Santiago",
+    "Camino de Madrid",
+    "Teresa of Avila",
+    "pilgrimage reflections",
+    "daily readings",
+    "Life of St. Teresa",
+    "prayer"
+  ],
+  "categories": [
+    "Religion / Christianity / Catholic",
+    "Religion / Christian Living / Spiritual Growth",
+    "Travel / Special Interest / Pilgrimages"
+  ],
+  "cover": {
+    "colour": "goldWash",
+    "icon": "book"
+  },
+  "version": "1.0.0",
+  "date": "2026-11",
+  "sources": [
+    {
+      "id": "gutenberg-8120",
+      "work": "The Life of St. Teresa of Jesus",
+      "author": "Teresa of Ávila",
+      "translator": "David Lewis",
+      "year": "1904 edition",
+      "licence": "Public domain",
+      "url": "https://www.gutenberg.org/ebooks/8120",
+      "text_from": "As I have been commanded and left at liberty to describe at length"
+    }
+  ]
+}

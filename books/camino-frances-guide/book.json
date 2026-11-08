@@ -1,0 +1,26 @@
+{
+  "id": "camino-frances-guide",
+  "kind": "guide",
+  "order": 1,
+  "title": "The French Way",
+  "subtitle": "A Pilgrim's Guide to the Camino Francés",
+  "route_slug": "camino-frances",
+  "description_short": "A calm, honest guide to the Camino Francés: 33 walking days from Saint-Jean-Pied-de-Port to Santiago, five regions, where to start, when to go, what to carry and how the Compostela works.",
+  "description_long": "The Camino Francés is the best-known Camino: about 773 km from Saint-Jean-Pied-de-Port, in the French Pyrenees, to the cathedral of Santiago de Compostela, in 33 usual walking days. It crosses the Pyrenees and Navarra, the vineyards of La Rioja, the high plains of the Meseta, the mountains of León and the green hills of Galicia.\n\nThis guide is written for the Planner first and the Walker's evenings second. It helps you decide whether this is your Camino, choose where to start and how many days to give it, pick a season, train and pack, and know what to check locally. It explains plainly how the Pilgrim's Office describes the Compostela, and how that rule looks on a road that offers many ways in.\n\nYou will find a short, honest history; a chapter for each of the five regions, with a short entry for every one of the 33 stages named as in the CaminoPlus app; and chapters on sleeping, eating and resting, on body, weather and safety, on the inner side of walking, on arriving in Santiago and on going home.\n\nEvery distance is marked approximate, and the book says where sources differ. It names no hostels, cafes or prices, because they change; it sends you to the CaminoPlus app and to local information for the live answer. Its facts come from named public sources, which the book credits.",
+  "keywords": [
+    "Camino Francés",
+    "French Way",
+    "Camino de Santiago",
+    "Saint-Jean-Pied-de-Port to Santiago",
+    "pilgrim guidebook",
+    "Camino stages",
+    "Compostela"
+  ],
+  "categories": [
+    "Travel / Special Interest / Pilgrimages",
+    "Travel / Europe / Spain"
+  ],
+  "cover": { "colour": "goldSoft", "icon": "library" },
+  "version": "1.0.0",
+  "date": "2026-11"
+}
