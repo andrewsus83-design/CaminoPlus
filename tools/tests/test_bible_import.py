@@ -482,6 +482,7 @@ class Head(unittest.TestCase):
         self.refuses(usfm(body).replace("\\ide UTF-8", "\\ide ISO-8859-1"), r"PSA line 2: \\ide says 'ISO-8859-1', not UTF-8")
         self.refuses(usfm(body).replace("\\toc3 Fix\n", ""), r"PSA line 6: the first chapter starts before the head of the book is complete \(missing \\toc3\)")
         self.refuses(usfm(body).replace("\\h Psalms\n", "\\h Psalms\n\\h Again\n"), r"PSA line 4: \\h twice")
+        self.refuses(usfm(body).replace("\\ide UTF-8", "\\id PSA Again\n\\ide UTF-8"), r"PSA line 2: \\id twice")
         self.refuses(usfm(body) + "\\id PSA\n", r"PSA line 10: the marker \\id is not one this importer knows in the middle of a book")
         self.refuses(usfm(body).replace("\\toc2 Psalms", "\\toc2"), r"^PSA: \\toc2 is empty, so the book has no name$")
         self.refuses(usfm(body, before="\\v 1 Early\n"), r"PSA line 7: the marker \\v before the first chapter is not one this importer knows")
@@ -986,6 +987,45 @@ class RealZip(unittest.TestCase):
         self.assertEqual(imp.differences(built, ASSETS, GENERATED), [])
         self.assertEqual(imp.build(members, digest, size).files, built.files)
         self.assertEqual(built.summary, "73 books, 1,328 chapters, 35,408 verses, 5,389,017 bytes of JSON")
+
+    def test_every_verse_has_the_words_of_an_independent_reading_of_the_zip(self):
+        """The words of each verse are read again here with regular expressions and no state (the importer reads line by line with a tokenizer), and the two
+        readings have the same words in all of the 35,408 verses, whitespace aside. This is how it was checked that the importer takes only markup away."""
+        members, digest, size = imp.read_zip(pathlib.Path(os.environ["WEBC_ZIP"]), imp.PINNED.sha256)
+        built = imp.build(members, digest, size)
+
+        def words(s):
+            s = re.sub(r"\\f\s.*?\\f\*", "", s, flags=re.S)  # footnotes
+            s = re.sub(r"\\x\s.*?\\x\*", "", s, flags=re.S)  # cross references
+            s = re.sub(r"\\\+?w\s+([^|\\]*)\|[^\\]*?\\\+?w\*", r"\1", s)  # a word and its Strong's number
+            s = re.sub(r"\\(?:wj|qs|bk|nd|add)\*", "", s)
+            return re.sub(r"\\(?:wj|qs|bk|nd|add) ", "", s)
+
+        checked = 0
+        for code in imp.PINNED.order:
+            name = next(n for n in members if n.endswith(f"-{code}eng-web-c.usfm"))
+            expected, chapter, verse = {}, 0, None
+            for line in members[name].decode("utf-8-sig").split("\n"):
+                if not line.strip():
+                    continue
+                m = re.match(r"\\([a-z0-9]+)(?: (.*))?$", line.rstrip(" "))
+                marker, rest = m.group(1), m.group(2) or ""
+                if marker == "c":
+                    chapter, verse = int(rest), None
+                elif marker == "v" and chapter:
+                    label, _, text = rest.partition(" ")
+                    verse = (chapter, label)
+                    expected[verse] = [words(text)]
+                elif marker in ("p", "m", "mi", "pi1", "q1", "q2", "q3", "li1", "nb") and verse is not None:
+                    expected[verse].append(words(rest))
+            book = json.loads(built.files[f"{code}.json"])
+            got = {(c["c"], v["n"]): v["t"] for c in book["chapters"] for v in c["verses"]}
+            self.assertEqual(list(got), list(expected), f"{code}: the same verses in the same order")
+            for key, parts in expected.items():
+                flat = lambda t: re.sub(r"[ \t\n\r]+", " ", t).strip(" ")
+                self.assertEqual(flat(got[key]), flat(" ".join(parts)), f"{code} {key}")
+                checked += 1
+        self.assertEqual(checked, 35408)
 
 
 if __name__ == "__main__":

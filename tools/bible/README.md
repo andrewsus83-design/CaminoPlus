@@ -201,9 +201,10 @@ When eBible.org publishes a new edition of the zip:
 ## Tests
 
 - `python3 -m unittest discover -s tools/tests -v` runs [test_bible_import.py](../tests/test_bible_import.py): a small USFM text that has every marker above and every edge, the
-  refusals, the pinned hash, deterministic output, and `--check` against a changed file. No network.
+  refusals, the pinned hash, deterministic output, `--check` against a changed file, and that the committed files agree with the importer and with each other. No network.
 - `npm run test:library` (in `mobile/`) runs `bibletext.test.ts` (totals, a table of the chapters and verses of every book typed in again and read against a second
   source, the hash of every file, the format, Psalm 121:1-4 equal to the sample of the Daily reading, Esther and Daniel from the Greek, the wiring of
   `text.ts` and `webc.generated.ts`, run for real) and `searchtext.test.ts`.
-- A reading of the whole zip with another method (regular expressions, no state) was compared with every one of the 35,408 verses when the importer was written: the
-  same words in all of them.
+- With `WEBC_ZIP=PATH` (a copy of the zip) set, the same Python tests also run the importer on the real zip: the files it makes are exactly the committed ones, and the words
+  of every one of the 35,408 verses are the words of an independent reading of the zip (regular expressions, no state), whitespace aside. That is how it is checked that the
+  importer takes only markup away. CI has no copy of the zip, so it skips them; run `WEBC_ZIP=PATH python3 -m unittest tools.tests.test_bible_import -v` after a bump of the pin.
