@@ -16,7 +16,7 @@ const SLOT = 78;
 function Stamp({ p, onPress }: { p: RoutePoint<Post>; onPress: () => void }) {
   const done = p.posts.length > 0;
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={stampLabel(p)} onPress={onPress} style={{ width: '33.33%', alignItems: 'center', gap: 6, paddingHorizontal: 4 }}>
+    <Pressable accessibilityRole="button" accessibilityLabel={stampLabel(p)} onPress={onPress} style={{ width: '33.33%', alignItems: 'center', gap: 8, paddingHorizontal: 4 }}>
       <View style={{ width: SLOT, height: SLOT }}>
         <View style={{ width: SLOT, height: SLOT, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center', backgroundColor: done ? c.goldSoft : 'transparent', borderWidth: done ? 0 : 2, borderStyle: 'dashed', borderColor: role.borderStrong, transform: [{ rotate: done ? '-8deg' : '0deg' }] }}>
           <Icon name="shell" color={done ? c.blue : role.borderStrong} size={32} />

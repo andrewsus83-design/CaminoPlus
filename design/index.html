@@ -494,6 +494,36 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
 .highlights div { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; flex: none; }
 .highlights .cp-avatar { width: 60px; height: 60px; }
 .highlights .add { width: 66px; height: 66px; border-radius: 50%; border: 2px dashed var(--cp-border-strong); display: grid; place-items: center; color: var(--cp-text-muted); }
+/* ---- Me: the All item (the first highlight, pinned at the left), the stamps it opens, and the bar over the grid of one place ---- */
+.hl-row { display: flex; margin: 14px -24px 0; padding-left: 24px; }
+.hl-row .highlights { flex: 1; min-width: 0; margin: 0 0 0 16px; padding: 2px 24px 2px 0; }
+.hl-all { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: none; width: 72px; padding: 2px 0; font-size: 12px; line-height: 16px; font-weight: 500; }
+.hl-all .all-ring { width: 66px; height: 66px; box-sizing: border-box; border-radius: 50%; border: 1px solid var(--cp-border); background: var(--cp-surface); display: grid; place-items: center; color: var(--cp-action); }
+.hl-all .all-ring .in { display: grid; place-items: center; width: 100%; height: 100%; box-sizing: border-box; border-radius: 50%; }
+.hl-all .all-ring .cp-icon { width: 28px; height: 28px; }
+.hl-all.on { font-weight: 600; }
+.hl-all.on .all-ring { padding: 3px; border: 0; background: var(--cp-color-gold); }
+.hl-all.on .all-ring .in { border: 3px solid var(--cp-bg); background: var(--cp-surface); }
+.allp-card { background: var(--cp-surface); border-radius: var(--cp-radius-lg); box-shadow: var(--cp-shadow-sm); padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+.allp-card .row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.allp-card h4 { margin: 0; font-family: var(--cp-font-title); font-weight: 600; font-size: 24px; line-height: 30px; }
+.allp-card .n { font-size: 17px; line-height: 22px; font-weight: 600; color: var(--cp-text-accent); }
+.allp-card .bar { height: 12px; border-radius: var(--cp-radius-pill); background: var(--cp-surface-sunken); overflow: hidden; }
+.allp-card .bar span { display: block; height: 100%; border-radius: inherit; background: var(--cp-color-gold); }
+.allp-card p { margin: 0; font-size: 17px; line-height: 25px; color: var(--cp-text-muted); }
+.allp { display: grid; grid-template-columns: repeat(3, 1fr); row-gap: 20px; margin-top: 16px; }
+.allp .sl { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 0 4px; min-height: 48px; font: inherit; color: inherit; background: none; border: 0; }
+.allp .sl .ring { position: relative; width: 78px; height: 78px; }
+.allp .sl .rd { width: 78px; height: 78px; box-sizing: border-box; border-radius: 50%; display: grid; place-items: center; border: 2px dashed var(--cp-border-strong); color: var(--cp-border-strong); }
+.allp .sl.done .rd { border: 0; background: var(--cp-color-gold-soft); color: var(--cp-action); transform: rotate(-8deg); }
+.allp .sl .rd .cp-icon { width: 32px; height: 32px; }
+.allp .sl .ct { position: absolute; top: -4px; right: -4px; min-width: 28px; height: 28px; box-sizing: border-box; padding: 0 8px; border-radius: 14px; background: var(--cp-highlight); color: var(--cp-on-highlight); border: 2px solid var(--cp-bg); font-size: 12px; line-height: 24px; font-weight: 600; text-align: center; }
+.allp .sl .nm { font-size: 15px; line-height: 21px; letter-spacing: .4px; font-weight: 500; color: var(--cp-text-muted); text-align: center; }
+.allp .sl.done .nm { font-weight: 600; color: var(--cp-text); }
+.place-bar { min-height: 48px; display: flex; align-items: center; gap: 8px; padding: 0 16px 0 12px; border-radius: var(--cp-radius-pill); background: var(--cp-surface); border: 1px solid var(--cp-border); font-size: 17px; line-height: 22px; font-weight: 600; margin-bottom: 16px; }
+.place-bar .back { color: var(--cp-text-accent); display: inline-flex; align-items: center; gap: 8px; flex: none; }
+.place-bar .back .cp-icon { width: 18px; height: 18px; }
+.place-bar .nm { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .cp-post { background: var(--cp-surface); border-radius: var(--cp-radius-lg); box-shadow: var(--cp-shadow-sm); overflow: hidden; }
 .cp-post .hd { display: flex; align-items: center; gap: 12px; padding: 16px 16px 12px; }
 .cp-post .hd .cp-avatar { width: 40px; height: 40px; border: 0; }
@@ -2122,12 +2152,12 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
 <section class="doc" id="screens">
   <p class="eyebrow">15 · Screens @ 390 × 844</p>
   <h2>The app, tab by tab</h2>
-  <p class="intro">Reference layouts at iPhone 15 size. Scroll sideways to see all of them. Me has the My Camino card with its Change button, a row of highlights (one round picture for each destination of the day plan: a gold ring when you posted there, a dashed circle while it is still ahead), four sub-tabs (Notes, Journey, Plan, Health), a chat button that opens the inbox, a two-step write flow, a share screen and a stamp pop-up. Maps has two layers: helicopter view and city view. Stays opens into Airbnb / Agoda-style detail pages for stays and cafes. Explore has a second screen for the photo marketplace. Library has a search field with a bookmarks button on top and directly under it the tabs Bible and Books, each with its banner; Bible has three choices at the bottom (Old Testament, Deuterocanon, New Testament); a search lists its results grouped by tab, Bookmarks lists what the pilgrim kept, and the diary (the Notes sub-tab of Me) has a feed of pages and an editor. Settings is a screen opened from the gear at the top right of Me; it opens the business-owner flow: a welcome page, five registration steps, the review status and the owner dashboard.</p>
+  <p class="intro">Reference layouts at iPhone 15 size. Scroll sideways to see all of them. Me has the My Camino card with its Change button, a row of highlights (first All, pinned at the left, which opens one stamp for every place of the Camino and, with a tap on a stamp, your journeys there; then one round picture for each destination of the day plan: a gold ring when you posted there, a dashed circle while it is still ahead), four sub-tabs (Notes, Journey, Plan, Health), a chat button that opens the inbox, a two-step write flow, a share screen and a stamp pop-up. Maps has two layers: helicopter view and city view. Stays opens into Airbnb / Agoda-style detail pages for stays and cafes. Explore has a second screen for the photo marketplace. Library has a search field with a bookmarks button on top and directly under it the tabs Bible and Books, each with its banner; Bible has three choices at the bottom (Old Testament, Deuterocanon, New Testament); a search lists its results grouped by tab, Bookmarks lists what the pilgrim kept, and the diary (the Notes sub-tab of Me) has a feed of pages and an editor. Settings is a screen opened from the gear at the top right of Me; it opens the business-owner flow: a welcome page, five registration steps, the review status and the owner dashboard.</p>
 
   <div class="phones">
 
     <div class="phone-wrap">
-      <p class="phone-label"><b>Me · Journey</b>The gear alone at the top right · My Camino card · highlights per destination · the grid starts with the card that writes a post · the chat button</p>
+      <p class="phone-label"><b>Me · Journey</b>The gear alone at the top right · My Camino card · All, then highlights per destination · the grid starts with the card that writes a post · the chat button</p>
       <div class="phone">
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
         <div class="scroll">
@@ -2152,13 +2182,13 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
             </div>
             <span style="height:40px;padding:0 16px;border-radius:999px;background:var(--cp-color-gold);color:var(--cp-color-blue);font-size:17px;font-weight:600;display:inline-flex;align-items:center;flex:none">Change</span>
           </div>
-          <div class="highlights" style="margin-top:14px">
+          <div class="hl-row"><div class="hl-all"><span class="all-ring"><span class="in"><svg class="cp-icon"><use href="#i-shell"/></svg></span></span>All</div><div class="highlights">
             <div><span class="cp-ring seen"><span class="cp-avatar" style="background:linear-gradient(150deg,#F2D8B6,#A0583F)"></span></span>Pamplona</div>
             <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#9DB4CC,#14365D)"></span></span>Logroño</div>
             <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#D7C6E0,#6E5470)"></span></span>Burgos</div>
             <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Hornillos</div>
             <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Castrojeriz</div>
-          </div><div class="cp-subtabs" style="margin:22px -24px 20px;padding:0 12px"><span>Notes</span><span class="on">Journey</span><span>Plan</span><span>Health</span></div>
+          </div></div><div class="cp-subtabs" style="margin:22px -24px 20px;padding:0 12px"><span>Notes</span><span class="on">Journey</span><span>Plan</span><span>Health</span></div>
           <div class="jg">
             <button class="jt write" aria-label="Write a journey post"><span class="ico"><svg class="cp-icon"><use href="#i-pen"/></svg></span>Write a journey post</button>
             <div class="jt"><div class="cp-img v4"></div><span class="cap">Burgos</span></div>
@@ -2206,13 +2236,13 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
             </div>
             <span style="height:40px;padding:0 16px;border-radius:999px;background:var(--cp-color-gold);color:var(--cp-color-blue);font-size:17px;font-weight:600;display:inline-flex;align-items:center;flex:none">Change</span>
           </div>
-          <div class="highlights" style="margin-top:14px">
+          <div class="hl-row"><div class="hl-all"><span class="all-ring"><span class="in"><svg class="cp-icon"><use href="#i-shell"/></svg></span></span>All</div><div class="highlights">
             <div><span class="cp-ring seen"><span class="cp-avatar" style="background:linear-gradient(150deg,#F2D8B6,#A0583F)"></span></span>Pamplona</div>
             <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#9DB4CC,#14365D)"></span></span>Logroño</div>
             <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#D7C6E0,#6E5470)"></span></span>Burgos</div>
             <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Hornillos</div>
             <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Castrojeriz</div>
-          </div><div class="cp-subtabs" style="margin:22px -24px 20px;padding:0 12px"><span>Notes</span><span class="on">Journey</span><span>Plan</span><span>Health</span></div>
+          </div></div><div class="cp-subtabs" style="margin:22px -24px 20px;padding:0 12px"><span>Notes</span><span class="on">Journey</span><span>Plan</span><span>Health</span></div>
           <div class="jg">
             <button class="jt write" aria-label="Write a journey post"><span class="ico"><svg class="cp-icon"><use href="#i-pen"/></svg></span>Write a journey post</button>
             <div class="jt"><div class="cp-img v4"></div><span class="cap">Burgos</span></div>
@@ -2220,6 +2250,106 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
             <div class="jt"><div class="cp-img v5"></div><span class="n">3</span><span class="cap">Logroño</span></div>
             <div class="jt"><div class="cp-img v2"></div><span class="cap">Pamplona</span></div>
             <div class="jt txt gold"><p>Stamp number one in the credencial!</p><span class="cap">Albergue</span></div>
+          </div>
+        </div>
+        <div class="fab-slot"><button class="cp-fab-write" aria-label="Inbox, 3 unread"><svg class="cp-icon"><use href="#i-chat"/></svg><span class="cp-fab-badge" aria-hidden="true">3</span></button></div>
+        <div class="tabdock"><nav class="cp-tabbar">
+          <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Discover</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-library"/></svg></span>Library</div>
+        </nav></div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Me · All places</b>The first highlight, All, is on (gold ring) · one stamp for every place of the Camino, three in a row, in the look of the passport: filled with a count where you have journeys, dashed where you have none · 5 of 34 places · tap a place</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll" data-scroll-strip="1">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span class="un">ana.camina</span>
+            <span class="cp-edit-pill" role="button" aria-label="Edit profile"><svg class="cp-icon "><use href="#i-pencil"/></svg>camino.plus/ana</span>
+            <button class="cp-icon-btn flat" style="width:44px;height:44px;margin-left:auto" aria-label="Settings"><svg class="cp-icon "><use href="#i-settings"/></svg></button>
+          </div>
+          <div class="profile-top" style="margin-top:20px">
+            <span class="cp-ring"><span class="cp-avatar" style="width:86px;height:86px"></span></span>
+            <div class="pstats"><div><b>312</b><span>km</span></div><div><b>12</b><span>stamps</span></div><div><b>148</b><span>friends</span></div></div>
+          </div>
+          <div style="margin-top:14px"><div style="font-weight:600;font-size:17px">Ana García</div>
+          <div style="font-size:15px;line-height:22px">Camino Francés, day 12. Walking for my grandmother. Ultreia!</div></div>
+          <div style="margin-top:14px;display:flex;align-items:center;gap:14px;padding:14px;border-radius:var(--cp-radius-lg);background:var(--cp-surface-inverse);color:var(--cp-text-inverse);box-shadow:var(--cp-shadow-md)">
+            <span style="width:52px;height:52px;border-radius:50%;border:1.5px solid rgba(217,162,27,.55);display:grid;place-items:center;flex:none"><svg width="48" height="48" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="20" fill="#14365D"/><g transform="translate(0 -2.12)"><path d="M20 28.5L5.84 22.20A2.84 2.84 0 0 1 8.64 17.96A2.84 2.84 0 0 1 12.66 14.85A2.84 2.84 0 0 1 17.46 13.21A2.84 2.84 0 0 1 22.54 13.21A2.84 2.84 0 0 1 27.34 14.85A2.84 2.84 0 0 1 31.36 17.96A2.84 2.84 0 0 1 34.16 22.20z" fill="#D9A21B"/><path d="M20 29.0Q14.09 22.35 8.49 17.82M20 29.0Q16.22 20.86 12.56 14.67M20 29.0Q18.70 20.07 17.43 13.01M20 29.0Q21.30 20.07 22.57 13.01M20 29.0Q23.78 20.86 27.44 14.67M20 29.0Q25.91 22.35 31.51 17.82" stroke="#14365D" stroke-width="1.15" stroke-linecap="round" fill="none"/><path d="M15.2 31.4Q18 30.6 18.4 28.3H21.6Q22 30.6 24.8 31.4Q24.6 32.6 20 32.6Q15.4 32.6 15.2 31.4z" fill="#D9A21B"/></g></svg></span>
+            <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+              <div style="font-family:var(--cp-font-accent);font-weight:700;font-size:24px;line-height:28px;color:var(--cp-color-gold)">Buen Camino!</div>
+              <div style="font-family:var(--cp-font-title);font-weight:600;font-size:17px;line-height:21px;color:var(--cp-color-gold-soft)">My Camino</div>
+              <div style="font-size:17px;line-height:22px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Camino Francés</div>
+              <div style="font-size:15px;line-height:21px;font-weight:500;letter-spacing:.4px;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">From stage 1 · 11 stages done</div>
+            </div>
+            <span style="height:40px;padding:0 16px;border-radius:999px;background:var(--cp-color-gold);color:var(--cp-color-blue);font-size:17px;font-weight:600;display:inline-flex;align-items:center;flex:none">Change</span>
+          </div>
+          <div class="hl-row"><div class="hl-all on"><span class="all-ring"><span class="in"><svg class="cp-icon"><use href="#i-shell"/></svg></span></span>All</div><div class="highlights">
+            <div><span class="cp-ring seen"><span class="cp-avatar" style="background:linear-gradient(150deg,#F2D8B6,#A0583F)"></span></span>Pamplona</div>
+            <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#9DB4CC,#14365D)"></span></span>Logroño</div>
+            <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#D7C6E0,#6E5470)"></span></span>Burgos</div>
+            <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Hornillos</div>
+            <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Castrojeriz</div>
+          </div></div><div class="cp-subtabs" style="margin:22px -24px 20px;padding:0 12px"><span>Notes</span><span class="on">Journey</span><span>Plan</span><span>Health</span></div>
+          <div class="allp-card"><div class="row"><h4>All places</h4><span class="n">5 of 34 places</span></div><div class="bar"><span style="width:14.7%"></span></div><p>Tap a place to see your journeys there.</p></div>
+          <div class="allp"><button class="sl" aria-label="Saint-Jean-Pied-de-Port, no journeys yet"><span class="ring"><span class="rd"><svg class="cp-icon"><use href="#i-shell"/></svg></span></span><span class="nm">Saint-Jean-Pied-de-Port</span></button><button class="sl done" aria-label="Roncesvalles, 1 journey"><span class="ring"><span class="rd"><svg class="cp-icon"><use href="#i-shell"/></svg></span><span class="ct">1</span></span><span class="nm">Roncesvalles</span></button><button class="sl done" aria-label="Zubiri, 2 journeys"><span class="ring"><span class="rd"><svg class="cp-icon"><use href="#i-shell"/></svg></span><span class="ct">2</span></span><span class="nm">Zubiri</span></button><button class="sl done" aria-label="Pamplona, 3 journeys"><span class="ring"><span class="rd"><svg class="cp-icon"><use href="#i-shell"/></svg></span><span class="ct">3</span></span><span class="nm">Pamplona</span></button><button class="sl" aria-label="Puente la Reina, no journeys yet"><span class="ring"><span class="rd"><svg class="cp-icon"><use href="#i-shell"/></svg></span></span><span class="nm">Puente la Reina</span></button><button class="sl" aria-label="Estella, no journeys yet"><span class="ring"><span class="rd"><svg class="cp-icon"><use href="#i-shell"/></svg></span></span><span class="nm">Estella</span></button><button class="sl" aria-label="Los Arcos, no journeys yet"><span class="ring"><span class="rd"><svg class="cp-icon"><use href="#i-shell"/></svg></span></span><span class="nm">Los Arcos</span></button><button class="sl done" aria-label="Logroño, 3 journeys"><span class="ring"><span class="rd"><svg class="cp-icon"><use href="#i-shell"/></svg></span><span class="ct">3</span></span><span class="nm">Logroño</span></button><button class="sl" aria-label="Nájera, no journeys yet"><span class="ring"><span class="rd"><svg class="cp-icon"><use href="#i-shell"/></svg></span></span><span class="nm">Nájera</span></button><button class="sl" aria-label="Santo Domingo de la Calzada, no journeys yet"><span class="ring"><span class="rd"><svg class="cp-icon"><use href="#i-shell"/></svg></span></span><span class="nm">Santo Domingo de la Calzada</span></button><button class="sl" aria-label="Belorado, no journeys yet"><span class="ring"><span class="rd"><svg class="cp-icon"><use href="#i-shell"/></svg></span></span><span class="nm">Belorado</span></button><button class="sl" aria-label="San Juan de Ortega, no journeys yet"><span class="ring"><span class="rd"><svg class="cp-icon"><use href="#i-shell"/></svg></span></span><span class="nm">San Juan de Ortega</span></button></div>
+        </div>
+        <div class="fab-slot"><button class="cp-fab-write" aria-label="Inbox, 3 unread"><svg class="cp-icon"><use href="#i-chat"/></svg><span class="cp-fab-badge" aria-hidden="true">3</span></button></div>
+        <div class="tabdock"><nav class="cp-tabbar">
+          <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Discover</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-library"/></svg></span>Library</div>
+        </nav></div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Me · a place</b>A stamp opened · the bar goes back to All places · the grid shows only your journeys there, and its first tile is still the card that writes a post · a place with none says No journeys at … yet</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll" data-scroll-strip="1">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span class="un">ana.camina</span>
+            <span class="cp-edit-pill" role="button" aria-label="Edit profile"><svg class="cp-icon "><use href="#i-pencil"/></svg>camino.plus/ana</span>
+            <button class="cp-icon-btn flat" style="width:44px;height:44px;margin-left:auto" aria-label="Settings"><svg class="cp-icon "><use href="#i-settings"/></svg></button>
+          </div>
+          <div class="profile-top" style="margin-top:20px">
+            <span class="cp-ring"><span class="cp-avatar" style="width:86px;height:86px"></span></span>
+            <div class="pstats"><div><b>312</b><span>km</span></div><div><b>12</b><span>stamps</span></div><div><b>148</b><span>friends</span></div></div>
+          </div>
+          <div style="margin-top:14px"><div style="font-weight:600;font-size:17px">Ana García</div>
+          <div style="font-size:15px;line-height:22px">Camino Francés, day 12. Walking for my grandmother. Ultreia!</div></div>
+          <div style="margin-top:14px;display:flex;align-items:center;gap:14px;padding:14px;border-radius:var(--cp-radius-lg);background:var(--cp-surface-inverse);color:var(--cp-text-inverse);box-shadow:var(--cp-shadow-md)">
+            <span style="width:52px;height:52px;border-radius:50%;border:1.5px solid rgba(217,162,27,.55);display:grid;place-items:center;flex:none"><svg width="48" height="48" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="20" fill="#14365D"/><g transform="translate(0 -2.12)"><path d="M20 28.5L5.84 22.20A2.84 2.84 0 0 1 8.64 17.96A2.84 2.84 0 0 1 12.66 14.85A2.84 2.84 0 0 1 17.46 13.21A2.84 2.84 0 0 1 22.54 13.21A2.84 2.84 0 0 1 27.34 14.85A2.84 2.84 0 0 1 31.36 17.96A2.84 2.84 0 0 1 34.16 22.20z" fill="#D9A21B"/><path d="M20 29.0Q14.09 22.35 8.49 17.82M20 29.0Q16.22 20.86 12.56 14.67M20 29.0Q18.70 20.07 17.43 13.01M20 29.0Q21.30 20.07 22.57 13.01M20 29.0Q23.78 20.86 27.44 14.67M20 29.0Q25.91 22.35 31.51 17.82" stroke="#14365D" stroke-width="1.15" stroke-linecap="round" fill="none"/><path d="M15.2 31.4Q18 30.6 18.4 28.3H21.6Q22 30.6 24.8 31.4Q24.6 32.6 20 32.6Q15.4 32.6 15.2 31.4z" fill="#D9A21B"/></g></svg></span>
+            <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+              <div style="font-family:var(--cp-font-accent);font-weight:700;font-size:24px;line-height:28px;color:var(--cp-color-gold)">Buen Camino!</div>
+              <div style="font-family:var(--cp-font-title);font-weight:600;font-size:17px;line-height:21px;color:var(--cp-color-gold-soft)">My Camino</div>
+              <div style="font-size:17px;line-height:22px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Camino Francés</div>
+              <div style="font-size:15px;line-height:21px;font-weight:500;letter-spacing:.4px;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">From stage 1 · 11 stages done</div>
+            </div>
+            <span style="height:40px;padding:0 16px;border-radius:999px;background:var(--cp-color-gold);color:var(--cp-color-blue);font-size:17px;font-weight:600;display:inline-flex;align-items:center;flex:none">Change</span>
+          </div>
+          <div class="hl-row"><div class="hl-all on"><span class="all-ring"><span class="in"><svg class="cp-icon"><use href="#i-shell"/></svg></span></span>All</div><div class="highlights">
+            <div><span class="cp-ring seen"><span class="cp-avatar" style="background:linear-gradient(150deg,#F2D8B6,#A0583F)"></span></span>Pamplona</div>
+            <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#9DB4CC,#14365D)"></span></span>Logroño</div>
+            <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#D7C6E0,#6E5470)"></span></span>Burgos</div>
+            <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Hornillos</div>
+            <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Castrojeriz</div>
+          </div></div><div class="cp-subtabs" style="margin:22px -24px 20px;padding:0 12px"><span>Notes</span><span class="on">Journey</span><span>Plan</span><span>Health</span></div>
+          <div class="place-bar" role="button" aria-label="Back to all places"><span class="back"><svg class="cp-icon"><use href="#i-back"/></svg>All places</span><span class="nm">· Zubiri</span></div>
+          <div class="jg">
+            <button class="jt write" aria-label="Write a journey post"><span class="ico"><svg class="cp-icon"><use href="#i-pen"/></svg></span>Write a journey post</button>
+            <div class="jt"><div class="cp-img v2"></div><span class="cap">Zubiri</span></div>
+            <div class="jt txt blue"><p>Over the bridge at Zubiri, the first evening.</p><span class="cap">Zubiri</span></div>
           </div>
         </div>
         <div class="fab-slot"><button class="cp-fab-write" aria-label="Inbox, 3 unread"><svg class="cp-icon"><use href="#i-chat"/></svg><span class="cp-fab-badge" aria-hidden="true">3</span></button></div>
@@ -3790,13 +3920,13 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
             </div>
             <span style="height:40px;padding:0 16px;border-radius:999px;background:var(--cp-color-gold);color:var(--cp-color-blue);font-size:17px;font-weight:600;display:inline-flex;align-items:center;flex:none">Change</span>
           </div>
-          <div class="highlights" style="margin-top:14px">
+          <div class="hl-row"><div class="hl-all"><span class="all-ring"><span class="in"><svg class="cp-icon"><use href="#i-shell"/></svg></span></span>All</div><div class="highlights">
             <div><span class="cp-ring seen"><span class="cp-avatar" style="background:linear-gradient(150deg,#F2D8B6,#A0583F)"></span></span>Pamplona</div>
             <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#9DB4CC,#14365D)"></span></span>Logroño</div>
             <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#D7C6E0,#6E5470)"></span></span>Burgos</div>
             <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Hornillos</div>
             <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Castrojeriz</div>
-          </div>
+          </div></div>
             <div class="cp-subtabs" style="margin:22px -24px 0;padding:0 12px"><span class="on">Notes</span><span>Journey</span><span>Plan</span><span>Health</span></div>
           </div>
           <div class="nt-feedbody" style="padding-top:16px">
@@ -3860,13 +3990,13 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
             </div>
             <span style="height:40px;padding:0 16px;border-radius:999px;background:var(--cp-color-gold);color:var(--cp-color-blue);font-size:17px;font-weight:600;display:inline-flex;align-items:center;flex:none">Change</span>
           </div>
-          <div class="highlights" style="margin-top:14px">
+          <div class="hl-row"><div class="hl-all"><span class="all-ring"><span class="in"><svg class="cp-icon"><use href="#i-shell"/></svg></span></span>All</div><div class="highlights">
             <div><span class="cp-ring seen"><span class="cp-avatar" style="background:linear-gradient(150deg,#F2D8B6,#A0583F)"></span></span>Pamplona</div>
             <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#9DB4CC,#14365D)"></span></span>Logroño</div>
             <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#D7C6E0,#6E5470)"></span></span>Burgos</div>
             <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Hornillos</div>
             <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Castrojeriz</div>
-          </div>
+          </div></div>
             <div class="cp-subtabs" style="margin:22px -24px 0;padding:0 12px"><span class="on">Notes</span><span>Journey</span><span>Plan</span><span>Health</span></div>
           </div>
           <div class="nt-feedbody" style="padding-top:16px">
@@ -3930,13 +4060,13 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
             </div>
             <span style="height:40px;padding:0 16px;border-radius:999px;background:var(--cp-color-gold);color:var(--cp-color-blue);font-size:17px;font-weight:600;display:inline-flex;align-items:center;flex:none">Change</span>
           </div>
-          <div class="highlights" style="margin-top:14px">
+          <div class="hl-row"><div class="hl-all"><span class="all-ring"><span class="in"><svg class="cp-icon"><use href="#i-shell"/></svg></span></span>All</div><div class="highlights">
             <div><span class="cp-ring seen"><span class="cp-avatar" style="background:linear-gradient(150deg,#F2D8B6,#A0583F)"></span></span>Pamplona</div>
             <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#9DB4CC,#14365D)"></span></span>Logroño</div>
             <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#D7C6E0,#6E5470)"></span></span>Burgos</div>
             <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Hornillos</div>
             <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Castrojeriz</div>
-          </div>
+          </div></div>
             <div class="cp-subtabs" style="margin:22px -24px 0;padding:0 12px"><span class="on">Notes</span><span>Journey</span><span>Plan</span><span>Health</span></div>
           </div>
           <div class="nt-feedbody" style="padding-top:16px">
@@ -4000,13 +4130,13 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
             </div>
             <span style="height:40px;padding:0 16px;border-radius:999px;background:var(--cp-color-gold);color:var(--cp-color-blue);font-size:17px;font-weight:600;display:inline-flex;align-items:center;flex:none">Change</span>
           </div>
-          <div class="highlights" style="margin-top:14px">
+          <div class="hl-row"><div class="hl-all"><span class="all-ring"><span class="in"><svg class="cp-icon"><use href="#i-shell"/></svg></span></span>All</div><div class="highlights">
             <div><span class="cp-ring seen"><span class="cp-avatar" style="background:linear-gradient(150deg,#F2D8B6,#A0583F)"></span></span>Pamplona</div>
             <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#9DB4CC,#14365D)"></span></span>Logroño</div>
             <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#D7C6E0,#6E5470)"></span></span>Burgos</div>
             <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Hornillos</div>
             <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Castrojeriz</div>
-          </div>
+          </div></div>
             <div class="cp-subtabs" style="margin:22px -24px 0;padding:0 12px"><span class="on">Notes</span><span>Journey</span><span>Plan</span><span>Health</span></div>
           </div>
           <div class="nt-feedbody" style="padding-top:16px">
@@ -4070,13 +4200,13 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
             </div>
             <span style="height:40px;padding:0 16px;border-radius:999px;background:var(--cp-color-gold);color:var(--cp-color-blue);font-size:17px;font-weight:600;display:inline-flex;align-items:center;flex:none">Change</span>
           </div>
-          <div class="highlights" style="margin-top:14px">
+          <div class="hl-row"><div class="hl-all"><span class="all-ring"><span class="in"><svg class="cp-icon"><use href="#i-shell"/></svg></span></span>All</div><div class="highlights">
             <div><span class="cp-ring seen"><span class="cp-avatar" style="background:linear-gradient(150deg,#F2D8B6,#A0583F)"></span></span>Pamplona</div>
             <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#9DB4CC,#14365D)"></span></span>Logroño</div>
             <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#D7C6E0,#6E5470)"></span></span>Burgos</div>
             <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Hornillos</div>
             <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Castrojeriz</div>
-          </div>
+          </div></div>
             <div class="cp-subtabs" style="margin:22px -24px 0;padding:0 12px"><span class="on">Notes</span><span>Journey</span><span>Plan</span><span>Health</span></div>
           </div>
           <div class="nt-feedbody" style="padding-top:16px">
@@ -4131,13 +4261,13 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
             </div>
             <span style="height:40px;padding:0 16px;border-radius:999px;background:var(--cp-color-gold);color:var(--cp-color-blue);font-size:17px;font-weight:600;display:inline-flex;align-items:center;flex:none">Change</span>
           </div>
-          <div class="highlights" style="margin-top:14px">
+          <div class="hl-row"><div class="hl-all"><span class="all-ring"><span class="in"><svg class="cp-icon"><use href="#i-shell"/></svg></span></span>All</div><div class="highlights">
             <div><span class="cp-ring seen"><span class="cp-avatar" style="background:linear-gradient(150deg,#F2D8B6,#A0583F)"></span></span>Pamplona</div>
             <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#9DB4CC,#14365D)"></span></span>Logroño</div>
             <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#D7C6E0,#6E5470)"></span></span>Burgos</div>
             <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Hornillos</div>
             <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Castrojeriz</div>
-          </div>
+          </div></div>
             <div class="cp-subtabs" style="margin:22px -24px 0;padding:0 12px"><span class="on">Notes</span><span>Journey</span><span>Plan</span><span>Health</span></div>
           </div>
           <div class="nt-feedbody" style="padding-top:16px">

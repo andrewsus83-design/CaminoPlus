@@ -256,6 +256,7 @@ TABS = [
   ["Notes: a private notebook, the first tab under your profile. Tap the card at the top, Write a note, and the page is saved on your phone as you type. Make words bold or italic, add headings and lists, and attach photos, videos and the place you are at",
    "Nothing in Notes is uploaded or shared, so it is not backed up either. It works without a signal and stays on your phone when you log out",
    "Your journey as a grid of posts: tap the first card, Write a journey post, pick photos, write a caption, post",
+   "All places: the first item in the row under your Camino card opens a stamp for every place of your route, filled where you have posted. Tap a stamp to see your own journeys there",
    "Passport &amp; stamps: a digital credencial, each stamp with its story",
    "Plan: a stage-by-stage tracker for where you sleep tonight and tomorrow",
    "Health from your smartwatch: steps, distance and heart rate",

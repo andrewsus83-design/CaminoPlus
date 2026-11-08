@@ -39,6 +39,7 @@ const STAGES = FRANCES.map((name, i) => {
     start: linked ? { name: from } : null, end: linked ? { name: to } : null };
 });
 const POINTS = 34; // the first start and the 33 ends
+export { STAGES as ALL_PLACES_STAGES };
 
 const iso = (hoursAgo) => new Date(Date.now() - hoursAgo * 3_600_000).toISOString();
 const post = (n, place, hoursAgo, body) => ({ id: `81000000-0000-4000-8000-00000000000${n}`, body, place_name: place, published_at: iso(hoursAgo), like_count: 0, comment_count: 0, media_count: 0, health_summary: null,
@@ -51,6 +52,7 @@ const POSTS = [
   post(5, 'Burgos Cathedral', 41, 'Burgos, inside the cathedral'),
   post(6, null, 60, 'A day with no place written'),
 ];
+export { POSTS as ALL_PLACES_POSTS };
 // what the route and the posts say: the points that have a post (Zubiri 2, Pamplona 1, Burgos 2) and the post that names no place
 const VISITED = { Zubiri: 2, Pamplona: 1, Burgos: 2 };
 
