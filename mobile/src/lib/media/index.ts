@@ -7,9 +7,11 @@
 // file (src/lib/__tests__/media.test.ts pins that). Without it every photo falls back to the original file within the
 // plan's cap. No video compressor is in the app yet (MEDIA.md says why): videos use the picker's own export preset.
 import { Platform } from 'react-native';
-import { File } from 'expo-file-system';
+import { File, Paths } from 'expo-file-system';
 import { NativeName, hasNativeModule } from '@/lib/optionalNative';
 import { ImageManipulatorLike, MediaDeps, VideoCompressorLike, createMedia } from './core';
+import { PickedFile, Stage, prepareBatch } from './batch';
+import type { MediaTier } from './limits';
 
 let manipulatorCache: ImageManipulatorLike | null | undefined;
 function manipulator(): ImageManipulatorLike | null {
@@ -46,8 +48,24 @@ async function byteSize(uri: string): Promise<number | null> {
   }
 }
 
-const deps: MediaDeps = { manipulator, compressor, byteSize };
+/** Delete a file this app made in its cache folder (never a file anywhere else). */
+function removeFile(uri: string) {
+  if (Platform.OS === 'web' || !uri) return;
+  try {
+    const cache = Paths.cache.uri.endsWith('/') ? Paths.cache.uri : `${Paths.cache.uri}/`;
+    if (!uri.startsWith(cache)) return;
+    const f = new File(uri);
+    if (f.exists) f.delete();
+  } catch { /* the system empties its cache folder anyway */ }
+}
+
+const deps: MediaDeps = { manipulator, compressor, byteSize, removeFile };
 export const { prepareImage, prepareVideo } = createMedia(deps);
+
+/** Delete the files prepareImage made (Cancel, or slides that were left out). Originals are never touched. */
+export function discardPrepared(uris: readonly (string | null | undefined)[]) {
+  for (const u of uris) if (u) removeFile(u);
+}
 
 /** Can this build resize photos itself? (false on the 1.1.0 dev build) */
 export const canResizePhotos = () => manipulator() != null;
@@ -55,6 +73,11 @@ export const canResizePhotos = () => manipulator() != null;
 export const canCompressVideo = () => compressor() != null;
 
 export { MediaCancelled, MediaRejected } from './core';
+export type { PickedFile, ReadyFile, Stage } from './batch';
+
+/** Make the files picked for a post ready, one after the other (./batch.ts): Cancel adds nothing and deletes what was made. */
+export const preparePicked = (picked: readonly PickedFile[], tier: MediaTier, signal: AbortSignal, onStage: (s: Stage) => void) =>
+  prepareBatch(picked, tier, { prepareImage, prepareVideo, discard: discardPrepared }, signal, onStage);
 export type { PreparedImage, PreparedThumb, PreparedVideo } from './core';
 export * from './limits';
 export { pickerQuality, pickerVideoPreset } from './picker';

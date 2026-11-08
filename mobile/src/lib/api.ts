@@ -2,6 +2,7 @@
 // the offline layer (local SQLite + outbox) can later wrap these same functions.
 import { supabase } from './supabase';
 import { MEDIA_BUCKET, deleteMedia, signedUrls, upload } from './mediaStorage';
+import { uploadPostMediaWith } from './postMediaUpload';
 import { assertOnline } from './net';
 import { uuid } from './uuid';
 import { isCount } from './engagement';
@@ -251,36 +252,25 @@ export type PreparedMedia = {
 };
 
 /** Upload photos/videos of a post to the private user-media bucket and register them in post_media (with the storage key
- *  of the photo's thumbnail in thumb_path). Returns how many failed (the server refuses uploads over the plan's storage). */
+ *  of the photo's thumbnail in thumb_path). Returns how many failed (the server refuses uploads over the plan's storage).
+ *  The order of the steps and when files are deleted: src/lib/postMediaUpload.ts. */
 export async function uploadPostMedia(userId: string, postId: string, items: PreparedMedia[]) {
   await assertOnline();
-  let failed = 0;
-  for (let i = 0; i < items.length; i++) {
-    const m = items[i];
-    const uploaded: string[] = [];
-    try {
-      const ext = m.type === 'video' ? (m.mimeType === 'video/quicktime' ? 'mov' : 'mp4') : m.mimeType === 'image/png' ? 'png' : 'jpg';
-      const path = `${userId}/posts/${postId}-${i}.${ext}`;
-      const main = await upload(MEDIA_BUCKET.userMedia, path, m.uri, m.mimeType);
-      uploaded.push(path);
-      let thumbPath: string | null = null;
-      if (m.thumbUri) {
-        try {
-          const t = await upload(MEDIA_BUCKET.userMedia, `${userId}/posts/${postId}-${i}-thumb.jpg`, m.thumbUri, 'image/jpeg');
-          thumbPath = t.path;
-          uploaded.push(t.path);
-        } catch {
-          thumbPath = null; // lists then show the photo itself
-        }
-      }
-      must(await supabase.from('post_media').insert({ post_id: postId, user_id: userId, sort_order: i, media_type: m.type, storage_path: path, thumb_path: thumbPath, width: m.width ?? null, height: m.height ?? null, duration_ms: m.durationMs ? Math.round(m.durationMs) : null, size_bytes: m.bytes ?? main.bytes, upload_status: 'uploaded' }));
-    } catch {
-      failed++;
-      // A file without its post_media row is never shown and would only take up the pilgrim's storage.
-      if (uploaded.length) void deleteMedia(MEDIA_BUCKET.userMedia, uploaded);
-    }
-  }
-  return failed;
+  return uploadPostMediaWith({
+    upload: (path, uri, type) => upload(MEDIA_BUCKET.userMedia, path, uri, type),
+    insertRow: async (row) => {
+      const res = await supabase.from('post_media').insert(row);
+      if (!res.error) return { ok: true };
+      const e = res.error as { code?: string };
+      return { ok: false, status: res.status, code: e.code || null };
+    },
+    rowExists: async (postId_, sortOrder) => {
+      const res = await supabase.from('post_media').select('id').eq('post_id', postId_).eq('sort_order', sortOrder).limit(1);
+      if (res.error) throw new Error(res.error.message);
+      return (res.data ?? []).length > 0;
+    },
+    deleteFiles: (paths) => deleteMedia(MEDIA_BUCKET.userMedia, paths),
+  }, userId, postId, items);
 }
 
 export type PostMediaUrl = { type: 'image' | 'video'; url: string; thumbUrl?: string | null };

@@ -1,6 +1,7 @@
 import { updateProfile } from './api';
 import { NativeName, hasNativeModule } from './optionalNative';
-import { canResizePhotos, pickerQuality, prepareImage } from './media';
+import { canResizePhotos, discardPrepared, pickerQuality, prepareImage } from './media';
+import { storeAvatar } from './avatarFlow';
 import { MEDIA_BUCKET, deleteMedia, publicUrl, upload } from './mediaStorage';
 
 export class PickerUnavailable extends Error {}
@@ -23,12 +24,14 @@ export async function pickAndUploadAvatar(userId: string): Promise<string | null
   const asset = res.assets[0];
   // The profile picture is the same size on every plan, so the tier does not matter here.
   const photo = await prepareImage(asset.uri, 'free', { use: 'avatar', width: asset.width, height: asset.height, bytes: asset.fileSize, mimeType: asset.mimeType });
-  const ext = photo.mimeType === 'image/png' ? 'png' : 'jpg';
-  const path = `${userId}/avatar.${ext}`; // fixed name: a new photo replaces the old one instead of piling up in storage
-  await upload(MEDIA_BUCKET.avatars, path, photo.uri, photo.mimeType);
-  // A picture saved before under the other file type would stay behind and count against the per-user cap.
-  void deleteMedia(MEDIA_BUCKET.avatars, [`${userId}/avatar.${ext === 'png' ? 'jpg' : 'png'}`]);
-  const url = `${publicUrl(MEDIA_BUCKET.avatars, path)}?v=${Date.now()}`; // busts the CDN/image cache
-  await updateProfile(userId, { avatar_url: url });
+  // Upload, point the profile at it, and only then delete an older picture (src/lib/avatarFlow.ts says why).
+  const url = await storeAvatar(userId, photo.uri, {
+    upload: (path, uri, type) => upload(MEDIA_BUCKET.avatars, path, uri, type),
+    publicUrl: (path) => publicUrl(MEDIA_BUCKET.avatars, path),
+    updateProfile: (avatarUrl) => updateProfile(userId, { avatar_url: avatarUrl }),
+    deleteOld: (paths) => deleteMedia(MEDIA_BUCKET.avatars, paths),
+    now: Date.now,
+  });
+  if (photo.processed) discardPrepared([photo.uri]);
   return url;
 }

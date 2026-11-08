@@ -108,7 +108,32 @@ export function estimateVideoBytes(seconds: number, tier: MediaTier): number {
 
 /* ------------------------------------------------------------------ honest messages */
 
-export type MediaProblem = 'too_long' | 'too_big' | 'quota';
+export type MediaProblem = 'too_long' | 'too_big' | 'quota' | 'location' | 'unsupported';
+
+/** A photo that could not be saved again and is not a JPEG (HEIC above all) would go up with its position: refused. */
+export const LOCATION_REFUSED_MESSAGE = 'This photo format cannot be shared without its location. Try another photo.';
+/** The cloud takes JPEG photos (every photo is turned into one) and MP4 or MOV videos. */
+export const UNSUPPORTED_TYPE_MESSAGE = 'This file type is not supported. Use a photo or an MP4 or MOV video.';
+/** The plan could not be checked (offline, not loaded yet): the smaller sizes are used, and the composer says so. */
+export const PLAN_UNKNOWN_NOTE = 'Sizes for the Free plan. Your plan could not be checked.';
+
+/** The video types the cloud takes. */
+export const UPLOAD_VIDEO_TYPES = ['video/mp4', 'video/quicktime'] as const;
+
+/** Is this a JPEG by its type, or (no type) by its name? */
+export function looksLikeJpeg(mimeType: string | null | undefined, uri: string): boolean {
+  const t = (mimeType ?? '').toLowerCase();
+  if (t) return t === 'image/jpeg' || t === 'image/jpg' || t === 'image/pjpeg';
+  return /\.jpe?g($|\?)/i.test(uri);
+}
+
+/** Can a picked file go up at all? Photos of any kind (they are turned into JPEG), videos only as MP4 or MOV. */
+export function isSupportedPick(kind: 'image' | 'video', mimeType: string | null | undefined, uri: string): boolean {
+  if (kind === 'image') return true;
+  const t = (mimeType ?? '').toLowerCase();
+  if (t) return (UPLOAD_VIDEO_TYPES as readonly string[]).includes(t);
+  return /\.(mp4|mov|m4v)($|\?)/i.test(uri);
+}
 
 export function formatMB(bytes: number): string {
   const mb = bytes / MB;
@@ -116,6 +141,8 @@ export function formatMB(bytes: number): string {
 }
 
 export function problemMessage(kind: MediaProblem, o: { capBytes?: number; neededBytes?: number; remainingBytes?: number } = {}): string {
+  if (kind === 'location') return LOCATION_REFUSED_MESSAGE;
+  if (kind === 'unsupported') return UNSUPPORTED_TYPE_MESSAGE;
   if (kind === 'too_long') return `This video is longer than ${MAX_VIDEO_SECONDS} seconds. Trim it in your Photos app, then add it again.`;
   if (kind === 'too_big') return `This file is too big to upload, even after making it smaller. The limit is ${formatMB(o.capBytes ?? 0)}. Try a shorter clip or another photo.`;
   const left = Math.max(0, o.remainingBytes ?? 0);

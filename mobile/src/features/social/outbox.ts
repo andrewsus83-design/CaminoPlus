@@ -7,7 +7,7 @@ import { AppState } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
 import { localStore, userKey } from '@/lib/localStore';
 import { socialApi } from './api';
-import { classifySendError, friendlyError, outboxToMessage, parseOutbox, patchOutbox, removeOutbox, retryDelayMs, upsertOutbox } from './logic';
+import { classifySendError, discardMediaPlan, friendlyError, outboxToMessage, parseOutbox, patchOutbox, removeOutbox, retryDelayMs, upsertOutbox } from './logic';
 import type { ChatMessage, OutboxItem } from './types';
 
 // One saved outbox per account (u.<userId>.social.outbox.v1): signing out wipes it with the rest of that
@@ -102,9 +102,17 @@ export function retryItem(id: string) {
 }
 
 export function discardItem(id: string) {
-  // A photo that went up but whose message was never sent would stay in storage and count against the quota.
+  // A photo that went up but whose message was never sent would stay in storage and count against the quota. It is
+  // deleted only when no message can use it (logic.ts discardMediaPlan).
   const gone = items.find((i) => i.id === id);
-  if (gone?.media_path) void socialApi.deleteChatImage(gone.media_path);
+  if (gone?.media_path) {
+    const path = gone.media_path;
+    const plan = discardMediaPlan(gone);
+    if (plan === 'delete') void socialApi.deleteChatImage(path);
+    else if (plan === 'check') {
+      void socialApi.getMessages([gone.id]).then((found) => { if (found.length === 0) void socialApi.deleteChatImage(path); }).catch(() => {});
+    }
+  }
   items = removeOutbox(items, id);
   emit();
   persist();

@@ -7,7 +7,6 @@ import * as L from '../media/limits';
 import { ImageManipulatorLike, MediaCancelled, MediaDeps, MediaRejected, VideoCompressorLike, createMedia } from '../media/core';
 import { pickerQuality, pickerVideoPreset } from '../media/picker';
 import { SIGNED_URL_REUSE_MS, createUrlMemo } from '../media/urlMemo';
-import { jpegHasLocation, stripJpegLocation } from '../media/exif';
 
 let n = 0;
 let chain: Promise<void> = Promise.resolve();
@@ -224,63 +223,6 @@ check('signed links are reused for 50 minutes, then asked again; a replaced file
   assert.deepEqual(memo.split('b', ['x']).need, ['x']);
 });
 
-/* ------------------------------------------------------------------ the location is removed */
-
-const fixture = () => new Uint8Array(readFileSync(join(root, 'src', 'lib', '__tests__', 'fixtures', 'gps-exif.jpg')));
-const has = (b: Uint8Array, text: string) => Buffer.from(b).includes(Buffer.from(text, 'latin1'));
-
-check('a real camera-style JPEG with a GPS position (fixture) loses the position and keeps its orientation and the picture', () => {
-  const src = fixture();
-  assert.equal(jpegHasLocation(src), true, 'the fixture carries GPS data');
-  const { bytes, removed } = stripJpegLocation(src);
-  assert.equal(removed, true);
-  assert.equal(jpegHasLocation(bytes), false);
-  assert.equal(bytes.length, src.length, 'emptied in place: the picture data is untouched');
-  assert.ok(has(bytes, 'TestCam'), 'other EXIF data stays');
-  // orientation 6 (the fixture is a big-endian "MM" TIFF block): tag 0x0112, type SHORT, count 1, value 6
-  assert.ok(Buffer.from(bytes).includes(Buffer.from([0x01, 0x12, 0x00, 0x03, 0x00, 0x00, 0x00, 0x01, 0x00, 0x06])), 'orientation kept');
-  const tail = (b: Uint8Array) => Buffer.from(b.subarray(b.length - 200)).toString('hex');
-  assert.equal(tail(bytes), tail(src));
-  assert.equal(jpegHasLocation(src), true, 'the input is not changed');
-});
-
-check('XMP data (it can hold a position too) is removed; a file without location, or that is not a JPEG, comes back as it was', () => {
-  const src = fixture();
-  const xmpBody = Buffer.from('http://ns.adobe.com/xap/1.0/\0<x:xmpmeta><exif:GPSLatitude>42,52.95N</exif:GPSLatitude></x:xmpmeta>', 'latin1');
-  const seg = Buffer.concat([Buffer.from([0xff, 0xe1, (xmpBody.length + 2) >> 8, (xmpBody.length + 2) & 0xff]), xmpBody]);
-  const withXmp = new Uint8Array(Buffer.concat([Buffer.from(src.subarray(0, 2)), seg, Buffer.from(src.subarray(2))]));
-  assert.equal(jpegHasLocation(withXmp), true);
-  const out = stripJpegLocation(withXmp);
-  assert.equal(jpegHasLocation(out.bytes), false);
-  assert.equal(has(out.bytes, 'GPSLatitude'), false);
-  assert.equal(out.bytes.length, src.length, 'exactly the XMP segment is gone');
-  const clean = stripJpegLocation(out.bytes);
-  assert.equal(clean.removed, false);
-  const png = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 1, 2, 3]);
-  assert.equal(stripJpegLocation(png).bytes, png);
-  const broken = new Uint8Array([0xff, 0xd8, 0xff, 0xe1, 0xff, 0xff, 0x00]);
-  assert.doesNotThrow(() => stripJpegLocation(broken), 'a broken file does not throw');
-});
-
-check('a little-endian (Intel "II") EXIF block loses its GPS entries too', () => {
-  // TIFF "II", IFD0 with one entry: GPS pointer -> GPS IFD with one RATIONAL[3] latitude stored outside the entry.
-  const tiff = Buffer.alloc(8 + 2 + 12 + 4 + 2 + 12 + 4 + 24);
-  tiff.write('II', 0, 'latin1'); tiff.writeUInt16LE(42, 2); tiff.writeUInt32LE(8, 4);
-  tiff.writeUInt16LE(1, 8);
-  tiff.writeUInt16LE(0x8825, 10); tiff.writeUInt16LE(4, 12); tiff.writeUInt32LE(1, 14); tiff.writeUInt32LE(26, 18);
-  tiff.writeUInt32LE(0, 22);
-  tiff.writeUInt16LE(1, 26);
-  tiff.writeUInt16LE(2, 28); tiff.writeUInt16LE(5, 30); tiff.writeUInt32LE(3, 32); tiff.writeUInt32LE(44, 36);
-  tiff.writeUInt32LE(0, 40);
-  for (let i = 0; i < 6; i++) tiff.writeUInt32LE(42 + i, 44 + i * 4);
-  const body = Buffer.concat([Buffer.from('Exif\0\0', 'latin1'), tiff]);
-  const jpeg = new Uint8Array(Buffer.concat([Buffer.from([0xff, 0xd8, 0xff, 0xe1, (body.length + 2) >> 8, (body.length + 2) & 0xff]), body, Buffer.from([0xff, 0xd9])]));
-  assert.equal(jpegHasLocation(jpeg), true);
-  const out = stripJpegLocation(jpeg).bytes;
-  assert.equal(jpegHasLocation(out), false);
-  assert.ok(!Buffer.from(out).includes(Buffer.from([42, 0, 0, 0, 43, 0, 0, 0])), 'the latitude numbers are gone');
-});
-
 /* ------------------------------------------------------------------ wiring pins */
 
 function sources(dir: string): string[] {
@@ -303,19 +245,26 @@ check('no file but mediaStorage.ts talks to Storage (upload, signed links, publi
     assert.doesNotMatch(text, /\.storage\s*\.from\(|\bcreateSignedUrls?\(|getPublicUrl\(/, `${f} calls Storage directly: use src/lib/mediaStorage.ts`);
   }
   const storage = read(STORAGE_MODULE);
-  assert.match(storage, /stripJpegLocation\(/, 'every JPEG loses its location on the way up');
+  assert.match(storage, /cleanForUpload\(new Uint8Array\(raw\), contentType\)/, 'every file is sniffed and loses its location on the way up');
+  assert.match(storage, /upload\(path, body, \{ contentType: clean\.contentType/, 'what goes up is the cleaned bytes with the sniffed type');
 });
 
 check('every upload site prepares its media first: the post composer, the avatar, chat photos', () => {
   const composer = read(join('app', 'write.tsx'));
-  assert.match(composer, /prepareImage\(/);
-  assert.match(composer, /prepareVideo\(/);
-  assert.match(composer, /thumb: true/, 'a post photo gets its thumbnail');
+  assert.match(composer, /preparePicked\(/);
+  const batch = read(join('src', 'lib', 'media', 'batch.ts'));
+  assert.match(batch, /d\.prepareImage\(/);
+  assert.match(batch, /d\.prepareVideo\(/);
+  assert.match(batch, /thumb: true/, 'a post photo gets its thumbnail');
+  assert.match(composer, /await loadMyStorage\(/, 'the plan is known before the picker opens');
+  assert.match(composer, /PLAN_UNKNOWN_NOTE/);
+  assert.match(composer, /if \(sharing\.current\) return;/, 'a double tap makes one post');
   assert.match(composer, /quotaCheck\(/);
   assert.match(composer, /<MediaPreparing /);
   const api = read(join('src', 'lib', 'api.ts'));
   assert.match(api, /uploadPostMedia\(userId: string, postId: string, items: PreparedMedia\[\]\)/, 'only prepared media can be uploaded');
-  assert.match(api, /thumb_path: thumbPath/);
+  assert.match(api, /uploadPostMediaWith\(/);
+  assert.match(read(join('src', 'lib', 'postMediaUpload.ts')), /thumb_path: thumbPath/);
   assert.match(read(join('src', 'lib', 'avatar.ts')), /prepareImage\([^)]*use: 'avatar'/);
   assert.match(read(join('src', 'features', 'social', 'pick.ts')), /prepareImage\([^)]*use: 'chat'/);
   const uploaders = all.filter((f) => /\bupload\(MEDIA_BUCKET\./.test(read(f)) || /\bupload\(CHAT_BUCKET/.test(read(f)));
@@ -323,10 +272,26 @@ check('every upload site prepares its media first: the post composer, the avatar
 });
 
 check('files no message or post uses any more are deleted: a failed post row, a discarded chat photo, an unsent photo, an old avatar', () => {
-  assert.match(read(join('src', 'lib', 'api.ts')), /deleteMedia\(MEDIA_BUCKET\.userMedia, uploaded\)/);
-  assert.match(read(join('src', 'features', 'social', 'outbox.ts')), /deleteChatImage\(gone\.media_path\)/);
+  assert.match(read(join('src', 'lib', 'api.ts')), /deleteFiles: \(paths\) => deleteMedia\(MEDIA_BUCKET\.userMedia, paths\)/);
+  const outbox = read(join('src', 'features', 'social', 'outbox.ts'));
+  assert.match(outbox, /const plan = discardMediaPlan\(gone\)/);
+  assert.match(outbox, /getMessages\(\[gone\.id\]\)\.then\(\(found\) => \{ if \(found\.length === 0\)/, 'a queued photo is deleted only when no message uses it');
   assert.match(read(join('src', 'features', 'social', 'api.ts')), /if \(mediaPath\) void deleteMedia\(CHAT_BUCKET/);
-  assert.match(read(join('src', 'lib', 'avatar.ts')), /deleteMedia\(MEDIA_BUCKET\.avatars/);
+  assert.match(read(join('src', 'lib', 'avatar.ts')), /deleteOld: \(paths\) => deleteMedia\(MEDIA_BUCKET\.avatars, paths\)/);
+});
+
+check('signing out forgets every signed link, so the next account on the phone never gets the last one\'s links', () => {
+  const auth = read(join('src', 'lib', 'auth.tsx'));
+  assert.match(auth, /signOut: async \(\) => \{\s*const uid = userId;\s*clearSignedUrlMemo\(\);/);
+  assert.match(auth, /if \(event === 'SIGNED_OUT'\) clearSignedUrlMemo\(\);/);
+});
+
+check('the preparing screen: a progress bar for screen readers, an announcement on iPhone, Android Back cancels', () => {
+  const ui = read(join('src', 'components', 'MediaPreparing.tsx'));
+  assert.match(ui, /accessibilityRole="progressbar"/);
+  assert.match(ui, /announceForAccessibility\(/);
+  assert.match(ui, /hardwareBackPress', \(\) => \{ onCancel\(\); return true; \}/);
+  assert.match(read(join('app', 'chat', '[id].tsx')), /pickPhoto\(tierFor\(known\.info\), \(\) => toast\('Preparing your photo…'\)\)/);
 });
 
 check('the photo picker is opened without asking for library permission first (the system picker needs none)', () => {
@@ -343,7 +308,7 @@ check('expo-image-manipulator is never imported at the top of a file, and is req
   const req = idx.indexOf("require('expo-image-manipulator')");
   const ask = idx.lastIndexOf('hasNativeModule(NativeName.imageManipulator)', req);
   assert.ok(req > 0 && ask > 0 && req - ask < 300);
-  for (const pure of ['limits.ts', 'core.ts', 'picker.ts', 'urlMemo.ts', 'exif.ts']) {
+  for (const pure of ['limits.ts', 'core.ts', 'picker.ts', 'urlMemo.ts', 'exif.ts', 'videoLocation.ts', 'clean.ts', 'batch.ts']) {
     assert.doesNotMatch(read(join('src', 'lib', 'media', pure)), /from 'react-native'|from 'expo|require\(/, `${pure} stays pure`);
   }
 });

@@ -4,6 +4,7 @@ import type { Session } from '@supabase/supabase-js';
 import { readStoredSession, supabase } from './supabase';
 import { getCurrentJourney, getProfile, Journey, Profile } from './api';
 import { clearUserData, localStore, userKey } from './localStore';
+import { clearSignedUrlMemo } from './mediaStorage';
 import { errorMessage, isOfflineError, withTimeout } from './net';
 
 // 'loading' = first answer pending, 'ready' = account known (fresh or saved copy), 'error' = signed in but
@@ -68,7 +69,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
     readStoredSession().then((s) => { if (alive) { setSession(s); setSessionReady(true); } });
     // Only synchronous work in this callback (supabase-js holds a lock while it runs).
-    const { data } = supabase.auth.onAuthStateChange((_event, s) => { void reconcile(s).then(() => { if (alive) setSessionReady(true); }); });
+    const { data } = supabase.auth.onAuthStateChange((event, s) => {
+      if (event === 'SIGNED_OUT') clearSignedUrlMemo(); // links signed for the account that left are never reused
+      void reconcile(s).then(() => { if (alive) setSessionReady(true); });
+    });
     return () => { alive = false; data.subscription.unsubscribe(); };
   }, []);
 
@@ -134,6 +138,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     refresh: async () => { if (userId) await loadRef.current(userId); },
     signOut: async () => {
       const uid = userId;
+      clearSignedUrlMemo(); // the next account on this phone must never get links signed for this one
       // Offline the server-side logout cannot be reached: fall back to signing out on this phone only.
       const { error } = await supabase.auth.signOut();
       if (error) await supabase.auth.signOut({ scope: 'local' });

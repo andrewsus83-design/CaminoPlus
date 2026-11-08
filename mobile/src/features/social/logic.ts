@@ -359,6 +359,19 @@ export function classifySendError(e: { status?: number; code?: string; network?:
   return 'rejected';
 }
 
+/**
+ * What to do with the uploaded photo of an outbox item that the person deletes. A failed item was refused by the server
+ * (only a clear refusal makes an item failed), so no message uses its photo: delete it. A queued item may have landed
+ * after a lost answer: ask first. While it is being sent the message may land any moment: keep the photo (an unused
+ * one is left to the server's orphan sweep).
+ */
+export function discardMediaPlan(item: { status: OutboxStatus; media_path: string | null }): 'none' | 'delete' | 'check' | 'keep' {
+  if (!item.media_path) return 'none';
+  if (item.status === 'failed') return 'delete';
+  if (item.status === 'queued') return 'check';
+  return 'keep';
+}
+
 export type MessageAction = 'reply' | 'copy' | 'unsend' | 'report' | 'retry' | 'delete';
 /** What the long-press menu offers for a message. */
 export function messageActions(m: TimelineMessage, mine: boolean): MessageAction[] {

@@ -131,7 +131,7 @@ export default function ChatScreen() {
       return;
     }
     try {
-      const photo = await pickPhoto(tierFor(known.info));
+      const photo = await pickPhoto(tierFor(known.info), () => toast('Preparing your photo…'));
       if (!photo) return;
       const room = quotaCheck(photo.fileSize ?? 0, known.info);
       if (!room.ok) { await notice({ title: 'Not enough cloud storage', icon: 'image', message: room.message }); return; }

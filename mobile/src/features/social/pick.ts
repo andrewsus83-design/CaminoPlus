@@ -9,7 +9,8 @@ export class PickerUnavailable extends Error {}
 export type PickedPhoto = { uri: string; mimeType?: string | null; fileSize?: number | null };
 
 /** Throws MediaRejected (with a message to show) when the photo is too big for the plan. */
-export async function pickPhoto(tier: MediaTier): Promise<PickedPhoto | null> {
+/** `onPreparing` runs once the photo is chosen, before it is made ready (a large photo takes a moment). */
+export async function pickPhoto(tier: MediaTier, onPreparing?: () => void): Promise<PickedPhoto | null> {
   let Picker: typeof import('expo-image-picker');
   try {
     if (!hasNativeModule(NativeName.imagePicker)) throw new Error('missing');
@@ -23,6 +24,7 @@ export async function pickPhoto(tier: MediaTier): Promise<PickedPhoto | null> {
   const res = await Picker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: pickerQuality(tier, 'chat', canResizePhotos()), allowsEditing: false });
   if (res.canceled || !res.assets[0]) return null;
   const a = res.assets[0];
+  onPreparing?.();
   const photo = await prepareImage(a.uri, tier, { use: 'chat', width: a.width, height: a.height, bytes: a.fileSize, mimeType: a.mimeType });
   return { uri: photo.uri, mimeType: photo.mimeType, fileSize: photo.bytes };
 }

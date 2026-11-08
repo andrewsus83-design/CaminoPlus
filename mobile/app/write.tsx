@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, TextInput, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -10,8 +10,8 @@ import { FormMessage } from '@/components/auth/Field';
 import { c, fixed, fonts, radius, role, layout } from '@/theme';
 import { useAuth } from '@/lib/auth';
 import { PickedMedia, PreparedMedia, createJournalPost, uploadPostMedia } from '@/lib/api';
-import { useMyStorage } from '@/lib/billing';
-import { MAX_VIDEO_SECONDS, MediaCancelled, MediaRejected, MediaTier, canResizePhotos, pickerQuality, pickerVideoPreset, prepareImage, prepareVideo, quotaCheck, tierFor } from '@/lib/media';
+import { loadMyStorage, useMyStorage } from '@/lib/billing';
+import { MAX_VIDEO_SECONDS, MediaTier, PLAN_UNKNOWN_NOTE, canResizePhotos, discardPrepared, pickerQuality, pickerVideoPreset, preparePicked, quotaCheck, tierFor } from '@/lib/media';
 import { MediaPreparing } from '@/components/MediaPreparing';
 import { NativeName, hasNativeModule } from '@/lib/optionalNative';
 
@@ -103,9 +103,13 @@ export default function Write() {
   const [error, setError] = useState<string | null>(null);
   // Photos and clips are made ready (smaller, location data removed) right after they are picked: src/lib/media.
   const storage = useMyStorage();
-  const tier = tierFor(storage.data);
   const [preparing, setPreparing] = useState<{ label: string; fraction: number | null } | null>(null);
   const cancelRef = useRef<AbortController | null>(null);
+  // The plan decides the sizes. When it could not be checked, the Free sizes are used and the screen says so.
+  const [planUnknown, setPlanUnknown] = useState(false);
+  const mounted = useRef(true);
+  const sharing = useRef(false);
+  useEffect(() => () => { mounted.current = false; cancelRef.current?.abort(); }, []);
 
   const slide = slides[idx];
   const bg = BACKGROUNDS[slide.bgIdx];
@@ -115,46 +119,32 @@ export default function Write() {
   const patch = (p: Partial<Slide>) => setSlides((all) => all.map((s, i) => (i === idx ? { ...s, ...p } : s)));
   const hasContent = slides.some((s) => s.text.trim() || s.media);
 
-  /** Make each picked file ready. Files that cannot go up are left out, with the reason; Cancel stops the rest. */
-  const prepareAll = async (picked: PickedMedia[]): Promise<PreparedMedia[]> => {
+  /** Pick, then make each file ready. Files that cannot go up are left out, with the reason; Cancel adds nothing. */
+  const addMedia = async () => {
+    if (cancelRef.current) return; // already preparing
+    // Wait for the plan before the picker opens, so a Pilgrim Plus member never gets the smaller sizes by accident.
+    const info = storage.data ?? (await loadMyStorage(session?.user.id));
+    const tier: MediaTier = tierFor(info);
+    const raw = await pickMedia(tier);
+    if (!raw || raw.length === 0 || !mounted.current) return;
     const ctrl = new AbortController();
     cancelRef.current = ctrl;
-    const ready: PreparedMedia[] = [];
-    const problems: string[] = [];
+    let result;
     try {
-      for (const m of picked) {
-        if (ctrl.signal.aborted) break;
-        try {
-          if (m.type === 'video') {
-            setPreparing({ label: 'Preparing your video', fraction: 0 });
-            const v = await prepareVideo(m.uri, tier, (f) => setPreparing({ label: 'Preparing your video', fraction: f }), ctrl.signal, { width: m.width, height: m.height, bytes: m.fileSize, durationMs: m.durationMs, mimeType: m.mimeType });
-            ready.push({ prepared: true, type: 'video', uri: v.uri, mimeType: v.mimeType, width: v.width, height: v.height, durationMs: v.durationMs, bytes: v.bytes, thumbUri: null });
-          } else {
-            setPreparing({ label: picked.length > 1 ? 'Preparing your photos' : 'Preparing your photo', fraction: null });
-            const ph = await prepareImage(m.uri, tier, { use: 'post', width: m.width, height: m.height, bytes: m.fileSize, mimeType: m.mimeType, thumb: true });
-            ready.push({ prepared: true, type: 'image', uri: ph.uri, mimeType: ph.mimeType, width: ph.width, height: ph.height, durationMs: null, bytes: ph.bytes, thumbUri: ph.thumb?.uri ?? null });
-          }
-        } catch (e) {
-          if (e instanceof MediaCancelled) break;
-          problems.push(e instanceof MediaRejected ? e.message : 'One photo or video could not be read. Try it again.');
-        }
-      }
+      result = await preparePicked(raw.slice(0, MAX_SLIDES), tier, ctrl.signal, (st) => { if (mounted.current) setPreparing(st); });
     } finally {
       cancelRef.current = null;
-      setPreparing(null);
+      if (mounted.current) setPreparing(null);
     }
-    if (problems.length) {
-      const left = problems.length === 1 ? 'It was left out.' : `${problems.length} files were left out.`;
-      Alert.alert('Not added', `${problems[0]} ${left}`);
+    if (!mounted.current) { discardPrepared(result.ready.flatMap((r) => r.madeFiles)); return; }
+    if (result.cancelled) return;
+    if (result.problems.length) {
+      const left = result.problems.length === 1 ? 'It was left out.' : `${result.problems.length} files were left out.`;
+      Alert.alert('Not added', `${result.problems[0]} ${left}`);
     }
-    return ready;
-  };
-
-  const addMedia = async () => {
-    const raw = await pickMedia(tier);
-    if (!raw || raw.length === 0) return;
-    const picked = await prepareAll(raw.slice(0, MAX_SLIDES));
+    const picked = result.ready;
     if (picked.length === 0) return;
+    setPlanUnknown(info == null);
     setSlides((all) => {
       const empty = !all[idx].text.trim() && !all[idx].media;
       const base = empty ? all.filter((_, i) => i !== idx) : all;
@@ -176,12 +166,14 @@ export default function Write() {
   };
 
   const share = async () => {
+    if (sharing.current) return; // a second tap must not make a second post
     if (!session || !hasContent) return setError('Add a few words or a photo about today first.');
     const needed = slides.reduce((sum, s) => sum + (s.media?.bytes ?? 0), 0);
     if (needed > 0) {
       const room = quotaCheck(needed, storage.data);
       if (!room.ok) return setError(`${room.message} You can also remove the photos and videos and share the words.`);
     }
+    sharing.current = true;
     setBusy(true); setError(null);
     try {
       const texts = slides.map((s) => s.text.trim()).filter(Boolean);
@@ -191,11 +183,12 @@ export default function Write() {
       const media = slides.flatMap((s) => (s.media ? [s.media] : []));
       const failed = media.length ? await uploadPostMedia(session.user.id, post.id, media) : 0;
       await refresh();
-      if (failed > 0) Alert.alert('Posted without some media', `${failed} of ${media.length} photos or videos could not be uploaded. Check your cloud storage in Settings.`);
+      if (failed > 0) Alert.alert('Posted without some media', `${failed} of ${media.length} photos or videos could not be uploaded. Check your connection and your cloud storage in Settings.`);
       router.back();
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
       setBusy(false);
+      sharing.current = false;
     }
   };
 
@@ -313,6 +306,7 @@ export default function Write() {
             </Pressable>
           )}
         </ScrollView>
+        {planUnknown && slides.some((s) => !!s.media) && <AppText variant="caption" color={fg}>{PLAN_UNKNOWN_NOTE}</AppText>}
         {!onMedia && (
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 12, paddingVertical: 4 }}>
             {BACKGROUNDS.map((b, i) => (

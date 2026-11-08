@@ -1,7 +1,7 @@
 // What prepareImage and prepareVideo do, with the native parts handed in (so a plain-node test can give fakes, and a
 // phone without the native parts gets the fallback). The app uses ./index.ts, which hands in the real modules.
 // Rules and numbers: ./limits.ts. What happens on a build without the modules: mobile/docs/MEDIA.md.
-import { MediaProblem, MediaTier, PhotoUse, THUMB_EDGE, THUMB_JPEG_QUALITY, fitWithin, photoRule, problemMessage, videoRule } from './limits';
+import { MediaProblem, MediaTier, PhotoUse, THUMB_EDGE, THUMB_JPEG_QUALITY, fitWithin, isSupportedPick, looksLikeJpeg, photoRule, problemMessage, videoRule } from './limits';
 
 /* ------------------------------------------------------------------ the shapes of the native parts we use */
 
@@ -19,6 +19,8 @@ export type MediaDeps = {
   compressor: () => VideoCompressorLike | null;
   /** The size of a local file in bytes, or null when it cannot be read. */
   byteSize: (uri: string) => Promise<number | null>;
+  /** Delete a file this module made (cancel, or a file that was left out). Best effort. */
+  removeFile?: (uri: string) => void;
 };
 
 /* ------------------------------------------------------------------ results and errors */
@@ -41,7 +43,7 @@ export class MediaCancelled extends Error {
   constructor() { super('Cancelled'); }
 }
 
-export type ImageOptions = { use?: PhotoUse; width?: number | null; height?: number | null; bytes?: number | null; mimeType?: string | null; thumb?: boolean };
+export type ImageOptions = { use?: PhotoUse; width?: number | null; height?: number | null; bytes?: number | null; mimeType?: string | null; thumb?: boolean; signal?: AbortSignal };
 export type VideoMeta = { width?: number | null; height?: number | null; bytes?: number | null; durationMs?: number | null; mimeType?: string | null };
 
 const tooBig = (capBytes: number) => new MediaRejected('too_big', problemMessage('too_big', { capBytes }), capBytes);
@@ -53,21 +55,33 @@ export function createMedia(deps: MediaDeps) {
     try { return await deps.byteSize(uri); } catch { return null; }
   }
 
-  /** The original file, as long as it is within the plan's cap. */
+  /**
+   * The original file, as long as it is a JPEG (its location is then removed on upload) and within the plan's cap. Any
+   * other format (HEIC above all) would go up with its position: refused.
+   */
   async function original(uri: string, o: ImageOptions, capBytes: number): Promise<PreparedImage> {
+    if (!looksLikeJpeg(o.mimeType, uri)) throw new MediaRejected('location', problemMessage('location'));
     const bytes = await measure(uri, o.bytes);
     if (bytes != null && bytes > capBytes) throw tooBig(capBytes);
-    return { uri, width: o.width ?? null, height: o.height ?? null, bytes, mimeType: o.mimeType ?? 'image/jpeg', processed: false, thumb: null };
+    return { uri, width: o.width ?? null, height: o.height ?? null, bytes, mimeType: 'image/jpeg', processed: false, thumb: null };
   }
 
   /**
    * Make a photo ready to upload: shrink it to the plan's long side (never larger), save it again as JPEG. Saving again
    * drops all EXIF data including the GPS position, bakes in the orientation and turns HEIC into JPEG. With `thumb`, also
    * a THUMB_EDGE thumbnail from the same image. Without the native module, or when it fails, the original file is used
-   * as long as it is within the plan's cap. Throws MediaRejected (with a message to show) when the file is too big.
+   * when it is a JPEG within the plan's cap. Throws MediaRejected (with a message to show) when the file is too big or
+   * cannot go up without its location, and MediaCancelled when `signal` was aborted (files made so far are deleted).
    */
   async function prepareImage(uri: string, tier: MediaTier, o: ImageOptions = {}): Promise<PreparedImage> {
     const rule = photoRule(tier, o.use ?? 'post');
+    const made: string[] = [];
+    const check = () => {
+      if (!o.signal?.aborted) return;
+      for (const f of made) { try { deps.removeFile?.(f); } catch { /* best effort */ } }
+      throw new MediaCancelled();
+    };
+    check();
     const M = deps.manipulator();
     if (!M) return original(uri, o, rule.capBytes);
     let main: SavedImage;
@@ -83,12 +97,14 @@ export function createMedia(deps: MediaDeps) {
         ref = await ctx.resize({ width: fit.width, height: fit.height }).renderAsync();
       }
       main = await ref.saveAsync({ compress: rule.quality, format: 'jpeg' });
+      made.push(main.uri);
       release(ref);
       if (o.thumb) {
         try {
           const t = fitWithin(main.width, main.height, THUMB_EDGE);
           const tref = t.scaled ? await ctx.resize({ width: t.width, height: t.height }).renderAsync() : await ctx.renderAsync();
           const saved = await tref.saveAsync({ compress: THUMB_JPEG_QUALITY, format: 'jpeg' });
+          made.push(saved.uri);
           release(tref);
           thumb = { ...saved, bytes: await measure(saved.uri) };
         } catch {
@@ -97,11 +113,18 @@ export function createMedia(deps: MediaDeps) {
       }
     } catch {
       release(ctx);
+      check();
+      for (const f of made) { try { deps.removeFile?.(f); } catch { /* best effort */ } }
       return original(uri, o, rule.capBytes);
     }
     release(ctx);
+    check();
     const bytes = await measure(main.uri);
-    if (bytes != null && bytes > rule.capBytes) throw tooBig(rule.capBytes);
+    check();
+    if (bytes != null && bytes > rule.capBytes) {
+      for (const f of made) { try { deps.removeFile?.(f); } catch { /* best effort */ } }
+      throw tooBig(rule.capBytes);
+    }
     return { uri: main.uri, width: main.width, height: main.height, bytes, mimeType: 'image/jpeg', processed: true, thumb };
   }
 
@@ -114,6 +137,7 @@ export function createMedia(deps: MediaDeps) {
     const rule = videoRule(tier);
     const check = () => { if (signal?.aborted) throw new MediaCancelled(); };
     check();
+    if (!isSupportedPick('video', meta.mimeType, uri)) throw new MediaRejected('unsupported', problemMessage('unsupported'));
     if (meta.durationMs != null && meta.durationMs > rule.maxSeconds * 1000 + 500) {
       throw new MediaRejected('too_long', problemMessage('too_long'));
     }

@@ -4,7 +4,7 @@
 // Only storage keys ("<user id>/posts/...") are kept in the database, never full links.
 import { supabase } from './supabase';
 import { SIGNED_URL_TTL_SECONDS, createUrlMemo } from './media/urlMemo';
-import { stripJpegLocation } from './media/exif';
+import { UploadRefused, cleanForUpload } from './media/clean';
 
 export const MEDIA_BUCKET = {
   /** Public profile pictures, one per pilgrim. */
@@ -14,16 +14,19 @@ export const MEDIA_BUCKET = {
 } as const;
 export type MediaBucket = (typeof MEDIA_BUCKET)[keyof typeof MEDIA_BUCKET];
 
-/** An upload that failed. `status` is the HTTP status when the server answered; `network` when it did not; `missing` when the file is gone from the phone. */
+/** An upload that failed. `status` is the HTTP status when the server answered; `network` when it did not; `missing` when
+ *  the file is gone from the phone; `refused` when this phone refused it (type, or a location it cannot remove; message says which). */
 export class MediaStorageError extends Error {
   status?: number;
   network: boolean;
   missing: boolean;
-  constructor(message: string, o: { status?: number; network?: boolean; missing?: boolean } = {}) {
+  refused: boolean;
+  constructor(message: string, o: { status?: number; network?: boolean; missing?: boolean; refused?: boolean } = {}) {
     super(message);
     this.status = o.status;
     this.network = !!o.network;
     this.missing = !!o.missing;
+    this.refused = !!o.refused;
   }
 }
 
@@ -31,18 +34,23 @@ const memo = createUrlMemo();
 
 /** Upload a local file (a uri from prepareImage / prepareVideo). Returns the key and the size that went up. */
 export async function upload(bucket: MediaBucket, path: string, uri: string, contentType: string, o: { upsert?: boolean } = {}): Promise<{ path: string; bytes: number }> {
-  let body: ArrayBuffer;
+  let raw: ArrayBuffer;
   try {
-    body = await (await fetch(uri)).arrayBuffer();
+    raw = await (await fetch(uri)).arrayBuffer();
   } catch {
     throw new MediaStorageError('The file is no longer on this phone.', { status: 400, missing: true });
   }
-  // No photo leaves the phone with its GPS position, also when this build could not save it again (media/exif.ts).
-  if (contentType === 'image/jpeg') {
-    const clean = stripJpegLocation(new Uint8Array(body));
-    if (clean.removed) body = clean.bytes.buffer.slice(clean.bytes.byteOffset, clean.bytes.byteOffset + clean.bytes.byteLength) as ArrayBuffer;
+  // No photo or clip leaves the phone with its location: the type is read from the bytes, the location removed, and a
+  // file whose location cannot be removed is refused (media/clean.ts).
+  let clean: { bytes: Uint8Array; contentType: string };
+  try {
+    clean = cleanForUpload(new Uint8Array(raw), contentType);
+  } catch (e) {
+    if (e instanceof UploadRefused) throw new MediaStorageError(e.message, { refused: true });
+    throw e;
   }
-  const up = await supabase.storage.from(bucket).upload(path, body, { contentType, upsert: o.upsert ?? true });
+  const body = clean.bytes;
+  const up = await supabase.storage.from(bucket).upload(path, body, { contentType: clean.contentType, upsert: o.upsert ?? true });
   if (up.error) {
     // StorageApiError carries an HTTP status; a failed fetch (offline) does not.
     const e = up.error as { status?: number; statusCode?: string | number };
