@@ -95,9 +95,15 @@ Then the **scenarios** ([scenarios.mjs](scenarios.mjs)), each in light and dark,
     and the card opens `/write`; a pilgrim with no post yet (the account with nothing in it) has the sample journey, whose banner says to tap the first card,
     with the card in front of the ten samples (the last sample is alone on its row);
   - Notes is the first sub-tab: its feed starts, right under the strip, with ONE card, "Write a note" (full width, at least 64 high, "Notes stay on this
-    phone." under its title); there is no filter row (no tab named All, Photos and videos or Places, none of those words, no tab list); the empty diary says
+    phone." under its title); there is no filter row (no tab named All, Photos and videos or Places, none of those words except the All item of the highlights row, no tab list); the empty diary says
     "No notes yet" with no button of its own; Plan and Health have no card; Journey has its own; the card opens `/diary/new`, and a note written there is
     in the feed after Back;
+  - All places ([allplaces.scenarios.mjs](allplaces.scenarios.mjs), on the 33 stages of the Camino Francés and six posts made up in the walk): the highlights row starts with "All" (the
+    shell, pinned at the left, the leftmost button of the row, 72 wide, selected only while its stamps are open), then the destinations of the plan; a tap opens one stamp for every place of
+    the route (33 stages are 34 places), three in a row, each a button of at least 48 named "<place>, N journeys" or "<place>, no journeys yet", a filled one with its number, and the line
+    "3 of 34 places"; a stamp shows exactly the posts at that place with the card that writes a post once, the app's one Back button over it goes back to the stamps (not to all the posts), and
+    All again closes the stamps; a place with no post says "No journeys at <place> yet" over the card alone; from Plan and Health All opens the stamps of Journey, and a destination of the row
+    still shows its posts (the same one again clears it); a plan with no destination still has the All item, alone in the row; an account whose route has no places has no All item;
 - Notes, a page is a draft until it is published: on a blank page Read and Publish are off and there is no Save draft; with words in it Save draft is at the
   top right and the date says Draft; the marks (Bold, Italic, Heading, Bulleted list, Quote) sit inside the text box, under the text and above the bottom
   row; Read is a third and Publish two thirds of one row at the bottom (margin to margin, at least 48 high); Read turns into Edit in the same place; Save draft
@@ -227,6 +233,7 @@ Chromium; a test checks they agree). Bump both on purpose, with the tests looked
 | [plan.mjs](plan.mjs) | which checks exist (route x state x scheme x mode, then the scenarios), the redirect list |
 | [scenarios.mjs](scenarios.mjs) | the walks a person does |
 | [me.scenarios.mjs](me.scenarios.mjs) | the walks of Me: the header with the gear alone, the chat button and where it opens, the card of Journey (also in the sample journey), the card of Notes |
+| [allplaces.scenarios.mjs](allplaces.scenarios.mjs) | the walks of the All item of Me: the row, the stamps of the route, the journeys at a place, the way back, Plan and Health, no destination, no places |
 | [bible.scenarios.mjs](bible.scenarios.mjs) | the walks of the Bible tab and the reader (kept apart so the other walks stay short) |
 | [books.scenarios.mjs](books.scenarios.mjs) | the walks of the Books tab: the covers, a book page, the reader, the place kept on the phone, the notice of each kind |
 | [continue.scenarios.mjs](continue.scenarios.mjs) | the walks of the Continue reading bar above the tab bar of the Library: where it sits, closing it, the most recent place, a mark that does not read |
