@@ -10,10 +10,11 @@ import { readerPath } from '../books/copy';
 import type { BookContent } from '../books';
 import { cleanBook, layoutBlocks } from '../books/reading';
 import {
-  CHAPTER_KEY_LENGTH, EXCERPT_MAX, blockOfItem, chapterLabel, chapterOfKey, chosenAnnouncement, excerpt, isPassageBlock, parsePassageKey, passageKey, passageLabel, passageNumber,
-  passageParam, passageRowsForKeys, passageShareText, passageWords,
+  CHAPTER_KEY_LENGTH, EXCERPT_MAX, NOTE_QUOTE_MAX, blockOfItem, chapterLabel, chapterOfKey, chosenAnnouncement, excerpt, isPassageBlock, parsePassageKey, passageKey, passageLabel, passageNumber,
+  noteHref, noteStart, noteStartForKey, passageParam, passageRowsForKeys, passageShareText, passageWords,
 } from '../books/passages';
 import { itemKey } from '../search';
+import { parseRich, plainText } from '../../diary/richtext';
 
 let n = 0;
 const check = (name: string, fn: () => void) => { fn(); n += 1; console.log(`ok   ${name}`); };
@@ -235,6 +236,65 @@ check('a book is read once for all the passages of it', () => {
   const keys = [1, 2, 4, 5].map((block) => passageKey('demo-guide', id, block));
   assert.equal(passageRowsForKeys(keys, counting).length, 4);
   assert.equal(loads, 1);
+});
+
+/* ================================================================ a note about a passage */
+
+check('a note about a passage starts as a reply in a chat starts: the passage as a quotation in the marks of the diary, whose words and where, and an empty line to write on', () => {
+  const blocks = book.chapters[0].blocks;
+  assert.equal(noteStart(book.title, book.chapters[0], 1), '> Happy is the man whom Truth by itself doth teach.\n> — The Demo Way, Chapter III, passage 1\n\n');
+  assert.equal(noteStart(book.title, book.chapters[0], 4), '> First line of a prayer,\n> second line of it.\n> — A pilgrim\n> — The Demo Way, Chapter III, passage 3\n\n', 'a quotation keeps its lines and its attribution');
+  assert.equal(noteStart(book.title, book.chapters[0], 5), '> • A point.\n> • Another point.\n> — The Demo Way, Chapter III, passage 4\n\n');
+  for (const at of [0, 3, 7, 99]) assert.equal(noteStart(book.title, book.chapters[0], at), null, `block ${at} is no passage`);
+  assert.equal(blocks.length > 0, true);
+});
+
+check('a long passage is quoted in part, cut at a space with an ellipsis, and the quotation is a quotation of the diary: its marks read back as a quote and the line under it is empty', () => {
+  const long: BookContent = { ...book, chapters: [{ id: '01-long', title: 'Chapter I', blocks: [{ t: 'p', spans: sp('word '.repeat(400).trim()) }] }] };
+  const start = noteStart(long.title, long.chapters[0], 0)!;
+  const lines = start.split('\n');
+  assert.equal(lines.length, 4, 'the quotation, the line of whose words, an empty line, and nothing after it');
+  assert.ok(lines[0].startsWith('> word') && lines[0].endsWith('…'));
+  assert.ok(lines[0].length <= NOTE_QUOTE_MAX + 3, `${lines[0].length}`);
+  assert.equal(lines[2], '', 'an empty line to write on');
+  const rich = parseRich(start);
+  assert.ok(JSON.stringify(rich).includes('"q"') || JSON.stringify(rich).toLowerCase().includes('quote'), 'the diary reads the first lines as a quote');
+  assert.ok(plainText(start).includes('The Demo Way'), 'the book is in the note');
+});
+
+check('the note of a key finds its passage, and a key that is not one, or a passage that is gone, gives nothing (a blank note opens instead)', () => {
+  const id = '03-where-to-start-and-how-many-days';
+  assert.equal(noteStartForKey(passageKey('demo-guide', id, 1), texts), noteStart(book.title, book.chapters[0], 1));
+  for (const key of ['books:demo-guide', 'bible:PSA.121.3', '', 'nonsense', passageKey('no-such-book', id, 1), passageKey('demo-guide', '99-nothing-here', 1), passageKey('demo-guide', id, 99), passageKey('demo-guide', id, 0)]) {
+    assert.equal(noteStartForKey(key, texts), null, key);
+  }
+  assert.equal(noteStartForKey(passageKey('demo-guide', id, 1), () => { throw new Error('damaged'); }), null);
+});
+
+check('the address of a new note about a passage is the diary\'s new page with the key of the passage, and the key reads back from the address', () => {
+  const id = '05-zamora-granja-de-moreruela-to-rionegro-del-puente';
+  const href = noteHref('camino-sanabres-guide', id, 12);
+  assert.equal(href, '/diary/new?quote=books%3Acamino-sanabres-guide.05-zamora-granja-de-more.12');
+  const quote = new URL(href, 'https://app.test').searchParams.get('quote')!;
+  assert.deepEqual(parsePassageKey(quote), { bookId: 'camino-sanabres-guide', chapter: id.slice(0, CHAPTER_KEY_LENGTH), block: 12 });
+});
+
+check('every passage of every book of the Library can start a note: the note reads back as quotation, whose words and where, and is under the 20,000 characters of a page', () => {
+  let started = 0;
+  const load = (id: string) => cleanBook(loadBookContent(id));
+  for (const entry of CATALOG) {
+    const content = load(entry.id)!;
+    content.chapters.forEach((c) => c.blocks.forEach((b, block) => {
+      if (!isPassageBlock(b)) return;
+      const key = passageKey(entry.id, c.id, block);
+      const start = noteStartForKey(key, load);
+      assert.ok(start, key);
+      assert.ok(start!.startsWith('> ') && start!.endsWith('\n\n') && start!.includes(`— ${content.title}, `), key);
+      assert.ok(start!.length <= NOTE_QUOTE_MAX + 400, `${key}: ${start!.length}`);
+      started += 1;
+    }));
+  }
+  assert.ok(started > 3000, `${started} passages`);
 });
 
 console.log(`${n} of ${n} passed (Passages)`);

@@ -97,6 +97,39 @@ export const passageShareText = (bookTitle: string, chapter: { title: string; bl
   return `${isPassageBlock(b) ? passageWords(b) : ''}\n${passageLabel(chapter, block)}, ${bookTitle}`.trim();
 };
 
+/** How much of a passage a note quotes: a longer passage is cut at a space with an ellipsis. */
+export const NOTE_QUOTE_MAX = 600;
+
+/**
+ * What a new note starts with when it is written about a passage, as a reply starts in a chat: the passage as a quotation, in the marks of the diary (richtext.ts: a
+ * "> " before each line), then the line that says whose words they are and where ("— The French Way, Chapter III, passage 4"), and an empty line to write on. The
+ * quotation stays in the note as text, so the note is a note of the diary like any other, with words, photos and a place, and Notes shows it.
+ */
+export function noteStart(bookTitle: string, chapter: { title: string; blocks: readonly Block[] }, block: number): string | null {
+  const b = chapter.blocks[block];
+  if (!isPassageBlock(b)) return null;
+  const words = passageWords(b);
+  const lines = words.length > NOTE_QUOTE_MAX ? [excerpt(words, NOTE_QUOTE_MAX)] : words.split('\n');
+  return `${lines.map((l) => `> ${l}`).join('\n')}\n> — ${bookTitle}, ${passageLabel(chapter, block)}\n\n`;
+}
+
+/** The start of a note for the passage of a bookmark key, or null when the key is not one, or the book, the chapter or the passage cannot be found. A blank note then opens instead. */
+export function noteStartForKey(key: string, texts: PassageSource): string | null {
+  const ref = parsePassageKey(key);
+  if (!ref) return null;
+  try {
+    const text = texts(ref.bookId);
+    if (!text) return null;
+    const at = chapterOfKey(text.chapters, ref.chapter);
+    return at < 0 ? null : noteStart(text.title, text.chapters[at], ref.block);
+  } catch {
+    return null;
+  }
+}
+
+/** The address of a new note written about a passage: the page of the diary for a new note, with the key of the passage. */
+export const noteHref = (bookId: string, chapterId: string, block: number): string => `/diary/new?quote=${encodeURIComponent(passageKey(bookId, chapterId, block))}`;
+
 /** How much of a passage a row of the Bookmarks screen shows. */
 export const EXCERPT_MAX = 160;
 

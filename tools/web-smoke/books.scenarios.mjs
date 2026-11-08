@@ -490,4 +490,71 @@ export const BOOKS_SCENARIOS = [
       await eventually(keptKeys, (keys) => !keys.includes(key), { what: 'the passage taken off the bookmarks kept on the phone' });
     },
   },
+  {
+    name: 'Books: Note on a chosen passage opens a new note of the diary that starts with the passage as a quotation (whose words, where), a note that was only opened is not kept, and the words written under the quotation are in Notes',
+    persona: 'in',
+    async run(ctx) {
+      const { page, step, go } = ctx;
+      const book = readBook(guide.id);
+      const flat = (s) => s.replace(/\s+/g, ' ').trim();
+      const plain = (spans) => flat(spans.map((x) => x.t).join(''));
+      const longOnes = (c) => c.blocks.map((b, i) => ({ b, i })).filter(({ b }) => b.t === 'p' && plain(b.spans).length > 80 && plain(b.spans).length < 900);
+      const chapter = book.chapters.find((c) => longOnes(c).length >= 4);
+      assert(chapter, 'a guide has a chapter with four paragraphs of a good length');
+      const target = longOnes(chapter)[3];
+      const first = plain(target.b.spans).slice(0, 30);
+      const bar = page.getByRole('toolbar', { name: /^Actions for / });
+      const field = page.getByRole('textbox', { name: 'Page text' });
+      // Back writes what is typed and then leaves, so the way out is waited for: the next address is loaded only after the page of the note has gone
+      const back = async () => {
+        await page.getByRole('button', { name: 'Back', exact: true }).first().click();
+        await eventually(() => pathOf(page), (p) => p !== '/diary/new', { what: 'the address after Back from the note' });
+      };
+      const openNote = async () => {
+        await go(`/library/book/${guide.id}/read?c=${chapter.id}&p=${target.i}`);
+        await bar.waitFor();
+        const label = (await bar.getAttribute('aria-label')).replace(/^Actions for /, '');
+        await page.getByRole('button', { name: `Write a note: ${label}`, exact: true }).click();
+        await eventually(() => pathOf(page), (p) => p === '/diary/new', { what: 'the address of a new note' });
+        await field.waitFor();
+        return label;
+      };
+      const inNotes = async () => {
+        await go('/me');
+        await strip(page, 'Notes').click();
+        await page.getByText('Notes stay on this phone.', { exact: true }).waitFor();
+      };
+
+      step('the bar of a chosen passage has a fourth action, Note, named by where the passage is, after Bookmark and before Share');
+      await go(`/library/book/${guide.id}/read?c=${chapter.id}&p=${target.i}`);
+      await bar.waitFor();
+      const label = (await bar.getAttribute('aria-label')).replace(/^Actions for /, '');
+      const names = await page.getByRole('button').evaluateAll((els) => els.map((e) => e.getAttribute('aria-label') || ''));
+      const at = (re) => names.findIndex((n) => re.test(n));
+      assert(at(/^Bookmark: /) >= 0 && at(/^Write a note: /) > at(/^Bookmark: /) && at(/^Share: /) > at(/^Write a note: /), 'Bookmark, Note, then Share');
+      assert.equal(await page.getByRole('button', { name: `Write a note: ${label}`, exact: true }).count(), 1);
+
+      step('Note opens a new note of the diary: the passage quoted with the marks of the diary, whose words and where, and an empty line under it');
+      await openNote();
+      const value = await field.inputValue();
+      assert(value.startsWith('> '), `the note starts with a quotation: ${JSON.stringify(value.slice(0, 40))}`);
+      assert(value.includes(first), 'the first words of the passage are in the note');
+      assert(value.includes(`— ${book.title}, ${label}`), 'the note says whose words they are and where');
+      assert(value.endsWith('\n\n'), 'the note ends with an empty line to write on');
+
+      step('a note that was only opened is not kept: after Back, Notes is still empty');
+      await back();
+      await inNotes();
+      await page.getByText('No notes yet', { exact: true }).waitFor();
+
+      step('words written under the quotation make a note, and Notes shows it with the quoted passage');
+      await openNote();
+      await field.fill(`${await field.inputValue()}Walking the first day.`);
+      await back();
+      await inNotes();
+      await page.getByText(/Walking the first day\./).filter({ visible: true }).first().waitFor();
+      await page.getByText(new RegExp(esc(first.slice(0, 20)))).filter({ visible: true }).first().waitFor();
+      await eventually(() => page.getByText('No notes yet', { exact: true }).filter({ visible: true }).count(), (c) => c === 0, { what: 'the number of "No notes yet" once a note is written' });
+    },
+  },
 ];

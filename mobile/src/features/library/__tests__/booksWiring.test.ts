@@ -441,7 +441,15 @@ check('a passage of a chapter can be chosen, as a verse of the Bible can: a touc
   assert.doesNotMatch(code(actions), /position: 'absolute'/, 'the bar takes its own room between the chapter and the bar at the bottom: nothing is hidden behind it');
   const reader = src['Reader.tsx'];
   assert.match(reader, /const key = selected !== null && isPassageBlock\(block\) \? passageKey\(bookId, chapter\.id, selected\) : null;/);
-  assert.match(reader, /bookmarked=\{marks\.has\(key\)\}\s+canBookmark=\{marks\.ready && parsePassageKey\(key\) !== null\}\s+onBookmark=\{\(\) => marks\.toggle\(key\)\}/, 'the bookmark is the Library\'s own, under the key of the passage');
+  assert.match(reader, /bookmarked=\{marks\.has\(key\)\}\s+canBookmark=\{marks\.ready && parsePassageKey\(key\) !== null\}\s+canNote=\{parsePassageKey\(key\) !== null\}\s+onBookmark=\{\(\) => marks\.toggle\(key\)\}\s+onNote=\{\(\) => router\.push\(noteHref\(bookId, chapter\.id, selected\)\)\}/, 'the bookmark is the Library\'s own, under the key of the passage; Note opens a new note of the diary about it');
+  assert.match(actions, /<ActionButton icon="pen" label="Note" spoken=\{`Write a note: \$\{label\}`\} disabled=\{!canNote\}/, 'the fourth action: Note, named by where the passage is');
+  assert.ok(actions.indexOf('label="Bookmark"') < actions.indexOf('label="Note"') && actions.indexOf('label="Note"') < actions.indexOf('icon="copy"') && actions.indexOf('icon="copy"') < actions.indexOf('label="Share"'), 'Bookmark, Note, Copy, Share');
+  assert.match(actions, /minWidth: compact \? 0 : ACTION_MIN_WIDTH/, 'with four actions they share the bar, as wide as 320 allows');
+  const diaryPage = read('app/diary/[id].tsx');
+  assert.match(diaryPage, /const start = useMemo\(\(\) => \(id === NEW_PAGE && quote \? noteStartForKey\(quote, safeText\) : null\), \[id, quote\]\);/, 'only a NEW page can start from a passage, and a key that finds nothing opens it blank');
+  assert.match(diaryPage, /useState\(initial\?\.body \?\? start \?\? ''\)/, 'the quotation is on the screen before anything is typed');
+  assert.match(diaryPage, /const seed = \(\) => \{ if \(start && !initial && !seeded\.current\) \{ seeded\.current = true; saver\.edit\(\{ body \}\); \} \};/, 'the quotation is kept with the first thing that is saved, and a page that was only opened is not saved');
+  assert.match(diaryPage, /seed\(\);\s+say\(attachMessage\(await saver\.attach\(picked\.assets\)\)\);/, 'a photo added first carries the quotation with it');
   assert.match(reader, /const next = chosenNow\.current === block \? null : block;/, 'a second touch lets it go');
   assert.match(reader, /const release = useCallback\(\(\) => \{ chosenNow\.current = null; setSelected\(null\); \}, \[\]\);/, 'Close lets it go too');
   assert.match(reader, /const ACTIONS_COVER = BAR_HEIGHT \+ 8;/, 'the room the bar of actions takes is the Bible\'s bar and the 8 under it');
