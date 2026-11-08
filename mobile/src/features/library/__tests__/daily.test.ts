@@ -13,7 +13,7 @@ import {
 } from '../daily/calendar';
 import { CARD_PAD, COLUMNS, GRID_MAX, TOUCH, calendarMetrics } from '../daily/layout';
 import { DAILY_NOTICE, SAMPLE_READING, SAMPLE_REFLECTION, readingFor } from '../daily/sample';
-import { BOOKMARK_DAY, UNBOOKMARK_DAY } from '../daily/bookmarks';
+import { BOOKMARK_DAY, DAILY_GROUP, UNBOOKMARK_DAY, dailyKey, dailyTitle } from '../daily/bookmarks';
 import { dayContent } from '../daily/content';
 import { arrows, dailyReducer, initDaily, type DailyAction, type DailyState } from '../daily/state';
 import './liturgy.test'; // the liturgical calendar (daily/liturgy.ts): its own file, run here so no script has to name it
@@ -508,7 +508,7 @@ const all = () => dailyFiles.map((f) => `// ${f}\n${source(f)}`).join('\n');
 
 check('the feature is the files this test expects, so a new one is looked at (and the scans below see all of them)', () => {
   assert.deepEqual(dailyFiles.map((f) => path.basename(f)).sort(), [
-    'CalendarSheet.tsx', 'DailyHeader.tsx', 'DayReading.tsx', 'LiturgicalCard.tsx', 'MonthCalendar.tsx', 'WeekStrip.tsx', 'bookmarks.ts', 'calendar.ts', 'content.ts', 'daily.tsx',
+    'CalendarSheet.tsx', 'DailyBookmarks.tsx', 'DailyHeader.tsx', 'DayReading.tsx', 'LiturgicalCard.tsx', 'MonthCalendar.tsx', 'WeekStrip.tsx', 'bookmarks.ts', 'calendar.ts', 'content.ts', 'daily.tsx',
     'datekey.ts', 'layout.ts', 'liturgy.ts', 'sample.ts', 'state.ts', 'useDailyReading.ts', 'week.ts',
   ]);
 });
@@ -516,7 +516,7 @@ check('the feature is the files this test expects, so a new one is looked at (an
 check('no new native module and no network: React, React Native, expo-router and the app\'s own components, theme and Library bookmarks, and no call to the account, the network or the phone\'s storage from this feature itself', () => {
   // NEW RULE: the screen keeps one thing on the phone, the bookmark of a day, and only through the Library's own hook (useLibraryBookmarks), which is the one place the
   // Library's bookmarks are read and written; nothing of the feature itself touches the account, the network or the storage
-  const allowed = /^(react|react-native|expo-router|react-native-safe-area-context)$|^\.{1,2}\/|^@\/(components\/|theme$|features\/library\/daily\/|features\/library\/(useLibraryBookmarks|bookmarks)$)/;
+  const allowed = /^(react|react-native|expo-router|react-native-safe-area-context)$|^\.{1,2}\/|^@\/(components\/|theme$|features\/library\/daily\/|features\/library\/(useLibraryBookmarks|bookmarks|BookmarkToggle)$)/;
   const offenders: string[] = [];
   for (const f of dailyFiles) for (const m of read(f).matchAll(/^import [^;]*? from '([^']+)';/gm)) if (!allowed.test(m[1])) offenders.push(`${f}: ${m[1]}`);
   assert.deepEqual(offenders, []);
@@ -676,6 +676,33 @@ check('the screen is a stack screen like Bookmarks: one row (Back, the title, th
   assert.match(src, /\{marks\.failed && <FormMessage>\{BOOKMARK_NOT_SAVED\}<\/FormMessage>\}/, 'a bookmark that could not be saved says so');
   const bookmarks = source('app/library/bookmarks.tsx');
   for (const shared of [/<Screen tabBar=\{false\}>/, /router\.canGoBack\(\) \? router\.back\(\) : router\.replace\('\/library'\)/, /<IconButton name="back" label="Back" onPress=\{goBack\} \/>/]) assert.match(bookmarks, shared, 'Bookmarks still has what this screen copies');
+});
+
+check('a bookmarked day is a row on the Bookmarks screen: "Daily reading" as the heading, the date and the liturgical name in the row, opening the Daily reading on that day, with a bookmark that takes it off', () => {
+  // NEW RULE: the Bookmarks screen grows by one import and one line (app/library/bookmarks.tsx), and everything else it does is left as it was
+  const screen = source('app/library/bookmarks.tsx');
+  assert.match(screen, /import \{ DailyBookmarks \} from '@\/features\/library\/daily\/DailyBookmarks';/);
+  assert.equal((screen.match(/<DailyBookmarks marks=\{marks\} \/>/g) ?? []).length, 1);
+  assert.ok(screen.indexOf('<LibraryGroups') < screen.indexOf('<DailyBookmarks') && screen.indexOf('<DailyBookmarks') < screen.indexOf('>Posts</AppText>'), 'between the Library rows and the Posts');
+  assert.match(screen, /\) : marks\.ready && \(\s*<Card><AppText variant="small" muted>\{LIBRARY_BOOKMARKS_EMPTY\}<\/AppText><\/Card>/, 'the Library part says what it said before');
+  const part = source(`${DIR}/DailyBookmarks.tsx`);
+  assert.match(part, /const days = useMemo\(\(\) => dailyDaysOf\(marks\.shown\), \[marks\.shown\]\);/, 'made of the keys of the Library\'s own bookmark list, as they were when the screen came into view');
+  assert.match(part, /if \(days\.length === 0\) return null;/, 'with no day bookmarked it draws nothing');
+  assert.match(part, /<AppText variant="h4" accessibilityRole="header" style=\{\{ marginTop: 8 \}\}>\{DAILY_GROUP\}<\/AppText>/);
+  assert.equal(DAILY_GROUP, 'Daily reading');
+  assert.match(part, /accessibilityLabel=\{`\$\{DAILY_GROUP\}, \$\{date\}, \$\{title\}`\}/, 'a screen reader says "Daily reading", the date and the name');
+  assert.match(part, /<AppText variant="label">\{date\}<\/AppText>\s*<AppText variant="caption" muted>\{title\}<\/AppText>/);
+  assert.match(part, /const date = formatDate\(day\);/);
+  assert.match(part, /const title = dailyTitle\(day\);/);
+  assert.match(part, /router\.push\(\{ pathname: '\/library\/daily', params: \{ date: dateKey\(day\) \} \}\)/, 'a tap opens the Daily reading on that date');
+  assert.match(part, /<BookmarkToggle on=\{marks\.has\(key\)\} title=\{`\$\{DAILY_GROUP\}, \$\{date\}`\} toggle=\{\(\) => marks\.toggle\(key\)\} \/>/, 'the same bookmark button as the other rows');
+  assert.match(part, /minHeight: 48/, 'the row is a touch target of at least 44');
+  assert.doesNotMatch(part, /SampleNotice|SampleTag/, 'a day is real: its date and its name are worked out on the phone');
+  // what the part shows for a day is what the screen of that day says
+  const day = { y: 2026, m: 11, d: 8 };
+  assert.equal(formatDate(day), 'Sunday 8 November 2026');
+  assert.equal(dailyTitle(day), '32nd Sunday in Ordinary Time');
+  assert.equal(dailyKey(day), 'daily:2026-11-08');
 });
 
 check('the route is registered once, in the block for someone with a journey, next to library/bookmarks and with the same (no) options', () => {
