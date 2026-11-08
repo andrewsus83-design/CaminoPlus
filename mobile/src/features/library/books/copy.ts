@@ -96,4 +96,6 @@ export function booksBanner(books: readonly BannerBook[], last: Pick<BookPlace, 
 
 /** The path of a book page, and of its reader (at a chapter, when one is given). */
 export const bookPath = (id: string): string => `/library/book/${id}`;
-export const readerPath = (id: string, chapterId?: string): string => `/library/book/${id}/read${chapterId ? `?c=${encodeURIComponent(chapterId)}` : ''}`;
+/** The address of the reader: at a chapter (`?c=<chapter id>`), and at a passage of it (`&p=12`, the index of the block, see passages.ts). A passage without a chapter is no place, so it is left out. */
+export const readerPath = (id: string, chapterId?: string, block?: number): string =>
+  `/library/book/${id}/read${chapterId ? `?c=${encodeURIComponent(chapterId)}${block !== undefined && Number.isInteger(block) && block >= 0 ? `&p=${block}` : ''}` : ''}`;

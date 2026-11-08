@@ -50,7 +50,8 @@ const scrollTo = (page, fraction) => page.evaluate((f) => {
 }, fraction);
 /** The font size of the first long paragraph of the chapter on the screen. */
 const paragraphSize = (page) => page.evaluate(() => {
-  const p = [...document.querySelectorAll('div[dir]')].find((d) => d.children.length === 0 && (d.textContent || '').length > 200);
+  // a paragraph holds only inline elements (the words of a passage are a link inside it, bold and italic are spans), never a box
+  const p = [...document.querySelectorAll('div[dir]')].find((d) => [...d.children].every((x) => x.tagName !== 'DIV') && (d.textContent || '').length > 200);
   return p ? getComputedStyle(p).fontSize : null;
 });
 const saved = (page, uid) => page.evaluate((k) => localStorage.getItem(k), `kv:u.${uid}.library.reading`);
@@ -402,6 +403,91 @@ export const BOOKS_SCENARIOS = [
       await eventually(() => saved(page, UID), (v) => !!v && JSON.parse(v).items.some((p) => p.id === readings.id && p.c === book.chapters[1].id), { what: 'the place kept with no signal', timeout: 10000 });
       await go(`/library/book/${readings.id}`);
       await page.getByRole('button', { name: /^Continue: / }).first().waitFor();
+    },
+  },
+  {
+    name: 'Books: a touch on a passage chooses it (gold ground, underline, a bar with Bookmark, Copy and Share), a second touch lets it go, Bookmark keeps it, Bookmarks lists it, and its row opens the reader at that passage, chosen and in view',
+    persona: 'in',
+    async run(ctx) {
+      const { page, step, go } = ctx;
+      const book = readBook(guide.id);
+      const flat = (s) => s.replace(/\s+/g, ' ').trim();
+      const plain = (spans) => flat(spans.map((x) => x.t).join(''));
+      // a chapter with at least four paragraphs of a good length: the passage to keep is the fourth, so it is not at the top and a link has to scroll to it
+      const longOnes = (c) => c.blocks.map((b, i) => ({ b, i })).filter(({ b }) => b.t === 'p' && plain(b.spans).length > 80 && plain(b.spans).length < 900);
+      const chapter = book.chapters.find((c) => longOnes(c).length >= 4);
+      assert(chapter, 'a guide has a chapter with four paragraphs of a good length');
+      const target = longOnes(chapter)[3];
+      const first = plain(target.b.spans).slice(0, 40);
+      const key = `books:${guide.id}.${chapter.id.slice(0, 24)}.${target.i}`;
+      const words = page.getByRole('link', { name: new RegExp(esc(first)) });
+      const bar = page.getByRole('toolbar', { name: /^Actions for / });
+      const stored = () => page.evaluate((k) => localStorage.getItem(k), `kv:u.${UID}.library.bookmarks`);
+      const keptKeys = async () => { const raw = await stored(); return raw ? JSON.parse(raw).items.map((x) => x.key) : []; };
+
+      step('the reader at that chapter: nothing is chosen, and no bar of actions');
+      await go(`/library/book/${guide.id}/read?c=${chapter.id}`);
+      await words.first().waitFor();
+      assert.equal(await bar.count(), 0, 'no bar of actions before a passage is chosen');
+
+      step('a touch on the words chooses the passage: a gold ground and an underline, and a bar with Bookmark, Copy or Share named by where the passage is');
+      await words.first().scrollIntoViewIfNeeded();
+      await words.first().click();
+      await bar.waitFor();
+      const label = (await bar.getAttribute('aria-label')).replace(/^Actions for /, '');
+      assert(/^.+, passage \d+$/.test(label), `where the passage is: "${label}"`);
+      const look = await words.first().evaluate((el) => ({ bg: getComputedStyle(el).backgroundColor, line: getComputedStyle(el).textDecorationLine }));
+      assert(look.line.includes('underline'), 'the chosen passage is underlined, so that it is not the colour alone that says so');
+      assert(!/rgba\(0, 0, 0, 0\)|transparent/.test(look.bg), `the chosen passage has a ground (${look.bg})`);
+      await page.getByRole('button', { name: `Bookmark: ${label}`, exact: true }).waitFor();
+      await page.getByRole('button', { name: `Share: ${label}`, exact: true }).waitFor();
+      const barBox = await box(bar, 'the bar of actions');
+      const readerBar = await box(page.getByRole('button', { name: /^Next: / }).last(), 'Next in the bar at the bottom');
+      assert(barBox.y + barBox.height <= readerBar.y + 2, 'the bar of actions is above the bar at the bottom, not over it');
+      const height = await page.evaluate(() => window.innerHeight);
+      const under = await box(words.first(), 'the chosen passage');
+      assert(under.y + 20 < barBox.y, `the chosen passage is not hidden under the bar of actions (it starts at ${under.y}, the bar at ${barBox.y} of ${height})`);
+
+      step('a second touch lets it go, and a touch on the close button does too');
+      await words.first().click();
+      await eventually(() => bar.count(), (c) => c === 0, { what: 'the bar of actions after a second touch' });
+      await words.first().click();
+      await bar.waitFor();
+      await page.getByRole('button', { name: 'Close the passage actions', exact: true }).click();
+      await eventually(() => bar.count(), (c) => c === 0, { what: 'the bar of actions after Close' });
+
+      step('Bookmark keeps the passage in the Library\'s bookmarks, under its key; the button says so');
+      await words.first().click();
+      await bar.waitFor();
+      await page.getByRole('button', { name: `Bookmark: ${label}`, exact: true }).click();
+      await page.getByRole('button', { name: `Remove bookmark: ${label}`, exact: true }).waitFor();
+      await eventually(keptKeys, (keys) => keys.includes(key), { what: 'the key of the passage in the bookmarks kept on the phone' });
+
+      step('Bookmarks lists it under "Passages · 1", with the book, where it is and the first words');
+      await go('/library/bookmarks');
+      await page.getByText('Passages · 1', { exact: true }).waitFor();
+      const row = page.getByRole('button', { name: new RegExp(`^${esc(book.title)}, ${esc(label)}: `) });
+      await row.waitFor();
+      assert((await row.getAttribute('aria-label')).includes(first.slice(0, 30)), 'the row shows the first words of the passage');
+
+      step('a tap on the row opens the reader at that passage: the address names it, it is chosen, bookmarked and in view');
+      await row.click();
+      await eventually(() => pathOf(page), (p) => p === `/library/book/${guide.id}/read`, { what: 'the address of the reader' });
+      await eventually(() => new URL(page.url()).search, (s) => s === `?c=${chapter.id}&p=${target.i}`, { what: 'the address names the passage' });
+      await bar.waitFor();
+      assert.equal((await bar.getAttribute('aria-label')), `Actions for ${label}`, 'the passage of the address is the one that is chosen');
+      await page.getByRole('button', { name: `Remove bookmark: ${label}`, exact: true }).waitFor();
+      const at = await box(words.first(), 'the linked passage');
+      assert(at.y >= 0 && at.y < height - barBox.height, `the linked passage is in view (at ${at.y} of ${height})`);
+
+      step('Back goes to Bookmarks, and taking the bookmark off there leaves the row in its place until the screen is left');
+      await page.goBack();
+      await eventually(() => pathOf(page), (p) => p === '/library/bookmarks', { what: 'the address after Back' });
+      await row.waitFor();
+      await page.getByRole('button', { name: `Remove bookmark: ${book.title}, ${label}`, exact: true }).click();
+      await page.getByRole('button', { name: `Bookmark: ${book.title}, ${label}`, exact: true }).waitFor();
+      await row.waitFor();
+      await eventually(keptKeys, (keys) => !keys.includes(key), { what: 'the passage taken off the bookmarks kept on the phone' });
     },
   },
 ];

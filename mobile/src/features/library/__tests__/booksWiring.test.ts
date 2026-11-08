@@ -23,8 +23,8 @@ const B = (f: string) => `${DIR}/${f}`;
 const count = (src: string, re: RegExp) => (src.match(re) ?? []).length;
 
 /** The files of this feature that are mine: the screens and what they use. (catalog.ts reads the bundle that tools/build_books.py makes, and index.ts, sources.ts and notices.ts are plain data.) */
-const SCREENS = ['BookCover.tsx', 'BookPage.tsx', 'BookRows.tsx', 'BookUi.tsx', 'BooksBanner.tsx', 'BooksGrid.tsx', 'ChapterFooter.tsx', 'Reader.tsx', 'ReaderBar.tsx', 'ReaderBlocks.tsx', 'ReaderHeader.tsx'];
-const LOGIC = ['copy.ts', 'cover.ts', 'index.ts', 'notices.ts', 'readerType.ts', 'reading.ts', 'sources.ts', 'typeMetrics.ts'];
+const SCREENS = ['BookCover.tsx', 'BookPage.tsx', 'BookRows.tsx', 'BookUi.tsx', 'BooksBanner.tsx', 'BooksGrid.tsx', 'ChapterFooter.tsx', 'PassageActions.tsx', 'PassageRows.tsx', 'Reader.tsx', 'ReaderBar.tsx', 'ReaderBlocks.tsx', 'ReaderHeader.tsx'];
+const LOGIC = ['copy.ts', 'cover.ts', 'index.ts', 'notices.ts', 'passages.ts', 'readerType.ts', 'reading.ts', 'sources.ts', 'typeMetrics.ts'];
 const HOOKS = ['readingStore.ts', 'safeText.ts', 'useBooksReading.ts', 'useReaderSize.ts', 'useReadingWriter.ts'];
 const MINE = [...SCREENS, ...LOGIC, ...HOOKS];
 const ROUTES = ['app/library/book/[id]/index.tsx', 'app/library/book/[id]/read.tsx'];
@@ -311,8 +311,11 @@ check('the routes are /library/book/<id> and /library/book/<id>/read?c=<chapter>
   assert.match(route, /if \(book && chapter\) return <Redirect href=\{readerPath\(book, chapter\)\} \/>;/, '/library/book/<id>?c=<chapter> is a link to the reader');
   assert.match(route, /return <BookPage id=\{book\} \/>;/);
   const reader = src['app/library/book/[id]/read.tsx'];
-  assert.match(reader, /<Reader key=\{`\$\{typeof id === 'string' \? id : ''\}\.\$\{typeof c === 'string' \? c : ''\}`\} id=\{typeof id === 'string' \? id : ''\} chapterId=\{typeof c === 'string' && c \? c : undefined\} \/>/);
-  assert.match(code(read('src/features/library/books/copy.ts')), /export const readerPath = \(id: string, chapterId\?: string\): string => `\/library\/book\/\$\{id\}\/read\$\{chapterId \? `\?c=\$\{encodeURIComponent\(chapterId\)\}` : ''\}`;/);
+  assert.match(reader, /<Reader key=\{`\$\{typeof id === 'string' \? id : ''\}\.\$\{typeof c === 'string' \? c : ''\}\.\$\{passage \?\? ''\}`\} id=\{typeof id === 'string' \? id : ''\} chapterId=\{typeof c === 'string' && c \? c : undefined\} passage=\{passage\} \/>/);
+  assert.match(reader, /const passage = typeof c === 'string' && c \? passageParam\(p\) : undefined;/, 'a passage is named only together with a chapter');
+  const copy = code(read('src/features/library/books/copy.ts'));
+  assert.match(copy, /export const readerPath = \(id: string, chapterId\?: string, block\?: number\): string =>/, 'the reader can be opened at a passage');
+  assert.match(copy, /\/library\/book\/\$\{id\}\/read\$\{chapterId \? `\?c=\$\{encodeURIComponent\(chapterId\)\}\$\{block !== undefined && Number\.isInteger\(block\) && block >= 0 \? `&p=\$\{block\}` : ''\}` : ''\}`;/);
   assert.equal(count(layout, /library\/book\//g), 2);
 });
 
@@ -331,7 +334,7 @@ check('the reader: Previous and Next replace the screen (Back goes to where the 
   assert.match(reader, /const ready = size\.ready && writer\.ready;/, 'the words are shown once the size and the place have been read: never at one size and then another');
   assert.match(reader, /if \(!target\) return <View style=\{\{ flex: 1, backgroundColor: role\.bg \}\} \/>;/);
   assert.match(reader, /const r = resumeAt\(chapters, writer\.peek\(\)\);/, 'without a chapter in the address it opens where the person stopped, or at the start');
-  assert.match(reader, /y: startAt\(writer\.peek\(\), chapters\[i\]\.id\)/, 'a chapter opens at the line where the person was in it, when it is the saved one');
+  assert.match(reader, /y: passage !== undefined \? 0 : startAt\(writer\.peek\(\), chapters\[i\]\.id\)/, 'a chapter opens at the line where the person was in it, when it is the saved one');
   assert.match(reader, /const nav = chapterNav\(text\.chapters, index\)!;/);
 });
 
@@ -354,7 +357,7 @@ check('the reader keeps the place well: nothing is saved before the person was p
   assert.match(reader, /onContentSizeChange=\{onContentSizeChange\}/);
   assert.match(reader, /const type = useMemo\(\(\) => readerType\(size\.step\), \[size\.step\]\);/);
   assert.match(reader, /const items = useMemo\(\(\) => layoutBlocks\(chapter\.blocks\), \[chapter\]\);/, 'a chapter is made into things to draw once');
-  assert.match(reader, /<ReaderBlocks items=\{items\} t=\{type\} \/>/);
+  assert.match(reader, /<ReaderBlocks items=\{items\} t=\{type\} selected=\{selected\} choose=\{choose\} spot=\{spot\} \/>/);
   assert.match(reader, /<View accessible accessibilityRole="header" accessibilityLabel=\{chapter\.title\}/, 'one heading with the whole title, however it is split for the eye');
   assert.match(reader, /maxWidth: type\.measure/, 'a line is about 70 characters on a wide window');
   assert.match(reader, /paddingBottom: 48,/, 'the bar under the chapter has the home indicator\'s room, so the chapter needs none of its own');
@@ -397,7 +400,7 @@ check('the bar at the bottom of the reader, as on a Kindle: the thin line that i
   assert.match(bar, /style=\{\{ fontSize: 18, lineHeight: 24, textAlign: 'center' \}\}>\{bookTitle\}/, 'the title of the book is 18');
   assert.match(bar, /style=\{\{ fontSize: 14, lineHeight: 20, textAlign: 'center' \}\}>\{positionLine\(nav\)\}/, '"Chapter 7 of 40" is 14');
   const reader = src['Reader.tsx'];
-  assert.match(reader, /<\/ScrollView>\s*<ReaderBar\s+bookTitle=\{text\.title\}\s+nav=\{nav\}\s+onPrevious=\{\(\) => nav\.prev && goTo\(nav\.prev\.id\)\}\s+onNext=\{\(\) => nav\.next && goTo\(nav\.next\.id\)\}\s+progress=\{progress\}\s+\/>/, 'the bar is under the chapter, not inside the scroll: it stays');
+  assert.match(reader, /<\/ScrollView>\s*\{selected !== null && key && \(\s*<PassageActions[^]*?\/>\s*\)\}\s*<ReaderBar\s+bookTitle=\{text\.title\}\s+nav=\{nav\}\s+onPrevious=\{\(\) => nav\.prev && goTo\(nav\.prev\.id\)\}\s+onNext=\{\(\) => nav\.next && goTo\(nav\.next\.id\)\}\s+progress=\{progress\}\s+\/>/, 'the bar is under the chapter, not inside the scroll: it stays');
   assert.match(reader, /import \{ ReaderBar, type ProgressApi \} from '\.\/ReaderBar';/);
 });
 
@@ -417,6 +420,41 @@ check('the round buttons of the reader are 44 by 44 and named, a dimmed button i
   assert.match(footer, /minHeight: 64/);
   assert.match(footer, /\{last && \(\s*<View style=\{\{ gap: 12, alignItems: 'center', marginTop: 8 \}\}>\s*<AppText variant="h4" accessibilityRole="header" style=\{\{ textAlign: 'center' \}\}>\{END_OF_BOOK\}<\/AppText>\s*<AppText variant="caption" muted style=\{\{ textAlign: 'center' \}\}>\{credit\}<\/AppText>/, 'the credit line is printed at the end of the book');
   assert.match(footer, /<Step side="next" nav=\{nav\} onPress=\{onNext\} \/>\s+<Step side="previous" nav=\{nav\} onPress=\{onPrevious\} \/>/);
+});
+
+check('a passage of a chapter can be chosen, as a verse of the Bible can: a touch on its words, a pale gold ground and an underline, the bar of Bookmark, Copy and Share between the chapter and the bar at the bottom, a bookmark under its key, and an address that names it scrolls to it', () => {
+  const blocks = src['ReaderBlocks.tsx'];
+  assert.match(blocks, /const chosen = \(\) => \(\{ backgroundColor: c\.goldSoft, textDecorationLine: 'underline' as const \}\);/, 'a pale gold ground and an underline, like a verse');
+  assert.match(blocks, /on=\{selected !== null && blockOfItem\(item\.key\) === selected\}/, 'every piece of a long paragraph shows the passage that is chosen');
+  assert.match(blocks, /if \(item\.k !== 'p' \|\| !item\.cont\) spot\(/, 'a long paragraph reports where it starts once');
+  assert.equal(count(blocks, /<Words /g), 3, 'a paragraph, a quotation and a list have words that can be chosen; a heading and a break do not');
+  assert.doesNotMatch(blocks.slice(blocks.indexOf('const Heading'), blocks.indexOf('const Quotation')), /Words/, 'a heading cannot be chosen');
+  assert.doesNotMatch(blocks.slice(blocks.indexOf('const Break'), blocks.indexOf('const Block =')), /Words/, 'a break cannot be chosen');
+  const actions = src['PassageActions.tsx'];
+  assert.match(actions, /accessibilityRole="toolbar"/);
+  assert.match(actions, /accessibilityLabel=\{`Actions for \$\{label\}`\}/);
+  assert.match(actions, /icon="bookmark" filled=\{bookmarked\}/);
+  assert.match(actions, /Share\.share\(\{ message: text \}\)/);
+  assert.match(actions, /hasNativeModule\(NativeName\.clipboard\)/, 'Copy only where the phone has the module, asked for first');
+  assert.match(actions, /accessibilityLabel="Close the passage actions"/);
+  assert.match(actions, /from '\.\.\/bible\/actionBar'/, 'the bar is as big as the Bible\'s: its sizes are the same numbers');
+  assert.doesNotMatch(code(actions), /position: 'absolute'/, 'the bar takes its own room between the chapter and the bar at the bottom: nothing is hidden behind it');
+  const reader = src['Reader.tsx'];
+  assert.match(reader, /const key = selected !== null && isPassageBlock\(block\) \? passageKey\(bookId, chapter\.id, selected\) : null;/);
+  assert.match(reader, /bookmarked=\{marks\.has\(key\)\}\s+canBookmark=\{marks\.ready && parsePassageKey\(key\) !== null\}\s+onBookmark=\{\(\) => marks\.toggle\(key\)\}/, 'the bookmark is the Library\'s own, under the key of the passage');
+  assert.match(reader, /const next = chosenNow\.current === block \? null : block;/, 'a second touch lets it go');
+  assert.match(reader, /const release = useCallback\(\(\) => \{ chosenNow\.current = null; setSelected\(null\); \}, \[\]\);/, 'Close lets it go too');
+  assert.match(reader, /const ACTIONS_COVER = BAR_HEIGHT \+ 8;/, 'the room the bar of actions takes is the Bible\'s bar and the 8 under it');
+  assert.match(reader, /if \(visible > 0 && top - offset > visible - ZONE\) scroller\.current\?\.scrollTo\(/, 'a passage that would be under the bar of actions is brought up, as a verse is');
+  assert.match(reader, /passage !== undefined && isPassageBlock\(chapter\.blocks\[passage\]\) \? passage : null/, 'a passage the text does not have is no passage');
+  assert.match(reader, /scroller\.current\?\.scrollTo\(\{ y: to, animated: false \}\)/, 'a linked passage is scrolled into view once its block and the column are measured');
+  assert.match(reader, /label=\{passageLabel\(chapter, selected\)\}\s+text=\{passageShareText\(text\.title, chapter, selected\)\}/);
+  const rows = src['PassageRows.tsx'];
+  assert.match(rows, /export const passagesLabel = \(count: number\): string => `Passages · \$\{count\}`;/);
+  assert.match(rows, /accessibilityHint="Opens the book at this passage"/);
+  assert.match(rows, /<BookmarkToggle on=\{marks\.has\(r\.key\)\} title=\{`\$\{r\.bookTitle\}, \$\{r\.label\}`\} toggle=\{\(\) => marks\.toggle\(r\.key\)\} \/>/, 'the bookmark button of a row is the Library\'s, beside the row and not inside it');
+  assert.match(rows, /<AppText variant="mono" color=\{role\.accentText\}/, 'where the passage is, is mono');
+  assert.doesNotMatch(code(read('src/features/library/search.ts')), /passage/i, 'the search of the Library does not look for passages');
 });
 
 check('the words of a chapter: a heading is a heading for a screen reader, a quotation is indented with a rule and says whose words they are, a list has its bullet or number hanging in a column of its own, bold and italic are drawn, a break is for the eye only, and every size comes from the step', () => {
@@ -549,14 +587,19 @@ check('every button of the Books screens has a role, a label for a screen reader
       assert.match(around, /accessibilityRole="button"/, `${f}: a Pressable that is not a button`);
       assert.match(around, /accessibilityLabel=/, `${f}: a Pressable without a label`);
     }
-    assert.doesNotMatch(s, /\bonClick\b|<TouchableOpacity|<TouchableWithoutFeedback|<Text[^>]*onPress/, `${f}: another way to press`);
+    // the words of a passage are the one text that can be pressed (as a verse of the Bible is): a link for a screen reader, in ReaderBlocks.tsx only
+    const pressable = f === 'ReaderBlocks.tsx' ? s.replace(/<Text accessibilityRole="link" onPress=\{onChoose\} style=\{on \? chosen\(\) : undefined\}>/g, '') : s;
+    assert.doesNotMatch(pressable, /\bonClick\b|<TouchableOpacity|<TouchableWithoutFeedback|<Text[^>]*onPress/, `${f}: another way to press`);
   }
   assert.match(src['BookPage.tsx'], /minHeight: 56/);
   assert.match(src['ReaderHeader.tsx'], /minHeight: 44/);
   assert.match(src['ChapterFooter.tsx'], /minHeight: 64/);
   assert.match(src['BookRows.tsx'], /import \{ BookmarkToggle \} from '\.\.\/BookmarkToggle';/, 'the bookmark button of a row is the one of the Library, 44 by 44');
   assert.match(read('src/features/library/BookmarkToggle.tsx'), /width: 44, height: 44/);
-  for (const f of ['BooksBanner.tsx', 'BooksGrid.tsx', 'ReaderBlocks.tsx']) assert.equal(count(src[f], /<Pressable\b/g), 0, `${f} is not a button`);
+  for (const f of ['BooksBanner.tsx', 'BooksGrid.tsx']) assert.equal(count(src[f], /<Pressable\b/g), 0, `${f} is not a button`);
+  assert.equal(count(src['ReaderBlocks.tsx'], /<Text accessibilityRole="link" onPress=\{onChoose\}/g), 1, 'the words of a passage: one text, a link, that a touch chooses');
+  assert.match(src['PassageActions.tsx'], /minHeight: ACTION_MIN_HEIGHT/, 'Bookmark, Copy and Share are as high as the Bible\'s (68)');
+  assert.match(src['PassageRows.tsx'], /minHeight: 44/, 'a row of a bookmarked passage is at least 44 high');
 });
 
 check('text sizes grow with the phone, up to a cap: the running text of the reader and the contents have no fixed size, the header, the cover and the banner are held at their own limits', () => {
