@@ -3450,7 +3450,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
 
 
     <div class="phone-wrap">
-      <p class="phone-label"><b>Library · Bookmarks</b>A book, verses and an example book kept on this phone · a verse opens the reader at it · bookmarked posts</p>
+      <p class="phone-label"><b>Library · Bookmarks</b>A book, verses and an example book kept on this phone · a verse opens the reader at it · bookmarked posts · a passage of a book opens the reader at it</p>
       <div class="phone">
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
         <div class="scroll">
@@ -3473,6 +3473,10 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
             <div class="cp-card" style="padding:4px">
               <div class="lib-row lib-vrow"><div class="lib-tx" role="button" aria-label="Psalm 121:3. He will not allow your foot to be moved. He who keeps you will not slumber."><div class="vl">Psalm 121:3</div><div class="vt">He will not allow your foot to be moved. He who keeps you will not slumber.</div></div><button class="lib-mark on" aria-label="Remove bookmark: Psalm 121:3"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
               <div class="lib-row lib-vrow"><div class="lib-tx" role="button" aria-label="John 3:16. For God so loved the world, that he gave his only born Son, that whoever believes in him should not perish, but have eternal life."><div class="vl">John 3:16</div><div class="vt">For God so loved the world, that he gave his only born Son, that whoever believes in him should not perish, but have eternal life.</div></div><button class="lib-mark on" aria-label="Remove bookmark: John 3:16"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
+            </div>
+            <div class="lib-label">Passages · 1</div>
+            <div class="cp-card" style="padding:4px">
+              <div class="bk-prow"><span class="bk-pt" role="button" aria-label="The French Way, Chapter III, passage 4: Where the road begins, a short paragraph that says what the first day is like and what to carry…"><span class="bn">The French Way</span><span class="pl">Chapter III, passage 4</span><span class="px">Where the road begins, a short paragraph that says what the first day is like and what to carry…</span></span><button class="lib-mark on" aria-label="Remove bookmark: The French Way, Chapter III, passage 4"><svg class="cp-icon"><use href="#i-bookmark"/></svg></button></div>
             </div>
             <h4 class="lib-h" style="margin-top:8px">Posts</h4>
             <div class="cp-card" style="padding:16px 6px 16px 20px;display:flex;align-items:center;gap:4px">
@@ -4050,7 +4054,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
   and with no text in any book there is no pill and the banner says plainly that the texts are being checked. A cover opens the <b>book page</b>: a larger cover, the title, the author, the era, how long it is,
   the blurb, the gold button (<b>Start reading</b> or <b>Continue: Chapter 7</b>), the table of contents under its parts with the chapters read ticked and the place where you stopped marked, and the credit of the edition.
   A book with no text says <b>Not in the app yet</b> and why, and has no button. The <b>reader</b> keeps a header at the top while the chapter scrolls under it, with one row as on a Kindle: the way back to the contents and two buttons for smaller and larger text
-  (five steps, kept on the phone). At the bottom it keeps a bar: a thin line that shows how far down you are, and under it Previous and Next named by where they go (they cross the parts and are off at the first and the last chapter) with the title of the book (18) and "Chapter 7 of 40" (14) between them, on round buttons of 56. The title of the book is there and only there.
+  (five steps, kept on the phone). At the bottom it keeps a bar: a thin line that shows how far down you are, and under it Previous and Next named by where they go (they cross the parts and are off at the first and the last chapter) with the title of the book (18) and "Chapter 7 of 40" (14) between them, on round buttons of 56. The title of the book is there and only there. A touch on the words of a paragraph, a quotation or a list <b>chooses that passage</b>, as a touch on a verse does in the Bible: a gold ground and an underline, and a bar with Bookmark, Copy and Share (the Bible's size) takes its own room above the bar at the bottom (a second touch, or Close, lets it go). A bookmarked passage is kept on the phone with the other Library bookmarks and is listed in Bookmarks under <b>Passages</b>, with the book, where it is ("Chapter III, passage 4") and its first words; a tap on the row opens the reader at that passage, chosen and in view.
   The chapter is Fraunces for its title, Inter for the words (a line 1.6 times the letter, about 70 characters across on a wide window), JetBrains Mono for the numbers; at the end Next and Previous again, and one handwritten note.
   Where you stopped, the chapters you read and the size of the text stay on the phone and nothing is fetched: the books work with no signal.</p>
   <style>
@@ -4143,6 +4147,16 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
   .bk-prog { height: 4px; background: var(--cp-border); }
   .bk-prog i { display: block; height: 4px; background: var(--cp-action); }
   .phone .scroll.bk-rscroll { top: 106px; bottom: 102px; padding: 20px 20px 48px; }
+  /* a passage that is chosen: the gold ground and underline of a verse; the bar of actions (the Bible's, 138 high) takes its own room above the bar at the bottom, and the chapter has that much less */
+  .bk-rtx .on { background: var(--cp-color-gold-soft); text-decoration: underline; }
+  .phone .scroll.bk-rscroll.pa { bottom: 248px; }
+  .rd-act.dock { bottom: 110px; }
+  /* a bookmarked passage on the Bookmarks screen: the book, where it is, the first words; one button, and the bookmark beside it */
+  .bk-prow { display: flex; align-items: flex-start; gap: 6px; padding: 10px 6px 10px 12px; }
+  .bk-pt { flex: 1; min-width: 0; min-height: 44px; display: flex; flex-direction: column; gap: 4px; padding: 4px 0; }
+  .bk-pt .bn { font-family: var(--cp-font-title); font-weight: 600; font-size: 19px; line-height: 24px; }
+  .bk-pt .pl { font-family: var(--cp-font-mono); font-size: 14px; line-height: 20px; color: var(--cp-text-accent); }
+  .bk-pt .px { font-size: 15px; line-height: 21px; }
   .bk-rtx { margin: 0 auto; }
   .bk-rtx .chead { display: flex; flex-direction: column; gap: 6px; margin-bottom: 18px; }
   .bk-rtx .chead .part, .bk-rtx .chead .me { font-family: var(--cp-font-mono); color: var(--cp-text-muted); }
@@ -4405,6 +4419,66 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
         </div>
         <div class="bk-rbar">
           <div class="bk-prog" aria-hidden="true"><i style="width:96%"></i></div>
+          <div class="r2"><span class="bk-ic off" role="button" aria-label="Previous chapter. This is the first chapter"><svg class="cp-icon"><use href="#i-back"/></svg></span><span class="mid"><span class="bt">The Imitation of Christ</span><span class="ps">Chapter 1 of 114</span></span><span class="bk-ic" role="button" aria-label="Next: Chapter II. Of thinking humbly of oneself"><svg class="cp-icon"><use href="#i-chev"/></svg></span></div>
+        </div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Reader · passage chosen</b>A touch chooses a passage: a gold ground and an underline · Bookmark, Copy, Share, as big as the Bible's · the bar takes its own room above the bar at the bottom</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="bk-rhead">
+          <div class="r1"><span class="bk-back" role="button" aria-label="Contents"><svg class="cp-icon"><use href="#i-back"/></svg><span>Contents</span></span><span class="sz"><span class="a s" role="button" aria-label="Smaller text"><i>A</i></span><span class="a l" role="button" aria-label="Larger text"><i>A</i></span></span></div>
+        </div>
+        <div class="scroll bk-rscroll pa">
+          <div class="bk-rtx" style="max-width:684px">
+            <div class="chead"><div class="part" style="font-size:13px;line-height:18px">The First Book</div>
+              <div role="heading" aria-level="2" aria-label="Chapter I. Of the imitation of Christ, and of contempt of the world and all its vanities"><div class="ti" style="font-size:28px;line-height:34px">Chapter I</div><div class="su" style="font-size:18px;line-height:28px">Of the imitation of Christ, and of contempt of the world and all its vanities</div></div>
+              <div class="me" style="font-size:13px;line-height:18px">2 min · 434 words</div></div>
+            <p style="font-size:19px;line-height:30px;margin:0 0 15px">He that followeth me shall not walk in darkness, saith the Lord. These are the words of Christ; and they teach us how far we must imitate His life and character, if we seek true illumination, and deliverance from all blindness of heart. Let it be our most earnest study, therefore, to dwell upon the life of Jesus Christ.</p>
+            <p style="font-size:19px;line-height:30px;margin:0 0 15px"><span class="on">2. His teaching surpasseth all teaching of holy men, and such as have His Spirit find therein the hidden manna. But there are many who, though they frequently hear the Gospel, yet feel but little longing after it, because they have not the mind of Christ. He, therefore, that will fully and with true wisdom understand the words of Christ, let him strive to conform his whole life to that mind of Christ.</span></p>
+            <p style="font-size:19px;line-height:30px;margin:0 0 15px">3. What doth it profit thee to enter into deep discussion concerning the Holy Trinity, if thou lack humility, and be thus displeasing to the Trinity? For verily it is not deep words that make a man holy and upright; it is a good life which maketh a man dear to God. I had rather feel contrition than be skilful in the definition thereof. If thou knewest the whole Bible, and the sayings of all the philosophers, what should all this profit thee without the love and grace of God? Vanity of vanities, all is vanity, save to love God, and Him only to serve. That is the highest wisdom, to cast the world behind us, and to reach forward to the heavenly kingdom.</p>
+            <p style="font-size:19px;line-height:30px;margin:0 0 15px">4. It is vanity then to seek after, and to trust in, the riches that shall perish. It is vanity, too, to covet honours, and to lift up ourselves on high. It is vanity to follow the desires of the flesh and be led by them, for this shall bring misery at the last. It is vanity to desire a long life, and to have little care for a good life. It is vanity to take thought only for the life which now is, and not to look forward to the things which shall be hereafter. It is vanity to love that which quickly passeth away, and not to hasten where eternal joy abideth.</p>
+          </div>
+        </div>
+        <div class="rd-act dock" role="toolbar" aria-label="Actions for Chapter I, passage 2">
+          <div class="top"><span class="pl">Chapter I, passage 2</span><button class="x" aria-label="Close the passage actions"><svg class="cp-icon"><use href="#i-x"/></svg></button></div>
+          <div class="btns"><button aria-label="Bookmark: Chapter I, passage 2"><svg class="cp-icon"><use href="#i-bookmark"/></svg><span>Bookmark</span></button><button aria-label="Copy: Chapter I, passage 2"><svg class="cp-icon"><use href="#i-copy"/></svg><span>Copy</span></button><button aria-label="Share: Chapter I, passage 2"><svg class="cp-icon"><use href="#i-share"/></svg><span>Share</span></button></div>
+        </div>
+        <div class="bk-rbar">
+          <div class="bk-prog" aria-hidden="true"><i style="width:8%"></i></div>
+          <div class="r2"><span class="bk-ic off" role="button" aria-label="Previous chapter. This is the first chapter"><svg class="cp-icon"><use href="#i-back"/></svg></span><span class="mid"><span class="bt">The Imitation of Christ</span><span class="ps">Chapter 1 of 114</span></span><span class="bk-ic" role="button" aria-label="Next: Chapter II. Of thinking humbly of oneself"><svg class="cp-icon"><use href="#i-chev"/></svg></span></div>
+        </div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Reader · passage bookmarked</b>The same passage after Bookmark: the glyph is filled and the button tinted; the word stays</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="bk-rhead">
+          <div class="r1"><span class="bk-back" role="button" aria-label="Contents"><svg class="cp-icon"><use href="#i-back"/></svg><span>Contents</span></span><span class="sz"><span class="a s" role="button" aria-label="Smaller text"><i>A</i></span><span class="a l" role="button" aria-label="Larger text"><i>A</i></span></span></div>
+        </div>
+        <div class="scroll bk-rscroll pa">
+          <div class="bk-rtx" style="max-width:684px">
+            <div class="chead"><div class="part" style="font-size:13px;line-height:18px">The First Book</div>
+              <div role="heading" aria-level="2" aria-label="Chapter I. Of the imitation of Christ, and of contempt of the world and all its vanities"><div class="ti" style="font-size:28px;line-height:34px">Chapter I</div><div class="su" style="font-size:18px;line-height:28px">Of the imitation of Christ, and of contempt of the world and all its vanities</div></div>
+              <div class="me" style="font-size:13px;line-height:18px">2 min · 434 words</div></div>
+            <p style="font-size:19px;line-height:30px;margin:0 0 15px">He that followeth me shall not walk in darkness, saith the Lord. These are the words of Christ; and they teach us how far we must imitate His life and character, if we seek true illumination, and deliverance from all blindness of heart. Let it be our most earnest study, therefore, to dwell upon the life of Jesus Christ.</p>
+            <p style="font-size:19px;line-height:30px;margin:0 0 15px"><span class="on">2. His teaching surpasseth all teaching of holy men, and such as have His Spirit find therein the hidden manna. But there are many who, though they frequently hear the Gospel, yet feel but little longing after it, because they have not the mind of Christ. He, therefore, that will fully and with true wisdom understand the words of Christ, let him strive to conform his whole life to that mind of Christ.</span></p>
+            <p style="font-size:19px;line-height:30px;margin:0 0 15px">3. What doth it profit thee to enter into deep discussion concerning the Holy Trinity, if thou lack humility, and be thus displeasing to the Trinity? For verily it is not deep words that make a man holy and upright; it is a good life which maketh a man dear to God. I had rather feel contrition than be skilful in the definition thereof. If thou knewest the whole Bible, and the sayings of all the philosophers, what should all this profit thee without the love and grace of God? Vanity of vanities, all is vanity, save to love God, and Him only to serve. That is the highest wisdom, to cast the world behind us, and to reach forward to the heavenly kingdom.</p>
+            <p style="font-size:19px;line-height:30px;margin:0 0 15px">4. It is vanity then to seek after, and to trust in, the riches that shall perish. It is vanity, too, to covet honours, and to lift up ourselves on high. It is vanity to follow the desires of the flesh and be led by them, for this shall bring misery at the last. It is vanity to desire a long life, and to have little care for a good life. It is vanity to take thought only for the life which now is, and not to look forward to the things which shall be hereafter. It is vanity to love that which quickly passeth away, and not to hasten where eternal joy abideth.</p>
+          </div>
+        </div>
+        <div class="rd-act dock" role="toolbar" aria-label="Actions for Chapter I, passage 2">
+          <div class="top"><span class="pl">Chapter I, passage 2</span><button class="x" aria-label="Close the passage actions"><svg class="cp-icon"><use href="#i-x"/></svg></button></div>
+          <div class="btns"><button class="on" aria-label="Remove bookmark: Chapter I, passage 2"><svg class="cp-icon"><use href="#i-bookmark"/></svg><span>Bookmark</span></button><button aria-label="Copy: Chapter I, passage 2"><svg class="cp-icon"><use href="#i-copy"/></svg><span>Copy</span></button><button aria-label="Share: Chapter I, passage 2"><svg class="cp-icon"><use href="#i-share"/></svg><span>Share</span></button></div>
+        </div>
+        <div class="bk-rbar">
+          <div class="bk-prog" aria-hidden="true"><i style="width:8%"></i></div>
           <div class="r2"><span class="bk-ic off" role="button" aria-label="Previous chapter. This is the first chapter"><svg class="cp-icon"><use href="#i-back"/></svg></span><span class="mid"><span class="bt">The Imitation of Christ</span><span class="ps">Chapter 1 of 114</span></span><span class="bk-ic" role="button" aria-label="Next: Chapter II. Of thinking humbly of oneself"><svg class="cp-icon"><use href="#i-chev"/></svg></span></div>
         </div>
         <span class="home-ind"></span>

@@ -47,8 +47,8 @@ check('the feature is the files this test expects, so a new one is looked at (an
     `${DIR}/bible/searchCore.ts`, `${DIR}/bible/searchText.ts`,
     `${DIR}/bible/text.ts`, `${DIR}/bible/textCore.ts`, `${DIR}/bible/textTypes.ts`, `${DIR}/bible/webc.generated.ts`,
     `${DIR}/books/BookCover.tsx`, `${DIR}/books/BookPage.tsx`, `${DIR}/books/BookRows.tsx`, `${DIR}/books/BookUi.tsx`, `${DIR}/books/BooksBanner.tsx`, `${DIR}/books/BooksGrid.tsx`,
-    `${DIR}/books/ChapterFooter.tsx`, `${DIR}/books/Reader.tsx`, `${DIR}/books/ReaderBar.tsx`, `${DIR}/books/ReaderBlocks.tsx`, `${DIR}/books/ReaderHeader.tsx`,
-    `${DIR}/books/catalog.ts`, `${DIR}/books/copy.ts`, `${DIR}/books/cover.ts`, `${DIR}/books/index.ts`, `${DIR}/books/notices.ts`, `${DIR}/books/readerType.ts`, `${DIR}/books/reading.ts`,
+    `${DIR}/books/ChapterFooter.tsx`, `${DIR}/books/PassageActions.tsx`, `${DIR}/books/PassageRows.tsx`, `${DIR}/books/Reader.tsx`, `${DIR}/books/ReaderBar.tsx`, `${DIR}/books/ReaderBlocks.tsx`, `${DIR}/books/ReaderHeader.tsx`,
+    `${DIR}/books/catalog.ts`, `${DIR}/books/copy.ts`, `${DIR}/books/cover.ts`, `${DIR}/books/index.ts`, `${DIR}/books/notices.ts`, `${DIR}/books/passages.ts`, `${DIR}/books/readerType.ts`, `${DIR}/books/reading.ts`,
     `${DIR}/books/readingStore.ts`, `${DIR}/books/safeText.ts`, `${DIR}/books/sources.ts`, `${DIR}/books/typeMetrics.ts`,
     `${DIR}/books/useBooksReading.ts`, `${DIR}/books/useReaderSize.ts`, `${DIR}/books/useReadingWriter.ts`,
     `${DIR}/bookBundle.ts`,
@@ -104,7 +104,7 @@ check('what can be pressed in the feature: the bookmark button, the search field
   const pressable = featureFiles.filter((f) => /<Pressable\b/.test(code(read(f)))).map((f) => path.basename(f)).sort();
   assert.deepEqual(pressable, [
     'BookCover.tsx', 'BookGrid.tsx', 'BookPage.tsx', 'BookRows.tsx', 'BookUi.tsx', 'BookmarkToggle.tsx', 'ChapterFooter.tsx', 'ChapterGrid.tsx', 'ChapterNav.tsx', 'ContinueCard.tsx',
-    'LibraryBanner.tsx', 'LibraryTabs.tsx', 'Reader.tsx', 'ReaderHeader.tsx', 'SearchBar.tsx', 'SearchResults.tsx', 'TestamentBar.tsx', 'VerseActions.tsx', 'VerseRows.tsx',
+    'LibraryBanner.tsx', 'LibraryTabs.tsx', 'PassageActions.tsx', 'PassageRows.tsx', 'Reader.tsx', 'ReaderHeader.tsx', 'SearchBar.tsx', 'SearchResults.tsx', 'TestamentBar.tsx', 'VerseActions.tsx', 'VerseRows.tsx',
   ]);
   // the sample content never acts like real content: no data file has a handler either
   for (const f of ['sample.ts', 'bible/books.ts', 'books/catalog.ts', 'search.ts', 'bookmarks.ts']) assert.doesNotMatch(code(read(`${DIR}/${f}`)), /onPress|Pressable|onClick|=>\s*router/, f);
@@ -284,7 +284,9 @@ check('there is no Music left: not a tab, not a notice, not a group of the searc
 check('the Bookmarks screen groups the Library rows with the same component as the search (the Bible, the twelve books, the verses), says where they are kept, and says how to bookmark when nothing current is kept', () => {
   const src = code(read('app/library/bookmarks.tsx'));
   assert.match(src, /<LibraryGroups hits=\{hits\} marks=\{marks\} onOpenBook=\{\(code\) => router\.push\(bookHref\(code\)\)\} onOpenVerse=\{\(ref\) => router\.push\(readerHref\(ref\)\)\} \/>/, 'a book opens its chapters, a verse opens the reader at it');
-  assert.match(src, /hitCount\(hits\) > 0 \? \(/);
+  assert.match(src, /hitCount\(hits\) > 0 \|\| passages\.length > 0 \? \(/, 'the group of a book\'s passages counts too: nothing is "empty" while a passage is kept');
+  assert.match(src, /const passages = useMemo\(\(\) => passageRowsForKeys\(marks\.shown, safeText\), \[marks\.shown\]\);/, 'the passages are read from the text of the app, for the list the screen had when it came into view');
+  assert.match(src, /<PassageRows rows=\{passages\} marks=\{marks\} onOpen=\{\(r\) => router\.push\(readerPath\(r\.bookId, r\.chapterId, r\.block\)\)\} \/>/, 'a passage opens the reader at it');
   assert.match(src, /<AppText variant="caption" muted>\{BOOKMARKS_KEPT\}<\/AppText>/, 'where they are kept, said once');
   assert.doesNotMatch(src, /SampleNotice|BOOKMARKS_NOTICE|hasBookText/, 'no notice about books: every book kept here is in the app');
   assert.match(src, /LIBRARY_BOOKMARKS_EMPTY/);

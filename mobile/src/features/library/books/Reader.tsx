@@ -1,16 +1,20 @@
-import { ComponentRef, useCallback, useEffect, useMemo, useRef } from 'react';
+import { ComponentRef, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { LayoutChangeEvent, NativeScrollEvent, NativeSyntheticEvent, ScrollView, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { AppText } from '@/components/AppText';
 import { role } from '@/theme';
+import { useLibraryBookmarks } from '../useLibraryBookmarks';
 import { BookPage } from './BookPage';
 import { ChapterFooter } from './ChapterFooter';
+import { PassageActions } from './PassageActions';
 import { ReaderBar, type ProgressApi } from './ReaderBar';
 import { ReaderBlocks } from './ReaderBlocks';
 import { ReaderHeader } from './ReaderHeader';
 import type { BookContent } from './index';
 import { bookById } from './catalog';
 import { NO_CHAPTER_TEXT, bookPath, readerPath } from './copy';
+import { BAR_HEIGHT } from '../bible/actionBar';
+import { isPassageBlock, parsePassageKey, passageKey, passageLabel, passageShareText } from './passages';
 import { LONG_LABEL, chapterIndex, chapterNav, chapterWords, groupThousands, isRead, layoutBlocks, offsetFor, partName, readingTime, resumeAt, scrollProgress, splitTitle, startAt } from './reading';
 import { readerType } from './readerType';
 import { safeText } from './safeText';
@@ -31,11 +35,20 @@ import { useReadingWriter, type ReadingWriter } from './useReadingWriter';
 // Previous and Next replace this screen, so Back still goes to where the reader came from (the contents, the Books tab) and not through every chapter read; the
 // way back to the contents is one tap on "Contents". The scroll is one ScrollView: a chapter is drawn once, and while it scrolls only the thin line is drawn again.
 
-type ViewProps = { bookId: string; text: BookContent; index: number; startY: number; size: ReaderSize; writer: ReadingWriter };
+/** How far under the top of the scroll a passage that was linked to comes to rest. */
+const SCROLL_MARGIN = 24;
+/** The room the bar of actions takes at the bottom of the reader while it is up: the bar (the Bible's, actionBar.ts) and the 8 under it. */
+const ACTIONS_COVER = BAR_HEIGHT + 8;
+/** A passage that starts less than this far above the bar of actions, or lower, is brought up; it comes to rest this far down the part of the scroll that stays visible. */
+const ZONE = 96;
+const ANCHOR = 0.3;
+
+type ViewProps = { bookId: string; text: BookContent; index: number; startY: number; passage?: number; size: ReaderSize; writer: ReadingWriter };
 
 /** One chapter on the screen. Made again for another chapter (the screen gives it a key), so every number it keeps is the chapter's own. */
-function ChapterView({ bookId, text, index, startY, size, writer }: ViewProps) {
+function ChapterView({ bookId, text, index, startY, passage, size, writer }: ViewProps) {
   const router = useRouter();
+  const marks = useLibraryBookmarks();
   const chapter = text.chapters[index];
   const nav = chapterNav(text.chapters, index)!;
   const type = useMemo(() => readerType(size.step), [size.step]);
@@ -98,8 +111,47 @@ function ChapterView({ bookId, text, index, startY, size, writer }: ViewProps) {
   const onLayout = useCallback((e: LayoutChangeEvent) => { box.current.viewport = e.nativeEvent.layout.height; place(); }, [place]);
   const onContentSizeChange = useCallback((_w: number, h: number) => { box.current.content = h; place(); }, [place]);
 
+  // The passage that is chosen (the index of its block, or null): by a touch, or by an address that names it (?p=12), which is then scrolled into view once its block and
+  // the column of words are both measured. A passage the text does not have is no passage: nothing is chosen.
+  const linked = useMemo(() => (passage !== undefined && isPassageBlock(chapter.blocks[passage]) ? passage : null), [chapter, passage]);
+  const [selected, setSelected] = useState<number | null>(linked);
+  const spots = useRef({ column: null as number | null, words: null as number | null, blocks: new Map<number, number>() });
+  const chosenNow = useRef<number | null>(linked);
+  const choose = useCallback((block: number) => {
+    const next = chosenNow.current === block ? null : block;
+    chosenNow.current = next;
+    setSelected(next);
+    if (next === null) return;
+    // The bar of actions takes room at the bottom while it is up: a passage that would be under it is brought up, as the Bible does for a verse.
+    const s = spots.current;
+    const y = s.blocks.get(next);
+    if (y === undefined || s.column === null || s.words === null) return;
+    const { viewport, offset } = box.current;
+    const visible = viewport - ACTIONS_COVER;
+    const top = s.column + s.words + y;
+    if (visible > 0 && top - offset > visible - ZONE) scroller.current?.scrollTo({ y: Math.max(0, Math.round(top - ANCHOR * visible)), animated: true });
+  }, []);
+  const release = useCallback(() => { chosenNow.current = null; setSelected(null); }, []);
+  const waiting = useRef<number | null>(linked);
+  const reveal = useCallback(() => {
+    const want = waiting.current;
+    if (want === null) return;
+    const s = spots.current;
+    const y = s.blocks.get(want);
+    if (y === undefined || s.column === null || s.words === null) return;
+    waiting.current = null;
+    const to = Math.max(0, s.column + s.words + y - SCROLL_MARGIN);
+    scroller.current?.scrollTo({ y: to, animated: false });
+    box.current.offset = to;
+    apply();
+  }, [apply]);
+  const spot = useCallback((block: number, y: number) => { spots.current.blocks.set(block, y); reveal(); }, [reveal]);
+
   const goTo = useCallback((id: string) => router.replace(readerPath(bookId, id)), [router, bookId]);
   const contents = useCallback(() => router.dismissTo(bookPath(bookId)), [router, bookId]);
+
+  const block = selected !== null ? chapter.blocks[selected] : undefined;
+  const key = selected !== null && isPassageBlock(block) ? passageKey(bookId, chapter.id, selected) : null;
 
   return (
     <View style={{ flex: 1, backgroundColor: role.bg }}>
@@ -120,7 +172,7 @@ function ChapterView({ bookId, text, index, startY, size, writer }: ViewProps) {
         style={{ flex: 1 }}
         contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 20, paddingBottom: 48, alignItems: 'center' }}
       >
-        <View style={{ width: '100%', maxWidth: type.measure }}>
+        <View onLayout={(e) => { spots.current.column = e.nativeEvent.layout.y; reveal(); }} style={{ width: '100%', maxWidth: type.measure }}>
           <View style={{ gap: 6, marginBottom: Math.round(type.gap * 1.2) }}>
             {!!chapter.part && (
               <AppText variant="mono" muted maxFontSizeMultiplier={type.meta.maxMultiplier} style={{ fontSize: type.meta.size, lineHeight: type.meta.lineHeight, textTransform: 'uppercase', letterSpacing: 1.5 }}>{partName(chapter.part)}</AppText>
@@ -132,7 +184,9 @@ function ChapterView({ bookId, text, index, startY, size, writer }: ViewProps) {
             </View>
             <AppText variant="mono" muted maxFontSizeMultiplier={type.meta.maxMultiplier} style={{ fontSize: type.meta.size, lineHeight: type.meta.lineHeight }}>{`${readingTime(words)} · ${groupThousands(words)} words`}</AppText>
           </View>
-          <ReaderBlocks items={items} t={type} />
+          <View onLayout={(e) => { spots.current.words = e.nativeEvent.layout.y; reveal(); }}>
+            <ReaderBlocks items={items} t={type} selected={selected} choose={choose} spot={spot} />
+          </View>
           <ChapterFooter
             nav={nav}
             credit={text.credit}
@@ -142,6 +196,16 @@ function ChapterView({ bookId, text, index, startY, size, writer }: ViewProps) {
           />
         </View>
       </ScrollView>
+      {selected !== null && key && (
+        <PassageActions
+          label={passageLabel(chapter, selected)}
+          text={passageShareText(text.title, chapter, selected)}
+          bookmarked={marks.has(key)}
+          canBookmark={marks.ready && parsePassageKey(key) !== null}
+          onBookmark={() => marks.toggle(key)}
+          onClose={release}
+        />
+      )}
       <ReaderBar
         bookTitle={text.title}
         nav={nav}
@@ -154,7 +218,7 @@ function ChapterView({ bookId, text, index, startY, size, writer }: ViewProps) {
 }
 
 /** Reads what the reader needs from the phone (the text size, the place in the book) and then shows the chapter. Until then it shows only the page. */
-function Chapter({ bookId, text, chapterId }: { bookId: string; text: BookContent; chapterId?: string }) {
+function Chapter({ bookId, text, chapterId, passage }: { bookId: string; text: BookContent; chapterId?: string; passage?: number }) {
   const size = useReaderSize();
   const writer = useReadingWriter(bookId);
   const ready = size.ready && writer.ready;
@@ -163,24 +227,25 @@ function Chapter({ bookId, text, chapterId }: { bookId: string; text: BookConten
     if (!ready) return null;
     if (chapterId) {
       const i = chapterIndex(chapters, chapterId);
-      return i < 0 ? ({ missing: true } as const) : ({ missing: false, index: i, y: startAt(writer.peek(), chapters[i].id) } as const);
+      // a link that names a passage opens at that passage, not at the line where the person stopped in this chapter
+      return i < 0 ? ({ missing: true } as const) : ({ missing: false, index: i, y: passage !== undefined ? 0 : startAt(writer.peek(), chapters[i].id) } as const);
     }
     const r = resumeAt(chapters, writer.peek());
     return { missing: false, index: r.index, y: r.y } as const;
     // The place is read once, when the reader is ready or the address changes: a save made while reading must not move the chapter under the person,
     // so `writer` is not a dependency (it is the same functions each time, and `peek` always reads the latest place).
-  }, [ready, chapterId, chapters]);
+  }, [ready, chapterId, passage, chapters]);
   if (!target) return <View style={{ flex: 1, backgroundColor: role.bg }} />;
   if (target.missing) return <BookPage id={bookId} notice={NO_CHAPTER_TEXT} />;
-  return <ChapterView key={chapters[target.index].id} bookId={bookId} text={text} index={target.index} startY={target.y} size={size} writer={writer} />;
+  return <ChapterView key={chapters[target.index].id} bookId={bookId} text={text} index={target.index} startY={target.y} passage={chapterId ? passage : undefined} size={size} writer={writer} />;
 }
 
 /**
  * The reader of a book at a chapter (`chapterId`, from the address) or where the person was. A book that is not one of the twelve, or has no text, or whose text
  * cannot be read, shows its page instead (which says so); a chapter the text does not have shows the page with a sentence that says so.
  */
-export function Reader({ id, chapterId }: { id: string; chapterId?: string }) {
+export function Reader({ id, chapterId, passage }: { id: string; chapterId?: string; passage?: number }) {
   const text = useMemo(() => (bookById(id) ? safeText(id) : null), [id]);
   if (!text || text.chapters.length === 0) return <BookPage id={id} />;
-  return <Chapter bookId={id} text={text} chapterId={chapterId} />;
+  return <Chapter bookId={id} text={text} chapterId={chapterId} passage={passage} />;
 }
