@@ -108,7 +108,7 @@ class Standard(unittest.TestCase):
         self.assertEqual(std.icon_sizes, [18, 20, 24, 28, 32], "the icon scale is 18, 20, 24, 28, 32")
         self.assertEqual(std.touch_hard, 48)
         self.assertEqual(std.touch_primary, 56)
-        self.assertEqual(std.smallest_font, 15)
+        self.assertEqual(std.smallest_font, min(t["size"] for t in TOKENS["text"].values()), "the smallest text size is the smallest token, not a number written in the scanner")
 
     def test_a_scale_changed_in_tokens_json_changes_the_verdict(self):
         body = tsx("<View style={{ padding: 6, gap: 4 }} />", "<Icon name='pin' size={22} />")
