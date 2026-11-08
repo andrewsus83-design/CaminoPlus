@@ -105,11 +105,37 @@ class Parser(unittest.TestCase):
         self.assertEqual(bk.format_minutes(180), "3 h")
 
 
+STANDARD_CHAPTER = f"# Welcome\n\n{cb.STANDARD_WELCOME}\n\n{cb.STANDARD_PURPOSE}\n"
+
+
 class Guide(unittest.TestCase):
-    def check(self, chapters, meta=None, facts=FACTS):
+    def check(self, chapters, meta=None, facts=FACTS, standard=True):
+        """Check a guide. The two standard sentences are added in a chapter of their own unless the test is about them."""
+        if standard:
+            chapters = {**chapters, "98-standard.md": STANDARD_CHAPTER}
         with tempfile.TemporaryDirectory() as t:
             d = write_book(pathlib.Path(t) / "books", meta or guide_meta(), chapters, facts)
             return cb.check_book(d)
+
+    def test_the_two_standard_sentences_are_required_word_for_word(self):
+        errors = "\n".join(self.check({"00-a.md": "# A\n\nx\n"}, standard=False).errors)
+        self.assertIn("the standard sentence of the welcome is missing", errors)
+        self.assertIn("the standard sentence of the Compostela rule is missing", errors)
+        curly = STANDARD_CHAPTER.replace('"', "“", 1).replace('" If', "” If").replace("'", "’")
+        self.assertEqual(self.check({"00-a.md": curly}, standard=False).errors, [])      # quote marks do not matter
+        changed = STANDARD_CHAPTER.replace("has not walked the road", "has walked the road")
+        self.assertIn("standard sentence of the welcome", "\n".join(self.check({"00-a.md": changed}, standard=False).errors))
+
+    def test_a_passport_in_any_app_is_not_only_a_keepsake(self):
+        loose = "# A\n\nA passport in any app is a keepsake until the Office says otherwise.\n"
+        self.assertIn("a passport in any app is", "\n".join(self.check({"00-a.md": loose}).errors).lower())
+        fine = "# A\n\nA passport in CaminoPlus, or in any app other than the Office's own digital credential, is a keepsake until the Office says otherwise.\n"
+        self.assertEqual(self.check({"00-a.md": fine}).errors, [])
+
+    def test_the_standard_sentences_in_the_checker_are_the_ones_of_shared_facts(self):
+        text = cb._strict((TOOLS.parent / "books" / "shared-facts.md").read_text(encoding="utf-8").replace("*", ""))
+        self.assertIn(cb._strict(cb.STANDARD_WELCOME), text)
+        self.assertIn(cb._strict(cb.STANDARD_PURPOSE), text)
 
     def test_a_clean_guide_has_no_errors(self):
         rep = self.check({"00-welcome.md": "# Welcome\n\nA walk of ~120 km, in a calm voice.\n"})

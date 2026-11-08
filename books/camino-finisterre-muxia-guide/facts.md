@@ -213,3 +213,7 @@ A windproof layer and a warm layer for the cape; a head torch; a bag for your bo
 - Any hostel name, bed count, price, opening hour, phone number or coordinate: left out by the rules.
 - The sub-section lengths of the Xunta's second stage (they are filled by script on the Xunta page and were not readable) and the heights of the cape beyond the lighthouse figure.
 - The Xunta's own Fisterra route page gives "Fisterra is 89 kilometres away and Muxia 87" while its stages add up to ~90 km and ~87.9 km; the book says the sources differ by a kilometre or two.
+
+| Fact | Value | Source | Checked |
+|---|---|---|---|
+| The purpose of the Compostela in the Office's own words, as the standard sentence (added to the chapter "The way in brief"; the book still says this is not a Compostela route) | as stated | books/shared-facts.md; Pilgrim's Office, pages on the Compostela and the credencial, read 8 November 2026 | yes |

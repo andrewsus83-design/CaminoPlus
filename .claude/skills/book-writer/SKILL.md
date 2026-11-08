@@ -10,7 +10,7 @@ You write books that pilgrims read on a phone, often offline, at the end of a wa
 
 | Kind | Length | What it is | Spec |
 |---|---|---|---|
-| `guide` | 9,000 to 12,000 words (hard maximum 12,000) | A practical and human guidebook to one Camino route | [`reference/guidebook.md`](reference/guidebook.md) |
+| `guide` | aim for 9,000 to 12,000 words; the checker warns below 7,000 (a short route is not padded) and fails above 12,000 | A practical and human guidebook to one Camino route | [`reference/guidebook.md`](reference/guidebook.md) |
 | `reflection` | 3 to 21 days, each a 5-minute morning reading and a 3-minute end-of-day reflection; never more than 3 hours (39,000 words) | A famous public-domain book walked in short days, for a Camino of fitting length: a verbatim passage, an original reflection, a prompt for the walk, an evening reflection with its questions, a short prayer | [`reference/reflection.md`](reference/reflection.md) |
 
 Read the spec of the kind you are writing **before** you write a word. Read [`reference/voice-and-honesty.md`](reference/voice-and-honesty.md)
@@ -34,7 +34,7 @@ you do not know. That is also the best service to the person who will walk with 
 ```
 books/
   series.json               shared publisher facts (publisher, rights, AI disclosure)
-  series.md                 the plan: all 20 books, order, days, Camino pairing, sources
+  series.md                 the plan: all 26 books, order, days, Camino pairing, sources
   shared-facts.md           facts several guides repeat (the Compostela rule), verified once; state them as this file does
   <book-id>/
     book.json               metadata (schema below)
@@ -113,7 +113,7 @@ per classic, which is what the checker verifies every quote against:
 - Your report to the person says: the word count and reading time, what you could not verify and left out, and anything they
   must decide (for example a claim you could not source).
 
-## Running a batch of books (the lessons of the first twenty)
+## Running a batch of books (the lessons of the first twenty-six)
 
 Writing many books at once works if the batch itself is controlled. What went wrong or nearly wrong, and the rule that prevents it:
 
@@ -128,3 +128,9 @@ Writing many books at once works if the batch itself is controlled. What went wr
 6. **Merge by squash, from a branch that holds only what is ready.** Before a merge, `git fetch` and look at what `main` and the other branches are doing: parts of the app may have been rebuilt by someone else in the
    meantime (the Library was), and content that does not touch the app can merge safely while app changes wait for a decision.
 7. **Count by running the checker, never from memory.** Twice in this project a count of finished books was wrong because it was remembered.
+8. **A new rule is run on the old books too.** The second batch's writers asked for a check of the two standard sentences; once it existed it found two books of the first batch that lacked one, and a loose sentence about
+   "a passport in any app" in seven. Every new rule goes into `check_books.py` with a test, and the whole library is checked with it before the merge.
+9. **When books are added, the numbers move.** A new book takes an `order`, and every book after it moves: change `plan.json` and each `book.json` together (a script, not by hand), then run `check_series.py`.
+   Two books with the same order, or a `book.json` that disagrees with the plan, fail the gate.
+10. **Read every report; the writers find mistakes in the brief and in the app.** Of six guides, four corrected the brief (where a road joins another, which pass it crosses, how many stages) and one found a wrong line in the app.
+   A correction goes into the book as the sources give it, and what cannot be verified goes to the person who checks the facts (`books/series.md`, "For whoever checks the facts").

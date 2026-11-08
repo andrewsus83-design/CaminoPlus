@@ -1,0 +1,26 @@
+{
+  "id": "camino-de-madrid-guide",
+  "kind": "guide",
+  "order": 12,
+  "title": "The Road from Madrid",
+  "subtitle": "A Pilgrim's Guide to the Camino de Madrid",
+  "route_slug": "camino-de-madrid",
+  "description_short": "An honest guide to the Camino de Madrid: thirteen walking days from the capital over the Sierra de Guadarrama and across Castile to Sahagún, where it joins the Camino Francés.",
+  "description_long": "The Camino de Madrid is about 320 km from the capital of Spain, over the granite Sierra de Guadarrama by a Roman road, through Segovia and the pine woods of Castile, and across the wheat plains of the Tierra de Campos to Sahagún, where it joins the Camino Francés. It is a young pilgrim road, marked in the 1990s on very old tracks, and it is quiet.\n\nThis guide is written for the Planner first and the Walker's evenings second. It is plain about what the road asks: one stiff climb of about 650 m to the Puerto de la Fuenfría, a day of about 31 km with no village on it, long open stretches in the heat, and sand in the pine woods. It helps you decide whether a quiet road is your Camino, shape the walk, pack, and know what to check locally. It states the Pilgrim's Office rules for the Compostela as the Office writes them, and says plainly that this road ends at Sahagún and the Camino Francés carries on to Santiago.\n\nYou will find the walk in thirteen days in three landscapes, the sierra, the pine country and the plains, with the choices the road offers (the snow alternative over the sierra, the detour to Valladolid, other ways to split the days); chapters on when to go, on sleeping, eating and resting, on body, weather and safety, on the inner side of walking, and on arriving and going home.\n\nEvery distance is marked approximate, and the book says where its sources differ, which on this road is often. It names no hostels, cafes or prices, because they change; it sends you to the CaminoPlus app and to local information for the live answer. Its facts come from named public sources, which the book credits.",
+  "keywords": [
+    "Camino de Madrid",
+    "Camino de Santiago",
+    "Madrid to Sahagun",
+    "pilgrim guidebook",
+    "Sierra de Guadarrama",
+    "Segovia walking",
+    "Compostela"
+  ],
+  "categories": [
+    "Travel / Special Interest / Pilgrimages",
+    "Travel / Europe / Spain"
+  ],
+  "cover": { "colour": "sand300", "icon": "library" },
+  "version": "1.0.0",
+  "date": "2026-11"
+}
