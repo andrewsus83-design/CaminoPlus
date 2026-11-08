@@ -20,7 +20,7 @@ Then he is lifted from his bed and laid, at his own request, on the bare ground.
 
 The last stretch of the passage is quiet. The brothers stand round him in their brown habits, and in "a sudden stillness" they look like bronze statues. The great heart stops. It was a heart, Chesterton says in the sentence that closes the scene, "that had not broken till it held the world".
 
-The song comes into this, though not in these lines. In the first chapter Chesterton remarks that the famous song of praise, the one that names the sun and the earth, "ends almost with the words 'Praised be God for our Sister, the death of the body.'" So the song's closing praise goes to death, and calls it a sister. It is one of the strangest and most beautiful things in the story, and it should not be tidied.
+The song comes into this, though not in these lines. In the first chapter Chesterton remarks that the famous song of praise, the one that names the sun and the earth, ends almost with the words "Praised be God for our Sister, the death of the body." So the song's closing praise goes to death, and calls it a sister. It is one of the strangest and most beautiful things in the story, and it should not be tidied.
 
 It also has to be said, honestly, that for a great many people death is not a sister. It is a loss, and some who walk the Camino carry it with them. Chesterton does not pretend otherwise on this page. He writes of the long day wearing on, and of how "that great darkness descended in which we all lost a friend". A reader who has lost someone is not asked to feel brotherly about it today. Nobody should be hurried into praise.
 

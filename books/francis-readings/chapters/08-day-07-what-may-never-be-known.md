@@ -26,7 +26,7 @@ You may take the story as a miracle, or as a mystery, or as a tale you cannot ju
 
 Now say where it is hard. In this chapter Chesterton tells us that a refrain ran through Francis's days: "I have not suffered enough; I have not sacrificed enough." He "wandered about the valleys of the world looking for the hill that has the outline of a skull." Nothing here asks you to want pain. A blister is not a sacrifice to be hoarded, and an aching knee is not a gift to be sought. If you are walking with pain today, your own or someone else's, this reading asks only that you be gentle.
 
-What can it ask of an ordinary day, then? Something much smaller than a vision: to let one thing stay unexplained. Almost every walker meets a thing like that. A feeling that arrives on a hill and does not fit anywhere. A grief that is not for any reason you can name. A joy with no cause. The habit of the mind is to explain it at once, to file it, to turn it into a sentence for a post. Chesterton's habit, here, is to wait. "May never be known" is a perfectly good place to stand.
+What can it ask of an ordinary day, then? Something much smaller than a vision: to let one thing stay unexplained. Almost every walker meets a thing like that. A feeling that arrives on a hill and does not fit anywhere. A grief that is not for any reason you can name. A joy with no cause. The habit of the mind is to explain it at once, to file it, to turn it into a sentence for a post. Chesterton's habit, here, is to wait. Where something "may never be known", there is still a perfectly good place to stand.
 
 ## For the walk
 

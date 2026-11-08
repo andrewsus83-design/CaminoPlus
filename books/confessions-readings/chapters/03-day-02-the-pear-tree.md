@@ -22,7 +22,7 @@ What troubles him, decades later, is that there was no reason. People do wrong f
 
 The line the whole day hangs on comes last: *but when it is said, "Let's go, let's do it," we are ashamed not to be shameless.* It is not wickedness that moves the lads, as he sees it. It is embarrassment. Nobody wants to be the one who says no.
 
-There are two honest doubts to set beside this. The first is proportion. To most readers now, a night of stolen fruit by teenage boys is small stuff, and the weight Augustine gives it can look out of scale. Much of the second book is built on it. He seems to choose a small wrong on purpose, one with no excuse of hunger or gain, so that he can look at something in himself without anything else in the way. You do not have to share his verdict to find his observation sound.
+Two doubts belong beside this. The first is proportion. To most readers now, a night of stolen fruit by teenage boys is small stuff, and the weight Augustine gives it can look out of scale. Much of the second book is built on it. He seems to choose a small wrong on purpose, one with no excuse of hunger or gain, so that he can look at something in himself without anything else in the way. You do not have to share his verdict to find his observation sound.
 
 The second doubt is about who is speaking. The boy is seen by a bishop in his forties, who has had a long time to be hard on him. He is both the only witness and the prosecutor. Take the story as one man's portrait of himself, told in his own severe light, and hold the severity a little loosely.
 

@@ -20,7 +20,7 @@ Love yourself, he says, "because he has a nature capable of good", but not "the 
 
 A little earlier in the same section, he puts the whole thing as a picture of a king who has lost his crown. Our weaknesses, he says, "are the infirmities of a great lord, of a discrowned king." And near it: "A tree does not know that it is miserable." A tired pilgrim in a bunk does not feel royal. The point is that you feel your smallness as a loss, and a loss implies something that was owed. The ache to be better is the evidence.
 
-He is just as fair to the people who write about all this. A little later he says: "I blame equally those who take on themselves to praise man, those who take on themselves to blame him, and those who merely amuse themselves; I can approve those only who seek with tears." The flatterer, the scold and the cynic all get the same mild reproach. The only person he approves is the one who is looking for something and is troubled that it is not found. That is a useful standard for how to talk to yourself on a bad hill.
+He is just as fair to the people who write about all this. A little later he says: "I blame equally those who take on themselves to praise man, those who take on themselves to blame him, and those who merely amuse themselves; I can approve those only who seek with tears." The flatterer, the scold and the cynic are all blamed alike. The only person he approves is the one who is looking for something and is troubled that it is not found. That is a useful standard for how to talk to yourself on a bad hill.
 
 There are things to be careful with.
 

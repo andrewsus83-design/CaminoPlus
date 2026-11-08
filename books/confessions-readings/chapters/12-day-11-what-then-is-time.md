@@ -24,7 +24,7 @@ Where does that leave a walker, with eleven minutes on the watch and the afterno
 
 It is worth noticing that the book in your hand is itself an example. Nine books of memory, and then a prayer that leans forward into what is not yet known: Augustine's own mind, stretched across time as he writes. He does not say so here. The passage is only the place where he stops, in the middle of a prayer, to ask how such a thing is possible at all.
 
-There are two honest difficulties. This is a place where a reader may lose patience. It is a puzzle about words, and a reader may well wonder what it has to do with a Camino. Fair. You can hold it lightly. The second is that it will not shorten a single afternoon. A philosopher's argument does not lengthen the daylight.
+Two difficulties, then. This is a place where a reader may lose patience. It is a puzzle about words, and a reader may well wonder what it has to do with a Camino. Fair. You can hold it lightly. The second is that it will not shorten a single afternoon. A philosopher's argument does not lengthen the daylight.
 
 What it can do is smaller, and it is not Augustine's claim but a use that a walker might make of it. If the present is never all there at once, and only the moment you are in is real, then an unbearable hour is not an hour at all. It is only this step, and this breath, followed by another. The hill is long. The step is short. You may find that this is a comfort at four in the afternoon, and you may find that it is not. It costs nothing to try.
 

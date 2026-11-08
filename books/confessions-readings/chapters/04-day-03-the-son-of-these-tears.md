@@ -24,7 +24,7 @@ There are two places where this is hard. The first is the advice itself. *Let hi
 
 The second is the last sentence. Augustine tells the story long after it ended well. He knows the result, and so the bishop's words come to him as a prophecy. Not every story ends that way, and a mother's tears are love, not a guarantee. If you are carrying someone whose road has not turned, the line may sting. Take it as the comfort it was to her on that day, and not as a promise anyone can be held to.
 
-What does it ask of an ordinary day? If you are the worried one, perhaps one small release: to do what you can, which may only be a kind message that asks for nothing, and then to let the person be, for a while. If you are the one being worried about, the story offers something too. Somewhere behind you, someone has been weeping for you without making a sound you can hear. You do not have to repay it today. You could let them know that you are well.
+What does that leave for today? If you are the worried one, perhaps one small release: to do what you can, which may only be a kind message that asks for nothing, and then to let the person be, for a while. If you are the one being worried about, the story offers something too. Somewhere behind you, someone has been weeping for you without making a sound you can hear. You do not have to repay it today. You could let them know that you are well.
 
 ## For the walk
 

@@ -32,7 +32,7 @@ What does it ask of an ordinary day? To lean, and to be leant on. To take the sh
 ## For the walk
 
 - Whose good luck do I find hard to watch today?
-- When envy twitches, give that person one silent good wish, in a sentence of your own, and mean it as much as you can. If you are able, do something small for someone: hold a gate, share a map, pass the water. Notice whether the twitch has gone.
+- When envy twitches, give that person one silent good wish, in a sentence of your own, and mean it as much as you can. If you are able, do something small for someone: hold a gate, share a map, pass the water. Notice whether the twitch has gone, and do it again the next time it comes.
 
 ## At the end of the day
 

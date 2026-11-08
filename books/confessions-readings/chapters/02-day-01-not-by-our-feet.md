@@ -24,7 +24,7 @@ It stings to read that on the first day of a walk of about 320 km. If distance i
 
 Where is the passage hard? Perhaps in its very first word of address. A reader who does not believe in a God to whom things can be said may feel shut out on the first page. The invitation is modest. Listen as you would to someone praying quietly in the next bunk. You need not join in. You can still hear what it sounds like to want something that much.
 
-What does it ask of an ordinary day? Something small. To bring the restlessness along instead of hiding it. To stop calling it a bad mood, and ask what it is reaching for. Over the coming days it will turn out to be reaching for a good deal: a crowd's approval, a lost friend, a clever teacher, a quiet window. For today it is enough to notice that it is there, and that you set out with it.
+What might this change on an ordinary day? Something small. To bring the restlessness along instead of hiding it. To stop calling it a bad mood, and ask what it is reaching for. Over the coming days it will turn out to be reaching for a good deal: a crowd's approval, a lost friend, a clever teacher, a quiet window. For today it is enough to notice that it is there, and that you set out with it.
 
 ## For the walk
 

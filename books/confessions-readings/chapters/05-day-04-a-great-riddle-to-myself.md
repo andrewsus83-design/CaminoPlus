@@ -24,9 +24,9 @@ In the second stretch he looks for rest, and the verb he uses will mean somethin
 
 So, in the last stretch, he does what a good many people have done. *And yet I fled out of my country; for so should mine eyes less look for him, where they were not wont to see him.* He left for Carthage. Before that, though, comes the question that is the best thing in the passage: *For whither should my heart flee from my heart?* You cannot walk away from the one who is walking. In the pages that follow, time and other friends patch him up, little by little, and the sorrow turns out not to have ended. It only changed its place.
 
-The honest doubts are these. The passage offers no consolation, and you will not find one in it. Augustine finds an answer of his own a few pages later, and it belongs to his faith. It need not be handed to anyone today. And a walk will not mend every sorrow. If what you carry is heavier than a road can lighten, tell somebody: a friend, a doctor, a counsellor, a helpline in your own country. In Spain, 112 is the emergency number for anything that cannot wait.
+Two limits are worth stating. The passage offers no consolation, and you will not find one in it. Augustine finds an answer of his own a few pages later, and it belongs to his faith. It need not be handed to anyone today. And a walk will not mend every sorrow. If what you carry is heavier than a road can lighten, tell somebody: a friend, a doctor, a counsellor, a helpline in your own country. In Spain, 112 is the emergency number for anything that cannot wait.
 
-What does it ask of an ordinary day? Very little. It gives leave to be a riddle to yourself. It gives leave to cry, and equally leave not to, if the tears do not come. And it suggests a small change in the way you walk with the weight. Not to flee, which he tried, and not to wrestle, but to let it walk beside you, and to put it down, now and then, on a bench.
+What is an ordinary day to do with all this? Very little. It gives leave to be a riddle to yourself. It gives leave to cry, and equally leave not to, if the tears do not come. And it suggests a small change in the way you walk with the weight. Not to flee, which he tried, and not to wrestle, but to let it walk beside you, and to put it down, now and then, on a bench.
 
 ## For the walk
 
@@ -43,7 +43,7 @@ Think of the places in the day that had a gap in them, like the doors in the pas
 
 Think also of what was good, because grief is not the whole of any day. A mouthful of something hot. A kindness that arrived from nowhere. A moment in which you forgot, and then remembered, and found you could bear the remembering. If a good moment feels like a betrayal of the one you miss, you may have it anyway. In the very next paragraph after the first stretch, Augustine says that *time hath assuaged my wound*, a sentence written from the far side of the sorrow, and you are allowed to arrive at it in your own time.
 
-Tiredness, honestly. Grief is hard work, and it is the sort of work that does not show on a map. If you are more worn out tonight than the distance can explain, this is why. Be gentle with yourself about the pace. A friend, a call, a cup of tea, a very early night: all of these are good company for a sorrow.
+Grief is hard work, and it is the sort of work that does not show on a map. If you are more worn out tonight than the distance can explain, this is why. Be gentle with yourself about the pace. A friend, a call, a cup of tea, a very early night: all of these are good company for a sorrow.
 
 If you were beside someone else's sorrow today, perhaps without being told, think about what you did. Did you fill the silence, or share it? Often the whole help is in staying at the same pace.
 

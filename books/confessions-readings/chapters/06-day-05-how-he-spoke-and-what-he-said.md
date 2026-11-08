@@ -26,7 +26,7 @@ It is a very gentle account of changing one's mind. No argument defeats him. He 
 
 There is a fair doubt to raise. Taken alone, that sentence could describe how people drift into anything, good or bad. Being moved by a speaker proves nothing about what the speaker says, and Augustine knows it. The lines just after the first stretch, which we have left out, make the point at length. Eloquence does not prove something true, and plainness does not prove it false. So the sentence is not a recommendation to follow whoever moves you. It is an observation about how slowly and sideways the truth, if it comes, tends to come.
 
-What does it ask of an ordinary day? To listen in two ways. Once for the manner: the accent, the humour, the confidence, the warmth. Once for the matter: what, in plain words, was actually said. And to notice whom you trust because of kindness before you have heard a word of their argument. On a road with a great many conversations in it, at tables and in doorways, there is plenty of practice to be had.
+Put to work on an ordinary day, this means listening in two ways. Once for the manner: the accent, the humour, the confidence, the warmth. Once for the matter: what, in plain words, was actually said. And to notice whom you trust because of kindness before you have heard a word of their argument. On a road with a great many conversations in it, at tables and in doorways, there is plenty of practice to be had.
 
 ## For the walk
 
