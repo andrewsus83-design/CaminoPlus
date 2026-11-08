@@ -17,7 +17,7 @@ function Item({ icon, label, danger, onPress }: { icon: IconName; label: string;
       accessibilityRole="button"
       accessibilityLabel={label}
       onPress={onPress}
-      style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 16, minHeight: layout.touchMin, paddingHorizontal: 12, borderRadius: radius.md, backgroundColor: pressed ? role.bg : 'transparent' })}
+      style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 16, minHeight: layout.touchPrimary, paddingHorizontal: 12, borderRadius: radius.md, backgroundColor: pressed ? role.bg : 'transparent' })}
     >
       <Icon name={icon} color={colour} size={24} />
       <AppText variant="lead" color={colour}>{label}</AppText>
