@@ -1,13 +1,13 @@
 import { ComponentRef, useCallback, useEffect, useMemo, useRef } from 'react';
 import { LayoutChangeEvent, NativeScrollEvent, NativeSyntheticEvent, ScrollView, View } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '@/components/AppText';
 import { role } from '@/theme';
 import { BookPage } from './BookPage';
 import { ChapterFooter } from './ChapterFooter';
+import { ReaderBar, type ProgressApi } from './ReaderBar';
 import { ReaderBlocks } from './ReaderBlocks';
-import { ReaderHeader, type ProgressApi } from './ReaderHeader';
+import { ReaderHeader } from './ReaderHeader';
 import type { BookText } from './bookTextTypes';
 import { bookById } from './catalog';
 import { NO_CHAPTER_TEXT, bookPath, readerPath } from './copy';
@@ -17,10 +17,11 @@ import { safeText } from './safeText';
 import { useReaderSize, type ReaderSize } from './useReaderSize';
 import { useReadingWriter, type ReadingWriter } from './useReadingWriter';
 
-// The reader: one chapter of one book, as a good reading app shows it. A header that stays (BookPage's way back, the size of the text, Previous and Next, how far
-// down the chapter you are: ReaderHeader.tsx), then the chapter: its part in JetBrains Mono, its title in Fraunces, how long it takes, the words in Inter with a
-// line 1.6 times the letter and no more than about 70 characters across (ReaderBlocks.tsx), and at the end Next and Previous again, one short handwritten note and,
-// after the last chapter, the credit of the edition (ChapterFooter.tsx).
+// The reader: one chapter of one book, as a good reading app shows it. A header at the top that stays and has one row (BookPage's way back and the size of the
+// text: ReaderHeader.tsx), the chapter under it: its part in JetBrains Mono, its title in Fraunces, how long it takes, the words in Inter with a line 1.6 times the
+// letter and no more than about 70 characters across (ReaderBlocks.tsx), and at the end Next and Previous again, one short handwritten note and, after the last
+// chapter, the credit of the edition (ChapterFooter.tsx). At the bottom a bar that stays, as on a Kindle: how far down the chapter you are, Previous, the title of the
+// book with "Chapter 7 of 40", and Next (ReaderBar.tsx).
 //
 // The reader remembers, only on this phone, the chapter and how far down it you were, for every book (useReadingWriter.ts), and the chapters you have read. It writes
 // a moment after you stop scrolling, when you leave and when the app goes to the background, and never before it has put you back where you were. A place that is
@@ -35,7 +36,6 @@ type ViewProps = { bookId: string; text: BookText; index: number; startY: number
 /** One chapter on the screen. Made again for another chapter (the screen gives it a key), so every number it keeps is the chapter's own. */
 function ChapterView({ bookId, text, index, startY, size, writer }: ViewProps) {
   const router = useRouter();
-  const insets = useSafeAreaInsets();
   const chapter = text.chapters[index];
   const nav = chapterNav(text.chapters, index)!;
   const type = useMemo(() => readerType(size.step), [size.step]);
@@ -104,17 +104,12 @@ function ChapterView({ bookId, text, index, startY, size, writer }: ViewProps) {
   return (
     <View style={{ flex: 1, backgroundColor: role.bg }}>
       <ReaderHeader
-        bookTitle={text.title}
-        nav={nav}
         step={size.step}
         canShrink={size.canShrink}
         canGrow={size.canGrow}
         onSmaller={size.smaller}
         onLarger={size.larger}
         onContents={contents}
-        onPrevious={() => nav.prev && goTo(nav.prev.id)}
-        onNext={() => nav.next && goTo(nav.next.id)}
-        progress={progress}
       />
       <ScrollView
         ref={scroller}
@@ -123,7 +118,7 @@ function ChapterView({ bookId, text, index, startY, size, writer }: ViewProps) {
         onLayout={onLayout}
         onContentSizeChange={onContentSizeChange}
         style={{ flex: 1 }}
-        contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 20, paddingBottom: insets.bottom + 48, alignItems: 'center' }}
+        contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 20, paddingBottom: 48, alignItems: 'center' }}
       >
         <View style={{ width: '100%', maxWidth: type.measure }}>
           <View style={{ gap: 6, marginBottom: Math.round(type.gap * 1.2) }}>
@@ -147,6 +142,13 @@ function ChapterView({ bookId, text, index, startY, size, writer }: ViewProps) {
           />
         </View>
       </ScrollView>
+      <ReaderBar
+        bookTitle={text.title}
+        nav={nav}
+        onPrevious={() => nav.prev && goTo(nav.prev.id)}
+        onNext={() => nav.next && goTo(nav.next.id)}
+        progress={progress}
+      />
     </View>
   );
 }
