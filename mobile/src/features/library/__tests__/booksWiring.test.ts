@@ -11,6 +11,7 @@ import path from 'node:path';
 import { BOOK_CATALOG } from '../books/catalog';
 import { a5Height, coverGrid, coverLabel, coverMetrics } from '../books/cover';
 import { DEFAULT_STEP, LAST_STEP, readerType } from '../books/readerType';
+import { fontPath, readFont } from '../../../lib/__tests__/fontFile';
 
 let n = 0;
 const check = (name: string, fn: () => void) => { fn(); n += 1; console.log(`ok   ${name}`); };
@@ -295,7 +296,8 @@ check('the book page: the cover with its ribbon, the title, the subtitle, the ki
   assert.match(missing, /UNKNOWN_TITLE/);
   assert.match(page, /if \(!book\) return <Missing \/>;/, 'an id that is no book is a calm sentence with the way to the Library');
   assert.match(page, /\{!!notice && <FormMessage tone="info">\{notice\}<\/FormMessage>\}/);
-  assert.match(page, /router\.canGoBack\(\) \? router\.back\(\) : router\.replace\('\/library'\)/);
+  assert.equal(count(page, /<BackButton fallback="\/library" \/>/g), 2, 'the page and the page of a book that is not there both have the Back button of the app, which goes to the Library when there is nothing behind them');
+  assert.doesNotMatch(page, /<IconButton\b/, 'and no button of their own for it');
 });
 
 check('the routes are /library/book/<id> and /library/book/<id>/read?c=<chapter>, registered for a pilgrim with a journey next to Bookmarks and the daily reading with no options; a link with ?c= goes on to the reader', () => {
@@ -367,18 +369,16 @@ check('the reader keeps the place well: nothing is saved before the person was p
   assert.match(blocks, /export const ReaderBlocks = memo\(function ReaderBlocks/);
 });
 
-check('the header of the reader has one row, as the top of a Kindle has: Contents, and Smaller and Larger text; the title of the book, Previous, Next and the line are not at the top', () => {
+check('the header of the reader has one row, as the top of a Kindle has: the Back button of the app (to the contents), and Smaller and Larger text, all 48 by 48; the title of the book, Previous, Next and the line are not at the top', () => {
   const header = src['ReaderHeader.tsx'];
-  assert.match(header, /accessibilityLabel="Contents"\s+accessibilityHint="Back to the table of contents of this book"/);
-  assert.match(header, /minHeight: 44, flexDirection: 'row', alignItems: 'center'/);
+  assert.match(header, /<BackButton onPress=\{onContents\} hint="Back to the contents of this book" \/>/, 'the way back is the Back button of the app, which goes to the contents of the book and says so');
+  assert.doesNotMatch(header, /Contents<\/AppText>|accessibilityLabel="Contents"|<Pressable\b|<Icon\b/, 'no pill of its own that says "Contents", and no icon drawn by hand');
   assert.match(header, /<SizeTap larger=\{false\} disabled=\{!canShrink\} onPress=\{onSmaller\} \/>/);
   assert.match(header, /<SizeTap larger disabled=\{!canGrow\} onPress=\{onLarger\} \/>/);
   assert.match(header, /<AppText accessibilityLiveRegion="polite" style=\{VISUALLY_HIDDEN\}>\{sizeLine\(step\)\}<\/AppText>/, '"Text size 4 of 5" is said when the size changes');
   assert.match(header, /paddingTop: insets\.top \+ layout\.screenTop/, 'under the camera, like every screen');
-  assert.match(header, /maxFontSizeMultiplier=\{HEADER_FONT_LIMIT\}/, 'the header never takes the page when the text is large');
-  assert.match(header, /const HEADER_FONT_LIMIT = 1\.3;/);
+  assert.match(header, /paddingHorizontal: layout\.screenMargin/, 'the Back button is as far from the edge as on every other screen');
   assert.doesNotMatch(code(header), /bookTitle|IconTap|positionLine|previousLabel|nextLabel|ReadingProgress|onPrevious|onNext/, 'the title of the book, Previous, Next and the line are at the bottom only');
-  assert.equal(count(code(header), /<Pressable\b/g), 1, 'the way back to the contents is the one button of the header besides the two sizes');
   const reader = src['Reader.tsx'];
   assert.match(reader, /<ReaderHeader\s+step=\{size\.step\}\s+canShrink=\{size\.canShrink\}\s+canGrow=\{size\.canGrow\}\s+onSmaller=\{size\.smaller\}\s+onLarger=\{size\.larger\}\s+onContents=\{contents\}\s+\/>/, 'the header is given the way back and the size, and nothing else');
 });
@@ -394,20 +394,59 @@ check('the bar at the bottom of the reader, as on a Kindle: the thin line that i
   assert.ok(bar.indexOf('<ReadingProgress api={progress} />') < bar.indexOf('<IconTap icon="back"'), 'the line is on top of the row');
   assert.match(bar, /maxFontSizeMultiplier=\{BAR_FONT_LIMIT\}/, 'the bar never takes the page when the text is large');
   assert.match(bar, /const BAR_FONT_LIMIT = 1\.3;/);
-  // the bar is the part the thumb rests on, so it is large: the buttons are 56 (never under 44), the title is 18 and the place 14
+  // the bar is the part the thumb rests on, so it is large: the buttons are 56 (never under 44), the title is the body of the type scale (19 on 28) and the place 14
   assert.match(bar, /const BAR_BUTTON = 56;/);
   assert.equal(count(bar, /size=\{BAR_BUTTON\}/g), 2, 'Previous and Next are both 56');
-  assert.match(bar, /style=\{\{ fontSize: 18, lineHeight: 24, textAlign: 'center' \}\}>\{bookTitle\}/, 'the title of the book is 18');
+  assert.match(bar, /const TITLE = \{ fontSize: textStyle\('body'\)\.fontSize, lineHeight: textStyle\('body'\)\.lineHeight \};/, 'the size and the line of the title are the body of the type scale (tokens.json)');
+  assert.match(bar, /<AppText variant="label" numberOfLines=\{1\} maxFontSizeMultiplier=\{BAR_FONT_LIMIT\} style=\{\{ \.\.\.TITLE, textAlign: 'center' \}\}>\{bookTitle\}<\/AppText>/, 'the title of the book is a label (SemiBold) at that size');
+  assert.doesNotMatch(bar, /fontSize: 1[5-9]|fontSize: 2\d/, 'no size of its own for the title: 18 was not on the type scale');
+  const scale = JSON.parse(read('src/theme/tokens.json')) as { text: { body: { size: number; lineHeight: number } } };
+  assert.deepEqual([scale.text.body.size, scale.text.body.lineHeight], [19, 28], 'the body of the type scale is 19 on 28: the title of the book in the bar is that');
   assert.match(bar, /style=\{\{ fontSize: 14, lineHeight: 20, textAlign: 'center' \}\}>\{positionLine\(nav\)\}/, '"Chapter 7 of 40" is 14');
   const reader = src['Reader.tsx'];
   assert.match(reader, /<\/ScrollView>\s*\{selected !== null && key && \(\s*<PassageActions[^]*?\/>\s*\)\}\s*<ReaderBar\s+bookTitle=\{text\.title\}\s+nav=\{nav\}\s+onPrevious=\{\(\) => nav\.prev && goTo\(nav\.prev\.id\)\}\s+onNext=\{\(\) => nav\.next && goTo\(nav\.next\.id\)\}\s+progress=\{progress\}\s+\/>/, 'the bar is under the chapter, not inside the scroll: it stays');
   assert.match(reader, /import \{ ReaderBar, type ProgressApi \} from '\.\/ReaderBar';/);
 });
 
-check('the round buttons of the reader are 44 by 44 and named, a dimmed button is disabled for a screen reader too, and the buttons at the end of a chapter name where they go', () => {
+check('the title of the book in the bar is ONE line between the two 56 buttons and every one of the 26 titles of the Library is whole on a phone 390 wide (and 430): measured with the real advances of Inter SemiBold, at the size of the type scale, and no larger size of the scale would keep that', () => {
+  const bar = src['ReaderBar.tsx'];
+  const button = Number(/const BAR_BUTTON = (\d+);/.exec(bar)![1]);
+  const row = Number(/<View style=\{\{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: (\d+), paddingVertical: 4 \}\}>/.exec(bar)![1]);
+  const mid = Number(/<View style=\{\{ flex: 1, minWidth: 0, alignItems: 'center', paddingHorizontal: (\d+) \}\}>/.exec(bar)![1]);
+  // the room of the title: the screen, less the two buttons and the padding of the row and of the title on both sides
+  const room = (screen: number): number => screen - 2 * button - 2 * row - 2 * mid;
+  assert.deepEqual([320, 360, 390, 430].map(room), [184, 224, 254, 294]);
+  const tokens = JSON.parse(read('src/theme/tokens.json')) as { text: Record<string, { size: number }> };
+  const size = tokens.text.body.size;
+  const inter = readFont(fontPath(root, 'Inter_600SemiBold'));
+  const titles = BOOK_CATALOG.map((b) => b.title);
+  assert.equal(titles.length, 26, 'the 26 books of the Library');
+  assert.deepEqual(inter.missing(titles.join('')), [], 'Inter has every letter of every title');
+  const width = (title: string, px: number): number => inter.width(title) * px;
+  const fitting = (screen: number, px: number): number => titles.filter((t) => width(t, px) <= room(screen)).length;
+  // 19 (the body of the scale): all 26 whole on 390 and on 430, with room to spare for a browser that rounds every glyph to a whole pixel (measured: at most 2.5 px wider)
+  assert.equal(fitting(390, size), 26, `at ${size}: every title is on one line on a phone 390 wide (the widest is ${Math.max(...titles.map((t) => width(t, size))).toFixed(1)} px of ${room(390)})`);
+  assert.equal(fitting(430, size), 26);
+  const widest = Math.max(...titles.map((t) => width(t, size)));
+  assert.ok(room(390) - widest >= 8, `the widest title has ${(room(390) - widest).toFixed(1)} px to spare on a phone 390 wide: a browser that hints the glyphs draws it up to 2.5 px wider, so keep 8`);
+  // the narrower phones cut what does not fit with an ellipsis: how many is on record, so that a new title or a larger size is noticed
+  assert.ok(fitting(360, size) >= 23, `${fitting(360, size)} of 26 titles are whole on a phone 360 wide`);
+  assert.ok(fitting(320, size) >= 15, `${fitting(320, size)} of 26 titles are whole on a phone 320 wide`);
+  // and no larger size of the type scale would do: each is a title cut on a phone 390 wide (22 cuts five, 24 eight, 28 fifteen)
+  const larger = [...new Set(Object.values(tokens.text).map((t) => t.size))].filter((px) => px > size && px <= 28).sort((a, b) => a - b);
+  assert.deepEqual(larger, [22, 24, 28], 'the sizes of the scale above the body that a title could take');
+  for (const px of larger) assert.ok(fitting(390, px) < 26, `${px} would keep all 26 titles whole on 390: then it is the size of the title, the largest of the scale that does`);
+  assert.deepEqual(larger.map((px) => 26 - fitting(390, px)), [5, 8, 15]);
+  // one line: the title is cut, not wrapped, and the bar is as tall for every book
+  assert.match(bar, /<AppText variant="label" numberOfLines=\{1\}/);
+});
+
+check('the round buttons of the reader are named, the size buttons of its header are 48 by 48 like the Back button (the bar\'s are 56), a dimmed button is disabled for a screen reader too, and the buttons at the end of a chapter name where they go', () => {
   const ui = src['BookUi.tsx'];
-  assert.equal(count(ui, /width: 44, height: 44/g), 1, 'the size buttons are 44 by 44');
-  assert.match(ui, /size = 44/, 'a round button of the reader is 44 by 44 unless it is asked to be larger');
+  assert.match(ui, /const HEADER_BUTTON = 48;/, 'the size buttons are 48 by 48, the size of IconButton and so of the Back button next to them');
+  assert.equal(count(ui, /width: HEADER_BUTTON, height: HEADER_BUTTON/g), 1);
+  assert.equal(count(ui, /width: 44, height: 44/g), 0, 'no round button of 44 is left in the header');
+  assert.match(ui, /size = 44/, 'a round button of the reader\'s bar is 44 by 44 unless it is asked to be larger (the bar asks for 56)');
   assert.match(ui, /width: size, height: size/);
   assert.match(ui, /accessibilityLabel=\{larger \? 'Larger text' : 'Smaller text'\}/);
   assert.match(ui, /accessibilityState=\{\{ disabled: !!disabled \}\}/);
@@ -600,7 +639,7 @@ check('every button of the Books screens has a role, a label for a screen reader
     assert.doesNotMatch(pressable, /\bonClick\b|<TouchableOpacity|<TouchableWithoutFeedback|<Text[^>]*onPress/, `${f}: another way to press`);
   }
   assert.match(src['BookPage.tsx'], /minHeight: 56/);
-  assert.match(src['ReaderHeader.tsx'], /minHeight: 44/);
+  assert.match(src['ReaderHeader.tsx'], /<BackButton onPress=\{onContents\} /, 'the way back is the app\'s Back button, 48 by 48');
   assert.match(src['ChapterFooter.tsx'], /minHeight: 64/);
   assert.match(src['BookRows.tsx'], /import \{ BookmarkToggle \} from '\.\.\/BookmarkToggle';/, 'the bookmark button of a row is the one of the Library, 44 by 44');
   assert.match(read('src/features/library/BookmarkToggle.tsx'), /width: 44, height: 44/);
@@ -611,7 +650,7 @@ check('every button of the Books screens has a role, a label for a screen reader
 });
 
 check('text sizes grow with the phone, up to a cap: the running text of the reader and the contents have no fixed size, the header, the cover and the banner are held at their own limits', () => {
-  assert.equal(count(src['ReaderHeader.tsx'], /maxFontSizeMultiplier=\{HEADER_FONT_LIMIT\}/g), 1, 'the header has one text: Contents');
+  assert.doesNotMatch(src['ReaderHeader.tsx'], /maxFontSizeMultiplier/, 'the header has no text that grows: its three buttons are a letter A, which stops at 1, and an icon');
   assert.equal(count(src['ReaderBar.tsx'], /maxFontSizeMultiplier=\{BAR_FONT_LIMIT\}/g), 2, 'the bar has two: the title of the book and "Chapter 7 of 40"');
   assert.match(src['ChapterFooter.tsx'], /maxFontSizeMultiplier=\{1\.3\}/);
   const page = src['BookPage.tsx'];

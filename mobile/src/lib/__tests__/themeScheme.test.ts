@@ -9,7 +9,8 @@ import assert from 'node:assert/strict';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import tokens from '../../theme/tokens.json';
-import { applyScheme, c, fixed, fonts, role, scrim, tabActiveWeight, textStyle, type TextVariant } from '../../theme';
+import { applyScheme, c, fixed, fonts, role, scrim, tabActiveWeight, tabInactiveWeight, textStyle, type TextVariant } from '../../theme';
+import { fontPath, readFont } from './fontFile';
 
 let n = 0;
 const check = (name: string, fn: () => void) => { fn(); n += 1; console.log(`ok   ${name}`); };
@@ -195,26 +196,79 @@ check('the tab bar draws the active tab in role.tabActive and the inactive ones 
   assert.doesNotMatch(src, /#[0-9a-fA-F]{3,8}\b|rgba?\(/, 'no colour of its own in the tab bar: a role from design/tokens.json');
 });
 
-check('the inactive tabs are thinner and lighter than the active one in weight as well as colour: a thin stroke and a Light label against a thick stroke and a SemiBold label', () => {
+check('the inactive tabs are thinner and lighter than the active one in weight as well as colour: a thin stroke and a Light label against a thick stroke and a SemiBold or Bold label', () => {
   // The owner asked (2026-11-08) for inactive tabs that are lighter and more transparent in light and dark mode; colour alone did not say it all.
   const src = read(join('src', 'components', 'TabBar.tsx'));
-  assert.match(src, /strokeWidth=\{focused \? tabActiveWeight\.stroke : 1\.3\}/, 'the active icon is drawn as heavy as tokens.tab says, the inactive ones at 1.3');
-  assert.match(src, /fontFamily: focused \? tabActiveWeight\.font : fonts\.bodyLight/, 'the active label is as heavy as tokens.tab says, the inactive ones Light');
+  assert.match(src, /const weight = focused \? tabActiveWeight : tabInactiveWeight;/, 'the weight of a tab is the one of tokens.tab for its state');
+  assert.match(src, /strokeWidth=\{weight\.stroke\}/, 'the icon is drawn as heavy as tokens.tab says (the inactive ones: inactiveStroke)');
+  assert.match(src, /fontFamily: weight\.font/, 'the label is as heavy as tokens.tab says (the inactive ones: inactiveLabelWeight)');
+  assert.doesNotMatch(src, /strokeWidth=\{[^}]*\b\d+(\.\d+)?\}/, 'no stroke written into the tab bar: it is in tokens.tab');
   assert.equal(fonts.bodyLight, 'Inter_300Light');
+  const t = tokens.tab as { activeStroke: Record<string, number>; inactiveStroke: Record<string, number>; inactiveLabelWeight: Record<string, number> };
+  for (const scheme of ['light', 'dark'] as const) {
+    applyScheme(scheme);
+    assert.equal(tabInactiveWeight.stroke, t.inactiveStroke[scheme], `${scheme}: the inactive stroke is the token`);
+    assert.equal(tabInactiveWeight.font, fonts.bodyLight, `${scheme}: the inactive label is Inter Light (the owner wants the inactive tabs thin and Light)`);
+    assert.equal(t.inactiveLabelWeight[scheme], 300);
+    assert.ok(tabActiveWeight.stroke >= 1.5 * tabInactiveWeight.stroke, `${scheme}: the active icon is much heavier than the inactive one`);
+  }
+  applyScheme('light');
   const layoutSrc = read(join('app', '_layout.tsx'));
   assert.match(layoutSrc, /import \{[^}]*\bInter_300Light\b[^}]*\} from '@expo-google-fonts\/inter'/, 'Inter Light is imported');
   assert.match(layoutSrc, /useFonts\(\{[^}]*\bInter_300Light\b/, 'and loaded with the other fonts, or the label would fall back to the system font');
   const page = readFileSync(join(root, '..', 'design', 'index.html'), 'utf8');
-  assert.match(page, /\.cp-tab \{[^}]*font-weight: 300/, 'the design page draws the inactive label Light');
-  assert.match(page, /\.cp-tab \.cp-icon \{[^}]*stroke-width: 1\.3px/, 'and the inactive icon thin');
+  assert.match(page, /\.cp-tab \{[^}]*font-weight: var\(--cp-tab-inactive-weight\)/, 'the design page draws the inactive label with the weight of the token (Light)');
+  assert.match(page, /\.cp-tab \.cp-icon \{[^}]*stroke-width: var\(--cp-tab-inactive-stroke\)/, 'and the inactive icon with the stroke of the token');
   assert.match(page, /\.cp-tab\.on \.ico \.cp-icon \{[^}]*stroke-width: var\(--cp-tab-active-stroke\)/, 'the active icon thick (the variable of the mode)');
+});
+
+check('the inactive icon is exactly as thin as its label: the stroke it is drawn with is the width of the stem of the label font, within 10 percent, in light and dark (the owner saw the icons thicker than the labels, 2026-11-08)', () => {
+  // Measured, not judged: the stem of Inter is the width of the ink of the glyph "l" (and "I" for a capital) in the font file the app loads, in font units;
+  // the label is drawn at the size TabBar.tsx says; the icon is drawn in a 24 unit box at the size TabBar.tsx says, so a stroke of s units is s * size / 24 px.
+  const t = tokens.tab as { inactiveStroke: Record<string, number>; inactiveLabelWeight: Record<string, number> };
+  const src = read(join('src', 'components', 'TabBar.tsx'));
+  const iconSize = Number(/<Icon name=\{route\.name as IconName\} color=\{color\} size=\{(\d+)\}/.exec(src)?.[1]);
+  const labelSize = Number(/fontFamily: weight\.font, fontSize: (\d+)/.exec(src)?.[1]);
+  const box = Number(/viewBox="0 0 (\d+) \d+"/.exec(read(join('src', 'components', 'Icon.tsx')))?.[1]);
+  assert.deepEqual([iconSize, labelSize, box], [28, 14, 24], 'the tab bar draws a 28 px icon (a 24 unit box) and a 14 px label: if that changes, the stroke has to be worked out again');
+  const page = readFileSync(join(root, '..', 'design', 'index.html'), 'utf8');
+  assert.match(page, /\.cp-tab \{[^}]*font-size: 14px/, 'the design page draws the same 14 px label');
+  assert.match(page, /\.cp-tab \.cp-icon \{[^}]*width: 28px; height: 28px/, 'and the same 28 px icon');
+  // the reader itself: Inter Light has a stem of 136 and Regular of 180 of 2048 units (also found by drawing the glyphs at 2048 px and counting the ink)
+  const stemUnits = (family: string, ch: string) => { const f = readFont(fontPath(root, family)); const b = f.box(f.glyphOf(ch)); return [b.xMax - b.xMin, f.unitsPerEm]; };
+  assert.deepEqual(stemUnits('Inter_300Light', 'l'), [136, 2048]);
+  assert.deepEqual(stemUnits('Inter_300Light', 'I'), [142, 2048]);
+  assert.deepEqual(stemUnits('Inter_400Regular', 'l'), [180, 2048]);
+  const measured: string[] = [];
+  for (const scheme of ['light', 'dark'] as const) {
+    applyScheme(scheme);
+    const strokePx = (t.inactiveStroke[scheme] * iconSize) / box;
+    assert.equal(tabInactiveWeight.stroke, t.inactiveStroke[scheme]);
+    for (const [ch, what] of [['l', 'lower case'], ['I', 'capital']] as const) {
+      const [stem, em] = stemUnits(tabInactiveWeight.font, ch);
+      const stemPx = (stem / em) * labelSize;
+      const off = strokePx / stemPx - 1;
+      measured.push(`${scheme} ${what}: stem ${stemPx.toFixed(3)} px, stroke ${strokePx.toFixed(3)} px`);
+      assert.ok(Math.abs(off) <= 0.1, `${scheme}: the icon is drawn ${strokePx.toFixed(3)} px thick and the ${what} stem of its label is ${stemPx.toFixed(3)} px (${(off * 100).toFixed(1)} percent): they must be within 10 percent, or one looks thicker than the other`);
+      // and the old stroke would have failed it: 1.3 is 1.517 px, more than 1.5 times the stem
+      const old = (1.3 * iconSize) / box;
+      assert.ok(old / stemPx > 1.5, 'the stroke of 1.3 that the tab bar used to draw is a failure of this check');
+    }
+  }
+  applyScheme('light');
+  assert.equal(measured.length, 4);
+  // the same numbers in the CSS of the design page: tokens.css has the light values, the dark phones the dark ones
+  const css = readFileSync(join(root, '..', 'design', 'tokens.css'), 'utf8');
+  assert.match(css, new RegExp(`--cp-tab-inactive-stroke:\\s*${t.inactiveStroke.light}px`), 'tokens.css has the light stroke');
+  assert.match(css, new RegExp(`--cp-tab-inactive-weight:\\s*${t.inactiveLabelWeight.light};`), 'tokens.css has the light weight');
+  assert.match(page, new RegExp(`\\.phone\\.dk \\{[^}]*--cp-tab-inactive-stroke:${t.inactiveStroke.dark}px;--cp-tab-inactive-weight:${t.inactiveLabelWeight.dark};`), 'the dark phones carry the dark values');
 });
 
 check('the active tab is drawn a little heavier in light mode than in dark mode: dark on light looks thinner than light on dark with the same stroke (the ink is the same in both modes, the owner saw light mode as thinner)', () => {
   const t = tokens.tab as { activeStroke: { light: number; dark: number }; activeLabelWeight: { light: number; dark: number } };
   assert.ok(t.activeStroke.light > t.activeStroke.dark, 'a thicker icon in light mode');
   assert.ok(t.activeLabelWeight.light > t.activeLabelWeight.dark, 'a heavier label in light mode');
-  for (const s of ['light', 'dark'] as const) assert.ok(t.activeStroke[s] >= 1.3 * 1.5, `${s}: the active icon stays much heavier than the inactive one (1.3)`);
+  for (const s of ['light', 'dark'] as const) assert.ok(t.activeStroke[s] >= (tokens.tab as { inactiveStroke: Record<string, number> }).inactiveStroke[s] * 1.5, `${s}: the active icon stays much heavier than the inactive one`);
   assert.ok(t.activeStroke.light <= t.activeStroke.dark * 1.3, 'a compensation, not a different weight: at most 30 percent more');
   applyScheme('light');
   assert.equal(tabActiveWeight.stroke, t.activeStroke.light);

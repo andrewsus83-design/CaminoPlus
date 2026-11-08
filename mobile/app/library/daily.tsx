@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { Screen } from '@/components/Screen';
 import { FormMessage } from '@/components/auth/Field';
 import { BOOKMARK_NOT_SAVED } from '@/features/library/bookmarks';
@@ -19,8 +19,6 @@ import { useLibraryBookmarks } from '@/features/library/useLibraryBookmarks';
 // Library's own bookmarks (useLibraryBookmarks, key "daily:2026-11-08"). The day comes from the phone's clock and nothing is fetched, so it works
 // offline.
 export default function DailyReading() {
-  const router = useRouter();
-  const goBack = () => (router.canGoBack() ? router.back() : router.replace('/library'));
   const { date } = useLocalSearchParams<{ date?: string | string[] }>();
   const daily = useDailyReading(undefined, parseDateKey(Array.isArray(date) ? date[0] : date));
   const marks = useLibraryBookmarks();
@@ -31,7 +29,7 @@ export default function DailyReading() {
 
   return (
     <Screen tabBar={false}>
-      <DailyHeader onBack={goBack} onCalendar={openCalendar} bookmarked={marks.has(key)} onBookmark={() => marks.toggle(key)} />
+      <DailyHeader onCalendar={openCalendar} bookmarked={marks.has(key)} onBookmark={() => marks.toggle(key)} />
       {marks.failed && <FormMessage>{BOOKMARK_NOT_SAVED}</FormMessage>}
       <WeekStrip
         selected={daily.selected}

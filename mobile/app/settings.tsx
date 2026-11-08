@@ -3,7 +3,8 @@ import { View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Screen } from '@/components/Screen';
 import { AppText } from '@/components/AppText';
-import { Card, IconButton, SectionLabel } from '@/components/ui';
+import { BackButton } from '@/components/BackButton';
+import { Card, SectionLabel } from '@/components/ui';
 import { AccountSection, LogoutButton, ThemeToggle } from '@/components/AccountSection';
 import { BuildCard } from '@/components/BuildCard';
 import { BusinessCard, IntroSheet } from '@/features/business/BusinessCard';
@@ -34,7 +35,7 @@ export default function Settings() {
     <Screen tabBar={false}>
       {/* A screen of its own, opened from the gear at the top right of Me: back on the left, light/dark and log out on the right. */}
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-        <IconButton name="back" label="Back" onPress={() => (router.canGoBack() ? router.back() : router.replace('/me'))} />
+        <BackButton fallback="/me" />
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
           <ThemeToggle />
           <LogoutButton />

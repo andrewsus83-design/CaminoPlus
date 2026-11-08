@@ -6,6 +6,7 @@ import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
 import { Pill } from '@/components/Pill';
 import { SampleNotice } from '@/components/SampleNotice';
+import { BackButton } from '@/components/BackButton';
 import { Avatar, Card, IconButton, SectionLabel } from '@/components/ui';
 import { Badge } from '@/features/business/ui';
 import { Availability, myListing, statusCopy } from '@/data/business';
@@ -39,9 +40,9 @@ export default function BusinessDashboard() {
   return (
     <Screen>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-        <IconButton name="back" label="Back" onPress={() => router.back()} flat />
+        <BackButton fallback="/settings" />
         <View style={{ marginLeft: 'auto' }}><Badge label={st.label} tone={st.tone} /></View>
-        <IconButton name="pen" label="Edit listing" onPress={() => router.push('/business/register')} flat />
+        <IconButton name="pen" label="Edit listing" onPress={() => router.push('/business/register')} />
       </View>
       <SampleNotice title="Sample dashboard">This is what owners will see once listings are live. The place, numbers, reviews and beds below are examples.</SampleNotice>
       <AppText variant="h2">{l.name}</AppText>

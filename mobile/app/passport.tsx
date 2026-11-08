@@ -1,9 +1,9 @@
 import { ActivityIndicator, ScrollView, View } from 'react-native';
-import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
-import { Card, IconButton } from '@/components/ui';
+import { BackButton } from '@/components/BackButton';
+import { Card } from '@/components/ui';
 import { Empty, ProgressBar, norm, shortDate } from '@/features/me/shared';
 import { useMeData } from '@/lib/useMeData';
 import { c, layout, radius, role } from '@/theme';
@@ -53,13 +53,12 @@ function Passport({ stamps, stages }: { stamps: StampT[]; stages: StageT[] }) {
 }
 
 export default function PassportScreen() {
-  const router = useRouter();
   const insets = useSafeAreaInsets();
   const { stamps, stages, offline } = useMeData();
   return (
     <View style={{ flex: 1, backgroundColor: role.bg }}>
       <ScrollView contentContainerStyle={{ paddingTop: insets.top + layout.screenTop, paddingHorizontal: layout.screenMargin, paddingBottom: insets.bottom + 40, gap: 16 }}>
-        <IconButton name="back" label="Back" onPress={() => router.back()} />
+        <BackButton fallback="/me" />
         <AppText variant="h2">Stamps</AppText>
         {!stamps ? (offline ? <Empty text="You are offline and your stamps are not saved on this phone yet. Open this once with a connection." /> : <ActivityIndicator color={role.action} style={{ marginTop: 24 }} />) : <Passport stamps={stamps} stages={stages} />}
       </ScrollView>

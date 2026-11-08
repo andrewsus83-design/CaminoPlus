@@ -223,7 +223,7 @@ export const BOOKS_SCENARIOS = [
     },
   },
   {
-    name: 'Books: the reader opens at the first chapter, Next and Previous go through the chapters (their labels name where they go), at the first chapter Previous is off and at the last Next is, and Contents goes back to the page',
+    name: 'Books: the reader opens at the first chapter, Next and Previous go through the chapters (their labels name where they go), at the first chapter Previous is off and at the last Next is, and Back (the same round 48 button as on every screen) goes to the contents, the page of the book',
     persona: 'in',
     async run(ctx) {
       const { page, step, go } = ctx;
@@ -242,10 +242,18 @@ export const BOOKS_SCENARIOS = [
       const height = await page.evaluate(() => window.innerHeight);
       const titleBox = await title.first().boundingBox();
       assert(titleBox && titleBox.y > height * 0.75, `the title of the book is at the bottom of the screen, as on a Kindle (it is at ${titleBox?.y} of ${height})`);
-      const contents = page.getByRole('button', { name: 'Contents', exact: true });
+      const contents = page.getByRole('button', { name: 'Back', exact: true });
       await contents.waitFor();
       const contentsBox = await contents.boundingBox();
       assert(contentsBox && contentsBox.y < height * 0.25, `the way back is at the top (it is at ${contentsBox?.y} of ${height})`);
+      step('the header is one row of three round buttons of 48 by 48, Back at 16 from the left edge like the Back of every other screen, no pill that says "Contents"');
+      for (const [what, button] of [['Back', contents], ['Smaller text', page.getByRole('button', { name: 'Smaller text', exact: true })], ['Larger text', page.getByRole('button', { name: 'Larger text', exact: true })]]) {
+        const r = await button.boundingBox();
+        assert(r && Math.abs(r.width - 48) <= 0.5 && Math.abs(r.height - 48) <= 0.5, `${what} is 48 by 48 (it is ${r?.width} by ${r?.height})`);
+        assert(Math.abs(r.y - contentsBox.y) <= 0.5, `${what} is in the row of Back`);
+      }
+      assert(Math.abs(contentsBox.x - 16) <= 0.5, `Back is 16 from the edge (it is at ${contentsBox.x})`);
+      assert.equal(await page.getByRole('button', { name: 'Contents', exact: true }).count(), 0, 'no button called Contents: Back goes there');
       step('at the first chapter Previous is dimmed and disabled (in the bar and at the end), and Next is not');
       const previous = page.getByRole('button', { name: /^Previous chapter\. This is the first chapter$/ });
       await eventually(() => previous.count(), (n) => n === 2, { what: 'the number of Previous buttons at the first chapter' });
@@ -281,10 +289,55 @@ export const BOOKS_SCENARIOS = [
       await page.getByRole('heading', { name: 'End of the book', exact: true }).waitFor();
       await page.getByText(book.credit.slice(0, 40), { exact: false }).first().waitFor();
       await page.getByText('Buen Camino!', { exact: true }).waitFor();
-      step('Contents goes back to the page of the book');
-      await page.getByRole('button', { name: 'Contents', exact: true }).click();
-      await eventually(() => pathOf(page), (p) => p === `/library/book/${id}`, { what: 'the address after Contents' });
+      step('Back goes to the contents, the page of the book');
+      await page.getByRole('button', { name: 'Back', exact: true }).click();
+      await eventually(() => pathOf(page), (p) => p === `/library/book/${id}`, { what: 'the address after Back' });
       await page.getByRole('button', { name: /^(Start reading|Continue: )/ }).first().waitFor();
+    },
+  },
+  {
+    name: 'Books: the title of the book in the bar of the reader is one line of 19 px: the longest title is whole on a phone 390 wide and 430, cut with an ellipsis on 320, and the bar is as tall for every book',
+    persona: 'in',
+    async run(ctx) {
+      const { page, step, go } = ctx;
+      // the longest titles of the catalog by the number of characters (the widest in Inter SemiBold of all 26 is checked on every run of the unit tests, with the real advances), and a short one
+      const byLength = [...CATALOG].sort((a, b) => b.title.length - a.title.length);
+      const long = byLength[0];
+      const short = byLength[byLength.length - 1];
+      const bar = async (book) => {
+        await go(`/library/book/${book.id}/read`);
+        const title = page.getByText(book.title, { exact: true }).filter({ visible: true }).last();
+        await title.waitFor();
+        return page.evaluate((text) => {
+          const el = [...document.querySelectorAll('div[dir]')].filter((d) => d.textContent === text && d.getBoundingClientRect().top > window.innerHeight * 0.6).pop();
+          const cs = getComputedStyle(el);
+          const place = el.nextElementSibling?.getBoundingClientRect();
+          const buttons = [...document.querySelectorAll('[role="button"]')].filter((b) => b.getBoundingClientRect().top > window.innerHeight * 0.6 && b.getBoundingClientRect().width < 60 && /^(Previous|Next)/.test(b.getAttribute('aria-label') || '')).map((b) => b.getBoundingClientRect());
+          return { size: cs.fontSize, line: cs.lineHeight, family: cs.fontFamily, whole: el.scrollWidth <= el.clientWidth, box: el.getBoundingClientRect().toJSON(), placeTop: place?.top, buttons: buttons.map((r) => ({ w: r.width, h: r.height, top: r.top })) };
+        }, book.title);
+      };
+      step(`on a phone 390 wide the longest title ("${long.title}") is whole, one line, in the body size of the scale (19 on 28), SemiBold, between two buttons of 56`);
+      await page.setViewportSize({ width: 390, height: 844 });
+      const a = await bar(long);
+      assert.equal(a.size, '19px', 'the title is 19 px');
+      assert.equal(a.line, '28px', 'on a line of 28');
+      assert(/Inter_600SemiBold/.test(a.family), `in Inter SemiBold (it is ${a.family})`);
+      assert(a.whole, `"${long.title}" is whole on a phone 390 wide: it is not cut`);
+      for (const book of byLength.slice(1, 3)) assert((await bar(book)).whole, `"${book.title}" is whole on a phone 390 wide`);
+      assert(a.box.height <= 28.5, `one line (it is ${a.box.height} high)`);
+      assert.equal(a.buttons.length, 2, 'Previous and Next are in the bar');
+      for (const b of a.buttons) assert(Math.abs(b.w - 56) <= 0.5 && Math.abs(b.h - 56) <= 0.5, `the buttons of the bar are 56 by 56 (${b.w} by ${b.h})`);
+      step('on a phone 320 wide the same title is cut on one line, not wrapped, and the bar is as tall as for a short title');
+      await page.setViewportSize({ width: 320, height: 700 });
+      const b = await bar(long);
+      assert(!b.whole, `"${long.title}" does not fit on a phone 320 wide: it is cut with an ellipsis`);
+      assert(b.box.height <= 28.5, `and still one line (it is ${b.box.height} high)`);
+      const c = await bar(short);
+      assert(c.whole, `"${short.title}" is whole on 320`);
+      assert(Math.abs(c.buttons[0].top - b.buttons[0].top) <= 0.5, 'the bar is as tall for a short title as for a long one: its buttons are at the same height');
+      step('and on 430 every title of that size is whole');
+      await page.setViewportSize({ width: 430, height: 900 });
+      assert((await bar(long)).whole, 'the longest title is whole on 430');
     },
   },
   {

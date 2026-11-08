@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, TextInput, View } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { BackButton } from '@/components/BackButton';
 import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
 import { Card } from '@/components/ui';
@@ -17,7 +18,6 @@ type Task = { id: string; text: string; done: boolean };
 const shortDate = (iso: string) => new Date(iso).toLocaleDateString([], { day: 'numeric', month: 'short' });
 
 export default function Planner() {
-  const router = useRouter();
   const insets = useSafeAreaInsets();
   const { day } = useLocalSearchParams<{ day?: string }>();
   const { session } = useAuth();
@@ -69,9 +69,9 @@ export default function Planner() {
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1, backgroundColor: role.bg }}>
       <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingTop: insets.top + layout.screenTop, paddingHorizontal: layout.screenMargin, paddingBottom: insets.bottom + 40, gap: 18 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Pressable accessibilityRole="button" accessibilityLabel="Back" onPress={() => router.back()} hitSlop={12}><Icon name="back" color={role.text} size={30} /></Pressable>
+          <BackButton fallback="/me" />
           <AppText variant="h4">Day planner</AppText>
-          <View style={{ width: 30 }} />
+          <View style={{ width: 48 }} />
         </View>
 
         {list.length > 1 && (

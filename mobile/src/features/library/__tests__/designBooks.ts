@@ -226,7 +226,7 @@ function bookPagePhone(b: CatalogBook, o: PageOptions): string {
   const toc = groups.map((g, gi) => `${g.part ? `<h5 class="part"${gi === 0 ? '' : ' style="margin-top:8px"'}>${esc(partName(g.part))}</h5>${partSubtitle(g.part) ? `<p class="ps">${esc(partSubtitle(g.part))}</p>` : ''}` : ''}<div class="cp-card bk-toc">${g.entries.map((e, i) => tocRowHtml(e.index, e.title, minutes.get(e.id), { read: read.has(e.id), here: !!place && place.c === e.id, first: i === 0 })).join('')}</div>`).join('');
   const inner = `<div class="scroll" style="padding-bottom:40px">
   <div class="bk-pg">
-    <div class="biz-top"><button class="cp-icon-btn" aria-label="Back">${svg('back')}</button></div>
+    <div class="biz-top"><button class="cp-icon-btn flat" aria-label="Back">${svg('back')}</button></div>
     <div class="bk-head">${coverHtml(b, coverWidth, { bookmarked: !!o.marked })}
       <h3>${esc(b.title)}</h3>${b.subtitle ? `<div class="su">${esc(b.subtitle)}</div>` : ''}
       <span class="kind" aria-label="${esc(kindName(b.kind))}">${esc(kindName(b.kind).toUpperCase())}</span>
@@ -327,7 +327,7 @@ function readerPhone(o: ReaderOptions): string {
     : '';
   const progress = Math.round((o.progress ?? (o.end ? 0.97 : from > 0 ? 0.3 : 0.05)) * 100);
   const inner = `<div class="bk-rhead">
-  <div class="r1"><span class="bk-back" role="button" aria-label="Contents">${svg('back')}<span>Contents</span></span><span class="sz"><span class="a s" role="button" aria-label="Smaller text"><i>A</i></span><span class="a l" role="button" aria-label="Larger text"><i>A</i></span></span></div>
+  <div class="r1"><button class="cp-icon-btn flat" aria-label="Back" title="Back to the contents of this book">${svg('back')}</button><span class="sz"><span class="a s" role="button" aria-label="Smaller text"><i>A</i></span><span class="a l" role="button" aria-label="Larger text"><i>A</i></span></span></div>
 </div>
 <div class="scroll bk-rscroll${o.chosen !== undefined ? ' pa' : ''}"${o.end ? ' data-bk-end' : ''}>
   <div class="bk-rtx" style="max-width:${t.measure}px">
@@ -458,15 +458,13 @@ const STYLE = `<style>
   .bk-row .rt .mn { font-family: var(--cp-font-mono); font-size: 13px; line-height: 20px; color: var(--cp-text-muted); }
   .bk-edition .k { font-family: var(--cp-font-mono); font-size: 12px; line-height: 16px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--cp-text-muted); }
   .bk-edition .v { font-size: 15px; line-height: 21px; letter-spacing: .4px; font-weight: 500; color: var(--cp-text-muted); }
-  /* the reader: a header at the top that stays (one row: the way back and the size of the text), the chapter under it, and a bar at the bottom that stays (the thin line, Previous, the title of the book with the place, Next) */
+  /* the reader: a header at the top that stays (one row: the Back button of the app, which goes to the contents, and the size of the text, three round buttons of 48, 16 from the edge like the Back button of every screen), the chapter under it, and a bar at the bottom that stays (the thin line, Previous, the title of the book with the place, Next) */
   .bk-rhead { position: absolute; top: 54px; left: 0; right: 0; z-index: 4; background: var(--cp-bg); padding-top: 8px; }
-  .bk-rhead .r1 { display: flex; align-items: center; justify-content: space-between; padding: 0 8px; }
+  .bk-rhead .r1 { display: flex; align-items: center; justify-content: space-between; padding: 0 16px; }
   .bk-rbar .r2 { display: flex; align-items: center; justify-content: space-between; padding: 4px 8px; }
   .bk-rbar { position: absolute; left: 0; right: 0; bottom: 0; z-index: 4; background: var(--cp-bg); padding-bottom: 34px; }
-  .bk-back { min-height: 44px; display: inline-flex; align-items: center; gap: 4px; padding: 0 14px 0 6px; font-weight: 600; font-size: 16px; line-height: 22px; }
-  .bk-back .cp-icon { width: 24px; height: 24px; }
   .bk-rhead .sz { display: flex; gap: 8px; }
-  .bk-rhead .a { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: var(--cp-surface); box-shadow: inset 0 0 0 1px var(--cp-border); font-family: var(--cp-font-title); font-weight: 600; }
+  .bk-rhead .a { width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; background: var(--cp-surface); box-shadow: inset 0 0 0 1px var(--cp-border); font-family: var(--cp-font-title); font-weight: 600; }
   .bk-rhead .a i { font-style: normal; }
   .bk-rhead .a.s i { font-size: 15px; line-height: 20px; }
   .bk-rhead .a.l i { font-size: 24px; line-height: 28px; }
@@ -474,11 +472,11 @@ const STYLE = `<style>
   .bk-ic { width: 56px; height: 56px; display: grid; place-items: center; border-radius: 50%; flex: none; }
   .bk-ic .cp-icon { width: 31px; height: 31px; }
   .bk-rbar .mid { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; padding: 0 4px; }
-  .bk-rbar .bt { max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; font-size: 18px; line-height: 24px; }
+  .bk-rbar .bt { max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; font-size: 19px; line-height: 28px; }
   .bk-rbar .ps { font-family: var(--cp-font-mono); font-size: 14px; line-height: 20px; color: var(--cp-text-muted); }
   .bk-prog { height: 4px; background: var(--cp-border); }
   .bk-prog i { display: block; height: 4px; background: var(--cp-action); }
-  .phone .scroll.bk-rscroll { top: 106px; bottom: 102px; padding: 20px 20px 48px; }
+  .phone .scroll.bk-rscroll { top: 110px; bottom: 102px; padding: 20px 20px 48px; }
   /* a passage that is chosen: the gold ground and underline of a verse; the bar of actions (the Bible's, 138 high) takes its own room above the bar at the bottom, and the chapter has that much less */
   .bk-rtx .on { background: var(--cp-color-gold-soft); text-decoration: underline; }
   .phone .scroll.bk-rscroll.pa { bottom: 248px; }
@@ -539,8 +537,8 @@ function groupNotes(): string {
   The banner is the compact one of the Bible tab: a label (the first book, or the one read last), a title, one short handwritten note and a gold pill: <b>Start reading</b> or, once something was read, <b>Continue reading</b>, which goes on at the line where you stopped.
   A cover opens the <b>book page</b>: a larger cover, the title, the subtitle, the kind, the chapters, the words and the time, the description, <b>the notice of its kind</b> (what was written with AI assistance and what has not been checked: <code>notices.ts</code>) above the gold button
   (<b>${esc(readButtonLabel(SHOWN.guide.chapters, null))}</b> or <b>${esc(readButtonLabel(SHOWN.guide.chapters, placeIn(SHOWN.guide)))}</b>), the table of contents with the minutes of each chapter, the ones read ticked and the place where you stopped marked, and the credit.
-  The <b>reader</b> keeps a header at the top while the chapter scrolls under it, with one row as on a Kindle: the way back to the contents and two buttons for smaller and larger text (five steps, kept on the phone). At the bottom it keeps a bar: a thin line that shows how far down you are,
-  and under it Previous and Next named by where they go (off at the first and the last chapter) with the title of the book and "${esc(positionLine({ position: 3, total: SHOWN.guide.chapters.length }))}" between them. It sets paragraphs, headings, <b>lists</b> and <b>quotations</b> (the passage of a book of readings is one, with a rule at its left and a line that says whose words they are).
+  The <b>reader</b> keeps a header at the top while the chapter scrolls under it, with one row as on a Kindle: the <b>Back button</b> of every screen (round, 48, with the chevron: here it goes to the contents of the book) and two round buttons of the same size for smaller and larger text (five steps, kept on the phone). At the bottom it keeps a bar: a thin line that shows how far down you are,
+  and under it Previous and Next named by where they go (off at the first and the last chapter) with the title of the book (19 on 28, the body of the type scale, in SemiBold, on one line, cut with an ellipsis where it does not fit) and "${esc(positionLine({ position: 3, total: SHOWN.guide.chapters.length }))}" between them. It sets paragraphs, headings, <b>lists</b> and <b>quotations</b> (the passage of a book of readings is one, with a rule at its left and a line that says whose words they are).
   A touch on a paragraph, a list or a quotation <b>chooses that passage</b>, as a touch on a verse of the Bible does, and raises Bookmark, Copy and Share; a bookmarked passage is a row of Bookmarks that opens the reader at it.
   Where you stopped, the chapters you read and the size of the text stay on the phone and nothing is fetched: the books work with no signal.</p>`;
 }

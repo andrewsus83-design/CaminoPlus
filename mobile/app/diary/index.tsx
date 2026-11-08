@@ -5,6 +5,7 @@ import { Screen } from '@/components/Screen';
 import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
 import { Pill } from '@/components/Pill';
+import { BackButton } from '@/components/BackButton';
 import { Card, IconButton } from '@/components/ui';
 import { FormMessage } from '@/components/auth/Field';
 import { confirmDelete } from '@/features/diary/confirm';
@@ -18,14 +19,13 @@ export default function DiaryList() {
   const router = useRouter();
   const { ready, entries, remove } = useDiary();
   const [deleteFailed, setDeleteFailed] = useState(false);
-  const goBack = () => (router.canGoBack() ? router.back() : router.replace('/me'));
   const write = () => router.push('/diary/new');
   const ask = (e: DiaryEntry) => confirmDelete(pageTitle(e), async () => setDeleteFailed(!(await remove(e.id))), metaLine(e) !== '');
   const usage = mediaUsageLine(entries);
 
   return (
     <Screen tabBar={false}>
-      <IconButton name="back" label="Back" onPress={goBack} />
+      <BackButton fallback="/me" />
       <View style={{ gap: 8 }}>
         <AppText variant="h2" accessibilityRole="header">My diary</AppText>
         {entries.length > 0 && <AppText variant="label" muted>{pagesLabel(entries.length)}</AppText>}

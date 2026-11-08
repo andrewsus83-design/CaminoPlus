@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { ScrollView, Share, View } from 'react-native';
-import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '@/components/AppText';
 import { Pill } from '@/components/Pill';
-import { Card, IconButton } from '@/components/ui';
+import { BackButton } from '@/components/BackButton';
+import { Card } from '@/components/ui';
 import { FormMessage } from '@/components/auth/Field';
 import { supabase } from '@/lib/supabase';
 import { assertOnline, isOfflineError } from '@/lib/net';
@@ -23,7 +23,6 @@ const INCLUDED = [
 ];
 
 export default function DownloadData() {
-  const router = useRouter();
   const insets = useSafeAreaInsets();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -52,7 +51,7 @@ export default function DownloadData() {
 
   return (
     <ScrollView contentContainerStyle={{ paddingTop: insets.top + layout.screenTop, paddingHorizontal: layout.screenMargin, paddingBottom: insets.bottom + 40, gap: 16 }} style={{ backgroundColor: role.bg }}>
-      <IconButton name="back" label="Back" onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))} />
+      <BackButton />
       <View style={{ gap: 8 }}>
         <AppText variant="h2">Download my data</AppText>
         <AppText variant="lead" muted>Get a copy of what you have shared with CaminoPlus, as one file you can keep.</AppText>

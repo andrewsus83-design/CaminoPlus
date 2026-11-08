@@ -34,8 +34,8 @@ check('the Bible screens are routes: /library/bible/<code> for the chapters and 
 check('the chapter screen: Back, the bookmark of the BOOK in the corner, the name as the title with its count in JetBrains Mono, one handwritten note, the chapter tiles; a code that is no book is "not found"', () => {
   const src = code(read(CHAPTERS));
   assert.match(src, /<Screen tabBar=\{false\}>/);
-  assert.match(src, /<IconButton name="back" label="Back" onPress=\{goBack\} \/>/);
-  assert.match(src, /router\.canGoBack\(\) \? router\.back\(\) : router\.replace\('\/library'\)/);
+  assert.match(src, /<BackButton fallback="\/library" \/>/, 'the Back button of the app (components/BackButton.tsx), which goes to the Library when the screen was opened by a link');
+  assert.match(code(read('src/components/BackButton.tsx')), /router\.canGoBack\(\) \? router\.back\(\) : router\.replace\(fallback\)/, 'and goes back to the screen before this one otherwise');
   assert.match(src, /const book = bookByCode\(typeof code === 'string' \? code\.toUpperCase\(\) : ''\);\s+if \(!book\) return <PlaceMissing message=\{MISSING_BOOK\} \/>;/);
   assert.match(src, /const key = itemKey\('Bible', book\.id\);/, 'the book is bookmarked under its id, as every bookmark kept before the tiles is');
   assert.match(src, /<BookmarkToggle on=\{marks\.has\(key\)\} title=\{book\.name\} toggle=\{\(\) => marks\.toggle\(key\)\} \/>/);
@@ -115,7 +115,7 @@ check('the reader is the screen at /library/bible/<code>/<chapter>: the address 
   assert.match(src, /return <Reader key=\{`\$\{at\.place\.code\}\.\$\{at\.place\.chapter\}`\} place=\{at\.place\} verse=\{at\.verse\} \/>;/);
   const missing = code(read(`${BIBLE}/PlaceMissing.tsx`));
   assert.match(missing, /<Screen tabBar=\{false\}>/);
-  assert.match(missing, /<IconButton name="back" label="Back" onPress=\{goBack\} \/>/);
+  assert.match(missing, /<BackButton fallback="\/library" \/>/);
   assert.match(missing, /<AppText variant="h2" accessibilityRole="header">Not found<\/AppText>/);
   assert.match(missing, /router\.replace\('\/library'\)/, 'a way on to the Bible');
   assert.match(missing, /router\.replace\(bookHref\(book\.code\)\)/, 'and to the chapters of the book when there is one');
@@ -127,7 +127,7 @@ check('the reader: the title of the chapter, the name of the book, the title of 
   assert.match(src, /<AppText variant="h4" color=\{role\.accentText\} maxFontSizeMultiplier=\{READER_MAX_FONT_SCALE\}>\{book\.name\}<\/AppText>/, 'the name of the book is in Fraunces');
   assert.match(src, /<AppText variant="h2" accessibilityRole="header" maxFontSizeMultiplier=\{READER_MAX_FONT_SCALE\}>\{chapterTitle\(place\)\}<\/AppText>/, 'the chapter title is the heading of the screen, in Fraunces');
   assert.match(src, /\{!!chapter\.title && <AppText variant="h4" muted /);
-  const order = ['<IconButton name="back"', '<ChaptersLink', '{book.name}', '{chapterTitle(place)}', 'chapter.title', '<ChapterNav place={place} variant="top"', '<ReaderText', '<ChapterNav place={place} variant="foot"', '{READER_NOTE}', 'creditLines(TRANSLATION.credit)'].map((needle) => src.indexOf(needle));
+  const order = ['<BackButton fallback={bookHref(place.code)}', '<Pill variant="ghost" compact label="All chapters"', '{book.name}', '{chapterTitle(place)}', 'chapter.title', '<ChapterNav place={place} variant="top"', '<ReaderText', '<ChapterNav place={place} variant="foot"', '{READER_NOTE}', 'creditLines(TRANSLATION.credit)'].map((needle) => src.indexOf(needle));
   assert.ok(order.every((i) => i > 0) && order.every((i, k) => k === 0 || i > order[k - 1]), `Back, all chapters, book, title, psalm title, Previous/Next, the words, Previous/Next, the note, the credit (${order})`);
   assert.match(src, /<AppText variant="accent" color=\{role\.accentText\}>\{READER_NOTE\}<\/AppText>/, 'one handwritten note');
   assert.equal((src.match(/variant="accent"/g) ?? []).length, 1);
@@ -147,8 +147,8 @@ check('the reader: the title of the chapter, the name of the book, the title of 
 check('Previous and Next replace the reader (Back still goes to where the person came from) and the way to all the chapters pushes the chapters; the chapter read is remembered; a link to a verse scrolls to it', () => {
   const src = code(read(`${BIBLE}/Reader.tsx`));
   assert.match(src, /const go = \(to: Place\) => router\.replace\(readerHref\(\{ code: to\.code, chapter: to\.chapter \}\)\);/);
-  assert.match(src, /<ChaptersLink onPress=\{\(\) => router\.push\(bookHref\(place\.code\)\)\} \/>/);
-  assert.match(src, /const goBack = \(\) => \(router\.canGoBack\(\) \? router\.back\(\) : router\.replace\(bookHref\(place\.code\)\)\);/, 'opened by a link there is nothing to go back to: the chapters of the book are');
+  assert.match(src, /<Pill variant="ghost" compact label="All chapters" accessibilityLabel="All chapters of this book" onPress=\{\(\) => router\.push\(bookHref\(place\.code\)\)\} \/>/, 'the other control of the top row is a ghost pill of the app, 48 high like the Back button (not one made by hand)');
+  assert.match(src, /<BackButton fallback=\{bookHref\(place\.code\)\} \/>/, 'opened by a link there is nothing to go back to: the chapters of the book are');
   assert.match(src, /useEffect\(\(\) => \{ if \(chapter\) remember\(\{ code: place\.code, chapter: place\.chapter \}\); \}, \[chapter, place\.code, place\.chapter, remember\]\);/, 'only a chapter that has words is the one read last');
   assert.match(src, /const linked = useMemo\(\(\) => \(chapter && verse !== null \? labelOfNumber\(chapter, verse\) : null\), \[chapter, verse\]\);/);
   assert.match(src, /const \[selected, setSelected\] = useState<string \| null>\(linked\);/, 'the verse a link names is chosen');
