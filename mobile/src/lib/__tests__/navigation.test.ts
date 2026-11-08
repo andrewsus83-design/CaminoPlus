@@ -365,12 +365,41 @@ check('the design page shows the same Library: the two tabs Bible and Books, the
   assert.match(bible, /aria-label="Song of Songs, 8 chapters"><span class="nm" style="[^"]*">Song of<br>Songs<\/span>/);
   assert.equal(count(bible, /class="hw"/g), 1, 'one handwritten note on the screen');
 
-  // Continue: the card above the banner, with the chapter in JetBrains Mono; the New Testament chosen, 27 tiles
-  assert.match(cont, /<div class="cont-card" role="button" aria-label="Continue reading, Psalm 121">\s*<span class="ic">[^]*?<div class="k">Continue reading<\/div><div class="r">Psalm 121<\/div>/);
-  assert.ok(cont.indexOf('class="cont-card"') > cont.indexOf('class="cp-subtabs"') && cont.indexOf('class="cont-card"') < cont.indexOf('class="cp-banner cmp"'), 'the card is under the tabs and above the banner');
+  // Continue: no card in the page (the banner is right under the tabs), and the Continue reading bar floats above the tab bar, drawn over the dock's fade (its z-index is above the dock's) and before the scroll in the markup;
+  // the place is drawn in two pieces, the name and the chapter; the New Testament chosen, 27 tiles
+  assert.doesNotMatch(cont, /cont-card/, 'the card is gone from the page');
+  assert.match(cont, /<div class="cont-bar">\s*<div class="main" role="button" aria-label="Continue reading, Psalm 121"><svg class="cp-icon ic"><use href="#i-book"\/><\/svg><div class="t"><div class="k">Continue reading<\/div><div class="r"><span class="h">Psalm<\/span><span class="c">121<\/span><\/div><\/div><\/div>\s*<button class="x" aria-label="Hide Continue reading"><svg class="cp-icon"><use href="#i-x"\/><\/svg><\/button>\s*<\/div>/);
+  assert.ok(cont.indexOf('class="cp-subtabs"') < cont.indexOf('class="cp-banner cmp"'), 'the banner is right under the tabs, with no card between');
+  assert.ok(cont.indexOf('class="cont-bar"') < cont.indexOf('class="scroll"'), 'the bar is not inside the scroll: it floats, and the cover grid of a phone ends before anything of it');
+  assert.equal(count(cont, /class="cont-bar"/g), 1, 'one bar on the screen');
+  assert.equal(count(cont, /class="hw"/g), 1, 'the bar adds no handwriting: the banner has the one note');
   assert.equal(count(cont, /class="lib-tile"/g), 27);
   assert.match(cont, /aria-label="1 Thessalonians, 5 chapters"><span class="nm" style="font-size:14px;/, 'the longest word of all comes down to 14 on a phone of 390: the fit counts every letter rounded up to a pixel, as a browser that hints the glyphs draws it');
-  assert.equal(count(bible, /cont-card/g), 0, 'without a chapter read there is no card');
+  assert.equal(count(bible, /cont-bar|cont-card/g), 0, 'without a chapter read there is no bar and no card');
+  // the list keeps the bar's room at its end, as Screen does: what a list keeps for the tab bar (130 on the page) and the room the bar says it takes (64 and 8)
+  const layoutOfBar = read(join('src', 'features', 'library', 'continueBar', 'barLayout.ts'));
+  const barRoom = Number(/export const BAR_HEIGHT = (\d+);/.exec(layoutOfBar)?.[1]) + Number(/export const BAR_GAP = (\d+);/.exec(layoutOfBar)?.[1]);
+  const listEnd = Number(/\.phone \.scroll \{[^}]*padding: [^;}]*? (\d+)px;/.exec(design)?.[1]);
+  assert.equal(listEnd, 130, 'what a list of the page keeps free at its end for the tab bar');
+  assert.equal(barRoom, 72);
+  assert.equal(count(cont, new RegExp(`<div class="scroll" style="padding-bottom:${listEnd + barRoom}px">`, 'g')), 1, 'the list of the phone keeps the bar\'s room at its end: 130 for the tab bar and 72 for the bar');
+  // the bar's numbers are the tab dock's: the pill is 26 above the bottom and 88 high, so the bar is 26 + 88 + 8 = 122 up, with the pill's side margins, 64 high, a pill, the hero card colours and the tab bar's shadow
+  const css = (selector: string) => new RegExp(`${selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')} \\{([^}]*)\\}`).exec(design)?.[1] ?? '';
+  const dockCss = css('.phone .tabdock'), pillCss = css('.cp-tabbar'), barCss = css('.cont-bar');
+  const px = (rule: string, prop: string) => Number(new RegExp(`(?:^|[; ])${prop}: (\\d+)px`).exec(rule)?.[1]);
+  assert.equal(px(barCss, 'bottom'), px(dockCss, 'padding-bottom') + px(pillCss, 'height') + 8, 'the bar is 8 above the pill');
+  assert.equal(px(barCss, 'min-height'), 64);
+  assert.ok(Number(/z-index: (\d+)/.exec(barCss)?.[1]) > Number(/z-index: (\d+)/.exec(dockCss)?.[1]), 'drawn over the fade of the tab dock');
+  assert.match(pillCss, /margin: 0 (\d+)px/);
+  assert.equal(px(barCss, 'left'), Number(/margin: 0 (\d+)px/.exec(pillCss)?.[1]), 'the pill\'s side margin');
+  assert.equal(px(barCss, 'right'), px(barCss, 'left'));
+  assert.match(barCss, /border-radius: var\(--cp-radius-pill\)/);
+  assert.match(barCss, /background: var\(--cp-surface-inverse\); color: var\(--cp-text-inverse\); box-shadow: var\(--cp-shadow-lg\)/);
+  assert.match(css('.cont-bar .x'), /width: 48px; height: 48px/, 'the X is at least 44 by 44');
+  assert.match(css('.cont-bar .ic'), /color: var\(--cp-highlight\)/, 'a gold glyph');
+  assert.match(css('.cont-bar .r'), /font-family: var\(--cp-font-title\)/, 'the place is Fraunces');
+  assert.match(css('.cont-bar .r .h'), /flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis/, 'the name gives way, with an ellipsis');
+  assert.match(css('.cont-bar .r .c'), /flex: none/, 'the chapter does not');
   // Dark: the same screen in the dark palette
   assert.match(dark, /^[^]*?<div class="phone dk">/);
   assert.equal(count(dark, /class="lib-tile"/g), 39);

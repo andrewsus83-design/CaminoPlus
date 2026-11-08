@@ -30,6 +30,8 @@ import {
 } from '../books/reading';
 import { DEFAULT_STEP, LAST_STEP, readerType } from '../books/readerType';
 import { safeText } from '../books/safeText';
+import { BAR_ROOM } from '../continueBar/barLayout';
+import { CONTINUE_TITLE, HIDE_LABEL, describeBook, type SpotView } from '../continueBar/spot';
 import { BOOKMARKS_KEPT } from '../sample';
 import { itemKey, resultsLine, searchLibrary } from '../search';
 
@@ -157,17 +159,36 @@ function shelfHtml(shelf: Shelf<CatalogBook>, screen: number, marked: readonly s
 </div>`;
 }
 
-type TabOptions = { title: string; sub: string; dark?: boolean; width?: number; last?: string | null; marked?: readonly string[]; limit?: number; only?: 'second' };
+/**
+ * The Continue reading bar as the page draws it (continueBar/ContinueBar.tsx): it floats above the tab dock, so it comes before the scroll in the markup; the glyph of the Bible or of a
+ * book, "Continue reading" over the place, which is drawn in two pieces (the name gives way, the chapter does not), and the close button, a button of its own beside the bar.
+ * `view` is what the app works out for a place (spot.ts), so the words, the glyph and the label a screen reader hears are the app's.
+ */
+export function barHtml(view: SpotView): string {
+  return `<div class="cont-bar">
+  <div class="main" role="button" aria-label="${esc(view.spoken)}"><svg class="cp-icon ic"><use href="#i-${view.icon}"/></svg><div class="t"><div class="k">${esc(CONTINUE_TITLE)}</div><div class="r"><span class="h">${esc(view.head)}</span>${view.tail ? `<span class="c">${esc(view.tail)}</span>` : ''}</div></div></div>
+  <button class="x" aria-label="${esc(HIDE_LABEL)}">${svg('x')}</button>
+</div>`;
+}
 
-/** The Books tab: the banner and the first shelf (the phone is cut short there), or only the second shelf, as the tab looks scrolled down to it. */
+/** What a list keeps free at its end for the tab bar on the page (the .scroll of a phone has 130), and what it keeps once the bar floats over it: the room the bar says it takes. */
+export const SCROLL_END = 130;
+export const SCROLL_END_WITH_BAR = SCROLL_END + BAR_ROOM;
+
+type TabOptions = { title: string; sub: string; dark?: boolean; width?: number; bar?: SpotView | null; marked?: readonly string[]; limit?: number; only?: 'second' };
+
+/**
+ * The Books tab: the banner and the first shelf (the phone is cut short there), or only the second shelf, as the tab looks scrolled down to it. The banner is always the one
+ * that starts a book: going back to the place read last is the bar above the tab bar (`bar`), which a phone shows when it has a place to go back to.
+ */
 function booksTabPhone(o: TabOptions): string {
   const width = o.width ?? 390;
-  const view = booksBanner(BOOK_CATALOG, o.last ? { id: o.last } : null);
+  const view = booksBanner(BOOK_CATALOG, null);
   const on = shelves(BOOK_CATALOG);
   const marked = o.marked ?? [];
   const inner = o.only === 'second'
     ? `<div class="scroll" style="padding-top:8px">\n${indent(shelfHtml(on[1], width, marked), 2)}\n</div>\n${DOCK}`
-    : `<div class="scroll">
+    : `${o.bar ? `${barHtml(o.bar)}\n` : ''}<div class="scroll"${o.bar ? ` style="padding-bottom:${SCROLL_END_WITH_BAR}px"` : ''}>
 ${indent(LIB_HEAD, 2)}
   ${bannerHtml(view)}
   <div style="margin-top:24px">
@@ -385,6 +406,14 @@ function placeIn(text: BookContent): BookPlace {
   return { id: text.id, c: text.chapters[2].id, y: 0.35, at: 0, read: [text.chapters[0].id, text.chapters[1].id] };
 }
 
+/** The bar that the "Continue" phones show for the same place: what the app works out for it (spot.ts), so the page says "Chapter 3" where the book page's button and line do. */
+export function barOf(text: BookContent): SpotView {
+  const p = placeIn(text);
+  const view = describeBook({ kind: 'book', id: p.id, c: p.c, y: p.y, at: 1731068400000 }, text.chapters);
+  if (!view) throw new Error(`${text.id} is not a book of the catalog`);
+  return view;
+}
+
 const STYLE = `<style>
   /* Library > Books: the shelves of covers (A5, two in a row), the book page and the reader. This page is DRAWN by mobile/src/features/library/__tests__/designBooks.ts from the books of the
      bundle and from the functions of the app (cover.ts, copy.ts, notices.ts, reading.ts, readerType.ts, passages.ts): do not edit what is between the marks, draw it again. */
@@ -537,7 +566,8 @@ function groupNotes(): string {
   Each is drawn like a book: a spine with a groove and the shade of the hinge, the edges of the pages on the right, a small radius, a soft shadow, the glyph of the book in a ring, the title set like a cover in Fraunces
   (as large as fits, never a word cut: "${esc(first.title.lines.join(' '))}" is set at ${first.title.size}), the kind of book in small spaced capitals (Inter) and how long it takes in JetBrains Mono. There is no mark of free or soon: every book is in the app.
   The paper does not change with light and dark, nor does the navy printed on it. A cover is <b>one button</b> ("${esc(coverLabel(GUIDE!))}") and the ribbon at its top right is <b>another</b>, 44 by 44, that bookmarks the book (the key is <code>books:id</code>).
-  The banner is the compact one of the Bible tab: a label (the first book, or the one read last), a title, one short handwritten note and a gold pill: <b>Start reading</b> or, once something was read, <b>Continue reading</b>, which goes on at the line where you stopped.
+  The banner is the compact one of the Bible tab: a label (the first book), a title, one short handwritten note and a gold pill: <b>Start reading</b>. It does not continue a book: going back to the place read last, in a book or in the Bible,
+  is the <b>Continue reading</b> bar that floats above the tab bar (the same bar on both tabs of the Library, with a close button of its own, and room kept for it at the end of the lists): a book is named by its title and the chapter the reader will open ("${esc(barOf(SHOWN.guide).label)}").
   A cover opens the <b>book page</b>: a larger cover, the title, the subtitle, the kind, the chapters, the words and the time, the description, <b>the notice of its kind</b> (what was written with AI assistance and what has not been checked: <code>notices.ts</code>) above the gold button
   (<b>${esc(readButtonLabel(SHOWN.guide.chapters, null))}</b> or <b>${esc(readButtonLabel(SHOWN.guide.chapters, placeIn(SHOWN.guide)))}</b>), the table of contents with the minutes of each chapter, the ones read ticked and the place where you stopped marked, and the credit.
   The <b>reader</b> keeps a header at the top while the chapter scrolls under it, with one row as on a Kindle: the way back to the contents and two buttons for smaller and larger text (five steps, kept on the phone). At the bottom it keeps a bar: a thin line that shows how far down you are,
@@ -553,7 +583,7 @@ function groupPhones(): string {
   const place = placeIn(guide);
   const out: string[] = [
     booksTabPhone({ title: 'Books · second shelf', sub: `The tab scrolled down to ${esc(second.title)}: ${second.books.length} books, every cover with its kind and its time`, only: 'second' }),
-    booksTabPhone({ title: 'Books · dark', sub: 'Continue reading · the covers are paper: they do not change', dark: true, last: GUIDE!.id, limit: 6 }),
+    booksTabPhone({ title: 'Books · dark', sub: 'The Continue reading bar names a book and its chapter · the banner still starts the first book · the covers are paper: they do not change', dark: true, bar: barOf(guide), limit: 6 }),
     booksTabPhone({ title: 'Books · 320 wide', sub: `The smallest phone: ${cover320.tile} by ${cover320.height} covers, titles fitted`, width: 320, limit: 6 }),
     bookPagePhone(GUIDE!, { title: 'Book page · guide', sub: 'Cover and ribbon · the notice of a guide above the button · Start reading · the minutes of each chapter', marked: true }),
     bookPagePhone(READINGS!, { title: 'Book page · readings', sub: 'The notice of a book of readings: the passages are word for word, the reflections are original' }),
