@@ -7,7 +7,7 @@
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { BADGE_MAX, DEFAULT_ME_TAB, INBOX_LABEL, JOURNEY_WRITE, ME_FAB, ME_TABS, badgeText, inboxLabel, inboxTab } from '../tabs';
+import { BADGE_MAX, DEFAULT_ME_TAB, INBOX_LABEL, JOURNEY_WRITE, JOURNEY_WRITE_CARD, ME_FAB, ME_TABS, badgeText, inboxLabel, inboxTab } from '../tabs';
 
 let n = 0;
 const check = (name: string, fn: () => void) => { fn(); n += 1; console.log(`ok   ${name}`); };
@@ -158,11 +158,22 @@ check('the write card of Journey is cell 0 of the grid and nothing else changes 
   assert.match(card, /accessibilityLabel=\{JOURNEY_WRITE\.label\}/);
   assert.match(card, /export function WriteCard\(\{ width, height, onPress \}: \{ width: number; height: number; onPress: \(\) => void \}\)/, 'its size is the size of a post tile: the grid gives it');
   assert.match(card, /style=\{\(\{ pressed \}\) => \(\{ width, height, /);
-  assert.match(card, /<Icon name="pen" color=\{role\.onHighlight\} size=\{icon\.lg\}/, 'the pen on the gold circle, 32 px (icon.lg): a step of the icon scale (it was 30, which is not one)');
-  assert.match(card, /gap: space\[4\], paddingHorizontal: space\[3\]/, 'the room inside the card is steps of the space scale (the gap was 14)');
-  assert.match(card, /backgroundColor: role\.highlight/, 'a gold circle');
-  assert.match(card, /<AppText variant="label" style=\{\{ textAlign: 'center' \}\}>\{JOURNEY_WRITE\.label\}<\/AppText>/, 'the words are the label style: 17 px');
-  assert.deepEqual([...card.matchAll(/borderRadius: ([\w.]+)/g)].map((m) => m[1]), ['radius.pill'], 'square corners, like the post tiles: only the gold circle is round');
+  assert.match(card, /<Icon name="pen" color=\{role\.onHighlight\} size=\{compact \? icon\.mdPlus : icon\.lg\}/, 'the pen on the gold circle, 32 px (icon.lg), 28 on a small phone: steps of the icon scale (it was 30, which is not one)');
+  assert.match(card, /const compact = height < 320;\s*const disc = compact \? 56 : 64;/, 'a smaller circle on the tile of a small phone (279 high at 320), so that large text fits');
+  // Updated on purpose (2026-11-08, the owner found the card too plain): a warm card. A gold wash and a large faint shell as art, the invitation in Fraunces
+  // over the action, a short gold rule. The gap is 12 (space[3], was space[4]), 8 on the tile of a small phone, so that it all fits a 320 phone with large text.
+  assert.match(card, /gap: compact \? space\[2\] : space\[3\], paddingHorizontal: space\[3\]/, 'the room inside the card is steps of the space scale (the gap was 14, then 16)');
+  assert.match(card, /width: disc, height: disc, borderRadius: radius\.pill, backgroundColor: role\.highlight/, 'a gold circle');
+  assert.equal(JOURNEY_WRITE_CARD.prompt, 'What did you see today?');
+  assert.match(card, /<AppText variant="h4" maxFontSizeMultiplier=\{1\.2\} style=\{\{ textAlign: 'center' \}\}>\{JOURNEY_WRITE_CARD\.prompt\}<\/AppText>/, 'the invitation in the title type (Fraunces, 24 px), growing at most 1.2 times with the text size of the phone');
+  assert.match(card, /<AppText variant="label" style=\{\{ textAlign: 'center' \}\}>\{JOURNEY_WRITE\.label\}<\/AppText>/, 'the action is still written on the card, in the label style: 17 px');
+  assert.ok(card.indexOf('{JOURNEY_WRITE_CARD.prompt}') < card.indexOf('>{JOURNEY_WRITE.label}<'), 'the invitation over the action');
+  assert.match(card, /<Icon name="shell" color=\{role\.highlight\} size=\{art\} strokeWidth=\{0\.6\} \/>/, 'the art is the shell of the app, in the gold role, the width of the card');
+  assert.match(card, /importantForAccessibility="no-hide-descendants" accessibilityElementsHidden/, 'the art is not read out');
+  assert.match(card, /backgroundColor: role\.highlight, opacity: JOURNEY_WRITE_CARD\.wash \}/, 'the wash is the gold role with an opacity: a role, so it follows the mode');
+  assert.ok(JOURNEY_WRITE_CARD.wash <= 0.1 && JOURNEY_WRITE_CARD.shell <= 0.25, 'the wash and the art stay faint');
+  assert.equal((card.match(/<AppText\b/g) ?? []).length, 2, 'two lines of words, no more');
+  assert.deepEqual([...card.matchAll(/borderRadius: ([\w.]+)/g)].map((m) => m[1]), ['radius.pill', 'radius.pill'], 'square corners, like the post tiles: only the gold circle and the gold rule are round');
   assert.doesNotMatch(card, /#[0-9A-Fa-f]{3,8}\b|\brgba?\(|\bc\.\w+/, 'colours from the roles only');
   assert.match(read('src/components/Icon.tsx'), /^ {2}pen: \[/m, 'the pen is an icon of the app');
   assert.equal(tokensText('text', 'label', 'size'), 17, 'the label style is 17 px: readable');
@@ -208,6 +219,25 @@ check('the card keeps its contrast in light and in dark: the words on the card a
     for (const [what, fg, bg, need] of pairs) {
       const got = ratio(roleColour(fg, dark), roleColour(bg, dark));
       assert.ok(got >= need, `${dark ? 'dark' : 'light'}: ${what} is ${got.toFixed(2)} : 1, needs ${need} : 1`);
+    }
+  }
+  // the Journey card is the surface (or sunken, pressed) under a gold wash, and where a line of the shell art runs behind a word, the gold of the shell over that:
+  // the invitation and the action (both text: muted over a line of the shell while pressed was 4.19 : 1) keep 4.5 : 1 on all of it, in both modes
+  const mix = (under: string, over: string, alpha: number) => {
+    const ch = (hex: string) => [0, 2, 4].map((i) => parseInt(hex.replace('#', '').slice(i, i + 2), 16));
+    const [u, o] = [ch(under), ch(over)];
+    return '#' + u.map((v, i) => Math.round(v * (1 - alpha) + o[i] * alpha).toString(16).padStart(2, '0')).join('');
+  };
+  for (const dark of [false, true]) {
+    const gold = roleColour('highlight', dark);
+    for (const base of ['surface', 'surfaceSunken']) {
+      const ground = mix(roleColour(base, dark), gold, JOURNEY_WRITE_CARD.wash);
+      for (const under of [ground, mix(ground, gold, JOURNEY_WRITE_CARD.shell)]) {
+        for (const fg of ['text']) {
+          const got = ratio(roleColour(fg, dark), under);
+          assert.ok(got >= 4.5, `${dark ? 'dark' : 'light'}: ${fg} on the Journey card (${base}, gold wash${under === ground ? '' : ' and a line of the shell'}) is ${got.toFixed(2)} : 1`);
+        }
+      }
     }
   }
   // the gold of the button is the palette gold in both modes (it never changes), and the pen on it is the role onHighlight
