@@ -13,7 +13,7 @@ import type { LibraryMarks } from './useLibraryBookmarks';
 
 // The two Library tabs that hold rows: Bible (the books of the Bible, one part at a time) and Books (twelve free classics). There is no
 // real text yet (see sample.ts), so each tab starts with an honest notice and then shows, with rows that say "Soon", what will be
-// there. The third tab, Notes, is the diary and lives in features/library/notes. Colours are read while drawing, never at import.
+// there. The diary is not a Library tab: it is the Notes sub-tab of Me (features/notes). Colours are read while drawing, never at import.
 //
 // A row can carry a bookmark button (when `marks` is given): the button is its own component, so a row stays a plain picture of
 // what will be there. The rows of one tab are also what a search result and the Bookmarks screen draw (LibraryGroups), so a row
