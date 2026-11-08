@@ -21,7 +21,7 @@ const DIR = 'src/features/library';
 const OWN_FOLDERS = ['', 'bible/', 'books/'];
 const featureFiles = [
   ...OWN_FOLDERS.flatMap((sub) => fs.readdirSync(path.join(root, DIR, sub), { withFileTypes: true }).filter((f) => f.isFile() && /\.tsx?$/.test(f.name)).map((f) => `${DIR}/${sub}${f.name}`)),
-  ...fs.readdirSync(path.join(root, 'app/library')).filter((f) => f !== 'daily.tsx').map((f) => `app/library/${f}`),
+  ...fs.readdirSync(path.join(root, 'app/library'), { withFileTypes: true }).filter((f) => f.isFile() && /\.tsx?$/.test(f.name) && !f.name.startsWith('daily')).map((f) => `app/library/${f.name}`),
 ];
 
 check('the feature is the files this test expects, so a new one is looked at (and the scan below sees all of them)', () => {
@@ -120,6 +120,8 @@ check('the three choices at the bottom of the Bible tab: radio buttons in a radi
   assert.match(src, /\{TESTAMENTS\.map\(\(t\) => \{/, 'one choice for each part, in the order of the parts');
   assert.match(src, /export const BAR_DRAWN: Record<Testament, string> = \{ old: 'Old\\nTestament', deutero: 'Deuterocanon', new: 'New\\nTestament' \};/);
   assert.match(src, /\{BAR_DRAWN\[t\]\}<\/AppText>/);
+  assert.match(src, /export const BAR_MAX_FONT_SCALE = 1\.2;/);
+  assert.match(src, /<AppText maxFontSizeMultiplier=\{BAR_MAX_FONT_SCALE\} style=/, 'larger text still fits three labels in a row');
   // size: 56 high with 3 of padding and a border of 1 is a choice 48 high; the middle one keeps its own width, the others share the rest
   const height = Number(/export const BAR_HEIGHT = (\d+);/.exec(src)?.[1]);
   const padding = Number(/gap: 2, padding: (\d+)/.exec(src)?.[1]);
@@ -227,9 +229,9 @@ check('the feature uses no console, no interval and no StyleSheet.create (colour
 check('the Notes tab and the daily reading are plugged in here and built elsewhere: the screen draws NotesTab as the third tab, with no banner, and the banner opens /library/daily', () => {
   const screen = code(read('app/(tabs)/library.tsx'));
   assert.match(screen, /import \{ NotesTab \} from '@\/features\/library\/notes\/NotesTab';/);
-  assert.match(screen, /\{tab === 'Notes' && <NotesTab \/>\}/, 'no props, and nothing before it: the notes start right under the tabs');
+  assert.match(screen, /<View style=\{\{ flex: 1 \}\}><NotesTab \/><\/View>/, 'no props, in a box of its own that fills what is under the tabs: the notes start right under them');
   assert.doesNotMatch(screen, /<NotesTab\s[^>]*\w+=/, 'NotesTab takes no props');
-  assert.doesNotMatch(screen, /tab === 'Notes' && <(?:DailyBanner|BooksBanner|LibraryBanner)/, 'Notes has no banner');
+  assert.doesNotMatch(screen.slice(screen.indexOf("if (!searching && tab === 'Notes') {"), screen.indexOf('<Screen keyboard')), /Banner|<Screen\b|ScrollView/, 'Notes has no banner and no scroll view around it: the feed scrolls by itself');
   assert.match(screen, /<DailyBanner onOpen=\{\(\) => router\.push\('\/library\/daily'\)\} \/>/);
   assert.ok(fs.existsSync(path.join(root, 'src/features/library/notes/NotesTab.tsx')), 'the file of the Notes tab is there (a placeholder until the real one is merged)');
   assert.match(read('src/features/library/notes/NotesTab.tsx'), /export function NotesTab\(\)/);

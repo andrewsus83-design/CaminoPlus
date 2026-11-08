@@ -209,17 +209,28 @@ check('Library: directly under the search row the tabs Bible, Books, Notes, and 
   assert.match(screen, /<Screen keyboard scrollRef=\{scroller\}/, 'a button can be tapped while the keyboard is up');
   assert.doesNotMatch(screen, /PromoBanner/, 'the carousel with dots is gone from Library: one banner for each of two tabs');
   assert.doesNotMatch(screen, /MusicTab|'Music'/);
-  // the order on the screen: the header row, then either the results or [the tab strip, then the banner and the content of the tab]
-  const at = (needle: string) => { const i = screen.indexOf(needle); assert.ok(i > 0, `library.tsx has no ${needle}`); return i; };
-  const header = at('<LibraryHeader '), strip = at('<SubTabs tabs={LIBRARY_TABS}'), daily = at('<DailyBanner'), bible = at('<BibleTab'), books = at('<BooksBanner />'), booksTab = at('<BooksTab'), notes = at('<NotesTab />');
-  assert.ok(header < strip && strip < daily && daily < bible && bible < books && books < booksTab && booksTab < notes, 'header, strip, Bible banner, Bible, Books banner, Books, Notes');
-  assert.match(screen, /\{searching \? \(\s*<SearchResults query=\{query\} marks=\{marks\} onClear=\{\(\) => setQuery\(''\)\} \/>\s*\) : \(\s*<>\s*<SubTabs tabs=\{LIBRARY_TABS\} value=\{tab\} onChange=\{setTab\} \/>/,
-    'the results take the place of the strip and the banners, clearing the field brings them back, and the strip comes before any banner');
+  // the top of the screen is one piece, `top`, drawn by both hosts: the heading, the search row, the message, and then the tab strip (not while searching)
+  const at = (needle: string, from = 0) => { const i = screen.indexOf(needle, from); assert.ok(i > 0, `library.tsx has no ${needle}`); return i; };
+  const top = at('const top = ('), header = at('<LibraryHeader ', top), strip = at('<SubTabs tabs={LIBRARY_TABS}', top);
+  assert.ok(header < strip, 'the search row comes first, the tab strip directly after it');
+  assert.match(screen, /\{!searching && <SubTabs tabs=\{LIBRARY_TABS\} value=\{tab\} onChange=\{setTab\} \/>\}/, 'the tab strip is drawn unless something is typed, and it is drawn before any banner or content');
+  assert.equal((screen.match(/\{top\}/g) ?? []).length, 2, 'both hosts draw the same top');
+  // Bible and Books and the results: rows in the screen's own scroll, after the top
+  const screenAt = at('<Screen keyboard');
+  const daily = at('<DailyBanner', screenAt), bible = at('<BibleTab', screenAt), books = at('<BooksBanner />', screenAt), booksTab = at('<BooksTab', screenAt);
+  assert.ok(at('{top}', screenAt) < daily && daily < bible && bible < books && books < booksTab, 'the top, the Bible banner, Bible, the Books banner, Books');
+  assert.match(screen, /\{searching \? \(\s*<SearchResults query=\{query\} marks=\{marks\} onClear=\{\(\) => setQuery\(''\)\} \/>\s*\) : \(\s*<>\s*\{tab === 'Bible' && <DailyBanner/, 'the results take the place of the banners and the tab content, and clearing the field brings them back');
   assert.match(screen, /const searching = isSearching\(query\);/);
-  // each banner is shown under its own tab only; Notes has none
+  // each banner is shown under its own tab only
   assert.match(screen, /\{tab === 'Bible' && <DailyBanner onOpen=\{\(\) => router\.push\('\/library\/daily'\)\} \/>\}/);
   assert.match(screen, /\{tab === 'Books' && <BooksBanner \/>\}/);
   assert.equal((screen.match(/<DailyBanner/g) ?? []).length + (screen.match(/<BooksBanner/g) ?? []).length, 2, 'two banners, one for each tab that has one');
+  // Notes, the third tab: no banner, no Screen (the feed owns its scroll), the top pinned above it, NotesTab filling the box under it
+  const notesHost = screen.slice(at("if (!searching && tab === 'Notes') {"), screenAt);
+  assert.match(notesHost, /paddingTop: insets\.top \+ layout\.screenTop, paddingHorizontal: layout\.screenMargin, paddingBottom: 16, gap: 16 \}\}>\{top\}<\/View>/, 'the same top, in the same place and the same size as in the other host');
+  assert.match(notesHost, /<View style=\{\{ flex: 1 \}\}><NotesTab \/><\/View>/, 'NotesTab fills the box under the tabs: a height of its own, as wide as the screen');
+  assert.doesNotMatch(notesHost, /<Screen\b|ScrollView|Banner|SubTabs/, 'no scroll view around the feed, no banner, and the strip comes from `top`');
+  assert.ok(notesHost.indexOf('{top}') < notesHost.indexOf('<NotesTab'), 'the notes start right under the tabs');
   // each tab with example rows starts with its notice
   const tabsSrc = read(join('src', 'features', 'library', 'LibraryTabs.tsx'));
   for (const t of SAMPLE_TABS) assert.match(tabsSrc, new RegExp(`<Notice tab="${t}" />`), `the ${t} tab does not start with its notice`);
@@ -234,10 +245,12 @@ check('what floats at the bottom: the three choices of the Bible only on Bible, 
   const screen = read(join('app', '(tabs)', 'library.tsx'));
   assert.equal((screen.match(/<TestamentBar\b/g) ?? []).length, 1);
   assert.equal((screen.match(/<Fab\b/g) ?? []).length, 1);
-  assert.match(screen, /\{!searching && tab === 'Bible' && <TestamentBar value=\{testament\} onChange=\{choose\} \/>\}/);
-  assert.match(screen, /\{!searching && tab === 'Notes' && <Fab label="Write a note" icon="compose" onPress=\{\(\) => router\.push\('\/diary\/new'\)\} \/>\}/);
-  // the bar is drawn outside the scroll view, after it (so it floats over the list), and the list ends with its room
-  assert.ok(screen.indexOf('</Screen>') > 0 && screen.indexOf('<TestamentBar') > screen.indexOf('</Screen>') && screen.indexOf('<Fab') > screen.indexOf('</Screen>'));
+  // the gold pen is in the Notes host, which is only used when nothing is typed and the tab is Notes
+  const notesHost = screen.slice(screen.indexOf("if (!searching && tab === 'Notes') {"), screen.indexOf('<Screen keyboard'));
+  assert.match(notesHost, /<Fab label="Write a note" icon="compose" onPress=\{\(\) => router\.push\('\/diary\/new'\)\} \/>/);
+  assert.ok(notesHost.includes('<Fab') && !screen.slice(screen.indexOf('<Screen keyboard')).includes('<Fab'), 'the pen is not in the other host');
+  // the bar is drawn outside the scroll view, after it (so it floats over the list), only on Bible and not while searching, and the list ends with its room
+  assert.match(screen, /<\/Screen>\s*\{!searching && tab === 'Bible' && <TestamentBar value=\{testament\} onChange=\{choose\} \/>\}/);
   assert.match(screen, /\{tab === 'Bible' && <View style=\{\{ height: BAR_ROOM \}\} \/>\}/, 'room under the last book for the bar');
   // Default: the Old Testament
   assert.match(screen, /useState<Testament>\('old'\)/);

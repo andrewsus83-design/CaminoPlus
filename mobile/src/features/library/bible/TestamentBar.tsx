@@ -11,6 +11,9 @@ export const BAR_ROOM = BAR_HEIGHT;
 /** Under this width (the same as the search field's) the bar keeps 12 from the edges instead of 16, which gives the three labels room down to 320. */
 export const BAR_NARROW_UNDER = 352;
 
+/** A person who has made the phone's text larger still gets larger labels here, up to this much: three labels in a row of a 320 wide phone cannot grow without end. */
+export const BAR_MAX_FONT_SCALE = 1.2;
+
 /** What is drawn on a choice: the two that have two words go on two lines, so the three fit side by side from 320 up and look alike at every width. A screen reader says the plain label. */
 export const BAR_DRAWN: Record<Testament, string> = { old: 'Old\nTestament', deutero: 'Deuterocanon', new: 'New\nTestament' };
 
@@ -58,7 +61,7 @@ export function TestamentBar({ value, onChange }: { value: Testament; onChange: 
               backgroundColor: on ? role.action : 'transparent', opacity: pressed ? 0.85 : 1,
             })}
           >
-            <AppText style={{ fontFamily: fonts.bodyBold, fontSize: 14, lineHeight: 18, textAlign: 'center', color: on ? role.onAction : role.text }}>{BAR_DRAWN[t]}</AppText>
+            <AppText maxFontSizeMultiplier={BAR_MAX_FONT_SCALE} style={{ fontFamily: fonts.bodyBold, fontSize: 14, lineHeight: 18, textAlign: 'center', color: on ? role.onAction : role.text }}>{BAR_DRAWN[t]}</AppText>
           </Pressable>
         );
       })}

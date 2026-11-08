@@ -131,9 +131,13 @@ export const SCENARIOS = [
       step('Books: what is only data for later (links, licence notes, groups) is nowhere on the screen');
       const text = (await page.locator('body').innerText()).replace(/\s+/g, ' ');
       assert(!/gutenberg|ccel\.org|licen[cs]e|translator|public domain|check-edition|Pilgrims on foot|Spanish and contemplative|Reflection and inner peace|Great classics/i.test(text), `the Books tab shows data that is not meant for the screen: ${text.slice(0, 200)}`);
-      step('Notes: no banner and no notice');
+      step('Notes: the search row and the tabs stay exactly where they were, and there is no banner and no notice');
       await strip('Notes').click();
       await page.getByRole('button', { name: 'Write a note', exact: true }).waitFor();
+      const [search2, bible2, books2, notes2] = [await box(page.getByRole('textbox', { name: 'Search the library' }), 'the search field on Notes'), await box(strip('Bible'), 'the Bible tab on Notes'), await box(strip('Books'), 'the Books tab on Notes'), await box(strip('Notes'), 'the Notes tab on Notes')];
+      for (const [what, before, now] of [['the search field', search, search2], ['the Bible tab', bible, bible2], ['the Books tab', books, books2], ['the Notes tab', notes, notes2]]) {
+        assert(Math.abs(before.x - now.x) < 1.5 && Math.abs(before.y - now.y) < 1.5 && Math.abs(before.width - now.width) < 1.5, `${what} moved when Notes was chosen: ${JSON.stringify(before)} -> ${JSON.stringify(now)}`);
+      }
       for (const gone of ["Today's reading and a short reflection", 'Twelve free companions for the road', 'Preview']) {
         await eventually(() => page.getByText(gone, { exact: true }).filter({ visible: true }).count(), (n) => n === 0, { what: `the number of "${gone}" texts on Notes` });
       }

@@ -1,6 +1,7 @@
 import { ComponentRef, useRef, useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Screen } from '@/components/Screen';
 import { AppText } from '@/components/AppText';
 import { Fab } from '@/components/Fab';
@@ -17,11 +18,16 @@ import { LIBRARY_TABS, LibraryTab } from '@/features/library/sample';
 import { BOOKMARK_NOT_SAVED } from '@/features/library/bookmarks';
 import { isSearching } from '@/features/library/search';
 import { useLibraryBookmarks } from '@/features/library/useLibraryBookmarks';
+import { layout, role } from '@/theme';
 
 // Library: no title. The row on top is a search field and the round Bookmarks button in the corner; directly under it the three tabs,
 // Bible, Books and Notes. Bible and Books each start with a banner (the Bible one opens today's reading); Notes, which is the diary,
 // has none: its notes start right under the tabs. While something is typed in the search field, its results (Bible and Books at once,
 // grouped by tab) take the place of the tabs and the banners; clearing it brings them back as they were.
+//
+// Two ways to host a tab. Bible, Books and the search results are rows in the screen's own scroll (Screen), so the search row and the tabs
+// scroll away with them. Notes is a feed that owns its scroll (a virtualised list with pull to refresh, features/library/notes): the search
+// row and the tabs stay at the top, in the same place and the same size, and NotesTab fills the box under them, edge to edge.
 //
 // What floats at the bottom depends on the tab, and only one thing at a time: on Bible the three choices Old Testament, Deuterocanon and
 // New Testament sit just above the tab bar (and the list ends with room for them); on Notes the gold pen writes a note; on Books nothing.
@@ -35,6 +41,7 @@ const VISUALLY_HIDDEN = { position: 'absolute', width: 1, height: 1, overflow: '
 
 export default function Library() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const [tab, setTab] = useState<LibraryTab>('Bible');
   const [testament, setTestament] = useState<Testament>('old');
   const [query, setQuery] = useState('');
@@ -48,28 +55,42 @@ export default function Library() {
     setTestament(t);
     if (offset.current > listTop.current) scroller.current?.scrollTo({ y: Math.max(listTop.current - 8, 0), animated: false });
   };
+  // The top of the screen, the same in both hosts: the heading for a screen reader, the search row, a message when a bookmark could not be kept, the tabs.
+  const top = (
+    <>
+      <AppText accessibilityRole="header" style={VISUALLY_HIDDEN}>Library</AppText>
+      <LibraryHeader query={query} onQuery={setQuery} onBookmarks={() => router.push('/library/bookmarks')} />
+      {marks.failed && <FormMessage>{BOOKMARK_NOT_SAVED}</FormMessage>}
+      {!searching && <SubTabs tabs={LIBRARY_TABS} value={tab} onChange={setTab} />}
+    </>
+  );
+
+  if (!searching && tab === 'Notes') {
+    return (
+      <View style={{ flex: 1, backgroundColor: role.bg }}>
+        <View style={{ paddingTop: insets.top + layout.screenTop, paddingHorizontal: layout.screenMargin, paddingBottom: 16, gap: 16 }}>{top}</View>
+        <View style={{ flex: 1 }}><NotesTab /></View>
+        <Fab label="Write a note" icon="compose" onPress={() => router.push('/diary/new')} />
+      </View>
+    );
+  }
   return (
     <View style={{ flex: 1 }}>
       <Screen keyboard scrollRef={scroller} onScroll={(e) => { offset.current = e.nativeEvent.contentOffset.y; }}>
-        <AppText accessibilityRole="header" style={VISUALLY_HIDDEN}>Library</AppText>
-        <LibraryHeader query={query} onQuery={setQuery} onBookmarks={() => router.push('/library/bookmarks')} />
-        {marks.failed && <FormMessage>{BOOKMARK_NOT_SAVED}</FormMessage>}
+        {top}
         {searching ? (
           <SearchResults query={query} marks={marks} onClear={() => setQuery('')} />
         ) : (
           <>
-            <SubTabs tabs={LIBRARY_TABS} value={tab} onChange={setTab} />
             {tab === 'Bible' && <DailyBanner onOpen={() => router.push('/library/daily')} />}
             {tab === 'Bible' && <BibleTab marks={marks} testament={testament} onListLayout={(e) => { listTop.current = e.nativeEvent.layout.y; }} />}
             {tab === 'Bible' && <View style={{ height: BAR_ROOM }} />}
             {tab === 'Books' && <BooksBanner />}
             {tab === 'Books' && <BooksTab marks={marks} />}
-            {tab === 'Notes' && <NotesTab />}
           </>
         )}
       </Screen>
       {!searching && tab === 'Bible' && <TestamentBar value={testament} onChange={choose} />}
-      {!searching && tab === 'Notes' && <Fab label="Write a note" icon="compose" onPress={() => router.push('/diary/new')} />}
     </View>
   );
 }
