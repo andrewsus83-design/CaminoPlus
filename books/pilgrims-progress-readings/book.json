@@ -1,0 +1,42 @@
+{
+  "id": "pilgrims-progress-readings",
+  "kind": "reflection",
+  "order": 11,
+  "title": "The Slough and the City",
+  "subtitle": "Twelve Days with The Pilgrim's Progress for the Camino Portugués",
+  "route_slug": "camino-portugues",
+  "days": 12,
+  "description_short": "Twelve days with Bunyan's allegory of a pilgrim, for the Camino Portugués from Porto: a morning reading and an evening reflection for each day. Honest about doubt and about the hard pages.",
+  "description_long": "The Pilgrim's Progress is a story of a walk. A man with a great burden on his back leaves his city, falls into a bog, knocks at a gate, climbs a hill, goes down into a valley, passes through a fair, loses his way, is shut in a castle, and comes at last to a river and a city. John Bunyan, a tinker and preacher of Bedford, told it as a dream, and it was first printed in 1678. It has been read ever since, by people who never took a step on a pilgrimage and by people who have walked a long way.\n\nThe Slough and the City is made to go with the Camino Portugués from Porto, a road of about two weeks and ~240 km. It has twelve days, one for each stretch of Christian's journey, in the order of the story. Every day has a morning reading of about five minutes and an evening reflection of about three. The morning begins with a short passage quoted word for word from the first part of Bunyan's book, in the old English of the public-domain text. Then comes a reflection that starts from something on the road, and then a question and a small practice to carry for the next hour. The evening looks back over the day with two or three gentle questions and ends with a short original prayer, open enough to be said as a wish by a reader who prays differently, or who does not pray.\n\nBunyan's book is a Protestant Christian allegory of the seventeenth century, with a stern side that this book does not hide. It leaves out its harshest pages, says plainly where it has done so, and does not pretend that the story says what it does not. It invites and does not push. Read it on a bench, in a pilgrim hostel bunk, or at your own kitchen table once the walking is done.",
+  "keywords": [
+    "Camino de Santiago",
+    "Camino Portugués",
+    "Pilgrim's Progress",
+    "John Bunyan",
+    "pilgrimage reflections",
+    "daily readings",
+    "prayer"
+  ],
+  "categories": [
+    "Religion / Christian Living / Spiritual Growth",
+    "Religion / Christianity / Devotional",
+    "Travel / Special Interest / Pilgrimages"
+  ],
+  "cover": {
+    "colour": "blue100",
+    "icon": "book"
+  },
+  "version": "1.0.0",
+  "date": "2026-11",
+  "sources": [
+    {
+      "id": "gutenberg-131",
+      "work": "The Pilgrim's Progress",
+      "author": "John Bunyan",
+      "translator": "none (English original)",
+      "year": "1678",
+      "licence": "Public domain",
+      "url": "https://www.gutenberg.org/ebooks/131"
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "id": "camino-del-norte-guide",
+  "kind": "guide",
+  "order": 4,
+  "title": "The Northern Way",
+  "subtitle": "A Pilgrim's Guide to the Camino del Norte",
+  "route_slug": "camino-del-norte",
+  "description_short": "An honest guide to the Camino del Norte: thirty-seven walking days from Irun along the Bay of Biscay to Santiago, region by region, with its boats, its variants, when to go and how to arrive.",
+  "description_long": "The Camino del Norte is the coast road to Santiago: about 820 km from Irun, on the French border, west along the Bay of Biscay through the Basque Country, Cantabria and Asturias, then inland across northern Galicia to meet the Camino Francés at Arzúa and walk the last stretch to the cathedral of Santiago de Compostela. It is long, green and hilly, and it is known for its changeable weather.\n\nThis guide is written for the Planner first and the Walker's evenings second. It is plain about the difficulty, and it helps you decide whether five or six weeks on the northern coast are your Camino, shape the walk, pack, and know what to check locally. No single body publishes the whole road, so the book follows the official stage lists of the four regions and says where they disagree with each other and with other sources. It tells you about the three boat crossings, the two roads into Galicia, the link to the Camino Primitivo and the other roads that branch from this one, and it says what the Pilgrim's Office writes about the Compostela, in its own words.\n\nYou will find the walk in thirty-seven days by region, the Basque Country, Cantabria, Asturias and Galicia, with other ways to split them; chapters on when to go, on sleeping, eating and resting, on body, weather and safety (written with care for a road that is often wet), on the inner side of walking, and on arriving in Santiago and going home.\n\nEvery distance is marked approximate, and the book says where sources differ. It names no hostels, cafes or prices, because they change; it sends you to the CaminoPlus app and to local information for the live answer. Its facts come from named public sources, which the book credits.",
+  "keywords": [
+    "Camino del Norte",
+    "Northern Way",
+    "Camino de Santiago",
+    "Irun to Santiago",
+    "pilgrim guidebook",
+    "coastal Camino",
+    "Compostela"
+  ],
+  "categories": [
+    "Travel / Special Interest / Pilgrimages",
+    "Travel / Europe / Spain"
+  ],
+  "cover": { "colour": "successWash", "icon": "library" },
+  "version": "1.0.0",
+  "date": "2026-11"
+}
