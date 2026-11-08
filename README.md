@@ -2,7 +2,7 @@
 
 The offline-first companion app for pilgrims walking the Camino de Santiago (iOS and Android, React Native).
 Maps that work without signal, stays and cafés, a digital pilgrim passport with stamps, a journal to share, and
-friends, chat and group chat. Website: [camino.plus](https://camino.plus). The app is in development.
+friends, chat and group chat. Website: [camino.plus](https://camino.plus). The app is in development; [`CHANGELOG.md`](CHANGELOG.md) says what each release changed.
 
 **Plans.** The basic app is free. The paid plan is called **Pilgrim Plus**: US$12 a year, with offline route
 downloads and 5 GB of cloud storage (extra storage US$5 per 5 GB a year). Use the name "Pilgrim Plus" everywhere,
@@ -12,13 +12,13 @@ never "CaminoPlus plan".
 
 | Folder | What is in it | Start here |
 |---|---|---|
-| `mobile/` | The app: Expo SDK 58, React Native 0.88, TypeScript (strict), Expo Router, supabase-js, MapLibre Native | [`mobile/AUTH.md`](mobile/AUTH.md) (sign-in, owner setup), [`mobile/docs/MAPS.md`](mobile/docs/MAPS.md) (maps, offline packs, GPS) |
-| `supabase/` | Postgres schema with row level security, storage buckets, RPCs, seed data, edge functions (Deno): `offline-pack-url`, and more | [`supabase/README.md`](supabase/README.md) |
+| `mobile/` | The app: Expo SDK 58, React Native 0.88, TypeScript (strict), Expo Router, supabase-js, MapLibre Native. Five tabs: Me (Notes, Journey, Plan, Health, and a chat button), Stays, Maps (the route line of Camino Francés stages 1 to 3 is the real OpenStreetMap route, bundled in the app), Discover and Library (Daily reading, the World English Bible, and the 26 books) | [`mobile/AUTH.md`](mobile/AUTH.md) (sign-in, owner setup), [`mobile/docs/MAPS.md`](mobile/docs/MAPS.md) (maps, offline packs, GPS), [`mobile/DEPLOY.md`](mobile/DEPLOY.md) (what to build, how a merge reaches a phone) |
+| `supabase/` | Postgres schema with row level security, storage buckets, RPCs, seed data, edge functions (Deno): `offline-pack-url`, and more. The OpenStreetMap stays and places of Camino Francés stages 1 to 3 are in the live database only, not in a migration | [`supabase/README.md`](supabase/README.md) |
 | `design/` | The design system: `tokens.css` and `tokens.json` are the single source of truth for colour, type, spacing; `index.html` shows the screens | open `design/index.html` |
 | `web/` | The camino.plus site: plain HTML and CSS, **generated** by `tools/build_web.py` | [`web/README.md`](web/README.md) |
 | `brand/` | Brand guideline, SVG logo and icon pack, the social content factory (plans, templates, QA checklist) | [`brand/README.md`](brand/README.md) |
-| `books/` | The CaminoPlus Library: 26 books (14 route guidebooks, one for every route of the catalog, and 12 reflection books on famous public-domain books), written and published with the two skills in `.claude/skills/` (`book-writer`, `book-publisher`) | [`books/series.md`](books/series.md) |
-| `tools/` | `offline-maps/` builds, tests and publishes the offline map packs; `poi-audit/` cross-checks places from open data; scripts for the site, tokens, screenshots and brand SVGs | [`tools/offline-maps/README.md`](tools/offline-maps/README.md), [`tools/poi-audit/README.md`](tools/poi-audit/README.md) |
+| `books/` | The CaminoPlus Library: 26 books (14 route guidebooks, one for every route of the catalog, and 12 reflection books on famous public-domain books), written and published with the two skills in `.claude/skills/` (`book-writer`, `book-publisher`); the app's Library reads them from `mobile/assets/library/` | [`books/series.md`](books/series.md) |
+| `tools/` | `offline-maps/` builds, tests and publishes the offline map packs; `poi-audit/` cross-checks places from open data and imports OpenStreetMap places into the database; `bible/` imports the text of the Bible; `design-audit/` is design-lint, the CI check of the app code against the design tokens; scripts for the site, tokens, screenshots and brand SVGs | [`tools/offline-maps/README.md`](tools/offline-maps/README.md), [`tools/poi-audit/README.md`](tools/poi-audit/README.md), [`tools/bible/README.md`](tools/bible/README.md), [`tools/design-audit/README.md`](tools/design-audit/README.md) (rules for a screen: [`mobile/docs/DESIGN-RULES.md`](mobile/docs/DESIGN-RULES.md)) |
 | `.github/` | CI, the two pipelines (offline maps, POI audit), Dependabot | [`.github/workflows/ci.yml`](.github/workflows/ci.yml) |
 
 ## Run it
@@ -29,7 +29,8 @@ never "CaminoPlus plan".
 cd mobile
 npm ci
 npx expo start          # Expo Go works for everything except the real map (MapLibre is native code)
-npm run build:dev:android   # a development build with MapLibre: see mobile/docs/MAPS.md
+npx expo start -c --dev-client   # with a development build, which has the real map
+npm run build:dev:android   # make that build: mobile/DEPLOY.md (which build, how to see it), mobile/docs/MAPS.md
 ```
 
 **The database** (Postgres 16 with PostGIS; no Docker needed): `supabase/dev/validate.sh` applies every migration and the
@@ -47,7 +48,11 @@ Preview with any static server, for example `npx serve web`. Deploys from Vercel
 
 **POI audit**: `cd tools/poi-audit && pip install -r requirements.txt && python audit.py --stage ../offline-maps/stages/camino-frances-01.json --out out/stage-1`.
 
-**The books**: `python3 tools/fetch_book_sources.py /tmp/book-sources` downloads the public-domain texts the reflection books quote; `python3 tools/check_books.py --strict --sources /tmp/book-sources` checks every book; `python3 tools/check_series.py` checks that the books are exactly the planned ones (`books/plan.json`); `python3 tools/build_books.py` builds the EPUB, PDF, cover and store metadata into `books/dist/` (and an app bundle, which is not part of the repository yet: see `books/series.md`).
+**The books**: `python3 tools/fetch_book_sources.py /tmp/book-sources` downloads the public-domain texts the reflection books quote; `python3 tools/check_books.py --strict --sources /tmp/book-sources` checks every book; `python3 tools/check_series.py` checks that the books are exactly the planned ones (`books/plan.json`); `python3 tools/build_books.py` builds the EPUB, PDF, cover and store metadata into `books/dist/` and the app's bundle (`mobile/assets/library/` and `mobile/src/features/library/bookBundle.ts`, committed; `--no-render` refreshes only the bundle and needs no browser, `--check` fails when it is out of date).
+
+**The Bible**: `python3 tools/bible/import_webc.py --check` compares the text in `mobile/assets/bible/webc/` with the pinned eBible.org download (see `tools/bible/README.md`).
+
+**Route lines of the map**: `python tools/poi-audit/build_route_lines.py` makes the bundled OpenStreetMap lines of Camino Francés stages 1 to 3 (`mobile/assets/map/lines/`) again from Overpass; the data ages, so run it before a release (see `mobile/docs/MAPS.md`).
 
 **Brand SVGs**: `pip install fonttools && python3 tools/build_brand_svg.py` (`--icons-only` after a design change that only touches icons).
 
