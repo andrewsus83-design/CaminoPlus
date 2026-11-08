@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { Alert, Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, TextInput, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { BackButton } from '@/components/BackButton';
 import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
 import { Pill } from '@/components/Pill';
@@ -177,9 +178,9 @@ export default function Write() {
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1, backgroundColor: role.bg }}>
         <ScrollView contentContainerStyle={{ paddingTop: insets.top + layout.screenTop, paddingHorizontal: layout.screenMargin, paddingBottom: 160, gap: 20 }} keyboardShouldPersistTaps="handled">
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-            <Pressable accessibilityRole="button" accessibilityLabel="Back" onPress={() => setStep(1)} hitSlop={12}><Icon name="back" color={role.text} size={30} /></Pressable>
+            <BackButton onPress={() => setStep(1)} hint="Back to your slides" />
             <AppText variant="h4">New journey post</AppText>
-            <View style={{ width: 30 }} />
+            <View style={{ width: 48 }} />
           </View>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 12 }} style={{ flexGrow: 0, marginHorizontal: -layout.screenMargin }}>
             <View style={{ width: layout.screenMargin }} />

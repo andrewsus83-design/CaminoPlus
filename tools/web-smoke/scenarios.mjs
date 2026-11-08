@@ -12,6 +12,9 @@
 // The Bible side of the Library (the grid of books, the chapters, the reader, the search of verses, Continue reading) is in bible.scenarios.mjs,
 // and the Books side (the covers, the book page, the reader of a book) in books.scenarios.mjs.
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { DAILY_SCENARIOS } from './daily.scenarios.mjs';
 import { UID } from './fixtures.mjs';
 import { domQuiet, eventually, pathOf } from './harness.mjs';
@@ -19,6 +22,10 @@ import { BIBLE_SCENARIOS } from './bible.scenarios.mjs';
 import { BOOKS_SCENARIOS, CATALOG, COVER_LABEL } from './books.scenarios.mjs';
 import { ME_SCENARIOS } from './me.scenarios.mjs';
 
+/** design/tokens.json: the weights of the tabs of the tab bar (section tab) are read from it, as the app reads them. */
+const TAB_TOKENS = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'design', 'tokens.json'), 'utf8')).tab;
+/** The stem of Inter Light is 136 of 2048 units (themeScheme.test.ts reads it from the font file on every run): 0.93 px at the 14 px of a tab label. */
+const LIGHT_STEM_PX = (136 / 2048) * 14;
 const TABS = ['Me', 'Stays', 'Maps', 'Discover', 'Library'];
 const TAB_PATH = { Me: '/me', Stays: '/stays', Maps: '/maps', Discover: '/explore', Library: '/library' };
 
@@ -54,6 +61,38 @@ export const SCENARIOS = [
         await waitPath(page, TAB_PATH[label], `the address after tapping ${label}`);
         await eventually(() => texts(page.getByRole('tab')), (t) => t.join('|') === TABS.join('|'), { what: `the tab bar after tapping ${label}` });
       }
+    },
+  },
+  {
+    name: 'Tab bar: an inactive tab is thin and Light and its icon is drawn exactly as thick as the stem of its label (0.93 px), the active tab is heavier in both',
+    persona: 'in',
+    async run({ page, step, go, task }) {
+      step('open Me, where Me is the active tab and the other four are not');
+      await go('/me');
+      await eventually(() => texts(page.getByRole('tab')), (t) => t.join('|') === TABS.join('|'), { what: 'the tabs of the tab bar' });
+      const drawn = await page.evaluate(() => [...document.querySelectorAll('[role="tab"]')].map((el) => {
+        const svg = el.querySelector('svg');
+        const shape = svg.querySelector('path, circle');
+        const label = [...el.querySelectorAll('div[dir]')].pop();
+        const cs = getComputedStyle(label);
+        return { name: label.textContent, size: svg.getBoundingClientRect().width, box: svg.viewBox.baseVal.width, stroke: Number(shape.getAttribute('stroke-width')), family: cs.fontFamily, fontSize: cs.fontSize };
+      }));
+      assert.equal(drawn.length, TABS.length);
+      const scheme = task.scheme;
+      const inactive = drawn.filter((t) => t.name !== 'Me');
+      assert.equal(inactive.length, 4, 'four tabs are inactive');
+      step('each inactive tab: the icon is the stroke of tokens.tab (0.8 of its 24 units, drawn 28 px square: 0.93 px) within 10 percent of the stem of its Light label at 14 px, and the label is Inter Light');
+      for (const t of inactive) {
+        assert.equal(t.stroke, TAB_TOKENS.inactiveStroke[scheme], `${t.name}: the stroke is the token`);
+        const px = (t.stroke * t.size) / t.box;
+        assert(Math.abs(px / LIGHT_STEM_PX - 1) <= 0.1, `${t.name}: the icon is drawn ${px.toFixed(3)} px thick, the stem of its label is ${LIGHT_STEM_PX.toFixed(3)} px`);
+        assert(/Inter_300Light/.test(t.family), `${t.name}: the label is Inter Light (${t.family})`);
+        assert.equal(t.fontSize, '14px', `${t.name}: the label is 14 px`);
+      }
+      const active = drawn.find((t) => t.name === 'Me');
+      assert.equal(active.stroke, TAB_TOKENS.activeStroke[scheme], 'the active icon is the active stroke of the mode');
+      assert(active.stroke >= 1.5 * inactive[0].stroke, 'much heavier than an inactive one');
+      assert(new RegExp(scheme === 'light' ? 'Inter_700Bold' : 'Inter_600SemiBold').test(active.family), `the active label is ${scheme === 'light' ? 'Bold' : 'SemiBold'} (${active.family})`);
     },
   },
   {

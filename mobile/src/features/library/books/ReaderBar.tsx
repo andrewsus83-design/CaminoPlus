@@ -2,7 +2,7 @@ import { memo, useEffect, useRef, useState } from 'react';
 import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '@/components/AppText';
-import { role } from '@/theme';
+import { role, textStyle } from '@/theme';
 import { IconTap } from './BookUi';
 import { nextLabel, positionLine, previousLabel, type ChapterNav } from './reading';
 
@@ -12,9 +12,16 @@ import { nextLabel, positionLine, previousLabel, type ChapterNav } from './readi
 //  The line is a picture of how far you are and says nothing to a screen reader, which has the position in words.
 // The bar stays under the chapter while it scrolls, above the home indicator of the phone. The title of the book is here and only here: the header at the top
 // has the way back and the size of the text, nothing else. Everything is at least 44 by 44, and the texts grow with the phone's text size only up to 1.3 times,
-// so that the bar never takes the page. It is the biggest part of the reader's chrome on purpose: the title is 18, the place 14, the buttons 56.
+// so that the bar never takes the page. It is the biggest part of the reader's chrome on purpose: the title is 19 (a label, SemiBold, at the size and the line of the type
+// scale's body, 19 on 28), the place 14, the buttons 56.
+// Why 19 and not more: the title is ONE line between the two 56 buttons, and one that does not fit is cut with an ellipsis. With the advances of Inter SemiBold (booksWiring.test.ts
+// works it out again on every run) the widest of the 26 titles, "The Long Portuguese Way", is 243 px at 19 and 282 at 22, and the room between the buttons is 254 px on a phone 390
+// wide (294 on 430, 224 on 360, 184 on 320). At 19 every title is whole on 390 and 430 (23 of 26 on 360, 15 of 26 on 320); at 22, the next size of the scale, five are cut on 390 and
+// 18 on 320, or they take a second line and the bar is 28 px taller for those books.
 
 const BAR_FONT_LIMIT = 1.3;
+/** The title of the book: a label (Inter SemiBold) at the size and the line of the type scale's body, 19 on 28 (tokens.json), not a size of its own. */
+const TITLE = { fontSize: textStyle('body').fontSize, lineHeight: textStyle('body').lineHeight };
 /** The round buttons of the bar: larger than the 44 that is the least, because the bar is where the thumb rests. */
 const BAR_BUTTON = 56;
 
@@ -57,7 +64,7 @@ export function ReaderBar({ bookTitle, nav, onPrevious, onNext, progress }: Prop
       <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 8, paddingVertical: 4 }}>
         <IconTap icon="back" label={previousLabel(nav)} disabled={!nav.prev} size={BAR_BUTTON} onPress={onPrevious} />
         <View style={{ flex: 1, minWidth: 0, alignItems: 'center', paddingHorizontal: 4 }}>
-          <AppText variant="label" numberOfLines={1} maxFontSizeMultiplier={BAR_FONT_LIMIT} style={{ fontSize: 18, lineHeight: 24, textAlign: 'center' }}>{bookTitle}</AppText>
+          <AppText variant="label" numberOfLines={1} maxFontSizeMultiplier={BAR_FONT_LIMIT} style={{ ...TITLE, textAlign: 'center' }}>{bookTitle}</AppText>
           <AppText variant="mono" muted numberOfLines={1} maxFontSizeMultiplier={BAR_FONT_LIMIT} style={{ fontSize: 14, lineHeight: 20, textAlign: 'center' }}>{positionLine(nav)}</AppText>
         </View>
         <IconTap icon="chevron" label={nextLabel(nav)} disabled={!nav.next} size={BAR_BUTTON} onPress={onNext} />

@@ -6,6 +6,7 @@ import { Screen } from '@/components/Screen';
 import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
 import { Pill } from '@/components/Pill';
+import { BackButton } from '@/components/BackButton';
 import { IconButton } from '@/components/ui';
 import { FormMessage } from '@/components/auth/Field';
 import { confirmDelete } from '@/features/diary/confirm';
@@ -51,7 +52,7 @@ export default function DiaryPage() {
   const goBack = () => (router.canGoBack() ? router.back() : router.replace('/me'));
 
   if (page.state === 'missing') return <NotHere goBack={goBack} />;
-  if (page.state === 'loading') return <Screen tabBar={false}><IconButton name="back" label="Back" onPress={goBack} /></Screen>;
+  if (page.state === 'loading') return <Screen tabBar={false}><BackButton onPress={goBack} /></Screen>;
   // Keyed by the person and the page: the saver is made once, for one person, so another account can never reuse an editor.
   return <PageEditor key={`${page.uid}:${page.entry?.id ?? NEW_PAGE}`} uid={page.uid} initial={page.entry} start={start} goBack={goBack} />;
 }
@@ -60,7 +61,7 @@ export default function DiaryPage() {
 function NotHere({ goBack }: { goBack: () => void }) {
   return (
     <Screen tabBar={false}>
-      <IconButton name="back" label="Back" onPress={goBack} />
+      <BackButton onPress={goBack} />
       <View style={{ gap: 8 }}>
         <AppText variant="h2" accessibilityRole="header">This page is not here</AppText>
         <AppText variant="lead" muted>It may have been deleted. Your other pages are still in your diary.</AppText>
@@ -236,7 +237,7 @@ function PageEditor({ uid, initial, start, goBack }: { uid: string; initial: Dia
 
   const topBar = (
     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-      <IconButton name="back" label="Back" onPress={goBack} />
+      <BackButton onPress={goBack} />
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
         {footer.saveDraft && (
           <Pressable

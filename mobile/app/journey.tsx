@@ -1,9 +1,9 @@
 import { ScrollView, View } from 'react-native';
-import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
-import { Card, IconButton } from '@/components/ui';
+import { BackButton } from '@/components/BackButton';
+import { Card } from '@/components/ui';
 import { useAuth } from '@/lib/auth';
 import { useMeData } from '@/lib/useMeData';
 import { c, layout, radius, role } from '@/theme';
@@ -22,7 +22,6 @@ function pace(km: number, start: string | null, end: string | null) {
 }
 
 export default function Journey() {
-  const router = useRouter();
   const insets = useSafeAreaInsets();
   const { journey } = useAuth();
   const { days } = useMeData();
@@ -37,7 +36,7 @@ export default function Journey() {
   return (
     <View style={{ flex: 1, backgroundColor: role.bg }}>
       <ScrollView contentContainerStyle={{ paddingTop: insets.top + layout.screenTop, paddingHorizontal: layout.screenMargin, paddingBottom: insets.bottom + 40, gap: 16 }}>
-        <IconButton name="back" label="Back" onPress={() => router.back()} />
+        <BackButton fallback="/me" />
         <View style={{ gap: 6 }}>
           <AppText variant="h2">My journey</AppText>
           <AppText variant="lead" muted>{journey?.route?.name ?? 'Your Camino'} · {fmtKm(at)} km walked</AppText>

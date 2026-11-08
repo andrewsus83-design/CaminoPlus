@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { Alert, Pressable, ScrollView, View } from 'react-native';
-import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
 import { Pill } from '@/components/Pill';
-import { Card, IconButton } from '@/components/ui';
+import { BackButton } from '@/components/BackButton';
+import { Card } from '@/components/ui';
 import { c, layout, radius, role } from '@/theme';
 
 // Watches a pilgrim can link. Connecting needs the watch native modules (next dev build),
@@ -19,13 +19,12 @@ const WATCHES = [
 ] as const;
 
 export default function Watches() {
-  const router = useRouter();
   const insets = useSafeAreaInsets();
   const [connected] = useState<string[]>([]);
   return (
     <View style={{ flex: 1, backgroundColor: role.bg }}>
       <ScrollView contentContainerStyle={{ paddingTop: insets.top + layout.screenTop, paddingHorizontal: layout.screenMargin, paddingBottom: insets.bottom + 40, gap: 16 }}>
-        <IconButton name="back" label="Back" onPress={() => router.back()} />
+        <BackButton fallback="/me" />
         <View style={{ gap: 8 }}>
           <AppText variant="h2">Smartwatch</AppText>
           <AppText variant="lead" muted>Connect a watch to add steps, heart rate and distance to your journey posts.</AppText>

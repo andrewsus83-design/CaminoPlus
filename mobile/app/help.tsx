@@ -5,7 +5,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
 import { Pill } from '@/components/Pill';
-import { Card, IconButton, SectionLabel } from '@/components/ui';
+import { BackButton } from '@/components/BackButton';
+import { Card, SectionLabel } from '@/components/ui';
 import { SUPPORT_EMAIL, mailSupport } from '@/lib/support';
 import { c, layout, role } from '@/theme';
 
@@ -42,7 +43,7 @@ export default function Help() {
   return (
     <View style={{ flex: 1, backgroundColor: role.bg }}>
       <ScrollView contentContainerStyle={{ paddingTop: insets.top + layout.screenTop, paddingHorizontal: layout.screenMargin, paddingBottom: insets.bottom + 40, gap: 20 }}>
-        <IconButton name="back" label="Back" onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))} />
+        <BackButton />
         <View style={{ gap: 8 }}>
           <AppText variant="h2">Help</AppText>
           <AppText variant="lead" muted>Quick answers for the road. Everything on this page works offline.</AppText>

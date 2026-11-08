@@ -1,10 +1,10 @@
 import { Pressable, ScrollView, View } from 'react-native';
-import { useRouter } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
-import { Card, IconButton } from '@/components/ui';
+import { BackButton } from '@/components/BackButton';
+import { Card } from '@/components/ui';
 import { ORIGINAL_TEXT, READING_SOURCES, type ReadingSource } from '@/features/library/books/sources';
 import { c, layout, role } from '@/theme';
 
@@ -73,12 +73,11 @@ function OriginalText() {
 }
 
 export default function Licences() {
-  const router = useRouter();
   const insets = useSafeAreaInsets();
   return (
     <View style={{ flex: 1, backgroundColor: role.bg }}>
       <ScrollView contentContainerStyle={{ paddingTop: insets.top + layout.screenTop, paddingHorizontal: layout.screenMargin, paddingBottom: insets.bottom + 40, gap: 20 }}>
-        <IconButton name="back" label="Back" onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))} />
+        <BackButton />
         <View style={{ gap: 8 }}>
           <AppText variant="h2">Licences and credits</AppText>
           <AppText variant="lead" muted>CaminoPlus stands on the shoulders of many open projects. Thank you to everyone who maps the Way.</AppText>
