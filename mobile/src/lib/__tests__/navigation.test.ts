@@ -591,7 +591,7 @@ check('the four fonts by role on the Bible side of the Library: Fraunces for nam
     [join(L, 'bible', 'Reader.tsx'), /<AppText variant="h2" accessibilityRole="header"[^>]*>\{chapterTitle\(place\)\}<\/AppText>/, 'the title of the chapter is Fraunces'],
     [join(L, 'bible', 'Reader.tsx'), /\{!!chapter\.title && <AppText variant="h4" muted /, 'the title of a psalm is Fraunces'],
     [join(L, 'bible', 'ReaderText.tsx'), /<AppText variant="h4" accessibilityRole="header"[^>]*>\{block\.text\}<\/AppText>/, 'a heading in the text is Fraunces'],
-    [join(L, 'bible', 'ReaderText.tsx'), /<AppText variant="mono"[^>]*>\{superscript\(label\)\}<\/AppText>/, 'the raised number of a verse is JetBrains Mono'],
+    [join(L, 'bible', 'ReaderText.tsx'), /<AppText variant="mono"[^>]*>\s+\{digits\.length > 0 && <Text style=\{\{ letterSpacing: NUMBER_TRACKING \}\}>\{digits\.join\(''\)\}<\/Text>\}\s+\{last\}\s+<\/AppText>/, 'the raised number of a verse is JetBrains Mono'],
     [join(L, 'bible', 'ReaderText.tsx'), /<AppText maxFontSizeMultiplier=\{READER_MAX_FONT_SCALE\} style=\{\{ fontSize: BODY_SIZE, lineHeight: BODY_LINE \}\}>/, 'the words of a verse are Inter (the body font of AppText)'],
     [join(L, 'bible', 'ChapterNav.tsx'), /<AppText variant="mono"[^>]*>\{placeLabel\(to\)\}<\/AppText>/, 'the chapter a button goes to is a reference: JetBrains Mono'],
     [join(L, 'bible', 'VerseActions.tsx'), /<AppText variant="mono"[^>]*color=\{role\.accentText\}[^>]*>\{place\}<\/AppText>/, 'the place of the chosen verse is a reference: JetBrains Mono'],
