@@ -657,7 +657,10 @@ check('the screen is a stack screen like Bookmarks: one row (Back, the title, th
   assert.equal((header.match(/<HeaderButton /g) ?? []).length, 3, 'Back, calendar, bookmark');
   assert.match(header, /label="Open calendar"/);
   assert.match(header, /label=\{bookmarked \? UNBOOKMARK_DAY : BOOKMARK_DAY\} selected=\{bookmarked\}/, 'the bookmark button says what a tap will do and exposes whether the day is bookmarked');
-  assert.match(header, /accessibilityState=\{selected === undefined \? undefined : \{ selected \}\}/);
+  // NEW RULE: selected and expanded are exposed with the aria props of React Native (aria-selected, aria-expanded), because the web does not draw the older accessibilityState object
+  assert.match(header, /aria-selected=\{selected\}/);
+  assert.match(source(`${DIR}/WeekStrip.tsx`), /accessibilityLabel=\{dayCellLabel\(day, today\)\}\s+aria-selected=\{selected\}/, 'a day of the strip says whether it is the picked one');
+  assert.doesNotMatch(all(), /accessibilityState=\{\{[^}]*\b(selected|expanded|checked)\b/, 'no state the web would not draw');
   assert.equal(BOOKMARK_DAY, 'Bookmark this day');
   assert.equal(UNBOOKMARK_DAY, 'Remove bookmark');
   // the calendar button opens the sheet, a day chosen in it closes it and picks the day, Today picks today and closes it, Close and the backdrop close it
@@ -736,7 +739,7 @@ check('the reading under the strip: the liturgical day (real), the Preview notic
   assert.match(src, /\{sample && <SampleTag \/>\}/);
   assert.match(src, /const content = useMemo\(\(\) => dayContent\(key\), \[key\]\);/, 'the screen asks the one provider function for the day, and nothing else');
   assert.ok(src.indexOf('<LiturgicalCard') < src.indexOf('<SampleNotice') && src.indexOf('<SampleNotice') < src.indexOf('label="Readings"') && src.indexOf('label="Readings"') < src.indexOf('<ReflectionCard key'), 'order: liturgical day, notice, readings, reflection');
-  assert.match(src, /accessibilityRole="button"[\s\S]*accessibilityState=\{\{ expanded: open \}\}/, 'a reading is a button that says whether its text is open');
+  assert.match(src, /accessibilityRole="button"[\s\S]*aria-expanded=\{open\}/, 'a reading is a button that says whether its text is open');
   assert.match(src, /<AppText variant="mono" muted style=\{\{ fontSize: 14, lineHeight: 20 \}\}>\{citation\}<\/AppText>/, 'the citation is in JetBrains Mono');
   assert.match(src, /passage\.citation \?\? SAMPLE_CITATION/);
   assert.match(src, /<AppText variant="caption" muted>\{`\$\{line\.n\} `\}<\/AppText>/, 'the verse numbers are small and muted');

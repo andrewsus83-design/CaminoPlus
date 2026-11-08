@@ -8,6 +8,8 @@ import { BOOKMARK_DAY, UNBOOKMARK_DAY } from './bookmarks';
 // smaller than their h2 so that it can sit beside three buttons), and at the right edge the calendar and the bookmark. The buttons look like the
 // round Back button of the other screens (components/ui.tsx IconButton) and are 44 by 44, the least a finger needs. The title wraps to a second
 // line on the narrowest phones and at the biggest text sizes (it stops growing at 1.2 times) and never runs under a button.
+// The bookmark exposes whether the day is bookmarked with aria-selected (a prop of React Native since 0.71, which the web draws as the attribute
+// of the same name: the older accessibilityState object is not drawn there).
 const SIZE = 44;
 
 function HeaderButton({ name, label, onPress, selected }: { name: IconName; label: string; onPress: () => void; selected?: boolean }) {
@@ -15,7 +17,7 @@ function HeaderButton({ name, label, onPress, selected }: { name: IconName; labe
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={label}
-      accessibilityState={selected === undefined ? undefined : { selected }}
+      aria-selected={selected}
       onPress={onPress}
       style={({ pressed }) => ({ width: SIZE, height: SIZE, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center', backgroundColor: role.surface, borderWidth: 1, borderColor: role.border, opacity: pressed ? 0.6 : 1 })}
     >

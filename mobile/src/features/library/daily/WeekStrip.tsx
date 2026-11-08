@@ -40,7 +40,8 @@ function Cell({ day, today, selected, enabled, onSelect }: { day: Ymd; today: bo
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={dayCellLabel(day, today)}
-      accessibilityState={{ selected, disabled: !enabled }}
+      aria-selected={selected}
+      accessibilityState={{ disabled: !enabled }}
       disabled={!enabled}
       onPress={() => onSelect(day)}
       style={({ pressed }) => ({ flex: 1, minHeight: 84, alignItems: 'center', justifyContent: 'center', gap: 2, opacity: pressed ? 0.6 : 1 })}

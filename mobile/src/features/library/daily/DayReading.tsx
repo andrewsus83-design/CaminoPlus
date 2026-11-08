@@ -39,7 +39,7 @@ function ReadingRow({ passage, first }: { passage: Passage; first: boolean }) {
         accessibilityRole="button"
         accessibilityLabel={`${title}, ${citation}`}
         accessibilityHint={open ? 'Hides the text' : 'Shows the text'}
-        accessibilityState={{ expanded: open }}
+        aria-expanded={open}
         onPress={() => setOpen(!open)}
         style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 64, paddingVertical: 10, opacity: pressed ? 0.6 : 1 })}
       >
