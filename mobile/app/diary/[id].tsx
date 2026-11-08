@@ -13,8 +13,7 @@ import { device } from '@/features/diary/device';
 import { FormatBar, type FormatAction } from '@/features/diary/FormatBar';
 import { MediaGrid, MediaStrip, MediaViewer } from '@/features/diary/MediaTiles';
 import { MEDIA_PER_PAGE_MAX, mediaOf } from '@/features/diary/media';
-import { noteStartForKey } from '@/features/library/books/passages';
-import { safeText } from '@/features/library/books/safeText';
+import { noteStartFor } from '@/features/library/noteStart';
 import { PlaceChip, PlaceEditRow, PlacePanel } from '@/features/diary/PlaceParts';
 import { normalizePlace, withName, type DiaryPlace } from '@/features/diary/place';
 import { FEATURES_NEED_NEW_APP, MEDIA_NEEDS_NEW_APP, MEDIA_ON_WEB, attachMessage, dateLine, metaLine, pageTitle, placeProblemMessage, problemMessage, thousands } from '@/features/diary/present';
@@ -41,8 +40,8 @@ export default function DiaryPage() {
   const params = useLocalSearchParams<{ id?: string | string[]; quote?: string | string[] }>();
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
   const quote = Array.isArray(params.quote) ? params.quote[0] : params.quote;
-  // A new note can start from a passage of a book (/diary/new?quote=<the key of the passage>, the Note action of the reader): the passage as a quotation, and the caret under it.
-  const start = useMemo(() => (id === NEW_PAGE && quote ? noteStartForKey(quote, safeText) : null), [id, quote]);
+  // A new note can start from a passage of a book or a verse of the Bible (/diary/new?quote=<the key>, the Note action of the readers): the passage as a quotation, and the caret under it.
+  const start = useMemo(() => (id === NEW_PAGE && quote ? noteStartFor(quote) : null), [id, quote]);
   const page = useDiaryPage(id);
   const goBack = () => (router.canGoBack() ? router.back() : router.replace('/me'));
 

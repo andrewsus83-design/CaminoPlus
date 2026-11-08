@@ -203,14 +203,19 @@ check('the actions on a verse: one at a time, Bookmark (under the place of the v
   assert.match(src, /AccessibilityInfo\.announceForAccessibility\?\.\(chosenAnnouncement\(place\)\);/, 'the verse that was chosen is said');
   assert.match(src, /accessibilityLiveRegion="polite" accessibilityLabel=\{`\$\{place\} selected`\}/);
   assert.match(src, /accessibilityRole="toolbar"/);
-  assert.match(src, /flex: 1, minWidth: ACTION_MIN_WIDTH, minHeight: ACTION_MIN_HEIGHT, alignItems: 'center'/, 'at least 88 wide and 68 high');
+  assert.match(src, /flex: 1, minWidth: compact \? 0 : ACTION_MIN_WIDTH, minHeight: ACTION_MIN_HEIGHT, alignItems: 'center'/, 'at least 88 wide and 68 high with three actions; with four (Note, and Copy is there) they share the bar');
   assert.match(src, /<Icon name=\{icon\} color=\{role\.action\} size=\{ACTION_ICON\} filled=\{filled\} \/>/, 'the glyph is 30');
-  assert.match(src, /<AppText variant="label" maxFontSizeMultiplier=\{1\.3\} numberOfLines=\{1\} adjustsFontSizeToFit minimumFontScale=\{0\.77\} style=\{\{ fontSize: ACTION_LABEL, lineHeight: ACTION_LABEL_LINE \}\}>\{label\}<\/AppText>/, 'the word is Inter SemiBold 16, and never under 16 at the largest text size the screen allows (16 x 1.3 x 0.77)');
+  assert.match(src, /<AppText variant="label" maxFontSizeMultiplier=\{1\.3\} numberOfLines=\{1\} adjustsFontSizeToFit minimumFontScale=\{0\.77\} style=\{\{ fontSize: size, lineHeight: ACTION_LABEL_LINE \}\}>\{label\}<\/AppText>/, 'the word is Inter SemiBold 16, and never under 16 at the largest text size the screen allows (16 x 1.3 x 0.77)');
   assert.match(src, /label="Bookmark" spoken=\{bookmarkLabel\(bookmarked, place\)\}/, 'the word does not change with the state: "Bookmarked" would not fit 88 at 16; the glyph is filled and a screen reader says "Remove bookmark"');
   assert.match(src, /backgroundColor: pressed \|\| filled \? role\.sunken : 'transparent'/, 'a bookmarked verse has its button tinted');
   assert.match(src, /style=\{\{ flex: 1, fontSize: PLACE_SIZE, lineHeight: PLACE_LINE \}\}>\{place\}/, 'the reference is 17');
   assert.match(src, /<AppText variant="mono"[^>]*color=\{role\.accentText\}[^>]*>\{place\}<\/AppText>/, 'the place of the verse is a reference: JetBrains Mono');
   assert.match(src, /accessibilityLabel="Close the verse actions"/);
+  assert.match(src, /<ActionButton icon="pen" label="Note" spoken=\{`Write a note: \$\{place\}`\} compact=\{compact\} onPress=\{onNote\} \/>/, 'the fourth action, Note: a new note of the diary that starts with the verse; named by where the verse is');
+  assert.ok(src.indexOf('label="Bookmark"') < src.indexOf('label="Note"') && src.indexOf('label="Note"') < src.indexOf('icon="copy"') && src.indexOf('icon="copy"') < src.indexOf('label="Share"'), 'Bookmark, Note, Copy, Share');
+  assert.match(src, /const compact = canCopy;/, 'four actions (Copy is there) share the bar, three keep their 88');
+  assert.match(src, /const size = compact && width < 360 \? 13 : ACTION_LABEL;/, 'with four actions on a phone under 360 the word is 13, else 16');
+  assert.match(code(read(`${BIBLE}/Reader.tsx`)), /onNote=\{\(\) => router\.push\(verseNoteHref\(key\)\)\}/, 'the Bible reader opens a new note about the verse, under the key the verse is bookmarked under');
   assert.match(src, /left: BAR_SIDE, right: BAR_SIDE, bottom: insets\.bottom \+ BAR_BOTTOM/, 'above the safe area');
   assert.match(src, /borderRadius: radius\.lg, backgroundColor: role\.surface, borderWidth: 1, borderColor: role\.border, \.\.\.shadowStyle\('lg'\)/);
   assert.doesNotMatch(src, /#[0-9a-fA-F]{3,8}\b|\bfixed\.|\bc\.[a-z]|fontFamily/);
@@ -286,7 +291,7 @@ check('the text of the Bible is imported only by the screens that read it and by
   const files = [...walk('app'), ...walk('src')];
   const resolve = (file: string, spec: string): string | null => (spec.startsWith('@/') ? `src/${spec.slice(2)}` : spec.startsWith('.') ? path.posix.normalize(path.posix.join(path.posix.dirname(file), spec)) : null);
   const importers = (target: string): string[] => files.filter((f) => [...read(f).matchAll(/from '([^']+)'/g)].some((m) => resolve(f, m[1]) === target)).sort();
-  assert.deepEqual(importers(`${BIBLE}/text`), [`${BIBLE}/Reader.tsx`, `${BIBLE}/searchText.ts`, 'app/library/bookmarks.tsx'].sort(), 'the reader, the search and Bookmarks (which shows the words of a verse) read the text; nothing else does: not the Licences screen, not the tiles, not the Continue card');
+  assert.deepEqual(importers(`${BIBLE}/text`), [`${BIBLE}/Reader.tsx`, `${BIBLE}/searchText.ts`, 'app/library/bookmarks.tsx', 'src/features/library/noteStart.ts'].sort(), 'the reader, the search, Bookmarks (which shows the words of a verse) and the start of a note (which quotes a verse) read the text; nothing else does: not the Licences screen, not the tiles, not the Continue card');
   assert.deepEqual(importers(`${BIBLE}/searchText`), [`${BIBLE}/useVerseSearch.ts`, 'app/(tabs)/library.tsx'].sort(), 'the search of verses, and the Library screen that makes it ready');
   assert.deepEqual(importers(`${BIBLE}/webc.generated`), [`${BIBLE}/text.ts`], 'the files of the text are reached through text.ts only');
   // the search is made ready when its field is touched, a beat before the first letter (the first search reads and folds the words of 35,408 verses: 100 to 135 ms on a laptop)

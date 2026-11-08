@@ -21,6 +21,7 @@ import { hasBook, loadBook, TRANSLATION } from './text';
 import type { Chapter } from './textTypes';
 import { useLastRead } from './useLastRead';
 import { VerseActions } from './VerseActions';
+import { verseNoteHref } from './verseActions';
 import { PlaceMissing, MISSING_CHAPTER } from './PlaceMissing';
 
 /** The chapter of this place in the text, or null when the book or the chapter is not there (or cannot be read): the text of a chapter is never taken for granted. */
@@ -147,6 +148,7 @@ export function Reader({ place, verse }: { place: Place; verse: number | null })
           bookmarked={marks.has(key)}
           canBookmark={marks.ready}
           onBookmark={() => marks.toggle(key)}
+          onNote={() => router.push(verseNoteHref(key))}
           onClose={() => setSelected(null)}
         />
       )}

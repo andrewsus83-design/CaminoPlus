@@ -432,10 +432,12 @@ check('the design page shows the same Library: the two tabs Bible and Books, the
   assert.equal(count(psalm, /class="hw"/g), 1);
   const chosen = phoneOf('Reader · Verse chosen');
   assert.match(chosen, /<span class="rd-v sel"><span class="rd-n">³<\/span>/);
-  assert.match(chosen, /<div class="rd-act" role="toolbar" aria-label="Actions for Psalm 121:3">\s*<div class="top"><span class="pl">Psalm 121:3<\/span><button class="x" aria-label="Close the verse actions">/);
-  assert.match(chosen, /aria-label="Bookmark: Psalm 121:3">[^]*?<span>Bookmark<\/span><\/button><button aria-label="Copy: Psalm 121:3">[^]*?<span>Copy<\/span><\/button><button aria-label="Share: Psalm 121:3">[^]*?<span>Share<\/span>/);
+  assert.match(chosen, /<div class="rd-act four" role="toolbar" aria-label="Actions for Psalm 121:3">\s*<div class="top"><span class="pl">Psalm 121:3<\/span><button class="x" aria-label="Close the verse actions">/);
+  assert.match(chosen, /aria-label="Bookmark: Psalm 121:3">[^]*?<span>Bookmark<\/span><\/button><button aria-label="Write a note: Psalm 121:3">[^]*?<span>Note<\/span><\/button><button aria-label="Copy: Psalm 121:3">[^]*?<span>Copy<\/span><\/button><button aria-label="Share: Psalm 121:3">[^]*?<span>Share<\/span>/);
   assert.match(phoneOf('Reader · Verse bookmarked'), /<button class="on" aria-label="Remove bookmark: Psalm 121:3">[^]*?<span>Bookmark<\/span>/, 'the word stays, the glyph is filled and the button tinted');
-  // the bar is made to be hit: a glyph of 30, a word of 16 (Inter SemiBold), each action at least 88 by 68, the reference 17, 12 from the sides, 8 between the actions
+  // the bar is made to be hit: a glyph of 30, a word of 16 (Inter SemiBold), each action at least 88 by 68 (with Note, four actions share the bar: a quarter each, the word 13 under 360 wide), the reference 17, 12 from the sides, 8 between the actions
+  assert.match(design, /\.rd-act\.four \.btns button \{ min-width: 0; \}/);
+  assert.equal(count(design, /class="rd-act four" role="toolbar"/g), 3, 'every bar of the Bible phones (the verse chosen, bookmarked, and the dark one) has Note');
   assert.match(design, /\.rd-act \{ position: absolute; left: 12px; right: 12px; bottom: 26px;/);
   assert.match(design, /\.rd-act \.pl \{ flex: 1; font-family: var\(--cp-font-mono\); font-size: 17px;/);
   assert.match(design, /\.rd-act \.btns \{ display: flex; gap: 8px; margin-top: 4px; \}/);

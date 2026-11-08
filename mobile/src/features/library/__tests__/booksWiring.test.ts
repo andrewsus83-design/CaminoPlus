@@ -446,7 +446,7 @@ check('a passage of a chapter can be chosen, as a verse of the Bible can: a touc
   assert.ok(actions.indexOf('label="Bookmark"') < actions.indexOf('label="Note"') && actions.indexOf('label="Note"') < actions.indexOf('icon="copy"') && actions.indexOf('icon="copy"') < actions.indexOf('label="Share"'), 'Bookmark, Note, Copy, Share');
   assert.match(actions, /minWidth: compact \? 0 : ACTION_MIN_WIDTH/, 'with four actions they share the bar, as wide as 320 allows');
   const diaryPage = read('app/diary/[id].tsx');
-  assert.match(diaryPage, /const start = useMemo\(\(\) => \(id === NEW_PAGE && quote \? noteStartForKey\(quote, safeText\) : null\), \[id, quote\]\);/, 'only a NEW page can start from a passage, and a key that finds nothing opens it blank');
+  assert.match(diaryPage, /const start = useMemo\(\(\) => \(id === NEW_PAGE && quote \? noteStartFor\(quote\) : null\), \[id, quote\]\);/, 'only a NEW page can start from a passage, and a key that finds nothing opens it blank');
   assert.match(diaryPage, /useState\(initial\?\.body \?\? start \?\? ''\)/, 'the quotation is on the screen before anything is typed');
   assert.match(diaryPage, /const seed = \(\) => \{ if \(start && !initial && !seeded\.current\) \{ seeded\.current = true; saver\.edit\(\{ body \}\); \} \};/, 'the quotation is kept with the first thing that is saved, and a page that was only opened is not saved');
   assert.match(diaryPage, /seed\(\);\s+say\(attachMessage\(await saver\.attach\(picked\.assets\)\)\);/, 'a photo added first carries the quotation with it');

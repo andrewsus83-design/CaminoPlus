@@ -3192,9 +3192,9 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           <p class="hw" style="margin:16px 0 0">Peace on the road</p>
           <div class="rd-credit"><p>World English Bible, Catholic edition (eBible.org). Public domain. The name &quot;World English Bible&quot; is a trademark of eBible.org.</p><p>This is not the translation read at Mass.</p></div>
         </div>
-        <div class="rd-act" role="toolbar" aria-label="Actions for Psalm 121:3">
+        <div class="rd-act four" role="toolbar" aria-label="Actions for Psalm 121:3">
           <div class="top"><span class="pl">Psalm 121:3</span><button class="x" aria-label="Close the verse actions"><svg class="cp-icon"><use href="#i-x"/></svg></button></div>
-          <div class="btns"><button aria-label="Bookmark: Psalm 121:3"><svg class="cp-icon"><use href="#i-bookmark"/></svg><span>Bookmark</span></button><button aria-label="Copy: Psalm 121:3"><svg class="cp-icon"><use href="#i-copy"/></svg><span>Copy</span></button><button aria-label="Share: Psalm 121:3"><svg class="cp-icon"><use href="#i-share"/></svg><span>Share</span></button></div>
+          <div class="btns"><button aria-label="Bookmark: Psalm 121:3"><svg class="cp-icon"><use href="#i-bookmark"/></svg><span>Bookmark</span></button><button aria-label="Write a note: Psalm 121:3"><svg class="cp-icon"><use href="#i-pen"/></svg><span>Note</span></button><button aria-label="Copy: Psalm 121:3"><svg class="cp-icon"><use href="#i-copy"/></svg><span>Copy</span></button><button aria-label="Share: Psalm 121:3"><svg class="cp-icon"><use href="#i-share"/></svg><span>Share</span></button></div>
         </div>
         <span class="home-ind"></span>
       </div>
@@ -3234,9 +3234,9 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           <p class="hw" style="margin:16px 0 0">Peace on the road</p>
           <div class="rd-credit"><p>World English Bible, Catholic edition (eBible.org). Public domain. The name &quot;World English Bible&quot; is a trademark of eBible.org.</p><p>This is not the translation read at Mass.</p></div>
         </div>
-        <div class="rd-act" role="toolbar" aria-label="Actions for Psalm 121:3">
+        <div class="rd-act four" role="toolbar" aria-label="Actions for Psalm 121:3">
           <div class="top"><span class="pl">Psalm 121:3</span><button class="x" aria-label="Close the verse actions"><svg class="cp-icon"><use href="#i-x"/></svg></button></div>
-          <div class="btns"><button class="on" aria-label="Remove bookmark: Psalm 121:3"><svg class="cp-icon"><use href="#i-bookmark"/></svg><span>Bookmark</span></button><button aria-label="Copy: Psalm 121:3"><svg class="cp-icon"><use href="#i-copy"/></svg><span>Copy</span></button><button aria-label="Share: Psalm 121:3"><svg class="cp-icon"><use href="#i-share"/></svg><span>Share</span></button></div>
+          <div class="btns"><button class="on" aria-label="Remove bookmark: Psalm 121:3"><svg class="cp-icon"><use href="#i-bookmark"/></svg><span>Bookmark</span></button><button aria-label="Write a note: Psalm 121:3"><svg class="cp-icon"><use href="#i-pen"/></svg><span>Note</span></button><button aria-label="Copy: Psalm 121:3"><svg class="cp-icon"><use href="#i-copy"/></svg><span>Copy</span></button><button aria-label="Share: Psalm 121:3"><svg class="cp-icon"><use href="#i-share"/></svg><span>Share</span></button></div>
         </div>
         <span class="home-ind"></span>
       </div>
@@ -3324,9 +3324,9 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           <p class="hw" style="margin:16px 0 0">Peace on the road</p>
           <div class="rd-credit"><p>World English Bible, Catholic edition (eBible.org). Public domain. The name &quot;World English Bible&quot; is a trademark of eBible.org.</p><p>This is not the translation read at Mass.</p></div>
         </div>
-        <div class="rd-act" role="toolbar" aria-label="Actions for John 1:5">
+        <div class="rd-act four" role="toolbar" aria-label="Actions for John 1:5">
           <div class="top"><span class="pl">John 1:5</span><button class="x" aria-label="Close the verse actions"><svg class="cp-icon"><use href="#i-x"/></svg></button></div>
-          <div class="btns"><button aria-label="Bookmark: John 1:5"><svg class="cp-icon"><use href="#i-bookmark"/></svg><span>Bookmark</span></button><button aria-label="Copy: John 1:5"><svg class="cp-icon"><use href="#i-copy"/></svg><span>Copy</span></button><button aria-label="Share: John 1:5"><svg class="cp-icon"><use href="#i-share"/></svg><span>Share</span></button></div>
+          <div class="btns"><button aria-label="Bookmark: John 1:5"><svg class="cp-icon"><use href="#i-bookmark"/></svg><span>Bookmark</span></button><button aria-label="Write a note: John 1:5"><svg class="cp-icon"><use href="#i-pen"/></svg><span>Note</span></button><button aria-label="Copy: John 1:5"><svg class="cp-icon"><use href="#i-copy"/></svg><span>Copy</span></button><button aria-label="Share: John 1:5"><svg class="cp-icon"><use href="#i-share"/></svg><span>Share</span></button></div>
         </div>
         <span class="home-ind"></span>
       </div>
@@ -4392,6 +4392,8 @@ Walking the first day, and thinking of this.</div>          </div>
   .rd-act.dock { bottom: 110px; }
   /* four actions (Copy is there) share the bar: as wide as the phone allows, the word shrinks to fit */
   .rd-act.four .btns button { min-width: 0; }
+  .rd-act.four .btns button { font-size: 16px; }
+  @media (max-width: 359px) { .rd-act.four .btns button { font-size: 13px; } }
   /* a bookmarked passage on the Bookmarks screen: the book, where it is, the first words; one button, and the bookmark beside it */
   .bk-prow { display: flex; align-items: flex-start; gap: 6px; padding: 10px 6px 10px 12px; }
   .bk-pt { flex: 1; min-width: 0; min-height: 44px; display: flex; flex-direction: column; gap: 4px; padding: 4px 0; }
