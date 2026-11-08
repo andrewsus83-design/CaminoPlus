@@ -26,7 +26,7 @@ Then the end, in the last stretch of our passage. The people who had resisted th
 
 One last caution, since the house she founded lived under a strict rule. Nobody should read this day as a call to hard fasting or to any harshness toward the body. The stubbornness in the passage is for a project, in the open, with advisers. It is not an ordeal chosen for its own sake.
 
-What does it ask of an ordinary day in the middle of a road? Do your part for the hour you are in. Let the finish be someone else's business for today. And when the road is long and flat and the same, let the sameness be what it is, a kind of weather that passes.
+Put plainly, the middle of a road asks for this. Do your part for the hour you are in. Let the finish be someone else's business for today. And when the road is long and flat and the same, let the sameness be what it is, a kind of weather that passes.
 
 ## For the walk
 

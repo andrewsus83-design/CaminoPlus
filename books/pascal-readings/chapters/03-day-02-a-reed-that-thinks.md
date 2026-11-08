@@ -22,9 +22,9 @@ Two things deserve a second look.
 
 A dignity that rests on thought can sound like a good deal for the clever and a poor one for everyone else. Pascal knows the worry. A little later in the same section he writes "But what is this thought? how foolish it is!" and, a little further, "How great it is in essence, how vile in defects!" He is not boasting about the mind. What he points to is a kind of knowing that needs no cleverness: knowing that you are small, that you are fragile, that you will die. A very plain mind can know that. Even so, if the passage leaves you cold on behalf of people who cannot think straight, from illness or age or exhaustion, that is a fair reaction, and the passage itself does not answer it.
 
-The other hard point is the bare line near the end. "The Universe knows nothing of this." The reed's nobility is lonely: a thing that knows it is dying, in a universe that does not notice. Pascal is a believer, and in other places he sets the reed inside a larger story. Here he leaves it standing in the open, and it is worth letting it stand there for a while before reaching for any comfort.
+The other hard point is the bare line near the end. "The Universe knows nothing of this." The reed's nobility is lonely: a thing that knows it is dying, in a universe that does not notice. Pascal was a believer, and in other places he sets the reed inside a larger story. Here he leaves it standing in the open, and it is worth letting it stand there for a while before reaching for any comfort.
 
-In practice, it asks you to stop letting the number tell you who you are. The day's worth is not its distance. A day on which you walked less far may have been the day you paid the best attention. A day when you covered a lot of ground may have been spent mostly in a mental argument with someone who is not there. Neither of those shows up on the count.
+In practice, then, it asks you to stop letting the number tell you who you are. The day's worth is not its distance. A day on which you walked less far may have been the day you paid the best attention. A day when you covered a lot of ground may have been spent mostly in a mental argument with someone who is not there. Neither of those shows up on the count.
 
 It also asks you to notice what bends. If the day is windy, find something in the verge that moves and watch how it takes the wind: it gives, and it stays rooted. Pascal chose the reed for its weakness. The part of us that thinks is not strong. It can be thrown by a hunger, a draught, a bad night. It is still the part that knows what is happening to the rest.
 
@@ -47,7 +47,7 @@ If the mind will not stop once you are lying down, do not fight it. Give it some
 
 A good deal of what is done well in a day is seen by nobody. A bag moved from the path of someone's feet, a greeting returned, a decision not to say the sharper thing. Pascal's Universe knows nothing of the reed's dying, and it knows nothing of these either. Our reading, and it is only ours, is that this does not make them smaller. The knowing was yours, and it was enough while you were doing them.
 
-Remember the others as well. Every walker on the road is the same kind of reed, and the person who passed you this morning and the person you passed this afternoon were measured by the same thing, which is not their pace. Their number tells you almost nothing about them. If you caught yourself comparing, notice it, and let it go.
+Remember the others as well. Every walker on the road is the same kind of reed. The person who passed you this morning and the one you passed this afternoon are worth the same, and neither worth is a pace. Their number tells you almost nothing about them. If you caught yourself comparing, notice it, and let it go.
 
 And since a drop of water is part of the passage: drink some before you sleep. It is a small act of thinking well.
 

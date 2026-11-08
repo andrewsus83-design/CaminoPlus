@@ -47,7 +47,7 @@ A road gives days clear edges: wake, walk, stop, eat, sleep. It is an unusual gi
 
 Then try the oddest part of Augustine's argument, just once, as an experiment, before you sleep. Take a single breath, and notice that this breath is the whole of what is happening. Not the day behind, which is memory, and not the day to come, which is expectation. Only the breath you are in. It will be over before you finish noticing, which is about as close as a breath can come to his argument.
 
-Tonight's tiredness is a very physical kind of time. Your body has measured the day in its own way, in muscles and soles and shoulders, and its measure is usually truer than the watch's. Let it be the clock tonight. When it says that it is time to sleep, it is probably right.
+Tonight's tiredness is a very physical kind of time. Your body has measured the day in its own way, in muscles and soles and shoulders, and its measure is usually truer than the watch's. Let it be the clock tonight. When it says that it is time to sleep, it is probably right. It has been keeping time all day without being asked, and it has not been wrong yet.
 
 - Which hour of today do I want to keep, and which am I glad to let pass?
 - What was I waiting for today, and did the waiting take more of the day than the thing itself?

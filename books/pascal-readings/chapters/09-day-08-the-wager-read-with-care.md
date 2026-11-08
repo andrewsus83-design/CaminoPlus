@@ -51,7 +51,7 @@ There is a quieter use of the passage that needs no belief at all. Its last line
 
 One more thing, about people. Fellow walkers answer this question every way there is: some with a settled faith, some with none, a great many in between, and quite a few who have never been asked. The man who wrote this page, by his own account, prayed for the reader on his knees. You might ask yourself how you would treat someone who answered differently from you, and how you did treat the people you met today.
 
-Tonight is not the night to settle anything this size, and nothing here needs deciding by morning. Tiredness makes big questions bigger. If you can, let this one be a question tonight, and sleep.
+Tonight is not the night to settle anything this size, and nothing here needs deciding by morning. Tiredness makes big questions bigger. If you can, let this one be a question tonight, and sleep on it in the old sense: let it be there in the morning, unsolved but not lost.
 
 - What did I risk today on something I could not be sure of?
 - What would I honestly lose by looking at the largest question, and what by never looking?

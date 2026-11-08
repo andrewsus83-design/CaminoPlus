@@ -22,7 +22,7 @@ It is worth knowing how she herself handled them. She warns against trying to fo
 
 Then there is a reading of our own, which is ours and not hers. On a walking day you may know all four waters. The well is the plain work: the first hour, the pack, the blister you tape. The wheel is whatever eases the work, a good rhythm, a pole, the right socks. The stream is the stretch where the walking walks you, and you hardly notice the kilometres go. The rain is what you could not arrange: a view at a bend, a kindness from a stranger, a morning that is simply good. You cannot order any of the last two. You can keep the garden ready for them.
 
-What does it ask of an ordinary day? First, to be honest about which water you have. A day at the well is not a failed day. Teresa says "the labour is greatest at first", which is true of the first day of a walk and the first week of anything. Second, not to despise the work. She tells the gardener to do what lies in his power and leave the rest, even when the well is dry. We will come back to that on Day 9. Third, to be ready for rain without waiting for it. A gardener who sits indoors until it rains has a poor garden. A gardener who is out in the beds when it comes has a good one.
+On an ordinary day this comes to three things. First, be honest about which water you have. A day at the well is not a failed day. Teresa says "the labour is greatest at first", which is true of the first day of a walk and the first week of anything. Second, do not despise the work. She tells the gardener to do what lies in his power and leave the rest, even when the well is dry. We will come back to that on Day 9. Third, be ready for rain without waiting for it. A gardener who sits indoors until it rains has a poor garden. A gardener who is out in the beds when it comes has a good one.
 
 If you do not pray, try reading "garden" as attention, the thing you tend, and "Lord" as whatever you call the part of life that you did not make. The picture still holds. The work is yours. The weather is not.
 
@@ -43,7 +43,7 @@ Her garden is also not for the gardener alone. It is made "wherein our Lord may 
 
 Notice, too, how little she asks for. She hopes the water will be given "drop by drop", and she says that when she drew "but one drop of water out of this blessed well", she considered it a mercy. A garden lives on drops. It may help to count yours: one real conversation, ten quiet minutes, a meal eaten slowly with nothing else going on. None of them will look like much in a diary. They are what the roots take up.
 
-Tiredness, honestly: a long day at the well takes it out of the arms. If today was all work and no rain, let tonight be rest. A dry well is not a fault in the gardener. It may only be a hot week.
+A long day at the well takes it out of the arms. If today was all work and no rain, let tonight be rest. A dry well is not a fault in the gardener. It may only be a hot week.
 
 - Which water did I draw today, and which came without my drawing it?
 - Whom did I compare myself with, and what did it cost me?

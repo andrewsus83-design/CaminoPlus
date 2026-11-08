@@ -10,7 +10,7 @@ The Office awards the Compostela to those who walk for religious or spiritual re
 
 ## Which routes the Office recognises
 
-The Office's pages read for this book speak of routes recognised by its own system, and say there are many traditional and recognised routes, but they do not list them. They do not mention the Portuguese Coastal route by name. The Office's own statistics, as Wikipedia reports them, count it as a route of its own. They also do not say how the Office treats a walk that starts on one recognised route and changes to another at a junction, as this one does at Redondela. The Xunta presents the Coastal route as a single route from A Guarda to Santiago. If any of this matters to your plan, ask the Office.
+The Office's pages read for this book speak of routes recognised by its own system, and say there are many traditional and recognised routes, but they do not list them. They do not mention the Portuguese Coastal route by name. The Office's own statistics, as Wikipedia reports them, count it as a route of its own. The pages also do not say how the Office treats a walk that starts on one recognised route and changes to another at a junction, as this one does at Redondela. The Xunta presents the Coastal route as a single route from A Guarda to Santiago. If any of this matters to your plan, ask the Office.
 
 ## The arithmetic for this road
 

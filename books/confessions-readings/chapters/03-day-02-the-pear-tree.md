@@ -18,7 +18,7 @@ He is in his sixteenth year. There is a pear tree near the family vineyard, and 
 
 The detail that stays is the pigs. A crowd of young men, in the dark, shakes a tree for fruit they do not want and flings it to animals that will eat it without a word of thanks. It would be funny if he did not mean it so seriously.
 
-What troubles him, decades later, is that there was no reason. People do wrong for money, for power, for revenge, out of fear, and he goes through the list in the pages around this one. None of it applied. He had better pears at home. He was not hungry. The fruit gave him no pleasure, and the only sweetness in it was the wrongdoing. *It was foul, and I loved it*, he says, which is about as blunt as a sentence can be. So he asks himself the question that makes the passage worth reading: why did I do it? And he finds an answer he did not expect. It was the company. *alone, I had never committed that theft*, he writes, and then he turns on the very thing he valued most: *O friendship too unfriendly!*
+What troubles him, decades later, is that there was no reason. People do wrong for money, for power, for revenge, out of fear, and he goes through the list in the pages around this one. None of it applied. He had better pears at home. He was not hungry. The fruit gave him no pleasure, and the only sweetness in it was the wrongdoing. *It was foul, and I loved it*, he says, which is about as blunt as a sentence can be. So he asks himself why he did it, which is the question that makes the passage worth reading. And he finds an answer he did not expect. It was the company. *alone, I had never committed that theft*, he writes, and then he turns on the very thing he valued most: *O friendship too unfriendly!*
 
 The line the whole day hangs on comes last: *but when it is said, "Let's go, let's do it," we are ashamed not to be shameless.* It is not wickedness that moves the lads, as he sees it. It is embarrassment. Nobody wants to be the one who says no.
 
@@ -50,6 +50,8 @@ Ask the other question too. Where did you pull someone else along today? You may
 One more look, and a kinder one. Think of the person whose company made the day lighter: the one who made you laugh at the wrong moment, or handed you a sweet at the right one. You need not know the name. A day with such a person in it is a good day, whatever else it held, and the passage is not an argument against them. It is only a reminder to notice what your company is doing to you, the way you notice what a new pair of boots is doing to your feet.
 
 Honest tiredness is useful here. A tired body is easy to lead, and the afternoon's agreements were probably made with the least of you present. If that is true, tomorrow's first decision, made with a rested mind, is your chance to take one back.
+
+Tomorrow the first *let's go* will arrive before breakfast is over. You do not have to say no to it. You only have to hear it, which is most of the work of choosing.
 
 - When did I say yes today because everyone else was saying it?
 - Where was I a little ashamed to be kind, and what did I do about it?

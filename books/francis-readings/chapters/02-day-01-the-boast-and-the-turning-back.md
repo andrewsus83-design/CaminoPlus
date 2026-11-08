@@ -29,7 +29,7 @@ And watch for the boast. Everyone sets out with a small one. It may sound like "
 ## For the walk
 
 - What have I promised myself about this road, and which part of that promise is a boast? You need not answer aloud. Only be curious about the shape of it.
-- For the first hour, walk a little slower than feels necessary. Each time you notice yourself speeding up, ask what you are hurrying toward, and then ease off by a step or two. If the answer is simply the end of the day, remember that it will arrive without any help from you.
+- For the first hour, walk a little slower than feels necessary. Each time you notice yourself speeding up, ask what you are hurrying towards, and then ease off by a step or two. If the answer is simply the end of the day, remember that it will arrive without any help from you.
 
 ## At the end of the day
 

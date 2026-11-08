@@ -24,7 +24,7 @@ She leans for support on three short remembered lines. One is from Paul: that al
 
 Be straight about the risk. Large hopes can lead to bad decisions on a mountain. Weather can change, and a pass in cloud is not a pass in sun. Start early, carry more water than you think you need, look at the forecast, and be ready to turn round without shame. 112 is the number for emergencies in Spain. Courage here includes the courage to stop. The same Teresa who says "not at once" would say it to you.
 
-What does it ask of an ordinary day? Name the large hope, perhaps only to yourself. Then reduce it to the next step you can see: the next bend, the next tree. Rest as the bird rests. And when someone, perhaps your own voice, says that it is pride to hope for much, ask whether it sounds more like humility or like fear.
+Day to day, then, name the large hope, perhaps only to yourself. Then reduce it to the next step you can see: the next bend, the next tree. Rest as the bird rests. And when someone, perhaps your own voice, says that it is pride to hope for much, ask whether it sounds more like humility or like fear.
 
 ## For the walk
 
@@ -45,7 +45,7 @@ The bird with weak wings rests. How did you rest today? Resting is easy to do ba
 
 If you want a large hope for tomorrow, name it in a single sentence tonight and leave it on the pillow. Hopes are better kept in a rested head, but a sentence put down now will still be there at breakfast, and you will not have to find it again.
 
-Honest tiredness: after a day of daring, the evening can bring the thing Peter felt afterwards. The fear arrives once the danger is behind you. Your knees may shake in the bunk when they did not on the path. That is not weakness returning. It is the body catching up with what it did.
+After a day of daring, the evening can bring the thing Peter felt afterwards. The fear arrives once the danger is behind you. Your knees may shake in the bunk when they did not on the path. That is not weakness returning. It is the body catching up with what it did.
 
 - What did I dare today, and what did it cost me?
 - Where did I rest like the bird, and did I let myself?

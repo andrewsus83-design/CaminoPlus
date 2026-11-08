@@ -15,7 +15,7 @@ This book rests on public sources, and the fact ledger that goes with it lists e
 - **The ten municipalities of the Caminho Português da Costa**: their official portal and guide leaflet (the file dates from 2017), and the pages of Viana do Castelo and Vila Nova de Cerveira.
 - **The Pilgrim's Reception Office of the Cathedral of Santiago** (oficinadelperegrino.com): the Compostela, the credencial, the Certificate of Distance and the notes on arriving.
 - **The Confraternity of St James** (csj.org.uk): its page on the Camino Portugués, for the routes out of Porto, the Spiritual Variant, the weather and the way there.
-- **Wikipedia**, for history, geography, climate and the Pilgrim's Office statistics for 2025: the articles on the Portuguese Way, Porto, Vila do Conde, Póvoa de Varzim, Viana do Castelo, Caminha, Vigo, Santiago de Compostela and its cathedral, the Jacobean Holy Year, the Schengen Area, the number 112 and time in Portugal and Spain. The climate averages are those of the Portuguese and Spanish weather services.
+- **Wikipedia**, for history, geography, climate and the Pilgrim's Office statistics for 2025: the articles on the Portuguese Way, Porto, Vila do Conde, Póvoa de Varzim, Viana do Castelo, Caminha, Vigo, Santiago and its cathedral, the Holy Year, the Schengen Area, the number 112 and time in the two countries. The climate averages are those of the Portuguese and Spanish weather services.
 - **Published walking plans** for the Portuguese days, compared with the leaflet. They are not named here; the ledger lists them.
 - **Day-length figures**, computed with a standard solar calculation, and **the CaminoPlus route catalog**, for the route's name, ends, length and difficulty.
 

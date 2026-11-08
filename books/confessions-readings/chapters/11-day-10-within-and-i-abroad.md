@@ -45,7 +45,9 @@ Then turn the same attention round, as the passage suggests, from the view to th
 
 *Too late* is not a sentence for tonight. You are not too late for anything this evening, except supper. Augustine wrote that cry as a man who had been found, and a cry of that kind looks back with relief and does not sulk. If you find something within yourself tonight that you wish you had noticed years ago, treat it as welcome.
 
-Tiredness has a plain use here. A body that has finished its work leaves a good deal of room for memory, and sleep does a good deal of the filing of what you have gathered, whether or not you approve.
+Tiredness has a plain use here, and a kind one. A body that has finished its work leaves a good deal of room for memory, and sleep does a good deal of the filing of what you have gathered, whether or not you approve.
+
+If you are too tired to walk the whole day again, walk half of it: only the morning, or only the last hour. A short memory kept is worth more than a long one lost.
 
 - What did I take in today that I would like to keep?
 - Where was I abroad today, in my head or my phone, while something waited within?

@@ -19,7 +19,7 @@ Where you begin sets the length of your walk. On this book's figures, which are 
 - **From A Guarda, after the boat:** eight days, ~163 km, the Xunta's own figure for its coastal route.
 - **From Vigo:** five days, ~101 km by the Xunta's stage figures.
 
-Add a rest day or two, and a day each to travel there and back, and the Porto start is about a fortnight and a half. If you are choosing a start with the Compostela in mind, read the chapter on the rule first and ask the Pilgrim's Office. No starting town in this book is a guarantee.
+Add a rest day or two, and a day each to travel there and back, and the Porto start is a little over two weeks. If you are choosing a start with the Compostela in mind, read the chapter on the rule first and ask the Pilgrim's Office. No starting town in this book is a guarantee.
 
 ## Training
 
@@ -31,7 +31,7 @@ The surfaces vary: the sources mention boardwalks, paved paths, dirt tracks and 
 
 ## Packing
 
-Pack light, and then lighter. The essentials are plain: a rain jacket, because this is a green coast; a windproof layer, because the shore is windy; a hat, sun protection and a water bottle, because the shore has little shade; a small first-aid kit for feet; a head torch and earplugs for shared rooms; and something dry to sleep in. A phone with an offline map is a good tool and a poor single plan, so know your next town before the battery is low.
+Pack light, and then lighter. The essentials are plain: a rain jacket, because this is a green coast; a windproof layer, because beaches are often windier and cooler than the land inland; a hat, sun protection and a water bottle, because stretches of the shore have little shade; a small first-aid kit for feet; a head torch and earplugs for shared rooms; and something dry to sleep in. A phone with an offline map is a good tool and a poor single plan, so know your next town before the battery is low.
 
 ## Money, language and the clock
 

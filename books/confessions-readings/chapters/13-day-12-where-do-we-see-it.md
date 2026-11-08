@@ -18,13 +18,13 @@ Here is the plain situation. Book twelve is probably the hardest of the thirteen
 
 The first is the opening. *My heart, O Lord, touched with the words of Thy Holy Scripture, is much busied*, he says, and then: *enquiring hath more to say than discovering, and demanding is longer than obtaining, and our hand that knocks, hath more work to do, than our hand that receives.* It is a very plain description of seeking. The asking takes longer than the finding, and the hand that knocks is busier than the hand that is handed something. Anyone who has asked for directions and been given a long answer will know it.
 
-The second is a short sentence about the ground. The creation he is trying to understand is not far away. He says: *this heaven which I see, and this earth that I tread upon, whence is this earth that I bear about me; Thou madest it.* The earth he is walking on is the earth he is asking about. For a walker that is a nice small turn: the thing under your boots is the subject of the book.
+The second is a short sentence about the ground. The creation he is trying to understand is not far away. He says: *this heaven which I see, and this earth that I tread upon, whence is this earth that I bear about me; Thou madest it.* The earth he is walking on is the earth he is asking about. For a walker that is a nice small turn: the thing under your boots is the thing he is asking about.
 
 The third is the heart of the passage. People differ about what Moses meant. One says one thing and another says another, and each is sure. Augustine imagines saying to one of them: *If we both see that to be true that Thou sayest, and both see that to be true that I say, where, I pray Thee, do we see it? Neither I in thee, nor thou in me; but both in the unchangeable Truth itself, which is above our souls.* The point is delicate. If we both see a thing is true, we are not seeing it in each other. We are both looking at the same thing, and it belongs to neither of us. Then, in the last lines: *Why not rather as both, if both be true?*
 
 A few lines before this passage, in words we have left out, he says it more broadly: *Thy truth is neither mine, nor his, nor another's.* Truth, in his picture, is public, like the road. Elsewhere in the book he compares a short sacred text to a spring: a small source that feeds more streams than any one of the streams could.
 
-Two cautions. First, *both* is not a blanket. Augustine says plainly that there are readings which are false, and on those he is not gentle: *away with all those who imagine themselves to know as a truth, what is false.* The generosity applies when two readings are both true. It does not say that every opinion is as good as every other. Second, the whole conversation is about the Bible, and it takes the authority of that book for granted. A reader who does not share it can still hear the manner: how to disagree without making it a fight over who owns the light.
+Two cautions. First, *both* is not a blanket. Augustine is clear that some claims are simply false, and he has no patience with people who think they know them to be true: *away with all those who imagine themselves to know as a truth, what is false.* The generosity applies when two readings are both true. It does not say that every opinion is as good as every other. Second, the whole conversation is about the Bible, and it takes the authority of that book for granted. A reader who does not share it can still hear the manner: how to disagree without making it a fight over who owns the light.
 
 So how would this look at the next table? Slow down before you say that someone is wrong. Ask what they can see from where they sit. And ask yourself the question that is the day's title.
 
@@ -47,7 +47,9 @@ Try one more thing before you sleep. Name something that you and the person you 
 
 You do not need to settle any of this tonight. The earth you tread on will be there in the morning, and so, probably, will the table.
 
-Tiredness makes people quick to take offence. If you are feeling sharp at the edges tonight, it may not be anyone's fault, and it may be best to leave all the arguments of the day exactly where they are until you have slept.
+Tiredness can make people quick to take offence. If you are feeling sharp at the edges tonight, it may not be anyone's fault, and it may be best to leave all the arguments of the day exactly where they are until you have slept. They will not spoil. Most of them will be smaller in the morning, and some will have gone altogether.
+
+A last small thing. If the disagreement was with someone who is still beside you tonight, a plain, neutral sentence will do: "I was thinking about what you said." It claims nothing, and it costs very little.
 
 - Where did I insist on being right today?
 - What was true in a view I did not share?

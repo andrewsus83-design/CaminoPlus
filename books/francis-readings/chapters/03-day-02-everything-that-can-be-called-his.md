@@ -43,7 +43,7 @@ Then there is the song. Francis, in this story, leaves in the snow and sings. Pe
 
 Taking off the day's clothes is a small stripping of its own, and it is worth a moment. The sweat-stiff shirt, the socks that have walked all afternoon, the hat that kept the sun off. A wash, a clean shirt, a pair of dry feet. It is an ordinary comfort, and an easy one to overlook. Francis went out into the cold with almost nothing, and the clean shirt tonight is a long way from that, which is a good reason to enjoy it.
 
-A word on tiredness. Letting go costs energy, and the body does not always know the difference between putting down a worry and picking up a stone. If your head is full tonight, you have not failed at anything. Choose one small thing to be rid of until morning. A wet sock hung up to dry will do. It is surprising how much a small act of putting down can help the larger one.
+Letting go costs energy, and the body does not always know the difference between putting down a worry and picking up a stone. If your head is full tonight, you have not failed at anything. Choose one small thing to be rid of until morning. A wet sock hung up to dry will do. It is surprising how much a small act of putting down can help the larger one.
 
 Questions for tonight:
 

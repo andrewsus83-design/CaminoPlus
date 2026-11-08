@@ -26,7 +26,7 @@ A little later in the chapter she is given Augustine's *Confessions*. She writes
 
 Be careful not to make the turn bigger than she does. She does not say she was cured. She says "I have grown better ever since", which is modest, and the chapters that follow still hold fear, doubt and long dry spells. A turn is where a road bends, and the road goes on. The morning after it is usually plain. The picture is in its corner, the boots are where you left them, and the first hour has to be walked like any other.
 
-What does it ask of an ordinary day? To let yourself be stopped, which is harder than it sounds on a walk that is mostly about going on. And to be wary of the plan that rests on your own strength alone. Whatever help you reach for, a friend, a doctor, a prayer, a bench, Teresa's report is that the turn came when she stopped trying to manage it by herself.
+In practice it comes to letting yourself be stopped, which is harder than it sounds on a walk that is mostly about going on. And it comes to being wary of the plan that rests on your own strength alone. Whatever help you reach for, a friend, a doctor, a prayer, a bench, Teresa's report is that the turn came when she stopped trying to manage it by herself.
 
 ## For the walk
 
@@ -45,7 +45,7 @@ Look, too, at the way she asks. She does not make a vow in front of the picture.
 
 The turn she describes is not a thing to wait for tonight. You may be tired of something in yourself: a habit, a mood, a way of talking to people you love. You do not have to settle it before you sleep. It is enough to admit it, once, to yourself. Teresa put it off for years, and she is plain about the cost.
 
-Tiredness, honestly: the body at the end of a long day is a poor judge of its own life. A decision made on a bunk at nine o'clock is often wrong by breakfast. So do not decide anything big tonight. Note only what stopped you, and what you are tired of, and let the rest sleep. And if nothing stopped you today, that is a day too. Some stretches of road simply go by. The picture was in its corner for the feast, and nobody knows for how long before she looked at it.
+The body at the end of a long day is a poor judge of its own life. A decision made on a bunk at nine o'clock is often wrong by breakfast. So do not decide anything big tonight. Note only what stopped you, and what you are tired of, and let the rest sleep. And if nothing stopped you today, that is a day too. Some stretches of road simply go by. The picture was in its corner for the feast, and nobody knows for how long before she looked at it.
 
 - What stopped me today, even for a moment?
 - What am I tired of in myself, and have I said so to anyone?

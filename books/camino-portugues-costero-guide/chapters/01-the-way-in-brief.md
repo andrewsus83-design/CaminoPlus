@@ -13,7 +13,24 @@ Nobody agrees, and that tells you how this road is built.
 - For the Portuguese part, the government order of 2022 that certifies the route, and the national tourism authority, give ~138 km from Porto to Valença, in nine stages. The official portal of the ten municipalities says ~149.5 km. An official guide leaflet from the municipalities, whose file dates from 2017, marks its legs at ~29, ~27, ~26 and ~27 km from Porto to Caminha, which is ~109 km, and a further ~32 km on to Valença. The three official figures for Porto to Valença are therefore ~138, ~141 and ~149.5 km.
 - Published walking plans put the whole road at ~271 to ~280 km.
 
-Part of the gap is variants: the road has a traditional line, a seaside line on boardwalks, and three ways to cross into Spain. Part of it is where each source starts and stops counting. The twelve days of this book follow the leaflet's legs in Portugal and the Xunta's stage pages in Galicia, and add up to ~272 km on foot, plus the boat. Treat every figure as a good guide and not as a measurement.
+Part of the gap is variants: a traditional line, a seaside line on boardwalks, and three ways into Spain. Part is where each source starts and stops counting. The twelve days of this book follow the leaflet's legs in Portugal and the Xunta's stage pages in Galicia, and add up to ~272 km on foot, plus the boat. Treat every figure as a good guide, not a measurement.
+
+## The twelve days
+
+- Day 1: Porto to Vila do Conde, ~29 km
+- Day 2: Vila do Conde to Esposende, ~27 km
+- Day 3: Esposende to Viana do Castelo, ~26 km
+- Day 4: Viana do Castelo to Caminha, ~27 km
+- Day 5: Caminha to Oia, by boat and ~17 km on foot
+- Day 6: Oia to Baiona, ~19 km
+- Day 7: Baiona to Vigo, ~27 km
+- Day 8: Vigo to Redondela, ~16 km
+- Day 9: Redondela to Pontevedra, ~18 km
+- Day 10: Pontevedra to Caldas de Reis, ~23 km
+- Day 11: Caldas de Reis to Padrón, ~19 km
+- Day 12: Padrón to Santiago de Compostela, ~25 km
+
+The rounded figures add up to a kilometre more than the ~272 km total.
 
 ## Where it meets its neighbours
 
@@ -23,7 +40,7 @@ It touches the Central route again at Valença, which the tourism authority of P
 
 ## What it feels like
 
-It is a road of sea, estuaries and small rivers. Wikipedia describes a seaside version that follows beach boardwalks, and pictures a way of ~1.5 km over the dunes at Ofir. The Confraternity calls the Portuguese coast "an interesting if undulating journey", with mixed farms and pine and eucalyptus woods behind the shore. In Galicia the Xunta describes cliffs, Cape Silleiro and the Ría de Vigo, then the inner ría near Redondela with mussel rafts on the water. The Xunta rates its Galician part Medium-Low overall.
+It is a road of sea, estuaries and small rivers. Wikipedia describes a seaside version that follows beach boardwalks, and pictures a way of ~1.5 km over the dunes at Ofir. The Confraternity calls the Portuguese coast "an interesting if undulating journey", with mixed farms and pine and eucalyptus woods behind the shore. In Galicia the Xunta describes cliffs, Cape Silleiro and the Ría de Vigo, then mussel rafts on the inner ría near Redondela. It rates the Galician part Medium-Low overall.
 
 ## Why it exists
 

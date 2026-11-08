@@ -14,7 +14,7 @@ There comes a day, a few days after a walk, when the rucksack is emptied onto a 
 
 Teresa's answer, in this passage, is the plainest thing in her book. "We are not angels, for we have a body." She says it in a chapter that answers certain books on prayer, written by people she respects. Those books advised the advanced to put away every image and every human support. Teresa says that this seems right enough now and then, but that to withdraw altogether is more than she can endure. She also tells how she tried the advice herself and came to think it a mistake for her, adding at once, "still, it may be that it is I who am deluded". To try to make ourselves angels while we are on the earth, "and so much on the earth as I was", she says, is an act of folly. It is a small joke at her own expense, from a woman who was often ill, often tired and always busy.
 
-"Our thoughts must have something to rest on." Think of what that means to someone who has been walking. A bench. A shell on a rucksack. A route you know in your legs. A cup of coffee at a certain bar. These are not distractions from the pilgrimage. They are the things that held it up. And coming home is a matter of finding the new benches: the chair by the window, the walk to the shops, the usual hour.
+"In general, our thoughts must have something to rest on." Think of what that means to someone who has been walking. A bench. A shell on a rucksack. A route you know in your legs. A cup of coffee at a certain bar. These are not distractions from the pilgrimage. They are the things that held it up. And coming home is a matter of finding the new benches: the chair by the window, the walk to the shops, the usual hour.
 
 Then comes her list, which is as good a short account of an ordinary life as any: "when we have many things to do, when we are persecuted and in trouble, when we cannot have much rest, and when we have our seasons of dryness". Busy, pressed, short of sleep, and dry. That is a Tuesday. It is also, in a way, the whole of this book, since you have met every item on the list. In such times, she says, "Christ is our best Friend", for we see Him as a man, "faint and in trouble", and He is our companion. This is a Christian sentence and says so. Its sense for a reader outside the faith is still clear: you do not have to be at your best to be accompanied. A companion who knows what it is to be tired and in trouble is better than a lofty one.
 
@@ -24,7 +24,7 @@ She is also honest about how much of her own life was spent in the middle of thi
 
 And the book does not end on a summit. In the last chapter she records words that were said to her, she says, to console her: that "in this life we could not continue in the same state". She says she was told to expect it to be like this: "At one time I should be fervent, at another not; now disquieted, and again at peace, and tempted; but I must hope in Him, and fear not." You can hear these as spoken from outside or as the conclusion of a shrewd woman looking back over her life. In either case they remove a pressure. You may not be able to hold on to the best day of the walk, and nothing says you should. What you can keep is smaller and more durable.
 
-What does it ask of an ordinary day? Mostly to be small and bodily. Unpack. Wash the clothes. Eat at a table. Call the people who have wondered. Then pick one habit from the road that will fit into a kitchen, and put it where you will see it.
+What goes home with you is mostly small and bodily. Unpack. Wash the clothes. Eat at a table. Call the people who have wondered. Then pick one habit from the road that will fit into a kitchen, and put it where you will see it.
 
 ## For the walk
 
@@ -43,7 +43,7 @@ Teresa does not promise that the best of it can be kept. The words she records a
 
 A last small thing for the evening is to mark the end of the walk, however quietly. Wash the boots. Put the shell, the credencial or the ticket where you will find it. Say thank you, to somebody or to nobody, for ten days of a road and a book. Endings need a little ceremony, even a kitchen-sized one, or they leave the day open.
 
-Tiredness, honestly: the body often catches up after the walk is over. It may be heavier for a day or two than it was on the road. Rest is not a betrayal of the pilgrimage. It is a part of it. And if a long low mood follows the end of the walk, one that does not lift after some days of ordinary life, talk to a doctor or someone you trust.
+The body often catches up after the walk is over. It may be heavier for a day or two than it was on the road. Rest is not a betrayal of the pilgrimage. It is a part of it. And if a long low mood follows the end of the walk, one that does not lift after some days of ordinary life, talk to a doctor or someone you trust.
 
 - What do I most want to carry from this road into an ordinary week?
 - Who needs to hear that I am home, or that I am grateful?

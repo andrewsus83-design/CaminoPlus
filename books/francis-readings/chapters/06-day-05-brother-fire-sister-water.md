@@ -18,15 +18,15 @@ That is the point of the passage, and of the song it talks about. The sun and mo
 
 A word about the song itself. This book does not print it. Chesterton gives only pieces, such as the line from his first chapter, "Praised be God for our Sister, Mother Earth, which brings forth varied fruits and grass and glowing flowers". (Earth is a sister and a mother there, so his remark about nature and mothers is about a way of looking, not a count of words.) What we have here is Chesterton's English for Francis's words, and a portrait of the man who sang them. The whole Canticle is easy to find in many translations, and it is short enough to read on a bench.
 
-Say what the passage says, plainly. Francis treated every creature as someone, and treated someone with courtesy. Chesterton says he would have apologised to the cat. When he came to preach in a wood full of chattering birds, the story goes, he said, "Little sisters, if you have now had your say, it is time that I also should be heard." And the birds, Chesterton says, were silent, "as I for one can very easily believe".
+The passage says this much, simply: Francis treated every creature as someone, and treated someone with courtesy. Chesterton says he would have apologised to the cat. When he came to preach in a wood full of chattering birds, the story goes, he said, "Little sisters, if you have now had your say, it is time that I also should be heard." And the birds, Chesterton says, were silent, "as I for one can very easily believe".
 
 Now the doubt. Plenty of readers will not believe the birds fell silent, and Chesterton does not need them to. A few lines later he calls much of Francis's way with animals "a sort of symbolic joke, a pious pantomime", a way of showing that he "not only loved but reverenced God in all his creatures". The legend is a bow, in other words, and you can take the bow without taking the legend as news. Chesterton's smile in that last clause is part of it.
 
 There is a second difficulty, and it is a practical one on a coast. The elements in the song are not all gentle. Fire is "fierce". The sea is cold and large and does not care who you are. The route guide in the app names wind and sun as the main challenge on this road, and the sun, whom Francis called a brother, can burn. Courtesy to the elements does not mean carelessness with them. Carry water, cover your head and your neck, take shade when it is offered, and rest earlier than your pride suggests. It is a form of manners to arrive in one piece.
 
-On the road it asks for something very small: to choose one thing, and meet it as itself. Not "the sea" but this wave, this one, coming in. Not "birds" but that gull standing on one leg on a post, who has been standing there since before you came up the path. It does not need a speech. It needs a minute of attention, and perhaps a quiet nod, as a stranger nods to another.
+On the road it asks for something very small: to choose one thing, and meet it as itself. Not "the sea" but this wave, this one, coming in. Not "birds" but that gull on a post, standing there as if it had been there all morning. It does not need a speech. It needs a minute of attention, and perhaps a quiet nod, as a stranger nods to another.
 
-You will find that a thing looked at in this way changes. It stops being scenery and becomes an event. That is all Chesterton is claiming for Francis: not that he loved the world in general, but that he met it in particular, which is harder and, for a walker, a good deal more interesting.
+You may find that a thing looked at in this way changes. It stops being scenery and becomes an event. That is all Chesterton is claiming for Francis: not that he loved the world in general, but that he met it in particular, which is harder and, for a walker, a good deal more interesting.
 
 ## For the walk
 
@@ -43,11 +43,11 @@ Water and fire are good guides for the evening. Water: what did it do for you to
 
 The one element left out of the list is earth, the ground itself, which Francis's song calls both a sister and a mother. Your feet will have a good deal to say about it tonight. Sand that slides, boards that ring, cobbles that bruise, a hard shoulder of tarmac, a soft patch of grass that was a gift. Every kind of ground speaks differently to the sole of a foot. It held you up for hours and asked for nothing. That is worth a thought before the shoes come off, and perhaps a quiet word of thanks as you take them off.
 
-If today's weather was harsh, wind, glare, or a long grey drizzle, you might think of it that way. Not as an enemy, and not as a friend, but as something with a character, which you can meet with manners. Your sunburn, if you have one, is not a moral failure. Take care of it, and be glad of the sun at the same time.
+If today's weather was harsh, wind, glare or a long grey drizzle, you could try the same attitude: not an enemy, and not a friend, but something with a character, which you can meet with manners. Your sunburn, if you have one, is not a moral failure. Take care of it, and be glad of the sun at the same time.
 
-A word on tiredness. After a long day the mind goes flat, and a thing like a gull ceases to be interesting. Do not try to be moved. If you can manage one clear minute at the window, with whatever is outside it, that is plenty.
+Tiredness flattens all of this. After a long day the mind goes grey, and a thing like a gull ceases to be interesting. Do not try to be moved. If you can manage one clear minute at the window, with whatever is outside it, that is plenty.
 
-Questions for tonight:
+Questions for the last light:
 
 - What one thing did I truly meet today, and not merely pass?
 - Where did I speak to something, a bird, a dog, the wind, even as a joke, with some courtesy?

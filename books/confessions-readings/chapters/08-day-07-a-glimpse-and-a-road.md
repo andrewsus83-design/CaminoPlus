@@ -49,9 +49,11 @@ If you shared a view today, there is a small gift in remembering that you saw it
 
 Be honest, too, about the days when there was no view. Some days are wet and low, and the distance is the only thing on offer. They count. The passage does not say that only the high days are the real ones. It says that high moments pass, and the road goes on.
 
-If a view did give you a clear sight of something, a kinder way of being, a conversation you have put off, a rest you need, here is the practical use of Augustine's mountain. A view is not a route, so choose the smallest step towards it that you can take tomorrow before noon, and fix it in your mind tonight. A step is a modest thing. It is also what is left when the view has gone.
+If a view did give you a clear sight of something, a kinder way of being, a conversation you have put off, a rest you need, here is the practical use of Augustine's mountain. A view is not a route, so choose the smallest step towards it that you can take tomorrow before noon, and fix it in your mind tonight. A step is a modest thing. It is also what is left when the view has gone, and it is the thing that can actually be walked.
 
 If you cannot think what lifted you today, think instead of what carried you: a pair of socks, a warm drink, a bed with a blanket. A great deal of life is carried by small things.
+
+If today included a long descent, your knees may have something to say. Take the ache seriously and tomorrow's downhill slowly, and ask a doctor or a pharmacist about any pain that does not ease. A road is long, and the body is the only one you have.
 
 - What lifted me today, and what pulled me down?
 - What have I kept from the best hour of today?

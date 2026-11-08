@@ -71,6 +71,7 @@ is short of what was promised. "For the walk" is 60 to 200 words.
 
 - **Never copy a passage by hand.** Use `python3 tools/passage.py <source.txt> --from "first words" --to "last words"` (several pairs make one passage joined by `…`). It
   copies the exact stretch, turns `_italics_` into `*italics*`, and tells you the nearest book and chapter heading, so the citation is read from the source and not from memory.
+  Where a work has no chapters it recognises (Bunyan, Pascal's italic section titles, Thoreau), the tool says "no heading found": then read the place off the file yourself, by the title it gives, never from memory.
   It warns about what old editions carry inside the text, and so must you: a footnote marker like `(3)` or `[3]`, a paragraph number like `2.`, and a quotation mark
   that opens in one stretch and closes in the next. End the stretch at the full stop before a marker, start after one, and never leave an opening quotation mark unclosed.
 - **Inside the prose, anything in quotation marks or in italics that reads as the classic's words must be exact too.** A near-miss ("if I only knew" for "if I but knew")

@@ -12,7 +12,7 @@
 
 At the foot of a long climb there is a moment when you say, quietly, right, now. You look up at the slope. You adjust a strap. You take a drink you do not need. Then you say it again, and a minute has gone, and your feet have not moved. Nobody is watching, and nothing is wrong with your legs. It is the smallest version of a very old difficulty.
 
-The eighth book of the *Confessions* is the book of that difficulty, at the largest size. By now Augustine has been searching for years. He has read, listened, doubted and half agreed, and in this book he sits in the little garden of his lodging with his friend Alypius, and something has to be decided. In the pages before the passage he tries to say what is happening in him, and the sentence he finds is one of the best in the book: *The mind commands the mind, its own self, to will, and yet it doth not.* A hand will move when it is told. A will will not always move when it is told, because part of it is willing and part is not. He calls it *partly to will, partly to nill*, and says it is a sort of sickness of the mind. Anyone who has ever meant to begin something and not begun it knows what he means.
+The eighth book of the *Confessions* is the book of that difficulty, at the largest size. By now Augustine has been searching for years. He has read, listened, doubted and half agreed, and in this book he sits in the little garden of his lodging with his friend Alypius, and something has to be decided. In the pages before the passage he tries to say what is happening in him, and the sentence he finds is one of the best in the book: *The mind commands the mind, its own self, to will, and yet it doth not.* A hand will move when it is told. A will does not always move when it is told, because part of it is willing and part is not. He calls it *partly to will, partly to nill*, and says it is a sort of sickness of the mind. Anyone who has ever meant to begin something and not begun it knows what he means.
 
 The passage opens in the middle of the struggle. *Be it done now, be it done now*, he says to himself, and then: *I all but did it, and did it not.* He gets close to the edge and stops, but he does not go back either. In his words, he *kept my stand hard by, and took breath*. That is almost funny, and entirely true. Most of what we call putting something off is exactly this: standing close to the edge, breathing.
 
@@ -33,9 +33,9 @@ On an ordinary day, this comes down to something very small. The task is to find
 
 ## At the end of the day
 
-Do not decide anything tonight. That is the first piece of advice, and it comes with the day's whole authority. A body that has walked a long way, and a mind that has taken in a long day, are bad judges of large things. Augustine's garden scene happens in the middle of a day, with a friend close by and a night's sleep still ahead. Yours should too.
+Do not decide anything tonight. That is the first piece of advice, and perhaps the most useful. A body that has walked a long way, and a mind that has taken in a long day, are bad judges of large things. Augustine's garden scene happens in the middle of a day, with a friend close by and a night's sleep still ahead. Anything of yours that needs deciding deserves the same: daylight, company and a night's sleep still to come.
 
-So, only a look back. Did you take the small step? If you did, notice how it was. It may have been over very quickly, and felt out of proportion to the weeks of worry. That is the usual way of such things. The step is nearly always smaller than the wait.
+So, only a look back. Did you take the small step? If you did, notice how it was. It may have been over very quickly, and felt out of proportion to the weeks of worry. That is a common way of such things. The step is often smaller than the wait.
 
 If you did not, be gentle. *All but* is a respectable place to stand. Augustine stood there for a long time and wrote a book about it. Look at what held you back, as honestly as you can, and without any scolding. Was it fear? Tiredness? A reasonable doubt? Or just the long habit of the old way? Naming it is a step of its own.
 
@@ -47,7 +47,7 @@ And who sat beside you? On a road there is nearly always someone, a fellow walke
 
 If you took the small step and the day felt lighter after it, take note. Lightness is a kind of information. It does not prove that the step was right, but it tells you something about the weight of the delay, which was probably heavier than the deed.
 
-A word about weeping. Augustine goes away to be alone for it, and nobody thinks the less of him. If today brought tears, from a struggle or from nothing you can name, they belong in the day as much as the kilometres do.
+A word about weeping. Augustine goes away to be alone for it, and Alypius, astonished, lets him go. If today brought tears, from a struggle or from nothing you can name, they belong in the day as much as the kilometres do.
 
 - What did I all but do today?
 - What would I do now if I were not waiting to feel ready?

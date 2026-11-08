@@ -24,7 +24,7 @@ Some places along the Way offer a *menú del peregrino*, a set meal for pilgrims
 
 The sea is the larder here, and the sources say so in their way. Wikipedia describes Póvoa de Varzim as a town of fishermen and seafarers, with a fishing history that reaches to Newfoundland. In Galicia the Xunta points to A Pedra, in Vigo, as known for its restaurants and for the oysters of the ría, and shows mussel rafts on the water at Rande. In Redondela it names the Festa do Choco, a cuttlefish festival, each May. You do not need to eat all of it. Pick one local thing a day, and eat it without a screen.
 
-Water matters as much. The Xunta says the shore beyond Portecelo has hardly any shade, and the summer sun asks for water. Fill your bottle in each town, and carry something for lunch on the long days: Day 1, Day 4 and Day 7.
+Water matters as much. Fill your bottle in each town, and carry something for lunch on the long days: Day 1, Day 4 and Day 7.
 
 ## Resting
 
@@ -32,4 +32,4 @@ It is easy to treat the walk as a timetable to be kept. Resist that. A day of re
 
 If you have a day to spare, there are candidates. Baiona is a place to slow down: the Xunta says the Cíes Islands, in the Illas Atlánticas National Park, can be reached by boat from there. Viana do Castelo is another, with its old hospital for pilgrims and its hill. Pontevedra is the one that *The Portuguese Way* suggests, and it lies on this road too. The last place is the end. Santiago is a city built for the end of a pilgrimage, and it deserves more than a night.
 
-On the road, listen to your body before you listen to your plan. Take the short days as short days. If something hurts in a way that grows rather than fades, stop, rest, and let a doctor look at it. You are not walking to prove anything.
+On the road, listen to your body before you listen to your plan. You are not walking to prove anything.

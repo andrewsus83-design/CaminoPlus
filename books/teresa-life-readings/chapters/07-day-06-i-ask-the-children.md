@@ -24,7 +24,7 @@ This matters because Teresa herself, elsewhere in her book, can sound as if humi
 
 There is one more small picture in this chapter, which is a different sort of humility altogether. She used to fold up the sisters' mantles as they left the choir, secretly, thinking of herself as serving the angels who had been there praising God. When the sisters found out she was ashamed. The shame came, she says, not because she was humble but because she was afraid they would laugh. Her virtue, she says, "was not strong enough to bear that they should know of it". Even the secret kindness had her vanity in it, and she says so cheerfully.
 
-What does it ask of an ordinary day? Ask the question. Say "I am lost" and "I can't manage the last four kilometres" and "I don't know what that bird is", plainly, to the person next to you. And hold the other side loosely too. There is no prize for being the most self-effacing walker on the road. If you are praised, say thank you and be done. If you are wrong, say so and carry on. Most of what looks like humility is truthfulness. Most of what is hard about it is the first moment.
+For a day on the road, then: ask the question. Say "I am lost" and "I can't manage the last four kilometres" and "I don't know what that bird is", plainly, to the person next to you. And hold the other side loosely too. There is no prize for being the most self-effacing walker on the road. If you are praised, say thank you and be done. If you are wrong, say so and carry on. Most of what looks like humility is truthfulness. Most of what is hard about it is the first moment.
 
 ## For the walk
 
@@ -43,7 +43,7 @@ So the truth runs between two errors: the show of knowing and the show of not kn
 
 There is a small thing to try over supper, if there is a supper. Ask the person beside you a question to which you do not know the answer, and mean it: where the day began for them, what they carry, what they are walking toward. You may find that the wish to look as if you knew things was a weight you had not noticed carrying all day.
 
-An honest word about tiredness. Fatigue is a great breeder of small untruths, since it is easier to say "fine" than to explain. If you can say one true thing tonight to the person nearest you, "I am done in", you will have done a day's work in humility. The rest can wait for rest.
+Fatigue is a great breeder of small untruths, since it is easier to say "fine" than to explain. If you can say one true thing tonight to the person nearest you, "I am done in", you will have done a day's work in humility. The rest can wait for rest.
 
 - Where did I pretend today to know the way?
 - What small service did I do that I would not mind being unseen?

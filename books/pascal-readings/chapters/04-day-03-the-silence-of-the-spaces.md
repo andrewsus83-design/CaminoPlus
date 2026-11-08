@@ -32,7 +32,7 @@ And do not skip over "no reason why here rather than there." There is a vertigo 
 
 In practice: a minute of wonder without a verdict. Look at something large, or something very small, and do not explain it. The day is full of such things, and most of them go by while we are working out what to have for supper.
 
-This is the book's title seen from the other side. On the first day the quiet was a room you could leave. Here it is the sky, and you cannot. The nearest you can come to peace with it, Pascal suggests, is to stop arguing with its size.
+This is the book's title seen from the other side. On the first day the quiet was a room you could leave. Here it is the sky, and you cannot. The nearest you can come to peace with it, on his account, is to stop arguing with its size.
 
 ## For the walk
 

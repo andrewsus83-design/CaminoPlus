@@ -12,13 +12,13 @@
 
 A long walk offers you two parts to play, and both of them are tempting. The first is the angel. The angel in you wants to be all will: a body that does what it is told, a mind that has no need of a bench, a stubborn refusal of every twinge. The second is the brute, which wants only to be comfortable, to be fed and let alone, and to call that wisdom.
 
-Pascal says you are neither, and he adds a warning: "the misfortune is that whoever would play the angel plays the brute." He means something moral by it, a pride that tries to rise above its own nature and ends up cruel. The idea has a plainer version on a road, and it is only our reading, not his. Anyone who walks through a worsening pain to prove something arrives at the evening sour and short with everyone. The performance of the angel, kept up all day, turns into the manners of the brute by supper.
+Pascal says you are neither, and he adds a warning: "the misfortune is that whoever would play the angel plays the brute." He seems to mean something moral by it, an attempt to rise above one's own nature that ends up below it. The idea has a plainer version on a road, and it is only our reading, not his. A walker who goes on through a worsening pain to prove something may well arrive at the evening sour and short with everyone. The performance of the angel, kept up all day, turns into the manners of the brute by supper.
 
 The second half of the passage is a piece of careful sorting. Pascal gives three orders that appear to contradict one another. Love yourself. Despise yourself. Hate yourself, love yourself. They stop contradicting one another when you see what each is aimed at.
 
 Love yourself, he says, "because he has a nature capable of good", but not "the vileness which exists in that nature." That is: you are capable of more than you have done, and some of what you have done is not worth loving. Despise yourself, because "this capacity is void". As we read it, he means the capacity is still empty, not yet filled with anything, so that boasting would be silly. But "let him not therefore despise his natural capacity." The possibility is real, even though it has not been used. The passage ends on a restless note: a person has "the power of knowing the truth and being happy, and yet has found no truth either permanent or satisfactory."
 
-A little earlier in the same section, he puts the whole thing as a picture of a king who has lost his crown. Our weaknesses, he says, "are the infirmities of a great lord, of a discrowned king." And near it: "A tree does not know that it is miserable." A tired pilgrim in a bunk does not feel royal. The point is that you feel your smallness as a loss, and a loss implies something that was owed. The ache to be better is the evidence.
+A little earlier in the same section, he puts the whole thing as a picture of a king who has lost his crown. Our weaknesses, he says, "are the infirmities of a great lord, of a discrowned king." And near it: "A tree does not know that it is miserable." A tired pilgrim in a bunk does not feel royal. The point is that you feel your smallness as a loss, and a loss implies something that was once yours. The ache to be better is the evidence.
 
 He is just as fair to the people who write about all this. A little later he says: "I blame equally those who take on themselves to praise man, those who take on themselves to blame him, and those who merely amuse themselves; I can approve those only who seek with tears." The flatterer, the scold and the cynic are all blamed alike. The only person he approves is the one who is looking for something and is troubled that it is not found. That is a useful standard for how to talk to yourself on a bad hill.
 
@@ -41,13 +41,13 @@ The order of things, then: body first, then self. At the next stop, do one kind 
 
 ## At the end of the day
 
-Look at your feet. It is the most honest inspection of the day. See what the road has done to them, and give them what they need: a wash, a dry sock, some air, a plaster where there is a rub. That is Pascal's passage in practice. The body is neither to be despised nor worshipped.
+Look at your feet. It is the most honest inspection of the day. See what the road has done to them, and give them what they need: a wash, a dry sock, some air, a plaster where there is a rub. That is the passage, as we have read it, in practice. The body is neither to be despised nor worshipped. Thank the knees, the hips and the shoulders by name. A list of joints is a plainer litany than most.
 
 Then go back through the day and ask where you played the angel. Was there a thirst you ignored, a rest you said you did not need, a pace you kept up because someone was watching? And what came after it? The pushing and the short temper are often the same hour, an hour apart. If the connection is there, it is useful to see it.
 
 Ask also where you played the brute. This is not rest. Rest is wise. The brute is the shrug: the small thing you could have done for someone else and did not, because you were tired, and you were tired, and that was true. It is not a crime. It is only a place to look.
 
-Try a different test, too. Imagine a friend telling you the story of today, with all of its shortcuts and all of its stubbornness. What would you say to them? It is usually shorter, and kinder, and just as truthful as what we say to ourselves. You are allowed to use that voice on yourself, and it does not let you off anything.
+Try a different test, too. Imagine a friend telling you the story of today, with all of its shortcuts and all of its stubbornness. What would you say to them? It is often shorter, kinder and just as truthful as what we say to ourselves. You are allowed to use that voice on yourself, and it does not let you off anything.
 
 Then, to balance it, there is the other half of the passage, which is easily forgotten. Pascal says: love yourself, because you have a nature capable of good. So name something good that you did today, and name it specifically. Not "I was all right." A particular act, however small. A sentence you did not say. A bag you carried. A pace you slowed for someone else.
 

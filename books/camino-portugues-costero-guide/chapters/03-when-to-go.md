@@ -6,7 +6,7 @@ A road beside the sea is a road beside the weather. The Confraternity of St Jame
 
 **Spring.** The Confraternity calls spring a rewarding time, cool, with fresh growth. It is also wet: in April the rain is ~96 mm at Porto, ~118 mm at Viana and ~150 mm at Vigo. Carry a proper rain jacket and a plan for wet feet.
 
-**Summer.** The Confraternity warns that summer can be hot and humid, and that the coast is crowded in the peak holiday months. The averages are mild: in July the mean daytime high is ~24 °C at Porto airport, ~26 °C at Viana, ~25 °C at Vigo and ~25 °C at Santiago. Wikipedia adds that the beaches near Porto are often windier and cooler than the land inland. The averages hide the extremes: the record highs are ~38.6 °C at Porto airport, ~39.5 °C at Viana, ~40.8 °C at Vigo airport (7 August 2016) and ~39.4 °C at Santiago. Rain is scarce, ~17 mm in July at Porto and ~40 mm at Vigo. The Pilgrim's Office statistics, as Wikipedia reports them, say that most pilgrims finish the Coastal route in May and in September.
+**Summer.** The Confraternity warns that summer can be hot and humid, and that the coast is crowded in the peak holiday months. The averages are mild: in July the mean daytime high is ~24 °C at Porto airport, ~26 °C at Viana, ~25 °C at Vigo and ~25 °C at Santiago. The averages hide the extremes: the record highs are ~38.6 °C at Porto airport, ~39.5 °C at Viana, ~40.8 °C at Vigo airport (7 August 2016) and ~39.4 °C at Santiago. Rain is scarce, ~17 mm in July at Porto and ~40 mm at Vigo. The Pilgrim's Office statistics, as Wikipedia reports them, say that most pilgrims finish the Coastal route in May and in September.
 
 **Autumn.** The Confraternity says early autumn is regarded as fairly dry and settled. By October the rain has returned: ~149 mm at Porto, ~208 mm at Vigo and ~214 mm at Santiago, and November is wetter still at Vigo, ~236 mm.
 
@@ -27,9 +27,8 @@ At the winter solstice there are about nine hours of daylight at Porto and at Vi
 - **March and April:** cool, fresh and wet.
 - **May and June:** mild, highs of ~20 to ~25 °C, long days; May is one of the two months when most pilgrims finish.
 - **July and August:** warm and dry, crowded on the coast; start early.
-- **September:** warm, with the rain beginning to return, and the other busy month.
-- **October and November:** wet, and the days shorten.
-- **December to February:** the shortest days, with rain.
+- **September:** warm, the rain returning, and the other busy month.
+- **October to February:** wet, with the shortest days.
 
 ## Holy Year and checking
 

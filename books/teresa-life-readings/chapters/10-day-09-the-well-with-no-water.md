@@ -24,7 +24,7 @@ You are already on that prescription. A walker goes out into the fields every da
 
 Be honest about the limit. If the dryness goes on for weeks and takes the colour out of everything, that is a matter to take to a doctor or to someone you trust, and not to a garden image. Teresa herself says more than once that a person who suffers in this way needs a guide with experience, and she sought one out again and again. A long flat spell is a reason to ask someone, not to endure alone.
 
-What does it ask of an ordinary day? To lower the bucket anyway, which is the whole of it. To do the plain, near, next thing, and not to demand that it taste of anything. And to look after the body as though it were a friend who is also tired.
+The whole of it, for a dry day, is to lower the bucket anyway. It is to do the plain, near, next thing and not demand that it taste of anything, and to look after the body as though it were a friend who is also tired.
 
 ## For the walk
 
@@ -43,7 +43,7 @@ One thing to be careful about is the verdict you pass tonight. A tired mind in a
 
 Dryness is also lonelier when it is hidden. A sentence said aloud, "this was a flat day", to whoever is near, often loosens it. You do not need a remedy from them. You may find that they know the feeling too. And if nobody is near, say it to the page, to a message, or to the dark. It stops being a secret, and that is half of its weight.
 
-An honest word about tiredness. Dry days and tired days are close cousins, and a good night's sleep clears some of the dryness for no reason anyone can name. If you can, go to bed a little earlier than usual. If you cannot sleep, do not argue with the dark. Lie on your back and listen to the building for a minute.
+Dry days and tired days are close cousins, and a good night's sleep clears some of the dryness for no reason anyone can name. If you can, go to bed a little earlier than usual. If you cannot sleep, do not argue with the dark. Lie on your back and listen to the building for a minute.
 
 - What did I do today without feeling it, and what did that teach my feet?
 - What did my body ask for today, and did I give it?

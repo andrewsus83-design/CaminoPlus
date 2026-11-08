@@ -27,7 +27,7 @@ marked "known", the file does not state it and it is the well-documented first p
 | `gutenberg-24534` | *The Autobiography of St. Ignatius*, Ignatius of Loyola | Edited by J. F. X. O'Conor, S.J., "Copyright 1900, by Benziger Brothers" (in the file) | Published in 1900 |
 | `gutenberg-1022` | *Walking*, Henry David Thoreau | The essay (1862, known); no translator, no modern editor named in the file | Nineteenth-century text |
 | `gutenberg-63084` | *St. Francis of Assisi*, G. K. Chesterton | The book (1923, known); no modern editor named in the file | Published in 1923; the author died in 1936 |
-| `gutenberg-46921` | *The Thoughts of Blaise Pascal* | Translated by C. Kegan Paul; edited by Auguste Molinier (Paris, 1877 to 1879, in the file) | Nineteenth-century translation and edition |
+| `gutenberg-46921` | *The Thoughts of Blaise Pascal* | Translated by C. Kegan Paul, 1885 (the title page says MDCCCLXXXV); the file names Molinier's French edition of 1877 to 1879 as the one translated | Nineteenth-century translation |
 
 The Gutenberg files are used only to **read and verify**. Nothing of the Project Gutenberg header, licence text or trademark is copied into a book. Some of these old editions have an
 introduction or notes by their editor (Teresa, Ignatius, Pascal, Julian): only the classic itself is quoted, never the introduction.

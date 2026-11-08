@@ -12,13 +12,13 @@
 
 Some mornings by the sea the fog rubs out the horizon. The road is where it was, and the next marker is there somewhere, but the world has shrunk to the few paces ahead. There is a particular quiet in that, and also a small unease. You are used to knowing what is coming. Today you walk beside a great deal that you cannot see, and you go on anyway.
 
-Francis spent much of his later life in that sort of fog, and Chesterton, to his credit, does not try to clear it. This day's passage comes at the end of a long chapter, so a few words of background are needed first.
+Francis's story has a stretch of that sort of fog, and Chesterton, to his credit, does not try to clear it. This day's passage comes at the end of a long chapter, so a few words of background are needed first.
 
 The chapter follows Francis's wish to be as like Christ as he could. In Chesterton's telling that wish took him across the sea. His first attempt, a sail for the East, has a comic edge. He saw a boat, threw himself into it without waiting for introductions or bargains, "becoming the Patron Saint of Stowaways", and lay "like lumber among the cargo". The voyage turned out "unfortunate and erratic" and ended with a return to Italy. A later voyage got further. He reached the camp of the Crusaders outside the city of Damietta, went on alone to speak with the Sultan, and came back, Chesterton says, "as freely as he came". The aim, as Chesterton puts it, was to end the Crusades "by conversion and not by conquest". The whole effort broke off short. "Men liked him too much for himself to let him die for his faith," Chesterton writes, and he calls the whole venture the "beginnings of a great bridge that might have united East and West".
 
-Here the book has to say something plainly. Chesterton writes about Islam and about "the East" in the language of 1923, and with a confidence we do not share. Some of his sentences in this chapter read badly now. We have left them out of the passage and have not tried to defend them. One thing in his account holds up without them: a man set out to meet people he was told to fear, and did so alone, in good faith.
+Here the book has to say something plainly. Chesterton writes about Islam and about "the East" in the language of 1923, and with a confidence we do not share. Some of his sentences in this chapter read badly now. We have left them out of the passage and have not tried to defend them. One thing in his account holds up without them: a man went from one camp of a war to the other, to talk, and went alone.
 
-Then Francis turned toward the mountains. A gentleman with lands in Tuscany gave him a mountain, "a thing somewhat unique among the gifts of the world", and he used it as a place for prayer. The mountain is Alverno. And here is the sentence this day is built on: "What it was exactly that happened there may never be known."
+Then Francis turned towards the mountains. A gentleman with lands in Tuscany gave him a mountain, "a thing somewhat unique among the gifts of the world", and he used it as a place for prayer. The mountain is Alverno. And here is the sentence this day is built on: "What it was exactly that happened there may never be known."
 
 In the stretch we have left out, Chesterton describes what Francis is said to have seen: a winged figure filling the sky, like a seraph spread out in the shape of a cross, in pain. At the end of the passage the vision is gone, the morning is quiet, and Francis looks down and sees "the marks of nails in his own hands". These are what Christians call the stigmata, wounds like those of the crucified Christ. Chesterton takes the account as true. He says the one thin report that has come down "reads very like the report of something real".
 
@@ -26,7 +26,7 @@ You may take the story as a miracle, or as a mystery, or as a tale you cannot ju
 
 Now say where it is hard. In this chapter Chesterton tells us that a refrain ran through Francis's days: "I have not suffered enough; I have not sacrificed enough." He "wandered about the valleys of the world looking for the hill that has the outline of a skull." Nothing here asks you to want pain. A blister is not a sacrifice to be hoarded, and an aching knee is not a gift to be sought. If you are walking with pain today, your own or someone else's, this reading asks only that you be gentle.
 
-What can it ask of an ordinary day, then? Something much smaller than a vision: to let one thing stay unexplained. Almost every walker meets a thing like that. A feeling that arrives on a hill and does not fit anywhere. A grief that is not for any reason you can name. A joy with no cause. The habit of the mind is to explain it at once, to file it, to turn it into a sentence for a post. Chesterton's habit, here, is to wait. Where something "may never be known", there is still a perfectly good place to stand.
+What can it ask of an ordinary day, then? Something much smaller than a vision: to let one thing stay unexplained. You may meet a thing like that on any long walk. A feeling that arrives on a hill and does not fit anywhere. A grief that is not for any reason you can name. A joy with no cause. The habit of the mind is to explain it at once, to file it, to turn it into a sentence for a post. Chesterton's habit, here, is to wait. Where something "may never be known", there is still a perfectly good place to stand.
 
 ## For the walk
 
@@ -47,9 +47,9 @@ And then the small thing about silence. The passage ends in it: "silence and the
 
 It may help to notice, too, what you left unsaid today. A word held back at a table, a name you did not look up, a feeling you let pass without a comment. Not all silence is a failure of nerve. Some of it is courtesy, and some of it is simply the right size for the thing.
 
-A word on tiredness. A tired mind wants every question answered so that it can stop. Tonight, let some of them stay on the table. They will still be there in the morning, and a rested mind is a better judge of them.
+A tired mind wants every question answered so that it can stop. Tonight, let some of them stay on the table. They will still be there in the morning, and a rested mind is a better judge of them.
 
-Questions for tonight:
+Questions to leave open:
 
 - What did I try to explain today that might have been better left alone?
 - What can I carry for a while without understanding it?

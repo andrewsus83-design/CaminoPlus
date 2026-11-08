@@ -10,21 +10,21 @@
 
 ## Reflection
 
-On a long straight stretch, a boardwalk or a beach or a field track, you can watch someone come toward you for several minutes. At first they are only a shape. Then a hat, a pack, a pace. You cannot tell if they are a pilgrim or a neighbour, and you cannot tell if they are in a good mood. A few seconds before you pass, you both do the same small thing: look up, nod, say *Buen Camino*, and the shape becomes a person for the length of a sentence.
+On a long straight stretch, a boardwalk or a beach or a field track, you can watch someone come towards you for several minutes. At first they are only a shape. Then a hat, a pack, a pace. You cannot tell if they are a pilgrim or a neighbour, and you cannot tell if they are in a good mood. A few seconds before you pass, you both do the same small thing: look up, nod, say *Buen Camino*, and the shape becomes a person for the length of a sentence.
 
 Chesterton asks us to do that with Francis. He has just spent a chapter guessing at Francis from the inside, with the dreams and the cold and the song, and now he stops and says it is time to see the man from the outside. Not the saint in a painting, but a stranger coming up the road "along the hills of Umbria, between the olives or the vines". His reason is odd and bold. If we want to know why a movement swept across Europe, he says, there is no answer except that "Francis Bernardone had happened". And so we should "see what we should have seen if he had happened to us". The people who met him, he adds, "acted quite differently according to whether they had met him or not". The explanation, in other words, is a face under a hood.
 
 What would the face have looked like? Chesterton sketches him elsewhere, and the sketch is not romantic. A small, quick man in a brown tunic tied with a rope. The rope, he says, was snatched up almost at random because it lay nearby, and the clothes were the oldest a peasant could spare. Francis begged for his bread, and chose the worst: "the beggar would eat the best he could get and the saint ate the worst he could get." A traveller from a more comfortable world might have crossed the road.
 
-And yet, says Chesterton, nobody who looked into "those brown burning eyes" came away feeling like a crowd member. Each man felt that Francis was truly interested in him, in his own life from beginning to end. Chesterton says the only outward form that can carry such a feeling is courtesy. Francis moved among men like "one courtier, moving among a hundred kings". He honoured everyone he met: he loved them, and also respected them. That is a rarer thing than it sounds.
+And yet, says Chesterton, nobody who looked into "those brown burning eyes" came away feeling like one of a crowd. Each man felt that Francis was truly interested in him, in his own life from beginning to end. Chesterton says the only outward form that can carry such a feeling is courtesy. Francis moved among men like "one courtier, moving among a hundred kings". He honoured everyone he met: he loved them, and also respected them. That is a rarer thing than it sounds.
 
 There is a second side to his courtesy, and it is the more surprising one. He asked for things as politely as he gave them. Chesterton says he could beg so confidently for food because he "really did regard every house as the house of a friend". Any pilgrim who has knocked at a door at the end of a day will see how much trust that takes, and how much it puts on the house. It is a compliment to the people who open the door, and also a request.
 
-Say it plainly. The passage asks you to picture a poor man on the road and to ask what meeting him did. It claims that something began with an encounter, long before it was an argument or a rule or an order.
+Put plainly, the passage asks you to picture a poor man on the road and to ask what meeting him did. It claims that something began with an encounter, long before it was an argument or a rule or an order.
 
 The hard part comes from the word "poor". Chesterton is a romantic about Francis, and a pilgrim is in danger of being romantic about poverty, too. A pack, a hostel bunk and a simple supper are a mild, chosen version of it. The people you pass are not all in that position. In another chapter Chesterton himself notes the difference, saying that the churchmen of Francis's day pitied men entering poverty "of their own free will", while the poor of his own day were "daily driven by cold coercion and moved on by the police". It is a fair thing to remember when you walk through a village. Its people are not scenery or lessons. Whatever your pack weighs, you are not living their life.
 
-On an ordinary day it asks you to be a better stranger. Everyone on the road is somebody's stranger. You come up a path toward a farmer, a woman at a gate, a child on a wall, a tired walker sitting on a kerb, and for a moment you are the whole of what they know about pilgrims. Francis's way of doing it was attention, with nothing added. A look that says you are not a statistic. A greeting that treats the other person as somebody who matters.
+On an ordinary day it asks you to be a better stranger. Everyone on the road is somebody's stranger. You come up a path towards a farmer, a woman at a gate, a child on a wall, a tired walker sitting on a kerb, and for a moment you are the whole of what they know about pilgrims. Francis's way of doing it was attention, with nothing added. A look that says you are not a statistic. A greeting that treats the other person as somebody who matters.
 
 You will not manage it every time. A hot afternoon is not a good one for courtesy. But it is possible to try once, with one person, and to give them your whole attention for the length of a hello.
 
@@ -49,7 +49,7 @@ And if you walked alone and met almost nobody, that is a day too. You may have b
 
 On tiredness, honestly: the end of a long day is not a time for good manners, and the bunk room does not always get your best. The effort is small. A word of thanks to whoever made the bed. A quiet voice after lights are low. A light turned out early. These are the small hospitalities that make a night shared by strangers easier to bear.
 
-Questions for tonight:
+Questions to take to bed:
 
 - Who did I meet today, and did I really look at them?
 - When did I treat someone as part of the scenery?

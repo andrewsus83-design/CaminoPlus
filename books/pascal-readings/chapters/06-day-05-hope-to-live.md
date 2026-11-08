@@ -22,7 +22,7 @@ A few things are hard here.
 
 "The present generally gives us pain." That is not true of every morning, and it is not even what he says in the next breath: if the present is pleasant, "we regret to see it vanish away". Even the good moment is spoiled by watching it go. That may be a fair account of some temperaments and some days. It is a bleak thing to say about all of them, and he assumes that everyone is alike in this. You may already know which kind of walker you are, and you can decide how much of it fits you.
 
-Pascal is not offering a technique, either. These days there are many schools of being present, and he belongs to none. He describes. He thinks the restlessness runs deeper than a trick of attention can reach, which is the point of Day 1. So take today's practice as a small thing, and not as a cure.
+Pascal is not offering a technique, either. These days there are many schools of being present, and he belongs to none. He describes. As we read him, he thinks the restlessness runs deeper than a trick of attention can reach. That was the point of Day 1. So take today's practice as a small thing, and not as a cure.
 
 And hope is not a vice. A person who did not hope to arrive, or to see someone, or to get better, would be in trouble. Read his last sentence as a warning about the balance and not as a ban. The clause about "a time at which we have no certainty of arriving" is blunt, too. You can take it as a fright, or as a quiet reason to enjoy the plain fact that you are, so far, here.
 
@@ -41,7 +41,7 @@ It need not even have been pleasant. A blister is the most present thing in the 
 
 Take the pleasure you looked forward to most today, the shower, the chair, the cold drink. When it came, were you there for it, or already on to the next thing? It is a curious test, and the answer may well be "only partly". Anticipation can use up a good deal of what it hoped for.
 
-Think about what you were always getting ahead of. For many people it is rehearsal: speeches given in the head to people who are not there, plans for a stage that will arrive in its own time. The mind is trying to be useful, and a good deal of this is kindly meant. Still, count how many of the rehearsed conversations will ever happen, and how many of today's hours went on them.
+Think about what you were always getting ahead of. For some of us it is rehearsal: speeches given in the head to people who are not there, plans for a stage that will arrive in its own time. The mind is trying to be useful, and a good deal of this is kindly meant. Still, count how many of the rehearsed conversations will ever happen, and how many of today's hours went on them. If you spent the day ahead of yourself, that is the common way to walk. It is not a failing. It is the very thing the passage describes, and noticing it is the whole exercise.
 
 The past needs the same look. Did you call something back today, a remark you wish you had not made, an hour at home that went badly, a face? For tonight it is finished. You cannot change it by carrying it. You can only decide whether it goes to bed with you. Hand it over, in whatever way you like, to someone bigger than you, or just to the night.
 

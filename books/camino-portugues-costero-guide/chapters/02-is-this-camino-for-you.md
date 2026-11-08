@@ -10,7 +10,7 @@ There are no mountains. What makes the days demanding is length and exposure. Th
 
 It suits a first-time walker who has trained a little and wants a Camino with a clear shape: a start at a cathedral, a long run beside the sea, a boat across a border river, an arrival at another cathedral. Twelve days with a rest day or two fit inside a fortnight, and the road passes through towns often enough that a day can be cut.
 
-It suits people who love the sea and can live with weather. The wind, the sun and the rain all matter, as the chapter on the weather explains, and a wet, windy day on an open shore asks more than the kilometres suggest.
+It suits people who love the sea and can live with weather. The wind, the sun and the rain all matter, and a wet, windy day on an open shore asks more than the kilometres suggest.
 
 It suits people who want company in the second half. The Office statistics, as Wikipedia reports them, show a third of those who finish the Coastal route starting in Vigo or Baiona, and from Redondela the road is shared with the Central route.
 

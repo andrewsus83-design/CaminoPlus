@@ -10,7 +10,7 @@
 
 ## Reflection
 
-Anyone who has been truly thirsty knows that the beauty of the cup is not the point. A glass can be cut with great care and polished until it sings, and if it is empty you are still thirsty. Augustine had a picture of this in his head for years, and in the fifth book he finally describes it.
+Anyone who has been truly thirsty knows that the beauty of the cup is not the point. A glass can be cut with great care and polished until it sings, and if it is empty you are still thirsty. Augustine uses exactly this picture in the fifth book of the *Confessions*.
 
 For nearly nine years he had belonged to the Manichees, the movement he joined in his nineteenth year, and for most of that time he had been carrying questions the local teachers could not answer. They all said the same thing: wait for Faustus. Faustus was a bishop of their movement, a famous speaker, and when he came to Carthage the questions would be answered. Augustine longed for that visit, he says, rather too intensely, and when Faustus finally arrived he turned out to be pleasant, fluent and graceful, and to say *the self-same things* as everyone else.
 
