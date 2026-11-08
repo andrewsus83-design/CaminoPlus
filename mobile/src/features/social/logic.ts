@@ -461,7 +461,7 @@ export function requestState(n: NotificationItem, incomingIds: ReadonlySet<strin
 
 /* ------------------------------------------------------------------ friends, search, groups */
 
-export const MIN_SEARCH_CHARS = 2;
+export const MIN_SEARCH_CHARS = 3; // the server answers nothing below 3 (search_pilgrims, migration 20261120010000)
 export const normalizeQuery = (q: string) => q.trim().replace(/\s+/g, ' ');
 export const isSearchable = (q: string) => normalizeQuery(q).length >= MIN_SEARCH_CHARS;
 

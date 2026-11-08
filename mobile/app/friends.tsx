@@ -192,7 +192,7 @@ export default function FriendsScreen() {
   // What to show when the current tab has no rows: loading, an error, or a warm invitation.
   let empty: ReactNode = null;
   if (tab === 'find') {
-    if (!search.searchable) empty = <EmptyState icon="search" title="Find your Camino family" text="Search by name or @username. Type at least 2 letters." />;
+    if (!search.searchable) empty = <EmptyState icon="search" title="Find your Camino family" text="Search by name or @username. Type at least 3 letters." />;
     else if (search.error) empty = <ErrorState text={search.error} onRetry={search.retry} title="Search did not work" />;
     else if (search.loading || search.results === null) empty = <LoadingRows count={3} />;
     else empty = <EmptyState icon="search" title="No pilgrims found" text="Check the spelling, or invite them with the link above." action={{ label: 'Invite friends', icon: 'share', onPress: invite }} />;

@@ -23,8 +23,9 @@ export type Post = { id: string; body: string | null; place_name: string | null;
 
 const PROFILE_COLS = 'id, username, display_name, bio, avatar_url, xp, level, followers_count, following_count, friends_count, posts_count, stamps_count, km_walked, is_private';
 
-function must<T>(res: { data: T | null; error: { message: string } | null }): T {
-  if (res.error) throw new Error(res.error.message);
+// The error keeps the database's code and hint: a rate limit (code 54000, hint rate_limited_*) carries a sentence for people.
+function must<T>(res: { data: T | null; error: { message: string; code?: string; hint?: string | null } | null }): T {
+  if (res.error) throw Object.assign(new Error(res.error.message), { code: res.error.code, hint: res.error.hint ?? undefined });
   return res.data as T;
 }
 

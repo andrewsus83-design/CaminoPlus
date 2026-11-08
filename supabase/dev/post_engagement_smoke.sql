@@ -245,7 +245,7 @@ grant execute on all functions in schema engage_test to anon, authenticated;
 
 -- ---------------------------------------------------------------- people, relations, posts
 insert into auth.users (id, email, raw_user_meta_data)
-select id, 'zz1d.' || name || '@example.com', jsonb_build_object('full_name', initcap(name) || ' Zzcamino')
+select id, 'zz1d.' || name || '@example.com', jsonb_build_object('full_name', initcap(name) || ' Zzcamino', 'username', 'zz1d.' || name)
 from engage_test.users;
 update public.profiles set is_private = true where id = engage_test.u('gina');
 
