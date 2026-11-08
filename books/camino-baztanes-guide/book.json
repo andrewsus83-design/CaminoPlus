@@ -1,0 +1,26 @@
+{
+  "id": "camino-baztanes-guide",
+  "kind": "guide",
+  "order": 13,
+  "title": "The Baztán Way",
+  "subtitle": "A Pilgrim's Guide to the Camino Baztanes",
+  "route_slug": "camino-baztanes",
+  "description_short": "A calm, honest guide to the Camino Baztanes: six days from Bayonne over the Pyrenees by the Baztán valley to Pamplona, when to go, what to carry, and where the road meets the French Way.",
+  "description_long": "The Camino Baztanes is a small road with a long memory. It leaves Bayonne, in the French Basque Country, climbs through the hills of Labourd to the frontier at Dantxarinea, crosses the passes of Otsondo and Belate, runs down the green Baztán valley of Navarre, and reaches the edge of Pamplona at the medieval bridge of the Trinity, where it meets the Camino Francés. The official tourism pages of Navarre put it at about 109 km in six walking days.\n\nThis guide is written for the Planner first and the Walker's evenings second. It helps you decide whether this quiet, wet, hilly road is yours, shape the days, pack for the rain, and know what to check before each stage. It is plain about the two hard days, over Otsondo and over Belate, and calm about the weather: a mountain road in a green country, where the advice is always to check before you go.\n\nYou will find the road day by day, from the towpath of the Nive to the old hospital of Belate and the river park of the Ultzama; the other ways to cut it, since the French association and the Navarre pages do not give the same number of stages; chapters on sleeping, eating and resting, on weather and safety, on the inner side of crossing a frontier on foot, and on arriving in Pamplona.\n\nThe book says what the Pilgrim's Office in Santiago writes about the Compostela, and says plainly that this road ends at Pamplona and that the French Way carries on. Every distance is marked approximate, and the book says where sources differ. It names no hostels, cafes or prices, because they change. Its facts come from named public sources, which it credits.",
+  "keywords": [
+    "Camino Baztanés",
+    "Baztán valley",
+    "Bayonne to Pamplona",
+    "Camino de Santiago",
+    "Navarre",
+    "pilgrim guidebook",
+    "Pyrenees walk"
+  ],
+  "categories": [
+    "Travel / Special Interest / Pilgrimages",
+    "Travel / Europe / Spain"
+  ],
+  "cover": { "colour": "blue100", "icon": "library" },
+  "version": "1.0.0",
+  "date": "2026-11"
+}

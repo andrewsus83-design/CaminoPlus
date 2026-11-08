@@ -282,3 +282,7 @@ Start slowly and take a rest day or two; carry food and water for the long stret
 - **The Pilgrim's Office statistics page** is dynamic and was not readable; its numbers come through Wikipedia, and the monthly figures do not add up to the year's total there.
 - **The Meseta altitude**: Wikipedia's article on the Meseta Central gives 700 to 800 m for the northern sub-plateau; the book says ~800 to ~900 m, which follows the altitude profiles of the route tables for the road itself.
 - **Whether an app's digital stamps count for the Compostela**: left out; the book tells the reader to carry the paper credencial and ask the Office.
+
+| Fact | Value | Source | Checked |
+|---|---|---|---|
+| The standard welcome sentence: written with AI assistance, from public sources; the author has not walked the road (added to the welcome, under "What this book is not") | as stated | books/shared-facts.md | yes |

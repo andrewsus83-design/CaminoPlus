@@ -90,7 +90,20 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      # setup-deno downloads Deno from GitHub's releases and gives up after three tries in about 40 seconds. A 504 from that download failed this job twice
+      # before any test ran (nothing in supabase/ had changed), so the install is tried once more after a pause.
       - uses: denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed # v2.0.5
+        id: deno-first
+        continue-on-error: true
+        with:
+          deno-version: v2.x
+      - name: Wait before installing Deno again
+        if: steps.deno-first.outcome == 'failure'
+        run: |
+          echo "::warning::The first install of Deno failed (the download); trying again in 60 seconds."
+          sleep 60
+      - uses: denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed # v2.0.5
+        if: steps.deno-first.outcome == 'failure'
         with:
           deno-version: v2.x
       - name: Deno tests of every edge function
@@ -253,5 +266,14 @@ jobs:
           python-version: '3.12'
       - name: actionlint (with shellcheck for the run scripts)
         run: |
-          pip install -q actionlint-py==1.7.12.25 shellcheck-py==0.11.0.1
+          # actionlint-py fetches the actionlint binary from GitHub while pip installs it; one failed download turned main red with nothing wrong in a workflow.
+          for attempt in 1 2 3; do
+            pip install -q actionlint-py==1.7.12.25 shellcheck-py==0.11.0.1 && break
+            if [ "$attempt" = 3 ]; then
+              echo "::error::pip could not install actionlint in 3 attempts"
+              exit 1
+            fi
+            echo "::warning::pip install attempt $attempt failed, trying again"
+            sleep $((attempt * 10))
+          done
           actionlint

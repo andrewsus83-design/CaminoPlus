@@ -40,6 +40,15 @@ Every guide says, once, in its welcome chapter, what it is and is not, in these 
 
 The full disclosure of the series (`ai_disclosure` in `books/series.json`) is on the "About this edition" page of every book and in the app.
 
+## The passport in an app
+
+The credencial page of the Office (8 November 2026) says: "There is also a digital credential, developed as an app, that pilgrims can download and carry on their mobile phone or other electronic device."
+So a book must not say that a passport "in any app" is only a keepsake: the Office's own digital credential is an app. What a book may say, in the app-and-sources chapter:
+
+> A passport in CaminoPlus, or in any app other than the Office's own digital credential, is a keepsake until the Office says otherwise.
+
+(`tools/check_books.py` fails a guide that says "a passport in any app is". Where a book also speaks of the Office's digital credential, it says only that the Office describes one, and tells the reader to ask the Office whether to rely on it.)
+
 ## Notes on the Pilgrim's Office pages (verified 8 November 2026)
 
 - The Compostela is described on <https://oficinadelperegrino.com/en/the-compostela/> and also under <https://oficinadelperegrino.com/en/pilgrimage/the-compostela/>: both load and carry the same text. Use the first as the citation.
