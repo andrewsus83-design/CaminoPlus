@@ -387,6 +387,8 @@ check('headings, `h` on the verse they stand before: BOOK 1 to 5 over Psalms 1, 
   assert.deepEqual(headings('DAG'), [[3, '24', 'THE SONG OF THE THREE HOLY CHILDREN'], [3, '91', 'Deliverance from the Furnace'], [13, '1', 'THE HISTORY OF SUSANNA'], [14, '1', 'Bel and the Dragon']]);
   assert.deepEqual(headings('BAR'), [[6, '1', 'The Letter of Jeremy (Jeremiah)']]);
   assert.deepEqual(ORDER.filter((c) => !['PSA', 'SNG', 'DAG', 'BAR'].includes(c)).flatMap(headings), [], 'no other book has a heading');
+  const both = [...everyVerse()].filter((v) => v.verse.b && v.verse.h).map((v) => `${v.code} ${v.chapter.c}:${v.verse.n}`);
+  assert.deepEqual(both, ['SNG 6:4', 'SNG 8:6'], 'a blank line and a heading before the same verse: only these two (the space is drawn first and the heading under it)');
 });
 
 check('a heading in the middle of a verse cannot stand there (the format has a heading before a verse): the Song of Songs has five, three are put before the next verse and two, which a verse has no room for, are left out, and the manifest says which', () => {
@@ -485,6 +487,26 @@ check('the files of the text are pure and fetch nothing: no React, no React Nati
     assert.doesNotMatch(src, /from '(react|react-native|expo|@\/)|\bfetch\(|XMLHttpRequest|localStorage|AsyncStorage|SecureStore|FileSystem|supabase/, `${f} is pure`);
   }
   assert.ok(statSync(ASSETS).isDirectory());
+});
+
+// ----------------------------------------------------------------------------------------------------------------- the licences screen
+
+check('the licences screen has an entry for the translation: its name, "Public domain", the trademark sentence, the link, and what is not included; it says what the credit of the index says', () => {
+  const src = readFileSync(join(root, 'app/licences.tsx'), 'utf8');
+  const m = /const TEXT: Item\[\] = \[\s*\{ name: '([^']*)', what: '([^']*)', licence: '([^']*)', url: '([^']*)' \},\s*\];/.exec(src);
+  assert.ok(m, 'one entry in a group of its own');
+  const [, name, what, licence, url] = m!;
+  assert.equal(name, index.translation.name);
+  assert.equal(url, 'https://ebible.org/eng-web-c/');
+  assert.equal(url, index.translation.source);
+  assert.equal(licence, 'Public domain. The name “World English Bible” is a trademark of eBible.org.');
+  assert.ok(index.translation.credit.endsWith(licence.replace(/[“”]/g, '"')), 'the same sentences as TRANSLATION.credit (straight quotes there, curly ones on the screen)');
+  assert.ok(licence.startsWith(index.translation.licence));
+  assert.match(what, /^The text of the Bible in the Library: 73 books, kept in the app, so it reads without a signal\./);
+  assert.match(what, /Strong’s numbers, footnotes and cross references are not included\.$/);
+  assert.match(src, /<Group title="MAPS AND DATA" items=\{DATA\} \/>\s*<Group title="THE BIBLE TEXT" items=\{TEXT\} \/>\s*<Group title="FONTS AND SOFTWARE" items=\{SOFTWARE\} \/>/, 'its own group, between the data and the software');
+  assert.doesNotMatch(src, /^import .*(library\/bible|assets\/bible)|\brequire\(/m, 'the screen does not pull the text of the Bible into its own code: the entry is plain text');
+  assert.match(src, /Pressable key=\{i\.name\} accessibilityRole="link" accessibilityLabel=\{`\$\{i\.name\}: open licence details`\} onPress=\{\(\) => \{ void WebBrowser\.openBrowserAsync\(i\.url\); \}\}/, 'it opens the page of the translation like every other entry');
 });
 
 console.log(`${n} of ${n} passed (Bible text)`);
