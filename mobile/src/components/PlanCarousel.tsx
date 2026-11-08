@@ -3,15 +3,17 @@ import { FlatList, Pressable, View, useWindowDimensions } from 'react-native';
 import { AppText } from './AppText';
 import { Icon } from './Icon';
 import { config } from '@/lib/config';
-import { c, layout, radius, role, shadowStyle } from '@/theme';
+import { ADDON_PRICE_LABEL, ADDON_STORAGE_LABEL, FREE_MEDIA_FACTS, FREE_STORAGE_LABEL, MEDIA_HEADLINE, PLUS_MEDIA_FACTS, PLUS_STORAGE_LABEL } from '@/lib/plan';
+import { c, layout, radius, role, shadowStyle, space } from '@/theme';
 
-// Swipeable plan / storage cards. The first card is the plan you are on now.
+// Swipeable plan / storage cards. The first card is the plan you are on now. Every number comes from lib/plan.ts.
 // A function, not a constant: a constant would keep the colours of the mode the app was in when this file loaded.
-const plans = () => [
-  { id: 'free', name: 'Free', price: '$0', note: 'Browse every route and stage, stays and Discover.', perks: ['Basic app', 'Journal and passport'], bg: role.bg, fg: role.action },
-  { id: 'plus', name: 'Pilgrim Plus', price: config.priceLabel, note: 'Walk the whole Camino offline.', perks: ['Offline maps per stage', '5 GB cloud storage'], bg: role.inverse, fg: role.onInverse },
-  { id: 'storage', name: 'Extra storage', price: '$5 / year', note: 'Add 5 GB for photos and videos.', perks: ['+5 GB cloud storage', 'Stack as many as you need'], bg: c.gold, fg: role.onHighlight },
-] as const;
+type PlanCard = { id: 'free' | 'plus' | 'storage'; name: string; price: string; note: string; perks: string[]; facts?: string; bg: string; fg: string };
+const plans = (): PlanCard[] => [
+  { id: 'free', name: 'Free', price: '$0', note: 'Browse every route and stage, stays and Discover.', perks: ['Basic app', 'Journal and passport', `${FREE_STORAGE_LABEL} cloud storage`], facts: FREE_MEDIA_FACTS, bg: role.bg, fg: role.action },
+  { id: 'plus', name: 'Pilgrim Plus', price: config.priceLabel, note: 'Walk the whole Camino offline.', perks: ['Offline maps per stage', `${PLUS_STORAGE_LABEL} cloud storage`, MEDIA_HEADLINE], facts: PLUS_MEDIA_FACTS, bg: role.inverse, fg: role.onInverse },
+  { id: 'storage', name: 'Extra storage', price: ADDON_PRICE_LABEL, note: `Add ${ADDON_STORAGE_LABEL} for photos and videos.`, perks: [`+${ADDON_STORAGE_LABEL} cloud storage`, 'For Pilgrim Plus only', 'One add-on at a time'], bg: c.gold, fg: role.onHighlight },
+];
 
 /** `plan` is the plan the pilgrim is on now (from the server); the badge follows it. */
 export function PlanCarousel({ plan, onPick }: { plan: 'free' | 'plus'; onPick: (id: string) => void }) {
@@ -49,6 +51,7 @@ export function PlanCarousel({ plan, onPick }: { plan: 'free' | 'plus'; onPick: 
                 </View>
               ))}
             </View>
+            {p.facts ? <AppText variant="small" color={p.fg} style={{ opacity: 0.85, marginTop: space[1] }}>{p.facts}</AppText> : null}
           </Pressable>
         )}
       />

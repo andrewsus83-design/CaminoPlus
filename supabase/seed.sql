@@ -6,16 +6,18 @@
 
 -- App config ------------------------------------------------------------------
 insert into public.app_config (key, value, description) values
-  ('free_storage_bytes', '0', 'Cloud storage for free users (bytes). Free = basic app, 0 GB.'),
+  ('free_storage_bytes', '500000000', 'Cloud storage for free accounts, in bytes (decimal: 500000000 is shown as 500 MB). 0 closes free uploads at once; files already uploaded stay.'),
   ('crowd_ttl_minutes.crowd_level', '120', 'How long a crowd level report stays on the map')
 on conflict (key) do nothing;
 
--- Billing products (prices are display/reference; stores are the source of truth)
+-- Billing products (prices are display/reference; stores are the source of truth). Sizes are DECIMAL bytes so the app
+-- prints 10 GB; the add-on id has no size in it (a store product id can never be renamed). The numbers are the same as in
+-- migrations/20261114030000_plan_storage.sql and mobile/src/lib/plan.ts (tools/tests/test_plan_numbers.py checks them).
 insert into public.billing_products (id, kind, name, price_cents, currency, billing_period, storage_bytes, revenuecat_entitlement, store_product_ids) values
-  ('plus_yearly', 'subscription', 'Pilgrim Plus yearly', 1200, 'USD', 'year', 5368709120, 'plus',
+  ('plus_yearly', 'subscription', 'Pilgrim Plus yearly', 1200, 'USD', 'year', 10000000000, 'plus',
      '{"app_store": "caminoplus_plus_yearly", "play_store": "caminoplus_plus_yearly"}'),
-  ('storage_5gb_yearly', 'storage_addon', 'Extra 5 GB storage', 500, 'USD', 'year', 5368709120, null,
-     '{"app_store": "caminoplus_storage_5gb_yearly", "play_store": "caminoplus_storage_5gb_yearly"}')
+  ('storage_addon_yearly', 'storage_addon', 'Extra storage yearly', 500, 'USD', 'year', 10000000000, null,
+     '{"app_store": "caminoplus_storage_addon_yearly", "play_store": "caminoplus_storage_addon_yearly"}')
 on conflict (id) do nothing;
 
 -- Stay labels -------------------------------------------------------------------

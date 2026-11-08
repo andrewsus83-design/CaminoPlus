@@ -48,7 +48,7 @@ insert into public.stays (id, source, category, name, location, currency)
 values ('1a5a0000-0000-0000-0000-000000000001', 'editorial', 'albergue_private', 'IA second stay',
         'SRID=4326;POINT(-3.7038 42.3440)', 'EUR');
 
--- anna has CaminoPlus (5 GB); everybody else is on the free plan (0 GB)
+-- anna has Pilgrim Plus (10 GB); everybody else is on the free plan (500 MB)
 update public.subscriptions set status = 'active', product_id = 'plus_yearly', store = 'app_store',
   will_renew = true, expires_at = now() + interval '1 year'
 where user_id = '1a000000-0000-0000-0000-0000000000a1';
@@ -654,9 +654,9 @@ delete from public.user_stamps where user_id = '1a000000-0000-0000-0000-00000000
 delete from public.crowd_reports where user_id = '1a000000-0000-0000-0000-0000000000b1';
 
 -- ================================================================== S3: the storage quota is live
--- anna's 6 GB file got in while there was room; nobody refreshed the cached usage
+-- anna's 11 GB file got in while there was room (her quota is 10 GB: the last file can overshoot); nobody refreshed the cached usage
 insert into storage.objects (bucket_id, name, metadata)
-values ('user-media', '1a000000-0000-0000-0000-0000000000a1/big/huge.mp4', '{"size": 6000000000}');
+values ('user-media', '1a000000-0000-0000-0000-0000000000a1/big/huge.mp4', '{"size": 11000000000}');
 begin;
 :as_anna
 do $$ begin
@@ -668,7 +668,7 @@ do $$ begin
   end;
 end $$;
 do $$ begin
-  assert (public.get_my_storage() ->> 'used_bytes')::bigint = 6000000000 + 1000 * 5 + 100, 'S3: get_my_storage shows the live usage';
+  assert (public.get_my_storage() ->> 'used_bytes')::bigint = 11000000000 + 1000 * 5 + 100, 'S3: get_my_storage shows the live usage';
   assert (public.get_my_storage() ->> 'remaining_bytes')::bigint < 0, 'S3: no room left';
 end $$;
 rollback;
@@ -687,14 +687,20 @@ begin
   assert (select used_bytes from public.storage_usage where user_id = auth.uid()) = 6100, 'S3: the cache follows the refresh';
 end $$;
 commit;
--- free plan: still 0 GB
+-- free plan: 500 MB (migration 20261114030000 opened free uploads). A small file gets in, the last file may overshoot,
+-- and once the 500 MB are used up the next upload is refused
 begin;
 :as_ben
 do $$ begin
+  assert (public.get_my_storage() ->> 'quota_bytes')::bigint = 500000000, 'S3: a free pilgrim has 500 MB';
+  insert into storage.objects (bucket_id, name, metadata)
+  values ('user-media', '1a000000-0000-0000-0000-0000000000b1/posts/two.jpg', '{"size": 10}');
+  insert into storage.objects (bucket_id, name, metadata)
+  values ('user-media', '1a000000-0000-0000-0000-0000000000b1/posts/big.mp4', '{"size": 500000000}');
   begin
     insert into storage.objects (bucket_id, name, metadata)
-    values ('user-media', '1a000000-0000-0000-0000-0000000000b1/posts/two.jpg', '{"size": 10}');
-    raise exception 'S3: a free user uploaded';
+    values ('user-media', '1a000000-0000-0000-0000-0000000000b1/posts/three.jpg', '{"size": 10}');
+    raise exception 'S3: a free user uploaded over 500 MB';
   exception when insufficient_privilege then null;
   end;
 end $$;

@@ -4,8 +4,10 @@ The offline-first companion app for pilgrims walking the Camino de Santiago (iOS
 Maps that work without signal, stays and cafés, a digital pilgrim passport with stamps, a journal to share, and
 friends, chat and group chat. Website: [camino.plus](https://camino.plus). The app is in development; [`CHANGELOG.md`](CHANGELOG.md) says what each release changed.
 
-**Plans.** The basic app is free. The paid plan is called **Pilgrim Plus**: US$12 a year, with offline route
-downloads and 5 GB of cloud storage (extra storage US$5 per 5 GB a year). Use the name "Pilgrim Plus" everywhere,
+**Plans.** The basic app is free and has 500 MB of cloud storage. The paid plan is called **Pilgrim Plus**: US$12 a year,
+with offline route downloads, 10 GB of cloud storage and higher resolution photos and video (an add-on of 10 GB costs
+US$5 a year, for Pilgrim Plus only, one at a time). The numbers live in `mobile/src/lib/plan.ts`; `tools/tests/test_plan_numbers.py`
+keeps the app, the database migration, the website and the design page in step. Use the name "Pilgrim Plus" everywhere,
 never "CaminoPlus plan".
 
 ## Repository layout

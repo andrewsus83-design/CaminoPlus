@@ -287,22 +287,29 @@ erDiagram
   billing_products ||--o{ subscriptions : ""
   billing_products ||--o{ storage_addons : ""
   profiles ||--|| subscriptions : ""
-  profiles ||--o{ storage_addons : "+5 GB each"
+  profiles ||--o| storage_addons : "one +10 GB add-on (Plus only)"
   profiles ||--|| storage_usage : ""
   revenuecat_events }o..o| profiles : "webhook log"
 ```
 
-- `billing_products`: `plus_yearly` ($12/year, 5 GB) and `storage_5gb_yearly` ($5/year, +5 GB).
+- `billing_products`: `plus_yearly` ($12/year, 10 GB) and `storage_addon_yearly` ($5/year, +10 GB). Sizes are DECIMAL bytes
+  (10000000000) because the app prints sizes in decimal units: the screens say "10 GB". The add-on id has no size in it on purpose:
+  a store product id can never be renamed. (Migration `20261114030000_plan_storage.sql` sets these numbers. It also opens cloud
+  uploads to free accounts, so it is applied only after the owner agrees; its header lists what must be in place first.)
 - `subscriptions` mirrors RevenueCat. Only the RevenueCat webhook edge function (service role) writes it,
   logging every event in `revenuecat_events` (event id is the primary key, so retries are harmless).
-- **Free = basic app**: 0 GB cloud storage and no offline route downloads. Everything else
+- **Free = basic app**: 500 MB cloud storage and no offline route downloads. Everything else
   (browsing routes, stays, map online, social) works. `rpc('get_my_entitlements')` tells the app
   which plan the user is on.
 - Offline pack URLs (`offline_packs`) are readable only with Pilgrim Plus; free users see sizes via
   `rpc('offline_pack_catalog')` for the upgrade prompt. Pack files on R2 must be served through
   signed URLs from an edge function that checks the plan.
-- Quota = 5 GB with an active plan (including grace period and "cancelled but not yet expired")
-  + all active add-ons. Without a plan the quota is `app_config.free_storage_bytes` (0 for now).
+- Quota = 10 GB with an active plan (including grace period and "cancelled but not yet expired")
+  + at most ONE active add-on (+10 GB), and the add-on counts only while the plan is active. Without a plan the quota is
+  `app_config.free_storage_bytes` (500 MB, read live: set it to 0 to close free uploads at once) and an add-on row counts for
+  nothing. One add-on at a time is enforced by the database (`storage_addons.quantity = 1` and a unique index on the one active
+  row of a person) and by the quota function (it counts the biggest single add-on). A renewal must update the active row, not
+  insert a second one. `supabase/dev/plan_storage_smoke.sql` is the quota enforcement test.
 - Uploads to the `user-media` bucket are refused once usage reaches the quota. Nothing is deleted
   automatically; the user frees space or buys more.
 - `rpc('get_my_storage')` returns plan, quota, used and remaining for the Settings screen.
@@ -369,7 +376,7 @@ Written after a security audit; every point has an attack test in `dev/integrity
   `user-media`, first folder = user id) on every upload; `storage_usage` is only a cache that
   `refresh_my_storage_usage` updates. Limit: Storage creates the object row before the file size is known, so the
   check is "is there room left" and the cap bites on the **next** upload (one file can overshoot by its own size, up
-  to the bucket limit of 200 MB). Bucket bounds: `avatars` 10 objects per user, `business-media` 200 and
+  to the bucket limit of 200 MB; a limit of 50 MiB is proposed, not applied: see the end of `20261114030000_plan_storage.sql`). Bucket bounds: `avatars` 10 objects per user, `business-media` 200 and
   `business-docs` 100 per business (restrictive policies; at the limit delete an old object first, an upsert counts
   as an insert).
 - **Rows cannot be re-pointed.** Votes, post media, comments, reviews, price reports, stay photos, journey days,

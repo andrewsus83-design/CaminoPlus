@@ -202,7 +202,8 @@ function tables({ persona, data }) {
 // Each function gets (body, state) where state = { persona, data, full }.
 const RPC = {
   get_unread_totals: (_b, s) => [s.full ? { notifications: 1, chats: 2, groups: 0, friend_requests: 1 } : { notifications: 0, chats: 0, groups: 0, friend_requests: 0 }],
-  get_my_storage: () => ({ has_plus: false, quota_bytes: 0, used_bytes: 0, object_count: 0, remaining_bytes: 0 }),
+  // a free pilgrim: 500 MB of cloud storage (decimal bytes, the number of mobile/src/lib/plan.ts; it was 0 before the plan numbers)
+  get_my_storage: () => ({ has_plus: false, quota_bytes: 500000000, used_bytes: 0, object_count: 0, remaining_bytes: 500000000 }),
   list_conversations: (_b, s) => (s.full ? CONVERSATIONS : []),
   list_conversation_members: (_b, s) => (s.full ? MEMBERS : []),
   list_friends: (_b, s) => (s.full ? FRIENDS : []),

@@ -15,6 +15,7 @@ import { Alert, Pressable } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
 import { useMyStorage } from '@/lib/billing';
 import { formatBytes } from '@/lib/format';
+import { NO_CLOUD_STORAGE_TEXT } from '@/lib/plan';
 import { c, layout, radius, role, space } from '@/theme';
 
 export default function Settings() {
@@ -67,7 +68,7 @@ export default function Settings() {
           <View style={{ height: 10, borderRadius: radius.pill, backgroundColor: role.sunken, overflow: 'hidden' }}>
             <View style={{ width: `${quota > 0 ? Math.max(2, Math.min(100, (used / quota) * 100)) : 0}%`, height: 10, borderRadius: radius.pill, backgroundColor: used / (quota || 1) > 0.9 ? role.danger : role.highlight }} />
           </View>
-          {storage.data && quota === 0 && <AppText variant="caption" muted>Photos and videos in your posts and chats are saved in the cloud. That is part of Pilgrim Plus.</AppText>}
+          {storage.data && quota === 0 && <AppText variant="caption" muted>{NO_CLOUD_STORAGE_TEXT}</AppText>}
           {!!storage.error && <AppText variant="caption" color={c.red700}>Could not check your storage. {storage.error}</AppText>}
         </Card>
       </View>

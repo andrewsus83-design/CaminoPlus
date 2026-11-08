@@ -8,15 +8,16 @@ import { Pill } from '@/components/Pill';
 import { BackButton } from '@/components/BackButton';
 import { Card, SectionLabel } from '@/components/ui';
 import { SUPPORT_EMAIL, mailSupport } from '@/lib/support';
+import { FREE_STORAGE_LABEL, PLUS_STORAGE_LABEL } from '@/lib/plan';
 import { c, layout, role, space } from '@/theme';
 
 // Settings > Support > Help centre: short answers that work without signal, then ways to reach the team.
 const FAQ: { q: string; a: string }[] = [
   { q: 'Do the maps work without signal?', a: 'Yes, with Pilgrim Plus. Offline maps are only for paying members. Open Maps, choose Offline maps and download the stages you will walk while you still have Wi-Fi. Without Pilgrim Plus the map needs a connection. Your GPS dot works without signal either way, but the online base map only loads when you are connected.' },
-  { q: 'Is offline mode only for Pilgrim Plus members?', a: 'Yes. Offline maps and cloud storage for photos and videos are part of Pilgrim Plus, a paid yearly subscription. The free plan has no offline maps, so the map needs a connection.' },
+  { q: 'Is offline mode only for Pilgrim Plus members?', a: `Yes. Offline maps are part of Pilgrim Plus, a paid yearly subscription. The free plan has no offline maps, so the map needs a connection. Cloud storage for photos and videos is in both plans: ${FREE_STORAGE_LABEL} on the free plan and ${PLUS_STORAGE_LABEL} with Pilgrim Plus.` },
   { q: 'How do I change the Camino I am walking?', a: 'Open Me and tap the My Camino card. You can pick another route or a different starting point at any time.' },
   { q: 'What does the help bell do?', a: 'It sends your last known position and a short message to the friends you choose. In an emergency call 112 first. CaminoPlus does not call anyone for you and cannot promise that a friend will see your message in time.' },
-  { q: 'Why can I not upload photos or videos?', a: 'Photos and videos in posts and chats are saved in the cloud, which is part of Pilgrim Plus, together with offline maps. The rest of the basic app, including your plan, is free.' },
+  { q: 'Why can I not upload photos or videos?', a: `Photos and videos in posts and chats use your cloud storage: ${FREE_STORAGE_LABEL} on the free plan and ${PLUS_STORAGE_LABEL} with Pilgrim Plus. When it is full you cannot add more, and you need a connection to upload. Settings, Plan and storage, shows how much you have used.` },
   { q: 'Where are my diary pages kept?', a: 'Only on your phone. Open Me and tap the Notes tab: your diary lives there. The pages, and the photos, videos and places in them, are not uploaded, not shared and not backed up, so if you delete the app or lose the phone they are gone. Logging out keeps them on the phone. Deleting a page deletes its photos, videos and place with it, and deleting your account deletes the whole diary.' },
   { q: 'Can I add photos, videos and where I am to a diary page?', a: 'Yes, and it does not need Pilgrim Plus. Open a page and use the buttons above the keyboard: the picture adds photos and videos from your library (up to 12 on a page), the pin adds the place you are at, and the letters make words bold, italic, a heading, a list or a quote. Photos and videos are copied into the app and stay only on this phone. To find the name of a place, your phone\'s own map service may be asked, which needs a signal; without one you can type a name.' },
   { q: 'A place on the map is wrong or missing', a: 'Thank you for telling us. Choose Send feedback, pick "A problem" and write the name of the place and the stage. We cross-check it against the open map data before we change anything.' },
