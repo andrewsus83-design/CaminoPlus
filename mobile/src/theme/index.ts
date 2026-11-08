@@ -68,9 +68,20 @@ const roleFor = (k: Palette, scheme: Scheme) => ({
 
 export const role = roleFor(c, 'light');
 
+/**
+ * The five colours of the liturgical year, for the little dot that says what colour a day is (features/library/daily). They are colours of the
+ * Church's calendar, not brand colours, so they are kept apart from the palette: green and red are the palette's own, violet and rose are not in
+ * it. In dark mode they are lighter, so the dot keeps 3 : 1 on a card and on the page in both modes (the white dot also has a ring, because paper
+ * white on a paper white card would not show). Read while drawing, like `role`; applyScheme swaps them.
+ */
+const LITURGICAL_LIGHT = { green: '#2F6B4F', violet: '#6B3FA0', white: '#FFFDF8', red: '#A63D2F', rose: '#C94F7C' } as const;
+const LITURGICAL_DARK = { green: '#6FBF98', violet: '#B79BE0', white: '#FFFDF8', red: '#E07868', rose: '#F29BB9' } as const;
+export const liturgical: Record<keyof typeof LITURGICAL_LIGHT, string> = { ...LITURGICAL_LIGHT };
+
 export function applyScheme(scheme: Scheme) {
   Object.assign(c, LIGHT, scheme === 'dark' ? DARK : {});
   Object.assign(role, roleFor(c, scheme));
+  Object.assign(liturgical, scheme === 'dark' ? LITURGICAL_DARK : LITURGICAL_LIGHT);
 }
 
 /** The dimming behind a sheet or a dialog. Navy at 45% over either mode's screen; it does not change with the mode. */

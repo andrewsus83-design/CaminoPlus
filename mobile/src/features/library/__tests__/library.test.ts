@@ -21,7 +21,7 @@ import {
 } from '../savedPosts';
 import { BIBLE_BOOKS, booksOf } from '../bible/books';
 import { BOOK_CATALOG } from '../books/catalog';
-import { LIBRARY_TABS, ROW_TABS } from '../sample';
+import { LIBRARY_TABS, ROW_TABS, asLibraryTab } from '../sample';
 import { RESULT_GROUPS, hitCount, hitGroups, hitsForKeys, isSearching, itemKey, resultsLine, searchLibrary, shownQuery, verseKey, wordsOf } from '../search';
 
 let n = 0;
@@ -101,7 +101,7 @@ check('the name of a tab finds the whole tab, so "bible" and "books" are not dea
   assert.deepEqual(found('book'), { bible: [], books: ids(BOOK_CATALOG), total: BOOK_CATALOG.length });
   assert.deepEqual(found('BOOKS'), found('book'));
   assert.equal(found('music').total, 0, 'there is no Music tab, and no row says music');
-  assert.equal(found('notes').total, 0, 'Notes are not searched here');
+  assert.equal(found('notes').total, 0, 'the diary is not in the Library and is not searched here: it is the Notes sub-tab of Me');
 });
 
 check('a word counts when it is the start of a word of the row, and every word of the query has to: "john" finds the books of John, "1 sam" the one, and the order of the words does not matter', () => {
@@ -136,13 +136,13 @@ check('no query is not a search, a query of only punctuation is one that finds n
   for (const q of ['', '   ', '...', '?!', '“”']) assert.equal(searchLibrary(q).total, 0, JSON.stringify(q));
 });
 
-check('the answer is grouped by tab in the order of the tabs (Bible, Books; Notes are not rows), counts every row once, and does not touch the data', () => {
+check('the answer is grouped by tab in the order of the tabs (Bible, Books), counts every row once, and does not touch the data', () => {
   const before = JSON.stringify([BIBLE_BOOKS, BOOK_CATALOG]);
   const s = searchLibrary('psalm');
   assert.deepEqual(Object.keys(s.hits), [...RESULT_GROUPS]);
   assert.deepEqual([...RESULT_GROUPS], ['Bible', 'Books', 'Verses']);
   assert.deepEqual([...ROW_TABS], ['Bible', 'Books']);
-  assert.deepEqual([...LIBRARY_TABS], ['Bible', 'Books', 'Notes']);
+  assert.deepEqual([...LIBRARY_TABS], ['Bible', 'Books'], 'the Library has exactly these two tabs: Notes is a sub-tab of Me now');
   assert.equal(s.total, hitCount(s.hits));
   assert.deepEqual(hitGroups(s.hits), ['Bible', 'Books']);
   assert.deepEqual(hitGroups(searchLibrary(BOOK_CATALOG[0].subtitle).hits), ['Books']);
@@ -204,6 +204,39 @@ check('bookmarks kept before the tabs changed (Music rows, the old example shelv
   assert.deepEqual(bookmarkKeys(next).slice(0, 2), [`books:${BOOK_CATALOG[0].id}`, 'music:morning']);
   assert.equal(hitCount(hitsForKeys(bookmarkKeys(next))), 1);
   // the screens: a Bookmarks screen with only such keys is empty, and says how to bookmark (wiring.test.ts reads the screen)
+});
+
+check('the Library has exactly the tabs Bible and Books, and a tab name that is not one of them (the "Notes" an older version had, nothing, junk) shows the first tab, never a blank screen', () => {
+  assert.deepEqual([...LIBRARY_TABS], ['Bible', 'Books']);
+  assert.deepEqual([...ROW_TABS], [...LIBRARY_TABS], 'both tabs hold rows, so both are searched and bookmarked');
+  for (const tab of LIBRARY_TABS) assert.equal(asLibraryTab(tab), tab, `${tab} stays ${tab}`);
+  for (const stale of ['Notes', 'notes', 'NOTES', ' Bible', 'Bible ', 'Music', 'Bibles', '', 'undefined', null, undefined, 0, 1, true, {}, [], ['Books'], { toString: () => 'Books' }]) {
+    assert.equal(asLibraryTab(stale), 'Bible', `${JSON.stringify(stale)} is the first tab`);
+  }
+  assert.equal(asLibraryTab(LIBRARY_TABS[0]), LIBRARY_TABS[0], 'the first tab is the one a stale value falls back to');
+});
+
+check('bookmark keys of a tab that is not in the Library (notes:..., what a phone of an older version could hold) are read without a crash, show nothing, stay in the saved list, and do not block a current key', () => {
+  const stale = ['notes:2f6c1a', 'notes:', 'notes:bible-genesis', 'Notes:abc', 'diary:1', 'note', ':', 'x'.repeat(81)];
+  const h = hitsForKeys(stale);
+  assert.deepEqual(h, { Bible: [], Books: [], Verses: [] }, 'not a row of the Library');
+  assert.equal(hitCount(h), 0);
+  assert.deepEqual(hitGroups(h), []);
+  // a saved file that holds them (and a key that is too long to be one: over 80 characters) still reads: the long one is skipped, the rest are kept as they were
+  const stored = parseBookmarks(JSON.parse(JSON.stringify(packBookmarks(stale.map((key, i) => ({ key, at: 50 - i }))))));
+  assert.ok(stored);
+  assert.deepEqual(bookmarkKeys(stored!), stale.slice(0, -1));
+  // they sit among current keys: only the current ones show, in the order of the list, and taking one off leaves the stale ones alone
+  const book = `books:${BOOK_CATALOG[0].id}`;
+  const mixed = hitsForKeys(['notes:2f6c1a', book, 'notes:', 'bible:bible-job']);
+  assert.deepEqual({ bible: ids(mixed.Bible), books: ids(mixed.Books) }, { bible: ['bible-job'], books: [BOOK_CATALOG[0].id] });
+  const next = toggleBookmark(stored!, book, 900);
+  assert.deepEqual(bookmarkKeys(next), [book, ...bookmarkKeys(stored!)]);
+  assert.deepEqual(bookmarkKeys(toggleBookmark(next, book, 901)), bookmarkKeys(stored!));
+  // the screens that read the list use only hitsForKeys (the Bookmarks screen) and key lookups of their own rows (the tabs): a stale key is nothing to them
+  const screen = read('app/library/bookmarks.tsx');
+  assert.match(screen, /const hits = useMemo\(\(\) => hitsForKeys\(marks\.shown, \{ hasBook, loadBook \}\), \[marks\.shown\]\);/);
+  assert.doesNotMatch(screen.split('\n').filter((l) => !/^\s*\/\//.test(l)).join('\n'), /marks\.shown\.(map|forEach|filter)|split\(':'\)/, 'the screen never takes a key apart');
 });
 
 /* ================================================================ bookmarks of Library rows */
