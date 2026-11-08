@@ -31,7 +31,7 @@ import {
 // HOW THE SHELL HOSTS IT. Two ways, one component:
 //   <NotesTab />            in the page that holds it: inside the Library screen's own scroll view, right under the tab strip. The notes are drawn
 //                           a page at a time (30, then a button for 30 more), so a diary of 2,000 notes never draws them all at once. It runs from
-//                           edge to edge (a margin of -layout.screenMargin: the Screen's own), and leaves a little room for the gold pen. No pull to
+//                           edge to edge (a margin of -layout.screenMargin: the Screen's own), and leaves room for the gold pen. No pull to
 //                           refresh here (that belongs to the scroll view); the list is read again whenever the tab comes back into view.
 //   <NotesTab ownScroll />  the tab is the scroller: a virtualised list that draws only the rows on screen, with pull to refresh and the search row
 //                           and the tab strip standing still above it. Mount it in a box that has a height of its own (flex: 1 below them, never
@@ -197,7 +197,8 @@ export function NotesTab({ ownScroll = false }: { ownScroll?: boolean }) {
             <Pill variant="ghost" label={moreNotesLabel(left)} onPress={() => setLimit((n) => nextLimit(n, shown.length))} />
           </View>
         )}
-        <View style={{ height: 16 }} />
+        {/* room under the last note and the button for the gold pen that floats at the bottom right (the host already leaves the room of the tab bar) */}
+        <View style={{ height: 56 }} />
         {overlays}
       </View>
     );
