@@ -55,9 +55,9 @@ const TocRow = memo(function TocRow({ entry, read, here, first, onOpen }: { entr
       accessibilityRole="button"
       accessibilityLabel={spoken}
       onPress={() => onOpen(entry.id)}
-      style={({ pressed }) => ({ minHeight: 56, flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10, paddingHorizontal: 12, borderTopWidth: first ? 0 : 1, borderTopColor: role.border, backgroundColor: pressed ? role.sunken : 'transparent' })}
+      style={({ pressed }) => ({ minHeight: 56, flexDirection: 'row', alignItems: 'flex-start', gap: 12, paddingVertical: 17, paddingHorizontal: 12, borderTopWidth: first ? 0 : 1, borderTopColor: role.border, backgroundColor: pressed ? role.sunken : 'transparent' })}
     >
-      <AppText variant="mono" muted style={{ width: 36, textAlign: 'right', fontSize: 14, lineHeight: 20 }}>{entry.index + 1}</AppText>
+      <AppText variant="mono" muted style={{ width: 36, textAlign: 'right', fontSize: 14, lineHeight: 20, marginTop: 1 }}>{entry.index + 1}</AppText>
       <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
         <AppText variant="label">{label}</AppText>
         {!!subtitle && <AppText variant="small" muted numberOfLines={3} style={{ fontSize: 15, lineHeight: 21 }}>{subtitle}</AppText>}
@@ -67,7 +67,7 @@ const TocRow = memo(function TocRow({ entry, read, here, first, onOpen }: { entr
           </View>
         )}
       </View>
-      {read && <Icon name="check" color={c.success} size={20} strokeWidth={2.2} />}
+      {read && <View style={{ marginTop: 1 }}><Icon name="check" color={c.success} size={20} strokeWidth={2.2} /></View>}
     </Pressable>
   );
 });

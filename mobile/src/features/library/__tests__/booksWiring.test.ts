@@ -275,7 +275,7 @@ check('the book page: the cover with its ribbon, the title, the author, the era 
   assert.match(page, /const groups = useMemo\(\(\) => tocGroups\(chapters\), \[chapters\]\);/);
   assert.match(page, /\{groups\.map\(\(g, gi\) => \(/, 'the chapters under their parts');
   assert.match(page, /read=\{readSet\.has\(e\.id\)\} here=\{!!place && place\.c === e\.id\}/, 'the chapters read are marked, and the one where the person stopped');
-  assert.match(page, /\{read && <Icon name="check"/);
+  assert.match(page, /\{read && <View style=\{\{ marginTop: 1 \}\}><Icon name="check"/);
   assert.match(page, /LAST READ/);
   assert.match(page, /minHeight: 56/, 'a row of the contents is at least 56 high');
   assert.match(page, /const spoken = `\$\{entry\.title\}\$\{read \? ', read' : ''\}\$\{here \? ', where you stopped' : ''\}`;/);
