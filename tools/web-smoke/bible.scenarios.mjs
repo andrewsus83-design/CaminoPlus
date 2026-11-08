@@ -61,7 +61,7 @@ const scrollPage = (page, y) => page.evaluate((to) => {
 
 export const BIBLE_SCENARIOS = [
   {
-    name: 'Library: the daily reading banner is compact (at most 120 high at 390 wide, 140 at 320), ONE button, and the banner, the three choices, the heading and the first row of tiles (two) are all on the first screen, clear of the tab bar',
+    name: 'Library: the daily reading banner is compact (at most 128 high at 390 wide, 148 at 320), ONE button, and the banner, the three choices, the heading and the first row of tiles (two) are all on the first screen, clear of the tab bar',
     persona: 'in',
     async run({ page, step, go }) {
       step('open Library at 390 x 844');
@@ -69,7 +69,7 @@ export const BIBLE_SCENARIOS = [
       const banner = page.getByRole('button', { name: /^Read today/ });
       await eventually(() => banner.count(), (n) => n === 1, { what: 'the number of "Read today" buttons: the card is one button, the gold pill is not a second one' });
       const b = await box(banner, 'the banner');
-      assert(b.height <= 120, `the banner is ${b.height} high at 390 wide`);
+      assert(b.height <= 128, `the banner is ${b.height} high at 390 wide`);
       assert(b.height >= 90, `the banner is ${b.height} high: it has its label, title, note and pill`);
       step('the card holds the date, the title, one handwritten note and the gold pill with its label');
       await page.getByText('Daily reading', { exact: true }).first().waitFor();
@@ -88,11 +88,11 @@ export const BIBLE_SCENARIOS = [
       assert(Math.abs(second.y - first.y) <= 1 && second.x > first.x + first.width, 'Genesis and Exodus are the two tiles of the first row');
       assert(Math.abs(first.height - tileSums(390).height) <= 1, `a tile is ${tileSums(390).height} high at 390 (${first.height})`);
       assert(second.y + second.height <= tabs.y + 1, 'and so is the second tile of the row');
-      step('at 320 x 640 the banner is at most 140 high');
+      step('at 320 x 640 the banner is at most 148 high');
       await page.setViewportSize({ width: 320, height: 640 });
       await domQuiet(page, 300);
       const narrow = await box(banner, 'the banner at 320');
-      assert(narrow.height <= 140, `the banner is ${narrow.height} high at 320 wide`);
+      assert(narrow.height <= 148, `the banner is ${narrow.height} high at 320 wide`);
       step('tapping the title (not the pill) and tapping the pill both open the daily reading');
       await page.setViewportSize({ width: 390, height: 844 });
       await domQuiet(page, 300);

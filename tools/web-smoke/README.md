@@ -45,8 +45,8 @@ Then the **scenarios** ([scenarios.mjs](scenarios.mjs)), each in light and dark,
   for ..." with a way back); the Bookmarks button opens `/library/bookmarks` with the bookmarked rows of both tabs, a verse and the
   bookmarked post (the full account has one bookmarked post); bookmarks kept before the tabs changed (a Music row, the old example rows, `notes:` keys, the
   two Bible rows that were taken out) or kept for a verse that is not in the text are ignored without an error;
-- Bible ([bible.scenarios.mjs](bible.scenarios.mjs), the same walks on the real text): the daily banner is compact (at most 120 high at 390
-  wide, 140 at 320) and is one button; the three parts (Old Testament, Deuterocanon, New Testament) are a segmented control under the banner
+- Bible ([bible.scenarios.mjs](bible.scenarios.mjs), the same walks on the real text): the daily banner is compact (at most 128 high at 390
+  wide, 148 at 320) and is one button; the three parts (Old Testament, Deuterocanon, New Testament) are a segmented control under the banner
   that scrolls with the page, and each shows its books as compact tiles, two in a row (173 by 124 on a phone of 390, 140 by 116 on 320), the words 17 from the outline
   (13 under 352 wide) and the first row clear of the tab bar; all 73 book names fit their tile at 320, 360, 390 and 430, each at a size of the type scale (24, 17 or 15, in Fraunces;
   the 21 short ones the full 24; 17 or more from 390 up) with the count in JetBrains Mono at 15; a Chromium that hints the glyphs (CI's does)

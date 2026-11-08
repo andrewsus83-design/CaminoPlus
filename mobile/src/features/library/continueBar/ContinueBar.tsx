@@ -6,7 +6,7 @@ import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
 import { setAboveTabBar } from '@/lib/aboveTabBar';
 import { useTabBarHidden } from '@/lib/tabBarVisibility';
-import { layout, radius, role, shadowStyle } from '@/theme';
+import { layout, radius, role, shadowStyle, space } from '@/theme';
 import { BAR_HEIGHT, BAR_PAD_LEFT, BAR_PAD_RIGHT, BAR_ROOM, CLOSE_SIZE, barBottom } from './barLayout';
 import { setSearchFocused } from './searchFocus';
 import { CONTINUE_TITLE, HIDE_LABEL, OPEN_HINT, barVisible } from './spot';
@@ -15,7 +15,7 @@ import { useTyping } from './useTyping';
 
 /**
  * The "Continue reading" bar: one slim bar that floats just above the tab bar, a mini player for the page you were reading. It takes the place of the two cards the Bible tab and
- * the Books tab used to have inside their pages. Two lines: "Continue reading" (small) over the place, the chapter of the Bible ("Genesis 3") or of a book ("The French Way ·
+ * the Books tab used to have inside their pages. Two lines: "Continue reading" (the caption of the type scale) over the place, the chapter of the Bible ("Genesis 3") or of a book ("The French Way ·
  * Chapter 2"), whichever was read last (spot.ts), with the glyph of the Bible or of a book in gold. A tap opens the reader there. The X at the end hides it: it stays hidden,
  * across restarts, until the saved place is another one (hidden.ts). The books of the Library have titles of their own and some are long ("The Mountain of the Heart"), so the
  * place is drawn in two pieces, the name and then the chapter ("· Chapter 2"): when the line is too short it is the name that ends in an ellipsis, never the chapter.
@@ -63,14 +63,14 @@ export function ContinueBar() {
         accessibilityLabel={view.spoken}
         accessibilityHint={OPEN_HINT}
         onPress={() => router.push(view.href)}
-        style={({ pressed }) => ({ flex: 1, minWidth: 0, minHeight: BAR_HEIGHT, flexDirection: 'row', alignItems: 'center', gap: 12, opacity: pressed ? 0.85 : 1 })}
+        style={({ pressed }) => ({ flex: 1, minWidth: 0, minHeight: BAR_HEIGHT, flexDirection: 'row', alignItems: 'center', gap: space[3], opacity: pressed ? 0.85 : 1 })}
       >
         <Icon name={view.icon} color={role.highlight} size={28} strokeWidth={1.9} />
         <View style={{ flex: 1, minWidth: 0 }}>
-          <AppText variant="label" maxFontSizeMultiplier={1.2} numberOfLines={1} color={role.onInverseAccent} style={{ fontSize: 14, lineHeight: 18 }}>{CONTINUE_TITLE}</AppText>
-          <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 5 }}>
-            <AppText variant="h4" maxFontSizeMultiplier={1.2} numberOfLines={1} color={role.onInverse} style={{ flexShrink: 1, minWidth: 0, fontSize: 18, lineHeight: 24 }}>{view.head}</AppText>
-            {!!view.tail && <AppText variant="h4" maxFontSizeMultiplier={1.2} numberOfLines={1} color={role.onInverse} style={{ flexShrink: 0, fontSize: 18, lineHeight: 24 }}>{view.tail}</AppText>}
+          <AppText variant="caption" maxFontSizeMultiplier={1.2} numberOfLines={1} color={role.onInverseAccent}>{CONTINUE_TITLE}</AppText>
+          <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: space[1] }}>
+            <AppText variant="h5" maxFontSizeMultiplier={1.2} numberOfLines={1} color={role.onInverse} style={{ flexShrink: 1, minWidth: 0 }}>{view.head}</AppText>
+            {!!view.tail && <AppText variant="h5" maxFontSizeMultiplier={1.2} numberOfLines={1} color={role.onInverse} style={{ flexShrink: 0 }}>{view.tail}</AppText>}
           </View>
         </View>
       </Pressable>
@@ -80,7 +80,7 @@ export function ContinueBar() {
         onPress={hide}
         style={({ pressed }) => ({ width: CLOSE_SIZE, height: CLOSE_SIZE, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.6 : 1 })}
       >
-        <Icon name="close" color={role.onInverse} size={22} strokeWidth={2} />
+        <Icon name="close" color={role.onInverse} strokeWidth={2} />
       </Pressable>
     </View>
   );

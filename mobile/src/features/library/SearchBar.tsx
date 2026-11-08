@@ -1,7 +1,7 @@
 import { type ComponentRef, useEffect, useRef, useState } from 'react';
 import { Platform, Pressable, TextInput, View, useWindowDimensions } from 'react-native';
 import { Icon } from '@/components/Icon';
-import { c, fonts, radius, role } from '@/theme';
+import { c, fonts, radius, role, space } from '@/theme';
 import { setSearchFocused } from './continueBar/searchFocus';
 
 /** Browsers draw a focus outline on inputs; the border of the pill already shows focus. (Web only: native rejects the value.) */
@@ -15,8 +15,8 @@ export const SEARCH_LABEL = 'Search the library';
 export const CLEAR_LABEL = 'Clear search';
 
 /**
- * The search field of the Library: a pill 52 high (as high as the two round buttons next to it), the search icon, the text, and
- * a clear button (x) once something is typed. It takes the width it is given and shrinks with it (minWidth 0 on both the pill and
+ * The search field of the Library: a pill 52 high (as high as the round button next to it), the search icon 16 from its edge, the text, and
+ * a clear button (x, 48 by 48, 4 from the edge) once something is typed. It takes the width it is given and shrinks with it (minWidth 0 on both the pill and
  * the input: without it a web input keeps its own width and pushes the buttons out of the row).
  *
  * Colours are roles only: typed text role.text, placeholder and the x role.muted (both well over 4.5:1 on role.surface in light and
@@ -37,10 +37,10 @@ export function SearchBar({ value, onChangeText, onFocus }: { value: string; onC
     <View
       style={{
         flex: 1, minWidth: 0, height: 52, borderRadius: radius.pill, backgroundColor: role.surface, borderWidth: edge, borderColor: focus ? c.gold : role.border,
-        flexDirection: 'row', alignItems: 'center', paddingLeft: 17 - edge, paddingRight: 5 - edge, gap: 8,
+        flexDirection: 'row', alignItems: 'center', paddingLeft: space[4] - edge, paddingRight: space[1] - edge, gap: space[2],
       }}
     >
-      <Icon name="search" color={role.text} size={22} />
+      <Icon name="search" color={role.text} />
       <TextInput
         ref={input}
         value={value}

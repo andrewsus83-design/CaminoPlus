@@ -693,7 +693,7 @@ check('a bookmarked day is a row on the Bookmarks screen: "Daily reading" as the
   const part = source(`${DIR}/DailyBookmarks.tsx`);
   assert.match(part, /const days = useMemo\(\(\) => dailyDaysOf\(marks\.shown\), \[marks\.shown\]\);/, 'made of the keys of the Library\'s own bookmark list, as they were when the screen came into view');
   assert.match(part, /if \(days\.length === 0\) return null;/, 'with no day bookmarked it draws nothing');
-  assert.match(part, /<AppText variant="h4" accessibilityRole="header" style=\{\{ marginTop: 8 \}\}>\{DAILY_GROUP\}<\/AppText>/);
+  assert.match(part, /<AppText variant="h4" accessibilityRole="header" style=\{\{ marginTop: space\[2\] \}\}>\{DAILY_GROUP\}<\/AppText>/);
   assert.equal(DAILY_GROUP, 'Daily reading');
   assert.match(part, /accessibilityLabel=\{`\$\{DAILY_GROUP\}, \$\{date\}, \$\{title\}`\}/, 'a screen reader says "Daily reading", the date and the name');
   assert.match(part, /<AppText variant="label">\{date\}<\/AppText>\s*<AppText variant="caption" muted>\{title\}<\/AppText>/);
@@ -740,7 +740,7 @@ check('the reading under the strip: the liturgical day (real), the Preview notic
   assert.match(src, /const content = useMemo\(\(\) => dayContent\(key\), \[key\]\);/, 'the screen asks the one provider function for the day, and nothing else');
   assert.ok(src.indexOf('<LiturgicalCard') < src.indexOf('<SampleNotice') && src.indexOf('<SampleNotice') < src.indexOf('label="Readings"') && src.indexOf('label="Readings"') < src.indexOf('<ReflectionCard key'), 'order: liturgical day, notice, readings, reflection');
   assert.match(src, /accessibilityRole="button"[\s\S]*aria-expanded=\{open\}/, 'a reading is a button that says whether its text is open');
-  assert.match(src, /<AppText variant="mono" muted style=\{\{ fontSize: 14, lineHeight: 20 \}\}>\{citation\}<\/AppText>/, 'the citation is in JetBrains Mono');
+  assert.match(src, /<AppText variant="mono" muted>\{citation\}<\/AppText>/, 'the citation is in JetBrains Mono');
   assert.match(src, /passage\.citation \?\? SAMPLE_CITATION/);
   assert.match(src, /<AppText variant="caption" muted>\{`\$\{line\.n\} `\}<\/AppText>/, 'the verse numbers are small and muted');
   assert.equal((src.match(/variant="accent"/g) ?? []).length, 1, 'Caveat is used once on the screen');

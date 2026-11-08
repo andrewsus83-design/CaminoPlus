@@ -51,7 +51,8 @@ check('the chapter tiles: one button each ("Psalm 121", "Chapter 3"), square, at
   assert.match(src, /export const chapterTileLabel = \(book: BibleBook, n: number\): string => \(book\.code === 'PSA' \? `Psalm \$\{n\}` : `Chapter \$\{n\}`\);/);
   assert.match(src, /accessibilityRole="button"\s+accessibilityLabel=\{chapterTileLabel\(book, n\)\}\s+onPress=\{\(\) => onOpen\(n\)\}/);
   assert.match(src, /width: tile, height: tile/, 'square');
-  assert.match(src, /<AppText variant="mono" maxFontSizeMultiplier=\{1\.3\} numberOfLines=\{1\} style=\{\{ fontSize: 20, lineHeight: 26 \}\}>\{n\}<\/AppText>/);
+  assert.match(src, /<AppText variant="mono" maxFontSizeMultiplier=\{1\.3\} numberOfLines=\{1\} style=\{NUMBER\}>\{n\}<\/AppText>/);
+  assert.match(src, /const NUMBER = \{ fontSize: 19, lineHeight: 28 \} as const;/, 'the number of a chapter is the size and the line of the type scale\'s body (it was 20 on 26, which the scale does not have)');
   assert.match(src, /const grid = chapterGrid\(width\);/);
   assert.match(src, /Array\.from\(\{ length: book\.chapters \}, \(_, i\) => i \+ 1\)/);
   assert.match(src, /flexDirection: 'row', flexWrap: 'wrap', gap: grid\.gap/);
@@ -274,7 +275,7 @@ check('the search of verses never stands between a keystroke and the screen: it 
   assert.match(rows, /accessibilityRole="button" accessibilityLabel=\{verseRowLabel\(row\)\} accessibilityHint="Opens the chapter at this verse" onPress=\{\(\) => onOpen\(row\.ref\)\}/);
   assert.match(rows, /<\/Pressable>\s+\{marks && <BookmarkToggle on=\{marks\.has\(key\)\} title=\{row\.label\} toggle=\{\(\) => marks\.toggle\(key\)\} \/>\}/);
   assert.match(rows, /const key = verseKey\(row\.ref\);/);
-  assert.match(rows, /<AppText variant="mono" color=\{role\.accentText\} style=\{\{ fontSize: 14, lineHeight: 20 \}\}>\{row\.label\}<\/AppText>/);
+  assert.match(rows, /<AppText variant="mono" color=\{role\.accentText\}>\{row\.label\}<\/AppText>/);
   assert.match(rows, /backgroundColor: c\.goldSoft, textDecorationLine: 'underline'/);
   assert.match(rows, /numberOfLines=\{ROW_TEXT_LINES\}/);
   assert.match(rows, /excerpt\(row\.text, row\.marks\)/, 'a long verse is cut around the match');

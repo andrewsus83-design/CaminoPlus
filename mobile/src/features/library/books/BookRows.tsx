@@ -2,7 +2,7 @@ import { Pressable, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { AppText } from '@/components/AppText';
 import { Card } from '@/components/ui';
-import { radius, role } from '@/theme';
+import { radius, role, space } from '@/theme';
 import { BookmarkToggle } from '../BookmarkToggle';
 import { itemKey } from '../search';
 import type { LibraryMarks } from '../useLibraryBookmarks';
@@ -15,40 +15,41 @@ import { formatMinutes } from './reading';
 // The books as rows, one under the other, for a list of results (the search) and for the Bookmarks screen: the Books tab itself draws them as covers
 // (BooksGrid.tsx). A row is a small cover, the title in Fraunces, the subtitle, the description (at most three lines), and a small mark with the kind of book and how long it
 // takes. The row is ONE button that opens the book page; the bookmark button is another one beside it, not inside it.
+// The card holds its rows at 20 from its edge (4 of the card and 16 of the row, 8 at the end where the bookmark button is, which is itself 48 wide).
 
 /** The width of the small cover in a row; it is an A5 page that wide (74 high). */
 export const THUMB_WIDTH = 52;
 
-/** The kind of book as a small label: caps in mono on a pale ground ("GUIDE", "READINGS"). */
+/** The kind of book as a small label: caps in mono on a pale ground ("GUIDE", "READINGS"), with 8 above and below the words and 12 at the sides like every pill. */
 const Mark = ({ kind }: { kind: string }) => (
-  <View accessibilityLabel={kindName(kind)} style={{ alignSelf: 'flex-start', paddingHorizontal: 10, height: 24, borderRadius: radius.pill, backgroundColor: role.sunken, justifyContent: 'center' }}>
-    <AppText variant="mono" color={role.muted} style={{ fontSize: 12, lineHeight: 16, letterSpacing: 1 }}>{kindMark(kind)}</AppText>
+  <View accessibilityLabel={kindName(kind)} style={{ alignSelf: 'flex-start', paddingHorizontal: space[3], paddingVertical: space[2], borderRadius: radius.pill, backgroundColor: role.sunken }}>
+    <AppText variant="mono" color={role.muted}>{kindMark(kind)}</AppText>
   </View>
 );
 
 export function BookRows({ items, marks }: { items: readonly CatalogBook[]; marks?: LibraryMarks }) {
   const router = useRouter();
   return (
-    <Card style={{ padding: 4 }}>
+    <Card style={{ padding: space[1] }}>
       {items.map((b, i) => {
         const key = itemKey('Books', b.id);
         return (
-          <View key={b.id} style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 6, paddingLeft: 12, paddingRight: marks ? 6 : 12, paddingVertical: 10, borderTopWidth: i === 0 ? 0 : 1, borderTopColor: role.border }}>
+          <View key={b.id} style={{ flexDirection: 'row', alignItems: 'flex-start', gap: space[2], paddingLeft: space[4], paddingRight: marks ? space[2] : space[4], paddingVertical: space[3], borderTopWidth: i === 0 ? 0 : 1, borderTopColor: role.border }}>
             <Pressable
               accessibilityRole="button"
               accessibilityLabel={coverLabel(b)}
               accessibilityHint="Opens the book"
               onPress={() => router.push(bookPath(b.id))}
-              style={({ pressed }) => ({ flex: 1, minWidth: 0, flexDirection: 'row', alignItems: 'flex-start', gap: 14, paddingVertical: 4, opacity: pressed ? 0.7 : 1 })}
+              style={({ pressed }) => ({ flex: 1, minWidth: 0, flexDirection: 'row', alignItems: 'flex-start', gap: space[4], paddingVertical: space[1], opacity: pressed ? 0.7 : 1 })}
             >
               <BookCover book={b} width={THUMB_WIDTH} thumb />
-              <View style={{ flex: 1, minWidth: 0, gap: 4 }}>
-                <AppText variant="h4" style={{ fontSize: 19, lineHeight: 24 }}>{b.title}</AppText>
+              <View style={{ flex: 1, minWidth: 0, gap: space[1] }}>
+                <AppText variant="h5">{b.title}</AppText>
                 <AppText variant="caption" muted>{b.subtitle}</AppText>
                 <AppText variant="small" numberOfLines={3}>{b.description}</AppText>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', columnGap: space[3], rowGap: space[1] }}>
                   <Mark kind={b.kind} />
-                  <AppText variant="mono" muted style={{ fontSize: 13, lineHeight: 19 }}>{formatMinutes(b.minutes)}</AppText>
+                  <AppText variant="mono" muted>{formatMinutes(b.minutes)}</AppText>
                 </View>
               </View>
             </Pressable>

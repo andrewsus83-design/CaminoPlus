@@ -109,12 +109,12 @@ check('each text is in its role: titles and headings are the Fraunces variants (
   assert.match(cover, /<AppText variant="mono" maxFontSizeMultiplier=\{1\} numberOfLines=\{1\} color=\{INK\} style=\{\{ textAlign: 'center' \}\}>\{text\.time\}<\/AppText>/, 'the time is JetBrains Mono at the mono token, with no size of its own');
   const page = src['BookPage.tsx'];
   assert.match(page, /<AppText variant="h3" accessibilityRole="header" style=\{\{ textAlign: 'center' \}\}>\{book\.title\}<\/AppText>/, 'the title of the book is Fraunces');
-  assert.match(page, /<AppText variant="mono" color=\{role\.muted\} style=\{\{ fontSize: 12, lineHeight: 16, letterSpacing: 1 \}\}>\{kindName\(kind\)\.toUpperCase\(\)\}<\/AppText>/, 'the kind of book is a mono mark');
+  assert.match(page, /<AppText variant="mono" color=\{role\.muted\}>\{kindName\(kind\)\.toUpperCase\(\)\}<\/AppText>/, 'the kind of book is a mono mark');
   assert.match(page, /bookFacts\(book\.chapters\.length, book\.words\)/, 'the chapters, words and reading time are mono');
-  assert.match(page, /<AppText variant="mono" muted style=\{\{ fontSize: 14, lineHeight: 20 \}\}>\{`\$\{chapters\.length\}/);
-  assert.match(page, /<View accessible accessibilityRole="header" accessibilityLabel=\{g\.part\} style=\{\{ gap: 2, marginTop: gi === 0 \? 0 : 8 \}\}>/, 'a part is one heading for a screen reader, with its whole name');
-  assert.match(page, /<AppText variant="h4" style=\{\{ fontSize: 19, lineHeight: 25 \}\}>\{partName\(g\.part\)\}<\/AppText>/, 'a part is a heading in Fraunces: its name');
-  assert.match(page, /\{!!partSubtitle\(g\.part\) && <AppText variant="small" muted numberOfLines=\{4\}/, 'and what it is about under it, in Inter, in at most four lines');
+  assert.match(page, /<AppText variant="mono" muted>\{`\$\{chapters\.length\}/);
+  assert.match(page, /<View accessible accessibilityRole="header" accessibilityLabel=\{g\.part\} style=\{\{ gap: space\[1\], marginTop: gi === 0 \? 0 : space\[2\] \}\}>/, 'a part is one heading for a screen reader, with its whole name');
+  assert.match(page, /<AppText variant="h5">\{partName\(g\.part\)\}<\/AppText>/, 'a part is a heading in Fraunces: its name (h5, 17 on 22: the step of the scale next to the 19 it was)');
+  assert.match(page, /\{!!partSubtitle\(g\.part\) && <AppText variant="caption" muted numberOfLines=\{4\}/, 'and what it is about under it, in Inter (the caption of the scale), in at most four lines');
   assert.match(page, /<AppText variant="mono" muted style=\{\{ width: 28, textAlign: 'right'/, 'the number of a chapter is mono');
   assert.match(page, /<AppText variant="label">\{label\}<\/AppText>/, 'the chapter in the contents is Inter');
   const reader = src['Reader.tsx'];
@@ -213,7 +213,7 @@ check('the Books tab: the books as covers in two columns on one shelf for each k
   assert.match(grid, /width: grid\.width, alignSelf: 'center', flexDirection: 'row', flexWrap: 'wrap', columnGap: grid\.gap, rowGap: ROW_GAP/);
   assert.match(grid, /const onShelves = useMemo\(\(\) => shelves\(items\), \[items\]\);/, 'a shelf for each kind of book, in the order of the shelves');
   assert.match(grid, /<AppText variant="h4" accessibilityRole="header">\{shelf\.title\}<\/AppText>/, 'the heading of a shelf is Fraunces and a heading for a screen reader');
-  assert.match(grid, /export const ROW_GAP = 16;/);
+  assert.match(grid, /export const ROW_GAP = space\[4\];/);
   assert.match(grid, /const open = useCallback\(\(id: string\) => router\.push\(bookPath\(id\)\), \[router\]\);/, 'a cover opens the book page');
   assert.doesNotMatch(grid, /hasText|hasBookText/, 'every book of the bundle has its text: there is nothing to ask');
   assert.match(grid, /bookmarked=\{marks \? marks\.has\(itemKey\('Books', b\.id\)\) : undefined\}/);
@@ -242,8 +242,8 @@ check('the banner of the Books tab is the compact banner of the Bible tab with w
   assert.match(banner, /note=\{view\.note\} cta=\{view\.cta\} onPress=\{\(\) => router\.push\(bookPath\(view\.bookId\)\)\} hint=\{view\.hint\}/, 'the pill opens the page of the book');
   const compact = code(read('src/features/library/LibraryBanner.tsx'));
   assert.match(compact, /export function CompactBanner\(/);
-  assert.match(compact, /height: 44, paddingHorizontal: 16, borderRadius: radius\.pill, backgroundColor: c\.gold/, 'the gold pill is 44 high');
-  assert.match(compact, /export const COMPACT_BANNER_MAX_HEIGHT = 120;/);
+  assert.match(compact, /height: 44, paddingHorizontal: space\[4\], borderRadius: radius\.pill, backgroundColor: c\.gold/, 'the gold pill is 44 high');
+  assert.match(compact, /export const COMPACT_BANNER_MAX_HEIGHT = 128;/);
 });
 
 check('the rows of a search and of Bookmarks: ONE button that opens the book page, the bookmark button beside it, a small cover, the title, the subtitle, the description and the kind of book; no notice: every book is in the app', () => {
@@ -251,7 +251,7 @@ check('the rows of a search and of Bookmarks: ONE button that opens the book pag
   assert.match(rows, /accessibilityLabel=\{coverLabel\(b\)\}/);
   assert.match(rows, /onPress=\{\(\) => router\.push\(bookPath\(b\.id\)\)\}/);
   assert.match(rows, /<BookCover book=\{b\} width=\{THUMB_WIDTH\} thumb \/>/);
-  assert.match(rows, /<AppText variant="h4" style=\{\{ fontSize: 19, lineHeight: 24 \}\}>\{b\.title\}<\/AppText>/, 'the title is Fraunces');
+  assert.match(rows, /<AppText variant="h5">\{b\.title\}<\/AppText>/, 'the title is Fraunces (h5, 17 on 22: the step of the scale next to the 19 it was)');
   assert.match(rows, /<AppText variant="caption" muted>\{b\.subtitle\}<\/AppText>/);
   assert.match(rows, /<AppText variant="small" numberOfLines=\{3\}>\{b\.description\}<\/AppText>/, 'the description, in at most three lines');
   assert.match(rows, /<BookmarkToggle on=\{marks\.has\(key\)\} title=\{b\.title\} toggle=\{\(\) => marks\.toggle\(key\)\} \/>/);
@@ -276,7 +276,7 @@ check('the book page: the cover with its ribbon, the title, the subtitle, the ki
   assert.match(page, /import \{ noticeFor \} from '\.\/notices';/);
   for (const f of Object.keys(src)) if (f !== 'notices.ts') assert.doesNotMatch(src[f], /Written with AI assistance|word for word from the public-domain/, `${f}: the wording of the notice is in notices.ts only`);
   assert.match(page, /\{text && target && nav \? \(/, 'the button and the contents are for a book whose text reads');
-  assert.match(page, /\) : \(\s*<Card style=\{\{ gap: 8 \}\}>\s*<AppText variant="h4" accessibilityRole="header">\{UNREADABLE_TITLE\}<\/AppText>\s*<AppText variant="small">\{UNREADABLE_TEXT\}<\/AppText>/);
+  assert.match(page, /\) : \(\s*<Card style=\{\{ gap: space\[2\] \}\}>\s*<AppText variant="h4" accessibilityRole="header">\{UNREADABLE_TITLE\}<\/AppText>\s*<AppText variant="small">\{UNREADABLE_TEXT\}<\/AppText>/);
   const readable = page.slice(page.indexOf('{text && target && nav ? ('), page.indexOf(') : (\n        <Card'));
   assert.match(readable, /<ReadButton\s+label=\{readButtonLabel\(chapters, place\)\}\s+spoken=\{readButtonSpoken\(chapters, place\)\}/, '"Start reading" or "Continue: Day 3", and the whole title for a screen reader');
   assert.match(readable, /onPress=\{\(\) => open\(target\.id\)\}/);
@@ -446,18 +446,18 @@ check('the round buttons of the reader are named, the size buttons of its header
   assert.match(ui, /const HEADER_BUTTON = 48;/, 'the size buttons are 48 by 48, the size of IconButton and so of the Back button next to them');
   assert.equal(count(ui, /width: HEADER_BUTTON, height: HEADER_BUTTON/g), 1);
   assert.equal(count(ui, /width: 44, height: 44/g), 0, 'no round button of 44 is left in the header');
-  assert.match(ui, /size = 44/, 'a round button of the reader\'s bar is 44 by 44 unless it is asked to be larger (the bar asks for 56)');
+  assert.match(ui, /size = 48/, 'a round button of the reader\'s bar is 48 by 48 unless it is asked to be larger (the bar asks for 56)');
   assert.match(ui, /width: size, height: size/);
   assert.match(ui, /accessibilityLabel=\{larger \? 'Larger text' : 'Smaller text'\}/);
   assert.match(ui, /accessibilityState=\{\{ disabled: !!disabled \}\}/);
   assert.equal(count(ui, /accessibilityState=\{\{ disabled: !!disabled \}\}/g), 2, 'a dimmed button is disabled for a screen reader too');
-  assert.match(ui, /minHeight: 56, paddingHorizontal: 24/, 'the gold button is at least 56 high');
+  assert.match(ui, /minHeight: 56, paddingHorizontal: space\[6\]/, 'the gold button is at least 56 high');
   assert.match(ui, /backgroundColor: c\.gold/);
   const footer = src['ChapterFooter.tsx'];
   assert.match(footer, /accessibilityLabel=\{next \? nextLabel\(nav\) : previousLabel\(nav\)\}/, 'the buttons at the end of a chapter name the destination too');
   assert.match(footer, /accessibilityState=\{\{ disabled: !to \}\}\s+disabled=\{!to\}/);
   assert.match(footer, /minHeight: 64/);
-  assert.match(footer, /\{last && \(\s*<View style=\{\{ gap: 12, alignItems: 'center', marginTop: 8 \}\}>\s*<AppText variant="h4" accessibilityRole="header" style=\{\{ textAlign: 'center' \}\}>\{END_OF_BOOK\}<\/AppText>\s*<AppText variant="caption" muted style=\{\{ textAlign: 'center' \}\}>\{credit\}<\/AppText>/, 'the credit line is printed at the end of the book');
+  assert.match(footer, /\{last && \(\s*<View style=\{\{ gap: space\[3\], alignItems: 'center', marginTop: space\[2\] \}\}>\s*<AppText variant="h4" accessibilityRole="header" style=\{\{ textAlign: 'center' \}\}>\{END_OF_BOOK\}<\/AppText>\s*<AppText variant="caption" muted style=\{\{ textAlign: 'center' \}\}>\{credit\}<\/AppText>/, 'the credit line is printed at the end of the book');
   assert.match(footer, /<Step side="next" nav=\{nav\} onPress=\{onNext\} \/>\s+<Step side="previous" nav=\{nav\} onPress=\{onPrevious\} \/>/);
 });
 
@@ -642,11 +642,11 @@ check('every button of the Books screens has a role, a label for a screen reader
   assert.match(src['ReaderHeader.tsx'], /<BackButton onPress=\{onContents\} /, 'the way back is the app\'s Back button, 48 by 48');
   assert.match(src['ChapterFooter.tsx'], /minHeight: 64/);
   assert.match(src['BookRows.tsx'], /import \{ BookmarkToggle \} from '\.\.\/BookmarkToggle';/, 'the bookmark button of a row is the one of the Library, 44 by 44');
-  assert.match(read('src/features/library/BookmarkToggle.tsx'), /width: 44, height: 44/);
+  assert.match(read('src/features/library/BookmarkToggle.tsx'), /width: 48, height: 48/);
   for (const f of ['BooksBanner.tsx', 'BooksGrid.tsx']) assert.equal(count(src[f], /<Pressable\b/g), 0, `${f} is not a button`);
   assert.equal(count(src['ReaderBlocks.tsx'], /<Text accessibilityRole="link" onPress=\{onChoose\}/g), 1, 'the words of a passage: one text, a link, that a touch chooses');
   assert.match(src['PassageActions.tsx'], /minHeight: ACTION_MIN_HEIGHT/, 'Bookmark, Copy and Share are as high as the Bible\'s (68)');
-  assert.match(src['PassageRows.tsx'], /minHeight: 44/, 'a row of a bookmarked passage is at least 44 high');
+  assert.match(src['PassageRows.tsx'], /minHeight: 48/, 'a row of a bookmarked passage is at least 48 high');
 });
 
 check('text sizes grow with the phone, up to a cap: the running text of the reader and the contents have no fixed size, the header, the cover and the banner are held at their own limits', () => {

@@ -89,7 +89,7 @@ check('the rows of the books of the Library (a search, Bookmarks) are books/Book
   assert.match(toggle, /bookmarkLabel = \(on: boolean, title: string\) => `\$\{on \? 'Remove bookmark' : 'Bookmark'\}: \$\{title\}`/);
   assert.match(toggle, /accessibilityLabel=\{bookmarkLabel\(on, title\)\}/);
   assert.match(toggle, /accessibilityRole="button"/);
-  assert.match(toggle, /width: 44, height: 44/);
+  assert.match(toggle, /width: 48, height: 48/);
 });
 
 check('a book of the Bible in a list of results or of Bookmarks is ONE button that opens its chapters, the bookmark button is another beside it (never inside), and the name is in Fraunces with the count in JetBrains Mono', () => {
@@ -97,8 +97,8 @@ check('a book of the Bible in a list of results or of Bookmarks is ONE button th
   const rows = tabs.slice(tabs.indexOf('export function BibleBookRows'), tabs.indexOf('export function LibraryGroups'));
   assert.match(rows, /<Pressable accessibilityRole="button" accessibilityLabel=\{`\$\{b\.name\}, \$\{bookLine\(b, withPart\)\.replace\(\/\\u00a0\/g, ' '\)\}`\} accessibilityHint="Opens the chapters" onPress=\{\(\) => onOpen\(b\.code\)\}/);
   assert.match(rows, /<\/Pressable>\s*<Mark marks=\{marks\} tab="Bible" id=\{b\.id\} title=\{b\.name\} \/>/, 'the bookmark button follows the row button, outside of it');
-  assert.match(rows, /<AppText variant="h4" style=\{\{ fontSize: 20, lineHeight: 26 \}\}>\{b\.name\}<\/AppText>/);
-  assert.match(tabs, /<AppText variant="mono" muted style=\{\{ fontSize: 14, lineHeight: 21 \}\}>\{chaptersLabel\(book\.chapters\)\}<\/AppText>/);
+  assert.match(rows, /<AppText variant="h5">\{b\.name\}<\/AppText>/);
+  assert.match(tabs, /<AppText variant="mono" muted>\{chaptersLabel\(book\.chapters\)\}<\/AppText>/);
   assert.match(tabs, /import \{ Pressable, View \} from 'react-native';/);
 });
 
@@ -130,23 +130,28 @@ check('the compact banner of the Bible tab is ONE button for a screen reader (th
   // the four fonts, by variant, never a font of its own: JetBrains Mono for the label, Fraunces for the title, Inter for the line and the pill, Caveat for the note
   assert.match(compact, /<AppText variant="mono"[^>]*>\{label\}<\/AppText>/);
   assert.match(compact, /<AppText variant="h4"[^>]*>\{title\}<\/AppText>/);
-  assert.match(compact, /<AppText variant="small"[^>]*>\{line\}<\/AppText>/);
+  assert.match(compact, /<AppText variant="caption"[^>]*>\{line\}<\/AppText>/);
   assert.match(compact, /<AppText variant="accent"[^>]*>\{note\}<\/AppText>/);
   assert.match(compact, /<AppText variant="label"[^>]*>\{cta\}<\/AppText>/);
   assert.equal((compact.match(/variant="accent"/g) ?? []).length, 1, 'one handwritten note, never two');
   assert.doesNotMatch(compact, /fontFamily|#[0-9a-fA-F]{3,8}\b|\bfixed\./, 'colours are roles and the gold, never a literal');
-  // the size: 12 above and below + the label (16) + the title (28) + the two gaps and the margin of the bottom row (6) + the pill (44) is under 120
-  const padV = Number(/paddingVertical: (\d+)/.exec(compact)?.[1]);
-  const gap = Number(/paddingVertical: \d+, gap: (\d+)/.exec(compact)?.[1]);
-  const rowTop = Number(/alignItems: 'center', gap: 12, marginTop: (\d+)/.exec(compact)?.[1]);
-  const labelLine = Number(/fontSize: 12, lineHeight: (\d+), textTransform/.exec(compact)?.[1]);
-  const titleLine = Number(/fontSize: 24, lineHeight: (\d+) \}\}>\{title\}/.exec(compact)?.[1]);
-  const pill = Number(/height: (\d+), paddingHorizontal: 16, borderRadius: radius\.pill, backgroundColor: c\.gold/.exec(compact)?.[1]);
+  // the size: 12 above and below + the label (mono, 22 high: the 15 of the type scale) + the title (h4, 30) + the two gaps of 4 + the pill (44) is 128. It was 118 and the most it
+  // could be was 120, when the label was 12 px on 16: the type scale has nothing under 15, so the label is 6 higher, the title 2 and the gap between them 2, and the most is 128
+  const tokens = JSON.parse(read('src/theme/tokens.json')) as { space: Record<string, number>; text: Record<string, { lineHeight: number }> };
+  const step = (k: string | undefined) => tokens.space[k ?? ''];
+  const padV = step(/paddingVertical: space\[(\d+)\]/.exec(compact)?.[1]);
+  const gap = step(/paddingVertical: space\[\d+\], gap: space\[(\d+)\]/.exec(compact)?.[1]);
+  const labelLine = tokens.text.mono.lineHeight;
+  const titleLine = tokens.text.h4.lineHeight;
+  const pill = Number(/height: (\d+), paddingHorizontal: space\[4\], borderRadius: radius\.pill, backgroundColor: c\.gold/.exec(compact)?.[1]);
+  assert.match(compact, /variant="mono"[^>]*style=\{\{ textTransform: 'uppercase' \}\}>\{label\}/, 'the label is the mono variant as it is: no size, no line, no tracking of its own');
+  assert.match(compact, /<AppText variant="h4"[^>]*>\{title\}<\/AppText>/);
   assert.ok(pill >= 44, `the gold pill is ${pill} high`);
-  const height = 2 * padV + labelLine + titleLine + 2 * gap + rowTop + pill;
+  const height = 2 * padV + labelLine + titleLine + 2 * gap + pill;
+  assert.equal(height, 128, 'the banner is 128 high at the normal text size');
   assert.ok(height <= Number(/export const COMPACT_BANNER_MAX_HEIGHT = (\d+);/.exec(src)![1]), `the banner is ${height} high (with the phone's text at its normal size)`);
-  assert.equal(Number(/COMPACT_BANNER_MAX_HEIGHT = (\d+)/.exec(src)![1]), 120);
-  assert.equal(Number(/COMPACT_BANNER_MAX_HEIGHT_NARROW = (\d+)/.exec(src)![1]), 140);
+  assert.equal(Number(/COMPACT_BANNER_MAX_HEIGHT = (\d+)/.exec(src)![1]), 128);
+  assert.equal(Number(/COMPACT_BANNER_MAX_HEIGHT_NARROW = (\d+)/.exec(src)![1]), 148);
   assert.match(src, /COMPACT_BANNER_MAX_FONT_SCALE = 1\.2;/);
   assert.match(compact, /adjustsFontSizeToFit minimumFontScale=\{0\.8\}/, 'a handwritten note beside a pill shrinks a little before it is cut');
   // contrast of what is on the card is checked in navigation.test.ts, for light and dark
@@ -161,10 +166,11 @@ check('the three choices of the Bible tab are an inline segmented pill: radio bu
   assert.match(src, /export const BAR_DRAWN: Record<Testament, string> = \{ old: 'Old\\nTestament', deutero: 'Deuterocanon', new: 'New\\nTestament' \};/, 'the labels stay as they were');
   assert.match(src, /\{BAR_DRAWN\[t\]\}<\/AppText>/);
   assert.match(src, /export const BAR_MAX_FONT_SCALE = 1\.2;/);
-  assert.match(src, /<AppText variant="label" maxFontSizeMultiplier=\{BAR_MAX_FONT_SCALE\} color=\{on \? role\.onAction : role\.text\} style=\{\{ fontSize: 14, lineHeight: 18, textAlign: 'center' \}\}>/, 'Inter, the same for the filled one and the others, and larger text still fits three labels in a row');
+  assert.match(src, /<AppText variant="caption" maxFontSizeMultiplier=\{BAR_MAX_FONT_SCALE\} color=\{on \? role\.onAction : role\.text\} style=\{\{ textAlign: 'center' \}\}>/, 'Inter, the same for the filled one and the others, and larger text still fits three labels in a row');
   // size: 56 high with 4 of padding is a choice 48 high; the middle one keeps its own width, the others share the rest
   const height = Number(/export const BAR_HEIGHT = (\d+);/.exec(src)?.[1]);
-  const padding = Number(/gap: 2, padding: (\d+)/.exec(src)?.[1]);
+  const padding = 4;
+  assert.match(src, /gap: space\[1\], padding: space\[1\],/, 'the track has 4 of padding and the choices are 4 apart');
   assert.ok(height - 2 * padding >= 44, `a choice is ${height - 2 * padding} high`);
   assert.match(src, /flexGrow: t === 'deutero' \? 0 : 1, flexShrink: t === 'deutero' \? 0 : 1, flexBasis: t === 'deutero' \? 'auto' : 0/);
   // colours: roles only; the track is the sunken colour, the filled choice the action colour

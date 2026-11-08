@@ -1,7 +1,7 @@
 import { Pressable, View } from 'react-native';
 import { AppText } from '@/components/AppText';
 import { Card } from '@/components/ui';
-import { c, role } from '@/theme';
+import { c, role, space } from '@/theme';
 import { BookmarkToggle } from '../BookmarkToggle';
 import { verseKey } from '../search';
 import type { LibraryMarks } from '../useLibraryBookmarks';
@@ -19,14 +19,14 @@ export const verseRowLabel = (row: VerseRow): string => `${row.label}. ${row.tex
  */
 export function VerseRowList({ rows, marks, onOpen }: { rows: readonly VerseRow[]; marks?: LibraryMarks; onOpen: (ref: Ref) => void }) {
   return (
-    <Card style={{ padding: 4 }}>
+    <Card style={{ padding: space[1] }}>
       {rows.map((row, i) => {
         const cut = excerpt(row.text, row.marks);
         const key = verseKey(row.ref);
         return (
-          <View key={`${row.key}-${i}`} style={{ flexDirection: 'row', alignItems: 'center', gap: 6, minHeight: 64, paddingLeft: 16, paddingRight: marks ? 6 : 16, paddingVertical: 6, borderTopWidth: i === 0 ? 0 : 1, borderTopColor: role.border }}>
-            <Pressable accessibilityRole="button" accessibilityLabel={verseRowLabel(row)} accessibilityHint="Opens the chapter at this verse" onPress={() => onOpen(row.ref)} style={{ flex: 1, minWidth: 0, gap: 2, paddingVertical: 6 }}>
-              <AppText variant="mono" color={role.accentText} style={{ fontSize: 14, lineHeight: 20 }}>{row.label}</AppText>
+          <View key={`${row.key}-${i}`} style={{ flexDirection: 'row', alignItems: 'center', gap: space[2], minHeight: 64, paddingLeft: space[4], paddingRight: marks ? space[2] : space[4], paddingVertical: space[2], borderTopWidth: i === 0 ? 0 : 1, borderTopColor: role.border }}>
+            <Pressable accessibilityRole="button" accessibilityLabel={verseRowLabel(row)} accessibilityHint="Opens the chapter at this verse" onPress={() => onOpen(row.ref)} style={{ flex: 1, minWidth: 0, gap: space[1], paddingVertical: space[2] }}>
+              <AppText variant="mono" color={role.accentText}>{row.label}</AppText>
               <AppText variant="small" numberOfLines={ROW_TEXT_LINES}>
                 {segments(cut.text, cut.marks).map((s, k) => (s.mark
                   ? <AppText key={k} variant="small" style={{ backgroundColor: c.goldSoft, textDecorationLine: 'underline' }}>{s.text}</AppText>
