@@ -28,6 +28,16 @@ const SOFTWARE: Item[] = [
   { name: 'Expo, React Native, React, Supabase', what: 'App framework and backend client', licence: 'MIT', url: 'https://github.com/expo/expo/blob/main/LICENSE' },
 ];
 
+// The books of the Books tab that have text in the app: one entry for each book of assets/books/manifest.json (written by tools/books/import_books.py,
+// public domain everywhere), so this list cannot fall behind the texts. The link is the page of the edition the text was taken from.
+type ManifestBook = { title: string; author: string; translator: string; firstPublished: number; source: string };
+const BOOKS: Item[] = (require('../assets/books/manifest.json') as { books: ManifestBook[] }).books.map((b) => ({
+  name: b.title,
+  what: `${b.author}, translated by ${b.translator} (${b.firstPublished}). The full text of the book, to read offline`,
+  licence: 'Public domain',
+  url: b.source,
+}));
+
 function Group({ title, items }: { title: string; items: Item[] }) {
   return (
     <View style={{ gap: 10 }}>
@@ -61,6 +71,7 @@ export default function Licences() {
         </View>
         <Group title="MAPS AND DATA" items={DATA} />
         <Group title="FONTS AND SOFTWARE" items={SOFTWARE} />
+        {BOOKS.length > 0 && <Group title="BOOKS IN THE LIBRARY" items={BOOKS} />}
         <AppText variant="caption" muted>Map data and places © OpenStreetMap contributors · © OpenMapTiles. Packs are rebuilt every month from fresh OpenStreetMap data. Places from OpenStreetMap are shown as they are, with where they came from and how far they were checked.</AppText>
       </ScrollView>
     </View>

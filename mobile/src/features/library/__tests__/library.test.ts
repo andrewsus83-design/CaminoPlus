@@ -7,6 +7,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import './bible.test';
 import './books.test';
+import './bookText.test';
 import './reading.test'; // reading a book and drawing its cover: the neighbours of a chapter, the saved place, the text sizes, the A5 covers, the banner
 import {
   BOOKMARKS_MAX, bookmarkKeys, hasBookmark, packBookmarks, parseBookmarks, toggleBookmark, type Bookmark,

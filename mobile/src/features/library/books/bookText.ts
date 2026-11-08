@@ -1,23 +1,22 @@
-// TEMPORARY, replaced by the real bookText.ts of the texts branch. It has the same API (BOOK_TEXT_INDEX, hasBookText, loadBookText) over a
-// small fixture made only to try the reader (fixtures.ts): three books, a few chapters each. The real one reads assets/books/<id>.json,
-// only for the books whose text is confirmed everywhere, so the screens work with any of the twelve, or none.
-import { BOOK_CATALOG } from './catalog';
+// How the screens reach the text of a book: BOOK_TEXT_INDEX (which books have text, how long each is), hasBookText and loadBookText. The text
+// is in the app, in mobile/assets/books/<id>.json, made by tools/books/import_books.py from public domain editions (tools/books/README.md).
+// This file is only the glue to the bundled assets: the logic is in bookTextApi.ts (tested in plain node), the list of loaders in
+// books.generated.ts (written by the importer, with a literal path in every require() because Metro needs one). A book is read from its
+// file when it is first opened, not when the app starts.
 import type { BookText, BookTextIndexEntry } from './bookTextTypes';
-import { FIXTURE_IDS, fixtureText } from './fixtures';
-import { blockWords } from './reading';
+import { makeBookTextApi } from './bookTextApi';
+import { BOOK_TEXT_LOADERS } from './books.generated';
 
-/** The books that have a text, in the order of the catalog. */
-export const BOOK_TEXT_INDEX: readonly BookTextIndexEntry[] = BOOK_CATALOG.filter((b) => FIXTURE_IDS.includes(b.id)).map((b) => {
-  const text = fixtureText(b.id)!;
-  return { id: b.id, chapters: text.chapters.length, words: text.chapters.reduce((sum, c) => sum + blockWords(c.blocks), 0) };
-});
+const api = makeBookTextApi(require('../../../../assets/books/index.json') as BookTextIndexEntry[], BOOK_TEXT_LOADERS);
 
-/** The book has a text in the app. */
-export const hasBookText = (id: string): boolean => BOOK_TEXT_INDEX.some((e) => e.id === id);
+/** The books that have text, in the order of the catalogue (0 to 12). */
+export const BOOK_TEXT_INDEX: readonly BookTextIndexEntry[] = api.index;
 
-/** The text of a book, at once. Throws for a book that has none: ask hasBookText first. */
+export function hasBookText(id: string): boolean {
+  return api.hasBookText(id);
+}
+
+/** The text of a book, at once. Throws Error(`no text for ${id}`) when the book has none (check hasBookText first). */
 export function loadBookText(id: string): BookText {
-  const text = fixtureText(id);
-  if (!text) throw new Error(`The book "${id}" has no text`);
-  return text;
+  return api.loadBookText(id);
 }
