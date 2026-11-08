@@ -11,7 +11,7 @@ import { ReaderHeader, type ProgressApi } from './ReaderHeader';
 import type { BookText } from './bookTextTypes';
 import { bookById } from './catalog';
 import { NO_CHAPTER_TEXT, bookPath, readerPath } from './copy';
-import { blockWords, chapterIndex, chapterNav, groupThousands, isRead, layoutBlocks, offsetFor, readingTime, resumeAt, scrollProgress, startAt } from './reading';
+import { blockWords, chapterIndex, chapterNav, groupThousands, isRead, layoutBlocks, offsetFor, partName, readingTime, resumeAt, scrollProgress, splitTitle, startAt } from './reading';
 import { readerType } from './readerType';
 import { safeText } from './safeText';
 import { useReaderSize, type ReaderSize } from './useReaderSize';
@@ -41,6 +41,7 @@ function ChapterView({ bookId, text, index, startY, size, writer }: ViewProps) {
   const type = useMemo(() => readerType(size.step), [size.step]);
   const items = useMemo(() => layoutBlocks(chapter.blocks), [chapter]);
   const words = useMemo(() => blockWords(chapter.blocks), [chapter]);
+  const head = useMemo(() => splitTitle(chapter.title), [chapter]);
   const scroller = useRef<ComponentRef<typeof ScrollView>>(null);
   const progress: ProgressApi = useRef(null);
   const box = useRef({ content: 0, viewport: 0, offset: 0 });
@@ -125,9 +126,13 @@ function ChapterView({ bookId, text, index, startY, size, writer }: ViewProps) {
         <View style={{ width: '100%', maxWidth: type.measure }}>
           <View style={{ gap: 6, marginBottom: Math.round(type.gap * 1.2) }}>
             {!!chapter.part && (
-              <AppText variant="mono" muted maxFontSizeMultiplier={type.meta.maxMultiplier} style={{ fontSize: type.meta.size, lineHeight: type.meta.lineHeight, textTransform: 'uppercase', letterSpacing: 1.5 }}>{chapter.part}</AppText>
+              <AppText variant="mono" muted maxFontSizeMultiplier={type.meta.maxMultiplier} style={{ fontSize: type.meta.size, lineHeight: type.meta.lineHeight, textTransform: 'uppercase', letterSpacing: 1.5 }}>{partName(chapter.part)}</AppText>
             )}
-            <AppText variant="h3" accessibilityRole="header" maxFontSizeMultiplier={type.title.maxMultiplier} style={{ fontSize: type.title.size, lineHeight: type.title.lineHeight }}>{chapter.title}</AppText>
+            {/* One heading for a screen reader, with the whole title, however it is split for the eye: "Chapter XXXVI" large, and what the chapter is about under it. */}
+            <View accessible accessibilityRole="header" accessibilityLabel={chapter.title} style={{ gap: 6 }}>
+              <AppText variant="h3" maxFontSizeMultiplier={type.title.maxMultiplier} style={{ fontSize: type.title.size, lineHeight: type.title.lineHeight }}>{head.label}</AppText>
+              {!!head.subtitle && <AppText maxFontSizeMultiplier={type.quote.maxMultiplier} muted style={{ fontSize: type.quote.size, lineHeight: type.quote.lineHeight }}>{head.subtitle}</AppText>}
+            </View>
             <AppText variant="mono" muted maxFontSizeMultiplier={type.meta.maxMultiplier} style={{ fontSize: type.meta.size, lineHeight: type.meta.lineHeight }}>{`${readingTime(words)} · ${groupThousands(words)} words`}</AppText>
           </View>
           <ReaderBlocks items={items} t={type} />

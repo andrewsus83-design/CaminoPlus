@@ -4,10 +4,10 @@ import { Icon } from '@/components/Icon';
 import { Pill } from '@/components/Pill';
 import { radius, role } from '@/theme';
 import { END_OF_BOOK } from './copy';
-import { nextLabel, previousLabel, type ChapterNav } from './reading';
+import { nextLabel, partName, previousLabel, splitTitle, type ChapterNav } from './reading';
 
 // The end of a chapter: Next, then Previous, each a wide button named by where it goes (a screen reader hears "Next: Book Two, Chapter I. Of the inward life";
-// the eye sees NEXT in JetBrains Mono, the part when it changes, and the title of the chapter in Inter), one short handwritten note, and, at the end of the
+// the eye sees NEXT in JetBrains Mono, the part when it changes, the chapter in Inter and what it is about under it, in one line), one short handwritten note, and, at the end of the
 // last chapter, the end of the book with the credit of the edition and the way back to the contents. At the first and the last chapter the button that has no
 // chapter to go to is still there, dimmed and disabled, so that nothing moves.
 
@@ -23,7 +23,8 @@ function Step({ side, nav, onPress }: { side: 'previous' | 'next'; nav: ChapterN
   const next = side === 'next';
   const filled = next && !!to;
   const ink = filled ? role.onAction : role.text;
-  const part = to && to.part && to.part !== nav.part ? to.part : null;
+  const part = to && to.part && to.part !== nav.part ? partName(to.part) : null;
+  const { label, subtitle } = to ? splitTitle(to.title) : { label: next ? NO_NEXT : NO_PREVIOUS, subtitle: '' };
   return (
     <Pressable
       accessibilityRole="button"
@@ -41,7 +42,8 @@ function Step({ side, nav, onPress }: { side: 'previous' | 'next'; nav: ChapterN
         <AppText variant="mono" maxFontSizeMultiplier={1.3} color={filled ? role.onAction : role.muted} style={{ fontSize: 12, lineHeight: 16, letterSpacing: 1.2, textTransform: 'uppercase', textAlign: next ? 'right' : 'left' }}>
           {part ? `${next ? 'Next' : 'Previous'} · ${part}` : next ? 'Next' : 'Previous'}
         </AppText>
-        <AppText variant="label" maxFontSizeMultiplier={1.3} numberOfLines={2} color={ink} style={{ textAlign: next ? 'right' : 'left' }}>{to ? to.title : next ? NO_NEXT : NO_PREVIOUS}</AppText>
+        <AppText variant="label" maxFontSizeMultiplier={1.3} numberOfLines={2} color={ink} style={{ textAlign: next ? 'right' : 'left' }}>{label}</AppText>
+        {!!subtitle && <AppText variant="small" maxFontSizeMultiplier={1.3} numberOfLines={1} color={filled ? role.onAction : role.muted} style={{ fontSize: 15, lineHeight: 20, textAlign: next ? 'right' : 'left' }}>{subtitle}</AppText>}
       </View>
       {next && <Icon name="chevron" color={filled ? role.onAction : role.action} size={22} />}
     </Pressable>

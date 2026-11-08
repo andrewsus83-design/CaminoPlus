@@ -65,9 +65,9 @@ export function chapterNav(chapters: readonly ChapterRef[], index: number): Chap
 /** "Chapter 7 of 40": where this chapter is in the whole book, whatever the parts. */
 export const positionLine = (nav: Pick<ChapterNav, 'position' | 'total'>): string => `Chapter ${nav.position} of ${nav.total}`;
 
-/** The destination as it is named in a label: "Book Two, Chapter I. Of the inward life" when it is in another part than `from`, else just its title. */
+/** The destination as it is named in a label: "The Second Book, Chapter I. Of the inward life" when it is in another part than `from`, else just its title. */
 export function destination(n: Neighbour, from: string | null): string {
-  return n.part && n.part !== from ? `${n.part}, ${n.title}` : n.title;
+  return n.part && n.part !== from ? `${partName(n.part)}, ${n.title}` : n.title;
 }
 
 /** What a screen reader says for the Previous button: the destination, or why there is none. */
@@ -115,6 +115,32 @@ export function shortTitle(title: string, max = 28): string {
   const cut = t.slice(0, max - 1);
   const at = cut.lastIndexOf(' ');
   return `${(at > max / 2 ? cut.slice(0, at) : cut).replace(/[\s,;:.\-–—]+$/, '')}…`;
+}
+
+/**
+ * The part as a name, without its subtitle: the editions give "The First Book. Admonitions Profitable for the Spiritual Life", and a heading over a chapter, a button
+ * or a label has room for "The First Book". Cut at the first full stop that ends a sentence (not at "St." or "Mr."); a part with none is kept whole.
+ */
+export function partName(part: string): string {
+  const t = part.replace(/\s+/g, ' ').trim();
+  const re = /\.\s+(?=[A-Z0-9])/g;
+  for (let m = re.exec(t); m; m = re.exec(t)) {
+    const head = t.slice(0, m.index);
+    if (head.length >= 3 && !/\b(?:St|Sts|Mt|Mr|Mrs|Dr|Fr|Bl|Bp)$/.test(head)) return head;
+  }
+  return t;
+}
+
+/**
+ * A chapter title split in two, so that a long one does not become a wall of heading: "Chapter XXXVI. The Foundation of the Monastery of St. Joseph. Persecution
+ * and Temptations." is the label "Chapter XXXVI" (Fraunces) and the rest, which says what the chapter is about (Inter, under it). A title that does not start
+ * with a word and a number ("Prologue", "Book X") is only a label.
+ */
+export function splitTitle(title: string): { label: string; subtitle: string } {
+  const t = title.replace(/\s+/g, ' ').trim();
+  const m = NUMBERED.exec(t);
+  if (!m) return { label: t, subtitle: '' };
+  return { label: m[0].replace(/ /g, NO_BREAK_SPACE), subtitle: t.slice(m[0].length).replace(/^[\s.:;,\-–—]+/, '').trim() };
 }
 
 /* ============================================================ progress */
@@ -385,5 +411,6 @@ export function readButtonSpoken(chapters: readonly ChapterRef[], place: Pick<Bo
   const r = resumeAt(chapters, place);
   if (r.fresh) return 'Start reading';
   const c = chapters[r.index];
-  return `Continue: ${partOf(c) ? `${partOf(c)}, ` : ''}${c.title}`;
+  const part = partOf(c);
+  return `Continue: ${part ? `${partName(part)}, ` : ''}${c.title}`;
 }

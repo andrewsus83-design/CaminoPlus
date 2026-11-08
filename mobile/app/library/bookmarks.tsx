@@ -8,6 +8,7 @@ import { Card, IconButton } from '@/components/ui';
 import { FormMessage } from '@/components/auth/Field';
 import { bookHref, readerHref } from '@/features/library/bible/order';
 import { hasBook, loadBook } from '@/features/library/bible/text';
+import { hasBookText } from '@/features/library/books/bookText';
 import { BOOKMARK_NOT_SAVED, LIBRARY_BOOKMARKS_EMPTY } from '@/features/library/bookmarks';
 import { LibraryGroups } from '@/features/library/LibraryTabs';
 import { SavedPostCard } from '@/features/library/SavedPostCard';
@@ -39,8 +40,8 @@ export default function Bookmarks() {
       {marks.failed && <FormMessage>{BOOKMARK_NOT_SAVED}</FormMessage>}
       {hitCount(hits) > 0 ? (
         <>
-          {hits.Books.length > 0
-            ? <SampleNotice title="Preview">{BOOKMARKS_NOTICE}</SampleNotice>
+          {hits.Books.some((b) => !hasBookText(b.id))
+            ? <SampleNotice title="Coming soon">{BOOKMARKS_NOTICE}</SampleNotice>
             : <AppText variant="caption" muted>{BOOKMARKS_KEPT}</AppText>}
           <LibraryGroups hits={hits} marks={marks} onOpenBook={(code) => router.push(bookHref(code))} onOpenVerse={(ref) => router.push(readerHref(ref))} />
         </>

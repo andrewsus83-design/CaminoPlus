@@ -3,14 +3,18 @@
 //
 // Whether a book has a text is never kept here or in the catalog: a screen asks bookText.ts (`hasBookText`) and hands the answer in. A book
 // without a text says "Soon" and why (its edition is still being checked); nothing here says "verified" or "official".
+import { BOOKS_NOTICE } from '../sample';
 import type { BookPlace } from './reading';
 
 export const BOOKS_BANNER_TITLE = 'Books for the road';
 export const START_CTA = 'Start reading';
 export const CONTINUE_CTA = 'Continue reading';
-/** The one handwritten note of the banner (Caveat), only when there is a button beside it. */
-export const START_NOTE = 'Take your time';
-export const CONTINUE_NOTE = 'Welcome back';
+/**
+ * The one handwritten note of the banner (Caveat), only when there is a button beside it. Seven characters at most: the pill takes most of the card on a 320
+ * wide phone ("Continue reading" is 172 wide there), and the room left for a note in 24 point handwriting is about 72.
+ */
+export const START_NOTE = 'No rush';
+export const CONTINUE_NOTE = 'Onward!';
 export const NONE_LINE = 'The texts are being checked.';
 
 /** A book that has no text in the app yet: on its page, and why. */
@@ -56,7 +60,7 @@ export type BooksNoticeView = { title: string; text: string };
 /** The notice under the banner: none once every book has its text, what is still missing otherwise. `readable` of `total` have a text. */
 export function booksNotice(readable: number, total: number): BooksNoticeView | null {
   if (readable >= total) return null;
-  if (readable <= 0) return { title: 'Preview', text: 'Books are not in the app yet. We are checking the editions before we add them.' };
+  if (readable <= 0) return { title: 'Preview', text: BOOKS_NOTICE };
   const are = readable === 1 ? 'is' : 'are';
   return {
     title: 'More books are coming',

@@ -11,7 +11,9 @@ import { ContinueCard } from '@/features/library/bible/ContinueCard';
 import type { Testament } from '@/features/library/bible/books';
 import { bookHref, readerHref } from '@/features/library/bible/order';
 import { useLastRead } from '@/features/library/bible/useLastRead';
-import { BooksBanner, DailyBanner } from '@/features/library/LibraryBanner';
+import { BooksBanner } from '@/features/library/books/BooksBanner';
+import { useBooksReading } from '@/features/library/books/useBooksReading';
+import { DailyBanner } from '@/features/library/LibraryBanner';
 import { LibraryHeader } from '@/features/library/LibraryHeader';
 import { BibleTab, BooksTab } from '@/features/library/LibraryTabs';
 import { NotesTab } from '@/features/library/notes/NotesTab';
@@ -50,6 +52,8 @@ export default function Library() {
   const [query, setQuery] = useState('');
   const marks = useLibraryBookmarks();
   const lastRead = useLastRead();
+  // Where the person has got to in the books: read here, with the screen, so that the banner of the Books tab says "Continue" from its first frame.
+  const booksReading = useBooksReading();
   const searching = isSearching(query);
   // The top of the screen, the same in both hosts: the heading for a screen reader, the search row, a message when a bookmark could not be kept, the tabs.
   const top = (
@@ -95,7 +99,7 @@ export default function Library() {
           {tab === 'Bible' && lastRead.place && <ContinueCard place={lastRead.place} onOpen={() => router.push(readerHref({ code: lastRead.place!.code, chapter: lastRead.place!.chapter }))} />}
           {tab === 'Bible' && <DailyBanner onOpen={() => router.push('/library/daily')} />}
           {tab === 'Bible' && <BibleTab testament={testament} onTestament={setTestament} onOpenBook={(code) => router.push(bookHref(code))} />}
-          {tab === 'Books' && <BooksBanner />}
+          {tab === 'Books' && <BooksBanner reading={booksReading} />}
           {tab === 'Books' && <BooksTab marks={marks} />}
         </>
       )}

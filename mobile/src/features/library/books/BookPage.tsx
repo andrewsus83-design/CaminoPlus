@@ -16,7 +16,7 @@ import { ReadButton } from './BookUi';
 import { BOOK_TEXT_INDEX } from './bookText';
 import { bookById, type CatalogBook } from './catalog';
 import { NOT_YET_TEXT, NOT_YET_TITLE, UNKNOWN_TEXT, UNKNOWN_TITLE, readerPath } from './copy';
-import { bookFacts, positionLine, chapterNav, readButtonLabel, readButtonSpoken, resumeAt, tocGroups, type TocEntry } from './reading';
+import { bookFacts, chapterNav, partName, positionLine, readButtonLabel, readButtonSpoken, resumeAt, splitTitle, tocGroups, type TocEntry } from './reading';
 import { safeText } from './safeText';
 import { useBooksReading } from './useBooksReading';
 
@@ -31,6 +31,9 @@ import { useBooksReading } from './useBooksReading';
 /** The one short handwritten note of the page (Caveat), for a book you can read. */
 export const PAGE_NOTE = 'A little each day';
 
+/** How wide the cover is on the page: about 60 % of the screen's width, so larger than the covers of the grid (173 on a 390 phone) and never more than 240. */
+export const coverWidthOf = (screen: number): number => Math.min(Math.max(Math.round((screen - 32) * 0.6), 150), 240);
+
 /** The mark under the title, in JetBrains Mono: "FREE" for a book with a text, "SOON" for one without. */
 function Mark({ free }: { free: boolean }) {
   return (
@@ -40,9 +43,13 @@ function Mark({ free }: { free: boolean }) {
   );
 }
 
-/** One chapter in the table of contents: its number in the book (mono), its title, a tick when it is read, and "Last read" where you stopped. One button. */
+/**
+ * One chapter in the table of contents: its number in the book (mono), its title split in two ("Chapter XXXVI" in Inter, and under it what the chapter is about,
+ * muted, in at most three lines), a tick when it is read, and "Last read" where you stopped. One button; a screen reader hears the whole title.
+ */
 const TocRow = memo(function TocRow({ entry, read, here, first, onOpen }: { entry: TocEntry; read: boolean; here: boolean; first: boolean; onOpen: (chapterId: string) => void }) {
   const spoken = `${entry.title}${read ? ', read' : ''}${here ? ', where you stopped' : ''}`;
+  const { label, subtitle } = splitTitle(entry.title);
   return (
     <Pressable
       accessibilityRole="button"
@@ -51,8 +58,9 @@ const TocRow = memo(function TocRow({ entry, read, here, first, onOpen }: { entr
       style={({ pressed }) => ({ minHeight: 56, flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10, paddingHorizontal: 12, borderTopWidth: first ? 0 : 1, borderTopColor: role.border, backgroundColor: pressed ? role.sunken : 'transparent' })}
     >
       <AppText variant="mono" muted style={{ width: 36, textAlign: 'right', fontSize: 14, lineHeight: 20 }}>{entry.index + 1}</AppText>
-      <View style={{ flex: 1, minWidth: 0, gap: 4 }}>
-        <AppText variant="small" style={{ fontSize: 17, lineHeight: 23 }}>{entry.title}</AppText>
+      <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
+        <AppText variant="label">{label}</AppText>
+        {!!subtitle && <AppText variant="small" muted numberOfLines={3} style={{ fontSize: 15, lineHeight: 21 }}>{subtitle}</AppText>}
         {here && (
           <View style={{ alignSelf: 'flex-start', paddingHorizontal: 8, height: 20, borderRadius: radius.pill, backgroundColor: role.sunken, justifyContent: 'center' }}>
             <AppText variant="mono" muted style={{ fontSize: 11, lineHeight: 14, letterSpacing: 1 }}>LAST READ</AppText>
@@ -104,7 +112,7 @@ function Page({ book, notice }: { book: CatalogBook; notice?: string }) {
   const goBack = () => (router.canGoBack() ? router.back() : router.replace('/library'));
   const open = useCallback((chapterId: string) => router.push(readerPath(book.id, chapterId)), [router, book.id]);
   const toggle = useCallback(() => marks.toggle(key), [marks, key]);
-  const coverWidth = Math.min(Math.max(Math.round((width - 32) / 2), 140), 220);
+  const coverWidth = coverWidthOf(width);
 
   return (
     <Screen tabBar={false}>
@@ -135,7 +143,7 @@ function Page({ book, notice }: { book: CatalogBook; notice?: string }) {
               onPress={() => open(target.id)}
             />
             {!resume.fresh && (
-              <AppText variant="mono" muted style={{ fontSize: 13, lineHeight: 19, textAlign: 'center' }}>{[nav.part, positionLine(nav)].filter(Boolean).join(' · ')}</AppText>
+              <AppText variant="mono" muted style={{ fontSize: 13, lineHeight: 19, textAlign: 'center' }}>{[nav.part ? partName(nav.part) : null, positionLine(nav)].filter(Boolean).join(' · ')}</AppText>
             )}
             <AppText variant="accent" color={role.accentText} style={{ textAlign: 'center' }}>{PAGE_NOTE}</AppText>
           </View>
@@ -146,7 +154,7 @@ function Page({ book, notice }: { book: CatalogBook; notice?: string }) {
             </View>
             {groups.map((g, gi) => (
               <View key={`${gi}-${g.part ?? ''}`} style={{ gap: 8 }}>
-                {!!g.part && <AppText variant="mono" muted accessibilityRole="header" style={{ fontSize: 12, lineHeight: 16, letterSpacing: 1.5, textTransform: 'uppercase', marginTop: gi === 0 ? 0 : 8 }}>{g.part}</AppText>}
+                {!!g.part && <AppText variant="h4" accessibilityRole="header" style={{ fontSize: 19, lineHeight: 25, marginTop: gi === 0 ? 0 : 8 }}>{g.part}</AppText>}
                 <Card style={{ padding: 0, overflow: 'hidden' }}>
                   {g.entries.map((e, i) => (
                     <TocRow key={e.id} entry={e} first={i === 0} read={readSet.has(e.id)} here={!!place && place.c === e.id} onOpen={open} />

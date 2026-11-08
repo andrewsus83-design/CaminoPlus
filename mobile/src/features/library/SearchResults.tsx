@@ -9,6 +9,7 @@ import { radius, role, shadowStyle } from '@/theme';
 import { refLabel } from './bible/order';
 import { parseRef, type Ref } from './bible/ref';
 import { useVerseSearch } from './bible/useVerseSearch';
+import { hasBookText } from './books/bookText';
 import { LibraryGroups } from './LibraryTabs';
 import { SEARCH_NOTICE } from './sample';
 import { resultsLine, searchLibrary } from './search';
@@ -35,7 +36,7 @@ export function SearchResults({ query, marks, onClear, onOpenBook, onOpenVerse }
   const looking = verses.state === 'waiting' || verses.state === 'searching';
   return (
     <>
-      {found.hits.Books.length > 0 && <SampleNotice title="Preview">{SEARCH_NOTICE}</SampleNotice>}
+      {found.hits.Books.some((b) => !hasBookText(b.id)) && <SampleNotice title="Coming soon">{SEARCH_NOTICE}</SampleNotice>}
       {goTo && (
         <Pressable
           accessibilityRole="button"

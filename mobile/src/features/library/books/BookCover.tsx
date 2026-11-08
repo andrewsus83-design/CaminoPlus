@@ -24,6 +24,9 @@ import { coverLabel, coverText, a5Height, withAlpha, type CoverMetrics } from '.
 const INK = fixed.blue;
 const PAPER = fixed.parchment;
 
+/** How dark the cover is, column after column, to the right of the groove: the shadow where the cover bends at the spine, fading out in five points. */
+const HINGE = [0.1, 0.07, 0.05, 0.035, 0.02] as const;
+
 /** The glyph in its ring, at the top of the cover. */
 function Medallion({ icon, m }: { icon: CatalogBook['icon']; m: CoverMetrics }) {
   return (
@@ -91,8 +94,10 @@ export const BookCover = memo(function BookCover({ book, width, hasText, onOpen,
       <View style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: m.spine, backgroundColor: withAlpha(INK, 0.16) }} />
       <View style={{ position: 'absolute', left: m.spine, top: 0, bottom: 0, width: 1, backgroundColor: withAlpha(INK, 0.28) }} />
       <View style={{ position: 'absolute', left: m.spine + 1, top: 0, bottom: 0, width: 1, backgroundColor: withAlpha(fixed.white, 0.6) }} />
+      {HINGE.map((a, i) => <View key={a} style={{ position: 'absolute', left: m.spine + 2 + i, top: 0, bottom: 0, width: 1, backgroundColor: withAlpha(INK, a) }} />)}
       {/* the edges of the pages: a thin pale strip, with a line where the cover ends */}
-      <View style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: m.edge, backgroundColor: withAlpha(fixed.white, 0.85), borderLeftWidth: 1, borderLeftColor: withAlpha(INK, 0.2) }} />
+      <View style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: m.edge, backgroundColor: withAlpha(fixed.white, 0.9), borderLeftWidth: 1, borderLeftColor: withAlpha(INK, 0.22) }} />
+      <View style={{ position: 'absolute', right: 1, top: 0, bottom: 0, width: 1, backgroundColor: withAlpha(INK, 0.1) }} />
       {thumb ? (
         <View style={{ position: 'absolute', left: m.spine + 2, right: m.edge, top: 0, bottom: 0, alignItems: 'center', justifyContent: 'center' }}>
           <Icon name={book.icon} color={INK} size={Math.round(width * 0.42)} strokeWidth={1.5} />
