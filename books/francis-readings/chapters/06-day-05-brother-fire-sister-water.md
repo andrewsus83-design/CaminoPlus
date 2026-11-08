@@ -24,7 +24,7 @@ Now the doubt. Plenty of readers will not believe the birds fell silent, and Che
 
 There is a second difficulty, and it is a practical one on a coast. The elements in the song are not all gentle. Fire is "fierce". The sea is cold and large and does not care who you are. The route guide in the app names wind and sun as the main challenge on this road, and the sun, whom Francis called a brother, can burn. Courtesy to the elements does not mean carelessness with them. Carry water, cover your head and your neck, take shade when it is offered, and rest earlier than your pride suggests. It is a form of manners to arrive in one piece.
 
-What does it ask of an ordinary day? Something very small. To choose one thing, and meet it as itself. Not "the sea" but this wave, this one, coming in. Not "birds" but that gull standing on one leg on a post, who has been standing there since before you came up the path. It does not need a speech. It needs a minute of attention, and perhaps a quiet nod, as a stranger nods to another.
+On the road it asks for something very small: to choose one thing, and meet it as itself. Not "the sea" but this wave, this one, coming in. Not "birds" but that gull standing on one leg on a post, who has been standing there since before you came up the path. It does not need a speech. It needs a minute of attention, and perhaps a quiet nod, as a stranger nods to another.
 
 You will find that a thing looked at in this way changes. It stops being scenery and becomes an event. That is all Chesterton is claiming for Francis: not that he loved the world in general, but that he met it in particular, which is harder and, for a walker, a good deal more interesting.
 

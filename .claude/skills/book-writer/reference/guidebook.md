@@ -94,6 +94,11 @@ stages are today), and then the pointer would be false. Read the comment of the 
   what the Finisterre guide does about the Fisterrana and the Muxiana, which the Pilgrim's Office pages do not mention.
 - **No business names, not even a famous hotel.** A landmark that is also a hotel or a restaurant is named by its historic name only if the name is not the business's own;
   otherwise name the building by what it is ("the former pilgrims' hospital on the cathedral square") or leave it out. The checker warns on "Hostal ...", "Hotel ...", "Parador ...".
+- **Some official sites refuse every fetch** (UNESCO and Turismo de Cantabria returned 403 to both WebFetch and curl). Use a named secondary source and attribute it in the text, or leave the
+  fact out; never state it as if you had read the official page.
+- **One tilde per number.** "about 175, 170, 280 and 220 km" marks only the first: write "~175, ~170, ~280 and ~220 km". The ledger's last column is plain `yes`, `computed` or `removed`
+  (put "the repo" in the source column, not in the last).
+- **Keep the welcome to about 500 words**, and give a long route's days about 100 to 160 words each: with 35 or more days the stage chapters alone take about 4,000 words.
 - **Say when the sources disagree.** Official pages often disagree with each other by a kilometre or two. Say so once per stage in a plain sentence, as a good guide does.
 
 ## Fact ledger format (`facts.md`, not published)

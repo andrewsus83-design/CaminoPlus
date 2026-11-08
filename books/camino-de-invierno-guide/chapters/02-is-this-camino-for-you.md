@@ -22,7 +22,7 @@ The Confraternity's words are the best summary: fit and confident walkers with g
 
 ## Who might choose another
 
-If this is your first Camino and you want company, short days and a bed that is easy to find, the Camino Francés is the road the Castilla y León guide calls the best known and most used of the Jacobean routes. It has its own book in this series, *The French Way*.
+If this is your first Camino and you want company, consider the Camino Francés, which the Castilla y León guide calls the best known and most used of the Jacobean routes. It has its own book in this series, *The French Way*.
 
 If you have only a week, the Camino Inglés is a walk of six days, and has its own book too, *The English Way*. If mountains are what you want, *The Original Way* covers the Primitivo.
 

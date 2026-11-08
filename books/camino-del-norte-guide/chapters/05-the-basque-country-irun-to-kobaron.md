@@ -8,7 +8,7 @@ The distances come from the Basque Government's tourism portal, whose eight stag
 
 ### Day 1: Irun to San Sebastián (~24 km)
 
-The hardest day comes first. From the Santiago bridge a cycle path follows the estuary into Irun. Just past the town hall the Coast Way and the Interior Way part, and you keep right. The road passes through Hondarribia's old town and climbs to the sanctuary and fort of Guadalupe, with views over the bay of Txingudi. The official way over Jaizkibel begins with a steep ascent and follows the ridge past towers from the second Carlist war; some pilgrims take a track round the mountain's side instead. Then comes the descent to Lezo and Pasai Donibane, and the first boat of the road, across the bay to Pasai San Pedro. The Basque brochure gives ~24.6 km, the portal ~23.8 km from Hondarribia. *Check the boat before you set out.*
+The road starts with a climb. From the Santiago bridge a cycle path follows the estuary into Irun. Just past the town hall the Coast Way and the Interior Way part, and you keep right. The road passes through Hondarribia's old town and climbs to the sanctuary and fort of Guadalupe, with views over the bay of Txingudi. The official way over Jaizkibel begins with a steep ascent and follows the ridge past towers from the second Carlist war; some pilgrims take a track round the mountain's side instead. Then comes the descent to Lezo and Pasai Donibane, and the first boat of the road, across the bay to Pasai San Pedro. The Basque brochure gives ~24.6 km, the portal ~23.8 km from Hondarribia. *Check the boat before you set out.*
 
 ### Day 2: San Sebastián to Zarautz (~23 km)
 
@@ -20,11 +20,11 @@ Two ports and a climb. The road passes the hermitage and causeway of Santa Bárb
 
 ### Day 4: Deba to Markina-Xemein (~22 km)
 
-The road leaves the sea here. The Basque list for the stage names the old town of Deba and the Sasiola convent, the old town and port of Mutriku with the hamlet of Astigarribia, and the tower and ironworks of Antsotegi. The Basque Government says the landscape changes as you enter Bizkaia at Markina-Xemein: the broken Gipuzkoan coast gives way to the calm valleys of Lea-Artibai. Take food for the day, because the road leaves the towns behind.
+The road leaves the sea here. The Basque list for the stage names the old town of Deba and the Sasiola convent, the old town and port of Mutriku with the hamlet of Astigarribia, and the tower and ironworks of Antsotegi. The Basque Government says the landscape changes as you enter Bizkaia at Markina-Xemein: the broken Gipuzkoan coast gives way to the calm valleys of Lea-Artibai. Carry food and water for the day.
 
 ### Day 5: Markina-Xemein to Gernika (~25 km)
 
-A day of valleys and small villages. The Basque list names Markina's fronton, the "university of pelota", the collegiate church of Cenarruza at Bolibar, and the towers and country churches of Mendata and Arratzu. The national tourism site calls the road through inland Bizkaia one of the most rugged and hardest on the Camino, with mountain paths and quiet forests. Carry food and water. You arrive in Gernika-Lumo, home of the Casa de Juntas, the assembly house of Bizkaia. The portal gives ~24.8 km.
+A day of valleys and small villages. The Basque list names Markina's fronton, the "university of pelota", the collegiate church of Cenarruza at Bolibar, and the towers and country churches of Mendata and Arratzu. The national tourism site calls the road through inland Bizkaia one of the most rugged and hardest on the Camino, with mountain paths and quiet forests. You arrive in Gernika-Lumo, home of the Casa de Juntas, the assembly house of Bizkaia. The portal gives ~24.8 km.
 
 ### Day 6: Gernika to Bilbao (~30 km)
 

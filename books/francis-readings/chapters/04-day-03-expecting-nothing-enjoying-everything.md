@@ -26,7 +26,7 @@ Now the hard part. "Expecting nothing" is not easy on a bad day. The albergue is
 
 And there is a deeper catch for some readers. Chesterton believed that thanks needs somebody to thank. In a sentence we left out of the passage, just before the painter and his colours, Chesterton quotes Rossetti, who said that the worst moment for an atheist is when he is truly thankful and has nobody to thank. You may not share that. You may thank the day, or the sea, or no one at all. The practice does not seem to depend on the address.
 
-What does it ask of an ordinary day? Something very small: to receive. Not to be grateful on command, not to list ten blessings with your jaw set, but to notice the moment when something arrives that you did not pay for, and to let it arrive. The sun on the water. A path laid by somebody, and kept by somebody else. A stranger's shorthand directions. The first cold mouthful of water.
+In practice it asks something very small: to receive. Not to be grateful on command, not to list ten blessings with your jaw set, but to notice the moment when something arrives that you did not pay for, and to let it arrive. The sun on the water. A path laid by somebody, and kept by somebody else. A stranger's shorthand directions. The first cold mouthful of water.
 
 On the coast there will be plenty of that to receive, and plenty of its opposite: wind, glare, sand in the boots. Both are part of the walk. Francis, in Chesterton's picture, did not enjoy the one by denying the other.
 
@@ -49,7 +49,7 @@ Then look at the other side. Was there something you treated as owed today? A se
 
 Gratitude has an awkward feature: it refuses to come on demand. Tiredness is the great enemy of it. When your feet hurt and your head is thick, a list of blessings can feel like a lecture. If that is tonight, put the list down. Do not manufacture a feeling. Sleep is a form of thanks as well, and perhaps the most honest one, and the list will still be there in the morning, looking fresher.
 
-Chesterton says the saint "may be said to mix all his thoughts with thanks". You do not have to be a saint to try a spoonful. One thing, tonight, that was a gift. One word of thanks, aloud or under your breath, to whomever you like.
+Chesterton says the saint "may be said to mix all his thoughts with thanks". Saintliness is not required for a spoonful. One thing, tonight, that was a gift. One word of thanks, aloud or under your breath, to whomever you like.
 
 Questions for tonight:
 

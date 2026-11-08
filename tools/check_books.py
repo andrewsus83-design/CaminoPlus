@@ -301,7 +301,7 @@ def _guide(book: bk.Book, rep: Report) -> None:
                 if HOURS.search(line):
                     rep.warn(f"{ch.file}: an opening time ('{HOURS.search(line).group(0)[:40]}'): hours change, send the reader to the app")
                 for km in KM_NO_TILDE.finditer(line):
-                    if re.search(r"(?:about|around|roughly|nearly|almost)\s+[−\-]?$", line[:km.start()], re.I) or re.search(r"[−\-]$", line[:km.start()]) and re.search(r"(?:about|around|roughly|nearly|almost)\s+[−\-]$", line[:km.start()], re.I):
+                    if re.search(r"(?:about|around|roughly|approximately|approx\.?|nearly|almost)\s+[−\-]?$", line[:km.start()], re.I) or re.search(r"[−\-]$", line[:km.start()]) and re.search(r"(?:about|around|roughly|approximately|approx\.?|nearly|almost)\s+[−\-]$", line[:km.start()], re.I):
                         continue           # "about 25 km" and "about −6 °C" are marked as approximate in words
                     km_hits.append(f"{ch.file}: '{km.group(0)}'")
     if km_hits:

@@ -11,11 +11,10 @@ The etiquette of a dormitory is short and kind.
 - Arrive, claim a bed, shower, wash and hang out your clothes. The evening is for resting.
 - Keep your voice low after the lights go out, and pack your rucksack in the hall, not at dawn beside sleepers.
 - Use a head torch, not the main light. Silence your phone.
-- Keep your pack and shoes off the bed. Shoes belong where the house puts them.
-- Earplugs are a small comfort that goes a long way. Somebody will snore, and if it is you, apologise at breakfast.
-- Keep your valuables close.
+- Keep your pack and shoes off the bed. Keep your valuables close.
+- Earplugs go a long way. Somebody will snore, and if it is you, apologise at breakfast.
 
-**Bedbugs** are a risk in any shared bed anywhere. Check the seams of the mattress, keep your pack and clothes off the bed, and if you find bites, tell the host and wash and dry everything hot. It is not a reason to avoid hostels, only a reason to look before you lie down.
+**Bedbugs** are a risk in any shared bed anywhere. Check the seams of the mattress, and if you find bites, tell the host and wash and dry everything hot. It is not a reason to avoid hostels, only a reason to look before you lie down.
 
 If you are ill, tired or sleeping badly, take a private room. It is not cheating. A good night is part of the walk.
 

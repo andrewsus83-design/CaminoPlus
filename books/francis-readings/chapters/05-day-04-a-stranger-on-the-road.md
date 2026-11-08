@@ -24,7 +24,7 @@ Say it plainly. The passage asks you to picture a poor man on the road and to as
 
 The hard part comes from the word "poor". Chesterton is a romantic about Francis, and a pilgrim is in danger of being romantic about poverty, too. A pack, a hostel bunk and a simple supper are a mild, chosen version of it. The people you pass are not all in that position. In another chapter Chesterton himself notes the difference, saying that the churchmen of Francis's day pitied men entering poverty "of their own free will", while the poor of his own day were "daily driven by cold coercion and moved on by the police". It is a fair thing to remember when you walk through a village. Its people are not scenery or lessons. Whatever your pack weighs, you are not living their life.
 
-What does it ask of an ordinary day? To be a better stranger. Everyone on the road is somebody's stranger. You come up a path toward a farmer, a woman at a gate, a child on a wall, a tired walker sitting on a kerb, and for a moment you are the whole of what they know about pilgrims. Francis's way of doing it was attention, with nothing added. A look that says you are not a statistic. A greeting that treats the other person as somebody who matters.
+On an ordinary day it asks you to be a better stranger. Everyone on the road is somebody's stranger. You come up a path toward a farmer, a woman at a gate, a child on a wall, a tired walker sitting on a kerb, and for a moment you are the whole of what they know about pilgrims. Francis's way of doing it was attention, with nothing added. A look that says you are not a statistic. A greeting that treats the other person as somebody who matters.
 
 You will not manage it every time. A hot afternoon is not a good one for courtesy. But it is possible to try once, with one person, and to give them your whole attention for the length of a hello.
 
@@ -37,7 +37,7 @@ You will not manage it every time. A hot afternoon is not a good one for courtes
 
 The people of the day arrive in the mind in no particular order. A face at a counter, a voice calling from a doorway, a walker who passed you twice in the afternoon, a hand lifted from a car window. Some you spoke to, and some you only saw. Tonight you can lay them out for a minute and look at them properly, which you could not do while you were moving.
 
-Then turn it round. For each of those people, you were also somebody coming up the road. What did you look like? Perhaps tired, perhaps glad, perhaps bent over your phone, perhaps humming. You do not have to guess what they thought. It is enough to know that you were part of their day, as they were part of yours, and that a day is partly made of strangers.
+Then turn it round. For each of those people, you were also somebody coming up the road. What did you look like? Perhaps tired, perhaps glad, perhaps bent over your phone, perhaps humming. There is no need to guess what they thought. It is enough to know that you were part of their day, as they were part of yours, and that a day is partly made of strangers.
 
 If someone asked you for help today, money or a seat or a moment of your time, you will have had your own answer. This reading does not tell you what it should have been. It only invites you to look at it honestly: what you did, and what you felt as you did it. Chesterton's Francis ran after a beggar once, and swore never to refuse a poor man. Most of us cannot keep a vow like that, and it is better to know exactly what we can keep.
 

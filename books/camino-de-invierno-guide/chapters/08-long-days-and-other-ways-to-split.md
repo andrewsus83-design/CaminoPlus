@@ -4,7 +4,7 @@
 
 The Xunta's nine stages are official units, not a recommended pace, and three of them are longer than ~30 km: Quiroga to Monforte (~36 km), Monforte to Chantada (~31 km) and Bendoiro to Outeiro (~34 km). The Xunta divides each stage into sections, and the sections show where a long day can be cut.
 
-Read the splits below as measuring points, not as promises. A point on the Xunta's list may be a village, a bridge or a hamlet, and this book does not say whether you can sleep there. Ask in the app, ask locally, and confirm the night before.
+Read the splits below as measuring points, not as promises. A point on the Xunta's list may be a village, a bridge or a hamlet, and this book does not say whether you can sleep there. Ask in the app, ask locally, and confirm the night before. For each day, the Xunta's web pages, its leaflet and the Castilla y León guide give figures that differ by a kilometre or two, and on the longest day by ~3 km. Plan for the longer figure, and carry enough water and food for it.
 
 ## Where the long days can be cut
 
@@ -42,7 +42,3 @@ If you have fewer days, the Xunta's last five stages, from Monforte to Santiago,
 ## Variants on the road
 
 The Xunta names three choices, in walking order: the detour over the Serra da Lastra on Day 2, ~14 km longer than the main line; the option by San Clodio and Ribas de Sil on Day 5; and the shorter way round Monte Faro on Day 7, which in winter avoids the snow. The days are those of the ten-day plan.
-
-## Lengths differ between sources
-
-For each day, the Xunta's web pages, the Xunta's leaflet and the Castilla y León guide give different figures, by a kilometre or two, and on the longest day by ~3 km. Plan for the longer figure, and carry enough water and food for it.

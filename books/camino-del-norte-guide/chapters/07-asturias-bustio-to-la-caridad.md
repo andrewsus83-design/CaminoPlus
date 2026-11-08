@@ -48,4 +48,4 @@ The way goes by San Cristuébanu, Queirúas, Caneiru, Caroyas, Barcia and Almuñ
 
 ### Day 27: Outur to La Caridad, by Navia (~25 km)
 
-The road goes by Villapedre, Piñera, Villaoril and La Colorada to Navia, where the poet Ramón de Campoamor was born. Then come Jarrio and Cartavio, and La Caridad (A Caridá in Asturian), in the council of El Franco. The list gives ~25.1 km. At La Caridad the road divides, and the next chapter says how.
+The road goes by Villapedre, Piñera, Villaoril and La Colorada to Navia, where the poet Ramón de Campoamor was born. Then come Jarrio and Cartavio, and La Caridad (A Caridá in Asturian), in the council of El Franco. The list gives ~25.1 km. At La Caridad the road divides, and the chapter on other roads says how.

@@ -17,8 +17,8 @@ The Office's pages read for this book speak of routes recognised by its own syst
 Here is the arithmetic, with its sources.
 
 - **From Porto.** The Xunta gives its coastal route in Galicia, from A Guarda, as ~163 km. That is well over the seventy kilometres in Spain that the Office names for those who have walked a recognised route outside Spain.
-- **From Vigo.** Add the Xunta's stage figures from Vigo to Santiago and you get ~101 km on its coastal pages, and ~101.4 km if you use its Central figures for the shared days. The Confraternity of St James calls Vigo the hundred-kilometre mark. It is just above the hundred, and where in Vigo you begin counting, which line you walk and how the Office measures can all move it.
-- **From Baiona.** The Xunta's stage from Baiona to Vigo adds ~26.8 km, so ~128 km.
+- **From Vigo.** Add the Xunta's stage figures from Vigo to Santiago and you get ~101 km on its coastal pages, and ~101.4 km if you use its Central figures for the shared days. The Confraternity of St James calls Vigo the hundred-kilometre mark, and one published plan counts ~99 km from Vigo, just under it. The Xunta's figure is just above the hundred, and where in Vigo you begin counting, which line you walk and how the Office measures can all move it.
+- **From Baiona.** The Xunta's stage from Baiona to Vigo adds ~26.8 km, so ~128 km; the same published plan counts ~122 km.
 - **From Redondela.** ~85 km by the same figures: under the hundred.
 
 None of that is a decision. The Office decides, and rules change. If you plan to start in Vigo, or anywhere near the limit, ask the Pilgrim's Office before you go.

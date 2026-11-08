@@ -4,7 +4,7 @@
 
 Eight days of small bays, estuaries and old fishing towns, with two boats on offer and a few very long days. A Cantabrian walking guide to this stretch gives nine stages. This book merges the second and third, and it follows the rest. The national tourism site calls the Cantabrian road easy walking, with plenty of road and track.
 
-The lengths come from that guide, "Caminando por el Patrimonio" (2018), which the Camino Lebaniego website hosts. Its stages follow every loop of the official route, such as the detour to Santoña and the walk round the whole bay of Santander. They add up to ~225 km, and the guide says ~250 km. The national tourism site counts only ~170 km, in seven or eight stages. Where boats or shorter ways exist, the real day can be much shorter than the figure, so read the figures as the longest honest version. The route description comes from Cantabria's 2015 definition of the Way, published in the official state gazette.
+The lengths come from that guide, "Caminando por el Patrimonio" (2018), which the Camino Lebaniego website hosts. Its figures are long. The guide does not say what they count, but its nine stages add up to ~225 km, and it says ~250 km for the road through Cantabria, while the national tourism site counts only ~170 km, in seven or eight stages. The official route has detours, to Santoña and round the bay of Santander, that a boat or a shorter way can cut, so a real day may be shorter than its figure. The route description comes from Cantabria's 2015 definition of the Way, published in the official state gazette.
 
 ### Day 9: Kobaron to Castro Urdiales (~21 km)
 
@@ -16,11 +16,11 @@ A very long day. The guide breaks it in two, at El Pontarrón in Guriezo, ~12.9 
 
 ### Day 11: Laredo to Güemes (~35 km)
 
-Another long day, with the second boat. From Laredo's seafront a boat crosses the bay to Santoña. The alternative is on foot by Colindres, over the bridge at Treto that replaced the barge that once crossed the Asón, and by Escalante. Either way, Santoña is part of the route: it was where pilgrims landed after embarking at Laredo, which the documents of the seventeenth and eighteenth centuries show, according to the official text. Everyone then walks back to Argoños. Beyond, a coastal and an inland branch lead to Bareyo, with its twelfth-century Romanesque church of Santa María. From there an inland road runs to Güemes, and a coastal one by Ajo to Galizano.
+Another long day, with the second boat. From Laredo's seafront a boat crosses the bay to Santoña. The alternative is on foot by Colindres, over the bridge at Treto that replaced the barge that once crossed the Asón, and by Escalante. Either way, Santoña is part of the route: it was where pilgrims landed after embarking at Laredo, the official text says, as documents of the seventeenth and eighteenth centuries record. Everyone then walks back to Argoños. Beyond, a coastal and an inland branch lead to Bareyo, with its twelfth-century Romanesque church of Santa María. From there an inland road runs to Güemes, and a coastal one by Ajo to Galizano.
 
 ### Day 12: Güemes to Santander (~40 km)
 
-The guide's ~40 km is the walk round the whole bay. The official text offers a boat from Somo to Santander as an option, and it describes the way round on foot by Pedreña, the shore path, El Astillero and the streets of Maliaño or Guarnizo. With the boat the day is far shorter, but check its times. Santander's cathedral grew from a collegiate church that had a chapel of St James in the fourteenth century, and the official text records several pilgrims' hospitals.
+The guide gives ~40 km for this stage. The official text offers a boat from Somo to Santander as an option, and it describes the way round the bay on foot by Pedreña, the shore path, El Astillero and the streets of Maliaño or Guarnizo. The boat shortens the day, but check its times. Santander's cathedral grew from a collegiate church that had a chapel of St James in the fourteenth century, and the official text records several pilgrims' hospitals.
 
 ### Day 13: Santander to Santillana del Mar (~40 km)
 

@@ -18,7 +18,7 @@ From the mountain the road goes down, past the manor of Camba, which the leaflet
 
 ### Day 8: Rodeiro to Bendoiro, by Lalín (~28 km)
 
-The Xunta rates this stage Medium and estimates 6 hours 55 minutes. Its leaflet says ~27 km and the Castilla y León guide ~27 km, so the sources sit within about a kilometre of each other. You follow the road towards Lalín and cross the River Arnego several times. The first bridge is A Ponte do Hospital, a name that, the Xunta says, recalls a pilgrims' hospital.
+The Xunta rates this stage Medium and estimates 6 hours 55 minutes. Its leaflet and the Castilla y León guide both say ~27 km. You follow the road towards Lalín and cross the River Arnego several times. The first bridge is A Ponte do Hospital, a name that, the Xunta says, recalls a pilgrims' hospital.
 
 After Penerbosa you cross the medieval bridge of Pedroso. In the hamlet of A Ponte, also called Mesón, "the inn", the Xunta says that many ground floors still keep the ledges that served as counters for travellers. You climb the Coto da Mamuela, a name that refers to a field of burial mounds, and pass among chestnut trees to Palmaz.
 

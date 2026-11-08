@@ -6,10 +6,10 @@ The Coastal Way starts at the Sé of Porto, as the Central route does, and ends 
 
 ## How long is it?
 
-Nobody agrees, and the disagreement is worth a few lines, because it tells you how this road is built.
+Nobody agrees, and that tells you how this road is built.
 
 - The CaminoPlus catalog gives ~260 km from Porto to Santiago. Wikipedia gives the same ~260 km for the Portuguese Way from Porto.
-- The Xunta gives ~163 km for the Galician part, from A Guarda to Santiago.
+- The Xunta gives ~163 km for the Galician part, from A Guarda to Santiago. The leaflet's legs add up to ~166 km, and one published plan counts ~151 km.
 - For the Portuguese part, the government order of 2022 that certifies the route, and the national tourism authority, give ~138 km from Porto to Valença, in nine stages. The official portal of the ten municipalities says ~149.5 km. An official guide leaflet from the municipalities, whose file dates from 2017, marks its legs at ~29, ~27, ~26 and ~27 km from Porto to Caminha, which is ~109 km, and a further ~32 km on to Valença. The three official figures for Porto to Valença are therefore ~138, ~141 and ~149.5 km.
 - Published walking plans put the whole road at ~271 to ~280 km.
 
@@ -19,7 +19,7 @@ Part of the gap is variants: the road has a traditional line, a seaside line on 
 
 The Confraternity of St James says the Coastal route follows the Central one out of Porto as far as Padrão da Légua, then branches off towards Vila do Conde. Wikipedia puts the split "in the countryside of Vila do Conde". Either way, after the first hours you are on a road of your own.
 
-It touches the Central route again at Valença, which the tourism authority of Porto and the North calls the meeting point of the two. That is where the route that Portugal has certified ends. The route that most walkers take to Santiago crosses to A Guarda by boat instead, and joins the Central route at Redondela, ~85 km from Santiago by the Xunta's stage figures. A separate chapter sets out these joins.
+It touches the Central route again at Valença, which the tourism authority of Porto and the North calls the meeting point of the two. That is where the route that Portugal has certified ends. The route the Xunta describes crosses to A Guarda by boat instead, and joins the Central route at Redondela, ~85 km from Santiago by the Xunta's stage figures. A later chapter sets out these joins.
 
 ## What it feels like
 
@@ -37,4 +37,4 @@ The Municipality of Viana do Castelo calls the Coastal Way a derivation of the C
 
 Wikipedia, reporting the Pilgrim's Office statistics for 2025, says the Portuguese coastal route was the third most walked route to Santiago, with 17 per cent of pilgrims. Of those who received the Compostela on it, 51 per cent started in Porto, 21 per cent in Vigo and 12 per cent in Baiona. Of all the pilgrims who started in Porto, it adds, 45 per cent went by Vigo and 55 per cent by Tui. Most finished in May and September.
 
-Read together, those figures say that a third of the walkers join in Galicia, at Vigo or Baiona, so the Galician stretch may feel busier than the Portuguese one. That is a reading of the statistics, not a promise.
+Read together, those figures say that a third of the pilgrims who finish the Coastal route started in Galicia, at Vigo or Baiona, so the Galician stretch may feel busier than the Portuguese one. That is a reading of the statistics, not a promise.

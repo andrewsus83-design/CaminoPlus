@@ -1,6 +1,6 @@
 # When to go
 
-This chapter gives patterns, not forecasts. The road crosses three kinds of country: the dry, sheltered Bierzo at the start, the deep valleys of the Sil and the Miño in the middle, and the wetter hills near Santiago. The figures below come from Wikipedia's climate tables, which cite AEMET, the Spanish state weather agency, and they are averages. Any week can differ.
+This chapter gives patterns, not forecasts. The road crosses three kinds of country: the drier Bierzo, ringed by mountains, at the start, the deep valleys of the Sil and the Miño in the middle, and the wetter country near Santiago. The figures below come from Wikipedia's climate tables, which cite AEMET, the Spanish state weather agency, and they are averages. Any week can differ.
 
 ## The short answer
 
@@ -16,7 +16,7 @@ Summer is hot in the valleys. In Ponferrada the average July afternoon reaches ~
 
 ## Autumn: September to November
 
-Autumn is the other good season. September afternoons average ~26 °C in Ponferrada and ~23 °C in Santiago, and the nights are cool. Then the rain arrives: in Santiago October averages ~214 mm, the wettest month of the year, and November ~194 mm. In Ponferrada the wet months are October to December, at ~78 to ~84 mm. The Xunta warns that at the start of the stage from Monforte to Chantada, flooding is frequent in the rainy season, on completely flat stretches. Daylight shrinks: on 1 November the day lasts ~10 hours, by a standard solar calculation.
+Autumn falls inside both sources' season. September afternoons average ~26 °C in Ponferrada and ~23 °C in Santiago, and the nights are cool. Then the rain arrives: in Santiago October averages ~214 mm, the wettest month of the year, and November ~194 mm. In Ponferrada the wet months are October to December, at ~78 to ~84 mm. The Xunta warns that at the start of the stage from Monforte to Chantada, flooding is frequent in the rainy season, on completely flat stretches. Daylight shrinks: on 1 November the day lasts ~10 hours, by a standard solar calculation.
 
 ## Winter: December to March
 

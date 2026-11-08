@@ -4,8 +4,9 @@
 
 ## The passage
 
-@@PASSAGE:d04.txt|Canto IX@@
-
+> Thither did we approach; and the first stair Was marble white, so polished and so smooth, I mirrored myself therein as I appear. The second, tinct of deeper hue than perse, Was of a calcined and uneven stone, Cracked all asunder lengthwise and across. The third, that uppermost rests massively, Porphyry seemed to me, as flaming red As blood that from a vein is spirting forth. … Devoutly at the holy feet I cast me, For mercy’s sake besought that he would open, But first upon my breast three times I smote. Seven P’s upon my forehead he described With the sword’s point, and, “Take heed that thou wash These wounds, when thou shalt be within,” he said. … Then pushed the portals of the sacred door, Exclaiming: “Enter; but I give you warning That forth returns whoever looks behind.”
+>
+> — Dante Alighieri, *Purgatory* (*The Divine Comedy*), Canto IX (tr. Henry Wadsworth Longfellow)
 ## Reflection
 
 Some thresholds on a road are real: a gate in a wall, a bridge, the sign at the edge of a town. You step through, and the place behind you stops being yours. Others you only notice afterwards, when you realise that somewhere in the last hour you stopped being a person who has just arrived and became a person who is walking.
@@ -40,6 +41,10 @@ Then the second step, the crack. Something broke or bent today. A plan, a pace, 
 And the third, the red. What was warm today? Something is the reason you set out, and some days you can feel it and some days you cannot. If you could feel it today, give it its due. If not, it has not gone.
 
 One more thing from the passage, the oldest kindness in it. Dante was carried while he slept. Think of what carried you today without your doing: the sleep, a meal that arrived on time, a word from a stranger, a stretch of road that was gentler than the map suggested. You may be too tired to be grateful, and that is all right. It is enough to notice it, as you would a hand under your elbow on a stair. If you looked back with regret at something today, it is also enough to say so, without making a case.
+
+The keeper told Dante to wash his marks once he was inside, and washing is the sort of work that gets done in small amounts, again and again. Tonight's portion might be literal: warm water over tired feet, a face rinsed twice. It might also be one thing to let go of, a sharp word said to someone or a mean thought you had about a stranger. You do not have to rehearse it. Name it, and let the water have it.
+
+Tomorrow will open with a door of its own, the one of the room you are in now. You might decide tonight what you will leave in it. Whatever the evening has taught you, you do not have to carry all of it out.
 
 - When I looked at myself plainly today, what did I see?
 - What did I try to leave behind, and how often did I look back at it?

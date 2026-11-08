@@ -6,7 +6,7 @@ The Camino del Norte is the coast road to Santiago. It starts at Irun, on the Fr
 
 ## How to use it
 
-If you are a month or more away, read the next four chapters in order: the Way in brief, whether it suits you, when to go, and what to do before you go. Then read the days, one chapter for each region, and the chapter on other roads, which covers the choices this Camino offers: the boats, the two ways into Galicia, and the link to the Camino Primitivo.
+If you are a month or more away, read the next four chapters in order: the Way in brief, whether it suits you, when to go, and what to do before you go. Then read the days, one chapter for each region, and the chapter on other roads, which covers the choices this Camino offers: the two ways into Galicia, the links to the Camino Primitivo, and the roads that branch from this one.
 
 If you are on the road tonight, go straight to your day. Each one says what the walking is like, what is worth a pause, and where to take care.
 

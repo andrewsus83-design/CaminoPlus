@@ -167,7 +167,7 @@ class Guide(unittest.TestCase):
         self.assertEqual(self.check({"00-a.md": "# A\n\nThe pass is ~1,100 m high and ~35°C. ~25 km.\n"}).warnings, [w for w in self.check({"00-a.md": "# A\n\nThe pass is ~1,100 m high and ~35°C. ~25 km.\n"}).warnings if "figure" not in w])
 
     def test_about_marks_an_approximation_like_a_tilde(self):
-        rep = self.check({"00-a.md": "# A\n\nThe record low is about \u22126 °C, a pass of about 1,100 m, and roughly 25 km. But 30 km is bare.\n"})
+        rep = self.check({"00-a.md": "# A\n\nThe record low is about \u22126 °C, a pass of about 1,100 m, roughly 25 km, and approximately 40 km. But 30 km is bare.\n"})
         self.assertIn("1 figure(s) without '~'", "\n".join(rep.warnings))
 
     def test_a_chapter_that_is_too_long_is_noticed(self):

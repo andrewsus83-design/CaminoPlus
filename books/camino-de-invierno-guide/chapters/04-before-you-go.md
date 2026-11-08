@@ -4,7 +4,7 @@
 
 The credencial is the pilgrim's passport, a folded card of stamps. The Pilgrim's Office in Santiago says it identifies the pilgrim, and that it has two practical uses: it gives access to the hostels of the Way, and it serves as the proof you show when you ask for the Compostela. The Office's page says it is issued by a parish church, a confraternity, a diocese, an association of friends of the Way, or another Christian institution connected with the pilgrimage. The Office's pages list confraternities and associations, in Spain and worldwide, so start there.
 
-Stamps, the Office says, are normally collected where pilgrims sleep, but they can also be had at parish churches, monasteries, cathedrals, hotels, town halls and other places. On a road with few pilgrims, remember that list: a town hall will often do. The Office also mentions a digital credential app of its own. This book says nothing more about it, so read the Office's page before you rely on one.
+Stamps, the Office says, are normally collected where pilgrims sleep, but they can also be had at parish churches, monasteries, cathedrals, hotels, town halls and other places. On a road with few pilgrims, remember that list: it includes town halls. The Office's page also mentions a digital credential, an app. This book says nothing more about it, so read the Office's page before you rely on one.
 
 ## Getting to Ponferrada, and home from Santiago
 
@@ -36,6 +36,6 @@ The road is walked mostly in Spanish. The Confraternity recommends good basic Sp
 
 ## Maps, signal and booking ahead
 
-Save an offline map before you leave home. The Confraternity says the waymarking has improved but may still be sparse or contradictory, and in the valleys a phone signal can fail. The CaminoPlus app is built to work without signal. It is still in development, and what it holds for this road is described at the end of this book.
+Save an offline map before you leave home. The Confraternity says the waymarking has improved but may still be sparse or contradictory. A phone signal can fail in the valleys. The CaminoPlus app is built to work without signal. It is still in development, and what it holds for this road is described at the end of this book.
 
 Book your nights ahead. The app's own note for this route says to plan accommodation ahead, and the Castilla y León guide says services for pilgrims are not yet very abundant. The Xunta publishes a list of hostels as a PDF on its page for the road. This book does not repeat any list, because lists change. Ask in the app, and phone or message the place the day before.

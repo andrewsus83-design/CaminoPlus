@@ -16,7 +16,7 @@ The app's catalog gives ~820 km. Other sources do not agree with it, or with eac
 - The Spanish Wikipedia counts ~828 km from Hendaye to Arzúa, and ~867 km to Santiago.
 - The Cantabria guide and the Spanish government's 2015 announcement of the UNESCO listing give ~936 km for the listed route.
 
-They start in different places (Hendaye, Irun or Hondarribia) and count different variants. Plan on ~820 km and expect it to feel longer. The thirty-seven days of this book add up to ~867 km, because they follow the official stage lists with all their loops.
+The pages do not always say what they count. Starting points differ (Hendaye, Irun or Hondarribia), and so do the variants. Plan on ~820 km, and know that the stage lists add up to more: the thirty-seven days of this book come to ~867 km, because they follow the official lists with all their loops.
 
 Stage counts vary as much. The four regional lists have eight, nine, thirteen and eight stages: thirty-eight in all. The national tourism site recommends 8 or 9, 7 or 8, 9 to 11, and 8 to 10 for the regions, which is 32 to 38 days. This book follows thirty-seven walking days, named by their stage towns. With rest days, count five to six weeks.
 
@@ -30,7 +30,7 @@ In 2015 UNESCO added the northern routes, among them this one, to the Camino Fra
 
 ## Who walks it now
 
-Wikipedia, reporting the Pilgrim's Office statistics, gives the Norte a share of about 4 per cent of pilgrims in 2024. That is far fewer than the Francés. The Confraternity of St James calls it a good alternative for a longer and slightly quieter first Camino, and Wikipedia says it is less travelled because of its changes of height.
+Wikipedia, reporting the Pilgrim's Office statistics, gives the Norte a share of about 4 per cent of pilgrims in 2024, a small part of the whole. The Confraternity of St James calls it a good alternative for a longer and slightly quieter first Camino, and Wikipedia says it is less travelled because of its changes of height.
 
 ## What it feels like
 

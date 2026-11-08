@@ -49,4 +49,4 @@ Stop, and get help, for chest pain, a fever, severe dizziness, a fall with a blo
 
 ## Check before you go
 
-Before each day, check the forecast, any local notice about the path, and the state of the ground: snow on Monte Faro, floods near Monforte, fires in a dry summer. Closures and diversions change, so look at the Xunta's pages and the app, and ask where you slept.
+Before each day, check the forecast, any local notice about the path, and the state of the ground: snow on Monte Faro, floods near Monforte, fires in a dry summer. Ask where you slept.

@@ -18,7 +18,7 @@ This book rests on public sources, and its fact ledger lists every fact against 
 - **A standard solar calculation**, for the hours of daylight.
 - **The CaminoPlus route catalog and route guide**, for the route's start, end, ~260 km, difficulty rating and the app's own note.
 
-The Xunta's English pages are machine-translated from Spanish. Three sentences read differently from the Spanish original: the length of the detour over the Serra da Lastra, the length of the climb after Belesar, and a few place names. Where they differ, this book follows the Spanish.
+The Xunta's English pages are machine-translated from Spanish. Two sentences read differently from the Spanish original: the length of the detour over the Serra da Lastra and the length of the climb after Belesar. Where they differ, this book follows the Spanish.
 
 Published figures differ between these sources, so every distance in this book is marked ~. Where the sources say nothing, the book says nothing and tells you to check. If you know a better figure, or a fact that has changed, tell CaminoPlus.
 

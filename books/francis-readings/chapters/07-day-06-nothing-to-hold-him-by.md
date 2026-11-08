@@ -24,7 +24,7 @@ Second, there is a trap in admiring the whole thing from a walker's point of vie
 
 Third, Chesterton adds a detail that deserves a look. He says Francis "was only once seen angry; and that was when there was talk of an exception to the rule". That tells you how much the rule mattered to him.
 
-What does it ask of an ordinary day? Not a vow. It asks only that you find your own fringes: the small thing the world is using to hold you by the sleeve. A battery, a pace, a comparison with the walker ahead, a hunger that is bigger in the mind than in the stomach. Once you can name it, it often loosens. You do not have to throw it away. You only have to see that it is a fringe, and not the garment.
+A vow is not what it asks. It asks only that you find your own fringes: the small thing the world is using to hold you by the sleeve. A battery, a pace, a comparison with the walker ahead, a hunger that is bigger in the mind than in the stomach. Once you can name it, it often loosens. You do not have to throw it away. You only have to see that it is a fringe, and not the garment.
 
 ## For the walk
 

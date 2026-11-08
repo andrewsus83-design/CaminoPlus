@@ -37,7 +37,7 @@ What can it ask of an ordinary day, then? Something much smaller than a vision: 
 
 The best conversations of the day may have been the ones without an answer. A sentence at a table that nobody finished. A question a stranger asked about why you were walking, which you answered one way at lunch and another way at supper. Evening is a good hour to notice how many things go unexplained, and how well you got on without it.
 
-Chesterton's own honesty is worth borrowing. He says that what happened on the mountain "may never be known", and a few sentences later that, "to me personally", the one report that has come down "reads very like the report of something real". It is possible to hold both. A hunch and a doubt can share a bench. You do not have to resolve the day's strangest moment before you sleep. Perhaps it will keep.
+Chesterton's own honesty is worth borrowing. He says that what happened on the mountain "may never be known", and a few sentences later that, "to me personally", the one report that has come down "reads very like the report of something real". It is possible to hold both. A hunch and a doubt can share a bench. The day's strangest moment need not be resolved before you sleep. Perhaps it will keep.
 
 It is worth remembering that the same chapter has a joke in it. A saint who sets out for the other end of the sea by lying like lumber in somebody else's cargo is allowed to make you smile, and Chesterton clearly meant him to. Awe and humour keep company more often than people expect. If something today made you laugh at yourself, a missed turn, a pack dropped in front of an audience, you may have been closer to Francis than you thought.
 

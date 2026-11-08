@@ -22,14 +22,14 @@ Here is the part worth slowing down for. The last sentence is told from a distan
 
 One more thing, calmly. The dream is a dream of its century: swords "patterned after the cross in the Crusading fashion". Francis will turn away from that world, though not at once. In a later chapter Chesterton says his glory would lie not in overthrowing men in battle but in building. We keep the passage because of the road in it, not because of the swords.
 
-What does it ask of an ordinary day? Two small things. The first is to carry the plan lightly. A plan is a good servant on a long walk, and a poor master. If the wind is against you, if your feet say stop, if a village turns out to be shut for lunch and a stranger points you somewhere else, the day may be amending the plan on purpose. The second is to be kind to the self that trails back. A short stage, an early stop, a rest day taken without a lecture: none of these is a failure. Francis did not choose his own descent into the "valley of humiliation" either.
+So what might it ask of a day of walking? Two small things. The first is to carry the plan lightly. A plan is a good servant on a long walk, and a poor master. If the wind is against you, if your feet say stop, if a village turns out to be shut for lunch and a stranger points you somewhere else, the day may be amending the plan on purpose. The second is to be kind to the self that trails back. A short stage, an early stop, a rest day taken without a lecture: none of these is a failure. Francis did not choose his own descent into the "valley of humiliation" either.
 
 And watch for the boast. Everyone sets out with a small one. It may sound like "I will do thirty kilometres by lunch", or like a picture of yourself arriving at the cathedral. You need not give it up. You need only notice it, and notice what the day does with it.
 
 ## For the walk
 
 - What have I promised myself about this road, and which part of that promise is a boast? You need not answer aloud. Only be curious about the shape of it.
-- For the first hour, walk a little slower than feels necessary. Each time you notice yourself speeding up, ask what you are hurrying toward, and then ease off by a step or two. If the answer is "the end of the day", remember that it will arrive without any help from you.
+- For the first hour, walk a little slower than feels necessary. Each time you notice yourself speeding up, ask what you are hurrying toward, and then ease off by a step or two. If the answer is simply the end of the day, remember that it will arrive without any help from you.
 
 ## At the end of the day
 

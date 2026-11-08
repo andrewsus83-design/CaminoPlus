@@ -20,6 +20,8 @@ Love yourself, he says, "because he has a nature capable of good", but not "the 
 
 A little earlier in the same section, he puts the whole thing as a picture of a king who has lost his crown. Our weaknesses, he says, "are the infirmities of a great lord, of a discrowned king." And near it: "A tree does not know that it is miserable." A tired pilgrim in a bunk does not feel royal. The point is that you feel your smallness as a loss, and a loss implies something that was owed. The ache to be better is the evidence.
 
+He is just as fair to the people who write about all this. A little later he says: "I blame equally those who take on themselves to praise man, those who take on themselves to blame him, and those who merely amuse themselves; I can approve those only who seek with tears." The flatterer, the scold and the cynic all get the same mild reproach. The only person he approves is the one who is looking for something and is troubled that it is not found. That is a useful standard for how to talk to yourself on a bad hill.
+
 There are things to be careful with.
 
 "Let him hate himself" is a dangerous sentence to hand to anyone. Pascal aims it at the vileness, not at the person, but some readers will hear a permission they have been giving themselves for years. The preface to our edition describes his last years as austere, full of self-denial, and a trace of that severity is in his pages. We do not recommend it. If you are already hard on yourself, take the first half of the passage, "Let him love himself", and leave the rest for another day.
@@ -45,9 +47,13 @@ Then go back through the day and ask where you played the angel. Was there a thi
 
 Ask also where you played the brute. This is not rest. Rest is wise. The brute is the shrug: the small thing you could have done for someone else and did not, because you were tired, and you were tired, and that was true. It is not a crime. It is only a place to look.
 
+Try a different test, too. Imagine a friend telling you the story of today, with all of its shortcuts and all of its stubbornness. What would you say to them? It is usually shorter, and kinder, and just as truthful as what we say to ourselves. You are allowed to use that voice on yourself, and it does not let you off anything.
+
 Then, to balance it, there is the other half of the passage, which is easily forgotten. Pascal says: love yourself, because you have a nature capable of good. So name something good that you did today, and name it specifically. Not "I was all right." A particular act, however small. A sentence you did not say. A bag you carried. A pace you slowed for someone else.
 
 A word about tiredness. Self-judgement is at its harshest and least accurate at the end of a long day. If the verdict you are giving yourself is a severe one, hold it over until morning. Judgements delivered at nine at night by a person who has been on the road since dawn are best treated as weather reports.
+
+The angel forgets to eat. If you have not had enough to eat or drink since the afternoon, that comes before any reflection. The questions will keep.
 
 If anything on your body is worrying you tonight, a pain, a swelling, something that does not feel like ordinary tiredness, that is for a doctor and not for a prayer. In an emergency, 112.
 
@@ -57,4 +63,4 @@ If anything on your body is worrying you tonight, a pain, a swelling, something 
 
 ## A short prayer
 
-*Thank you for this body and its small mercies: feet that carried me, hands that held the cup, a bed. Teach me to be neither harsh nor careless with it, or with myself. Show me what is good in me, and what is not, without cruelty. Let me sleep like someone worth looking after.*
+*Thank you for this body and its small mercies: feet that carried me, hands that held the cup, a bed. Teach me to be neither harsh nor careless with it, or with myself. Show me what is good in me, and what is not, without cruelty. Let me sleep like someone worth looking after, and wake up willing to do it again.*

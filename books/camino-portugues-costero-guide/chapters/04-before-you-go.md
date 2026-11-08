@@ -4,7 +4,7 @@
 
 The *credencial* is your pilgrim's passport, and you need one before the first stamp. The Pilgrim's Office in Santiago says the official model is a cardboard card of sixteen concertina-folded pages, with boxes for the stamps. You can ask for it in person at the Office or at institutions the cathedral has authorised: parish churches, associations of friends of the Way, pilgrim hostels, confraternities. The Office lists where, and it is worth looking before you leave home.
 
-The Office gives the credencial two practical purposes: access to the hostels of the Way, and proof when you ask for the Compostela. It adds that the credencial "does not generate any rights". The stamps are normally collected where you sleep, and also in parish churches, monasteries, cathedrals, hotels, town halls and other places. The Office describes a digital credential too, as a phone app. Ask the Office what it accepts, and carry the paper card in any case.
+The Office gives the credencial two practical purposes: access to the hostels of the Way, and proof when you ask for the Compostela. It adds that the credencial "does not generate any rights". Stamps are normally collected where you sleep, and also in parish churches, monasteries, cathedrals, hotels, town halls and other places. The Office describes a digital credential too, as a phone app. Ask the Office what it accepts, and carry the paper card in any case.
 
 ## Getting there
 
@@ -23,21 +23,21 @@ Add a rest day or two, and a day each to travel there and back, and the Porto st
 
 ## Training
 
-Nobody needs to be an athlete. The best preparation is also the dullest: walk, in the shoes and with the pack you will carry, on a hard surface, for two or three days in a row, and build up to the length of your longest planned day, ~27 km on this road. A few weeks of regular walking will do more than any programme.
+Nobody needs to be an athlete. The best preparation is also the dullest: walk, in the shoes and with the pack you will carry, on a hard surface, two or three days in a row, building up to your longest planned day, ~29 km on this road. A few weeks of regular walking will do more than any programme.
 
 ## Shoes and feet
 
-The surfaces vary. The sources mention boardwalks, paved paths, dirt tracks and old stone paths. Look for shoes with a cushioned sole and a little room in the toe box, because feet swell as the day goes on. Break them in before you leave. If the weather is wet, boardwalks and paving can be slick, so a grippy sole is a sensible choice. Two pairs of socks, changed at lunch, are a cheap defence against blisters. Treat a hot spot when you feel it, not when it has become a blister. If something hurts in a way that grows and does not fade, rest it, and see a doctor.
+The surfaces vary: the sources mention boardwalks, paved paths, dirt tracks and old stone paths. Look for shoes with a cushioned sole, a grippy tread for wet boards and paving, and a little room in the toe box, because feet swell as the day goes on. Break them in before you leave. Two pairs of socks, changed at lunch, are a cheap defence against blisters. Treat a hot spot when you feel it, not when it has become a blister. If something hurts in a way that grows and does not fade, rest it, and see a doctor.
 
 ## Packing
 
-Pack light, and then lighter. The essentials are plain: a rain jacket, because this is a green coast; a windproof layer, because the shore is windy; a hat, sun protection and a water bottle, because the shore has little shade; a small first-aid kit for feet; a head torch and earplugs for shared rooms; and something dry to sleep in. A phone with an offline map is a good tool and a poor single plan, so know your next town before the battery is low. Leave whatever you are unsure of at home.
+Pack light, and then lighter. The essentials are plain: a rain jacket, because this is a green coast; a windproof layer, because the shore is windy; a hat, sun protection and a water bottle, because the shore has little shade; a small first-aid kit for feet; a head torch and earplugs for shared rooms; and something dry to sleep in. A phone with an offline map is a good tool and a poor single plan, so know your next town before the battery is low.
 
 ## Money, language and the clock
 
 Portugal and Spain both use the euro. Carry some coins and small notes for small purchases. Prices are not in this book; the people you meet will tell you what things cost.
 
-Portuguese is spoken in Portugal. In Galicia there are two official languages, Galician and Spanish, and you will meet Galician on signs and in place names such as Oia, Baiona and A Guarda. Pilgrims need little: *bom dia* ("good morning" in Portuguese), *obrigado* (a man says thank you) or *obrigada* (a woman does), and in Galicia *grazas* or *gracias*. Say them with a smile and you will be understood.
+Portuguese is spoken in Portugal. In Galicia there are two official languages, Galician and Spanish, and you will meet Galician on signs and in place names such as Oia, Baiona and A Guarda. Pilgrims need little: *bom dia* ("good morning" in Portuguese), *obrigado* (a man says thank you) or *obrigada* (a woman does), and in Galicia *grazas* or *gracias*.
 
 Remember the clock. Mainland Portugal keeps Western European Time and Galicia Central European Time, one hour ahead. Your phone will change at the border, and your plans for the boat should change with it.
 

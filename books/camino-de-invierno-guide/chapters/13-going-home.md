@@ -15,6 +15,6 @@ You do not have to keep all of it. A few small habits are enough.
 
 ## Walking again
 
-Many people want another road after their first. The Winter Way meets the Camino Francés at Ponferrada, and the French Way has its own book in this series. The Camino Inglés and the Camino Primitivo have books too, and so do the roads to Finisterre and Muxía. This road will be here, as quiet as you left it, when you want to walk it again.
+You may want another road after this one. The Winter Way leaves the Camino Francés at Ponferrada, and the French Way has its own book in this series. The Camino Inglés and the Camino Primitivo have books too, and so do the roads to Finisterre and Muxía. This road will be here, as quiet as you left it, when you want to walk it again.
 
 *Buen Camino.*

@@ -4,7 +4,7 @@
 
 At La Caridad the road divides. The days of this book take the way to Ribadeo, which the Xunta de Galicia lists first, at ~190 km from Ribadeo to Santiago.
 
-The other way is the one the Asturias list follows. It turns inland by El Franco, Porcía and Brul to Vegadeo (A Veiga), ~25.6 km, then goes on to Abres, ~7.3 km, where it crosses the Eo. The Xunta calls it the road "through Santiago de Abres", ~184 km from there to Santiago. From Abres it runs by Trabada to Mondoñedo, ~31.2 km (~11.6 km to Trabada, ~19.6 km on, a section it rates high), and there it rejoins the main road. Counted to Mondoñedo, that is about 64 km by Vegadeo, against about 59 km by Ribadeo, a figure that rests on the unofficial ~22 km of Day 28. The Spanish Wikipedia says the Principado treats this inland way as the official one, and that it fell into disuse after the bridge of Los Santos opened in 1987. Check the waymarks on the day.
+The other way is the one the Asturias list follows. It turns inland by El Franco, Porcía and Brul to Vegadeo (A Veiga), ~25.6 km, then goes on to Abres, ~7.3 km, where it crosses the Eo. The Xunta calls it the road "through Santiago de Abres", ~184 km from there to Santiago. From Abres it runs by Trabada to Mondoñedo, ~31.2 km (~11.6 km to Trabada, ~19.6 km on, a section it rates high), and there it rejoins the main road. Counted to Mondoñedo, that is about 64 km by Vegadeo, against about 59 km by Ribadeo, which includes the unofficial ~22 km of Day 28. The Spanish Wikipedia says the Principado treats this inland way as the official one, and that it fell into disuse after the bridge of Los Santos opened in 1987. Ask locally which way is waymarked.
 
 ## The Interior Way
 
@@ -32,7 +32,7 @@ The Xunta describes a shorter way from Baamonde, ~8 km shorter, straight to Sobr
 
 This book follows thirty-seven days, but the official lists differ, and many pilgrims split the road differently:
 
-- **In the Basque Country** the Basque tourism portal has eight stages, from Hondarribia and Donostia to Kobaron.
+- **In the Basque Country** the Basque tourism portal has eight stages, from Hondarribia to Kobaron.
 - **In Cantabria** the walking guide has nine stages, and the national tourism site recommends seven or eight.
 - **In Asturias** the official list has thirteen stages, which Asturias says can be divided as often as you like.
 - **In Galicia** the Xunta has eight stages from Ribadeo, and this book splits the long one at Miraz.

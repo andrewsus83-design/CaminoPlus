@@ -29,7 +29,7 @@ From Ponferrada you have ~260 km ahead of you, far more than the last hundred ki
 - From Monforte de Lemos, the same stage lengths add up to ~135 km, and the leaflet says ~134 km. The Confraternity of St James gives Monforte as its suggested start for the minimum distance, at ~120 km from Santiago by its own figure. The sources differ by ~15 km.
 - The Xunta says the Winter Way joins the Vía de la Plata, and its stage pages put the meeting at A Laxe, ~50 km from Santiago. The Office's rule speaks of the same route. This book does not say how the Office counts a walk that begins on one route and ends on another.
 
-This book does not say whether any particular start counts. Ask the Pilgrim's Office before you go, say where you plan to start, and keep your credencial stamped along the way. The Confraternity says the Office recognised the road in 2015, and Wikipedia says 2016. The Office's pages on the Compostela and the credencial do not name the routes it recognises.
+This book does not say whether any particular start counts. Ask the Pilgrim's Office before you go, say where you plan to start, and keep your credencial stamped along the way. The Office's pages on the Compostela and the credencial do not name the routes it recognises.
 
 ## At the Pilgrim's Office
 

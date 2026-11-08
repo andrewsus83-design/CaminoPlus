@@ -18,6 +18,8 @@ This book rests on public sources, and its fact ledger lists every fact against 
 - **The Confraternity of St James**: its page on the Camino del Norte.
 - **Spain's national tourism site** (spain.info): the page on the Northern Way.
 - **Wikipedia**, for climate tables, the 2024 share of the route, and history: the articles on the Camino de Santiago, Irun, San Sebastián, Santander, Santiago de Compostela, its cathedral, the Jacobean Holy Year, the UNESCO listing, and the Spanish article on the Camino de Santiago de la Costa.
+- **The Spanish government's news item of 5 July 2015** on the UNESCO listing, for the length it gives the coastal route.
+- **A few pilgrim-information websites**, only for the unofficial ~21 to ~22 km of Day 28, named in the fact ledger.
 - **A standard solar calculation**, for the hours of daylight.
 - **The CaminoPlus route catalog**, for the route's start, end, ~820 km and difficulty rating.
 
