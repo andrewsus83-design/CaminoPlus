@@ -98,7 +98,7 @@ Two things only the owner can do, in the GitHub settings of the repository (and,
 |---|---|---|---|
 | iOS app icon (`assets/icon.png`) | The blue chevron of the Expo template | The brand shell on Atlantic Blue, 1024 x 1024, no alpha channel, square corners | A template icon is a review risk. App Store Connect refuses an icon with transparency, and iOS rounds the corners itself. |
 | Android icon (`assets/android-icon-*.png`) | The template | An adaptive icon: the shell in front, a blue layer behind, and a one-colour shell for Android 13 themed icons. The art stays inside the safe circle (66 dp of 108). | The launcher cuts the icon to its own shape and keeps only the middle. |
-| Launch screen | White, no picture | The shell in its blue circle, 200 wide, on parchment (`#F6EFE2`, the colour of `role.bg`). On Android, when the phone is in dark mode, the page colour of dark mode (`#0F1A2B`). | The first thing a person sees. The iPhone has no dark launch screen: the app is pinned to light (`userInterfaceStyle`), so it would never show. |
+| Launch screen | White, no picture | The shell in its blue circle (the picture is 200 wide, the circle in it about 117) on parchment (`#F6EFE2`, the colour of `role.bg`). On Android, when the phone is in dark mode, the page colour of dark mode (`#0F1A2B`). | The first thing a person sees. The iPhone has no dark launch screen: the app is pinned to light (`userInterfaceStyle`), so it would never show. |
 | Play Store icon | None | `brand/store/play-store-icon-512.png`, not in the app | Play Console asks for a 512 x 512 PNG with alpha. |
 | Devices | iPhone and iPad | iPhone only (`supportsTablet: false`) | The layouts are phone layouts, stretched on an iPad. People with an iPad can still install the app and use it in an iPhone-size window. To offer a real iPad version later, set it back to `true` after the screens have been looked at on an iPad. |
 | iOS permission texts | Generic ("Allow CaminoPlus to access your location", camera, microphone, motion) | The location texts say what the app does and that it never tracks in the background. No microphone key, no motion key. The camera key says CaminoPlus does not use the camera. | Apple asks for accurate purpose strings. The texts are in `app.json` and pinned by `tools/tests/test_store_config.py`. |
@@ -116,11 +116,11 @@ Two things only the owner can do, in the GitHub settings of the repository (and,
 
 ### See it before a store sees it
 
-On a scratch copy, never in the repository: `ios/` and `android/` are generated and are not committed.
+On a scratch copy of what is committed, never in the repository: `ios/` and `android/` are generated and are not committed.
 
 ```bash
-cp -R mobile /tmp/store-check && cd /tmp/store-check
-rm -rf ios android node_modules && npm ci
+mkdir /tmp/store-check && git archive HEAD mobile | tar -x -C /tmp/store-check && cd /tmp/store-check/mobile
+npm ci
 npx expo prebuild --no-install --clean
 grep -A1 UsageDescription ios/CaminoPlus/Info.plist                    # no microphone, no motion; the location texts; the camera text
 grep TARGETED_DEVICE_FAMILY ios/CaminoPlus.xcodeproj/project.pbxproj   # "1" (iPhone only)
@@ -156,8 +156,9 @@ Nobody has run these on a real bundle yet. You need `bundletool` (the jar from G
 # 1. The bundle is well formed, and the manifest in it is the one you expect
 java -jar bundletool.jar validate --bundle=app.aab
 java -jar bundletool.jar dump manifest --bundle=app.aab | grep -E "uses-permission|uses-feature|allowBackup|targetSdkVersion|foregroundServiceType"
-#    Expected: location, internet and network state only. No CAMERA, RECORD_AUDIO, SYSTEM_ALERT_WINDOW, VIBRATE, READ/WRITE_EXTERNAL_STORAGE,
-#    FOREGROUND_SERVICE*. allowBackup false. targetSdkVersion 36. The GPS feature with required false. No foregroundServiceType.
+#    Expected: location, internet, and the state of the network and of Wi-Fi (and AndroidX's own DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION, which
+#    every app has). No CAMERA, RECORD_AUDIO, SYSTEM_ALERT_WINDOW, VIBRATE, READ/WRITE_EXTERNAL_STORAGE, FOREGROUND_SERVICE*. allowBackup false.
+#    targetSdkVersion 36. The GPS feature with required false. No foregroundServiceType.
 
 # 2. A universal APK made from the bundle, for the next two checks
 java -jar bundletool.jar build-apks --bundle=app.aab --mode=universal --output=app.apks
