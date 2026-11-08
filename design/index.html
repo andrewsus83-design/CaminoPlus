@@ -857,9 +857,18 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
 .jg .jt.txt p { margin: 0; font-family: var(--cp-font-title); font-weight: 600; font-size: 16px; line-height: 22px; text-align: center; }
 .jg .jt.txt.blue { background: var(--cp-color-blue); color: var(--cp-color-parchment); }
 .jg .jt.txt.gold { background: var(--cp-color-gold); color: var(--cp-color-blue); }
-.jg .jt.write { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 0 12px; background: var(--cp-surface); box-shadow: inset 0 0 0 1px var(--cp-border); font-weight: 600; font-size: 17px; line-height: 22px; text-align: center; cursor: pointer; }
+/* the card that writes a journey post (mobile/src/features/me/WriteCard.tsx): a faint gold wash, a large shell as art off the bottom right corner, the gold
+   circle with the pen, the invitation in Fraunces, a short gold rule, the action; the numbers are JOURNEY_WRITE_CARD of features/me/tabs.ts (wash 0.07, shell 0.22) */
+.jg .jt.write { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 0 12px; background: var(--cp-surface); box-shadow: inset 0 0 0 1px var(--cp-border); color: var(--cp-text); font-weight: 600; font-size: 17px; line-height: 22px; text-align: center; cursor: pointer; }
+.jg .jt.write::before { content: ""; position: absolute; inset: 0; background: var(--cp-highlight); opacity: .07; }
+.jg .jt.write > * { position: relative; }
+.jg .jt.write .art { position: absolute; width: 105%; aspect-ratio: 1; right: -36%; bottom: -21%; opacity: .22; color: var(--cp-highlight); }
+.jg .jt.write .art svg { width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: .6px; stroke-linecap: round; stroke-linejoin: round; }
 .jg .jt.write .ico { width: 64px; height: 64px; border-radius: 50%; background: var(--cp-highlight); color: var(--cp-on-highlight); display: grid; place-items: center; }
-.jg .jt.write .ico .cp-icon { width: 30px; height: 30px; stroke-width: 2.2px; }
+.jg .jt.write .ico .cp-icon { width: 32px; height: 32px; stroke-width: 2.2px; }
+.jg .jt.write .q { font-family: var(--cp-font-title); font-weight: 600; font-size: 24px; line-height: 30px; }
+.jg .jt.write .rule { width: 32px; height: 2px; border-radius: 1px; background: var(--cp-highlight); }
+.phone[style*="width:320px"] .jg .jt.write { gap: 8px; } .phone[style*="width:320px"] .jg .jt.write .ico { width: 56px; height: 56px; } .phone[style*="width:320px"] .jg .jt.write .ico .cp-icon { width: 28px; height: 28px; } /* the tile of a small phone, as the app draws it (compact) */
 /* ---- Pilgrim: the profile of another pilgrim (mobile/app/pilgrim/[id].tsx). Back, @username and the three dots; the card; Message, Add friend, Requested, or Accept and Decline; their journey in the
    grid of Me without the card that writes a post. A private profile that is not a friend's is a minimal card. Nothing private is on it: no Notes, Plan or Health, no tab strip. ---- */
 .pf-top { display: flex; align-items: center; gap: 12px; }
@@ -2228,7 +2237,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
             <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Castrojeriz</div>
           </div></div><div class="cp-subtabs" style="margin:22px -24px 20px;padding:0 12px"><span>Notes</span><span class="on">Journey</span><span>Plan</span><span>Health</span></div>
           <div class="jg">
-            <button class="jt write" aria-label="Write a journey post"><span class="ico"><svg class="cp-icon"><use href="#i-pen"/></svg></span>Write a journey post</button>
+            <button class="jt write" aria-label="Write a journey post"><span class="art" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 4C7 4 4 8 4 13c0 3 1.5 6 3 7h10c1.5-1 3-4 3-7 0-5-3-9-8-9Z"/><path d="M12 4v16M12 4 8 20M12 4l4 16"/></svg></span><span class="ico"><svg class="cp-icon"><use href="#i-pen"/></svg></span><span class="q">What did you see today?</span><span class="rule"></span>Write a journey post</button>
             <div class="jt"><div class="cp-img v4"></div><span class="cap">Burgos</span></div>
             <div class="jt txt blue"><p>Legs say no, heart says yes.</p><span class="cap">Hontanas</span></div>
             <div class="jt"><div class="cp-img v5"></div><span class="n">3</span><span class="cap">Logroño</span></div>
@@ -2282,7 +2291,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
             <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Castrojeriz</div>
           </div></div><div class="cp-subtabs" style="margin:22px -24px 20px;padding:0 12px"><span>Notes</span><span class="on">Journey</span><span>Plan</span><span>Health</span></div>
           <div class="jg">
-            <button class="jt write" aria-label="Write a journey post"><span class="ico"><svg class="cp-icon"><use href="#i-pen"/></svg></span>Write a journey post</button>
+            <button class="jt write" aria-label="Write a journey post"><span class="art" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 4C7 4 4 8 4 13c0 3 1.5 6 3 7h10c1.5-1 3-4 3-7 0-5-3-9-8-9Z"/><path d="M12 4v16M12 4 8 20M12 4l4 16"/></svg></span><span class="ico"><svg class="cp-icon"><use href="#i-pen"/></svg></span><span class="q">What did you see today?</span><span class="rule"></span>Write a journey post</button>
             <div class="jt"><div class="cp-img v4"></div><span class="cap">Burgos</span></div>
             <div class="jt txt blue"><p>Legs say no, heart says yes.</p><span class="cap">Hontanas</span></div>
             <div class="jt"><div class="cp-img v5"></div><span class="n">3</span><span class="cap">Logroño</span></div>
@@ -2385,7 +2394,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           </div></div><div class="cp-subtabs" style="margin:22px -24px 20px;padding:0 12px"><span>Notes</span><span class="on">Journey</span><span>Plan</span><span>Health</span></div>
           <div class="place-head"><button class="cp-icon-btn flat" aria-label="Back" title="Back to all places"><svg class="cp-icon"><use href="#i-back"/></svg></button><div class="t"><div class="h">Zubiri</div><div class="s">All places</div></div></div>
           <div class="jg">
-            <button class="jt write" aria-label="Write a journey post"><span class="ico"><svg class="cp-icon"><use href="#i-pen"/></svg></span>Write a journey post</button>
+            <button class="jt write" aria-label="Write a journey post"><span class="art" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 4C7 4 4 8 4 13c0 3 1.5 6 3 7h10c1.5-1 3-4 3-7 0-5-3-9-8-9Z"/><path d="M12 4v16M12 4 8 20M12 4l4 16"/></svg></span><span class="ico"><svg class="cp-icon"><use href="#i-pen"/></svg></span><span class="q">What did you see today?</span><span class="rule"></span>Write a journey post</button>
             <div class="jt"><div class="cp-img v2"></div><span class="cap">Zubiri</span></div>
             <div class="jt txt blue"><p>Over the bridge at Zubiri, the first evening.</p><span class="cap">Zubiri</span></div>
           </div>
