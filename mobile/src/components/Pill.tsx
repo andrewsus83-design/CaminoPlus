@@ -3,7 +3,7 @@ import { AppText } from './AppText';
 import { c, layout, radius, role } from '@/theme';
 
 // `compact` is the pill that sits in a row with a round 48 px button (the header of a screen: the Back button on one side, "All chapters" on the other): 48 high, like it,
-// where a pill is 56 (layout.touchMin) and a large one 68. `accessibilityLabel` is for a pill whose spoken name is longer than what it says ("All chapters of this book").
+// where a pill is 56 (layout.touchPrimary) and a large one 68. `accessibilityLabel` is for a pill whose spoken name is longer than what it says ("All chapters of this book").
 type Props = { label: string; onPress?: () => void; variant?: 'primary' | 'gold' | 'ghost'; selected?: boolean; disabled?: boolean; loading?: boolean; large?: boolean; compact?: boolean; accessibilityLabel?: string };
 
 export function Pill({ label, onPress, variant = 'primary', selected, disabled, loading, large, compact, accessibilityLabel }: Props) {
