@@ -263,7 +263,7 @@ check('what floats at the bottom: only the gold pen on Notes; the three choices 
   // the screen keeps the props that move its scroll for the reader, which scrolls to the verse of a link, and nothing else uses them
   assert.match(read(join('src', 'components', 'Screen.tsx')), /scrollRef\?: Ref<ComponentRef<typeof ScrollView>>/);
   assert.match(read(join('src', 'components', 'Screen.tsx')), /<ScrollView ref=\{scrollRef\} onScroll=\{onScroll\} scrollEventThrottle=\{onScroll \? 16 : undefined\}/);
-  assert.match(read(join('src', 'features', 'library', 'bible', 'Reader.tsx')), /<Screen tabBar=\{false\} scrollRef=\{scroller\}>/);
+  assert.match(read(join('src', 'features', 'library', 'bible', 'Reader.tsx')), /<Screen tabBar=\{false\} scrollRef=\{scroller\} onScroll=\{onScroll\}>/);
   const users = files.filter((f) => /\bscrollRef=\{/.test(read(f)) && f !== join('src', 'components', 'Screen.tsx'));
   assert.deepEqual(users, [join('src', 'features', 'library', 'bible', 'Reader.tsx')], 'only the reader moves the scroll of a screen');
 });
@@ -347,8 +347,10 @@ check('the design page shows the same Library: the compact banner, the three par
   assert.deepEqual(radios(deutero), ['Old Testament:false', 'Deuterocanon:true', 'New Testament:false']);
   assert.deepEqual(radios(cont), ['Old Testament:false', 'Deuterocanon:false', 'New Testament:true']);
   assert.equal(count(bible, /class="lib-tile"/g), 39, 'the 39 books of the Old Testament, as tiles');
-  assert.match(bible, /aria-label="Genesis, 50 chapters"><span class="nm" style="font-size:18px;line-height:22px">Genesis<\/span><span class="ct" style="font-size:12px;line-height:17px">50&nbsp;chapters<\/span>/);
-  assert.match(bible, /aria-label="Deuteronomy, 34 chapters"><span class="nm" style="font-size:14px/, 'a long name is drawn smaller to fit the tile');
+  assert.match(bible, /aria-label="Genesis, 50 chapters"><span class="nm" style="font-size:24px;line-height:29px;letter-spacing:-0\.48px">Genesis<\/span><span class="ct" style="font-size:12px;line-height:17px">50&nbsp;chapters<\/span>/, 'the name is the hero of the tile: 24 where it fits, set a little closer');
+  assert.match(bible, /aria-label="Deuteronomy, 34 chapters"><span class="nm" style="font-size:15px/, 'a long name is drawn smaller to fit the tile, and never under 15 on a phone of 390');
+  assert.match(design, /\.lib-tile \{ width: 111px; height: 111px; padding: 7px 4px;/, 'the padding of a tile is the app\'s: 3 across and 6 down, and the border of 1');
+  assert.doesNotMatch(bible, /font-size:(1[0-4](\.5)?|[0-9](\.5)?)px;line-height:\d+px;letter-spacing:-0\.\d+px">/, 'no name on a tile of the Bible is drawn under 15 on a phone of 390');
   assert.match(bible, /aria-label="1 Samuel, 31 chapters"><span class="nm" style="[^"]*">1<br>Samuel<\/span>/, 'a number stands on a line of its own');
   assert.match(bible, /aria-label="Song of Songs, 8 chapters"><span class="nm" style="[^"]*">Song of<br>Songs<\/span>/);
   assert.equal(count(bible, /class="hw"/g), 1, 'one handwritten note on the screen');
@@ -428,7 +430,14 @@ check('the design page shows the same Library: the compact banner, the three par
   assert.match(chosen, /<span class="rd-v sel"><span class="rd-n">³<\/span>/);
   assert.match(chosen, /<div class="rd-act" role="toolbar" aria-label="Actions for Psalm 121:3">\s*<div class="top"><span class="pl">Psalm 121:3<\/span><button class="x" aria-label="Close the verse actions">/);
   assert.match(chosen, /aria-label="Bookmark: Psalm 121:3">[^]*?<span>Bookmark<\/span><\/button><button aria-label="Copy: Psalm 121:3">[^]*?<span>Copy<\/span><\/button><button aria-label="Share: Psalm 121:3">[^]*?<span>Share<\/span>/);
-  assert.match(phoneOf('Reader · Verse bookmarked'), /aria-label="Remove bookmark: Psalm 121:3">[^]*?<span>Bookmarked<\/span>/);
+  assert.match(phoneOf('Reader · Verse bookmarked'), /<button class="on" aria-label="Remove bookmark: Psalm 121:3">[^]*?<span>Bookmark<\/span>/, 'the word stays, the glyph is filled and the button tinted');
+  // the bar is made to be hit: a glyph of 30, a word of 16 (Inter SemiBold), each action at least 88 by 68, the reference 17, 12 from the sides, 8 between the actions
+  assert.match(design, /\.rd-act \{ position: absolute; left: 12px; right: 12px; bottom: 26px;/);
+  assert.match(design, /\.rd-act \.pl \{ flex: 1; font-family: var\(--cp-font-mono\); font-size: 17px;/);
+  assert.match(design, /\.rd-act \.btns \{ display: flex; gap: 8px; margin-top: 4px; \}/);
+  assert.match(design, /\.rd-act \.btns button \{ flex: 1; min-width: 88px; min-height: 68px;[^}]*font: 600 16px\/20px var\(--cp-font-body\); \}/);
+  assert.match(design, /\.rd-act \.btns \.cp-icon \{ width: 30px; height: 30px; color: var\(--cp-action\); \}/);
+  assert.match(design, /\.rd-act \.btns button\.on \.cp-icon \{ fill: currentColor; \}/);
   const john = phoneOf('Reader · John 1');
   assert.match(john, /<p class="rd-kick">John<\/p><h1 class="rd-title">Chapter 1<\/h1>/);
   assert.match(john, /aria-label="Previous: Luke 24"[^]*aria-label="Next: John 2"/, 'across the books: the chapter before John 1 is Luke 24');
@@ -512,7 +521,6 @@ check('what is new in Library keeps its contrast in light and dark: text 4.5 : 1
     assert.ok(contrast(r('textMuted'), r('bg')) >= 4.5, `the count under "Books of the Bible" on the page in ${mode}`);
     assert.ok(contrast(r('border'), r('surface')) >= 1.1 && contrast(r('border'), r('bg')) >= 1.05, `the edge of a tile is there in ${mode}`);
     assert.ok(contrast(r('text'), c('goldSoft')) >= 4.5, `a verse that is chosen or a word that matched, on its gold ground, in ${mode}`);
-    assert.ok(contrast(r('textMuted'), c('goldSoft')) >= 4.5 || true, `(the raised number of a chosen verse is the text colour, not the muted one) in ${mode}`);
     assert.ok(contrast(r('textAccent'), r('surface')) >= 4.5, `the place of a verse in a row, and in the action bar, in ${mode}`);
     // the reader: the words, the raised numbers, the name of the book and the handwritten notes on the page
     assert.ok(contrast(r('text'), r('bg')) >= 4.5, `the words on the page in ${mode}`);

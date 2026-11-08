@@ -38,7 +38,7 @@ check('the feature is the files this test expects, so a new one is looked at (an
     `${DIR}/BookmarkToggle.tsx`, `${DIR}/LibraryBanner.tsx`, `${DIR}/LibraryHeader.tsx`, `${DIR}/LibraryTabs.tsx`, `${DIR}/SavedPostCard.tsx`, `${DIR}/SearchBar.tsx`,
     `${DIR}/SearchResults.tsx`, `${DIR}/bookmarks.ts`, `${DIR}/client.ts`, `${DIR}/sample.ts`, `${DIR}/savedPosts.ts`, `${DIR}/search.ts`, `${DIR}/useLibraryBookmarks.ts`,
     `${DIR}/useSavedPosts.ts`,
-    `${DIR}/bible/BookGrid.tsx`, `${DIR}/bible/ChapterGrid.tsx`, `${DIR}/bible/ChapterNav.tsx`, `${DIR}/bible/ContinueCard.tsx`, `${DIR}/bible/PlaceMissing.tsx`,
+    `${DIR}/bible/actionBar.ts`, `${DIR}/bible/BookGrid.tsx`, `${DIR}/bible/ChapterGrid.tsx`, `${DIR}/bible/ChapterNav.tsx`, `${DIR}/bible/ContinueCard.tsx`, `${DIR}/bible/PlaceMissing.tsx`,
     `${DIR}/bible/Reader.tsx`, `${DIR}/bible/ReaderText.tsx`, `${DIR}/bible/TestamentBar.tsx`, `${DIR}/bible/VerseActions.tsx`, `${DIR}/bible/VerseRows.tsx`,
     `${DIR}/bible/blocks.ts`, `${DIR}/bible/books.ts`, `${DIR}/bible/credit.ts`, `${DIR}/bible/gridMath.ts`, `${DIR}/bible/lastRead.ts`, `${DIR}/bible/order.ts`,
     `${DIR}/bible/ref.ts`, `${DIR}/bible/tileFit.ts`, `${DIR}/bible/today.ts`, `${DIR}/bible/useLastRead.ts`, `${DIR}/bible/useVerseSearch.ts`, `${DIR}/bible/verseActions.ts`,

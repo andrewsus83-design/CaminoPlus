@@ -13,20 +13,25 @@ export type BookGrid = {
   gap: number;
   /** The side of a square tile. */
   tile: number;
-  /** Between the edge of a tile (its border is 1) and its words. */
-  pad: number;
+  /** Between the edge of a tile (its border is 1) and its words: across, where the name needs every pixel it can get, and down, where the corners are round (radius 20). */
+  padX: number;
+  padY: number;
   /** How wide the words of a tile may be, and how high. */
   innerWidth: number;
   innerHeight: number;
 };
 
-/** The book tiles for a screen `width` wide: three in a row between the side margins, square, with 12 between them (8 under NARROW_UNDER, where every pixel is a letter). */
+/**
+ * The book tiles for a screen `width` wide: three in a row between the side margins, square, with 12 between them (8 under NARROW_UNDER, where every pixel is a
+ * letter). The name is the hero of a tile, so the padding across is as small as the round corners allow: 3 (2 under NARROW_UNDER), and 6 (5) down.
+ */
 export function bookGrid(width: number): BookGrid {
-  const gap = width < NARROW_UNDER ? 8 : 12;
-  const pad = width < NARROW_UNDER ? 4 : 6;
+  const narrow = width < NARROW_UNDER;
+  const gap = narrow ? 8 : 12;
+  const padX = narrow ? 2 : 3;
+  const padY = narrow ? 5 : 6;
   const tile = Math.floor((width - 2 * SIDE - 2 * gap) / 3);
-  const inner = tile - 2 * (pad + 1);
-  return { columns: 3, gap, tile, pad, innerWidth: inner, innerHeight: inner };
+  return { columns: 3, gap, tile, padX, padY, innerWidth: tile - 2 * (padX + 1), innerHeight: tile - 2 * (padY + 1) };
 }
 
 /** No chapter tile is smaller than this: it is a button, and a person with a thumb has to hit it (44 is the least a target may be; these are bigger). */

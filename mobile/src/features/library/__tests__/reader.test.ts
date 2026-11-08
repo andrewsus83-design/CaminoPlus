@@ -10,6 +10,10 @@ import { join } from 'node:path';
 import {
   buildBlocks, findVerse, labelOfNumber, locateVerse, blocksOfVerse, superscript, verseLabels, verseText, type Block, type PoemLine,
 } from '../bible/blocks';
+import {
+  ACTION_GAP, ACTION_ICON, ACTION_LABEL, ACTION_LABEL_LINE, ACTION_MIN_HEIGHT, ACTION_MIN_WIDTH, ANCHOR, BAR_BORDER, BAR_BOTTOM, BAR_HEADER, BAR_HEIGHT, BAR_PAD_Y, BAR_ROW_GAP, BAR_SIDE,
+  PLACE_LINE, PLACE_SIZE, ZONE_LINES, actionWidth, barCovers, roomUnder, scrollForBar,
+} from '../bible/actionBar';
 import { BIBLE_BOOKS, bookByCode } from '../bible/books';
 import { CHAPTERS_NOTE, NOT_AT_MASS, READER_NOTE, creditLines } from '../bible/credit';
 import { CHAPTER_GAP, CHAPTER_TILE_MIN, NARROW_UNDER, SIDE, bookGrid, chapterGrid } from '../bible/gridMath';
@@ -20,7 +24,7 @@ import {
 import { INTER_400, THIN_SPACE_EM, HANG_EM, MONO_ADVANCE as NUMBER_ADVANCE, WRAP_SAFETY, textWidth, wrapPoem, wrapWords } from '../bible/wrap';
 import { bookOfTyped, formatRef, labelHolds, parseRef, parseRefKey, refKey, refName, refOfVerse, verseRange, type Ref } from '../bible/ref';
 import {
-  COUNT_FLOOR, COUNT_MAX, FIT_SAFETY, FRAUNCES_600, MONO_ADVANCE, NAME_FLOOR, NAME_MAX, TEXT_SCALE_CAP, fitCount, fitName, lineWidth, nameLines,
+  COUNT_FLOOR, COUNT_MAX, FIT_SAFETY, FRAUNCES_600, MONO_ADVANCE, NAME_FLOOR, NAME_MAX, NAME_TRACKING, NAME_WANTED, TEXT_SCALE_CAP, fitCount, fitName, inkWidth, lineWidth, nameLines,
 } from '../bible/tileFit';
 import type { BookText, Verse } from '../bible/textTypes';
 import { COPIED, SHARE_TRANSLATION, chosenAnnouncement, verseShareText } from '../bible/verseActions';
@@ -510,6 +514,8 @@ check('every chapter of the whole Bible, as the reader draws it: each verse that
   let verses = 0;
   const joined: string[] = [];
   const empty: string[] = [];
+  let mostBlocks = 0; // the reader draws a chapter all at once, so the busiest chapter is the budget
+  let mostPieces = 0;
   for (const b of BIBLE_BOOKS) {
     const text = bookText(b.code);
     assert.equal(text.chapters.length, b.chapters, `${b.code}: the chapters of the file are the chapters of the list`);
@@ -517,6 +523,8 @@ check('every chapter of the whole Bible, as the reader draws it: each verse that
     for (const c of text.chapters) {
       const blocks = buildBlocks(c);
       chapters += 1;
+      mostBlocks = Math.max(mostBlocks, blocks.length);
+      mostPieces = Math.max(mostPieces, blocks.reduce((sum, bl) => sum + (bl.kind === 'prose' ? bl.spans.length : bl.kind === 'poem' ? bl.lines.length : 1), 0));
       const wanted = c.verses.filter((x) => /\S/.test(x.t));
       verses += wanted.length;
       const numbers: string[] = [];
@@ -554,6 +562,7 @@ check('every chapter of the whole Bible, as the reader draws it: each verse that
     }
   }
   assert.equal(chapters, 1328);
+  assert.ok(mostBlocks <= 120 && mostPieces <= 420, `the busiest chapter has ${mostBlocks} blocks and ${mostPieces} pieces: the reader draws a chapter all at once (Psalm 119 has 44 and 373, Numbers 7 has 114 blocks; both scrolled with no long task with the processor 6 times slower)`);
   assert.ok(verses > 35000 && verses <= 35408, `${verses} verses have words`);
   assert.equal(empty.length, 29, `29 verses have no words: ${empty.join(', ')}`);
   assert.deepEqual([...joined].sort(), [...SHARED_LINES].sort(), 'the verses that go on in the line of poetry before them are the ones the text has: Psalm 55:3 and 66:14 among them');
@@ -735,6 +744,8 @@ const FRAUNCES_FILE = join(root, 'node_modules', '@expo-google-fonts', 'fraunces
 const MONO_FILE = join(root, 'node_modules', '@expo-google-fonts', 'jetbrains-mono', '400Regular', 'JetBrainsMono_400Regular.ttf');
 const REAL_FRAUNCES = existsSync(FRAUNCES_FILE) ? advances(FRAUNCES_FILE) : null; // a partial checkout without node_modules cannot check the table
 const realWidth = (line: string): number => [...line].reduce((sum, ch) => sum + (REAL_FRAUNCES!(ch) ?? 0.8), 0);
+/** The ink of a line of a name as the font file has it, with the letters set closer (NAME_TRACKING) between them. */
+const realInk = (line: string): number => realWidth(line) + ([...line].length - 1) * NAME_TRACKING;
 
 check('the table of letter widths is the font file: every letter of every book name, the digits and the space, read again from Fraunces SemiBold, to 0.0006 em; and JetBrains Mono is 0.6 wide', () => {
   const chars = new Set(BIBLE_BOOKS.flatMap((b) => [...b.name]));
@@ -764,8 +775,10 @@ check('names are broken into lines the same way in every book: a number stands o
 
 const WIDTHS = [320, 340, 360, 375, 390, 412, 430, 600, 768]; // from the narrowest phone the app is made for (320) to a tablet
 const SCALES = [0.85, 1, 1.15, 1.3, 1.6, 2];
+/** The names the owner named as the ones that have to be large (22 or more at 390): every one of them fits the tile at that size. */
+const SHORT_NAMES = ['Genesis', 'Exodus', 'Numbers', 'Joshua', 'Judges', 'Ruth', 'Job', 'Psalms', 'Isaiah', 'Amos', 'Jonah', 'Micah', 'Mark', 'Luke', 'John', 'Acts', 'Romans', 'James', 'Jude', 'Tobit', 'Judith'];
 
-check('all 73 names fit their tile without being cut at every phone width from 320 to 768 and at every text size, never drawn under 11, the largest 18: lines at most two, the real width of the font file', () => {
+check('all 73 names fit their tile without being cut at every phone width from 320 to 768 and at every text size, never drawn under 11, the largest 24: lines at most two, the real width of the font file, the tracking in it', () => {
   if (!REAL_FRAUNCES) return;
   for (const width of WIDTHS) {
     const grid = bookGrid(width);
@@ -776,50 +789,83 @@ check('all 73 names fit their tile without being cut at every phone width from 3
         const where = `${b.name} at ${width} wide, text ${scale}`;
         assert.equal(fit.fits, true, where);
         assert.ok(fit.lines.length <= 2, where);
-        const widest = Math.max(...fit.lines.map(realWidth));
+        const widest = Math.max(...fit.lines.map(realInk));
         assert.ok(widest * fit.size * m <= grid.innerWidth, `${where}: ${(widest * fit.size * m).toFixed(1)} px in ${grid.innerWidth}`);
+        assert.ok(Math.abs(fit.tracking - NAME_TRACKING * fit.size) < 1e-9, `${where}: the letters are set ${NAME_TRACKING} em closer`);
         const drawn = fit.size * m;
         assert.ok(drawn >= NAME_FLOOR - 1e-9, `${where}: drawn at ${drawn}`);
         assert.ok(drawn <= NAME_MAX + 1e-9, `${where}: drawn at ${drawn}`);
-        const count = fitCount(`${b.chapters}\u00a0${b.chapters === 1 ? 'chapter' : 'chapters'}`, grid.innerWidth, scale);
+        const count = fitCount(`${b.chapters} ${b.chapters === 1 ? 'chapter' : 'chapters'}`, grid.innerWidth, scale);
         assert.equal(count.fits, true, `${where}: the count`);
         assert.ok(count.size * m >= COUNT_FLOOR - 1e-9 && count.size * m <= COUNT_MAX + 1e-9, `${where}: the count is drawn at ${count.size * m}`);
         const high = fit.lines.length * fit.lineHeight * m + count.lineHeight * m;
         assert.ok(high <= grid.innerHeight, `${where}: ${high.toFixed(1)} high in ${grid.innerHeight}`);
+        // from a phone of 390 up no name is drawn under 15: the long words are the only ones that come down to it
+        if (width >= 390) assert.ok(drawn >= NAME_WANTED - 1e-9, `${where}: drawn at ${drawn}, under ${NAME_WANTED}`);
       }
     }
   }
 });
 
-check('the smallest name on each width is pinned: the longest ("Thessalonians") is 11 at 320, 13 at 390 and 15 at 430, and a short name ("Job") is the full 18', () => {
-  const size = (width: number, name: string) => fitName(name, bookGrid(width).innerWidth, 1).size;
-  assert.equal(size(320, '1 Thessalonians'), 11);
-  assert.equal(size(390, '1 Thessalonians'), 13.5);
-  assert.equal(size(430, '1 Thessalonians'), 15);
-  assert.equal(size(320, 'Job'), 18);
-  assert.equal(size(390, 'Job'), 18);
-  const smallest = (width: number) => Math.min(...BIBLE_BOOKS.map((b) => fitName(b.name, bookGrid(width).innerWidth, 1).size));
-  assert.equal(smallest(320), 11);
-  assert.ok(smallest(390) >= 13);
-  assert.ok(smallest(430) >= 14.5);
-  assert.equal(FIT_SAFETY, 1.03);
-  assert.equal(NAME_FLOOR, 11);
-  assert.equal(NAME_MAX, 18);
-  assert.ok(lineWidth('Thessalonians') > 6.9 && lineWidth('Thessalonians') < 7.0);
+check('the name is the hero of its tile: at 390 every name that fits on one or two lines at 22 is drawn at 22 or more (the 21 short ones the owner named are 23 and up), 24 where it fits, and the long words come down just enough, 15 at the least', () => {
+  const grid = bookGrid(390);
+  const size = (name: string) => fitName(name, grid.innerWidth, 1).size;
+  for (const name of SHORT_NAMES) assert.ok(size(name) >= 22, `${name} is ${size(name)} at 390`);
+  for (const name of ['Genesis', 'Exodus', 'Job', 'Ruth', 'Psalms', 'Mark', 'Luke', 'John', 'Acts', 'Judges']) assert.equal(size(name), NAME_MAX, `${name} is the full ${NAME_MAX}`);
+  let large = 0;
+  for (const b of BIBLE_BOOKS) {
+    const widest = Math.max(...nameLines(b.name).map(inkWidth));
+    const fitsAt22 = widest * 22 * FIT_SAFETY <= grid.innerWidth;
+    if (fitsAt22) { assert.ok(size(b.name) >= 22, `${b.name} fits at 22 and is ${size(b.name)}`); large += 1; }
+    assert.ok(size(b.name) >= NAME_WANTED, `${b.name} is ${size(b.name)}`);
+  }
+  assert.ok(large >= 50, `${large} of the names are 22 or more`);
+  // the long single words are drawn as large as the tile lets them, never broken inside the word
+  for (const name of ['Deuteronomy', 'Ecclesiastes', 'Lamentations', 'Philippians', 'Colossians', '1 Thessalonians', '2 Thessalonians', 'Habakkuk', 'Zephaniah']) {
+    assert.ok(size(name) >= NAME_WANTED && size(name) < 22, `${name} is ${size(name)}`);
+    assert.equal(nameLines(name).join(' '), name, 'no word is broken');
+    assert.ok(nameLines(name).every((line) => !line.includes('-')));
+  }
+  assert.equal(size('1 Thessalonians'), 15);
 });
 
-check('the book grid: three square tiles between the 16 side margins, 12 apart (8 under 352), the tile edge at least 44 from 280 up, padding 6 (4 narrow), and what fits in a row never exceeds the width', () => {
+check('the smallest name on each width is pinned: "Thessalonians" is 12 at 320 (a tile is only 90 wide there), 15 at 390 and 16.5 at 430, and a short name ("Job") is the full 24 from 390 up', () => {
+  const size = (width: number, name: string) => fitName(name, bookGrid(width).innerWidth, 1).size;
+  assert.equal(size(320, '1 Thessalonians'), 12);
+  assert.equal(size(390, '1 Thessalonians'), 15);
+  assert.equal(size(430, '1 Thessalonians'), 16.5);
+  assert.equal(size(320, 'Job'), 24);
+  assert.equal(size(390, 'Job'), 24);
+  const smallest = (width: number) => Math.min(...BIBLE_BOOKS.map((b) => fitName(b.name, bookGrid(width).innerWidth, 1).size));
+  assert.equal(smallest(320), 12);
+  assert.ok(smallest(390) >= 15);
+  assert.ok(smallest(430) >= 16.5);
+  assert.equal(FIT_SAFETY, 1.02);
+  assert.equal(NAME_FLOOR, 11);
+  assert.equal(NAME_MAX, 24);
+  assert.equal(NAME_WANTED, 15);
+  assert.equal(NAME_TRACKING, -0.02);
+  assert.ok(lineWidth('Thessalonians') > 6.9 && lineWidth('Thessalonians') < 7.0);
+  assert.ok(Math.abs(inkWidth('Thessalonians') - (lineWidth('Thessalonians') - 12 * 0.02)) < 1e-9, 'twelve gaps between thirteen letters');
+  // on 320 the names that cannot be 15 are these, and no others (a tile of 90 is what it is)
+  const under = BIBLE_BOOKS.filter((b) => fitName(b.name, bookGrid(320).innerWidth, 1).size < NAME_WANTED).map((b) => b.name);
+  assert.deepEqual(under, ['Deuteronomy', 'Ecclesiastes', 'Lamentations', '1 Corinthians', '2 Corinthians', '1 Thessalonians', '2 Thessalonians']);
+});
+
+check('the book grid: three square tiles between the 16 side margins, 12 apart (8 under 352), the tile edge at least 44 from 280 up, padding 3 across and 6 down (2 and 5 narrow), and what fits in a row never exceeds the width', () => {
   assert.equal(SIDE, 16);
   assert.equal(NARROW_UNDER, 352);
-  assert.deepEqual(bookGrid(320), { columns: 3, gap: 8, tile: 90, pad: 4, innerWidth: 80, innerHeight: 80 });
-  assert.deepEqual(bookGrid(390), { columns: 3, gap: 12, tile: 111, pad: 6, innerWidth: 97, innerHeight: 97 });
-  assert.deepEqual(bookGrid(430), { columns: 3, gap: 12, tile: 124, pad: 6, innerWidth: 110, innerHeight: 110 });
+  assert.deepEqual(bookGrid(320), { columns: 3, gap: 8, tile: 90, padX: 2, padY: 5, innerWidth: 84, innerHeight: 78 });
+  assert.deepEqual(bookGrid(390), { columns: 3, gap: 12, tile: 111, padX: 3, padY: 6, innerWidth: 103, innerHeight: 97 });
+  assert.deepEqual(bookGrid(430), { columns: 3, gap: 12, tile: 124, padX: 3, padY: 6, innerWidth: 116, innerHeight: 110 });
   for (let width = 280; width <= 1100; width += 3) {
     const g = bookGrid(width);
     assert.ok(g.tile >= 44, `${width}: tile ${g.tile}`);
     assert.ok(3 * g.tile + 2 * g.gap <= width - 2 * SIDE, `${width}: three tiles and two gaps fit between the margins`);
     assert.ok(width - 2 * SIDE - (3 * g.tile + 2 * g.gap) <= 2, `${width}: at most two pixels are left over`);
-    assert.equal(g.innerWidth, g.tile - 2 * (g.pad + 1));
+    assert.equal(g.innerWidth, g.tile - 2 * (g.padX + 1));
+    assert.equal(g.innerHeight, g.tile - 2 * (g.padY + 1));
+    assert.ok(g.padY >= g.padX, `${width}: the corners are round, so there is more room down than across`);
   }
   const tokens = JSON.parse(read('src/theme/tokens.json')) as { layout: { screenMargin: number } };
   assert.equal(SIDE, tokens.layout.screenMargin, 'the side margin of the grid is the one of every screen');
@@ -1002,6 +1048,60 @@ check('what goes out when a verse is copied or shared: its words, then on a line
   assert.equal(SHARE_TRANSLATION, 'World English Bible');
   assert.equal(chosenAnnouncement('Psalm 121:3'), 'Psalm 121:3 selected. Bookmark, copy or share it.');
   assert.equal(COPIED, 'Copied');
+});
+
+check('the bar of actions is made to be hit: a glyph of 30, a word of 16, every action at least 88 wide and 68 high on a phone from 320 wide, the reference 17, and the bar is as high as its parts add up to', () => {
+  assert.ok(ACTION_ICON >= 28, 'the glyph is at least 28');
+  assert.equal(ACTION_ICON, 30);
+  assert.ok(ACTION_LABEL >= 16, 'the word is at least 16');
+  assert.equal(ACTION_LABEL, 16);
+  assert.ok(PLACE_SIZE >= 16, 'the reference is at least 16');
+  assert.equal(PLACE_SIZE, 17);
+  assert.ok(ACTION_MIN_HEIGHT >= 56, 'at least 56 high');
+  assert.equal(ACTION_MIN_HEIGHT, 68);
+  assert.ok(ACTION_MIN_WIDTH >= 88, 'at least 88 wide');
+  assert.equal(ACTION_MIN_WIDTH, 88);
+  assert.ok(ACTION_GAP >= 8, 'a gap that is comfortable');
+  assert.ok(BAR_HEADER >= 44 && ACTION_LABEL_LINE >= ACTION_LABEL && PLACE_LINE >= PLACE_SIZE);
+  for (let width = 320; width <= 1000; width += 1) {
+    assert.ok(actionWidth(width, 3) >= ACTION_MIN_WIDTH, `${width}: three actions are ${actionWidth(width, 3).toFixed(1)} wide`);
+    assert.ok(actionWidth(width, 2) > actionWidth(width, 3), `${width}: two are wider than three`);
+  }
+  assert.ok(Math.abs(actionWidth(320, 3) - 88.67) < 0.01, '88.7 on the narrowest phone, with the side margin of 12');
+  assert.ok(actionWidth(317, 3) < ACTION_MIN_WIDTH, 'there is no room to spare: under 318 the three would be under 88');
+  assert.equal(BAR_HEIGHT, 138, '8 + 48 + 4 + 68 + 8 and the two edges');
+  assert.equal(BAR_HEIGHT, 2 * BAR_PAD_Y + BAR_HEADER + BAR_ROW_GAP + ACTION_MIN_HEIGHT + 2 * BAR_BORDER);
+  assert.equal(barCovers(0), 150);
+  assert.equal(barCovers(34), 184, 'the safe area of a phone with a home indicator is added');
+  assert.equal(roomUnder(0), 174);
+  assert.ok(BAR_SIDE >= 8 && BAR_BOTTOM >= 8);
+});
+
+check('a verse touched where the bar will be is brought up above it: nothing moves for a verse that is high enough, a low one comes to 40% of the screen above the bar, and a short phone is no different', () => {
+  const line = 32;
+  for (const [windowHeight, inset] of [[568, 0], [667, 0], [844, 34], [932, 34], [640, 0]] as const) {
+    const covered = barCovers(inset);
+    const visible = windowHeight - covered;
+    assert.equal(scrollForBar(0, windowHeight, covered, line), 0, `${windowHeight}: the top of the screen`);
+    assert.equal(scrollForBar(visible - ZONE_LINES * line, windowHeight, covered, line), 0, `${windowHeight}: just high enough`);
+    assert.ok(scrollForBar(visible - ZONE_LINES * line + 1, windowHeight, covered, line) > 0, `${windowHeight}: one pixel lower is brought up`);
+    for (let y = 0; y <= windowHeight; y += 7) {
+      const down = scrollForBar(y, windowHeight, covered, line);
+      assert.ok(down >= 0, `${windowHeight} at ${y}`);
+      // after the scroll the touched line is above the bar, with its next lines (up to three) above it too
+      if (down > 0) {
+        const after = y - down;
+        assert.ok(Math.abs(after - ANCHOR * visible) <= 1, `${windowHeight} at ${y}: it comes to ${after}`);
+        assert.ok(after + ZONE_LINES * line <= visible, `${windowHeight} at ${y}: ${ZONE_LINES} lines of the verse are above the bar`);
+      } else {
+        assert.ok(y + ZONE_LINES * line <= visible + 1e-9, `${windowHeight} at ${y}: it was high enough`);
+      }
+    }
+  }
+  assert.equal(scrollForBar(NaN, 800, 150, line), 0, 'a touch without a place moves nothing');
+  assert.equal(scrollForBar(700, 100, 150, line), 0, 'a screen with no room above the bar moves nothing');
+  assert.equal(ANCHOR, 0.4);
+  assert.equal(ZONE_LINES, 3);
 });
 
 check('the end of a chapter: the credit of the translation, then one plain line that it is not the translation read at Mass; one note in handwriting; and the screen of chapters has its own', () => {

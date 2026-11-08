@@ -12,9 +12,9 @@ export const tileLabel = (b: BibleBook): string => `${b.name}, ${chaptersLabel(b
 type TileProps = { book: BibleBook; grid: BookGrid; fontScale: number; onOpen: (code: string) => void };
 
 /**
- * One book: a square tile, ONE button for a screen reader ("Genesis, 50 chapters"). The name is in Fraunces, the title font, on one line or two
- * (a number in front of a name stands on a line of its own), as large as fits the tile and never under 11 (tileFit.ts has the sums, and the width of
- * every letter of the font); under it, at the bottom, the chapters in JetBrains Mono. There is no bookmark here: the 44 touch target of one does not fit
+ * One book: a square tile, ONE button for a screen reader ("Genesis, 50 chapters"). The name is the hero of the tile, in Fraunces, the title font, on one
+ * line or two (a number in front of a name stands on a line of its own), 24 where it fits and as large as fits where it does not, and never under 11 (tileFit.ts
+ * has the sums, and the width of every letter of the font); under it, at the bottom, the chapters in small JetBrains Mono. There is no bookmark here: the 44 touch target of one does not fit
  * a square of about 90, so a book is bookmarked on its own screen, and a bookmarked book is a row of Bookmarks. Colours are roles: the card colour
  * with the border of a card, and the sunken colour while it is pressed.
  */
@@ -27,7 +27,7 @@ const BookTile = memo(function BookTile({ book, grid, fontScale, onOpen }: TileP
       accessibilityLabel={tileLabel(book)}
       onPress={() => onOpen(book.code)}
       style={({ pressed }) => ({
-        width: grid.tile, height: grid.tile, padding: grid.pad, justifyContent: 'space-between', borderRadius: radius.md,
+        width: grid.tile, height: grid.tile, paddingHorizontal: grid.padX, paddingVertical: grid.padY, justifyContent: 'space-between', borderRadius: radius.md,
         backgroundColor: pressed ? role.sunken : role.surface, borderWidth: 1, borderColor: role.border, ...shadowStyle('sm'),
       })}
     >
@@ -35,7 +35,7 @@ const BookTile = memo(function BookTile({ book, grid, fontScale, onOpen }: TileP
         variant="h4"
         maxFontSizeMultiplier={TEXT_SCALE_CAP}
         numberOfLines={name.lines.length}
-        style={{ fontSize: name.size, lineHeight: name.lineHeight }}
+        style={{ fontSize: name.size, lineHeight: name.lineHeight, letterSpacing: name.tracking }}
       >
         {name.lines.join('\n')}
       </AppText>
