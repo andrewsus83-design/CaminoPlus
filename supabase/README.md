@@ -1,7 +1,7 @@
 # CaminoPlus database (Supabase)
 
 Postgres schema, row level security, storage buckets and RPCs for the CaminoPlus app.
-72 tables in `public` (plus 4 server-only tables in `private`), split by app area.
+73 tables in `public` (plus 4 server-only tables in `private`), split by app area.
 
 ```
 supabase/
@@ -37,6 +37,10 @@ supabase/
     ..._camino_frances_stages.sql   stages 4 to 33 of the Camino Francés (hidden, no distance)
     ..._camino_portugues_stages.sql the 11 stages of the Camino Portugués Central (hidden, no distance)
     ..._camino_ingles_stages.sql    the 6 stages of the Camino Inglés from Ferrol (hidden, no distance)
+    ..._plan_private.sql        the plan (journey_days), stamps and GPS tracks are readable by their owner only
+                                (see "Who can read what")
+    ..._share_links.sql         shared_links + create_share_link / list_share_links / revoke_share_link / get_shared:
+                                share ONE plan or ONE note through a link (see "Share links")
   functions/               Deno edge functions: offline-pack-url (signed pack links), delete-account
   seed.sql                 reference data + a small Camino Frances sample
   dev/validate.sh          applies everything to a throwaway local Postgres, runs every dev/*smoke*.sql
@@ -119,8 +123,8 @@ erDiagram
 - **Passport and stamps**: `user_stamps`. A stamp is `verified` when its GPS fix is within 300 m
   of the stay or POI. Verified stamps give 10 XP, unverified 2 XP (once per place, with daily caps: see Security notes).
 - **Plan**: `journeys` (one pilgrimage attempt, start anywhere on any route) and `journey_days`.
-  Marking a day `done` gives 50 XP and updates km walked. Journey `visibility` also controls who
-  sees its plan, tracks and stamps.
+  Marking a day `done` gives 50 XP and updates km walked. Journey `visibility` controls who sees the
+  journey row; the plan days, tracks and stamps are owner only (migration `20261114100000_plan_private.sql`).
 - **Health**: `health_daily` and `health_workouts` keep only what the device provides (all metric
   columns are nullable). Owner-only access. Garmin OAuth tokens live in `private.wearable_credentials`
   as Supabase Vault references, never readable by clients.
@@ -348,6 +352,57 @@ Built for 6 to 8 hours without signal:
 - Helper functions used by policies live in the `private` schema, which is not exposed by the API.
 - Health data, settings, devices, storage usage and subscriptions are owner-only.
 
+### Who can read what
+
+The owner's rule: friends and followers see a pilgrim's **journey** only (the posts the pilgrim publishes, the profile
+card and its counters, the journey row as its visibility says). The **plan**, the day notes, stamps, GPS tracks and
+health are the owner's alone, unless the owner shares ONE plan or ONE note through a link (see "Share links"). The notes
+and the diary of the app never reach the server. Audit of 2026-11-08 (live policies and functions), with the change of
+`20261114100000_plan_private.sql`:
+
+| Table or function | Who can read it before | Who can read it after |
+|---|---|---|
+| `journey_days` (plan: dates, from/to, stay, booking, day notes) | owner, friends, followers; anyone signed in for a public journey of a public profile | owner only |
+| `user_stamps` (note, place, GPS point, photo path) | same as above | owner only |
+| `tracks` (GPS geometry) | same as above | owner only |
+| `user-media` stamp photos (policy "read user media" via `private.can_read_user_media`, invoker) | same as above, through the stamp row | owner only, through the stamp row (no storage policy changed) |
+| `journey_private`, `health_daily`, `health_workouts`, `wearable_connections` | owner only | owner only (unchanged) |
+| `journeys` (route, status, planned dates and km, walked km) | owner + `can_see(visibility)` | unchanged (the journey) |
+| `posts`, `post_media` and their photos | owner + `can_see(visibility)` | unchanged (the published journey) |
+| `profiles` (card, counters) | every signed-in person not blocked, also for a private profile | unchanged (not covered tonight) |
+| `user_achievements` | owner + `can_see(owner, 'public')` | unchanged (profile card) |
+| `shared_links` | (new) | nobody through the API; the owner through `list_share_links()`; anybody with a token sees what `get_shared()` returns |
+| `private.can_see_journey` (definer) | used by the three policies above | used by no policy any more; kept |
+| `private.journey_progress`, `recompute_journey_km`, triggers (definer) | server only | unchanged |
+| `export_my_data()` (definer) | the caller's own rows | the caller's own rows, plus the caller's links (no token, no hash) |
+
+Not covered (for the owner to decide): every column of a **private** profile is still readable by any signed-in person
+who is not blocked (the app shows a minimal card); a follower can still read the planned dates and km of a journey
+whose visibility allows it; a post's `health_summary` and `location` are readable by whoever may read the post.
+Tests: `dev/plan_private_smoke.sql` (friend, follower, stranger, anon, owner, writes, the friend's Journey grid).
+
+### Share links
+
+`20261114100100_share_links.sql`. A pilgrim shares ONE plan or ONE note; anybody who has the link can see it until the
+pilgrim stops sharing it. The web page `web/s/index.html` reads the token from the address **fragment**
+(`/s/#<token>`), so the token never reaches a server log or a Referer, and calls `get_shared` with the publishable key.
+
+- `shared_links`: `owner_id` (references `auth.users`, on delete cascade), `kind` `plan` | `note`, `journey_id` (plan),
+  `snapshot` (note copy), `options` (`{"stays": false}` for a plan), `label`, `token_hash` (sha256 of the token; the token
+  itself is never stored), `expires_at`, `revoked_at`, `last_viewed_at`, `view_count`. RLS on and no table privilege for
+  `anon` or `authenticated`: only the functions touch it.
+- `create_share_link(p_kind, p_journey_id, p_note, p_options, p_label, p_expires_days)` returns `{id, token, expires_at}`.
+  The token (32 random bytes, base64url, 43 characters) is shown ONCE. Checks: signed in, your own journey, note body
+  at most 20,000 characters, title and place 200, label 80, expiry 1 to 365 days or none, at most 50 active links.
+- `list_share_links()`: your links (no token, no hash). `revoke_share_link(id)`: stops one of yours (idempotent; a stopped
+  note link loses its copy).
+- `get_shared(token)` (anon and signed in): `{kind, owner: {display_name}, plan, note}` or one generic `null` for an
+  unknown, stopped or expired link (or a deleted plan or account). A **plan** link is live and shows only the route name,
+  start date, total km and per day: day number, planned date, from, to, planned km, status (and the stay name only when
+  `options.stays` is true). Never day notes, booking, contacts, health, GPS, stamps or tasks. A **note** link is a copy
+  made at sharing time (`title`, `body`, `place`, `written_at`); photos and videos are not part of a link in v1.
+- Tests: `dev/share_links_smoke.sql`, and `tools/tests/test_share_links.py` reads the SQL.
+
 ### Security notes (integrity and privacy, migration 14)
 
 Written after a security audit; every point has an attack test in `dev/integrity_privacy_smoke.sql`.
@@ -530,8 +585,9 @@ erDiagram
   friend request notification is removed).
 - `profiles.friends_count` is server maintained (guarded like the other counters).
 - `private.is_friend(a, b)` is true for accepted friends. `private.can_see` treats an accepted friend like an accepted
-  follower, so the visibility value `followers` means **friends and followers** (the app labels it Friends). Journeys,
-  plan days, tracks and stamps follow because `can_see_journey` delegates to `can_see`.
+  follower, so the visibility value `followers` means **friends and followers** (the app labels it Friends). Journeys
+  and posts follow it. Plan days, tracks and stamps do NOT: they are owner only since `20261114100000_plan_private.sql`
+  (see "Who can read what").
 - `search_pilgrims(q, limit)`: at least 2 characters, username prefix or display name contains (each branch reads at
   most 100 rows through an index); never yourself, blocked pilgrims (either way) or deleted profiles; never email.
   `%` and `_` typed by the user are literal.
