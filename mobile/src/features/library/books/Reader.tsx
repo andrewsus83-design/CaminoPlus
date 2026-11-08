@@ -14,7 +14,7 @@ import type { BookContent } from './index';
 import { bookById } from './catalog';
 import { NO_CHAPTER_TEXT, bookPath, readerPath } from './copy';
 import { BAR_HEIGHT } from '../bible/actionBar';
-import { isPassageBlock, parsePassageKey, passageKey, passageLabel, passageShareText } from './passages';
+import { isPassageBlock, noteHref, parsePassageKey, passageKey, passageLabel, passageShareText } from './passages';
 import { LONG_LABEL, chapterIndex, chapterNav, chapterWords, groupThousands, isRead, layoutBlocks, offsetFor, partName, readingTime, resumeAt, scrollProgress, splitTitle, startAt } from './reading';
 import { readerType } from './readerType';
 import { safeText } from './safeText';
@@ -202,7 +202,9 @@ function ChapterView({ bookId, text, index, startY, passage, size, writer }: Vie
           text={passageShareText(text.title, chapter, selected)}
           bookmarked={marks.has(key)}
           canBookmark={marks.ready && parsePassageKey(key) !== null}
+          canNote={parsePassageKey(key) !== null}
           onBookmark={() => marks.toggle(key)}
+          onNote={() => router.push(noteHref(bookId, chapter.id, selected))}
           onClose={release}
         />
       )}

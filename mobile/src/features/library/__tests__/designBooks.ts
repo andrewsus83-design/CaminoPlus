@@ -9,6 +9,7 @@
 //  - the line that counts the results of the Search phone, and the group of books in it (there is none for the word the phone shows),
 //  - a second Search phone, for a word that finds books,
 //  - in the Bookmarks phone, the line that says where the bookmarks are kept, the group of books and the group of passages,
+//  - the page of the diary that Note, in the bar of a chosen passage, opens (among the Diary phones),
 //  - the group "Library · Books and the reader": its words, its style and all the other phones (the shelves, the book page, the reader).
 // To draw the page again after the books, the covers or a screen changed (from mobile/):
 //   npx tsc -p tsconfig.librarytest.json && node node_modules/.cache/library-test/features/library/__tests__/designBooks.js --write
@@ -22,7 +23,7 @@ import { booksBanner, kindMark, kindName, pageNote, shelves, type BooksBannerVie
 import { coverGrid, coverLabel, coverMetrics, coverText } from '../books/cover';
 import type { Block, BookContent, Span } from '../books/index';
 import { noticeFor } from '../books/notices';
-import { isPassageBlock, passageKey, passageLabel, passageRowsForKeys } from '../books/passages';
+import { noteStart, passageKey, passageLabel, passageRowsForKeys } from '../books/passages';
 import {
   bookFacts, chapterNav, chapterWords, formatMinutes, groupThousands, layoutBlocks, LONG_LABEL, nextLabel, partName, partSubtitle, positionLine, previousLabel, readButtonLabel,
   readButtonSpoken, readingTime, resumeAt, splitTitle, tocGroups, type BookPlace, type Item,
@@ -320,9 +321,9 @@ function readerPhone(o: ReaderOptions): string {
     : '';
   const label = o.chosen !== undefined ? passageLabel(chapter, o.chosen) : '';
   const actions = o.chosen !== undefined
-    ? `\n<div class="rd-act dock" role="toolbar" aria-label="${esc(`Actions for ${label}`)}">
+    ? `\n<div class="rd-act dock four" role="toolbar" aria-label="${esc(`Actions for ${label}`)}">
   <div class="top"><span class="pl">${esc(label)}</span><button class="x" aria-label="Close the passage actions">${svg('x')}</button></div>
-  <div class="btns"><button${o.bookmarked ? ' class="on"' : ''} aria-label="${esc(bookmarkWords(!!o.bookmarked, label))}">${svg('bookmark')}<span>Bookmark</span></button><button aria-label="${esc(`Copy: ${label}`)}">${svg('copy')}<span>Copy</span></button><button aria-label="${esc(`Share: ${label}`)}">${svg('share')}<span>Share</span></button></div>
+  <div class="btns"><button${o.bookmarked ? ' class="on"' : ''} aria-label="${esc(bookmarkWords(!!o.bookmarked, label))}">${svg('bookmark')}<span>Bookmark</span></button><button aria-label="${esc(`Write a note: ${label}`)}">${svg('pencil')}<span>Note</span></button><button aria-label="${esc(`Copy: ${label}`)}">${svg('copy')}<span>Copy</span></button><button aria-label="${esc(`Share: ${label}`)}">${svg('share')}<span>Share</span></button></div>
 </div>`
     : '';
   const progress = Math.round((o.progress ?? (o.end ? 0.97 : from > 0 ? 0.3 : 0.05)) * 100);
@@ -339,6 +340,38 @@ function readerPhone(o: ReaderOptions): string {
   <div class="r2"><span class="bk-ic${nav.prev ? '' : ' off'}" role="button" aria-label="${esc(previousLabel(nav))}">${svg('back')}</span><span class="mid"><span class="bt">${esc(o.text.title)}</span><span class="ps">${esc(positionLine(nav))}</span></span><span class="bk-ic${nav.next ? '' : ' off'}" role="button" aria-label="${esc(nextLabel(nav))}">${svg('chev')}</span></div>
 </div>`;
   return phone(o.title, o.sub, inner, { dark: o.dark, width: o.width });
+}
+
+/* ================================================================ the page of the diary that Note opens */
+
+/** What the person writes under the quotation: the note is a note of the diary like any other. */
+const NOTE_WORDS = 'Walking the first day, and thinking of this.';
+
+/** The page of the diary for a new note about the passage that the phones choose: it starts as passages.ts noteStart says (the passage in the marks of the diary, whose words and where). */
+export function diaryNotePhone(): string {
+  const chapter = SHOWN.readings.chapters[SHOWN.quote.index];
+  const start = noteStart(SHOWN.readings.title, chapter, SHOWN.quote.block);
+  if (start === null) throw new Error('the passage of the phones is not a passage');
+  return phone('Diary · note about a passage', 'Note in the bar of a passage opens a new page that starts with the passage as a quotation, whose words and where, and an empty line · words and photos go under it · it appears in Notes', `<div class="scroll" style="display:flex;flex-direction:column;padding-bottom:104px">
+  <div class="biz-top" style="justify-content:space-between"><button class="cp-icon-btn flat" aria-label="Back">${svg('back')}</button><span style="display:flex;align-items:center;gap:8px"><button class="cp-btn md" style="height:48px;padding:0 20px;font-size:17px;background:var(--cp-surface);color:var(--cp-text);box-shadow:inset 0 0 0 1px var(--cp-border)">Read</button><button class="cp-icon-btn flat" aria-label="Delete this page">${svg('trash')}</button></span></div>
+  <p class="note" style="margin:12px 0 10px">Friday 6 November</p>
+  <div class="cp-card" style="padding:0;flex:1;min-height:236px;box-shadow:inset 0 0 0 2px var(--cp-color-gold)">
+    <div style="font-family:var(--cp-font-title);font-weight:600;font-size:24px;line-height:30px;padding:14px 18px 10px;color:var(--cp-text-muted)">Title (optional)</div>
+    <div style="height:1px;margin:0 18px;background:var(--cp-border)"></div>
+    <div class="dn-text" style="font-size:19px;line-height:28px;padding:14px 18px;white-space:pre-wrap">${esc(`${start}${NOTE_WORDS}`).replace(/\n/g, '&#10;')}</div>
+  </div>
+  <p class="note" style="margin:10px 0 0;font-size:14px">Saved on this phone</p>
+</div>
+<div class="dy-bar">
+  <button class="t" aria-label="Bold"><i>${svg('bold')}</i></button>
+  <button class="t" aria-label="Italic"><i>${svg('italic')}</i></button>
+  <button class="t" aria-label="Heading"><i>${svg('heading')}</i></button>
+  <button class="t" aria-label="Bulleted list"><i>${svg('list')}</i></button>
+  <button class="t" aria-label="Quote"><i>${svg('quote')}</i></button>
+  <span class="sep"></span>
+  <button class="t" aria-label="Add photos or videos"><i>${svg('image')}</i></button>
+  <button class="t" aria-label="Change place"><i>${svg('pin')}</i></button>
+</div>`);
 }
 
 /* ================================================================ the phones of the group, and the style and the words of the group */
@@ -452,6 +485,8 @@ const STYLE = `<style>
   .bk-rtx .on { background: var(--cp-color-gold-soft); text-decoration: underline; }
   .phone .scroll.bk-rscroll.pa { bottom: 248px; }
   .rd-act.dock { bottom: 110px; }
+  /* four actions (Copy is there) share the bar: as wide as the phone allows, the word shrinks to fit */
+  .rd-act.four .btns button { min-width: 0; }
   /* a bookmarked passage on the Bookmarks screen (books/PassageRows.tsx): the book, where it is, the first words; one button, and the bookmark beside it */
   .bk-prow { display: flex; align-items: flex-start; gap: 6px; padding: 10px 6px 10px 12px; }
   .bk-pt { flex: 1; min-width: 0; min-height: 44px; display: flex; flex-direction: column; gap: 4px; padding: 4px 0; }
@@ -536,7 +571,7 @@ function groupPhones(): string {
 
 /* ================================================================ the regions of the page */
 
-export type RegionName = 'books-tab' | 'search-count' | 'search-books' | 'search-books-phone' | 'bookmarks-kept' | 'bookmarks-books' | 'bookmarks-passages' | 'group';
+export type RegionName = 'books-tab' | 'search-count' | 'search-books' | 'search-books-phone' | 'bookmarks-kept' | 'bookmarks-books' | 'bookmarks-passages' | 'diary-note' | 'group';
 
 /** The two lines that mark a region of design/index.html: what is between them is drawn here. */
 export const MARKERS: Record<RegionName, { start: string; end: string }> = {
@@ -547,6 +582,7 @@ export const MARKERS: Record<RegionName, { start: string; end: string }> = {
   'bookmarks-kept': { start: '            <!-- Bookmarks: kept (start) -->', end: '            <!-- Bookmarks: kept (end) -->' },
   'bookmarks-books': { start: '            <!-- Bookmarks: books (start) -->', end: '            <!-- Bookmarks: books (end) -->' },
   'bookmarks-passages': { start: '            <!-- Bookmarks: passages (start) -->', end: '            <!-- Bookmarks: passages (end) -->' },
+  'diary-note': { start: '    <!-- Diary: note about a passage (start) -->', end: '    <!-- Diary: note about a passage (end) -->' },
   group: { start: '  <!-- Library · Books and the reader (start) -->', end: '  <!-- Library · Books and the reader (end) -->' },
 };
 
@@ -588,6 +624,7 @@ ${indent(searchBooks(booksFound, SEARCH_ROWS), 2)}
 <div class="cp-card" style="padding:4px">
   <div class="bk-prow"><span class="bk-pt" role="button" aria-label="${esc(`${row.bookTitle}, ${row.label}: ${row.excerpt}`)}"><span class="bn">${esc(row.bookTitle)}</span><span class="pl">${esc(row.label)}</span><span class="px">${esc(row.excerpt)}</span></span><button class="lib-mark on" aria-label="${esc(bookmarkWords(true, `${row.bookTitle}, ${row.label}`))}">${svg('bookmark')}</button></div>
 </div>`, 12),
+    'diary-note': indent(diaryNotePhone(), 4),
     group: `  ${groupNotes()}\n  ${STYLE}\n  <div class="phones">\n${indent(groupPhones(), 4)}\n  </div>\n  ${SCRIPT}`,
   };
 }

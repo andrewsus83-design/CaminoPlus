@@ -3610,6 +3610,36 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
       </div>
     </div>
 
+    <!-- Diary: note about a passage (start) -->
+    <div class="phone-wrap">
+      <p class="phone-label"><b>Diary · note about a passage</b>Note in the bar of a passage opens a new page that starts with the passage as a quotation, whose words and where, and an empty line · words and photos go under it · it appears in Notes</p>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
+        <div class="scroll" style="display:flex;flex-direction:column;padding-bottom:104px">
+          <div class="biz-top" style="justify-content:space-between"><button class="cp-icon-btn flat" aria-label="Back"><svg class="cp-icon"><use href="#i-back"/></svg></button><span style="display:flex;align-items:center;gap:8px"><button class="cp-btn md" style="height:48px;padding:0 20px;font-size:17px;background:var(--cp-surface);color:var(--cp-text);box-shadow:inset 0 0 0 1px var(--cp-border)">Read</button><button class="cp-icon-btn flat" aria-label="Delete this page"><svg class="cp-icon"><use href="#i-trash"/></svg></button></span></div>
+          <p class="note" style="margin:12px 0 10px">Friday 6 November</p>
+          <div class="cp-card" style="padding:0;flex:1;min-height:236px;box-shadow:inset 0 0 0 2px var(--cp-color-gold)">
+            <div style="font-family:var(--cp-font-title);font-weight:600;font-size:24px;line-height:30px;padding:14px 18px 10px;color:var(--cp-text-muted)">Title (optional)</div>
+            <div style="height:1px;margin:0 18px;background:var(--cp-border)"></div>
+            <div class="dn-text" style="font-size:19px;line-height:28px;padding:14px 18px;white-space:pre-wrap">&gt; If thou wilt stand fast and wilt profit as thou oughtest, hold thyself as an exile and a pilgrim upon the earth. … Keep thyself as a stranger and a pilgrim upon the earth, to whom the things of the world appertain not. Keep thine heart free, and lifted up towards God, for here have we no continuing city.&#10;&gt; — Thomas à Kempis, The Imitation of Christ, Book 1, chapters 17 and 23 (tr. William Benham)&#10;&gt; — The Quiet Road, Day 1, passage 2&#10;&#10;Walking the first day, and thinking of this.</div>
+          </div>
+          <p class="note" style="margin:10px 0 0;font-size:14px">Saved on this phone</p>
+        </div>
+        <div class="dy-bar">
+          <button class="t" aria-label="Bold"><i><svg class="cp-icon"><use href="#i-bold"/></svg></i></button>
+          <button class="t" aria-label="Italic"><i><svg class="cp-icon"><use href="#i-italic"/></svg></i></button>
+          <button class="t" aria-label="Heading"><i><svg class="cp-icon"><use href="#i-heading"/></svg></i></button>
+          <button class="t" aria-label="Bulleted list"><i><svg class="cp-icon"><use href="#i-list"/></svg></i></button>
+          <button class="t" aria-label="Quote"><i><svg class="cp-icon"><use href="#i-quote"/></svg></i></button>
+          <span class="sep"></span>
+          <button class="t" aria-label="Add photos or videos"><i><svg class="cp-icon"><use href="#i-image"/></svg></i></button>
+          <button class="t" aria-label="Change place"><i><svg class="cp-icon"><use href="#i-pin"/></svg></i></button>
+        </div>
+        <span class="home-ind"></span>
+      </div>
+    </div>
+    <!-- Diary: note about a passage (end) -->
+
     <div class="phone-wrap">
       <p class="phone-label"><b>Diary · read</b>A page as it will be remembered · tap Edit to write</p>
       <div class="phone">
@@ -4398,6 +4428,8 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
   .bk-rtx .on { background: var(--cp-color-gold-soft); text-decoration: underline; }
   .phone .scroll.bk-rscroll.pa { bottom: 248px; }
   .rd-act.dock { bottom: 110px; }
+  /* four actions (Copy is there) share the bar: as wide as the phone allows, the word shrinks to fit */
+  .rd-act.four .btns button { min-width: 0; }
   /* a bookmarked passage on the Bookmarks screen (books/PassageRows.tsx): the book, where it is, the first words; one button, and the bookmark beside it */
   .bk-prow { display: flex; align-items: flex-start; gap: 6px; padding: 10px 6px 10px 12px; }
   .bk-pt { flex: 1; min-width: 0; min-height: 44px; display: flex; flex-direction: column; gap: 4px; padding: 4px 0; }
@@ -4796,9 +4828,9 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
             <p style="font-size:19px;line-height:30px;margin:0 0 15px">There is a moment, somewhere between your own front door and the first yellow arrow, when you stop being someone who lives somewhere and become someone who is going. The pack is on your back. A shell, if you have one, swings from a strap. In a pocket is the <span style="font-style:italic">credencial</span>, the folded pilgrim passport that will collect a stamp in town after town. Nothing has happened yet. You are simply no longer where you were.</p>
           </div>
         </div>
-        <div class="rd-act dock" role="toolbar" aria-label="Actions for Day 1, passage 2">
+        <div class="rd-act dock four" role="toolbar" aria-label="Actions for Day 1, passage 2">
           <div class="top"><span class="pl">Day 1, passage 2</span><button class="x" aria-label="Close the passage actions"><svg class="cp-icon"><use href="#i-x"/></svg></button></div>
-          <div class="btns"><button aria-label="Bookmark: Day 1, passage 2"><svg class="cp-icon"><use href="#i-bookmark"/></svg><span>Bookmark</span></button><button aria-label="Copy: Day 1, passage 2"><svg class="cp-icon"><use href="#i-copy"/></svg><span>Copy</span></button><button aria-label="Share: Day 1, passage 2"><svg class="cp-icon"><use href="#i-share"/></svg><span>Share</span></button></div>
+          <div class="btns"><button aria-label="Bookmark: Day 1, passage 2"><svg class="cp-icon"><use href="#i-bookmark"/></svg><span>Bookmark</span></button><button aria-label="Write a note: Day 1, passage 2"><svg class="cp-icon"><use href="#i-pencil"/></svg><span>Note</span></button><button aria-label="Copy: Day 1, passage 2"><svg class="cp-icon"><use href="#i-copy"/></svg><span>Copy</span></button><button aria-label="Share: Day 1, passage 2"><svg class="cp-icon"><use href="#i-share"/></svg><span>Share</span></button></div>
         </div>
         <div class="bk-rbar">
           <div class="bk-prog" aria-hidden="true"><i style="width:8%"></i></div>
@@ -4827,9 +4859,9 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
             <p style="font-size:19px;line-height:30px;margin:0 0 15px">There is a moment, somewhere between your own front door and the first yellow arrow, when you stop being someone who lives somewhere and become someone who is going. The pack is on your back. A shell, if you have one, swings from a strap. In a pocket is the <span style="font-style:italic">credencial</span>, the folded pilgrim passport that will collect a stamp in town after town. Nothing has happened yet. You are simply no longer where you were.</p>
           </div>
         </div>
-        <div class="rd-act dock" role="toolbar" aria-label="Actions for Day 1, passage 2">
+        <div class="rd-act dock four" role="toolbar" aria-label="Actions for Day 1, passage 2">
           <div class="top"><span class="pl">Day 1, passage 2</span><button class="x" aria-label="Close the passage actions"><svg class="cp-icon"><use href="#i-x"/></svg></button></div>
-          <div class="btns"><button class="on" aria-label="Remove bookmark: Day 1, passage 2"><svg class="cp-icon"><use href="#i-bookmark"/></svg><span>Bookmark</span></button><button aria-label="Copy: Day 1, passage 2"><svg class="cp-icon"><use href="#i-copy"/></svg><span>Copy</span></button><button aria-label="Share: Day 1, passage 2"><svg class="cp-icon"><use href="#i-share"/></svg><span>Share</span></button></div>
+          <div class="btns"><button class="on" aria-label="Remove bookmark: Day 1, passage 2"><svg class="cp-icon"><use href="#i-bookmark"/></svg><span>Bookmark</span></button><button aria-label="Write a note: Day 1, passage 2"><svg class="cp-icon"><use href="#i-pencil"/></svg><span>Note</span></button><button aria-label="Copy: Day 1, passage 2"><svg class="cp-icon"><use href="#i-copy"/></svg><span>Copy</span></button><button aria-label="Share: Day 1, passage 2"><svg class="cp-icon"><use href="#i-share"/></svg><span>Share</span></button></div>
         </div>
         <div class="bk-rbar">
           <div class="bk-prog" aria-hidden="true"><i style="width:8%"></i></div>

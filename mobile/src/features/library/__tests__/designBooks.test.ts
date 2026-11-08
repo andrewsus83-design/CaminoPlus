@@ -10,7 +10,7 @@ import { BOOK_CATALOG } from '../books/catalog';
 import { BOOKS_BANNER_TITLE, CONTINUE_CTA, START_CTA, kindMark, kindName, shelves } from '../books/copy';
 import { coverGrid, coverLabel, coverText } from '../books/cover';
 import { GUIDE_NOTICE, READINGS_NOTICE, noticeFor } from '../books/notices';
-import { passageLabel } from '../books/passages';
+import { noteStart, passageLabel } from '../books/passages';
 import { formatMinutes, nextLabel, previousLabel, chapterNav } from '../books/reading';
 import { READER_SIZES } from '../books/readerType';
 import { BOOKMARKS_KEPT } from '../sample';
@@ -144,8 +144,15 @@ check('the reader on the page: a list with its bullets and a quotation with its 
   const label = passageLabel(chapter, SHOWN.quote.block);
   assert.match(chosen, /<span class="on">/, 'the passage has the gold ground and the underline of a verse');
   assert.ok(chosen.includes(`aria-label="Actions for ${esc(label)}"`) && chosen.includes(`<span class="pl">${esc(label)}</span>`), 'the bar of actions says which passage it is');
-  assert.match(chosen, /<button aria-label="Bookmark: [^"]+">[^]*?<span>Bookmark<\/span><\/button><button aria-label="Copy: [^"]+">[^]*?<span>Copy<\/span><\/button><button aria-label="Share: [^"]+">[^]*?<span>Share<\/span>/);
+  assert.match(chosen, /<div class="rd-act dock four" role="toolbar"/, 'four actions share the bar');
+  assert.match(chosen, /<button aria-label="Bookmark: [^"]+">[^]*?<span>Bookmark<\/span><\/button><button aria-label="Write a note: [^"]+">[^]*?<span>Note<\/span><\/button><button aria-label="Copy: [^"]+">[^]*?<span>Copy<\/span><\/button><button aria-label="Share: [^"]+">[^]*?<span>Share<\/span>/, 'Bookmark, Note, Copy, Share, in the order of the bar of the app');
   assert.match(phoneOf('Reader · passage bookmarked'), /<button class="on" aria-label="Remove bookmark: [^"]+">[^]*?<span>Bookmark<\/span>/, 'the word stays, the glyph is filled and the button tinted');
+  // the page of the diary that Note opens starts with the passage as a quotation, whose words and where, and an empty line (passages.ts noteStart), made from the real text
+  const start = noteStart(SHOWN.readings.title, chapter, SHOWN.quote.block)!;
+  const diary = phoneOf('Diary · note about a passage');
+  assert.ok(start.startsWith('> ') && start.endsWith('\n\n') && start.includes(`> — ${SHOWN.readings.title}, ${label}`), 'the start of a note about a passage');
+  assert.ok(diary.includes(esc(start).replace(/\n/g, '&#10;')), 'the diary page of the design is the one the app opens, with the quotation in the marks of the diary (the line breaks are written as entities, so that nothing indents them)');
+  assert.match(diary, /<div class="dy-bar">/, 'with the bar of the diary under it');
 });
 
 check('the rows of a search and of Bookmarks on the page: a small cover, the title, the subtitle, the description, the kind and the time, the bookmark beside the button of the row; no chip; the counts are the app\'s own', () => {
