@@ -121,8 +121,10 @@ export function notificationTime(t: TimeInput, now: TimeInput = Date.now()): str
 
 /* ------------------------------------------------------------------ names, colours, text */
 
+// design-lint-ignore: color the soft tints of the initials circles: a person keeps the same colour (it comes from the id), so they are a fixed list of identity colours, not colours of the interface
 export const AVATAR_TINTS = ['#E9C987', '#9DB4CC', '#BFD0C4', '#D7C6E0', '#F2D8B6', '#C9A48A'] as const;
 // Sender names in group chats. All readable (>= 4.5:1) on the white bubble and on parchment.
+// design-lint-ignore: color the colours that tell the senders of a group chat apart, a fixed list that keeps its contrast on both bubbles: identity colours, not colours of the interface
 export const NAME_COLORS = ['#A63D2F', '#1E4A7A', '#2F6B4F', '#7A5A0C', '#6B3F7A', '#0F6670', '#8A4B1F', '#4F5F1C'] as const;
 
 export function hashString(s: string): number {

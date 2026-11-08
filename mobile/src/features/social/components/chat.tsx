@@ -62,7 +62,7 @@ export function ImageViewer({ uri, onClose }: { uri: string | null; onClose: () 
         <Pressable
           accessibilityRole="button" accessibilityLabel="Close photo" onPress={onClose}
           // design-lint-ignore: color a pale glass disc on the black of the photo viewer: FIXED.photoChip is a dark chip and would vanish on black, and no token is a light tint on black
-          style={{ position: 'absolute', top: insets.top + layout.screenTop, right: layout.screenMargin, width: layout.touchMin, height: layout.touchMin, borderRadius: radius.pill, backgroundColor: 'rgba(255,253,248,0.16)', alignItems: 'center', justifyContent: 'center' }}
+          style={{ position: 'absolute', top: insets.top + layout.screenTop, right: layout.screenMargin, width: layout.touchPrimary, height: layout.touchPrimary, borderRadius: radius.pill, backgroundColor: 'rgba(255,253,248,0.16)', alignItems: 'center', justifyContent: 'center' }}
         >
           <Icon name="close" color={FIXED.onPhoto} size={32} strokeWidth={2.2} />
         </Pressable>
@@ -238,7 +238,7 @@ type ComposerProps = {
 
 // One line = 56 dp (the line of the body text, 28, with 12 above and below and the border), the same height as the round buttons: Send is the main action of the screen.
 // It grows with the text up to about 4 lines (140 dp) and scrolls inside after that.
-const INPUT_MIN = layout.touchMin;
+const INPUT_MIN = layout.touchPrimary;
 const INPUT_MAX = 140;
 
 export function Composer({ onSend, onPhoto, reply, onCancelReply, blockedName, onUnblock, unblocking, focusToken }: ComposerProps) {

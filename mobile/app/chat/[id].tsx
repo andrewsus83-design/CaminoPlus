@@ -221,7 +221,7 @@ export default function ChatScreen() {
     <KeyboardAvoidingView behavior="padding" style={{ flex: 1, backgroundColor: role.bg }}>
       <View style={{ paddingTop: insets.top + layout.screenTop, paddingBottom: space[3], paddingHorizontal: layout.screenMargin, flexDirection: 'row', alignItems: 'center', gap: space[2], borderBottomWidth: 1, borderBottomColor: role.border, backgroundColor: role.bg }}>
         <BackButton onPress={() => goBack(router)} />
-        <Pressable accessibilityRole="button" accessibilityLabel={`${title}. ${group ? pilgrimsLabel(conv?.member_count ?? 0) : 'Friend'}. Open chat info`} onPress={() => router.push(`/chat/info/${id}`)} style={{ flex: 1, minHeight: 52, flexDirection: 'row', alignItems: 'center', gap: space[3] }}>
+        <Pressable accessibilityRole="button" accessibilityLabel={`${title}. ${group ? pilgrimsLabel(conv?.member_count ?? 0) : 'Friend'}. Open chat info`} onPress={() => router.push(`/chat/info/${id}`)} style={{ flex: 1, minHeight: 52, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
           {conv
             ? <PilgrimAvatar name={title} uri={group ? conv.avatar_url : conv.peer_avatar_url} seed={conv.peer_id ?? String(id)} size={44} group={group} />
             : <View style={{ width: 44, height: 44, borderRadius: radius.pill, backgroundColor: role.sunken }} />}

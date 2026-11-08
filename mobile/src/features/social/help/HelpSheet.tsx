@@ -79,7 +79,7 @@ function ActionBtn({ label, onPress, variant = 'primary', icon, disabled, loadin
   return (
     <Pressable
       accessibilityRole="button" accessibilityLabel={label} accessibilityHint={hint} accessibilityState={{ disabled: off, busy: !!loading }} disabled={off} onPress={onPress}
-      style={({ pressed }) => ({ minHeight: layout.touchMin, paddingHorizontal: space[6], paddingVertical: space[2], borderRadius: radius.pill, backgroundColor: palette.bg, borderWidth: 1, borderColor: palette.border, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: space[2], opacity: off && !loading ? 0.55 : pressed ? 0.85 : 1 })}
+      style={({ pressed }) => ({ minHeight: layout.touchPrimary, paddingHorizontal: space[6], paddingVertical: space[2], borderRadius: radius.pill, backgroundColor: palette.bg, borderWidth: 1, borderColor: palette.border, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: space[2], opacity: off && !loading ? 0.55 : pressed ? 0.85 : 1 })}
     >
       {loading
         ? <ActivityIndicator color={palette.fg} />

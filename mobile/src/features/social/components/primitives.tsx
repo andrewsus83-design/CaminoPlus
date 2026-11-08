@@ -57,6 +57,7 @@ export function CountBadge({ count, tone = 'red', style }: { count: number; tone
   if (!label) return null;
   const t = tones()[tone];
   return (
+    // design-lint-ignore: inset a count badge is as small as its number: 24 high round the 15 px text
     <View style={[{ minWidth: 24, height: 24, paddingHorizontal: space[2], borderRadius: radius.pill, backgroundColor: t.bg, alignItems: 'center', justifyContent: 'center' }, style]}>
       <AppText variant="caption" color={t.fg} style={{ fontFamily: fonts.bodyBold, letterSpacing: 0 }}>{label}</AppText>
     </View>
@@ -83,7 +84,7 @@ export function Btn({ label, onPress, variant = 'primary', size = 'md', loading,
     <Pressable
       accessibilityRole="button" accessibilityLabel={accessibilityLabel ?? label} accessibilityHint={hint} accessibilityState={{ disabled: !!off, busy: !!loading }}
       disabled={off} onPress={onPress}
-      style={({ pressed }) => [{ minHeight: size === 'sm' ? 48 : layout.touchMin, paddingHorizontal: size === 'sm' ? space[5] : space[6], borderRadius: radius.pill, backgroundColor: palette.bg, borderWidth: 1, borderColor: palette.border, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, opacity: off ? 0.55 : pressed ? 0.85 : 1 }, full ? { alignSelf: 'stretch' } : null, style]}
+      style={({ pressed }) => [{ minHeight: size === 'sm' ? 48 : layout.touchPrimary, paddingHorizontal: size === 'sm' ? space[5] : space[6], borderRadius: radius.pill, backgroundColor: palette.bg, borderWidth: 1, borderColor: palette.border, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, opacity: off ? 0.55 : pressed ? 0.85 : 1 }, full ? { alignSelf: 'stretch' } : null, style]}
     >
       {loading ? <ActivityIndicator color={palette.fg} /> : (
         <>
@@ -113,7 +114,7 @@ export function RoundBtn({ icon, label, onPress, tone = 'blue', loading, size = 
 export function SearchField({ value, onChangeText, placeholder, label, autoFocus }: { value: string; onChangeText: (t: string) => void; placeholder: string; label: string; autoFocus?: boolean }) {
   const [focus, setFocus] = useState(false);
   return (
-    <View style={{ minHeight: layout.touchMin, borderRadius: radius.pill, backgroundColor: role.surface, borderWidth: focus ? 2 : 1, borderColor: focus ? role.highlight : role.border, flexDirection: 'row', alignItems: 'center', paddingLeft: space[5], paddingRight: space[2], gap: space[3] }}>
+    <View style={{ minHeight: layout.touchPrimary, borderRadius: radius.pill, backgroundColor: role.surface, borderWidth: focus ? 2 : 1, borderColor: focus ? role.highlight : role.border, flexDirection: 'row', alignItems: 'center', paddingLeft: space[5], paddingRight: space[2], gap: space[3] }}>
       <Icon name="search" color={role.muted} size={24} />
       <TextInput
         value={value} onChangeText={onChangeText} placeholder={placeholder} placeholderTextColor={role.muted} accessibilityLabel={label}
@@ -157,7 +158,7 @@ export function SegmentedTabs<T extends string>({ tabs, value, onChange }: { tab
             key={t.key} accessibilityRole="tab" accessibilityState={{ selected: on }}
             accessibilityLabel={unread > 0 ? `${t.label}, ${unread} unread` : t.label}
             onPress={() => onChange(t.key)}
-            style={{ flex: 1, alignItems: 'center', justifyContent: 'center', minHeight: layout.touchMin, paddingTop: space[2], borderBottomWidth: 3, borderBottomColor: on ? role.action : 'transparent', marginBottom: -1 }}
+            style={{ flex: 1, alignItems: 'center', justifyContent: 'center', minHeight: layout.touchPrimary, paddingTop: space[2], borderBottomWidth: 3, borderBottomColor: on ? role.action : 'transparent', marginBottom: -1 }}
           >
             <View>
               <AppText variant="label" numberOfLines={1} color={on ? role.text : role.muted}>{t.label}</AppText>

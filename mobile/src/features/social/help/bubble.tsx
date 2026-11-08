@@ -65,7 +65,7 @@ export function HelpBody({ body }: { body: string }) {
       {!!p.mapUrl && (
         <Pressable
           accessibilityRole="button" accessibilityLabel="Open map" accessibilityHint="Opens this position in your maps app or browser" onPress={() => void openUrl(p.mapUrl!)}
-          style={({ pressed }) => ({ alignSelf: 'flex-start', minHeight: layout.touchMin, marginTop: space[1], paddingHorizontal: space[5], borderRadius: radius.pill, backgroundColor: role.action, flexDirection: 'row', alignItems: 'center', gap: space[2], opacity: pressed ? 0.85 : 1 })}
+          style={({ pressed }) => ({ alignSelf: 'flex-start', minHeight: layout.touchPrimary, marginTop: space[1], paddingHorizontal: space[5], borderRadius: radius.pill, backgroundColor: role.action, flexDirection: 'row', alignItems: 'center', gap: space[2], opacity: pressed ? 0.85 : 1 })}
         >
           <Icon name="pin" color={role.onAction} size={20} strokeWidth={2} />
           <AppText variant="label" color={role.onAction}>Open map</AppText>
