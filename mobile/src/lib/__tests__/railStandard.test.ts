@@ -83,7 +83,8 @@ check('the rail is the standard: 56 px circles, 14 px apart, at the screen margi
   assert.match(src, /backgroundColor: FIXED\.railCircle/);
   assert.match(src, /it\.tone === 'love' \? FIXED\.red : FIXED\.blue/);
   assert.match(src, /fontSize: 11, lineHeight: 13/, 'the count under the icon');
-  for (const f of [DISCOVER, VIEWER]) assert.match(code(read(f)), /paddingRight: layout\.screenMargin \+ RAIL_CIRCLE \+ 12/, `${f}: the caption keeps clear of the rail`);
+  // the 12 between the caption and the rail's circles is space[3] (the space scale); either way of writing it is the same 12
+  for (const f of [DISCOVER, VIEWER]) assert.match(code(read(f)), /paddingRight: layout\.screenMargin \+ RAIL_CIRCLE \+ (?:12|space\[3\])/, `${f}: the caption keeps clear of the rail`);
   assert.match(code(read(VIEWER)), /padding: small \? 12 : 32, paddingRight: small \? 12 : layout\.screenMargin \+ RAIL_CIRCLE \+ 12/, 'the text of a text-only post keeps clear of the rail in the viewer, as the caption does');
 });
 

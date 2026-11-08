@@ -12,7 +12,7 @@ import { Card, SectionLabel } from '@/components/ui';
 import { ROUTE_ID, ROUTE_NAME, StageInfo, formatMb, hasMapTiler, packs, stages, timeAgo, useOnline } from '@/features/map';
 import { MapIcon } from '@/features/map/MapIcon';
 import { packErrorText } from '@/features/map/messages';
-import { c, layout, radius, role } from '@/theme';
+import { c, layout, radius, role, scrim, space } from '@/theme';
 
 export default function OfflineMaps() {
   const insets = useSafeAreaInsets();
@@ -38,8 +38,8 @@ export default function OfflineMaps() {
 
   return (
     <View style={{ flex: 1, backgroundColor: role.bg }}>
-      <ScrollView contentContainerStyle={{ paddingTop: insets.top + layout.screenTop, paddingHorizontal: layout.screenMargin, paddingBottom: insets.bottom + 40, gap: 16 }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+      <ScrollView contentContainerStyle={{ paddingTop: insets.top + layout.screenTop, paddingHorizontal: layout.screenMargin, paddingBottom: insets.bottom + space[10], gap: space[4] }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: space[3] }}>
           <BackButton fallback="/maps" />
           <AppText variant="h3">Offline maps</AppText>
         </View>
@@ -47,15 +47,15 @@ export default function OfflineMaps() {
           Download each stage before you walk. The map, route and pins then work for the whole day with no signal. About 3 to 5 MB per stage.
         </AppText>
 
-        <Card style={{ gap: 6 }}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+        <Card style={{ gap: space[2] }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: space[3] }}>
             <AppText variant="label">On this phone</AppText>
-            <AppText variant="mono" muted style={{ fontSize: 12 }}>{formatMb(usedBytes)} · {Object.keys(state.installed).length} stages</AppText>
+            <AppText variant="mono" muted style={{ flexShrink: 1, textAlign: 'right' }}>{formatMb(usedBytes)} · {Object.keys(state.installed).length} stages</AppText>
           </View>
           <AppText variant="caption" muted>
             {online === false ? 'Offline now. Downloaded stages keep working.' : state.catalogAt ? `Checked for updates ${timeAgo(state.catalogAt)}` : 'Checking for map updates…'}
           </AppText>
-          {state.catalogError === 'not_signed_in' && <AppText variant="caption" color={c.goldInk}>Sign in to see sizes and download stages.</AppText>}
+          {state.catalogError === 'not_signed_in' && <AppText variant="caption" color={role.accentText}>Sign in to see sizes and download stages.</AppText>}
           {!hasMapTiler() && <AppText variant="caption" muted>Online map style: not set, the OSM offline style is used everywhere.</AppText>}
         </Card>
 
@@ -64,7 +64,7 @@ export default function OfflineMaps() {
           <StageRow key={s.id} stage={s} state={state} onUpgrade={() => setUpgrade(true)} />
         ))}
 
-        <AppText variant="caption" muted style={{ marginTop: 8 }}>
+        <AppText variant="caption" muted style={{ marginTop: space[2] }}>
           Map data © OpenStreetMap contributors (ODbL), © OpenMapTiles. Packs are rebuilt every month from fresh OSM data.
         </AppText>
       </ScrollView>
@@ -94,50 +94,50 @@ function StageRow({ stage, state, onUpgrade }: { stage: StageInfo; state: packs.
   const notPublished = !!state.catalog && !remote;
 
   return (
-    <Card style={{ gap: 10 }}>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 12 }}>
-        <View style={{ flex: 1, gap: 2 }}>
-          <AppText variant="mono" muted style={{ fontSize: 12 }}>STAGE {stage.number} · {stage.distanceKm} KM</AppText>
+    <Card style={{ gap: space[3] }}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: space[3] }}>
+        <View style={{ flex: 1, gap: space[1] }}>
+          <AppText variant="mono" muted>STAGE {stage.number} · {stage.distanceKm} KM</AppText>
           <AppText variant="label">{stage.name}</AppText>
         </View>
-        <AppText variant="mono" muted style={{ fontSize: 12 }}>{remote || installed ? '' : '~'}{formatMb(size)}</AppText>
+        <AppText variant="mono" muted>{remote || installed ? '' : '~'}{formatMb(size)}</AppText>
       </View>
 
       {job ? (
-        <View style={{ gap: 6 }}>
-          <View style={{ height: 8, borderRadius: radius.pill, backgroundColor: c.sand200, overflow: 'hidden' }}>
-            <View style={{ width: `${job.total ? Math.min(100, (job.received / job.total) * 100) : 4}%`, height: 8, borderRadius: radius.pill, backgroundColor: c.gold }} />
+        <View style={{ gap: space[2] }}>
+          <View style={{ height: 8, borderRadius: radius.pill, backgroundColor: role.sunken, overflow: 'hidden' }}>
+            <View style={{ width: `${job.total ? Math.min(100, (job.received / job.total) * 100) : 4}%`, height: 8, borderRadius: radius.pill, backgroundColor: role.highlight }} />
           </View>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
             <AppText variant="caption" muted>
               {job.phase === 'link' ? 'Getting secure link…' : job.phase === 'verifying' ? 'Checking file…' : `${formatMb(job.received)} of ${formatMb(job.total || size)}`}
             </AppText>
-            <Pressable onPress={() => packs.cancelDownload(stage.id)} hitSlop={10}>
-              <AppText variant="caption" color={c.red}>Cancel</AppText>
+            <Pressable onPress={() => packs.cancelDownload(stage.id)} hitSlop={14}>
+              <AppText variant="caption" color={role.danger}>Cancel</AppText>
             </Pressable>
           </View>
         </View>
       ) : installed ? (
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flex: 1 }}>
-            <Icon name="check" color={c.success} size={16} />
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: space[2] }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: space[2], flex: 1 }}>
+            <Icon name="check" color={c.success} size={18} />
             <AppText variant="caption" color={c.success}>Ready offline · updated {timeAgo(installed.downloadedAt)}</AppText>
           </View>
           {update && <Pill variant="gold" label={`Update · ${formatMb(remote!.size_bytes)}`} onPress={() => packs.downloadStage(stage.id)} />}
-          <Pressable accessibilityRole="button" accessibilityLabel={`Delete stage ${stage.number} map`} onPress={() => packs.removeStage(stage.id)} hitSlop={10} style={{ padding: 6 }}>
-            <MapIcon name="trash" color={c.red} size={20} />
+          <Pressable accessibilityRole="button" accessibilityLabel={`Delete stage ${stage.number} map`} onPress={() => packs.removeStage(stage.id)} hitSlop={10} style={{ padding: space[2] }}>
+            <MapIcon name="trash" color={role.danger} size={20} />
           </Pressable>
         </View>
       ) : (
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: space[2] }}>
           <AppText variant="caption" muted style={{ flex: 1 }}>{notPublished ? 'Map not published yet' : 'Not on this phone'}</AppText>
           <Pill label="Download" onPress={() => packs.downloadStage(stage.id)} />
         </View>
       )}
 
       {error && !job && (
-        <Pressable onPress={error === 'subscription_required' ? onUpgrade : () => packs.clearError(stage.id)}>
-          <AppText variant="caption" color={error === 'subscription_required' ? c.goldInk : c.red700}>
+        <Pressable onPress={error === 'subscription_required' ? onUpgrade : () => packs.clearError(stage.id)} style={{ minHeight: 48, justifyContent: 'center' }}>
+          <AppText variant="caption" color={error === 'subscription_required' ? role.accentText : c.red700}>
             {packErrorText[error]}{error === 'subscription_required' ? ' See plans ›' : ''}
           </AppText>
         </Pressable>
@@ -150,17 +150,17 @@ function UpgradePrompt({ visible, onClose, onSeePlans }: { visible: boolean; onC
   const insets = useSafeAreaInsets();
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <Pressable onPress={onClose} style={{ flex: 1, backgroundColor: 'rgba(12,35,64,0.35)' }} />
-      <View style={{ backgroundColor: role.surface, borderTopLeftRadius: radius.lg, borderTopRightRadius: radius.lg, paddingHorizontal: layout.screenMargin, paddingTop: 24, paddingBottom: insets.bottom + 24, gap: 12 }}>
-        <AppText variant="accent" color={c.goldInk}>Pilgrim Plus</AppText>
+      <Pressable onPress={onClose} style={{ flex: 1, backgroundColor: scrim }} />
+      <View style={{ backgroundColor: role.surface, borderTopLeftRadius: radius.lg, borderTopRightRadius: radius.lg, paddingHorizontal: layout.screenMargin, paddingTop: layout.sheetPadding, paddingBottom: insets.bottom + layout.sheetPadding, gap: space[3] }}>
+        <AppText variant="accent" color={role.accentText}>Pilgrim Plus</AppText>
         <AppText variant="h3">Walk all day without signal</AppText>
         {['Offline maps for every stage', 'Route, albergues, water and churches offline', '5 GB cloud storage for your journey'].map((t) => (
-          <View key={t} style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
+          <View key={t} style={{ flexDirection: 'row', gap: space[2], alignItems: 'center' }}>
             <Icon name="check" color={c.success} size={18} />
             <AppText variant="small">{t}</AppText>
           </View>
         ))}
-        <AppText variant="label" style={{ marginTop: 4 }}>$12 / year</AppText>
+        <AppText variant="label" style={{ marginTop: space[1] }}>$12 / year</AppText>
         <Pill variant="gold" label="See Pilgrim Plus" onPress={onSeePlans} />
         <Pill variant="ghost" label="Not now" onPress={onClose} />
       </View>

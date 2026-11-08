@@ -12,7 +12,7 @@ import { ownerStore, useOwner } from '@/features/business/store';
 import { Pill } from '@/components/Pill';
 import { SampleNotice, SampleTag } from '@/components/SampleNotice';
 import { OSM_COPYRIGHT_URL, OSM_CREDIT, openLink, sampleStaysNotice, savedLine, useMyStage, useStageStays, type StayModel } from '@/features/places';
-import { c, layout, radius, role, scrim } from '@/theme';
+import { fonts, layout, radius, role, scrim, space, textStyle } from '@/theme';
 // Sample content is never shared outside the app: share the invitation instead of an invented place or caption.
 const SHARE_APP = 'Walking the Camino? CaminoPlus has offline maps, stays and a pilgrim passport: https://camino.plus';
 
@@ -32,29 +32,29 @@ function FilterSheet({ open, value, distanceLabel, onClose, onApply }: { open: b
   return (
     <Modal visible={open} transparent animationType="slide" onRequestClose={onClose}>
       <Pressable accessibilityLabel="Close filters" onPress={onClose} style={{ flex: 1, backgroundColor: scrim }} />
-      <View style={{ backgroundColor: role.bg, borderTopLeftRadius: radius.lg, borderTopRightRadius: radius.lg, paddingHorizontal: layout.screenMargin, paddingTop: 24, paddingBottom: 36, gap: 20 }}>
+      <View style={{ backgroundColor: role.bg, borderTopLeftRadius: radius.lg, borderTopRightRadius: radius.lg, paddingHorizontal: layout.screenMargin, paddingTop: layout.sheetPadding, paddingBottom: space[10], gap: space[5] }}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
           <AppText variant="h4">Filters</AppText>
           <Pressable accessibilityLabel="Close" onPress={onClose} hitSlop={12}><Icon name="close" color={role.text} size={28} /></Pressable>
         </View>
-        <View style={{ gap: 10 }}>
+        <View style={{ gap: space[3] }}>
           <AppText variant="label">Type of stay</AppText>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>{KINDS.map((k) => <Chip key={k} label={k} selected={f.kind === k} onPress={() => setF({ ...f, kind: k })} />)}</View>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space[2] }}>{KINDS.map((k) => <Chip key={k} label={k} selected={f.kind === k} onPress={() => setF({ ...f, kind: k })} />)}</View>
         </View>
-        <View style={{ gap: 10 }}>
+        <View style={{ gap: space[3] }}>
           <AppText variant="label">{distanceLabel}</AppText>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>{DISTANCES.map((d) => <Chip key={d.l} label={d.l} selected={f.dist === d.v} onPress={() => setF({ ...f, dist: d.v })} />)}</View>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space[2] }}>{DISTANCES.map((d) => <Chip key={d.l} label={d.l} selected={f.dist === d.v} onPress={() => setF({ ...f, dist: d.v })} />)}</View>
         </View>
-        <View style={{ gap: 10 }}>
+        <View style={{ gap: space[3] }}>
           <AppText variant="label">Review</AppText>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>{REVIEWS.map((r) => <Chip key={r.l} label={r.l} selected={f.rating === r.v} onPress={() => setF({ ...f, rating: r.v })} />)}</View>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space[2] }}>{REVIEWS.map((r) => <Chip key={r.l} label={r.l} selected={f.rating === r.v} onPress={() => setF({ ...f, rating: r.v })} />)}</View>
         </View>
-        <View style={{ gap: 10 }}>
+        <View style={{ gap: space[3] }}>
           <AppText variant="label">Price</AppText>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>{PRICES.map((p) => <Chip key={p} label={p} selected={f.prices.includes(p)} onPress={() => setF({ ...f, prices: f.prices.includes(p) ? f.prices.filter((x) => x !== p) : [...f.prices, p] })} />)}</View>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space[2] }}>{PRICES.map((p) => <Chip key={p} label={p} selected={f.prices.includes(p)} onPress={() => setF({ ...f, prices: f.prices.includes(p) ? f.prices.filter((x) => x !== p) : [...f.prices, p] })} />)}</View>
           <AppText variant="caption" muted>$ under €20 · $$ €20 to €50 · $$$ over €50</AppText>
         </View>
-        <View style={{ flexDirection: 'row', gap: 12 }}>
+        <View style={{ flexDirection: 'row', gap: space[3] }}>
           <View style={{ flex: 1 }}><Pill large variant="ghost" label="Reset" onPress={() => setF(NO_FILTERS)} /></View>
           <View style={{ flex: 1 }}><Pill large label="Show stays" onPress={() => onApply(f)} /></View>
         </View>
@@ -67,23 +67,21 @@ function StayCard({ s, stageId, fav, onFav }: { s: StayModel; stageId: string | 
   const router = useRouter();
   // a real stay opens with the stage it was listed for (the stay page reads it from the same list); a sample opens as it always did
   return (
-    <Card style={{ padding: 12, gap: 12 }} onPress={() => router.push(s.sample || !stageId ? `/stay/${s.id}` : `/stay/${s.id}?stage=${stageId}`)}>
+    <Card style={{ padding: space[3], gap: space[3] }} onPress={() => router.push(s.sample || !stageId ? `/stay/${s.id}` : `/stay/${s.id}?stage=${stageId}`)}>
       <View>
         <Photo tint={s.tint} height={170} />
-        {s.sample && <View style={{ position: 'absolute', top: 10, left: 10 }}><SampleTag /></View>}
-        <Pressable accessibilityLabel="Share this stay" onPress={() => Share.share({ message: SHARE_APP }).catch(() => {})} style={{ position: 'absolute', top: 10, right: 58, width: 40, height: 40, borderRadius: radius.pill, backgroundColor: role.surface, alignItems: 'center', justifyContent: 'center' }}>
-          <Icon name="share" color={c.blue} size={20} />
-        </Pressable>
-        <Pressable accessibilityLabel={fav ? 'Remove favourite' : 'Add favourite'} onPress={onFav} style={{ position: 'absolute', top: 10, right: 10, width: 40, height: 40, borderRadius: radius.pill, backgroundColor: role.surface, alignItems: 'center', justifyContent: 'center' }}>
-          <Icon name="heart" color={fav ? c.red : c.blue} size={20} filled={fav} />
-        </Pressable>
+        {s.sample && <View style={{ position: 'absolute', top: space[3], left: space[3] }}><SampleTag /></View>}
+        <View style={{ position: 'absolute', top: space[3], right: space[3], flexDirection: 'row', gap: space[2] }}>
+          <IconButton name="share" label="Share this stay" onPress={() => Share.share({ message: SHARE_APP }).catch(() => {})} />
+          <IconButton name="heart" label={fav ? 'Remove favourite' : 'Add favourite'} active={fav} onPress={onFav} />
+        </View>
       </View>
-      <View style={{ paddingHorizontal: 8, paddingBottom: 8, gap: 4 }}>
+      <View style={{ paddingHorizontal: space[2], paddingBottom: space[2], gap: space[1] }}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
           <AppText variant="h4" style={{ flex: 1 }}>{s.name}</AppText>
           {s.rating != null && (
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-              <Icon name="star" color={c.gold} size={16} />
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: space[1] }}>
+              <Icon name="star" color={role.highlight} size={18} />
               <AppText variant="label">{s.rating}</AppText>
             </View>
           )}
@@ -91,13 +89,9 @@ function StayCard({ s, stageId, fav, onFav }: { s: StayModel; stageId: string | 
         {s.verifiedOwner && <Badge label="Verified owner" tone="blue" icon="shield" />}
         <AppText variant="small" muted>{s.subtitle}</AppText>
         {s.sourceLine && <AppText variant="caption" muted>{s.sourceLine}</AppText>}
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 6 }}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: space[2] }}>
           <AppText variant="label" muted={!s.sample}>{s.priceText}</AppText>
-          {s.chip && (
-            <View style={{ paddingHorizontal: 10, height: 26, borderRadius: radius.pill, backgroundColor: c.goldWash, justifyContent: 'center' }}>
-              <AppText variant="caption" color={role.accentText}>{s.chip}</AppText>
-            </View>
-          )}
+          {s.chip && <Badge label={s.chip} tone="wash" />}
         </View>
       </View>
     </Card>
@@ -126,20 +120,21 @@ export default function Stays() {
   const credit = !sample && rows.some((s) => s.row?.source === 'osm');
   return (
     <Screen>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-        <View style={{ flex: 1, height: 52, borderRadius: radius.pill, backgroundColor: role.surface, borderWidth: 1, borderColor: role.border, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 18, gap: 10 }}>
-          <Icon name="search" color={c.blue} size={20} />
-          <TextInput value={q} onChangeText={setQ} placeholder="Search stays and cafes" placeholderTextColor={role.muted} style={{ flex: 1, fontFamily: 'Inter_400Regular', fontSize: 16, color: role.text }} />
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: space[3] }}>
+        <View style={{ flex: 1, minWidth: 0, height: 52, borderRadius: radius.pill, backgroundColor: role.surface, borderWidth: 1, borderColor: role.border, flexDirection: 'row', alignItems: 'center', paddingHorizontal: space[4], gap: space[2] }}>
+          <Icon name="search" color={role.text} size={20} />
+          {/* 15, not 17: at 17 the placeholder "Search stays and cafes" (187 px) no longer fits the field on a 390 phone; 15 (the caption size) keeps it whole */}
+          <TextInput value={q} onChangeText={setQ} placeholder="Search stays and cafes" placeholderTextColor={role.muted} style={{ flex: 1, minWidth: 0, height: 48, paddingVertical: 0, fontFamily: fonts.body, fontSize: textStyle('caption').fontSize, color: role.text }} />
         </View>
         <View>
           <IconButton name="filter" label="Filters" size={52} onPress={() => setFilterOpen(true)} badge={activeCount} />
         </View>
         <IconButton name="heart" label="Favourites" size={52} active={onlyFavs} onPress={() => setOnlyFavs((v) => !v)} />
       </View>
-      {loading && <ActivityIndicator accessibilityLabel="Looking for places on your stage" color={role.action} style={{ marginTop: 24 }} />}
+      {loading && <ActivityIndicator accessibilityLabel="Looking for places on your stage" color={role.action} style={{ marginTop: space[6] }} />}
       {!loading && sample && <SampleNotice title="Sample stays">{sampleStaysNotice({ offline, error })}</SampleNotice>}
       {!loading && !sample && (
-        <View style={{ gap: 2 }}>
+        <View style={{ gap: space[1] }}>
           <AppText variant="small" muted>{stage.stageName ? `Along your stage: ${stage.stageName}` : 'Along your stage'}</AppText>
           {source === 'cache' && <AppText variant="caption" muted>{savedLine(savedAt)}</AppText>}
         </View>
@@ -150,7 +145,7 @@ export default function Stays() {
         { id: 'stamp', eyebrow: 'Pilgrim tip', title: 'Stay where the stamp is: albergues with a sello', cta: 'See albergues', icon: 'stays', onPress: () => setFilters({ ...NO_FILTERS, kind: 'Albergue' }) },
       ]} />
       {!loading && list.slice(0, shown).map((s, i) => (
-        <View key={s.id} style={{ gap: 16 }}>
+        <View key={s.id} style={{ gap: space[4] }}>
           <StayCard s={s} stageId={stage.stageId} fav={favs.has(s.id)} onFav={() => toggle(s.id)} />
           {i === 1 && owner.state === 'none' && !owner.feedCardHidden && (
             <BusinessFeedCard onPress={() => router.push('/business')} onDismiss={ownerStore.hideFeedCard} />

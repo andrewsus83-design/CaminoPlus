@@ -11,7 +11,7 @@ import type { SheetComment } from '@/lib/postComments';
 import { SHARE_APP } from '@/lib/postShare'; // sample content is never shared outside the app: share the invitation instead of an invented place or caption
 import { useLocalReactions } from '@/lib/useLocalReactions';
 import { exploreItems } from '@/data/mock';
-import { fonts, layout } from '@/theme';
+import { fonts, layout, radius, space } from '@/theme';
 
 const TABS = ['For you', 'Friends', 'Photos of you', 'Favourites'] as const;
 const FAV_KEY = 'discover.favs';
@@ -67,10 +67,10 @@ export default function Discover() {
             data={itemsFor(t)}
             getItemLayout={(_, index) => ({ length: height, offset: height * index, index })}
             onScrollBeginDrag={dismiss}
-            ListEmptyComponent={<View style={{ width, height, alignItems: 'center', justifyContent: 'center', padding: 40, gap: 12 }}><Icon name="heart" color={FIXED.emptyIcon} size={44} /><AppText variant="lead" color={FIXED.white} style={{ textAlign: 'center' }}>Nothing saved yet. Tap the heart or bookmark on a story to keep it here.</AppText></View>}
+            ListEmptyComponent={<View style={{ width, height, alignItems: 'center', justifyContent: 'center', padding: space[10], gap: space[3] }}><Icon name="heart" color={FIXED.emptyIcon} size={32} /><AppText variant="lead" color={FIXED.white} style={{ textAlign: 'center' }}>Nothing saved yet. Tap the heart or bookmark on a story to keep it here.</AppText></View>}
             keyExtractor={(i) => i.id}
             renderItem={({ item }) => (
-          <View style={{ width, height, backgroundColor: item.tint, justifyContent: 'flex-end', paddingLeft: layout.screenMargin, paddingRight: layout.screenMargin + RAIL_CIRCLE + 12, paddingTop: 24, paddingBottom: insets.bottom + RAIL_BOTTOM }}>
+          <View style={{ width, height, backgroundColor: item.tint, justifyContent: 'flex-end', paddingLeft: layout.screenMargin, paddingRight: layout.screenMargin + RAIL_CIRCLE + space[3], paddingTop: space[6], paddingBottom: insets.bottom + RAIL_BOTTOM }}>
             <AppText variant="h3" color={FIXED.blue900}>{item.caption}</AppText>
             <AppText variant="mono" color={FIXED.blue900}>@{item.user}</AppText>
             <ActionRail
@@ -83,14 +83,14 @@ export default function Discover() {
         )}
       />
       <View style={{ position: 'absolute', top: insets.top + layout.screenTop, left: 0, right: 0 }}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ minWidth: width, justifyContent: 'center', gap: 22, paddingHorizontal: layout.screenMargin }}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ minWidth: width, justifyContent: 'center', gap: space[6], paddingHorizontal: layout.screenMargin }}>
           {TABS.map((t) => (
-            <Pressable key={t} accessibilityRole="tab" accessibilityState={{ selected: tab === t }} onPress={() => goTab(t)} hitSlop={10} style={{ paddingVertical: 8, borderBottomWidth: 3, borderBottomColor: tab === t ? FIXED.white : 'transparent' }}>
+            <Pressable key={t} accessibilityRole="tab" accessibilityState={{ selected: tab === t }} onPress={() => goTab(t)} hitSlop={10} style={{ minHeight: 48, justifyContent: 'center', paddingVertical: space[2], borderBottomWidth: 3, borderBottomColor: tab === t ? FIXED.white : 'transparent' }}>
               <AppText variant="body" color={tab === t ? FIXED.white : FIXED.tabOff} style={{ fontFamily: fonts.bodyBold, textShadowColor: FIXED.tabShadow, textShadowRadius: 6 }}>{t}</AppText>
             </Pressable>
           ))}
         </ScrollView>
-        <View accessibilityLabel="Sample stories" style={{ alignSelf: 'center', marginTop: 8, marginHorizontal: layout.screenMargin, paddingHorizontal: 14, paddingVertical: 5, minHeight: 30, borderRadius: 15, backgroundColor: FIXED.pill, justifyContent: 'center' }}>
+        <View accessibilityLabel="Sample stories" style={{ alignSelf: 'center', marginTop: space[2], marginHorizontal: layout.screenMargin, paddingHorizontal: space[4], paddingVertical: space[2], borderRadius: radius.sm, backgroundColor: FIXED.pill, justifyContent: 'center' }}>
           <AppText variant="caption" color={FIXED.goldInk} style={{ textAlign: 'center' }}>Sample stories · real ones from pilgrims are coming</AppText>
         </View>
       </View>
@@ -101,12 +101,12 @@ export default function Discover() {
         onClose={() => setOpenId(null)}
       />
       {showTip && (
-        <Pressable onPress={dismiss} style={{ position: 'absolute', inset: 0, backgroundColor: FIXED.tutorialScrim, alignItems: 'center', justifyContent: 'center', gap: 12 }}>
+        <Pressable onPress={dismiss} style={{ position: 'absolute', inset: 0, backgroundColor: FIXED.tutorialScrim, alignItems: 'center', justifyContent: 'center', gap: space[3] }}>
           <AppText variant="accent" color={FIXED.parchment}>Swipe up or down</AppText>
           <AppText variant="small" color={FIXED.parchment}>for the next story</AppText>
-          <AppText variant="accent" color={FIXED.parchment} style={{ marginTop: 12 }}>Swipe left or right</AppText>
+          <AppText variant="accent" color={FIXED.parchment} style={{ marginTop: space[3] }}>Swipe left or right</AppText>
           <AppText variant="small" color={FIXED.parchment}>for For you, Friends and more</AppText>
-          <AppText variant="small" color={FIXED.goldSoft} style={{ marginTop: 16 }}>Tap anywhere to start</AppText>
+          <AppText variant="small" color={FIXED.goldSoft} style={{ marginTop: space[4] }}>Tap anywhere to start</AppText>
         </Pressable>
       )}
     </View>

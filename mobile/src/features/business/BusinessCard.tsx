@@ -6,7 +6,7 @@ import { Icon } from '@/components/Icon';
 import { Pill } from '@/components/Pill';
 import { Badge, Highlight } from './ui';
 import { OwnerState } from './store';
-import { c, layout, radius, role, shadowStyle } from '@/theme';
+import { c, layout, radius, role, scrim, shadowStyle, space } from '@/theme';
 
 // Press feedback shared by every card: scale to 98%, 120 ms.
 function PressCard({ onPress, children, style, label }: { onPress: () => void; children: ReactNode; style: object; label: string }) {
@@ -22,14 +22,14 @@ function PressCard({ onPress, children, style, label }: { onPress: () => void; c
 function Ring({ done, total = 5 }: { done: number; total?: number }) {
   // simple segmented ring stand-in: gold arc segments around the count
   return (
-    <View style={{ width: 52, height: 52, borderRadius: radius.pill, borderWidth: 5, borderColor: c.goldSoft, borderTopColor: c.gold, borderRightColor: done / total > 0.25 ? c.gold : c.goldSoft, borderBottomColor: done / total > 0.5 ? c.gold : c.goldSoft, borderLeftColor: done / total > 0.75 ? c.gold : c.goldSoft, alignItems: 'center', justifyContent: 'center' }}>
-      <AppText variant="mono" color={c.goldInk} style={{ fontSize: 12 }}>{done}/{total}</AppText>
+    <View style={{ width: 52, height: 52, borderRadius: radius.pill, borderWidth: 5, borderColor: c.goldSoft, borderTopColor: role.highlight, borderRightColor: done / total > 0.25 ? role.highlight : c.goldSoft, borderBottomColor: done / total > 0.5 ? role.highlight : c.goldSoft, borderLeftColor: done / total > 0.75 ? role.highlight : c.goldSoft, alignItems: 'center', justifyContent: 'center' }}>
+      <AppText variant="mono" color={role.accentText}>{done}/{total}</AppText>
     </View>
   );
 }
 
 // Getter for the colour, so it follows the light/dark theme.
-const row = { flexDirection: 'row' as const, alignItems: 'center' as const, gap: 14, padding: 16, borderRadius: radius.lg, get backgroundColor() { return role.surface; }, ...shadowStyle('sm') };
+const row = { flexDirection: 'row' as const, alignItems: 'center' as const, gap: space[4], padding: layout.cardPadding, borderRadius: radius.lg, get backgroundColor() { return role.surface; }, ...shadowStyle('sm') };
 
 // The "List your business" card. It changes with the owner's progress.
 export function BusinessCard({ state, name, stepsDone, onPress }: { state: OwnerState; name: string; stepsDone: number; onPress: () => void }) {
@@ -45,7 +45,7 @@ export function BusinessCard({ state, name, stepsDone, onPress }: { state: Owner
   );
   if (state === 'in_review') return (
     <PressCard label="Waiting for listings to open" onPress={onPress} style={row}>
-      <View style={{ width: 44, height: 44, borderRadius: radius.pill, backgroundColor: c.goldWash, alignItems: 'center', justifyContent: 'center' }}><Icon name="shell" color={c.goldInk} size={22} /></View>
+      <View style={{ width: 44, height: 44, borderRadius: radius.pill, backgroundColor: c.goldWash, alignItems: 'center', justifyContent: 'center' }}><Icon name="shell" color={role.accentText} size={24} /></View>
       <View style={{ flex: 1 }}>
         <AppText variant="label">{name || 'Your place'}</AppText>
         <AppText variant="caption" muted>Details sent · we write when listings open</AppText>
@@ -55,7 +55,7 @@ export function BusinessCard({ state, name, stepsDone, onPress }: { state: Owner
   );
   if (state === 'changes_requested') return (
     <PressCard label="Changes needed" onPress={onPress} style={{ ...row, borderWidth: 1.5, borderColor: c.red100 }}>
-      <View style={{ width: 44, height: 44, borderRadius: radius.pill, backgroundColor: c.red100, alignItems: 'center', justifyContent: 'center' }}><Icon name="pen" color={c.red700} size={22} /></View>
+      <View style={{ width: 44, height: 44, borderRadius: radius.pill, backgroundColor: c.red100, alignItems: 'center', justifyContent: 'center' }}><Icon name="pen" color={c.red700} size={24} /></View>
       <View style={{ flex: 1 }}>
         <AppText variant="label">Changes needed</AppText>
         <AppText variant="caption" muted>Fix and send again · note from our team</AppText>
@@ -75,12 +75,13 @@ export function BusinessCard({ state, name, stepsDone, onPress }: { state: Owner
   );
   // invite
   return (
-    <PressCard label="List your business" onPress={onPress} style={{ overflow: 'hidden', borderRadius: radius.xl, backgroundColor: role.inverse, padding: 22, ...shadowStyle('md') }}>
-      <View style={{ position: 'absolute', right: -30, bottom: -36, opacity: 0.85 }}><Icon name="shell" color={c.gold} size={150} /></View>
-      <AppText variant="mono" color={c.goldBright} style={{ fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase' }}>For business owners</AppText>
-      <AppText variant="h3" color={role.onInverse} style={{ marginTop: 8, maxWidth: 240 }}>Run an albergue, café or shop on the Way?</AppText>
-      <AppText variant="small" color={role.onInverse} style={{ opacity: 0.85, marginTop: 6, maxWidth: 230 }}>List it free. Pilgrims see you on the map tonight.</AppText>
-      <View style={{ flexDirection: 'row', alignSelf: 'flex-start', alignItems: 'center', gap: 8, marginTop: 16, height: 40, paddingHorizontal: 16, borderRadius: radius.pill, backgroundColor: c.gold }}>
+    <PressCard label="List your business" onPress={onPress} style={{ overflow: 'hidden', borderRadius: radius.xl, backgroundColor: role.inverse, padding: layout.cardPaddingLg, ...shadowStyle('md') }}>
+      {/* design-lint-ignore: size the shell is the card's decorative watermark, drawn as art at 150, not an icon of the interface */}
+      <View style={{ position: 'absolute', right: -30, bottom: -36, opacity: 0.85 }}><Icon name="shell" color={role.highlight} size={150} /></View>
+      <AppText variant="mono" color={c.goldBright} style={{ textTransform: 'uppercase' }}>For business owners</AppText>
+      <AppText variant="h3" color={role.onInverse} style={{ marginTop: space[2], maxWidth: 240 }}>Run an albergue, café or shop on the Way?</AppText>
+      <AppText variant="small" color={role.onInverse} style={{ opacity: 0.85, marginTop: space[2], maxWidth: 230 }}>List it free. Pilgrims see you on the map tonight.</AppText>
+      <View style={{ flexDirection: 'row', alignSelf: 'flex-start', alignItems: 'center', gap: space[2], marginTop: space[4], height: 40, paddingHorizontal: space[4], borderRadius: radius.pill, backgroundColor: role.highlight }}>
         <Icon name="briefcase" color={role.onHighlight} size={18} />
         <AppText variant="label" color={role.onHighlight}>List your business</AppText>
       </View>
@@ -92,12 +93,12 @@ export function BusinessCard({ state, name, stepsDone, onPress }: { state: Owner
 export function BusinessFeedCard({ onPress, onDismiss }: { onPress: () => void; onDismiss: () => void }) {
   return (
     <PressCard label="List your business" onPress={onPress} style={{ ...row, backgroundColor: c.goldWash }}>
-      <View style={{ width: 44, height: 44, borderRadius: radius.pill, backgroundColor: c.white, alignItems: 'center', justifyContent: 'center' }}><Icon name="briefcase" color={c.goldInk} size={22} /></View>
+      <View style={{ width: 44, height: 44, borderRadius: radius.pill, backgroundColor: role.surface, alignItems: 'center', justifyContent: 'center' }}><Icon name="briefcase" color={role.accentText} size={24} /></View>
       <View style={{ flex: 1 }}>
         <AppText variant="label">Own a place on the Camino?</AppText>
         <AppText variant="caption" muted>List it free in 10 minutes</AppText>
       </View>
-      <Pressable accessibilityLabel="Dismiss" hitSlop={10} onPress={onDismiss}><Icon name="close" color={role.muted} size={20} /></Pressable>
+      <Pressable accessibilityLabel="Dismiss" hitSlop={14} onPress={onDismiss}><Icon name="close" color={role.muted} size={20} /></Pressable>
     </PressCard>
   );
 }
@@ -107,9 +108,9 @@ export function Sheet({ visible, onClose, children }: { visible: boolean; onClos
   const insets = useSafeAreaInsets();
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <Pressable accessibilityLabel="Close" onPress={onClose} style={{ flex: 1, backgroundColor: 'rgba(12,35,64,0.45)' }} />
-      <View style={{ backgroundColor: role.surface, borderTopLeftRadius: radius.xl, borderTopRightRadius: radius.xl, paddingHorizontal: layout.screenMargin, paddingTop: 24, paddingBottom: insets.bottom + 24, gap: 14 }}>
-        <View style={{ width: 44, height: 5, borderRadius: radius.pill, backgroundColor: c.sand400, alignSelf: 'center', marginBottom: 6 }} />
+      <Pressable accessibilityLabel="Close" onPress={onClose} style={{ flex: 1, backgroundColor: scrim }} />
+      <View style={{ backgroundColor: role.surface, borderTopLeftRadius: radius.xl, borderTopRightRadius: radius.xl, paddingHorizontal: layout.screenMargin, paddingTop: layout.sheetPadding, paddingBottom: insets.bottom + layout.sheetPadding, gap: space[4] }}>
+        <View style={{ width: 44, height: 5, borderRadius: radius.pill, backgroundColor: role.borderStrong, alignSelf: 'center', marginBottom: space[2] }} />
         {children}
       </View>
     </Modal>
@@ -126,7 +127,7 @@ export function IntroSheet({ visible, onClose, onStart, onClaim }: { visible: bo
       <Highlight icon="chat" title="Reply to reviews" text="And see views and saves" />
       <Pill variant="gold" label="Get started" onPress={onStart} />
       <Pill variant="ghost" label="My place is already in the app" onPress={onClaim} />
-      <Pressable onPress={onClose} style={{ alignItems: 'center', padding: 8 }}><AppText variant="label" muted>Not now</AppText></Pressable>
+      <Pressable onPress={onClose} style={{ alignItems: 'center', justifyContent: 'center', minHeight: 48 }}><AppText variant="label" muted>Not now</AppText></Pressable>
     </Sheet>
   );
 }
