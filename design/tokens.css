@@ -61,6 +61,8 @@
   --cp-tab-inactive:     var(--cp-color-stone-550);  /* inactive tab icon and label on the tab bar */
   --cp-tab-bar:          var(--cp-color-white);      /* the floating tab bar: light mode the card white, dark mode darker than the page */
   --cp-tab-bar-border:   var(--cp-color-white);      /* its hairline: invisible in light mode (the shadow separates it), a lighter navy in dark mode */
+  --cp-tab-active-stroke: 3px;                       /* the active tab icon: a little heavier in light mode, because dark on light looks thinner */
+  --cp-tab-active-weight: 700;                       /* the active tab label (dark mode: 600) */
   --cp-text-inverse:     var(--cp-color-parchment);
   --cp-text-accent:      var(--cp-color-gold-ink);
 
