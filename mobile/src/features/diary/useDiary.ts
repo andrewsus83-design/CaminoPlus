@@ -1,8 +1,7 @@
 // The hooks of the diary screens. Nothing here uses the network, and nothing throws: the store answers, it does not raise.
 //
-//   useDiary()          the signed-in person's pages, newest first, for the list and the Library's Notes tab. Read again
-//                       each time the screen comes back into view (so a page written a moment ago shows after Back), and on
-//                       `reload()` (pull to refresh).
+//   useDiary()          the signed-in person's pages, newest first, for the list and the card on the Library screen. Read again
+//                       each time the screen comes back into view (so a page written a moment ago shows after Back).
 //   useDiaryPage(id)    one page for the editor, read once. `new` is a blank page. A page that is not there (deleted, or
 //                       another account's) or no session at all is "missing", never an error.
 //   usePageSaver()      the autosave of the editor (autosave.ts), tied to the screen: it writes when the screen goes away and

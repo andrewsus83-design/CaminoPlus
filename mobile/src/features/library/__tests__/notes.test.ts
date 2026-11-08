@@ -8,6 +8,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import type { DiaryMedia } from '../../diary/media';
 import type { DiaryPlace } from '../../diary/place';
+import { AVATAR_TINTS } from '../../social/logic';
 import {
   BLANK_NOTE, BODY_CLAMP_PX, BODY_LINES, BODY_LINE_PX, COMPOSER_PLACEHOLDER, DELETE_FAILED, EMPTY_BUTTON, FALLBACK_NAME, FEED_CHARS, FILTER_EMPTY, FILTER_LABEL, MEDIA_GAP, MEDIA_RATIO,
   MEDIA_SHOWN_MAX, NOTES_PRIVACY, NOTE_FILTERS, TOUCH_MIN, feedBody, feedState, filterLabel, filterNotes, hasMedia, hasPlace, identity, matchesFilter, mediaPlan, needsMore, noteCounts,
@@ -636,6 +637,58 @@ check('colours come from the theme: none written out, no stylesheet, and no colo
   }
   assert.deepEqual(offenders, []);
   for (const f of tsx) assert.match(read(`${DIR}/${f}`), /from '@\/theme'/, `${f} takes its colours from the theme`);
+});
+
+check('the pairs the Notes tab draws keep their contrast in light and in dark, read from the tokens the theme is built from: text 4.5 : 1, icons and the line of a selected tab 3 : 1', () => {
+  type Tokens = { color: Record<string, string>; role: Record<string, string>; dark: { color: Record<string, string>; role: Record<string, string> } };
+  const tokens = JSON.parse(read('src/theme/tokens.json')) as Tokens;
+  const palette = (dark: boolean): Record<string, string> => ({ ...tokens.color, ...(dark ? tokens.dark.color : {}) });
+  const roleColour = (name: string, dark: boolean): string => {
+    const literal = dark ? tokens.dark.role[name] : undefined;
+    if (literal) return literal.startsWith('#') ? literal : palette(dark)[literal];
+    return palette(dark)[tokens.role[name]];
+  };
+  const lin = (v: number) => { const x = v / 255; return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4; };
+  const lum = (hex: string) => { const h = hex.replace('#', ''); const [r, g, b] = [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16)); return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b); };
+  const ratio = (a: string, b: string) => { const [hi, lo] = [lum(a), lum(b)].sort((x, y) => y - x); return (hi + 0.05) / (lo + 0.05); };
+  // [what it is, foreground, background, needed]: a role of tokens.json by its token name, or a colour of the palette written as c:name
+  const pairs: [string, string, string, number][] = [
+    ['words, name and title on the page', 'text', 'bg', 4.5],
+    ['handle, time, the prompt and the line under the composer (muted) on the page', 'textMuted', 'bg', 4.5],
+    ['"Show more" (accent text) on the page', 'textAccent', 'bg', 4.5],
+    ['words on a row while it is pressed (sunken)', 'text', 'surfaceSunken', 4.5],
+    ['handle and time on a row while it is pressed', 'textMuted', 'surfaceSunken', 4.5],
+    ['"Show more" on a row while it is pressed', 'textAccent', 'surfaceSunken', 4.5],
+    ['the line under the selected tab and the two shortcuts (action) on the page', 'action', 'bg', 3],
+    ['the dots and the share icon (muted) on the page', 'textMuted', 'bg', 3],
+    ['the name of a place on its chip (surface)', 'text', 'surface', 4.5],
+    ['the pin on the chip (accent text on surface)', 'textAccent', 'surface', 3],
+    ['the mark of a file that is not here (muted on sunken)', 'textMuted', 'surfaceSunken', 3],
+    ['the button of the empty state (onAction on action)', 'onAction', 'action', 4.5],
+    ['the pen of the empty state (onHighlight on highlight)', 'onHighlight', 'highlight', 4.5],
+    ['Delete in the menu (danger on surface)', 'danger', 'surface', 4.5],
+    ['Delete in the menu while it is pressed (danger on the page colour)', 'danger', 'bg', 4.5],
+    ['Edit in the menu while it is pressed (text on the page colour)', 'text', 'bg', 4.5],
+    ['the name of the note over the menu (muted on surface)', 'textMuted', 'surface', 4.5],
+  ];
+  for (const dark of [false, true]) {
+    for (const [what, fg, bg, need] of pairs) {
+      const got = ratio(roleColour(fg, dark), roleColour(bg, dark));
+      assert.ok(got >= need, `${dark ? 'dark' : 'light'}: ${what} is ${got.toFixed(2)} : 1, needs ${need} : 1`);
+    }
+    // the notices (FormMessage): the red on the pink wash, the accent text on the gold wash
+    const p = palette(dark);
+    assert.ok(ratio(p.red700, p.red100) >= 4.5, `${dark ? 'dark' : 'light'}: the error notice`);
+    assert.ok(ratio(roleColour('textAccent', dark), p.goldWash) >= 4.5, `${dark ? 'dark' : 'light'}: the info notice`);
+  }
+  // the initials of the avatar sit on six soft colours that are the same in dark mode: they are the fixed navy, never c.blue
+  for (const tint of AVATAR_TINTS) assert.ok(ratio(tokens.color.blue, tint) >= 4.5, `the fixed navy on ${tint}`);
+  assert.match(read('src/features/social/components/primitives.tsx'), /<AppText variant="label" color=\{FIXED\.blue\} style=\{\{ fontSize: Math\.round\(size \* 0\.36\)/, 'the initials are FIXED.blue (c.blue is light blue in dark mode: 1 : 1 on these colours)');
+  // "+N" on the last tile is white on the 45 % black chip of a photo: over the lightest photo that is 3.4 : 1, and it is large text (needs 3)
+  const worst = 255 * (1 - 0.45);
+  const grey = `#${Math.round(worst).toString(16).repeat(3)}`;
+  assert.ok(ratio('#ffffff', grey) >= 3, 'white on 45 % black over a white photo');
+  assert.match(read('src/components/fixedColors.ts'), /photoChip: 'rgba\(0,0,0,0\.45\)'/, 'the chip is the 45 % black this check assumes');
 });
 
 check('the photos and videos use the diary\'s own tile (the loader, the "Not on this phone" tile, the play tile) and its full-screen viewer, and say which one of how many', () => {
