@@ -25,7 +25,7 @@ Deno.test('client secret: an ES256 JWT with the claims Apple asks for, signed wi
   const jwt = await clientSecret(cfgWith(pem), 1_800_000_000);
   const [h, p, s] = jwt.split('.');
   assertEquals(JSON.parse(new TextDecoder().decode(b64urlDecode(h))), { alg: 'ES256', kid: 'KEY1234567', typ: 'JWT' });
-  assertEquals(jwtClaims(jwt), { iss: 'TEAM123456', iat: 1_800_000_000, exp: 1_800_000_300, aud: 'https://appleid.apple.com', sub: 'plus.camino.app' });
+  assertEquals(jwtClaims(jwt), { iss: 'TEAM123456', iat: 1_799_999_940, exp: 1_800_000_300, aud: 'https://appleid.apple.com', sub: 'plus.camino.app' });
   const sig = b64urlDecode(s);
   assertEquals(sig.length, 64, 'a JWS ES256 signature is r || s, 64 bytes');
   assertMatch(jwt, /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/, 'base64url without padding');

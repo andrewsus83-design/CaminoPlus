@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { createHash, randomBytes } from 'node:crypto';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
-import { appleAvailable, appleErrorMessage, appleFullName, isAppleCancel, isPlaceholderName, makeNonce, nameToSave, toHex } from '../authAppleCore';
+import { appleAvailable, appleErrorMessage, appleFullName, forgetPendingName, isAppleCancel, isPlaceholderName, makeNonce, nameFromAppleOrPending, nameToSave, toHex, triggerDisplayName } from '../authAppleCore';
 
 let n = 0;
 const pending: Array<Promise<void>> = [];
@@ -103,21 +103,41 @@ check('Apple\'s name becomes one short line, or nothing', () => {
   assert.equal(appleFullName({ givenName: 'x'.repeat(80) })!.length, 60);
 });
 
-check('the name is saved only over the automatic name the sign-up trigger wrote', () => {
-  // automatic names: empty, the start of the email (also the username, maybe with digits after it), "pilgrim"
-  assert.equal(isPlaceholderName('', 'abc'), true);
-  assert.equal(isPlaceholderName(null, 'abc'), true);
-  assert.equal(isPlaceholderName('x7kq2m9pzt', 'x7kq2m9pzt'), true); // a private relay address
-  assert.equal(isPlaceholderName('ana.torres', 'ana.torres48213377'), true);
-  assert.equal(isPlaceholderName('pilgrim', 'pilgrim12345678'), true);
-  // a name somebody chose
-  assert.equal(isPlaceholderName('Ana Torres', 'ana.torres'), false);
-  assert.equal(isPlaceholderName('Ana', 'ana'), false);
-  assert.equal(isPlaceholderName('ana', 'peregrina'), false);
-  assert.equal(nameToSave({ display_name: 'x7kq2m9pzt', username: 'x7kq2m9pzt' }, 'Ana Torres'), 'Ana Torres');
-  assert.equal(nameToSave({ display_name: 'Ana T.', username: 'x7kq2m9pzt' }, 'Ana Torres'), null);
-  assert.equal(nameToSave({ display_name: 'x7kq2m9pzt', username: 'x7kq2m9pzt' }, null), null);
-  assert.equal(nameToSave(null, 'Ana Torres'), null);
+check('the automatic name is what the sign-up trigger makes from the email', () => {
+  assert.equal(triggerDisplayName('x7kq2m9pzt@privaterelay.appleid.com'), 'x7kq2m9pzt');
+  assert.equal(triggerDisplayName('Ana.Torres+camino@example.com'), 'ana.torrescamino');
+  assert.equal(triggerDisplayName('jo@example.com'), 'pilgrim');
+  assert.equal(triggerDisplayName('a'.repeat(30) + '@example.com'), 'a'.repeat(22));
+  assert.equal(triggerDisplayName(null), 'pilgrim');
+});
+
+check('the name is saved only over an exact automatic name, never over a name somebody chose', () => {
+  const relay = 'x7kq2m9pzt@privaterelay.appleid.com';
+  assert.equal(isPlaceholderName('', relay), true);
+  assert.equal(isPlaceholderName(null, relay), true);
+  assert.equal(isPlaceholderName('pilgrim', 'jo@example.com'), true);
+  assert.equal(isPlaceholderName('x7kq2m9pzt', relay), true); // the private relay name
+  assert.equal(isPlaceholderName('ana.torres', 'ana.torres@example.com'), true); // exactly the email local part
+  // chosen names, also one that is the start of the username or of the email
+  assert.equal(isPlaceholderName('ana', 'ana.torres@example.com'), false);
+  assert.equal(isPlaceholderName('Ana Torres', 'ana.torres@example.com'), false);
+  assert.equal(isPlaceholderName('x7kq', relay), false);
+  assert.equal(isPlaceholderName('ana.torres', null), false); // no email known: only empty or "pilgrim" count
+  assert.equal(nameToSave({ display_name: 'x7kq2m9pzt' }, 'Ana Torres', relay), 'Ana Torres');
+  assert.equal(nameToSave({ display_name: 'Ana T.' }, 'Ana Torres', relay), null);
+  assert.equal(nameToSave({ display_name: 'x7kq2m9pzt' }, null, relay), null);
+  assert.equal(nameToSave(null, 'Ana Torres', relay), null);
+});
+
+check('a name Apple shared is kept until saved: reused for the same Apple account only, forgotten unless saving failed', () => {
+  const kept = { appleUser: '001.abc', name: 'Ana Torres' };
+  assert.equal(nameFromAppleOrPending('Ana T', '001.abc', kept), 'Ana T'); // a fresh name wins
+  assert.equal(nameFromAppleOrPending(null, '001.abc', kept), 'Ana Torres'); // the second sign-in: Apple sends none
+  assert.equal(nameFromAppleOrPending(null, '002.other', kept), null);
+  assert.equal(nameFromAppleOrPending(null, '001.abc', null), null);
+  assert.equal(forgetPendingName('saved'), true);
+  assert.equal(forgetPendingName('kept'), true);
+  assert.equal(forgetPendingName('failed'), false);
 });
 
 // ---- wiring -----------------------------------------------------------------------------------------------------------
@@ -194,6 +214,16 @@ check('Apple\'s name reaches onboarding even when it is saved after the screen o
   assert.match(read(BUTTON), /if \(res\.ok && res\.nameSaved\) void refresh\(\);/);
   const t = read(join('app', 'onboarding.tsx'));
   assert.match(t, /setName\(\(typed\) => \(typed === shownName \? fresh : typed\)\);/);
+});
+
+check('the name is kept on the phone before anything can fail, and written only over the value just read', () => {
+  const t = read(APPLE);
+  const keep = t.indexOf('localStore.setJSON(PENDING_NAME_KEY');
+  assert.ok(keep > 0 && keep < t.indexOf('signInWithIdToken('), 'kept before the Supabase sign-in');
+  assert.match(t, /updateDisplayNameIf\(uid, profile\.display_name, next\)/);
+  assert.doesNotMatch(t, /updateProfile\(/, 'no unconditional write of the name');
+  assert.match(read(join('src', 'lib', 'api.ts')), /q\.is\('display_name', null\) : q\.eq\('display_name', expected\)/);
+  assert.match(read(join('src', 'lib', 'auth.tsx')), /void finishPendingAppleName\(uid\)\.then/, 'every account load retries a kept name');
 });
 
 check('app.json has the plugin that adds the Sign in with Apple entitlement', () => {

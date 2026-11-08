@@ -36,10 +36,17 @@ Android sign-in stops. Android has no App Store rule that asks for Apple, so v1 
 2. Apple gives back an identity token (with that hash inside) and a one-time authorization code.
 3. The app signs in with `supabase.auth.signInWithIdToken({ provider: 'apple', token, nonce })` with the raw nonce;
    Supabase checks the token with Apple's keys, the bundle id and the nonce.
-4. Apple sends the full name **only the very first time**. The app saves it as the display name if the profile only has
-   the automatic name (the start of the email). A name the pilgrim typed is never replaced.
+4. Apple sends the full name **only the very first time**. The app keeps it on the phone at once, before anything can
+   fail, then saves it as the display name if the profile has only the automatic name: empty, `pilgrim`, or exactly what
+   the sign-up trigger made from the email (for a hidden email, the random relay name). Any other name stays, even one
+   that is the start of the username. The write only happens while the name is still the one just read, so a name typed
+   in that same second wins. Then the account is loaded again and onboarding shows Apple's name.
+   If the save fails (no signal), the name waits on the phone and is saved at the next account load or the next Apple
+   sign-in of the same Apple account; it is removed from the phone once saved or not needed.
 5. The app sends the one-time code to `apple-link`, which swaps it with Apple for a refresh token and stores it in
-   `public.apple_sign_in_tokens` (no app can read that table). The app does not wait for the answer.
+   `public.apple_sign_in_tokens` (no app can read that table). The app does not wait for the answer. A new token
+   replaces the pilgrim's older one, which is revoked at Apple; a token that cannot be stored is revoked at once; a second
+   call within 20 seconds is answered `too_soon` without asking Apple.
 6. **Delete account** (App Store 5.1.1(v)): `delete-account` revokes that refresh token at Apple
    (`POST https://appleid.apple.com/auth/revoke`), then deletes the account. If Apple cannot be reached, the account is
    still deleted and the failure is written to the function's log.
@@ -121,12 +128,23 @@ and its sending address, with SPF set for that domain. Otherwise those emails ne
 2. On the iPhone, sign in to iCloud with an Apple Account that has two-factor authentication on.
 3. Open the app signed out: **Continue with Apple** is above Google. Tap it, choose "Hide My Email" once to see the relay
    address, confirm with Face ID.
-4. You land in onboarding with your Apple name filled in. In Supabase > Authentication > Users the user shows provider
+4. You land in onboarding with your Apple name filled in (not the relay name, not the start of your email). This is the
+   check that the name arrived: unit tests cannot see it. In Supabase > Authentication > Users the user shows provider
    **apple**; in the table editor `apple_sign_in_tokens` has one row (only once the secrets are set).
 5. Sign out and sign in again with Apple: the same account opens (Apple sends no name this time; the name stays).
 6. Delete the account in the app. On the iPhone, **Settings** > your name > **Sign-In & Security** > **Sign in with Apple**:
    CaminoPlus is gone from the list. That is the revoke working.
 7. To repeat the first-time flow (the name), remove CaminoPlus from that same list before you sign in again.
+
+## Not built yet (follow-ups)
+
+- **Accounts without a stored token cannot be revoked at Apple.** That is an account that signed in with Apple before the
+  secrets were set, or whose `apple-link` call failed. Apple's authorization code works once and for five minutes only, so
+  a later retry of the same code is impossible. The honest fix is to ask for a fresh Apple sign-in on the Delete account
+  screen of an Apple account and send that new code to the delete function. Until then such an account is deleted
+  without the revoke (the pilgrim can remove CaminoPlus in the iPhone's Sign in with Apple settings).
+- **No "revoke later" queue.** A revoke that fails (Apple not reachable) is logged and not tried again.
+- **Android and the web** (needs a Services ID and the six-month secret, see above).
 
 ## What App Review sees
 

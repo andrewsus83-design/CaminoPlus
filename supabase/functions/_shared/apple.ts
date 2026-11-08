@@ -51,7 +51,8 @@ export async function importAppleKey(pem: string): Promise<CryptoKey> {
 export async function clientSecret(cfg: AppleConfig, nowSeconds = Math.floor(Date.now() / 1000)): Promise<string> {
   const key = await importAppleKey(cfg.privateKey);
   const input = `${b64urlJson({ alg: 'ES256', kid: cfg.keyId, typ: 'JWT' })}.${b64urlJson({
-    iss: cfg.teamId, iat: nowSeconds, exp: nowSeconds + 300, aud: 'https://appleid.apple.com', sub: cfg.bundleId,
+    // iat a minute back, so a server clock a little ahead of Apple's is fine
+    iss: cfg.teamId, iat: nowSeconds - 60, exp: nowSeconds + 300, aud: 'https://appleid.apple.com', sub: cfg.bundleId,
   })}`;
   const sig = new Uint8Array(await crypto.subtle.sign({ name: 'ECDSA', hash: 'SHA-256' }, key, new TextEncoder().encode(input)));
   return `${input}.${b64urlBytes(sig)}`;

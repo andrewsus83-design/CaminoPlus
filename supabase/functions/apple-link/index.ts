@@ -8,9 +8,12 @@
 // 200 { ok: true }
 // 400 bad_request (no JSON, no code) | not_apple_account (this account has no Apple identity)
 // 401 not_signed_in · 403 apple_mismatch (the code belongs to another Apple account) · 405 method_not_allowed
+// 429 too_soon (this pilgrim's token was stored less than 20 seconds ago; Apple is not asked)
 // 502 apple_refused (Apple said no: an old or reused code, a wrong key ...) · 500 auth_unavailable | store_failed
 // 503 not_configured (one of the Apple secrets is missing)
 //
+// Tokens are never left behind at Apple without a row here: a token that replaces an older one revokes the older one, and a
+// token that cannot be stored is revoked at once (both best effort).
 // The app calls this and ignores the answer: sign-in has already worked. Nothing here logs a token or a code.
 // Env: SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY (from Supabase) and the Apple secrets of ../_shared/apple.ts.
 import { createClient } from 'npm:@supabase/supabase-js@2';
@@ -29,6 +32,8 @@ function authIsDown(err: { name?: string; status?: number }): boolean {
   const status = typeof err.status === 'number' ? err.status : 0;
   return err.name === 'AuthRetryableFetchError' || status === 0 || status === 429 || status >= 500;
 }
+
+const MIN_INTERVAL_MS = 20_000; // one stored token per pilgrim per 20 seconds
 
 type Identity = { provider?: string; id?: string; identity_data?: { sub?: unknown } };
 
@@ -71,6 +76,17 @@ Deno.serve(async (req) => {
   }
   if (!appleSub) return json(400, { error: 'not_apple_account' });
 
+  // What is stored already: the token a new one replaces, and when (a cheap limit, no table of its own).
+  const admin = createClient(url, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!, options);
+  const before = await admin.from('apple_sign_in_tokens').select('refresh_token, updated_at').eq('user_id', uid).maybeSingle();
+  if (before.error) {
+    console.error('apple-link: could not read the stored token:', before.error.code ?? 'error');
+    return json(500, { error: 'store_failed' }); // Apple not asked yet: no token is left behind
+  }
+  const old = before.data as { refresh_token?: string; updated_at?: string } | null;
+  const lastAt = old?.updated_at ? Date.parse(old.updated_at) : NaN;
+  if (Number.isFinite(lastAt) && Date.now() - lastAt < MIN_INTERVAL_MS) return json(429, { error: 'too_soon' });
+
   let refreshToken: string;
   try {
     const got = await exchangeCode(cfg, code);
@@ -85,13 +101,17 @@ Deno.serve(async (req) => {
     return json(502, { error: 'apple_refused' });
   }
 
-  const admin = createClient(url, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!, options);
   const { error } = await admin
     .from('apple_sign_in_tokens')
     .upsert({ user_id: uid, apple_sub: appleSub, refresh_token: refreshToken, updated_at: new Date().toISOString() }, { onConflict: 'user_id' });
   if (error) {
     console.error('apple-link: could not store the token:', error.code ?? 'error');
+    await revokeToken(cfg, refreshToken).catch(() => undefined); // nobody could revoke it later
     return json(500, { error: 'store_failed' });
+  }
+  if (old?.refresh_token && old.refresh_token !== refreshToken) {
+    // The older token of this pilgrim is not stored anywhere any more: revoke it now (best effort).
+    await revokeToken(cfg, old.refresh_token).catch((e) => console.error('apple-link: could not revoke the replaced token:', e instanceof AppleError ? e.reason : 'error'));
   }
   return json(200, { ok: true });
 });

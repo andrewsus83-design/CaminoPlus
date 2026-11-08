@@ -3,9 +3,13 @@ import { Platform } from 'react-native';
 import * as ExpoCrypto from 'expo-crypto';
 import type * as AppleAuthentication from 'expo-apple-authentication';
 import { supabase } from './supabase';
-import { getProfile, updateProfile } from './api';
+import { getProfile, updateDisplayNameIf } from './api';
+import { localStore } from './localStore';
 import { hasNativeModule, NativeName } from './optionalNative';
-import { appleAvailable, appleErrorMessage, appleFullName, isAppleCancel, makeNonce, nameToSave } from './authAppleCore';
+import {
+  appleAvailable, appleErrorMessage, appleFullName, forgetPendingName, isAppleCancel, makeNonce, nameFromAppleOrPending, nameToSave,
+  type NameOutcome, type PendingAppleName,
+} from './authAppleCore';
 
 // Sign in with Apple (iOS only in v1, mobile/docs/APPLE-SIGN-IN.md). This is the ONE file that talks to Apple: it asks
 // Apple for an identity token, hands it to Supabase, and passes Apple's one-time code to the apple-link function so the
@@ -46,15 +50,48 @@ export function appleButtonKit(): Pick<AppleModule, 'AppleAuthenticationButtonTy
 const sha256Hex = (text: string) =>
   ExpoCrypto.digestStringAsync(ExpoCrypto.CryptoDigestAlgorithm.SHA256, text, { encoding: ExpoCrypto.CryptoEncoding.HEX });
 
-/** Keep Apple's name if the new profile has only the automatic one. Best effort: a failure keeps the automatic name. */
-async function saveAppleName(uid: string, fromApple: string | null): Promise<boolean> {
-  if (!fromApple) return false;
+// The name Apple shared, kept on this phone until the profile has it (one at a time; not tied to a user key, so a
+// sign-out before it is saved does not lose it). Removed as soon as it is saved or not needed.
+const PENDING_NAME_KEY = 'apple-pending-name';
+
+/**
+ * Put Apple's name on the profile if the profile has only the automatic name. The write happens only while the name is
+ * still the one just read, so a name typed in that same second wins.
+ */
+async function saveAppleName(uid: string, name: string, email: string | null | undefined): Promise<NameOutcome> {
   try {
     const profile = await getProfile(uid);
-    const name = nameToSave(profile, fromApple);
-    if (!name) return false;
-    await updateProfile(uid, { display_name: name });
-    return true;
+    if (!profile) return 'failed';
+    const next = nameToSave(profile, name, email);
+    if (!next) return 'kept';
+    return (await updateDisplayNameIf(uid, profile.display_name, next)) ? 'saved' : 'kept';
+  } catch {
+    return 'failed';
+  }
+}
+
+async function settleName(uid: string, name: string | null, email: string | null | undefined): Promise<boolean> {
+  if (!name) return false;
+  const outcome = await saveAppleName(uid, name, email);
+  if (forgetPendingName(outcome)) await localStore.remove(PENDING_NAME_KEY);
+  return outcome === 'saved';
+}
+
+/**
+ * Called by the account loading (lib/auth.tsx) after each successful load: if a name from Apple is still waiting for this
+ * signed-in Apple account, save it now. True when the profile changed (then the caller loads it again).
+ */
+export async function finishPendingAppleName(uid: string): Promise<boolean> {
+  const pending = await localStore.getJSON<PendingAppleName>(PENDING_NAME_KEY);
+  if (!pending?.name) return false;
+  try {
+    const { data } = await supabase.auth.getSession(); // read from the phone, no network
+    const user = data.session?.user;
+    if (!user || user.id !== uid) return false;
+    const apple = user.identities?.find((i) => i.provider === 'apple');
+    const sub = (apple?.identity_data as { sub?: unknown } | undefined)?.sub ?? apple?.id;
+    if (sub !== pending.appleUser) return false;
+    return await settleName(uid, pending.name, user.email);
   } catch {
     return false;
   }
@@ -86,13 +123,17 @@ export async function signInWithApple(): Promise<{ ok: boolean; error?: string; 
     if (isAppleCancel(e)) return { ok: false, cancelled: true };
     return { ok: false, error: appleErrorMessage(e) };
   }
+  // Apple sends the name only this once: keep it on the phone first, so nothing below can lose it.
+  const fromApple = appleFullName(credential.fullName);
+  if (fromApple) await localStore.setJSON(PENDING_NAME_KEY, { appleUser: credential.user, name: fromApple } satisfies PendingAppleName);
+  const name = nameFromAppleOrPending(fromApple, credential.user, await localStore.getJSON<PendingAppleName>(PENDING_NAME_KEY));
   if (!credential.identityToken) return { ok: false, error: appleErrorMessage(null) };
   try {
     const { data, error } = await supabase.auth.signInWithIdToken({ provider: 'apple', token: credential.identityToken, nonce: rawNonce });
     if (error) return { ok: false, error: appleErrorMessage(error) };
     linkAppleAccount(credential.authorizationCode);
     const uid = data.user?.id;
-    const nameSaved = uid ? await saveAppleName(uid, appleFullName(credential.fullName)) : false;
+    const nameSaved = uid ? await settleName(uid, name, data.user?.email) : false;
     return { ok: true, nameSaved };
   } catch (e) {
     return { ok: false, error: appleErrorMessage(e) };

@@ -15,6 +15,7 @@ const state = {
   authStatus: 0,
   apple: { status: 200, sub: APPLE_SUB, body: null as unknown },
   storeStatus: 201,
+  lookupStatus: 200,
   rows: [] as Array<Record<string, unknown>>,
   log: [] as string[],
 };
@@ -26,6 +27,7 @@ function reset() {
   state.authStatus = 0;
   state.apple = { status: 200, sub: APPLE_SUB, body: null };
   state.storeStatus = 201;
+  state.lookupStatus = 200;
   state.rows = [];
   state.log = [];
 }
@@ -48,6 +50,13 @@ const fake = Deno.serve({ hostname: '127.0.0.1', port: 0, onListen() {} }, async
     if (u.pathname === '/auth/revoke') return new Response(null, { status: 200 });
     if (state.apple.status !== 200) return Response.json({ error: 'invalid_grant' }, { status: state.apple.status });
     return Response.json(state.apple.body ?? { access_token: 'a', token_type: 'Bearer', expires_in: 3600, refresh_token: REFRESH, id_token: idToken(state.apple.sub) });
+  }
+  if (u.pathname === '/rest/v1/apple_sign_in_tokens' && req.method === 'GET') {
+    if (bearer !== 'service') return new Response('{"message":"permission denied"}', { status: 403 });
+    state.log.push('rest.read');
+    if (state.lookupStatus !== 200) return Response.json({ code: '42P01', message: 'relation does not exist' }, { status: state.lookupStatus });
+    const id = (u.searchParams.get('user_id') ?? '').replace(/^eq\./, '');
+    return Response.json(state.rows.filter((r) => r.user_id === id).slice(-1).map((r) => ({ refresh_token: r.refresh_token, updated_at: r.updated_at })));
   }
   if (u.pathname === '/rest/v1/apple_sign_in_tokens' && req.method === 'POST') {
     if (bearer !== 'service') return new Response('{"message":"permission denied"}', { status: 403 });
@@ -177,7 +186,7 @@ Deno.test({ name: 'apple-link', sanitizeOps: false, sanitizeResources: false }, 
       assertEquals(r.status, 200);
       assertEquals(r.body, { ok: true });
       assertEquals(r.headers.get('cache-control'), 'no-store');
-      assertEquals(state.log, ['auth.getUser', `apple/auth/token ${CODE}`, 'rest.upsert user_id']);
+      assertEquals(state.log, ['auth.getUser', 'rest.read', `apple/auth/token ${CODE}`, 'rest.upsert user_id']);
       assertEquals(state.rows.length, 1);
       assertEquals(state.rows[0].user_id, ME);
       assertEquals(state.rows[0].apple_sub, APPLE_SUB);
@@ -203,12 +212,43 @@ Deno.test({ name: 'apple-link', sanitizeOps: false, sanitizeResources: false }, 
       assertEquals(state.rows, []);
     });
 
-    await t.step('the table is not there yet (migration not applied) -> 500 store_failed', async () => {
+    await t.step('the table is not there yet (migration not applied) -> 500 store_failed before Apple is asked', async () => {
       reset();
-      state.storeStatus = 404;
+      state.lookupStatus = 404;
       const r = await call(fn, 'tok-apple', { authorizationCode: CODE });
       assertEquals(r.status, 500);
       assertEquals(r.body.error, 'store_failed');
+      assert(!state.log.some((l) => l.startsWith('apple')), 'no token was made, so none is left behind');
+    });
+
+    await t.step('the store fails after the exchange -> 500 store_failed and the new token is revoked at once', async () => {
+      reset();
+      state.storeStatus = 500;
+      const r = await call(fn, 'tok-apple', { authorizationCode: CODE });
+      assertEquals(r.status, 500);
+      assertEquals(r.body.error, 'store_failed');
+      assertEquals(state.log.slice(-2), ['rest.upsert user_id', `apple/auth/revoke ${REFRESH}`]);
+    });
+
+    await t.step('a second sign-in: the new token replaces the old one, which is revoked at Apple', async () => {
+      reset();
+      state.rows.push({ user_id: ME, apple_sub: APPLE_SUB, refresh_token: 'r-old-token', updated_at: new Date(Date.now() - 60_000).toISOString() });
+      const r = await call(fn, 'tok-apple', { authorizationCode: CODE });
+      assertEquals(r.status, 200);
+      assertEquals(state.log, ['auth.getUser', 'rest.read', `apple/auth/token ${CODE}`, 'rest.upsert user_id', 'apple/auth/revoke r-old-token']);
+      assertEquals(state.rows.at(-1)?.refresh_token, REFRESH);
+      assert(!state.log.includes(`apple/auth/revoke ${REFRESH}`), 'the new token stays valid');
+    });
+
+    await t.step('a stored token less than 20 seconds old -> 429 too_soon, Apple is not asked and nothing changes', async () => {
+      reset();
+      state.rows.push({ user_id: ME, apple_sub: APPLE_SUB, refresh_token: 'r-fresh', updated_at: new Date(Date.now() - 5_000).toISOString() });
+      const r = await call(fn, 'tok-apple', { authorizationCode: CODE });
+      assertEquals(r.status, 429);
+      assertEquals(r.body.error, 'too_soon');
+      assertEquals(state.log, ['auth.getUser', 'rest.read']);
+      assertEquals(state.rows.length, 1);
+      // the same token twice in a row (an upsert of an equal value) is never revoked: covered by the happy path's log
     });
 
     await t.step('nothing the function logged contains the code, the refresh token or the key', async () => {

@@ -64,19 +64,45 @@ export function appleFullName(n: AppleName): string | null {
 }
 
 /**
- * Has the profile no real display name yet? The sign-up trigger always writes one: the name the provider sent, or, when
- * there is none (Apple never puts the name in its token), the start of the email address, which is also where the username
- * comes from (`ana.torres` -> username `ana.torres` or `ana.torres12345678`; a short one becomes `pilgrim`).
+ * The display name the sign-up trigger writes when the provider sends no name (Apple never puts it in its token): the start
+ * of the email, lowercase, only letters, digits, "_" and "."; "pilgrim" when that is shorter than 3; at most 22 characters.
+ * Mirrors private.handle_new_user() (supabase/migrations/20261104150100_profiles_auth.sql).
  */
-export function isPlaceholderName(displayName: string | null | undefined, username: string | null | undefined): boolean {
-  const d = (displayName ?? '').trim();
-  if (!d) return true;
-  const u = (username ?? '').toLowerCase();
-  return /^[a-z0-9_.]+$/.test(d) && (d === 'pilgrim' || (u !== '' && u.startsWith(d)));
+export function triggerDisplayName(email: string | null | undefined): string {
+  const local = (email ?? '').split('@')[0] ?? '';
+  const base = local.replace(/[^a-zA-Z0-9_.]/g, '').toLowerCase();
+  return (base.length < 3 ? 'pilgrim' : base).slice(0, 22);
 }
 
-/** The name to save, or null to leave the profile as it is (a name the pilgrim has, or no name from Apple). */
-export function nameToSave(profile: { display_name: string | null; username: string } | null, fromApple: string | null): string | null {
-  if (!fromApple || !profile) return null;
-  return isPlaceholderName(profile.display_name, profile.username) ? fromApple : null;
+/**
+ * Has the profile only the automatic name? Exactly: empty, "pilgrim", or exactly what the trigger made from this account's
+ * email (for a hidden email that is the random private relay name). Any other name was chosen by somebody and stays,
+ * even "ana" for the username "ana.torres".
+ */
+export function isPlaceholderName(displayName: string | null | undefined, email: string | null | undefined): boolean {
+  const d = (displayName ?? '').trim();
+  return d === '' || d === 'pilgrim' || (!!email && d === triggerDisplayName(email));
 }
+
+/** The name to save, or null to leave the profile as it is (a name somebody chose, or no name from Apple). */
+export function nameToSave(profile: { display_name: string | null } | null, fromApple: string | null, email: string | null | undefined): string | null {
+  if (!fromApple || !profile) return null;
+  return isPlaceholderName(profile.display_name, email) ? fromApple : null;
+}
+
+/**
+ * Apple shares the name once. It is kept on the phone until the profile has it, so a failure in between (no signal, the
+ * server busy) does not lose it: the next Apple sign-in of the same Apple account, or the next account load, tries again.
+ */
+export type PendingAppleName = { appleUser: string; name: string };
+
+/** The name to use: the one Apple just sent, else the one kept for this same Apple account. */
+export function nameFromAppleOrPending(fromApple: string | null, appleUser: string, pending: PendingAppleName | null): string | null {
+  if (fromApple) return fromApple;
+  return pending && pending.appleUser === appleUser && pending.name ? pending.name : null;
+}
+
+/** What happened to the name: saved, kept (the profile has a chosen name, nothing to do) or failed (try again later). */
+export type NameOutcome = 'saved' | 'kept' | 'failed';
+/** Forget the kept name unless saving failed. */
+export const forgetPendingName = (o: NameOutcome) => o !== 'failed';

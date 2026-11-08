@@ -5,6 +5,8 @@ import { readStoredSession, supabase } from './supabase';
 import { getCurrentJourney, getProfile, Journey, Profile } from './api';
 import { clearUserData, localStore, userKey } from './localStore';
 import { errorMessage, isOfflineError, withTimeout } from './net';
+import { latestGate, reloadCurrent } from './accountLoad';
+import { finishPendingAppleName } from './authApple';
 
 // 'loading' = first answer pending, 'ready' = account known (fresh or saved copy), 'error' = signed in but
 // the account could not be loaded and there is no saved copy (never treated as "needs onboarding").
@@ -72,23 +74,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => { alive = false; data.subscription.unsubscribe(); };
   }, []);
 
+  // Only the newest load writes its answer (lib/accountLoad.ts): an older one that finishes last is dropped.
+  const [gate] = useState(latestGate);
   const load = useCallback(async (uid: string) => {
+    const ticket = gate.begin();
+    const mine = () => currentUid.current === uid && gate.isLatest(ticket);
     try {
       const acc = await fetchAccount(uid);
-      if (currentUid.current !== uid) return;
+      if (!mine()) return;
       hasData.current = true;
       setProfile(acc.profile); setJourney(acc.journey); setAccountError(null); setStale(false); setStatus('ready');
       const saved: CachedAccount = { v: 1, profile: acc.profile, journey: acc.journey, savedAt: Date.now() };
       void localStore.setJSON(accountKey(uid), saved);
+      // A name Sign in with Apple shared that could not be saved yet: save it now, then load again to show it.
+      void finishPendingAppleName(uid).then((savedName) => { if (savedName && currentUid.current === uid) void loadRef.current(uid); });
     } catch (e) {
-      if (currentUid.current !== uid) return;
+      if (!mine()) return;
       setAccountError(isOfflineError(e) ? 'You are offline.' : errorMessage(e));
       if (hasData.current) { setStale(true); setStatus('ready'); } // keep showing the saved copy
       else setStatus('error');
     } finally {
-      if (currentUid.current === uid) setLoadedFor(uid);
+      if (mine()) setLoadedFor(uid);
     }
-  }, []);
+  }, [gate]);
   const loadRef = useRef(load);
   loadRef.current = load;
 
@@ -130,8 +138,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const value = useMemo<AuthState>(() => ({
     ready: sessionReady && (!userId || loadedFor === userId),
     status, session, profile, journey, accountError, stale,
-    retry: async () => { if (userId) { if (!hasData.current) setStatus('loading'); await loadRef.current(userId); } },
-    refresh: async () => { if (userId) await loadRef.current(userId); },
+    // Both read the signed-in user when they are called (a ref), not the user of this render (lib/accountLoad.ts).
+    retry: reloadCurrent(() => currentUid.current, (uid) => loadRef.current(uid), () => { if (!hasData.current) setStatus('loading'); }),
+    refresh: reloadCurrent(() => currentUid.current, (uid) => loadRef.current(uid)),
     signOut: async () => {
       const uid = userId;
       // Offline the server-side logout cannot be reached: fall back to signing out on this phone only.
