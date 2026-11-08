@@ -58,7 +58,7 @@ The source of truth for colours, type and spacing in code is [`design/tokens.jso
 | Community reply | Friendly, quick, personal | "Buen Camino, Marta! Which stage are you on?" |
 | Safety / weather | Calm, direct, no jokes | "Heat warning on the Meseta today. Start before 7, carry 2 L of water." |
 | Problem / complaint | Own it, move to DM | "Sorry, that's not okay. Sending you a DM to fix it now." |
-| Scripture and faith | Quiet, short, sourced | One verse at most, always with its book, chapter and verse. Use a paraphrase or the app's own translation, never one we have not cleared. |
+| Scripture and faith | Quiet, short, sourced. Invite, never promise: we make room for grace, we do not deliver it | One verse at most, always with its book, chapter and verse. Use a paraphrase or the app's own translation, never one we have not cleared. |
 
 **Words we use / avoid**
 
@@ -68,7 +68,7 @@ The source of truth for colours, type and spacing in code is [`design/tokens.jso
 | offline, no signal needed, works on the trail | revolutionary, game-changing, AI-powered (unless it really is) |
 | ~ (approximate) for distances | exact claims we haven't verified |
 | "from $12 a year" | "cheap", "free" (only the free tier is free) |
-| a verse with its reference, a quiet line | "find God", "be saved", "miracle" as hype, "real pilgrim" |
+| a verse with its reference, a quiet line, "meet God on the Way" as an invitation, a pilgrim's own words about God's grace (with permission, credited) | promising a spiritual result ("you will find God", "transform your life in 30 days"), "be saved", "miracle" as hype, "real pilgrim" |
 
 **Taglines and lines we can reuse**
 
