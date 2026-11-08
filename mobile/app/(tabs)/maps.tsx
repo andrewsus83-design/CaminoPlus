@@ -1,5 +1,5 @@
 import { Fragment, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Alert, BackHandler, Pressable, ScrollView, View, useWindowDimensions } from 'react-native';
+import { Alert, BackHandler, Pressable, View, useWindowDimensions } from 'react-native';
 import { useRouter, useIsFocused } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '@/components/AppText';
@@ -164,9 +164,9 @@ export default function Maps() {
   const fit = fitControls(walk ? walkRank(nearOpen && !poi) : ROUTE_RANK, room, { gap: GAP, pinned: walk ? undefined : 'details', must: walk ? ['zoom'] : ['zoom', 'bell'] });
   // The notices under the banner (Walk view) may use what is left of the band between the banner and the card, above the Re-center pill when it is there.
   const noticeRoom = Math.max(0, Math.floor(screenH - cardH - GAP - (follow ? 0 : BTN + GAP) - (insets.top + layout.screenTop + aboveH + space[2])));
-  // Not even one button fits (the largest text on a short phone): the column is not drawn, and every control, the zoom pair too, is a row of "Map options".
-  const columnHidden = fit.scroll && room < BTN;
-  const foldedIds = columnHidden ? [...(walk ? WALK_ORDER : ROUTE_ORDER).filter((id) => id !== 'zoom'), 'zoomIn', 'zoomOut'] : fit.folded;
+  // The zoom pair (or on the whole route the help bell) does not fit (the largest text on a short phone): the column is not drawn, and every control, the zoom pair too, is a row of
+  // "Map options". The whole route keeps the flag, the way to them, when there is room for one button.
+  const foldedIds = fit.overflow ? [...(walk ? WALK_ORDER : ROUTE_ORDER).filter((id) => id !== 'zoom' && id !== 'details'), 'zoomIn', 'zoomOut'] : fit.folded;
   const flagLabel = foldedIds.length ? 'Route details and map options' : 'Route details';
   const gpsColor = gpsMode === 'saver' ? (night ? '#7FD6A4' : fixed.success) : fixed.gold;
   const lightValue = light === 'auto' ? `Automatic, now ${night ? 'night' : 'day'}` : light === 'day' ? 'Day' : 'Night';
@@ -220,10 +220,10 @@ export default function Maps() {
     zoomIn: { label: 'Zoom in', value: 'Show the map closer', glyph: <MapIcon name="plus" color={role.text} size={ICON} />, onPress: () => setZoomCmd((z) => ({ dir: 1, n: z.n + 1 })) },
     zoomOut: { label: 'Zoom out', value: 'Show more of the map', glyph: <MapIcon name="minus" color={role.text} size={ICON} />, onPress: () => setZoomCmd((z) => ({ dir: -1, n: z.n + 1 })) },
   };
-  // The help bell is never two taps away: when the column has no room for it (or has to scroll), it sits in the row of buttons of the bottom card (a row of "Map options" has it too).
-  const bellInCard = walk && (fit.scroll || !fit.shown.includes('bell'));
-  // The controls of the column, top to bottom. When even the zoom pair does not fit the column scrolls, and then the zoom pair comes first, so it is what is in view.
-  const columnIds = (order: string[]) => (fit.scroll ? ['zoom', ...order.filter((id) => id !== 'zoom' && !(bellInCard && id === 'bell'))] : order.filter((id) => fit.shown.includes(id)));
+  // The help bell is never two taps away in the Walk view: when the column has no room for it, it sits in the row of buttons of the bottom card (a row of "Map options" has it too).
+  const bellInCard = walk && (fit.overflow || !fit.shown.includes('bell'));
+  // The controls of the column, top to bottom.
+  const columnIds = (order: string[]) => (fit.overflow ? (!walk && room >= BTN ? ['details'] : []) : order.filter((id) => fit.shown.includes(id)));
 
   return (
     <View style={{ flex: 1, backgroundColor: night ? '#0C1626' : role.bg }}>
@@ -305,7 +305,7 @@ export default function Maps() {
               card or the opened bottom card needs the room. */}
           {!poi && !cardOpen && (
             <View pointerEvents="box-none" style={{ position: 'absolute', right: EDGE, bottom: cardH + GAP }}>
-              <ControlColumn ids={columnIds(WALK_ORDER)} nodes={nodes} room={room} scroll={fit.scroll} />
+              <ControlColumn ids={columnIds(WALK_ORDER)} nodes={nodes} />
             </View>
           )}
 
@@ -363,7 +363,7 @@ export default function Maps() {
           {/* Right: the round buttons, in a column that ends one margin above the tab bar. */}
           {!poi && (
             <View pointerEvents="box-none" style={{ position: 'absolute', right: EDGE, bottom: tabTop + EDGE }}>
-              <ControlColumn ids={columnIds(ROUTE_ORDER)} nodes={nodes} room={room} scroll={fit.scroll} />
+              <ControlColumn ids={columnIds(ROUTE_ORDER)} nodes={nodes} />
             </View>
           )}
         </Fragment>
@@ -414,12 +414,10 @@ export default function Maps() {
   );
 }
 
-/** The column of round buttons: one above the other, GAP apart, on the right. When even the zoom pair does not fit the room it scrolls inside it (the last resort). */
-function ControlColumn({ ids, nodes, room, scroll }: { ids: string[]; nodes: Record<string, ReactNode>; room: number; scroll: boolean }) {
-  const stack = <View pointerEvents="box-none" style={{ alignItems: 'flex-end', gap: GAP }}>{ids.map((id) => nodes[id])}</View>;
-  if (!scroll) return stack;
-  if (room < BTN) return null; // not even one button fits: Map options (the flag of the card) has them all
-  return <ScrollView style={{ maxHeight: room }} showsVerticalScrollIndicator={false} contentContainerStyle={{ alignItems: 'flex-end' }}>{stack}</ScrollView>;
+/** The column of round buttons: one above the other, GAP apart, on the right. */
+function ControlColumn({ ids, nodes }: { ids: string[]; nodes: Record<string, ReactNode> }) {
+  if (ids.length === 0) return null;
+  return <View pointerEvents="box-none" style={{ alignItems: 'flex-end', gap: GAP }}>{ids.map((id) => nodes[id])}</View>;
 }
 
 /** "Whole route / Near me": two tabs in one pill, as high as a round button (BTN) so that it lines up with the offline maps button next to it. */

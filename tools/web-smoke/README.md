@@ -110,7 +110,7 @@ Then the **scenarios** ([scenarios.mjs](scenarios.mjs)), each in light and dark,
   column ends 12 above the bottom card and the whole route column 16 above the tab bar; the top row ("Whole route / Near me", 56 high, and the offline maps button) never touches at 320 wide; nothing on
   the screen overlaps (banner, chips, notices, column, pill, card, tab bar) and no text is under 15 px; a short phone folds what does not fit into the "Map options" rows of the sheet of the flag button
   (named "Route details and map options"), which work there, while the zoom pair and the help bell (in the column, or in the row of buttons of the card) are always there; and with the text 1.5 and 2 times
-  as big (the page's text and line heights scaled, as a phone does: the web has no such setting) nothing overlaps and the zoom pair is still reachable. The check fails on the build before the family existed
+  as big (the page's text and line heights scaled, as a phone does: the web has no such setting) nothing overlaps and the zoom pair is still reachable (in the column, or as two rows of Map options when it does not fit). The check fails on the build before the family existed
   (the help bell was 48 wide);
 - Notes, a page is a draft until it is published: on a blank page Read and Publish are off and there is no Save draft; with words in it Save draft is at the
   top right and the date says Draft; the marks (Bold, Italic, Heading, Bulleted list, Quote) sit inside the text box, under the text and above the bottom

@@ -122,11 +122,11 @@ check('the column and the pill: 16 from the right edge, level at the bottom (12 
 check('a control with no room is not lost: the flag opens "Map options" (rows), the bell moves into the row of the card, the zoom pair never folds', () => {
   const m = code(maps);
   assert.match(m, /fitControls\(walk \? walkRank\(nearOpen && !poi\) : ROUTE_RANK, room, \{ gap: GAP, pinned: walk \? undefined : 'details', must: walk \? \['zoom'\] : \['zoom', 'bell'\] \}\)/);
-  assert.match(m, /const bellInCard = walk && \(fit\.scroll \|\| !fit\.shown\.includes\('bell'\)\);/);
-  assert.match(m, /fit\.scroll \? \['zoom', \.\.\.order\.filter\(\(id\) => id !== 'zoom' && !\(bellInCard && id === 'bell'\)\)\]/, 'when the column scrolls the zoom pair is first, so it is what is in view');
+  assert.match(m, /const bellInCard = walk && \(fit\.overflow \|\| !fit\.shown\.includes\('bell'\)\);/);
+  assert.match(m, /fit\.overflow \? \(!walk && room >= BTN \? \['details'\] : \[\]\)/, 'when the zoom pair does not fit the column is not drawn; the whole route keeps the flag, the way to Map options');
   assert.match(m, /extra=\{bellInCard \? nodes\.bell : undefined\}/);
   assert.match(m, /foldedIds\.some\(\(id\) => optionRows\[id\]\)/);
-  assert.match(m, /const columnHidden = fit\.scroll && room < BTN;/, 'when not even one button fits, the column is not drawn and the zoom pair is two rows of Map options');
+  assert.match(m, /const foldedIds = fit\.overflow \? \[\.\.\.\(walk \? WALK_ORDER : ROUTE_ORDER\)\.filter\(\(id\) => id !== 'zoom' && id !== 'details'\), 'zoomIn', 'zoomOut'\] : fit\.folded;/, 'on an overflow every control is a row of Map options, the zoom pair too');
   assert.match(m, /Route details and map options/);
   for (const id of ['bell', 'compass', 'near', 'locate', 'light', 'gps', 'zoomIn', 'zoomOut']) assert.match(m, new RegExp(`${id}: \\{ label:`), `${id} has a row of Map options`);
   assert.match(read('src/features/map/controlLayout.ts'), /export function fitControls/);

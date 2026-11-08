@@ -37,7 +37,7 @@ test('with all the room it needs, nothing folds', () => {
     const f = fitControls(walkRank(), room, { gap: GAP });
     assert.deepEqual(f.shown, ['zoom', 'bell', 'compass', 'near', 'light', 'gps']);
     assert.deepEqual(f.folded, []);
-    assert.equal(f.scroll, false);
+    assert.equal(f.overflow, false);
   }
 });
 
@@ -64,12 +64,13 @@ test('a less important control never stays when a more important one folded (no 
   }
 });
 
-test('when not even the zoom pair fits, the column scrolls with every control (never a zoom pair folded away)', () => {
+test('when not even the zoom pair fits, that is an overflow: nothing is shown in the column and every control is folded (no scrolling window on half a zoom pair)', () => {
   const f = fitControls(walkRank(), 111, { gap: GAP, must: ['zoom'] });
-  assert.equal(f.scroll, true);
-  assert.deepEqual(f.folded, []);
-  assert.equal(f.shown.length, 6);
-  assert.equal(fitControls(walkRank(), 0, { gap: GAP, must: ['zoom'] }).scroll, true);
+  assert.equal(f.overflow, true);
+  assert.deepEqual(f.shown, []);
+  assert.equal(f.folded.length, 6);
+  assert.equal(fitControls(walkRank(), 0, { gap: GAP, must: ['zoom'] }).overflow, true);
+  assert.equal(fitControls(walkRank(), 112, { gap: GAP, must: ['zoom'] }).overflow, false);
 });
 
 test('while the chips of "What is near" are open, the button that closes them moves up and stays (it is not the one that folds)', () => {
@@ -87,9 +88,9 @@ test('the whole route: the flag is the way to the folded controls, so it moves u
   // no room for the flag: the zoom pair and the bell still stay, and the rest is what is left
   const tight = fitControls(ROUTE, 247, { gap: GAP, pinned: 'details', must: ['zoom', 'bell'] });
   assert.deepEqual(tight.shown, ['zoom', 'bell']);
-  assert.equal(tight.scroll, false);
-  // not even the zoom pair and the bell: scroll
-  assert.equal(fitControls(ROUTE, 179, { gap: GAP, pinned: 'details', must: ['zoom', 'bell'] }).scroll, true);
+  assert.equal(tight.overflow, false);
+  // not even the zoom pair and the bell: overflow
+  assert.equal(fitControls(ROUTE, 179, { gap: GAP, pinned: 'details', must: ['zoom', 'bell'] }).overflow, true);
 });
 
 // ---------------------------------------------------------------------------------------------------------------------- the phones
@@ -121,12 +122,12 @@ test('every phone, every banner: what the Walk view column shows fits its room, 
           const rank = walkRank(chips > 0);
           const f = fitControls(rank, room, { gap: GAP, must: ['zoom'] });
           const where = `${p.name}, banner ${banner}, chips ${chips}, card ${cardH}, room ${room}`;
-          if (f.scroll) assert.ok(room < 2 * BTN, `${where}: scrolls only when the zoom pair does not fit`);
+          if (f.overflow) assert.ok(room < 2 * BTN, `${where}: overflows only when the zoom pair does not fit`);
           else assert.ok(height(f.shown, rank) <= room, `${where}: ${f.shown.join(',')} is ${height(f.shown, rank)} high`);
           if (room >= 2 * BTN) assert.ok(f.shown.includes('zoom'), `${where}: the zoom pair is shown`);
           if (room >= 2 * BTN + GAP + BTN) assert.ok(f.shown.includes('bell'), `${where}: the bell is in the column`);
           // the column never reaches the banner or the card: its top is under the banner, its bottom is one gap above the card
-          const used = f.scroll ? Math.min(room, height(f.shown, rank)) : height(f.shown, rank);
+          const used = height(f.shown, rank);
           assert.ok(p.top + SCREEN_TOP + aboveH + GAP + used <= p.h - cardH - GAP + 1, `${where}: the column ends above the card`);
         }
       }
@@ -142,7 +143,7 @@ test('a 390 x 844 phone has the zoom pair, the bell, the compass and "What is ne
   assert.deepEqual(fitControls(walkRank(true), withChips, { gap: GAP, must: ['zoom'] }).shown.slice(0, 3), ['zoom', 'bell', 'near']);
 });
 
-test('large text: the banner and the card grow with the text, the room shrinks, and the column folds more (it never overlaps; it scrolls only at the very end)', () => {
+test('large text: the banner and the card grow with the text, the room shrinks, and the column folds more (it never overlaps; at the very end it is not drawn and Map options has the controls)', () => {
   const p = PHONES[1]; // 360 x 640
   let last = Infinity;
   for (const scale of [1, 1.15, 1.3, 1.5, 2]) {
@@ -152,8 +153,8 @@ test('large text: the banner and the card grow with the text, the room shrinks, 
     const f = fitControls(walkRank(), room, { gap: GAP, must: ['zoom'] });
     assert.ok(room <= last, `scale ${scale}: the room does not grow with the text`);
     last = room;
-    if (!f.scroll) assert.ok(height(f.shown, walkRank()) <= room, `scale ${scale}: fits in ${room}`);
-    assert.ok(f.shown.includes('zoom'), `scale ${scale}: the zoom pair is there (scrolling when it does not fit)`);
+    assert.ok(height(f.shown, walkRank()) <= room, `scale ${scale}: fits in ${room}`);
+    assert.ok(f.shown.includes('zoom') || f.overflow, `scale ${scale}: the zoom pair is in the column, or it is an overflow and the zoom pair is a row of Map options`);
   }
 });
 
@@ -181,7 +182,7 @@ test('the whole route: the column keeps the zoom pair and the bell, and the flag
       const room = routeRoom({ screenH: p.h, topInset: p.top, screenTop: SCREEN_TOP, topH, tabBarH: Math.max(p.bottom - 14, 10) + 88, gap: GAP, edge: EDGE });
       const f = fitControls(ROUTE, room, { gap: GAP, pinned: 'details', must: ['zoom', 'bell'] });
       const where = `${p.name}, top block ${topH}, room ${room}`;
-      if (f.scroll) assert.ok(room < 2 * BTN + GAP + BTN, `${where}: scrolls only when the zoom pair and the bell do not fit`);
+      if (f.overflow) assert.ok(room < 2 * BTN + GAP + BTN, `${where}: overflows only when the zoom pair and the bell do not fit`);
       else {
         assert.ok(f.shown.includes('zoom') && f.shown.includes('bell'), `${where}: zoom pair and bell`);
         assert.ok(height(f.shown, ROUTE) <= room, `${where}: ${f.shown.join(',')} fits`);

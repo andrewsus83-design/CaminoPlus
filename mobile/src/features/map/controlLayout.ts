@@ -16,8 +16,11 @@ export type Fit = {
   shown: string[];
   /** the ids that did not: they are in "Map options" (and `pinned`, the way to them, is shown when there is room for it) */
   folded: string[];
-  /** a control that must be in the column did not fit: the column keeps all its controls and scrolls inside the room (the last resort, for the largest text on a short phone) */
-  scroll: boolean;
+  /**
+   * a control that must be in the column did not fit (the zoom pair, or the help bell where nothing else holds it): the largest text on a short phone. The column is not drawn (on
+   * the whole route only the way to Map options is) and every control is a row of Map options. It does not scroll: a window on half a zoom pair is not a control.
+   */
+  overflow: boolean;
 };
 
 export type FitOptions = {
@@ -29,7 +32,7 @@ export type FitOptions = {
    */
   pinned?: string;
   keep?: number;
-  /** controls that must not fold (the zoom pair; the help bell where nothing else holds it): if one does not fit, the column scrolls instead of folding it */
+  /** controls that must not fold (the zoom pair; the help bell where nothing else holds it): if one does not fit, that is `overflow`, not a fold */
   must?: string[];
 };
 
@@ -39,7 +42,7 @@ export type FitOptions = {
  */
 export function fitControls(ranked: Slot[], room: number, { gap, pinned, keep = 2, must = [] }: FitOptions): Fit {
   const ids = ranked.map((s) => s.id);
-  if (ranked.length === 0) return { shown: [], folded: [], scroll: false };
+  if (ranked.length === 0) return { shown: [], folded: [], overflow: false };
 
   const take = (list: Slot[]) => {
     const taken: Slot[] = [];
@@ -51,13 +54,13 @@ export function fitControls(ranked: Slot[], room: number, { gap, pinned, keep = 
   };
 
   const all = take(ranked);
-  if (all.length === ranked.length) return { shown: ids, folded: [], scroll: false };
+  if (all.length === ranked.length) return { shown: ids, folded: [], overflow: false };
 
   const pin = ranked.find((s) => s.id === pinned);
   const others = ranked.filter((s) => s.id !== pin?.id);
   const shown = pin ? take([...others.slice(0, keep), pin, ...others.slice(keep)]) : all;
-  if (must.some((id) => !shown.includes(id))) return { shown: ids, folded: [], scroll: true };
-  return { shown, folded: ids.filter((id) => !shown.includes(id)), scroll: false };
+  if (must.some((id) => !shown.includes(id))) return { shown: [], folded: ids, overflow: true };
+  return { shown, folded: ids.filter((id) => !shown.includes(id)), overflow: false };
 }
 
 /** The room the right-hand column has in the Walk view: from the bottom of the banner (and the chips, when they are open) to one margin above the bottom card. */

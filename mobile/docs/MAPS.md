@@ -64,7 +64,7 @@ npm run build:dev:ios         # needs an Apple Developer account ($99/yr) and yo
 whole route. The whole family (eight 56 buttons) needs 532 px, which no phone has between the banner and the card, so `controlLayout.ts` shows the controls in order of importance while they
 fit (the zoom pair, the help bell, the compass or "Show my position", "What is near", the map light, GPS, and on the whole route the flag) and the rest are rows of "Map options" in the route
 sheet that the flag button opens (its label then says "Route details and map options"). The zoom pair never folds; the help bell moves into the row of buttons of the bottom card when the
-column has no room for it; when not even one button fits (the largest text on a 320 x 568 phone) the column is not drawn and Zoom in and Zoom out are rows of Map options too. The label of a
+column has no room for it; when not even the zoom pair (112 px) fits (the largest text on a 320 x 568 phone) the column is not drawn (the whole route keeps the flag) and Zoom in and Zoom out are rows of Map options too. The label of a
 control stops growing at 1.3 times the text setting (`CONTROL_TEXT_MAX`); the banner, the card and the sheets grow without a limit and the column folds to make room. The overlay has its own
 day and night (`walkTheme`): it reads the fixed palette, never `c.*`, so a dark app does not turn the icons of a night map dark. Tests: `features/map/__tests__/controlLayout.test.ts` (the
 arithmetic), `lib/__tests__/mapControls.test.ts` (the code), `tools/web-smoke/maps.scenarios.mjs` (the real screen on four phones, light and dark, and with large text).
