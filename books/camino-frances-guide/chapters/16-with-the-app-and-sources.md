@@ -4,7 +4,7 @@
 
 **CaminoPlus** is the offline-first companion app for the Camino de Santiago, with maps that work without signal, stays and cafes, a pilgrim passport with stamps, a journal and friends. The paid plan is called **Pilgrim Plus**. The app is still in development, so look in the app for what is available on the French Way today, and use it, not this book, for beds, cafes, closures and weather.
 
-A reminder about the passport: the Pilgrim's Office asks for the stamped credencial. A passport in any app is a keepsake until the Office says otherwise.
+A reminder about the passport: the Pilgrim's Office asks for the stamped credencial. A passport in CaminoPlus, or in any app other than the Office's own digital credential, is a keepsake until the Office says otherwise.
 
 ## Sources and thanks
 

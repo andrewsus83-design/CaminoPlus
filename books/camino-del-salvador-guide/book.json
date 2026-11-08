@@ -1,0 +1,29 @@
+{
+  "id": "camino-del-salvador-guide",
+  "kind": "guide",
+  "order": 10,
+  "title": "The Way of the Saviour",
+  "subtitle": "A Pilgrim's Guide to the Camino del Salvador",
+  "route_slug": "camino-del-salvador",
+  "description_short": "An honest guide to the short mountain road from León to Oviedo: six days over the Cantabrian range, the weather, the Salvadorana, and what the Pilgrim's Office says about a walk that ends at Oviedo.",
+  "description_long": "The Camino del Salvador is a short road with a mountain in the middle of it. It leaves León at the old pilgrims' hospital of San Marcos, follows the Bernesga river north, crosses the Cantabrian range near the Pajares pass, and falls through the mining valleys of Asturias to the cathedral of San Salvador in Oviedo: about 120 km. Pilgrims have taken this detour since the Middle Ages, to venerate the relics of the Holy Chamber, and many went on from there to Santiago by the Camino Primitivo.\n\nThis guide is written for the Planner first and the Walker's evenings second. It is plain about the difficulty, which lies in the mountain and not in the distance. It helps you decide whether this is your Camino, shape the walk, pack, and know what to check locally. It follows the usual six days from León to Oviedo, shows the other ways to cut them that the official and local sources give, and says where those sources disagree.\n\nYou will find the road day by day, from the river path out of León to the hardest day, over the ridge from Poladura de la Tercia to Pajares; chapters on when to go, on sleeping and eating, on body, weather and safety (written with extra care for this road), on the inner side of walking to a cathedral, and on arriving in Oviedo. It explains the Salvadorana, the certificate of Oviedo's cathedral, and states the Pilgrim's Office rules for the Compostela as the Office writes them, with what they mean for a walk that does not end in Santiago.\n\nEvery distance is marked approximate, and the book says where sources differ. It names no hostels, cafes or prices, because they change; it sends you to the CaminoPlus app and to local information for the live answer. Its facts come from named public sources, which the book credits.",
+  "keywords": [
+    "Camino del Salvador",
+    "Camino San Salvador",
+    "León to Oviedo",
+    "Salvadorana",
+    "Camino de Santiago",
+    "pilgrim guidebook",
+    "Pajares pass"
+  ],
+  "categories": [
+    "Travel / Special Interest / Pilgrimages",
+    "Travel / Europe / Spain"
+  ],
+  "cover": {
+    "colour": "successWash",
+    "icon": "library"
+  },
+  "version": "1.0.0",
+  "date": "2026-11"
+}

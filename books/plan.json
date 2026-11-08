@@ -51,9 +51,45 @@
       "route_slug": "camino-de-invierno"
     },
     {
+      "id": "camino-aragones-guide",
+      "kind": "guide",
+      "order": 9,
+      "route_slug": "camino-aragones"
+    },
+    {
+      "id": "camino-del-salvador-guide",
+      "kind": "guide",
+      "order": 10,
+      "route_slug": "camino-del-salvador"
+    },
+    {
+      "id": "camino-sanabres-guide",
+      "kind": "guide",
+      "order": 11,
+      "route_slug": "camino-sanabres"
+    },
+    {
+      "id": "camino-de-madrid-guide",
+      "kind": "guide",
+      "order": 12,
+      "route_slug": "camino-de-madrid"
+    },
+    {
+      "id": "camino-baztanes-guide",
+      "kind": "guide",
+      "order": 13,
+      "route_slug": "camino-baztanes"
+    },
+    {
+      "id": "camino-portugues-lisboa-guide",
+      "kind": "guide",
+      "order": 14,
+      "route_slug": "camino-portugues-lisboa"
+    },
+    {
       "id": "imitation-of-christ-readings",
       "kind": "reflection",
-      "order": 9,
+      "order": 15,
       "route_slug": "camino-frances",
       "days": 21,
       "sources": [
@@ -63,7 +99,7 @@
     {
       "id": "confessions-readings",
       "kind": "reflection",
-      "order": 10,
+      "order": 16,
       "route_slug": "camino-primitivo",
       "days": 13,
       "sources": [
@@ -73,7 +109,7 @@
     {
       "id": "pilgrims-progress-readings",
       "kind": "reflection",
-      "order": 11,
+      "order": 17,
       "route_slug": "camino-portugues",
       "days": 12,
       "sources": [
@@ -83,7 +119,7 @@
     {
       "id": "purgatory-readings",
       "kind": "reflection",
-      "order": 12,
+      "order": 18,
       "route_slug": "camino-del-norte",
       "days": 14,
       "sources": [
@@ -93,7 +129,7 @@
     {
       "id": "presence-of-god-readings",
       "kind": "reflection",
-      "order": 13,
+      "order": 19,
       "route_slug": "camino-ingles",
       "days": 6,
       "sources": [
@@ -103,7 +139,7 @@
     {
       "id": "songs-of-ascents-readings",
       "kind": "reflection",
-      "order": 14,
+      "order": 20,
       "route_slug": "camino-aragones",
       "days": 8,
       "sources": [
@@ -113,7 +149,7 @@
     {
       "id": "revelations-readings",
       "kind": "reflection",
-      "order": 15,
+      "order": 21,
       "route_slug": "camino-de-invierno",
       "days": 8,
       "sources": [
@@ -123,7 +159,7 @@
     {
       "id": "teresa-life-readings",
       "kind": "reflection",
-      "order": 16,
+      "order": 22,
       "route_slug": "camino-de-madrid",
       "days": 10,
       "sources": [
@@ -133,7 +169,7 @@
     {
       "id": "ignatius-pilgrim-readings",
       "kind": "reflection",
-      "order": 17,
+      "order": 23,
       "route_slug": "camino-baztanes",
       "days": 7,
       "sources": [
@@ -143,7 +179,7 @@
     {
       "id": "walking-readings",
       "kind": "reflection",
-      "order": 18,
+      "order": 24,
       "route_slug": "camino-finisterre-muxia",
       "days": 5,
       "sources": [
@@ -153,7 +189,7 @@
     {
       "id": "francis-readings",
       "kind": "reflection",
-      "order": 19,
+      "order": 25,
       "route_slug": "camino-portugues-costero",
       "days": 9,
       "sources": [
@@ -163,7 +199,7 @@
     {
       "id": "pascal-readings",
       "kind": "reflection",
-      "order": 20,
+      "order": 26,
       "route_slug": "camino-sanabres",
       "days": 10,
       "sources": [
@@ -171,12 +207,5 @@
       ]
     }
   ],
-  "routes_without_guide": [
-    "camino-aragones",
-    "camino-del-salvador",
-    "camino-sanabres",
-    "camino-de-madrid",
-    "camino-baztanes",
-    "camino-portugues-lisboa"
-  ]
+  "routes_without_guide": []
 }
