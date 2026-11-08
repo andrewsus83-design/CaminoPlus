@@ -164,7 +164,7 @@ def title_case(s: str) -> str:
         elif not starts_sentence and core.lower() in _SMALL_WORDS:
             out.append(w.lower())
         else:
-            out.append(re.sub(r"[A-Za-z][A-Za-z']*", lambda m: m.group(0)[:1].upper() + m.group(0)[1:].lower(), w))
+            out.append(re.sub(r"[A-Za-z][A-Za-z'\u2019]*", lambda m: m.group(0)[:1].upper() + m.group(0)[1:].lower(), w))
     return " ".join(out)
 
 

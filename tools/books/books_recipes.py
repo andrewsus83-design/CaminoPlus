@@ -591,11 +591,19 @@ LEFT_OUT: tuple[Left, ...] = (
     Left("way-of-a-pilgrim", "US only",
          "The only English translation found, by the Revd R. M. French (first impression September 1930, Philip Allan; on CCEL), is public domain in "
          "the US since 1 January 2026, but the translator, Reginald Michael French, died in 1969 according to CCEL and the library catalogues (1961 "
-         "according to LibraryThing): after 1955, so it is protected in countries with life plus 70 years."),
+         "according to LibraryThing): after 1955, so it is protected in countries with life plus 70 years (until the end of 2039; 2049 in Spain)."),
+    Left("little-flowers", "no clean text",
+         "The old translations are public domain everywhere (T. W. Arnold, 1908, died 1930; Thomas Okey, 1910, died 1935; W. Heywood, 1906), but "
+         "no clean digital text of any of them exists: Gutenberg has none, the CCEL text is a later revision, and the Internet Archive scans are OCR text."),
+    Left("dark-night", "no clean text",
+         "David Lewis's translation (1864, died 1895; the 1908 edition has an essay by Benedict Zimmerman, died 1937) is public domain everywhere, but there "
+         "is no clean digital text: Gutenberg has none, CCEL has only E. Allison Peers (1935, which fails the rule: published after 1930), and the "
+         "Internet Archive scans are OCR text with pervasive character errors."),
+    Left("interior-castle", "unclear",
+         "The clean text is CCEL's Benedictines of Stanbrook (third edition 1921): the translators are nuns of Stanbrook Abbey who are not named and the "
+         "translation dates from 1906 to 1912, so it is anonymous but not older than 1900. John Dalton's translation (1852, died 1874) is public "
+         "domain everywhere but only a scan with OCR text exists."),
     Left("story-of-a-soul", "US only",
          "The translation on Gutenberg (ebook 16772) is by Thomas N. Taylor (1873-1963), published in 1912: public domain in the US, but the "
-         "translator died in 1963, so it is protected in countries with life plus 70 years until the end of 2033."),
-    Left("little-flowers", "unclear", "Edition still being researched at this checkpoint."),
-    Left("dark-night", "unclear", "Edition still being researched at this checkpoint."),
-    Left("interior-castle", "unclear", "Edition still being researched at this checkpoint."),
+         "translator died in 1963, so it is protected in countries with life plus 70 years until the end of 2033 (2043 in Spain)."),
 )

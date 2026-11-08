@@ -96,7 +96,7 @@ check('every book of the catalogue is either in the index or in the manifest as 
   assert.deepEqual([...ids, ...left].sort(), [...catalogIds].sort());
   for (const l of manifest.leftOut) {
     assert.notEqual(l.verdict, 'public domain everywhere', `${l.id}: a book that is left out is not public domain everywhere`);
-    assert.ok(['US only', 'unclear'].includes(l.verdict), l.id);
+    assert.ok(['US only', 'unclear', 'no clean text'].includes(l.verdict), l.id);
     assert.ok(l.why.trim().length > 40, `${l.id} says why`);
   }
 });

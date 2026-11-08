@@ -119,6 +119,7 @@ class Cleaning(unittest.TestCase):
     def test_a_heading_in_capitals_is_set_in_title_case_and_other_text_is_left_alone(self):
         self.assertEqual(C.title_case("THE FIRST BOOK OF THE SAINT'S LIFE"), "The First Book of the Saint's Life")
         self.assertEqual(C.title_case("A PRAYER FOR THE SPIRIT OF DEVOTION"), "A Prayer for the Spirit of Devotion")
+        self.assertEqual(C.title_case("A PRAYER TO DO GOD\u2019S WILL"), "A Prayer to Do God\u2019s Will", "a curly apostrophe does not start a word")
         self.assertEqual(C.title_case("PART II OF I AND THE LORD"), "Part II of I and the Lord")
         self.assertEqual(C.title_case("Of thinking humbly of oneself"), "Of thinking humbly of oneself")
         self.assertEqual(C.title_case("1234"), "1234")
