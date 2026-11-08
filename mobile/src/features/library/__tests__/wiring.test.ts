@@ -40,7 +40,7 @@ check('the feature is the files this test expects, so a new one is looked at (an
     `${DIR}/bible/Reader.tsx`, `${DIR}/bible/ReaderText.tsx`, `${DIR}/bible/TestamentBar.tsx`, `${DIR}/bible/VerseActions.tsx`, `${DIR}/bible/VerseRows.tsx`,
     `${DIR}/bible/blocks.ts`, `${DIR}/bible/books.ts`, `${DIR}/bible/credit.ts`, `${DIR}/bible/gridMath.ts`, `${DIR}/bible/lastRead.ts`, `${DIR}/bible/order.ts`,
     `${DIR}/bible/ref.ts`, `${DIR}/bible/tileFit.ts`, `${DIR}/bible/today.ts`, `${DIR}/bible/useLastRead.ts`, `${DIR}/bible/useVerseSearch.ts`, `${DIR}/bible/verseActions.ts`,
-    `${DIR}/bible/verseRows.ts`,
+    `${DIR}/bible/verseRows.ts`, `${DIR}/bible/wrap.ts`,
     `${DIR}/bible/searchCore.ts`, `${DIR}/bible/searchText.ts`,
     `${DIR}/bible/text.ts`, `${DIR}/bible/textCore.ts`, `${DIR}/bible/textTypes.ts`, `${DIR}/bible/webc.generated.ts`,
     `${DIR}/books/catalog.ts`,

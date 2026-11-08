@@ -173,7 +173,10 @@ check('the words of the reader: prose is paragraphs and poetry is stanzas, each 
   assert.match(src, /selected=\{holding\.has\(i\) \? selected : null\}/, 'a block that does not hold the chosen verse gets nothing new and is not drawn again');
   assert.match(src, /export const INDENT = '\\u2003';/, 'an em space of Inter for each tab');
   assert.match(src, /\{INDENT\.repeat\(l\.indent\)\}/);
-  assert.match(src, /\{k < block\.lines\.length - 1 \? '\\n' : ''\}/, 'a stanza is one text, a line after the other');
+  assert.match(src, /\{k < lines\.length - 1 \? '\\n' : ''\}/, 'a stanza is one text, a line after the other');
+  assert.match(src, /const lines = useMemo\(\(\) => wrapPoem\(block\.lines, \{ width: width - 2 \* SIDE, size: BODY_SIZE, scale, numberSize: NUMBER_SIZE, numberOf: superscript \}\), \[block, width, scale\]\);/, 'a long line is cut by the reader, to the width of the page, and the rest hangs');
+  assert.match(src, /const scale = Math\.min\(fontScale, READER_MAX_FONT_SCALE\);/, 'at the text size the phone has, held to what the text is held to');
+  assert.match(src, /const \{ width, fontScale \} = useWindowDimensions\(\);/);
   assert.equal((src.match(/<AppText maxFontSizeMultiplier=\{READER_MAX_FONT_SCALE\} style=\{\{ fontSize: BODY_SIZE, lineHeight: BODY_LINE \}\}>/g) ?? []).length, 2, 'one text for a paragraph and one for a stanza, Inter');
   assert.doesNotMatch(src, /#[0-9a-fA-F]{3,8}\b|\bfixed\.|fontFamily|variant="accent"/, 'colours are roles and the gold wash; the fonts are variants; the handwriting is not in the words');
   assert.match(src, /import \{ c, role \} from '@\/theme';/);
