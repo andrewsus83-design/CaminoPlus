@@ -180,7 +180,7 @@ class Claims(unittest.TestCase):
     def test_legal_pages(self):
         privacy, terms = HTML["privacy.html"], HTML["terms.html"]
         for content in (privacy, terms):
-            self.assertIn("Last updated 7 November 2026.", content)
+            self.assertIn("Last updated 8 November 2026.", content)   # bumped with the plan numbers in the Terms (LEGAL_UPDATED is shared by both pages)
             self.assertIn("Draft for launch", content)
         for needle in ("not end-to-end encrypted", "Settings, then Account, then Delete account", "Supabase", "MapTiler and OpenFreeMap",
                        "friend requests", "within 30 days", "when enabled"):

@@ -20,7 +20,25 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 WEB = ROOT / "web"  # the committed site: asset hashes and the previous sitemap dates come from here
 SITE = "https://camino.plus"
-LEGAL_UPDATED = "7 November 2026"  # bump by hand whenever the Privacy Policy or Terms change
+LEGAL_UPDATED = "8 November 2026"  # bump by hand whenever the Privacy Policy or Terms change
+
+# The plan numbers: the ONE place this site takes them from (tools/tests/test_plan_numbers.py reads them from here). They are the
+# same numbers as mobile/src/lib/plan.ts, supabase/migrations/20261114030000_plan_storage.sql and design/index.html.
+#   Free 500 MB of cloud storage. Pilgrim Plus US$12 a year: 10 GB, offline maps, higher resolution photos and video.
+#   Extra storage: +10 GB for US$5 a year, Pilgrim Plus only, one at a time (it does not stack).
+# Video says only what holds on every phone (how long, how big): no 720p or 1080p, and 4K video is "planned", never offered.
+FREE_STORAGE = "500 MB"
+PLUS_STORAGE = "10 GB"
+ADDON_STORAGE = "10 GB"
+PLUS_PRICE = 12     # US$ a year
+ADDON_PRICE = 5     # US$ a year
+FREE_PHOTO_PX, PLUS_PHOTO_PX, VIDEO_SECONDS, FREE_VIDEO_MB, PLUS_VIDEO_MB = 1280, 3840, 60, 25, 45
+MEDIA_HEADLINE = "Higher resolution photos and video"
+MEDIA_LOWER = MEDIA_HEADLINE[0].lower() + MEDIA_HEADLINE[1:]   # the same words inside a sentence
+FREE_MEDIA = f"Photos up to {FREE_PHOTO_PX:,} px on the long side. Video up to {VIDEO_SECONDS} seconds, up to {FREE_VIDEO_MB} MB."
+PLUS_MEDIA = f"Photos up to {PLUS_PHOTO_PX:,} px on the long side. Video up to {VIDEO_SECONDS} seconds, up to {PLUS_VIDEO_MB} MB. 4K video is planned."
+TERMS_PLAN = (f"The basic app is free and includes {FREE_STORAGE} of cloud storage. Pilgrim Plus is a yearly subscription (currently US${PLUS_PRICE} a year) that includes "
+              f"offline route downloads, {PLUS_STORAGE} of cloud storage and {MEDIA_LOWER}. Pilgrim Plus members can add {ADDON_STORAGE} of cloud storage for US${ADDON_PRICE} a year; one add-on at a time.")
 PAGES = {}  # file name -> html, filled by page()
 
 
@@ -338,16 +356,17 @@ FAQ = [
  ]),
  ("pricing", "Pricing &amp; billing", [
   ("offline-plus", "Is offline mode only for paying members?", "<p>Yes. Offline maps are part of Pilgrim Plus (<b>$12 per year</b>) and are not available on the free plan. With Pilgrim Plus you download your stages over Wi-Fi, and the map and your GPS position keep working without signal. Without it the map needs a connection: your GPS dot still works without signal, but the base map under it only loads when you are online. See <a href=\"/pricing\">Pricing</a> for everything Pilgrim Plus includes.</p>"),
-  ("cost", "How much does CaminoPlus cost?", "<p>The basic app is free. Pilgrim Plus costs <b>$12 per year</b> and adds offline route downloads and 5 GB of cloud storage. See <a href=\"/pricing\">Pricing</a> for details.</p>"),
-  ("free-plan", "What can I do on the free plan?", "<p>You can use the basic app with a connection: browse routes and stages, look up stays and cafés, watch stories in Discover and keep your passport and journal on your phone. The free plan has no offline maps (route downloads) and no cloud storage. Both come with Pilgrim Plus.</p>"),
+  ("cost", "How much does CaminoPlus cost?", f"<p>The basic app is free and has {FREE_STORAGE} of cloud storage. Pilgrim Plus costs <b>${PLUS_PRICE} per year</b> and adds offline route downloads, {PLUS_STORAGE} of cloud storage and {MEDIA_LOWER}. See <a href=\"/pricing\">Pricing</a> for details.</p>"),
+  ("free-plan", "What can I do on the free plan?", f"<p>You can use the basic app with a connection: browse routes and stages, look up stays and cafés, watch stories in Discover and keep your passport and journal on your phone. The free plan has no offline maps (route downloads), but it has {FREE_STORAGE} of cloud storage for the photos and videos in your posts and chats. Pilgrim Plus adds offline maps and {PLUS_STORAGE}.</p>"),
   ("pay", "How do I pay?", "<p>Subscriptions are bought through the App Store or Google Play, using the payment method on your store account. Prices may be shown in your local currency.</p>"),
   ("renew", "Does the subscription renew automatically?", "<p>Yes, yearly, until you cancel. You can turn off auto-renew at any time in your App Store or Google Play subscription settings, and you keep access until the end of the paid year.</p>"),
   ("refund", "Can I get a refund?", "<p>Because payments go through Apple or Google, refunds follow their policies. On iPhone, request one at reportaproblem.apple.com. On Android, request one from your Google Play order history. If something went wrong, <a href=\"/contact\">tell us</a> and we will help.</p>"),
  ]),
  ("storage", "Cloud storage", [
-  ("storage-what", "What is the 5 GB of cloud storage for?", "<p>It backs up your journal posts, photos, passport stamps and plan, so nothing is lost if your phone is lost or broken, and you can open your journey on a new phone.</p>"),
-  ("storage-more", "What happens if I need more space?", "<p>Add 5 GB more for $5 per year, as many times as you need.</p>"),
-  ("storage-end", "What happens to my photos if my subscription ends?", "<p>Your posts stay on your phone. We will remind you before anything in cloud storage changes, and you can export your data at any time.</p>"),
+  ("storage-what", "What is cloud storage for?", f"<p>It holds the photos and videos you add to your posts and chats. The free plan has {FREE_STORAGE} and Pilgrim Plus has {PLUS_STORAGE}. Your private diary stays on your phone: it is not uploaded.</p>"),
+  ("storage-more", "What happens if I need more space?", f"<p>Pilgrim Plus members can add {ADDON_STORAGE} for ${ADDON_PRICE} per year. You can have one add-on at a time.</p>"),
+  ("media-limits", "How big can my photos and videos be?", f"<p><b>Free:</b> {FREE_MEDIA}</p><p><b>Pilgrim Plus:</b> {PLUS_MEDIA}</p>"),
+  ("storage-end", "What happens to my photos if my subscription ends?", f"<p>Your photos and videos stay in your cloud storage, but you cannot add more while you are over the free {FREE_STORAGE}. We will remind you before anything in cloud storage changes, and you can export your data at any time.</p>"),
  ]),
  ("watch", "Smartwatch &amp; health", [
   ("watch-which", "Which smartwatches work with CaminoPlus?", "<p>Apple Watch and Garmin. Connect them in Settings.</p>"),
@@ -415,7 +434,7 @@ def home():
   <li>{icon("route")}All Camino routes, start anywhere</li>
   <li>{icon("wifioff")}Offline maps for 6–8 hour walking days</li>
   <li>{icon("watch")}Apple Watch &amp; Garmin</li>
-  <li>{icon("tag")}$12 a year, 5 GB cloud included</li>
+  <li>{icon("tag")}${PLUS_PRICE} a year, {PLUS_STORAGE} cloud included</li>
 </ul></div></section>
 
 <section class="section"><div class="wrap">
@@ -477,14 +496,14 @@ def home():
     <article class="card pad-lg plan">
       <div><h3>Free</h3><p class="muted" style="margin-top:6px">The basic app, online.</p></div>
       <p class="price">$0</p>
-      <ul class="ticks"><li>Routes, stays, cafés and Discover</li><li>Passport and journal on your phone</li></ul>
+      <ul class="ticks"><li>Routes, stays, cafés and Discover</li><li>Passport and journal on your phone</li><li>{FREE_STORAGE} cloud storage for photos and videos</li></ul>
       <a class="btn btn-ghost" href="/pricing">Compare plans</a>
     </article>
     <article class="card pad-lg plan featured">
       <span class="badge-best">For the walk</span>
       <div><h3>Pilgrim Plus</h3><p class="muted" style="margin-top:6px">Everything, offline.</p></div>
       <p class="price">$12<small> / year</small></p>
-      <div class="on-dark"><ul class="ticks"><li>Offline route downloads, stage by stage</li><li>5 GB cloud storage for photos and journal</li><li>Extra storage: $5 per 5 GB a year</li></ul></div>
+      <div class="on-dark"><ul class="ticks"><li>Offline route downloads, stage by stage</li><li>{PLUS_STORAGE} cloud storage for photos and videos</li><li>{MEDIA_HEADLINE}</li><li>Add {ADDON_STORAGE} for ${ADDON_PRICE} a year, one at a time</li></ul></div>
       <a class="btn btn-gold" href="/pricing">See pricing</a>
     </article>
   </div>
@@ -585,7 +604,10 @@ def pricing():
     rows = [("Routes and stages (online)", True, True), ("Stays and cafés, with filters", True, True),
             ("Discover stories", True, True), ("Passport, stamps and journal on your phone", True, True),
             ("Offline route downloads", False, True), ("Offline map and GPS position", False, True),
-            ("Cloud backup of photos and journal", "—", "5 GB"), ("Extra cloud storage", "—", "$5 / 5 GB / year")]
+            ("Cloud storage for photos and videos", FREE_STORAGE, PLUS_STORAGE),
+            ("Extra cloud storage (Pilgrim Plus only, one at a time)", "—", f"+{ADDON_STORAGE} for ${ADDON_PRICE} / year"),
+            ("Photo size", f"Up to {FREE_PHOTO_PX:,} px", f"Up to {PLUS_PHOTO_PX:,} px"),
+            ("Video length and size", f"Up to {VIDEO_SECONDS} seconds, {FREE_VIDEO_MB} MB", f"Up to {VIDEO_SECONDS} seconds, {PLUS_VIDEO_MB} MB")]
     def cell(v):
         if v is True: return '<td class="yes">✓<span class="sr-only">Included</span></td>'
         if v is False: return '<td class="no">—<span class="sr-only">Not included</span></td>'
@@ -593,28 +615,29 @@ def pricing():
     tr = "".join(f"<tr><td>{a}</td>{cell(b)}{cell(c)}</tr>" for a, b, c in rows)
     qa = "".join(f'<details class="qa"><summary>{q}</summary><div class="ans">{a}</div></details>'
                  for _, q, a in faq_group("pricing") + faq_group("storage"))
-    body = head("Pricing", "Less than a café con leche a month.",
-        "Start free. When you are ready to walk, Pilgrim Plus unlocks offline maps and cloud storage for a whole year.", photo="galician-galleries", pos="center 18%")
+    body = head("Pricing", "Simple pricing.",
+        f"Start free with {FREE_STORAGE} of cloud storage. When you are ready to walk, Pilgrim Plus adds offline maps, {PLUS_STORAGE} of cloud storage and {MEDIA_LOWER} for a whole year.", photo="galician-galleries", pos="center 18%")
     body += f'''<section class="section" style="padding-top:32px"><div class="wrap">
   <div class="plans">
     <article class="card pad-lg plan">
       <div><h3>Free</h3><p class="muted" style="margin-top:6px">The basic app, with a connection.</p></div>
       <p class="price">$0</p>
-      <ul class="ticks"><li>Browse every route and stage</li><li>Stays and cafés with filters</li><li>Discover stories</li><li>Passport and journal on your phone</li></ul>
-      <p class="muted" style="font-size:15px">No offline route downloads. No cloud storage.</p>
+      <ul class="ticks"><li>Browse every route and stage</li><li>Stays and cafés with filters</li><li>Discover stories</li><li>Passport and journal on your phone</li><li>{FREE_STORAGE} cloud storage for photos and videos</li></ul>
+      <p class="muted" style="font-size:15px">{FREE_MEDIA}</p>
+      <p class="muted" style="font-size:15px">No offline route downloads.</p>
       <span class="btn btn-ghost" aria-disabled="true">Free at launch</span>
     </article>
     <article class="card pad-lg plan featured">
       <span class="badge-best">For the walk</span>
       <div><h3>Pilgrim Plus</h3><p class="muted" style="margin-top:6px">Everything in Free, plus offline.</p></div>
       <p class="price">$12<small> / year</small></p>
-      <div class="on-dark"><ul class="ticks"><li>Download your route stage by stage</li><li>Offline map and GPS position for walking days without signal</li><li>5 GB cloud storage for photos, posts and stamps</li><li>Syncs automatically when you are back online</li></ul></div>
+      <div class="on-dark"><ul class="ticks"><li>Download your route stage by stage</li><li>Offline map and GPS position for walking days without signal</li><li>{PLUS_STORAGE} cloud storage for photos and videos</li><li>{MEDIA_HEADLINE}</li><li>Syncs automatically when you are back online</li></ul><p style="font-size:15px;margin:12px 0 0">{PLUS_MEDIA}</p></div>
       <a class="btn btn-gold" href="/#download">Get notified at launch</a>
     </article>
   </div>
   <div class="card addon">
-    <div><h3>Extra storage</h3><p class="muted" style="margin-top:6px">Taking a lot of photos? Add space in blocks of 5 GB, as many as you need.</p></div>
-    <p class="price">$5<small> per 5 GB / year</small></p>
+    <div><h3>Extra storage</h3><p class="muted" style="margin-top:6px">Taking a lot of photos? Pilgrim Plus members can add {ADDON_STORAGE} of space. One add-on at a time.</p></div>
+    <p class="price">${ADDON_PRICE}<small> / year for {ADDON_STORAGE}</small></p>
   </div>
   <p class="muted center" style="margin-top:20px;font-size:15px">Prices in US dollars. The App Store and Google Play may show the price in your local currency. Subscriptions renew yearly until cancelled.</p>
 </div></section>
@@ -631,9 +654,9 @@ def pricing():
 </div></section>
 {cta()}'''
     ld = {"@context": "https://schema.org", "@type": "Product", "name": "Pilgrim Plus",
-          "description": "Yearly subscription with offline route downloads and 5 GB cloud storage.",
+          "description": f"Yearly subscription with offline route downloads, {PLUS_STORAGE} cloud storage and {MEDIA_LOWER}.",
           "offers": {"@type": "Offer", "price": "12.00", "priceCurrency": "USD"}}
-    page("pricing", "Pricing", "CaminoPlus is free to start. Pilgrim Plus is $12 a year with offline route downloads and 5 GB of cloud storage. Extra storage is $5 per 5 GB a year.", body, "pricing", ld)
+    page("pricing", "Pricing", f"Free to start with {FREE_STORAGE} of cloud storage. Pilgrim Plus is ${PLUS_PRICE} a year: offline route downloads, {PLUS_STORAGE} of cloud storage and {MEDIA_LOWER}.", body, "pricing", ld)
 
 def offline():
     steps = [("Pick your route", "Choose a Camino and the town you start from. CaminoPlus lists your stages."),
@@ -831,7 +854,7 @@ def terms():
 <p>Keep your sign-in details safe and tell us if you think someone else is using your account. You are responsible for activity on your account.</p>
 <h2>3. Subscriptions and payment</h2>
 <ul>
-<li>The basic app is free. Pilgrim Plus is a yearly subscription (currently US$12 a year) that includes offline route downloads and 5 GB of cloud storage. Extra storage is sold in blocks of 5 GB for US$5 a year.</li>
+<li>''' + TERMS_PLAN + '''</li>
 <li>Subscriptions are bought and managed through the App Store or Google Play and renew automatically each year until you cancel in your store account settings. Cancelling stops the next renewal; you keep access until the end of the paid period.</li>
 <li>Refunds are handled by Apple or Google under their policies. Local consumer rights are not affected.</li>
 <li>We may change prices for future periods. We will tell you in advance, and the store will ask for your consent where required.</li>

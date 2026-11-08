@@ -129,11 +129,17 @@ begin
   insert into public.crowd_reports (kind, location) values ('beds_full', 'SRID=4326;POINT(-1.3 43.0)');
   assert (select expires_at > now() + interval '10 hours' from public.crowd_reports where user_id = auth.uid()),
          'crowd report expiry (private.crowd_report_ttl as invoker)';
-  -- upload policy -> private.storage_remaining_bytes: a free user is refused by the POLICY, not by a missing grant
+  -- upload policy -> private.storage_remaining_bytes. A free pilgrim has 500 MB since migration 20261114030000, so a small
+  -- file gets in (the policy reaches the function without a missing grant); once the quota is used up the POLICY refuses
+  -- the next one, not a missing grant
+  insert into storage.objects (bucket_id, name, metadata)
+  values ('user-media', auth.uid()::text || '/posts/a.jpg', '{"size": 10}');
+  insert into storage.objects (bucket_id, name, metadata)
+  values ('user-media', auth.uid()::text || '/posts/big.mp4', '{"size": 500000000}');   -- room was left, so it gets in
   begin
     insert into storage.objects (bucket_id, name, metadata)
-    values ('user-media', auth.uid()::text || '/posts/a.jpg', '{"size": 10}');
-    raise exception 'a free user uploaded to user-media';
+    values ('user-media', auth.uid()::text || '/posts/b.jpg', '{"size": 10}');
+    raise exception 'a free user uploaded to user-media over the quota';
   exception when insufficient_privilege then
     get stacked diagnostics msg = message_text;
     assert msg like 'new row violates row-level security policy%', 'upload refused for the wrong reason: ' || msg;

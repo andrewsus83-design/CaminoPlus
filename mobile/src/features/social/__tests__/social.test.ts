@@ -523,12 +523,17 @@ test('group rules: 2 to 49 others, title 1 to 60 characters', () => {
   assert.match(String(groupBlocker(60)), /up to 50/);
 });
 
-test('photos in chat need Pilgrim Plus and free space', () => {
+test('photos in chat need room in the cloud storage of the plan: Free has 500 MB, so a free pilgrim with room can send one', () => {
   const info = (over: Record<string, unknown>) => parseStorage({ has_plus: true, quota_bytes: 1000, used_bytes: 10, remaining_bytes: 990, ...over });
   assert.equal(storageGate(info({})), 'ok');
+  // Free since the plan numbers (500 MB): with room left the gate is open; at the limit it says "full", not "get Pilgrim Plus"
+  assert.equal(storageGate(info({ has_plus: false, quota_bytes: 500_000_000, used_bytes: 1000, remaining_bytes: 499_999_000 })), 'ok');
+  assert.equal(storageGate(info({ has_plus: false, quota_bytes: 500_000_000, used_bytes: 500_000_000, remaining_bytes: 0 })), 'full');
+  // a plan with no cloud storage at all (quota 0: switched off on the server) is the only plus_required case left
   assert.equal(storageGate(info({ has_plus: false, quota_bytes: 0, remaining_bytes: 0 })), 'plus_required');
   assert.equal(storageGate(info({ remaining_bytes: 0 })), 'full');
   assert.equal(storageGate(null), 'unknown');
+  assert.equal(friendlyError(new Error('storage quota exceeded')), 'Could not save the photo. Check your cloud storage in Settings.');
   assert.equal(parseStorage('x'), null);
   assert.equal(parseStorage({ has_plus: 'yes' })?.has_plus, false);
 });

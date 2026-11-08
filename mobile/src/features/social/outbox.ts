@@ -160,7 +160,7 @@ export async function flush(): Promise<void> {
           } else {
             const code = (e as { code?: string }).code;
             const why = item.kind === 'image'
-              ? 'This photo could not be sent. Photos in chat need Pilgrim Plus and free cloud storage.'
+              ? 'This photo could not be sent. Check your cloud storage in Settings.'
               : code === '42501'
                 ? 'You can only message friends who are in this chat and have not blocked you.'
                 : friendlyError(e, 'This message could not be sent.');

@@ -12,6 +12,7 @@ import { Card, SectionLabel } from '@/components/ui';
 import { ROUTE_ID, ROUTE_NAME, StageInfo, formatMb, hasMapTiler, packs, stages, timeAgo, useOnline } from '@/features/map';
 import { MapIcon } from '@/features/map/MapIcon';
 import { packErrorText } from '@/features/map/messages';
+import { PLUS_PRICE_LABEL, PLUS_STORAGE_LABEL } from '@/lib/plan';
 import { c, layout, radius, role } from '@/theme';
 
 export default function OfflineMaps() {
@@ -154,13 +155,13 @@ function UpgradePrompt({ visible, onClose, onSeePlans }: { visible: boolean; onC
       <View style={{ backgroundColor: role.surface, borderTopLeftRadius: radius.lg, borderTopRightRadius: radius.lg, paddingHorizontal: layout.screenMargin, paddingTop: 24, paddingBottom: insets.bottom + 24, gap: 12 }}>
         <AppText variant="accent" color={c.goldInk}>Pilgrim Plus</AppText>
         <AppText variant="h3">Walk all day without signal</AppText>
-        {['Offline maps for every stage', 'Route, albergues, water and churches offline', '5 GB cloud storage for your journey'].map((t) => (
+        {['Offline maps for every stage', 'Route, albergues, water and churches offline', `${PLUS_STORAGE_LABEL} cloud storage for your journey`].map((t) => (
           <View key={t} style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
             <Icon name="check" color={c.success} size={18} />
             <AppText variant="small">{t}</AppText>
           </View>
         ))}
-        <AppText variant="label" style={{ marginTop: 4 }}>$12 / year</AppText>
+        <AppText variant="label" style={{ marginTop: 4 }}>{PLUS_PRICE_LABEL}</AppText>
         <Pill variant="gold" label="See Pilgrim Plus" onPress={onSeePlans} />
         <Pill variant="ghost" label="Not now" onPress={onClose} />
       </View>

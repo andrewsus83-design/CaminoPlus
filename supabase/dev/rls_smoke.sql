@@ -137,14 +137,29 @@ do $$ begin
   assert (select count(*) from public.nearby_pois(43.0094, -1.3195, 1000)) = 1, 'nearby pois';
 end $$;
 
--- storage: no plan, free quota is 0 -> upload blocked
+-- storage: no plan, free quota is 500 MB (migration 20261114030000): a small file gets in, a pilgrim cannot write into
+-- somebody else's folder, and once the quota is used up the next upload is blocked
 do $$ begin
+  assert (public.get_my_storage() ->> 'quota_bytes')::bigint = 500000000, 'free quota is 500 MB';
+  insert into storage.objects (bucket_id, name, metadata)
+  values ('user-media', 'aaaaaaaa-0000-0000-0000-000000000001/posts/free1.jpg', '{"size": 1000}');
   begin
     insert into storage.objects (bucket_id, name, metadata)
-    values ('user-media', 'aaaaaaaa-0000-0000-0000-000000000001/posts/p1.jpg', '{"size": 1000}');
-    raise exception 'upload allowed without quota';
+    values ('user-media', 'bbbbbbbb-0000-0000-0000-000000000002/posts/not-mine.jpg', '{"size": 1000}');
+    raise exception 'upload into somebody else''s folder allowed';
   exception when insufficient_privilege then null;
   end;
+  insert into storage.objects (bucket_id, name, metadata)
+  values ('user-media', 'aaaaaaaa-0000-0000-0000-000000000001/posts/free2.mp4', '{"size": 500000000}');   -- room was left: the last file may overshoot
+  begin
+    insert into storage.objects (bucket_id, name, metadata)
+    values ('user-media', 'aaaaaaaa-0000-0000-0000-000000000001/posts/free3.jpg', '{"size": 1000}');
+    raise exception 'upload allowed over the free quota';
+  exception when insufficient_privilege then null;
+  end;
+  -- leave nothing behind: the checks below count A's files
+  delete from storage.objects where bucket_id = 'user-media' and name like 'aaaaaaaa-0000-0000-0000-000000000001/posts/free%';
+  assert (select count(*) from storage.objects where bucket_id = 'user-media' and name like 'aaaaaaaa-0000-0000-0000-000000000001/posts/free%') = 0, 'the free-quota test files are gone';
 end $$;
 
 -- free plan: no route downloads, but the catalog (without URLs) is visible
@@ -169,7 +184,7 @@ update public.subscriptions set status = 'active', product_id = 'plus_yearly', s
   will_renew = true, expires_at = now() + interval '1 year'
 where user_id = 'aaaaaaaa-0000-0000-0000-000000000001';
 insert into public.storage_addons (user_id, product_id, storage_bytes, transaction_id, expires_at)
-values ('aaaaaaaa-0000-0000-0000-000000000001', 'storage_5gb_yearly', 5368709120, 'tx-1', now() + interval '1 year');
+values ('aaaaaaaa-0000-0000-0000-000000000001', 'storage_addon_yearly', 10000000000, 'tx-1', now() + interval '1 year');
 
 begin;
 select set_config('request.jwt.claims', '{"sub": "aaaaaaaa-0000-0000-0000-000000000001", "role": "authenticated"}', true);
@@ -181,7 +196,7 @@ declare s jsonb;
 begin
   s := public.refresh_my_storage_usage();
   assert (s ->> 'has_plus')::boolean, 'plus active';
-  assert (s ->> 'quota_bytes')::bigint = 10737418240, '5 GB plan + 5 GB add-on';
+  assert (s ->> 'quota_bytes')::bigint = 20000000000, '10 GB plan + 10 GB add-on';
   assert (s ->> 'used_bytes')::bigint = 1000, 'usage counted';
   assert (select count(*) from public.offline_packs) = 1, 'plus user reads pack URLs';
   assert (public.get_my_entitlements() ->> 'plan') = 'plus', 'plus entitlement';

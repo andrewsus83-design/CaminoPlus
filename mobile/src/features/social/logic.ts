@@ -520,10 +520,11 @@ export function groupBlocker(others: number): string | null {
   return null;
 }
 
-/** Photos in chat need cloud storage, which is part of Pilgrim Plus. */
+/** Photos in chat need room in the pilgrim's cloud storage (the size of each plan is in lib/plan.ts).
+ *  'plus_required' is now only the case of a plan with no cloud storage at all (a quota of 0, switched off on the server). */
 export function storageGate(info: StorageInfo | null): 'ok' | 'plus_required' | 'full' | 'unknown' {
   if (!info) return 'unknown';
-  if (!info.has_plus) return 'plus_required';
+  if (!info.has_plus && info.quota_bytes <= 0) return 'plus_required';
   return info.remaining_bytes <= 0 ? 'full' : 'ok';
 }
 
@@ -624,7 +625,7 @@ export function friendlyError(e: unknown, fallback = 'Something went wrong. Plea
   if (/too many/i.test(msg) && /request/i.test(msg)) return 'You have too many pending requests. Wait for some answers first.';
   if (/not (accepted )?friends|must be friends|need to be friends/i.test(msg)) return 'You need to be friends first.';
   if (/rate limit|too many messages|slow down/i.test(msg)) return 'Slow down a little and try again in a moment.';
-  if (/storage|quota/i.test(msg)) return 'Photos in chat are part of Pilgrim Plus.';
+  if (/storage|quota/i.test(msg)) return 'Could not save the photo. Check your cloud storage in Settings.';
   if (err.code === '42501' || /permission denied|row-level security/i.test(msg)) return 'You are not allowed to do that.';
   return fallback;
 }
