@@ -4,6 +4,41 @@ What changed in CaminoPlus, release by release, newest first, in the shape of [K
 The app's version is the `version` in [`mobile/app.json`](mobile/app.json) (Settings > This build shows it). How a release reaches a phone: [`mobile/DEPLOY.md`](mobile/DEPLOY.md).
 There was no changelog before this one, so it starts after the Library v2 (pull requests #87 and #88).
 
+## 1.2.0 (2026-11-09)
+
+The first build for the App Store and Google Play. It has new native code, so it needs the 1.2.0 build: an update cannot bring it to an older build.
+The native fingerprint of release 1.2.0 is `465f1376ea7633771b17d62fb0c15fb76f34de00` (release 1.1.0 had `ef37d5816b2829366ff35defbb05f59fb13c3705`). It moved on purpose: two new native modules and the new app config.
+How to build, test and submit it: [`mobile/DEPLOY.md`](mobile/DEPLOY.md), "Release 1.2.0". **Nothing here has been tried on a phone by us**: see "Not checked on a device".
+
+### Added
+
+- **Sign in with Apple on iPhone** (#114): a Continue with Apple button above Continue with Google on Welcome, Sign in and Create account. The pilgrim may hide the email. Deleting the account also revokes the sign-in at Apple, once the owner has set the Apple secrets. New edge function `apple-link`; `delete-account` changed. Setup: [`mobile/docs/APPLE-SIGN-IN.md`](mobile/docs/APPLE-SIGN-IN.md).
+- **Photos are made smaller before upload, and the place where they were taken is removed** (#111): Free up to 1,280 px on the long side, Pilgrim Plus up to 3,840 px, chat photos 1,280 px, the profile picture 512 px, and a small thumbnail for grids. The location is also removed from videos. Video is not compressed yet: on iPhone the picker makes it 720p (Free) or 1080p (Plus); on Android it goes up as recorded, within the file limit. Details: [`mobile/docs/MEDIA.md`](mobile/docs/MEDIA.md).
+- **A new app icon and launch screen** (#117): the brand shell on blue, on iPhone and Android (with a one-colour icon for Android 13 themed icons), and a Play Store icon.
+
+### Changed
+
+- **True permission texts** (#117): the location text says what the app does with it and that it never tracks in the background. The camera text says the app does not use the camera. No microphone and no motion text.
+- **iPhone only** (#117): no iPad layout. An iPad runs the iPhone app in a phone-size window.
+- **No photo-library question** before the photo picker (#111): the system picker needs none.
+- Also on `main` since 1.1.0 and in this build: the friend profile and another pilgrim's Journey (#108); Me (#109) and the account screens (#110) on the design tokens; the tab bar (#112); the "Write a journey post" card (#113); bigger map controls (#116).
+
+### Removed
+
+- **Unused permissions** (#117): on Android CAMERA, RECORD_AUDIO, SYSTEM_ALERT_WINDOW, VIBRATE, READ_EXTERNAL_STORAGE and WRITE_EXTERNAL_STORAGE are blocked, and the two background location services are removed. Android Auto Backup is off.
+
+### Not in this build
+
+- **Pilgrim Plus cannot be bought yet.** There is no in-app purchase.
+- **No Apple button on Android or the web.**
+- **Cloud storage for Free accounts is not switched on by this build.** Until it is, a Free account cannot save photos or videos to the cloud, and the app says so.
+- **No video compressor.**
+- The Apple table (migration `20261114020100_apple_sign_in_tokens.sql`) is not applied and the functions `apple-link` and `delete-account` are not deployed: the owner does that (`mobile/DEPLOY.md`, "Release 1.2.0", step 1).
+
+### Not checked on a device
+
+Nothing in this release was run by us on a phone, in Xcode, with Gradle, or in an EAS build, and nothing was tried against Apple's or Google's servers. It was checked by unit tests, `expo prebuild` on a scratch copy (the Apple entitlement, the permission texts, the merged Android manifest), `expo-doctor` and a web export.
+
 ## 1.1.0 (2026-11-08)
 
 The Library has the Bible and 26 books; Notes moved to Me; the tab bar, the Back button and Me follow one standard; stage 3 of the Camino Francés has real places.

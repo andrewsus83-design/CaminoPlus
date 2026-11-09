@@ -3,6 +3,7 @@
 // hooks never write query strings, so the offline layer can wrap these functions later.
 import { OfflineError, assertOnline } from '@/lib/net';
 import { supabase } from '@/lib/supabase';
+import { MEDIA_BUCKET, MediaStorageError, deleteMedia, signedUrls, upload } from '@/lib/mediaStorage';
 import { buildReportRow, normalizeTotals, parseBlocked, parseStorage } from './logic';
 import type { ReportRequest } from './logic';
 import type {
@@ -36,7 +37,7 @@ const rows = <T>(data: unknown): T[] => (Array.isArray(data) ? (data as T[]) : d
 export const PAGE_SIZE = 40;
 const MESSAGE_COLS = 'id, conversation_id, sender_id, kind, body, media_path, reply_to, client_created_at, created_at, edited_at, deleted_at';
 const NOTIFICATION_COLS = 'id, kind, title, body, data, read_at, created_at, actor:profiles!actor_id(id, username, display_name, avatar_url)';
-export const CHAT_BUCKET = 'user-media';
+export const CHAT_BUCKET = MEDIA_BUCKET.userMedia;
 
 const raw = {
   /* ---------------- unread ---------------- */
@@ -95,38 +96,39 @@ const raw = {
       reply_to: item.reply_to, client_created_at: item.client_created_at,
     }));
   },
-  async unsend(messageId: string): Promise<void> {
+  /** Unsend one of my messages; its photo, if any, is deleted from storage too (best effort). */
+  async unsend(messageId: string, mediaPath?: string | null): Promise<void> {
     must(await supabase.rpc('unsend_message', { p_message: messageId }));
+    if (mediaPath) void deleteMedia(CHAT_BUCKET, [mediaPath]);
   },
-  /** Uploads the photo of an outbox item to the private user-media bucket and returns its path. */
+  /** Delete a chat photo of mine that no message uses (best effort). */
+  async deleteChatImage(path: string): Promise<boolean> {
+    return deleteMedia(CHAT_BUCKET, [path]);
+  },
+  /** Uploads the photo of an outbox item (prepared by pick.ts through prepareImage) to the private user-media bucket and returns its path. */
   async uploadChatImage(item: OutboxItem): Promise<string> {
     if (!item.local_uri) throw new SocialError('The photo is no longer on this phone.', { status: 400 });
     const mime = item.mime ?? 'image/jpeg';
     const ext = mime === 'image/png' ? 'png' : mime === 'image/webp' ? 'webp' : mime === 'image/heic' ? 'heic' : 'jpg';
     const path = `${item.user_id}/chat/${item.conversation_id}/${item.id}.${ext}`;
-    let body: ArrayBuffer;
     try {
-      body = await (await fetch(item.local_uri)).arrayBuffer();
-    } catch {
-      throw new SocialError('The photo is no longer on this phone.', { status: 400 });
-    }
-    const up = await supabase.storage.from(CHAT_BUCKET).upload(path, body, { contentType: mime, upsert: true });
-    if (up.error) {
-      // StorageApiError carries an HTTP status; a failed fetch (offline) does not.
-      const e = up.error as { status?: number; statusCode?: string | number };
-      const raw = e.status ?? e.statusCode;
-      const status = raw == null ? NaN : Number(raw);
-      throw new SocialError(up.error.message, { status: Number.isFinite(status) ? status : undefined, network: !Number.isFinite(status) });
+      await upload(CHAT_BUCKET, path, item.local_uri, mime);
+    } catch (e) {
+      if (e instanceof MediaStorageError) {
+        throw new SocialError(e.missing ? 'The photo is no longer on this phone.' : e.message, { status: e.status, network: e.network });
+      }
+      throw e;
     }
     return path;
   },
+  /** Signed links by path; the same path keeps its link for 50 minutes (mediaStorage). */
   async signedUrls(paths: string[]): Promise<Record<string, string>> {
-    const out: Record<string, string> = {};
-    if (paths.length === 0) return out;
-    const res = await supabase.storage.from(CHAT_BUCKET).createSignedUrls(paths, 3600);
-    if (res.error || !res.data) throw new SocialError(res.error?.message ?? 'Could not load the photo.', { network: true });
-    for (const r of res.data) if (r.path && r.signedUrl) out[r.path] = r.signedUrl;
-    return out;
+    if (paths.length === 0) return {};
+    try {
+      return await signedUrls(CHAT_BUCKET, paths);
+    } catch (e) {
+      throw new SocialError(e instanceof Error ? e.message : 'Could not load the photo.', { network: true });
+    }
   },
   async storage(): Promise<StorageInfo | null> {
     return parseStorage(must(await supabase.rpc('get_my_storage')));

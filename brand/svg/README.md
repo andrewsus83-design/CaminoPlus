@@ -11,6 +11,8 @@ Open `preview.html` in a browser to see everything at once.
 | `app-icon/` | iOS 1024 (square, iOS rounds it), rounded preview, Android adaptive foreground/background/monochrome, splash | app stores, Expo `app.json` |
 | `icons/` | 77 UI icons from the design system (24x24, stroke 1.75, `currentColor`) | app and website |
 
+The app icons need PNG files, which this pack does not make: `node tools/export_app_icons.mjs` turns `app-icon/` into `mobile/assets/*.png` and the Play Store icon (see [brand/store](../store/README.md)).
+
 Colours: Atlantic Blue `#14365D`, ink `#0C2340`, Shell Gold `#D9A21B`, Parchment `#F6EFE2`.
 Fonts used for the outlines: Fraunces Bold (28pt optical size) for "Camino", Inter Bold for "+".
 

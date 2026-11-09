@@ -204,9 +204,9 @@ export function useChat(conversationId: string) {
   }, [uid, conversationId]);
 
   /** Unsend one of my messages. Returns an error text, or null. */
-  const unsend = useCallback(async (id: string): Promise<string | null> => {
+  const unsend = useCallback(async (id: string, mediaPath: string | null = null): Promise<string | null> => {
     try {
-      await socialApi.unsend(id);
+      await socialApi.unsend(id, mediaPath);
       setMsgs((list) => list.map((m) => (m.id === id ? { ...m, deleted_at: new Date().toISOString(), body: null, media_path: null } : m)));
       return null;
     } catch (e) {

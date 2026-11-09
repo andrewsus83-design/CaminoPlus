@@ -10,6 +10,7 @@ The app signs people in with Supabase Auth on the EU project `xgikdabgdqmbdgagow
 | Supabase client, PKCE flow, auto refresh in foreground only | `src/lib/supabase.ts` |
 | Session stored in Keychain / Keystore (chunked, values > 2 KB) | `src/lib/secureStorage.ts` |
 | Google sign-in (system browser) and deep link code exchange | `src/lib/authLinks.ts` |
+| Sign in with Apple (iOS only, needs the 1.2.0 build or newer): [docs/APPLE-SIGN-IN.md](docs/APPLE-SIGN-IN.md) | `src/lib/authApple.ts`, `src/components/auth/AppleButton.tsx` |
 | Session + profile + current journey, sign out | `src/lib/auth.tsx` |
 | All queries (profiles, routes, stages, journeys, stamps, posts) | `src/lib/api.ts` |
 | Route guard (`Stack.Protected`) | `app/_layout.tsx` |
@@ -74,8 +75,8 @@ The app has to open on the trail, so it never waits for the network to decide wh
 ## Deleting an account
 
 Me > gear > Settings > Account > Delete account (also under Edit account; `app/delete-account.tsx`). The pilgrim types DELETE;
-the app calls the `delete-account` edge function (service role: removes the user's files, then the auth
-user; the database cascades the rest), then deletes the diary on this phone: its pages and the folder of their photos
+the app calls the `delete-account` edge function (service role: removes the user's files, revokes the Sign in with Apple
+token at Apple when there is one, then the auth user; the database cascades the rest), then deletes the diary on this phone: its pages and the folder of their photos
 and videos (`clearDiary`, only after the server said yes), and signs out. Subscriptions are billed by the stores and are not cancelled by deletion; the
 screen says so.
 
@@ -98,6 +99,8 @@ screen says so.
 
    The app opens Google in the system browser, so only the Web client is needed. Native Google
    Sign-In (iOS/Android client IDs + `signInWithIdToken`) can be added later in a dev build.
+
+4. **Apple** (iOS): every step, for a first-time Apple developer, is in [docs/APPLE-SIGN-IN.md](docs/APPLE-SIGN-IN.md).
 
 ## Run it
 

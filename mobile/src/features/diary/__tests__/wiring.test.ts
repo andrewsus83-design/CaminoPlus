@@ -221,8 +221,11 @@ check('the diary needs nothing that is not in the app already: every package it 
     }
   }
   assert.deepEqual(offenders, []);
-  const forbidden = ['react-native-webview', 'expo-av', 'expo-media-library', 'expo-image', 'expo-video-thumbnails', 'expo-image-manipulator', 'expo-document-picker', 'expo-camera'];
+  const forbidden = ['react-native-webview', 'expo-av', 'expo-media-library', 'expo-image', 'expo-video-thumbnails', 'expo-document-picker', 'expo-camera'];
   for (const dep of forbidden) assert.ok(!deps.includes(dep), `${dep} is not a dependency, and the diary does not add it`);
+  // expo-image-manipulator joined the app in build 1.2.0 for photos that go to the cloud (src/lib/media); the diary keeps its
+  // media on the phone as it was picked and does not use it.
+  for (const f of diaryFiles()) assert.doesNotMatch(read(f), /expo-image-manipulator|@\/lib\/media\b/, `${f} uses the upload media path`);
 });
 
 check('the screens and parts of the diary take their colours from the theme: no colour written out, and no stylesheet', () => {

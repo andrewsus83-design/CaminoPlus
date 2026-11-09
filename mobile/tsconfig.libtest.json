@@ -28,6 +28,11 @@
     "src/lib/__tests__/navigation.test.ts",
     "src/lib/__tests__/optionalNative.test.ts",
     "src/lib/__tests__/mapControls.test.ts",
+    "src/lib/__tests__/authApple.test.ts",
+    "src/lib/__tests__/accountLoad.test.ts",
+    "src/lib/__tests__/media.test.ts",
+    "src/lib/__tests__/mediaLocation.test.ts",
+    "src/lib/__tests__/mediaFlows.test.ts",
     "src/lib/__tests__/shareLinks.test.ts"
   ]
 }

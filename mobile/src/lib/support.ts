@@ -21,7 +21,7 @@ export const RATING_WORDS = ['', 'Not good', 'Could be better', 'It is okay', 'G
 
 export function appVersion(): string {
   // The fallback is only for a run where Expo gives no config; tools/tests/test_release.py keeps it equal to app.json's version.
-  return Constants.expoConfig?.version ?? '1.1.0';
+  return Constants.expoConfig?.version ?? '1.2.0';
 }
 
 /** Why a message cannot be sent yet, or null. Kept pure so it is easy to test. */

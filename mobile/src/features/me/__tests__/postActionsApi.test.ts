@@ -79,6 +79,9 @@ const load = (script: Script, log: Call[] = [], net: { assertOnline(): Promise<v
     if (id === './net') return net;
     if (id === './uuid') return { uuid: () => 'id' };
     if (id in modules) return modules[id];
+    // the one storage module (uploads and links of photos); post actions do not touch it
+    if (id === './mediaStorage') return { MEDIA_BUCKET: { userMedia: 'user-media', avatars: 'avatars' }, upload: nothing, signedUrls: nothing, deleteMedia: nothing };
+    if (id === './postMediaUpload') return { uploadPostMediaWith: nothing };
     throw new Error(`api.ts imports ${id}: add it to this test`);
   }) as unknown as Api;
 
