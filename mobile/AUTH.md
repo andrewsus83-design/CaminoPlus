@@ -10,7 +10,7 @@ The app signs people in with Supabase Auth on the EU project `xgikdabgdqmbdgagow
 | Supabase client, PKCE flow, auto refresh in foreground only | `src/lib/supabase.ts` |
 | Session stored in Keychain / Keystore (chunked, values > 2 KB) | `src/lib/secureStorage.ts` |
 | Google sign-in (system browser) and deep link code exchange | `src/lib/authLinks.ts` |
-| Sign in with Apple (iOS only, build 1.2.0 and newer): [docs/APPLE-SIGN-IN.md](docs/APPLE-SIGN-IN.md) | `src/lib/authApple.ts`, `src/components/auth/AppleButton.tsx` |
+| Sign in with Apple (iOS only, needs the 1.2.0 build or newer): [docs/APPLE-SIGN-IN.md](docs/APPLE-SIGN-IN.md) | `src/lib/authApple.ts`, `src/components/auth/AppleButton.tsx` |
 | Session + profile + current journey, sign out | `src/lib/auth.tsx` |
 | All queries (profiles, routes, stages, journeys, stamps, posts) | `src/lib/api.ts` |
 | Route guard (`Stack.Protected`) | `app/_layout.tsx` |

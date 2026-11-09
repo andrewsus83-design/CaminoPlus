@@ -2,7 +2,7 @@
   "expo": {
     "name": "CaminoPlus",
     "slug": "caminoplus",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -50,7 +50,7 @@
       [
         "expo-location",
         {
-          "locationWhenInUsePermission": "CaminoPlus uses your location while the app is open to show where you are on the Camino, how far you have walked and what is near you. It also uses it when you choose to send your position to friends with the help bell.",
+          "locationWhenInUsePermission": "CaminoPlus uses your location while the app is open to show where you are on the Camino, how far you have walked and what is near you, and to add the place to a diary page. It also uses it when you choose to send your position to friends with the help bell.",
           "locationAlwaysAndWhenInUsePermission": "CaminoPlus only uses your location while the app is open. It never tracks you in the background.",
           "locationAlwaysPermission": "CaminoPlus only uses your location while the app is open. It never tracks you in the background.",
           "motionUsagePermission": false,

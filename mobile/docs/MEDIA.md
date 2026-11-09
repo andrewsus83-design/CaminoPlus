@@ -36,7 +36,7 @@ What is not covered, honestly:
 
 ## What happens to a video
 
-No video compressor is in the app yet. The best maintained one for React Native was checked for build 1.2.0 and left out: its current major version is a recent rewrite that adds a second native dependency, is tested against an older React Native than this app, and has open reports of build failures, missing 16 KB page support on Android, and broken output on some phones. A failed store build costs more than it gains.
+No video compressor is in the app yet. The best maintained one for React Native was checked for the 1.2.0 build and left out: its current major version is a recent rewrite that adds a second native dependency, is tested against an older React Native than this app, and has open reports of build failures, missing 16 KB page support on Android, and broken output on some phones. A failed store build costs more than it gains.
 
 So today:
 - On iPhone the picker itself exports the clip at the plan's size (H.264 at 1280x720 on Free, 1920x1080 on Plus).
@@ -57,7 +57,7 @@ The development build of 1.1.0 has no `expo-image-manipulator`. Nothing crashes:
 
 On the web the module works through the browser's canvas; there is no video compressor. Checked in a web build: a 4,000 x 3,000 px JPEG of 2 MB with a GPS position went up on a Free account as a 1,280 x 960 px JPEG of 266 KB with no EXIF data, and a 480 x 360 px thumbnail of 51 KB.
 
-## How to test on a phone (build 1.2.0)
+## How to test on a phone (the 1.2.0 build)
 
 1. Free account. Write a journey post, pick a large photo (12 MP or more, for example straight from the camera). Share it. In the Supabase dashboard, Storage, `user-media`, `<your id>/posts/`: the photo is about 0.2 to 0.6 MB and 1,280 px on its long side; a `-thumb.jpg` next to it is about 30 to 60 KB.
 2. Download that photo and look at its details (on a computer: any EXIF viewer). There is no location. The picture is the right way up.

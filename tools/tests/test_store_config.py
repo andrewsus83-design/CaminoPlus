@@ -30,7 +30,7 @@ TOKENS = json.loads(read("design/tokens.json"))
 
 # The words the phone shows when it asks. They are part of the product: short, plain, and true.
 LOCATION_WHEN_IN_USE = (
-    "CaminoPlus uses your location while the app is open to show where you are on the Camino, how far you have walked and what is near you. "
+    "CaminoPlus uses your location while the app is open to show where you are on the Camino, how far you have walked and what is near you, and to add the place to a diary page. "
     "It also uses it when you choose to send your position to friends with the help bell."
 )
 LOCATION_ALWAYS = "CaminoPlus only uses your location while the app is open. It never tracks you in the background."

@@ -5,10 +5,10 @@ what the app does and what you set up once, step by step. You need a paid Apple 
 
 ## What the pilgrim sees
 
-- **iPhone and iPad, build 1.2.0 or newer:** a black **Continue with Apple** button (white in dark mode) right above
+- **iPhone (and an iPad, which runs the iPhone app), the 1.2.0 build or newer:** a black **Continue with Apple** button (white in dark mode) right above
   **Continue with Google**, the same size, on Welcome, Sign in and Create account. One button for both: the first time it
   makes the account, after that it signs in.
-- **Android, the web, and any iPhone build older than 1.2.0:** no Apple button at all. Nothing breaks.
+- **Android, the web, and any iPhone build older than the 1.2.0 build:** no Apple button at all. Nothing breaks.
 - Apple's sheet asks for the name and the email. The pilgrim may hide the email; Apple then gives a private relay address
   (something like `x7kq2m9pzt@privaterelay.appleid.com`).
 - Closing Apple's sheet does nothing (no message). Other problems show a short sentence, never a code.
@@ -51,7 +51,7 @@ Android sign-in stops. Android has no App Store rule that asks for Apple, so v1 
    (`POST https://appleid.apple.com/auth/revoke`), then deletes the account. If Apple cannot be reached, the account is
    still deleted and the failure is written to the function's log.
 
-The package `expo-apple-authentication` has a native part, so it came with **build 1.2.0**. The app only loads it after
+The package `expo-apple-authentication` has a native part, so it needs **the 1.2.0 build**. The app only loads it after
 asking whether the installed build has it (`hasNativeModule`, `mobile/src/lib/optionalNative.ts`): an older build simply
 shows no Apple button.
 
@@ -123,7 +123,7 @@ and its sending address, with SPF set for that domain. Otherwise those emails ne
 
 ## Test it on a phone
 
-1. Make the 1.2.0 build (`mobile/DEPLOY.md`): a development or preview build for iOS. Expo Go cannot test this (its
+1. Make the 1.2.0 build (`mobile/DEPLOY.md`, "Release 1.2.0"): a development or preview build for iOS. Expo Go cannot test this (its
    bundle id is not yours).
 2. On the iPhone, sign in to iCloud with an Apple Account that has two-factor authentication on.
 3. Open the app signed out: **Continue with Apple** is above Google. Tap it, choose "Hide My Email" once to see the relay
