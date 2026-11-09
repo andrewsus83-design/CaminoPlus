@@ -507,14 +507,15 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
 .pstats { flex: 1; display: flex; justify-content: space-around; text-align: center; }
 .pstats b { display: block; font-family: var(--cp-font-title); font-weight: 600; font-size: 22px; line-height: 26px; }
 .pstats span { font-size: 15px; color: var(--cp-text-muted); }
-.highlights { display: flex; gap: 16px; overflow-x: auto; margin: 0 -24px; padding: 2px 24px; scrollbar-width: none; }
-.highlights div { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; flex: none; }
+/* the names under the rounds: the caption (15 px, 500, 0.4 tracking), centred on up to two lines, in a cell of 108 (the round stays 66): "Roncesvalles" is 99 px wide, so a narrower cell cuts it in the middle */
+.highlights { display: flex; gap: 4px; overflow-x: auto; margin: 0 -24px; padding: 2px 24px; scrollbar-width: none; }
+.highlights div { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 108px; font-size: 15px; line-height: 21px; letter-spacing: .4px; text-align: center; font-weight: 500; flex: none; }
 .highlights .cp-avatar { width: 60px; height: 60px; }
 .highlights .add { width: 66px; height: 66px; border-radius: 50%; border: 2px dashed var(--cp-border-strong); display: grid; place-items: center; color: var(--cp-text-muted); }
 /* ---- Me: the All item (the first highlight, pinned at the left), the stamps it opens, and the bar over the grid of one place ---- */
 .hl-row { display: flex; margin: 14px -24px 0; padding-left: 24px; }
 .hl-row .highlights { flex: 1; min-width: 0; margin: 0 0 0 16px; padding: 2px 24px 2px 0; }
-.hl-all { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: none; width: 72px; padding: 2px 0; font-size: 12px; line-height: 16px; font-weight: 500; }
+.hl-all { display: flex; flex-direction: column; align-items: center; gap: 8px; flex: none; width: 72px; padding: 2px 0; font-size: 15px; line-height: 21px; letter-spacing: .4px; font-weight: 500; }
 .hl-all .all-ring { width: 66px; height: 66px; box-sizing: border-box; border-radius: 50%; border: 1px solid var(--cp-border); background: var(--cp-surface); display: grid; place-items: center; color: var(--cp-action); }
 .hl-all .all-ring .in { display: grid; place-items: center; width: 100%; height: 100%; box-sizing: border-box; border-radius: 50%; }
 .hl-all .all-ring .cp-icon { width: 28px; height: 28px; }
@@ -851,8 +852,9 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
 .jg { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; margin: 0 -14px; }
 .jg .jt { position: relative; aspect-ratio: 9 / 16; overflow: hidden; border: 0; padding: 0; margin: 0; background: var(--cp-surface-sunken); font: inherit; color: inherit; }
 .jg .jt .cp-img { position: absolute; inset: 0; border-radius: 0; }
-.jg .jt .cap { position: absolute; left: 0; right: 0; bottom: 0; padding: 10px; background: rgba(0, 0, 0, .28); color: #fff; font-size: 13px; line-height: 16px; font-weight: 500; letter-spacing: .4px; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.jg .jt .n { position: absolute; top: 8px; right: 8px; box-sizing: border-box; min-width: 24px; height: 24px; padding: 0 8px; border-radius: 12px; background: rgba(0, 0, 0, .45); color: #fff; font-size: 12px; line-height: 24px; font-weight: 500; text-align: center; }
+/* the caption of a tile: the caption type (15 px on 21), white, on a band of 60 % black that holds 4.5 : 1 over ANY picture, a white one included (at 28 % the gold and tan tiles gave 4.2 and 3.1 : 1), up to two lines */
+.jg .jt .cap { position: absolute; left: 0; right: 0; bottom: 0; padding: 8px 12px; background: rgba(0, 0, 0, .6); color: #fff; font-size: 15px; line-height: 21px; font-weight: 500; letter-spacing: .4px; text-align: left; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+.jg .jt .n { position: absolute; top: 8px; right: 8px; box-sizing: border-box; min-width: 28px; height: 28px; padding: 0 8px; border-radius: 14px; background: rgba(0, 0, 0, .6); color: #fff; font-size: 15px; line-height: 28px; font-weight: 500; letter-spacing: .4px; text-align: center; }
 .jg .jt.txt { display: flex; align-items: center; justify-content: center; padding: 12px; }
 .jg .jt.txt p { margin: 0; font-family: var(--cp-font-title); font-weight: 600; font-size: 16px; line-height: 22px; text-align: center; }
 .jg .jt.txt.blue { background: var(--cp-color-blue); color: var(--cp-color-parchment); }
@@ -868,6 +870,16 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
 .jg .jt.write .ico .cp-icon { width: 32px; height: 32px; stroke-width: 2.2px; }
 .jg .jt.write .q { font-family: var(--cp-font-title); font-weight: 600; font-size: 24px; line-height: 30px; }
 .jg .jt.write .rule { width: 32px; height: 2px; border-radius: 1px; background: var(--cp-highlight); }
+/* ---- Me · Journey, short phone (an iPhone SE): the status bar is 20 high, there is no island and no home bar, so the chat button sits 106 from the bottom, as the app draws it; the header is the compact one (features/me/headerFit.ts) ---- */
+.phone.se .status { height: 20px; padding: 0 20px; font-size: 15px; }
+.phone.se .scroll { top: 20px; }
+.phone.se .tabdock { padding-bottom: 10px; }
+.phone.se .fab-slot { bottom: 106px; }
+.phone.se .pstats b { font-size: 24px; line-height: 30px; }
+.phone.se .pstats span { font-size: 15px; line-height: 21px; }
+.phone.se .highlights div { gap: 4px; }
+.phone.se .highlights .nm { display: block; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center; }
+.phone.se .hl-all { gap: 4px; }
 .phone[style*="width:320px"] .jg .jt.write { gap: 8px; } .phone[style*="width:320px"] .jg .jt.write .ico { width: 56px; height: 56px; } .phone[style*="width:320px"] .jg .jt.write .ico .cp-icon { width: 28px; height: 28px; } /* the tile of a small phone, as the app draws it (compact) */
 /* ---- Pilgrim: the profile of another pilgrim (mobile/app/pilgrim/[id].tsx). Back, @username and the three dots; the card; Message, Add friend, Requested, or Accept and Decline; their journey in the
    grid of Me without the card that writes a post. A private profile that is not a friend's is a minimal card. Nothing private is on it: no Notes, Plan or Health, no tab strip. ---- */
@@ -2199,7 +2211,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
 <section class="doc" id="screens">
   <p class="eyebrow">15 · Screens @ 390 × 844</p>
   <h2>The app, tab by tab</h2>
-  <p class="intro">Reference layouts at iPhone 15 size. Scroll sideways to see all of them. Me has the My Camino card with its Change button, a row of highlights (first All, pinned at the left, which opens one stamp for every place of the Camino and, with a tap on a stamp, your journeys there; then one round picture for each destination of the day plan: a gold ring when you posted there, a dashed circle while it is still ahead), four sub-tabs (Notes, Journey, Plan, Health), a chat button that opens the inbox, a two-step write flow, a share screen and a stamp pop-up. Maps has two layers: helicopter view and city view. Stays opens into Airbnb / Agoda-style detail pages for stays and cafes. Explore has a second screen for the photo marketplace. Library has a search field with a bookmarks button on top and directly under it the tabs Bible and Books, each with its banner; Bible has three choices at the bottom (Old Testament, Deuterocanon, New Testament); a search lists its results grouped by tab, Bookmarks lists what the pilgrim kept, and the diary (the Notes sub-tab of Me) has a feed of pages and an editor. A pilgrim's profile (opened from a friend, a search result, a comment or the header of a chat) shows the card, Message or Add friend and their journey in the grid of Me without the card that writes a post; nothing private is on it. Settings is a screen opened from the gear at the top right of Me; it opens the business-owner flow: a welcome page, five registration steps, the review status and the owner dashboard.</p>
+  <p class="intro">Reference layouts at iPhone 15 size. Scroll sideways to see all of them. Me has the My Camino card with its Change button, a row of highlights (first All, pinned at the left, which opens one stamp for every place of the Camino and, with a tap on a stamp, your journeys there; then one round picture for each destination of the day plan: a gold ring when you posted there, a dashed circle while it is still ahead), four sub-tabs (Notes, Journey, Plan, Health), a chat button that opens the inbox (on a short phone the header is compact, so that the strip of sub-tabs ends above that button), a two-step write flow, a share screen and a stamp pop-up. Maps has two layers: helicopter view and city view. Stays opens into Airbnb / Agoda-style detail pages for stays and cafes. Explore has a second screen for the photo marketplace. Library has a search field with a bookmarks button on top and directly under it the tabs Bible and Books, each with its banner; Bible has three choices at the bottom (Old Testament, Deuterocanon, New Testament); a search lists its results grouped by tab, Bookmarks lists what the pilgrim kept, and the diary (the Notes sub-tab of Me) has a feed of pages and an editor. A pilgrim's profile (opened from a friend, a search result, a comment or the header of a chat) shows the card, Message or Add friend and their journey in the grid of Me without the card that writes a post; nothing private is on it. Settings is a screen opened from the gear at the top right of Me; it opens the business-owner flow: a welcome page, five registration steps, the review status and the owner dashboard.</p>
 
   <div class="phones">
 
@@ -2219,21 +2231,25 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           </div>
           <div style="margin-top:14px"><div style="font-weight:600;font-size:17px">Ana García</div>
           <div style="font-size:15px;line-height:22px">Camino Francés, day 12. Walking for my grandmother. Ultreia!</div></div>
-          <div style="margin-top:14px;display:flex;align-items:center;gap:14px;padding:14px;border-radius:var(--cp-radius-lg);background:var(--cp-surface-inverse);color:var(--cp-text-inverse);box-shadow:var(--cp-shadow-md)">
-            <span style="width:52px;height:52px;border-radius:50%;border:1.5px solid rgba(217,162,27,.55);display:grid;place-items:center;flex:none"><svg width="48" height="48" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="20" fill="#14365D"/><g transform="translate(0 -2.12)"><path d="M20 28.5L5.84 22.20A2.84 2.84 0 0 1 8.64 17.96A2.84 2.84 0 0 1 12.66 14.85A2.84 2.84 0 0 1 17.46 13.21A2.84 2.84 0 0 1 22.54 13.21A2.84 2.84 0 0 1 27.34 14.85A2.84 2.84 0 0 1 31.36 17.96A2.84 2.84 0 0 1 34.16 22.20z" fill="#D9A21B"/><path d="M20 29.0Q14.09 22.35 8.49 17.82M20 29.0Q16.22 20.86 12.56 14.67M20 29.0Q18.70 20.07 17.43 13.01M20 29.0Q21.30 20.07 22.57 13.01M20 29.0Q23.78 20.86 27.44 14.67M20 29.0Q25.91 22.35 31.51 17.82" stroke="#14365D" stroke-width="1.15" stroke-linecap="round" fill="none"/><path d="M15.2 31.4Q18 30.6 18.4 28.3H21.6Q22 30.6 24.8 31.4Q24.6 32.6 20 32.6Q15.4 32.6 15.2 31.4z" fill="#D9A21B"/></g></svg></span>
-            <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
-              <div style="font-family:var(--cp-font-accent);font-weight:700;font-size:24px;line-height:28px;color:var(--cp-color-gold)">Buen Camino!</div>
-              <div style="font-family:var(--cp-font-title);font-weight:600;font-size:17px;line-height:21px;color:var(--cp-color-gold-soft)">My Camino</div>
-              <div style="font-size:17px;line-height:22px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Camino Francés</div>
-              <div style="font-size:15px;line-height:21px;font-weight:500;letter-spacing:.4px;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">From stage 1 · 11 stages done</div>
+          <div style="margin-top:8px;display:flex;flex-direction:column;gap:4px;padding:12px;border-radius:var(--cp-radius-lg);background:var(--cp-surface-inverse);color:var(--cp-text-inverse);box-shadow:var(--cp-shadow-md)">
+            <div style="display:flex;flex-wrap:wrap;align-items:center;column-gap:12px;row-gap:8px">
+              <span style="width:52px;height:52px;border-radius:50%;border:1.5px solid rgba(217,162,27,.55);display:grid;place-items:center;flex:none"><svg width="48" height="48" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="20" fill="#14365D"/><g transform="translate(0 -2.12)"><path d="M20 28.5L5.84 22.20A2.84 2.84 0 0 1 8.64 17.96A2.84 2.84 0 0 1 12.66 14.85A2.84 2.84 0 0 1 17.46 13.21A2.84 2.84 0 0 1 22.54 13.21A2.84 2.84 0 0 1 27.34 14.85A2.84 2.84 0 0 1 31.36 17.96A2.84 2.84 0 0 1 34.16 22.20z" fill="#D9A21B"/><path d="M20 29.0Q14.09 22.35 8.49 17.82M20 29.0Q16.22 20.86 12.56 14.67M20 29.0Q18.70 20.07 17.43 13.01M20 29.0Q21.30 20.07 22.57 13.01M20 29.0Q23.78 20.86 27.44 14.67M20 29.0Q25.91 22.35 31.51 17.82" stroke="#14365D" stroke-width="1.15" stroke-linecap="round" fill="none"/><path d="M15.2 31.4Q18 30.6 18.4 28.3H21.6Q22 30.6 24.8 31.4Q24.6 32.6 20 32.6Q15.4 32.6 15.2 31.4z" fill="#D9A21B"/></g></svg></span>
+              <div style="flex:1 0 auto">
+                <div style="font-family:var(--cp-font-accent);font-weight:700;font-size:24px;line-height:28px;color:var(--cp-color-gold)">Buen Camino!</div>
+                <div style="font-family:var(--cp-font-title);font-weight:600;font-size:17px;line-height:21px;color:var(--cp-color-gold-soft)">My Camino</div>
+              </div>
+              <span style="margin-left:auto;height:40px;padding:0 16px;border-radius:999px;background:var(--cp-color-gold);color:var(--cp-color-blue);font-size:17px;font-weight:600;display:inline-flex;align-items:center">Change</span>
             </div>
-            <span style="height:40px;padding:0 16px;border-radius:999px;background:var(--cp-color-gold);color:var(--cp-color-blue);font-size:17px;font-weight:600;display:inline-flex;align-items:center;flex:none">Change</span>
+            <div>
+              <div style="font-size:17px;line-height:22px;font-weight:600">Camino Francés</div>
+              <div style="font-size:15px;line-height:21px;font-weight:500;letter-spacing:.4px;opacity:.85">From stage 1 · 11 stages done</div>
+            </div>
           </div>
           <div class="hl-row"><div class="hl-all"><span class="all-ring"><span class="in"><svg class="cp-icon"><use href="#i-shell"/></svg></span></span>All</div><div class="highlights">
             <div><span class="cp-ring seen"><span class="cp-avatar" style="background:linear-gradient(150deg,#F2D8B6,#A0583F)"></span></span>Pamplona</div>
             <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#9DB4CC,#14365D)"></span></span>Logroño</div>
             <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#D7C6E0,#6E5470)"></span></span>Burgos</div>
-            <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Hornillos</div>
+            <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Hornillos del Camino</div>
             <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Castrojeriz</div>
           </div></div><div class="cp-subtabs" style="margin:22px -24px 20px;padding:0 12px"><span>Notes</span><span class="on">Journey</span><span>Plan</span><span>Health</span></div>
           <div class="jg">
@@ -2258,6 +2274,63 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     </div>
 
     <div class="phone-wrap">
+      <p class="phone-label"><b>Me · Journey, short phone</b>An iPhone SE, 375 by 667, with its status bar of 20 · the header is compact (a smaller picture, tighter space, a name on one line) so that the strip of sub-tabs ends above the chat button · nothing is taken out of it</p>
+      <div class="phone se" style="width:375px;height:667px">
+        <div class="status"><span>9:41</span><span>●●●</span></div>
+        <div class="scroll">
+          <div style="display:flex;align-items:center;gap:10px;min-height:48px">
+            <span class="un">ana.camina</span>
+            <span class="cp-edit-pill" role="button" aria-label="Edit profile"><svg class="cp-icon "><use href="#i-pencil"/></svg>camino.plus/ana</span>
+            <button class="cp-icon-btn flat" style="width:48px;height:48px;margin-left:auto" aria-label="Settings"><svg class="cp-icon "><use href="#i-settings"/></svg></button>
+          </div>
+          <div class="profile-top" style="margin-top:4px;gap:16px">
+            <span class="cp-ring"><span class="cp-avatar" style="width:50px;height:50px"></span></span>
+            <div class="pstats"><div><b>312</b><span>km</span></div><div><b>12</b><span>stamps</span></div><div><b>148</b><span>friends</span></div></div>
+          </div>
+          <div style="margin-top:4px"><div style="font-weight:600;font-size:17px">Ana García</div>
+          <div style="font-size:15px;line-height:22px">Camino Francés, day 12. Walking for my grandmother. Ultreia!</div></div>
+          <div style="margin-top:4px;display:flex;flex-direction:column;gap:0px;padding:12px;border-radius:var(--cp-radius-lg);background:var(--cp-surface-inverse);color:var(--cp-text-inverse);box-shadow:var(--cp-shadow-md)">
+            <div style="display:flex;flex-wrap:wrap;align-items:center;column-gap:12px;row-gap:8px">
+              <span style="width:40px;height:40px;border-radius:50%;border:1.5px solid rgba(217,162,27,.55);display:grid;place-items:center;flex:none"><svg width="36" height="36" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="20" fill="#14365D"/><g transform="translate(0 -2.12)"><path d="M20 28.5L5.84 22.20A2.84 2.84 0 0 1 8.64 17.96A2.84 2.84 0 0 1 12.66 14.85A2.84 2.84 0 0 1 17.46 13.21A2.84 2.84 0 0 1 22.54 13.21A2.84 2.84 0 0 1 27.34 14.85A2.84 2.84 0 0 1 31.36 17.96A2.84 2.84 0 0 1 34.16 22.20z" fill="#D9A21B"/><path d="M20 29.0Q14.09 22.35 8.49 17.82M20 29.0Q16.22 20.86 12.56 14.67M20 29.0Q18.70 20.07 17.43 13.01M20 29.0Q21.30 20.07 22.57 13.01M20 29.0Q23.78 20.86 27.44 14.67M20 29.0Q25.91 22.35 31.51 17.82" stroke="#14365D" stroke-width="1.15" stroke-linecap="round" fill="none"/><path d="M15.2 31.4Q18 30.6 18.4 28.3H21.6Q22 30.6 24.8 31.4Q24.6 32.6 20 32.6Q15.4 32.6 15.2 31.4z" fill="#D9A21B"/></g></svg></span>
+              <div style="flex:1 0 auto">
+                <div style="font-family:var(--cp-font-accent);font-weight:700;font-size:24px;line-height:28px;color:var(--cp-color-gold)">Buen Camino!</div>
+                <div style="font-family:var(--cp-font-title);font-weight:600;font-size:17px;line-height:21px;color:var(--cp-color-gold-soft)">My Camino</div>
+              </div>
+              <span style="margin-left:auto;height:40px;padding:0 16px;border-radius:999px;background:var(--cp-color-gold);color:var(--cp-color-blue);font-size:17px;font-weight:600;display:inline-flex;align-items:center">Change</span>
+            </div>
+            <div>
+              <div style="font-size:17px;line-height:22px;font-weight:600">Camino Francés</div>
+              <div style="font-size:15px;line-height:21px;font-weight:500;letter-spacing:.4px;opacity:.85">From stage 1 · 11 stages done</div>
+            </div>
+          </div>
+          <div class="hl-row" style="margin-top:4px"><div class="hl-all"><span class="all-ring"><span class="in"><svg class="cp-icon"><use href="#i-shell"/></svg></span></span>All</div><div class="highlights">
+            <div><span class="cp-ring seen"><span class="cp-avatar" style="background:linear-gradient(150deg,#F2D8B6,#A0583F)"></span></span><span class="nm">Pamplona</span></div>
+            <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#9DB4CC,#14365D)"></span></span><span class="nm">Logroño</span></div>
+            <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#D7C6E0,#6E5470)"></span></span><span class="nm">Burgos</span></div>
+            <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span><span class="nm">Hornillos del Camino</span></div>
+            <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span><span class="nm">Castrojeriz</span></div>
+          </div></div><div class="cp-subtabs" style="margin:4px -24px 20px;padding:0 12px"><span>Notes</span><span class="on">Journey</span><span>Plan</span><span>Health</span></div>
+          <div class="jg">
+            <button class="jt write" aria-label="Write a journey post"><span class="art" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 4C7 4 4 8 4 13c0 3 1.5 6 3 7h10c1.5-1 3-4 3-7 0-5-3-9-8-9Z"/><path d="M12 4v16M12 4 8 20M12 4l4 16"/></svg></span><span class="ico"><svg class="cp-icon"><use href="#i-pen"/></svg></span><span class="q">What did you see today?</span><span class="rule"></span>Write a journey post</button>
+            <div class="jt"><div class="cp-img v4"></div><span class="cap">Burgos</span></div>
+            <div class="jt txt blue"><p>Legs say no, heart says yes.</p><span class="cap">Hontanas</span></div>
+            <div class="jt"><div class="cp-img v5"></div><span class="n">3</span><span class="cap">Logroño</span></div>
+            <div class="jt"><div class="cp-img v2"></div><span class="cap">Pamplona</span></div>
+            <div class="jt txt gold"><p>Stamp number one in the credencial!</p><span class="cap">Albergue</span></div>
+          </div>
+        </div>
+        <div class="fab-slot"><button class="cp-fab-write" aria-label="Inbox, 3 unread"><svg class="cp-icon"><use href="#i-chat"/></svg><span class="cp-fab-badge" aria-hidden="true">3</span></button></div>
+        <div class="tabdock"><nav class="cp-tabbar">
+          <div class="cp-tab on"><span class="ico"><svg class="cp-icon"><use href="#i-me"/></svg></span>Me</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-stays"/></svg></span>Stays</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-maps"/></svg></span>Maps</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-explore"/></svg></span>Discover</div>
+          <div class="cp-tab"><span class="ico"><svg class="cp-icon"><use href="#i-library"/></svg></span>Library</div>
+        </nav></div>
+              </div>
+    </div>
+
+    <div class="phone-wrap">
       <p class="phone-label"><b>Me · Journey, grid</b>The same screen scrolled to the strip · the first tile is the card Write a journey post, the posts follow · the chat button with its badge</p>
       <div class="phone">
         <div class="status"><span>9:41</span><span class="island"></span><span>●●●</span></div>
@@ -2273,21 +2346,25 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           </div>
           <div style="margin-top:14px"><div style="font-weight:600;font-size:17px">Ana García</div>
           <div style="font-size:15px;line-height:22px">Camino Francés, day 12. Walking for my grandmother. Ultreia!</div></div>
-          <div style="margin-top:14px;display:flex;align-items:center;gap:14px;padding:14px;border-radius:var(--cp-radius-lg);background:var(--cp-surface-inverse);color:var(--cp-text-inverse);box-shadow:var(--cp-shadow-md)">
-            <span style="width:52px;height:52px;border-radius:50%;border:1.5px solid rgba(217,162,27,.55);display:grid;place-items:center;flex:none"><svg width="48" height="48" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="20" fill="#14365D"/><g transform="translate(0 -2.12)"><path d="M20 28.5L5.84 22.20A2.84 2.84 0 0 1 8.64 17.96A2.84 2.84 0 0 1 12.66 14.85A2.84 2.84 0 0 1 17.46 13.21A2.84 2.84 0 0 1 22.54 13.21A2.84 2.84 0 0 1 27.34 14.85A2.84 2.84 0 0 1 31.36 17.96A2.84 2.84 0 0 1 34.16 22.20z" fill="#D9A21B"/><path d="M20 29.0Q14.09 22.35 8.49 17.82M20 29.0Q16.22 20.86 12.56 14.67M20 29.0Q18.70 20.07 17.43 13.01M20 29.0Q21.30 20.07 22.57 13.01M20 29.0Q23.78 20.86 27.44 14.67M20 29.0Q25.91 22.35 31.51 17.82" stroke="#14365D" stroke-width="1.15" stroke-linecap="round" fill="none"/><path d="M15.2 31.4Q18 30.6 18.4 28.3H21.6Q22 30.6 24.8 31.4Q24.6 32.6 20 32.6Q15.4 32.6 15.2 31.4z" fill="#D9A21B"/></g></svg></span>
-            <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
-              <div style="font-family:var(--cp-font-accent);font-weight:700;font-size:24px;line-height:28px;color:var(--cp-color-gold)">Buen Camino!</div>
-              <div style="font-family:var(--cp-font-title);font-weight:600;font-size:17px;line-height:21px;color:var(--cp-color-gold-soft)">My Camino</div>
-              <div style="font-size:17px;line-height:22px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Camino Francés</div>
-              <div style="font-size:15px;line-height:21px;font-weight:500;letter-spacing:.4px;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">From stage 1 · 11 stages done</div>
+          <div style="margin-top:8px;display:flex;flex-direction:column;gap:4px;padding:12px;border-radius:var(--cp-radius-lg);background:var(--cp-surface-inverse);color:var(--cp-text-inverse);box-shadow:var(--cp-shadow-md)">
+            <div style="display:flex;flex-wrap:wrap;align-items:center;column-gap:12px;row-gap:8px">
+              <span style="width:52px;height:52px;border-radius:50%;border:1.5px solid rgba(217,162,27,.55);display:grid;place-items:center;flex:none"><svg width="48" height="48" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="20" fill="#14365D"/><g transform="translate(0 -2.12)"><path d="M20 28.5L5.84 22.20A2.84 2.84 0 0 1 8.64 17.96A2.84 2.84 0 0 1 12.66 14.85A2.84 2.84 0 0 1 17.46 13.21A2.84 2.84 0 0 1 22.54 13.21A2.84 2.84 0 0 1 27.34 14.85A2.84 2.84 0 0 1 31.36 17.96A2.84 2.84 0 0 1 34.16 22.20z" fill="#D9A21B"/><path d="M20 29.0Q14.09 22.35 8.49 17.82M20 29.0Q16.22 20.86 12.56 14.67M20 29.0Q18.70 20.07 17.43 13.01M20 29.0Q21.30 20.07 22.57 13.01M20 29.0Q23.78 20.86 27.44 14.67M20 29.0Q25.91 22.35 31.51 17.82" stroke="#14365D" stroke-width="1.15" stroke-linecap="round" fill="none"/><path d="M15.2 31.4Q18 30.6 18.4 28.3H21.6Q22 30.6 24.8 31.4Q24.6 32.6 20 32.6Q15.4 32.6 15.2 31.4z" fill="#D9A21B"/></g></svg></span>
+              <div style="flex:1 0 auto">
+                <div style="font-family:var(--cp-font-accent);font-weight:700;font-size:24px;line-height:28px;color:var(--cp-color-gold)">Buen Camino!</div>
+                <div style="font-family:var(--cp-font-title);font-weight:600;font-size:17px;line-height:21px;color:var(--cp-color-gold-soft)">My Camino</div>
+              </div>
+              <span style="margin-left:auto;height:40px;padding:0 16px;border-radius:999px;background:var(--cp-color-gold);color:var(--cp-color-blue);font-size:17px;font-weight:600;display:inline-flex;align-items:center">Change</span>
             </div>
-            <span style="height:40px;padding:0 16px;border-radius:999px;background:var(--cp-color-gold);color:var(--cp-color-blue);font-size:17px;font-weight:600;display:inline-flex;align-items:center;flex:none">Change</span>
+            <div>
+              <div style="font-size:17px;line-height:22px;font-weight:600">Camino Francés</div>
+              <div style="font-size:15px;line-height:21px;font-weight:500;letter-spacing:.4px;opacity:.85">From stage 1 · 11 stages done</div>
+            </div>
           </div>
           <div class="hl-row"><div class="hl-all"><span class="all-ring"><span class="in"><svg class="cp-icon"><use href="#i-shell"/></svg></span></span>All</div><div class="highlights">
             <div><span class="cp-ring seen"><span class="cp-avatar" style="background:linear-gradient(150deg,#F2D8B6,#A0583F)"></span></span>Pamplona</div>
             <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#9DB4CC,#14365D)"></span></span>Logroño</div>
             <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#D7C6E0,#6E5470)"></span></span>Burgos</div>
-            <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Hornillos</div>
+            <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Hornillos del Camino</div>
             <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Castrojeriz</div>
           </div></div><div class="cp-subtabs" style="margin:22px -24px 20px;padding:0 12px"><span>Notes</span><span class="on">Journey</span><span>Plan</span><span>Health</span></div>
           <div class="jg">
@@ -2327,21 +2404,25 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           </div>
           <div style="margin-top:14px"><div style="font-weight:600;font-size:17px">Ana García</div>
           <div style="font-size:15px;line-height:22px">Camino Francés, day 12. Walking for my grandmother. Ultreia!</div></div>
-          <div style="margin-top:14px;display:flex;align-items:center;gap:14px;padding:14px;border-radius:var(--cp-radius-lg);background:var(--cp-surface-inverse);color:var(--cp-text-inverse);box-shadow:var(--cp-shadow-md)">
-            <span style="width:52px;height:52px;border-radius:50%;border:1.5px solid rgba(217,162,27,.55);display:grid;place-items:center;flex:none"><svg width="48" height="48" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="20" fill="#14365D"/><g transform="translate(0 -2.12)"><path d="M20 28.5L5.84 22.20A2.84 2.84 0 0 1 8.64 17.96A2.84 2.84 0 0 1 12.66 14.85A2.84 2.84 0 0 1 17.46 13.21A2.84 2.84 0 0 1 22.54 13.21A2.84 2.84 0 0 1 27.34 14.85A2.84 2.84 0 0 1 31.36 17.96A2.84 2.84 0 0 1 34.16 22.20z" fill="#D9A21B"/><path d="M20 29.0Q14.09 22.35 8.49 17.82M20 29.0Q16.22 20.86 12.56 14.67M20 29.0Q18.70 20.07 17.43 13.01M20 29.0Q21.30 20.07 22.57 13.01M20 29.0Q23.78 20.86 27.44 14.67M20 29.0Q25.91 22.35 31.51 17.82" stroke="#14365D" stroke-width="1.15" stroke-linecap="round" fill="none"/><path d="M15.2 31.4Q18 30.6 18.4 28.3H21.6Q22 30.6 24.8 31.4Q24.6 32.6 20 32.6Q15.4 32.6 15.2 31.4z" fill="#D9A21B"/></g></svg></span>
-            <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
-              <div style="font-family:var(--cp-font-accent);font-weight:700;font-size:24px;line-height:28px;color:var(--cp-color-gold)">Buen Camino!</div>
-              <div style="font-family:var(--cp-font-title);font-weight:600;font-size:17px;line-height:21px;color:var(--cp-color-gold-soft)">My Camino</div>
-              <div style="font-size:17px;line-height:22px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Camino Francés</div>
-              <div style="font-size:15px;line-height:21px;font-weight:500;letter-spacing:.4px;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">From stage 1 · 11 stages done</div>
+          <div style="margin-top:8px;display:flex;flex-direction:column;gap:4px;padding:12px;border-radius:var(--cp-radius-lg);background:var(--cp-surface-inverse);color:var(--cp-text-inverse);box-shadow:var(--cp-shadow-md)">
+            <div style="display:flex;flex-wrap:wrap;align-items:center;column-gap:12px;row-gap:8px">
+              <span style="width:52px;height:52px;border-radius:50%;border:1.5px solid rgba(217,162,27,.55);display:grid;place-items:center;flex:none"><svg width="48" height="48" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="20" fill="#14365D"/><g transform="translate(0 -2.12)"><path d="M20 28.5L5.84 22.20A2.84 2.84 0 0 1 8.64 17.96A2.84 2.84 0 0 1 12.66 14.85A2.84 2.84 0 0 1 17.46 13.21A2.84 2.84 0 0 1 22.54 13.21A2.84 2.84 0 0 1 27.34 14.85A2.84 2.84 0 0 1 31.36 17.96A2.84 2.84 0 0 1 34.16 22.20z" fill="#D9A21B"/><path d="M20 29.0Q14.09 22.35 8.49 17.82M20 29.0Q16.22 20.86 12.56 14.67M20 29.0Q18.70 20.07 17.43 13.01M20 29.0Q21.30 20.07 22.57 13.01M20 29.0Q23.78 20.86 27.44 14.67M20 29.0Q25.91 22.35 31.51 17.82" stroke="#14365D" stroke-width="1.15" stroke-linecap="round" fill="none"/><path d="M15.2 31.4Q18 30.6 18.4 28.3H21.6Q22 30.6 24.8 31.4Q24.6 32.6 20 32.6Q15.4 32.6 15.2 31.4z" fill="#D9A21B"/></g></svg></span>
+              <div style="flex:1 0 auto">
+                <div style="font-family:var(--cp-font-accent);font-weight:700;font-size:24px;line-height:28px;color:var(--cp-color-gold)">Buen Camino!</div>
+                <div style="font-family:var(--cp-font-title);font-weight:600;font-size:17px;line-height:21px;color:var(--cp-color-gold-soft)">My Camino</div>
+              </div>
+              <span style="margin-left:auto;height:40px;padding:0 16px;border-radius:999px;background:var(--cp-color-gold);color:var(--cp-color-blue);font-size:17px;font-weight:600;display:inline-flex;align-items:center">Change</span>
             </div>
-            <span style="height:40px;padding:0 16px;border-radius:999px;background:var(--cp-color-gold);color:var(--cp-color-blue);font-size:17px;font-weight:600;display:inline-flex;align-items:center;flex:none">Change</span>
+            <div>
+              <div style="font-size:17px;line-height:22px;font-weight:600">Camino Francés</div>
+              <div style="font-size:15px;line-height:21px;font-weight:500;letter-spacing:.4px;opacity:.85">From stage 1 · 11 stages done</div>
+            </div>
           </div>
           <div class="hl-row"><div class="hl-all on"><span class="all-ring"><span class="in"><svg class="cp-icon"><use href="#i-shell"/></svg></span></span>All</div><div class="highlights">
             <div><span class="cp-ring seen"><span class="cp-avatar" style="background:linear-gradient(150deg,#F2D8B6,#A0583F)"></span></span>Pamplona</div>
             <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#9DB4CC,#14365D)"></span></span>Logroño</div>
             <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#D7C6E0,#6E5470)"></span></span>Burgos</div>
-            <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Hornillos</div>
+            <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Hornillos del Camino</div>
             <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Castrojeriz</div>
           </div></div><div class="cp-subtabs" style="margin:22px -24px 20px;padding:0 12px"><span>Notes</span><span class="on">Journey</span><span>Plan</span><span>Health</span></div>
           <div class="allp-card"><div class="row"><h4>All places</h4><span class="n">5 of 34 places</span></div><div class="bar"><span style="width:14.7%"></span></div><p>Tap a place to see your journeys there.</p></div>
@@ -2375,21 +2456,25 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           </div>
           <div style="margin-top:14px"><div style="font-weight:600;font-size:17px">Ana García</div>
           <div style="font-size:15px;line-height:22px">Camino Francés, day 12. Walking for my grandmother. Ultreia!</div></div>
-          <div style="margin-top:14px;display:flex;align-items:center;gap:14px;padding:14px;border-radius:var(--cp-radius-lg);background:var(--cp-surface-inverse);color:var(--cp-text-inverse);box-shadow:var(--cp-shadow-md)">
-            <span style="width:52px;height:52px;border-radius:50%;border:1.5px solid rgba(217,162,27,.55);display:grid;place-items:center;flex:none"><svg width="48" height="48" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="20" fill="#14365D"/><g transform="translate(0 -2.12)"><path d="M20 28.5L5.84 22.20A2.84 2.84 0 0 1 8.64 17.96A2.84 2.84 0 0 1 12.66 14.85A2.84 2.84 0 0 1 17.46 13.21A2.84 2.84 0 0 1 22.54 13.21A2.84 2.84 0 0 1 27.34 14.85A2.84 2.84 0 0 1 31.36 17.96A2.84 2.84 0 0 1 34.16 22.20z" fill="#D9A21B"/><path d="M20 29.0Q14.09 22.35 8.49 17.82M20 29.0Q16.22 20.86 12.56 14.67M20 29.0Q18.70 20.07 17.43 13.01M20 29.0Q21.30 20.07 22.57 13.01M20 29.0Q23.78 20.86 27.44 14.67M20 29.0Q25.91 22.35 31.51 17.82" stroke="#14365D" stroke-width="1.15" stroke-linecap="round" fill="none"/><path d="M15.2 31.4Q18 30.6 18.4 28.3H21.6Q22 30.6 24.8 31.4Q24.6 32.6 20 32.6Q15.4 32.6 15.2 31.4z" fill="#D9A21B"/></g></svg></span>
-            <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
-              <div style="font-family:var(--cp-font-accent);font-weight:700;font-size:24px;line-height:28px;color:var(--cp-color-gold)">Buen Camino!</div>
-              <div style="font-family:var(--cp-font-title);font-weight:600;font-size:17px;line-height:21px;color:var(--cp-color-gold-soft)">My Camino</div>
-              <div style="font-size:17px;line-height:22px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Camino Francés</div>
-              <div style="font-size:15px;line-height:21px;font-weight:500;letter-spacing:.4px;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">From stage 1 · 11 stages done</div>
+          <div style="margin-top:8px;display:flex;flex-direction:column;gap:4px;padding:12px;border-radius:var(--cp-radius-lg);background:var(--cp-surface-inverse);color:var(--cp-text-inverse);box-shadow:var(--cp-shadow-md)">
+            <div style="display:flex;flex-wrap:wrap;align-items:center;column-gap:12px;row-gap:8px">
+              <span style="width:52px;height:52px;border-radius:50%;border:1.5px solid rgba(217,162,27,.55);display:grid;place-items:center;flex:none"><svg width="48" height="48" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="20" fill="#14365D"/><g transform="translate(0 -2.12)"><path d="M20 28.5L5.84 22.20A2.84 2.84 0 0 1 8.64 17.96A2.84 2.84 0 0 1 12.66 14.85A2.84 2.84 0 0 1 17.46 13.21A2.84 2.84 0 0 1 22.54 13.21A2.84 2.84 0 0 1 27.34 14.85A2.84 2.84 0 0 1 31.36 17.96A2.84 2.84 0 0 1 34.16 22.20z" fill="#D9A21B"/><path d="M20 29.0Q14.09 22.35 8.49 17.82M20 29.0Q16.22 20.86 12.56 14.67M20 29.0Q18.70 20.07 17.43 13.01M20 29.0Q21.30 20.07 22.57 13.01M20 29.0Q23.78 20.86 27.44 14.67M20 29.0Q25.91 22.35 31.51 17.82" stroke="#14365D" stroke-width="1.15" stroke-linecap="round" fill="none"/><path d="M15.2 31.4Q18 30.6 18.4 28.3H21.6Q22 30.6 24.8 31.4Q24.6 32.6 20 32.6Q15.4 32.6 15.2 31.4z" fill="#D9A21B"/></g></svg></span>
+              <div style="flex:1 0 auto">
+                <div style="font-family:var(--cp-font-accent);font-weight:700;font-size:24px;line-height:28px;color:var(--cp-color-gold)">Buen Camino!</div>
+                <div style="font-family:var(--cp-font-title);font-weight:600;font-size:17px;line-height:21px;color:var(--cp-color-gold-soft)">My Camino</div>
+              </div>
+              <span style="margin-left:auto;height:40px;padding:0 16px;border-radius:999px;background:var(--cp-color-gold);color:var(--cp-color-blue);font-size:17px;font-weight:600;display:inline-flex;align-items:center">Change</span>
             </div>
-            <span style="height:40px;padding:0 16px;border-radius:999px;background:var(--cp-color-gold);color:var(--cp-color-blue);font-size:17px;font-weight:600;display:inline-flex;align-items:center;flex:none">Change</span>
+            <div>
+              <div style="font-size:17px;line-height:22px;font-weight:600">Camino Francés</div>
+              <div style="font-size:15px;line-height:21px;font-weight:500;letter-spacing:.4px;opacity:.85">From stage 1 · 11 stages done</div>
+            </div>
           </div>
           <div class="hl-row"><div class="hl-all on"><span class="all-ring"><span class="in"><svg class="cp-icon"><use href="#i-shell"/></svg></span></span>All</div><div class="highlights">
             <div><span class="cp-ring seen"><span class="cp-avatar" style="background:linear-gradient(150deg,#F2D8B6,#A0583F)"></span></span>Pamplona</div>
             <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#9DB4CC,#14365D)"></span></span>Logroño</div>
             <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#D7C6E0,#6E5470)"></span></span>Burgos</div>
-            <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Hornillos</div>
+            <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Hornillos del Camino</div>
             <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Castrojeriz</div>
           </div></div><div class="cp-subtabs" style="margin:22px -24px 20px;padding:0 12px"><span>Notes</span><span class="on">Journey</span><span>Plan</span><span>Health</span></div>
           <div class="place-head"><button class="cp-icon-btn flat" aria-label="Back" title="Back to all places"><svg class="cp-icon"><use href="#i-back"/></svg></button><div class="t"><div class="h">Zubiri</div><div class="s">All places</div></div></div>
@@ -4156,21 +4241,25 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           </div>
           <div style="margin-top:14px"><div style="font-weight:600;font-size:17px">Ana García</div>
           <div style="font-size:15px;line-height:22px">Camino Francés, day 12. Walking for my grandmother. Ultreia!</div></div>
-          <div style="margin-top:14px;display:flex;align-items:center;gap:14px;padding:14px;border-radius:var(--cp-radius-lg);background:var(--cp-surface-inverse);color:var(--cp-text-inverse);box-shadow:var(--cp-shadow-md)">
-            <span style="width:52px;height:52px;border-radius:50%;border:1.5px solid rgba(217,162,27,.55);display:grid;place-items:center;flex:none"><svg width="48" height="48" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="20" fill="#14365D"/><g transform="translate(0 -2.12)"><path d="M20 28.5L5.84 22.20A2.84 2.84 0 0 1 8.64 17.96A2.84 2.84 0 0 1 12.66 14.85A2.84 2.84 0 0 1 17.46 13.21A2.84 2.84 0 0 1 22.54 13.21A2.84 2.84 0 0 1 27.34 14.85A2.84 2.84 0 0 1 31.36 17.96A2.84 2.84 0 0 1 34.16 22.20z" fill="#D9A21B"/><path d="M20 29.0Q14.09 22.35 8.49 17.82M20 29.0Q16.22 20.86 12.56 14.67M20 29.0Q18.70 20.07 17.43 13.01M20 29.0Q21.30 20.07 22.57 13.01M20 29.0Q23.78 20.86 27.44 14.67M20 29.0Q25.91 22.35 31.51 17.82" stroke="#14365D" stroke-width="1.15" stroke-linecap="round" fill="none"/><path d="M15.2 31.4Q18 30.6 18.4 28.3H21.6Q22 30.6 24.8 31.4Q24.6 32.6 20 32.6Q15.4 32.6 15.2 31.4z" fill="#D9A21B"/></g></svg></span>
-            <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
-              <div style="font-family:var(--cp-font-accent);font-weight:700;font-size:24px;line-height:28px;color:var(--cp-color-gold)">Buen Camino!</div>
-              <div style="font-family:var(--cp-font-title);font-weight:600;font-size:17px;line-height:21px;color:var(--cp-color-gold-soft)">My Camino</div>
-              <div style="font-size:17px;line-height:22px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Camino Francés</div>
-              <div style="font-size:15px;line-height:21px;font-weight:500;letter-spacing:.4px;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">From stage 1 · 11 stages done</div>
+          <div style="margin-top:8px;display:flex;flex-direction:column;gap:4px;padding:12px;border-radius:var(--cp-radius-lg);background:var(--cp-surface-inverse);color:var(--cp-text-inverse);box-shadow:var(--cp-shadow-md)">
+            <div style="display:flex;flex-wrap:wrap;align-items:center;column-gap:12px;row-gap:8px">
+              <span style="width:52px;height:52px;border-radius:50%;border:1.5px solid rgba(217,162,27,.55);display:grid;place-items:center;flex:none"><svg width="48" height="48" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="20" fill="#14365D"/><g transform="translate(0 -2.12)"><path d="M20 28.5L5.84 22.20A2.84 2.84 0 0 1 8.64 17.96A2.84 2.84 0 0 1 12.66 14.85A2.84 2.84 0 0 1 17.46 13.21A2.84 2.84 0 0 1 22.54 13.21A2.84 2.84 0 0 1 27.34 14.85A2.84 2.84 0 0 1 31.36 17.96A2.84 2.84 0 0 1 34.16 22.20z" fill="#D9A21B"/><path d="M20 29.0Q14.09 22.35 8.49 17.82M20 29.0Q16.22 20.86 12.56 14.67M20 29.0Q18.70 20.07 17.43 13.01M20 29.0Q21.30 20.07 22.57 13.01M20 29.0Q23.78 20.86 27.44 14.67M20 29.0Q25.91 22.35 31.51 17.82" stroke="#14365D" stroke-width="1.15" stroke-linecap="round" fill="none"/><path d="M15.2 31.4Q18 30.6 18.4 28.3H21.6Q22 30.6 24.8 31.4Q24.6 32.6 20 32.6Q15.4 32.6 15.2 31.4z" fill="#D9A21B"/></g></svg></span>
+              <div style="flex:1 0 auto">
+                <div style="font-family:var(--cp-font-accent);font-weight:700;font-size:24px;line-height:28px;color:var(--cp-color-gold)">Buen Camino!</div>
+                <div style="font-family:var(--cp-font-title);font-weight:600;font-size:17px;line-height:21px;color:var(--cp-color-gold-soft)">My Camino</div>
+              </div>
+              <span style="margin-left:auto;height:40px;padding:0 16px;border-radius:999px;background:var(--cp-color-gold);color:var(--cp-color-blue);font-size:17px;font-weight:600;display:inline-flex;align-items:center">Change</span>
             </div>
-            <span style="height:40px;padding:0 16px;border-radius:999px;background:var(--cp-color-gold);color:var(--cp-color-blue);font-size:17px;font-weight:600;display:inline-flex;align-items:center;flex:none">Change</span>
+            <div>
+              <div style="font-size:17px;line-height:22px;font-weight:600">Camino Francés</div>
+              <div style="font-size:15px;line-height:21px;font-weight:500;letter-spacing:.4px;opacity:.85">From stage 1 · 11 stages done</div>
+            </div>
           </div>
           <div class="hl-row"><div class="hl-all"><span class="all-ring"><span class="in"><svg class="cp-icon"><use href="#i-shell"/></svg></span></span>All</div><div class="highlights">
             <div><span class="cp-ring seen"><span class="cp-avatar" style="background:linear-gradient(150deg,#F2D8B6,#A0583F)"></span></span>Pamplona</div>
             <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#9DB4CC,#14365D)"></span></span>Logroño</div>
             <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#D7C6E0,#6E5470)"></span></span>Burgos</div>
-            <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Hornillos</div>
+            <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Hornillos del Camino</div>
             <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Castrojeriz</div>
           </div></div>
             <div class="cp-subtabs" style="margin:22px -24px 0;padding:0 12px"><span class="on">Notes</span><span>Journey</span><span>Plan</span><span>Health</span></div>
@@ -4226,21 +4315,25 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           </div>
           <div style="margin-top:14px"><div style="font-weight:600;font-size:17px">Ana García</div>
           <div style="font-size:15px;line-height:22px">Camino Francés, day 12. Walking for my grandmother. Ultreia!</div></div>
-          <div style="margin-top:14px;display:flex;align-items:center;gap:14px;padding:14px;border-radius:var(--cp-radius-lg);background:var(--cp-surface-inverse);color:var(--cp-text-inverse);box-shadow:var(--cp-shadow-md)">
-            <span style="width:52px;height:52px;border-radius:50%;border:1.5px solid rgba(217,162,27,.55);display:grid;place-items:center;flex:none"><svg width="48" height="48" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="20" fill="#14365D"/><g transform="translate(0 -2.12)"><path d="M20 28.5L5.84 22.20A2.84 2.84 0 0 1 8.64 17.96A2.84 2.84 0 0 1 12.66 14.85A2.84 2.84 0 0 1 17.46 13.21A2.84 2.84 0 0 1 22.54 13.21A2.84 2.84 0 0 1 27.34 14.85A2.84 2.84 0 0 1 31.36 17.96A2.84 2.84 0 0 1 34.16 22.20z" fill="#D9A21B"/><path d="M20 29.0Q14.09 22.35 8.49 17.82M20 29.0Q16.22 20.86 12.56 14.67M20 29.0Q18.70 20.07 17.43 13.01M20 29.0Q21.30 20.07 22.57 13.01M20 29.0Q23.78 20.86 27.44 14.67M20 29.0Q25.91 22.35 31.51 17.82" stroke="#14365D" stroke-width="1.15" stroke-linecap="round" fill="none"/><path d="M15.2 31.4Q18 30.6 18.4 28.3H21.6Q22 30.6 24.8 31.4Q24.6 32.6 20 32.6Q15.4 32.6 15.2 31.4z" fill="#D9A21B"/></g></svg></span>
-            <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
-              <div style="font-family:var(--cp-font-accent);font-weight:700;font-size:24px;line-height:28px;color:var(--cp-color-gold)">Buen Camino!</div>
-              <div style="font-family:var(--cp-font-title);font-weight:600;font-size:17px;line-height:21px;color:var(--cp-color-gold-soft)">My Camino</div>
-              <div style="font-size:17px;line-height:22px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Camino Francés</div>
-              <div style="font-size:15px;line-height:21px;font-weight:500;letter-spacing:.4px;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">From stage 1 · 11 stages done</div>
+          <div style="margin-top:8px;display:flex;flex-direction:column;gap:4px;padding:12px;border-radius:var(--cp-radius-lg);background:var(--cp-surface-inverse);color:var(--cp-text-inverse);box-shadow:var(--cp-shadow-md)">
+            <div style="display:flex;flex-wrap:wrap;align-items:center;column-gap:12px;row-gap:8px">
+              <span style="width:52px;height:52px;border-radius:50%;border:1.5px solid rgba(217,162,27,.55);display:grid;place-items:center;flex:none"><svg width="48" height="48" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="20" fill="#14365D"/><g transform="translate(0 -2.12)"><path d="M20 28.5L5.84 22.20A2.84 2.84 0 0 1 8.64 17.96A2.84 2.84 0 0 1 12.66 14.85A2.84 2.84 0 0 1 17.46 13.21A2.84 2.84 0 0 1 22.54 13.21A2.84 2.84 0 0 1 27.34 14.85A2.84 2.84 0 0 1 31.36 17.96A2.84 2.84 0 0 1 34.16 22.20z" fill="#D9A21B"/><path d="M20 29.0Q14.09 22.35 8.49 17.82M20 29.0Q16.22 20.86 12.56 14.67M20 29.0Q18.70 20.07 17.43 13.01M20 29.0Q21.30 20.07 22.57 13.01M20 29.0Q23.78 20.86 27.44 14.67M20 29.0Q25.91 22.35 31.51 17.82" stroke="#14365D" stroke-width="1.15" stroke-linecap="round" fill="none"/><path d="M15.2 31.4Q18 30.6 18.4 28.3H21.6Q22 30.6 24.8 31.4Q24.6 32.6 20 32.6Q15.4 32.6 15.2 31.4z" fill="#D9A21B"/></g></svg></span>
+              <div style="flex:1 0 auto">
+                <div style="font-family:var(--cp-font-accent);font-weight:700;font-size:24px;line-height:28px;color:var(--cp-color-gold)">Buen Camino!</div>
+                <div style="font-family:var(--cp-font-title);font-weight:600;font-size:17px;line-height:21px;color:var(--cp-color-gold-soft)">My Camino</div>
+              </div>
+              <span style="margin-left:auto;height:40px;padding:0 16px;border-radius:999px;background:var(--cp-color-gold);color:var(--cp-color-blue);font-size:17px;font-weight:600;display:inline-flex;align-items:center">Change</span>
             </div>
-            <span style="height:40px;padding:0 16px;border-radius:999px;background:var(--cp-color-gold);color:var(--cp-color-blue);font-size:17px;font-weight:600;display:inline-flex;align-items:center;flex:none">Change</span>
+            <div>
+              <div style="font-size:17px;line-height:22px;font-weight:600">Camino Francés</div>
+              <div style="font-size:15px;line-height:21px;font-weight:500;letter-spacing:.4px;opacity:.85">From stage 1 · 11 stages done</div>
+            </div>
           </div>
           <div class="hl-row"><div class="hl-all"><span class="all-ring"><span class="in"><svg class="cp-icon"><use href="#i-shell"/></svg></span></span>All</div><div class="highlights">
             <div><span class="cp-ring seen"><span class="cp-avatar" style="background:linear-gradient(150deg,#F2D8B6,#A0583F)"></span></span>Pamplona</div>
             <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#9DB4CC,#14365D)"></span></span>Logroño</div>
             <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#D7C6E0,#6E5470)"></span></span>Burgos</div>
-            <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Hornillos</div>
+            <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Hornillos del Camino</div>
             <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Castrojeriz</div>
           </div></div>
             <div class="cp-subtabs" style="margin:22px -24px 0;padding:0 12px"><span class="on">Notes</span><span>Journey</span><span>Plan</span><span>Health</span></div>
@@ -4296,21 +4389,25 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           </div>
           <div style="margin-top:14px"><div style="font-weight:600;font-size:17px">Ana García</div>
           <div style="font-size:15px;line-height:22px">Camino Francés, day 12. Walking for my grandmother. Ultreia!</div></div>
-          <div style="margin-top:14px;display:flex;align-items:center;gap:14px;padding:14px;border-radius:var(--cp-radius-lg);background:var(--cp-surface-inverse);color:var(--cp-text-inverse);box-shadow:var(--cp-shadow-md)">
-            <span style="width:52px;height:52px;border-radius:50%;border:1.5px solid rgba(217,162,27,.55);display:grid;place-items:center;flex:none"><svg width="48" height="48" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="20" fill="#14365D"/><g transform="translate(0 -2.12)"><path d="M20 28.5L5.84 22.20A2.84 2.84 0 0 1 8.64 17.96A2.84 2.84 0 0 1 12.66 14.85A2.84 2.84 0 0 1 17.46 13.21A2.84 2.84 0 0 1 22.54 13.21A2.84 2.84 0 0 1 27.34 14.85A2.84 2.84 0 0 1 31.36 17.96A2.84 2.84 0 0 1 34.16 22.20z" fill="#D9A21B"/><path d="M20 29.0Q14.09 22.35 8.49 17.82M20 29.0Q16.22 20.86 12.56 14.67M20 29.0Q18.70 20.07 17.43 13.01M20 29.0Q21.30 20.07 22.57 13.01M20 29.0Q23.78 20.86 27.44 14.67M20 29.0Q25.91 22.35 31.51 17.82" stroke="#14365D" stroke-width="1.15" stroke-linecap="round" fill="none"/><path d="M15.2 31.4Q18 30.6 18.4 28.3H21.6Q22 30.6 24.8 31.4Q24.6 32.6 20 32.6Q15.4 32.6 15.2 31.4z" fill="#D9A21B"/></g></svg></span>
-            <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
-              <div style="font-family:var(--cp-font-accent);font-weight:700;font-size:24px;line-height:28px;color:var(--cp-color-gold)">Buen Camino!</div>
-              <div style="font-family:var(--cp-font-title);font-weight:600;font-size:17px;line-height:21px;color:var(--cp-color-gold-soft)">My Camino</div>
-              <div style="font-size:17px;line-height:22px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Camino Francés</div>
-              <div style="font-size:15px;line-height:21px;font-weight:500;letter-spacing:.4px;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">From stage 1 · 11 stages done</div>
+          <div style="margin-top:8px;display:flex;flex-direction:column;gap:4px;padding:12px;border-radius:var(--cp-radius-lg);background:var(--cp-surface-inverse);color:var(--cp-text-inverse);box-shadow:var(--cp-shadow-md)">
+            <div style="display:flex;flex-wrap:wrap;align-items:center;column-gap:12px;row-gap:8px">
+              <span style="width:52px;height:52px;border-radius:50%;border:1.5px solid rgba(217,162,27,.55);display:grid;place-items:center;flex:none"><svg width="48" height="48" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="20" fill="#14365D"/><g transform="translate(0 -2.12)"><path d="M20 28.5L5.84 22.20A2.84 2.84 0 0 1 8.64 17.96A2.84 2.84 0 0 1 12.66 14.85A2.84 2.84 0 0 1 17.46 13.21A2.84 2.84 0 0 1 22.54 13.21A2.84 2.84 0 0 1 27.34 14.85A2.84 2.84 0 0 1 31.36 17.96A2.84 2.84 0 0 1 34.16 22.20z" fill="#D9A21B"/><path d="M20 29.0Q14.09 22.35 8.49 17.82M20 29.0Q16.22 20.86 12.56 14.67M20 29.0Q18.70 20.07 17.43 13.01M20 29.0Q21.30 20.07 22.57 13.01M20 29.0Q23.78 20.86 27.44 14.67M20 29.0Q25.91 22.35 31.51 17.82" stroke="#14365D" stroke-width="1.15" stroke-linecap="round" fill="none"/><path d="M15.2 31.4Q18 30.6 18.4 28.3H21.6Q22 30.6 24.8 31.4Q24.6 32.6 20 32.6Q15.4 32.6 15.2 31.4z" fill="#D9A21B"/></g></svg></span>
+              <div style="flex:1 0 auto">
+                <div style="font-family:var(--cp-font-accent);font-weight:700;font-size:24px;line-height:28px;color:var(--cp-color-gold)">Buen Camino!</div>
+                <div style="font-family:var(--cp-font-title);font-weight:600;font-size:17px;line-height:21px;color:var(--cp-color-gold-soft)">My Camino</div>
+              </div>
+              <span style="margin-left:auto;height:40px;padding:0 16px;border-radius:999px;background:var(--cp-color-gold);color:var(--cp-color-blue);font-size:17px;font-weight:600;display:inline-flex;align-items:center">Change</span>
             </div>
-            <span style="height:40px;padding:0 16px;border-radius:999px;background:var(--cp-color-gold);color:var(--cp-color-blue);font-size:17px;font-weight:600;display:inline-flex;align-items:center;flex:none">Change</span>
+            <div>
+              <div style="font-size:17px;line-height:22px;font-weight:600">Camino Francés</div>
+              <div style="font-size:15px;line-height:21px;font-weight:500;letter-spacing:.4px;opacity:.85">From stage 1 · 11 stages done</div>
+            </div>
           </div>
           <div class="hl-row"><div class="hl-all"><span class="all-ring"><span class="in"><svg class="cp-icon"><use href="#i-shell"/></svg></span></span>All</div><div class="highlights">
             <div><span class="cp-ring seen"><span class="cp-avatar" style="background:linear-gradient(150deg,#F2D8B6,#A0583F)"></span></span>Pamplona</div>
             <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#9DB4CC,#14365D)"></span></span>Logroño</div>
             <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#D7C6E0,#6E5470)"></span></span>Burgos</div>
-            <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Hornillos</div>
+            <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Hornillos del Camino</div>
             <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Castrojeriz</div>
           </div></div>
             <div class="cp-subtabs" style="margin:22px -24px 0;padding:0 12px"><span class="on">Notes</span><span>Journey</span><span>Plan</span><span>Health</span></div>
@@ -4366,21 +4463,25 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           </div>
           <div style="margin-top:14px"><div style="font-weight:600;font-size:17px">Ana García</div>
           <div style="font-size:15px;line-height:22px">Camino Francés, day 12. Walking for my grandmother. Ultreia!</div></div>
-          <div style="margin-top:14px;display:flex;align-items:center;gap:14px;padding:14px;border-radius:var(--cp-radius-lg);background:var(--cp-surface-inverse);color:var(--cp-text-inverse);box-shadow:var(--cp-shadow-md)">
-            <span style="width:52px;height:52px;border-radius:50%;border:1.5px solid rgba(217,162,27,.55);display:grid;place-items:center;flex:none"><svg width="48" height="48" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="20" fill="#14365D"/><g transform="translate(0 -2.12)"><path d="M20 28.5L5.84 22.20A2.84 2.84 0 0 1 8.64 17.96A2.84 2.84 0 0 1 12.66 14.85A2.84 2.84 0 0 1 17.46 13.21A2.84 2.84 0 0 1 22.54 13.21A2.84 2.84 0 0 1 27.34 14.85A2.84 2.84 0 0 1 31.36 17.96A2.84 2.84 0 0 1 34.16 22.20z" fill="#D9A21B"/><path d="M20 29.0Q14.09 22.35 8.49 17.82M20 29.0Q16.22 20.86 12.56 14.67M20 29.0Q18.70 20.07 17.43 13.01M20 29.0Q21.30 20.07 22.57 13.01M20 29.0Q23.78 20.86 27.44 14.67M20 29.0Q25.91 22.35 31.51 17.82" stroke="#14365D" stroke-width="1.15" stroke-linecap="round" fill="none"/><path d="M15.2 31.4Q18 30.6 18.4 28.3H21.6Q22 30.6 24.8 31.4Q24.6 32.6 20 32.6Q15.4 32.6 15.2 31.4z" fill="#D9A21B"/></g></svg></span>
-            <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
-              <div style="font-family:var(--cp-font-accent);font-weight:700;font-size:24px;line-height:28px;color:var(--cp-color-gold)">Buen Camino!</div>
-              <div style="font-family:var(--cp-font-title);font-weight:600;font-size:17px;line-height:21px;color:var(--cp-color-gold-soft)">My Camino</div>
-              <div style="font-size:17px;line-height:22px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Camino Francés</div>
-              <div style="font-size:15px;line-height:21px;font-weight:500;letter-spacing:.4px;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">From stage 1 · 11 stages done</div>
+          <div style="margin-top:8px;display:flex;flex-direction:column;gap:4px;padding:12px;border-radius:var(--cp-radius-lg);background:var(--cp-surface-inverse);color:var(--cp-text-inverse);box-shadow:var(--cp-shadow-md)">
+            <div style="display:flex;flex-wrap:wrap;align-items:center;column-gap:12px;row-gap:8px">
+              <span style="width:52px;height:52px;border-radius:50%;border:1.5px solid rgba(217,162,27,.55);display:grid;place-items:center;flex:none"><svg width="48" height="48" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="20" fill="#14365D"/><g transform="translate(0 -2.12)"><path d="M20 28.5L5.84 22.20A2.84 2.84 0 0 1 8.64 17.96A2.84 2.84 0 0 1 12.66 14.85A2.84 2.84 0 0 1 17.46 13.21A2.84 2.84 0 0 1 22.54 13.21A2.84 2.84 0 0 1 27.34 14.85A2.84 2.84 0 0 1 31.36 17.96A2.84 2.84 0 0 1 34.16 22.20z" fill="#D9A21B"/><path d="M20 29.0Q14.09 22.35 8.49 17.82M20 29.0Q16.22 20.86 12.56 14.67M20 29.0Q18.70 20.07 17.43 13.01M20 29.0Q21.30 20.07 22.57 13.01M20 29.0Q23.78 20.86 27.44 14.67M20 29.0Q25.91 22.35 31.51 17.82" stroke="#14365D" stroke-width="1.15" stroke-linecap="round" fill="none"/><path d="M15.2 31.4Q18 30.6 18.4 28.3H21.6Q22 30.6 24.8 31.4Q24.6 32.6 20 32.6Q15.4 32.6 15.2 31.4z" fill="#D9A21B"/></g></svg></span>
+              <div style="flex:1 0 auto">
+                <div style="font-family:var(--cp-font-accent);font-weight:700;font-size:24px;line-height:28px;color:var(--cp-color-gold)">Buen Camino!</div>
+                <div style="font-family:var(--cp-font-title);font-weight:600;font-size:17px;line-height:21px;color:var(--cp-color-gold-soft)">My Camino</div>
+              </div>
+              <span style="margin-left:auto;height:40px;padding:0 16px;border-radius:999px;background:var(--cp-color-gold);color:var(--cp-color-blue);font-size:17px;font-weight:600;display:inline-flex;align-items:center">Change</span>
             </div>
-            <span style="height:40px;padding:0 16px;border-radius:999px;background:var(--cp-color-gold);color:var(--cp-color-blue);font-size:17px;font-weight:600;display:inline-flex;align-items:center;flex:none">Change</span>
+            <div>
+              <div style="font-size:17px;line-height:22px;font-weight:600">Camino Francés</div>
+              <div style="font-size:15px;line-height:21px;font-weight:500;letter-spacing:.4px;opacity:.85">From stage 1 · 11 stages done</div>
+            </div>
           </div>
           <div class="hl-row"><div class="hl-all"><span class="all-ring"><span class="in"><svg class="cp-icon"><use href="#i-shell"/></svg></span></span>All</div><div class="highlights">
             <div><span class="cp-ring seen"><span class="cp-avatar" style="background:linear-gradient(150deg,#F2D8B6,#A0583F)"></span></span>Pamplona</div>
             <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#9DB4CC,#14365D)"></span></span>Logroño</div>
             <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#D7C6E0,#6E5470)"></span></span>Burgos</div>
-            <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Hornillos</div>
+            <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Hornillos del Camino</div>
             <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Castrojeriz</div>
           </div></div>
             <div class="cp-subtabs" style="margin:22px -24px 0;padding:0 12px"><span class="on">Notes</span><span>Journey</span><span>Plan</span><span>Health</span></div>
@@ -4436,21 +4537,25 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           </div>
           <div style="margin-top:14px"><div style="font-weight:600;font-size:17px">Ana García</div>
           <div style="font-size:15px;line-height:22px">Camino Francés, day 12. Walking for my grandmother. Ultreia!</div></div>
-          <div style="margin-top:14px;display:flex;align-items:center;gap:14px;padding:14px;border-radius:var(--cp-radius-lg);background:var(--cp-surface-inverse);color:var(--cp-text-inverse);box-shadow:var(--cp-shadow-md)">
-            <span style="width:52px;height:52px;border-radius:50%;border:1.5px solid rgba(217,162,27,.55);display:grid;place-items:center;flex:none"><svg width="48" height="48" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="20" fill="#14365D"/><g transform="translate(0 -2.12)"><path d="M20 28.5L5.84 22.20A2.84 2.84 0 0 1 8.64 17.96A2.84 2.84 0 0 1 12.66 14.85A2.84 2.84 0 0 1 17.46 13.21A2.84 2.84 0 0 1 22.54 13.21A2.84 2.84 0 0 1 27.34 14.85A2.84 2.84 0 0 1 31.36 17.96A2.84 2.84 0 0 1 34.16 22.20z" fill="#D9A21B"/><path d="M20 29.0Q14.09 22.35 8.49 17.82M20 29.0Q16.22 20.86 12.56 14.67M20 29.0Q18.70 20.07 17.43 13.01M20 29.0Q21.30 20.07 22.57 13.01M20 29.0Q23.78 20.86 27.44 14.67M20 29.0Q25.91 22.35 31.51 17.82" stroke="#14365D" stroke-width="1.15" stroke-linecap="round" fill="none"/><path d="M15.2 31.4Q18 30.6 18.4 28.3H21.6Q22 30.6 24.8 31.4Q24.6 32.6 20 32.6Q15.4 32.6 15.2 31.4z" fill="#D9A21B"/></g></svg></span>
-            <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
-              <div style="font-family:var(--cp-font-accent);font-weight:700;font-size:24px;line-height:28px;color:var(--cp-color-gold)">Buen Camino!</div>
-              <div style="font-family:var(--cp-font-title);font-weight:600;font-size:17px;line-height:21px;color:var(--cp-color-gold-soft)">My Camino</div>
-              <div style="font-size:17px;line-height:22px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Camino Francés</div>
-              <div style="font-size:15px;line-height:21px;font-weight:500;letter-spacing:.4px;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">From stage 1 · 11 stages done</div>
+          <div style="margin-top:8px;display:flex;flex-direction:column;gap:4px;padding:12px;border-radius:var(--cp-radius-lg);background:var(--cp-surface-inverse);color:var(--cp-text-inverse);box-shadow:var(--cp-shadow-md)">
+            <div style="display:flex;flex-wrap:wrap;align-items:center;column-gap:12px;row-gap:8px">
+              <span style="width:52px;height:52px;border-radius:50%;border:1.5px solid rgba(217,162,27,.55);display:grid;place-items:center;flex:none"><svg width="48" height="48" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="20" fill="#14365D"/><g transform="translate(0 -2.12)"><path d="M20 28.5L5.84 22.20A2.84 2.84 0 0 1 8.64 17.96A2.84 2.84 0 0 1 12.66 14.85A2.84 2.84 0 0 1 17.46 13.21A2.84 2.84 0 0 1 22.54 13.21A2.84 2.84 0 0 1 27.34 14.85A2.84 2.84 0 0 1 31.36 17.96A2.84 2.84 0 0 1 34.16 22.20z" fill="#D9A21B"/><path d="M20 29.0Q14.09 22.35 8.49 17.82M20 29.0Q16.22 20.86 12.56 14.67M20 29.0Q18.70 20.07 17.43 13.01M20 29.0Q21.30 20.07 22.57 13.01M20 29.0Q23.78 20.86 27.44 14.67M20 29.0Q25.91 22.35 31.51 17.82" stroke="#14365D" stroke-width="1.15" stroke-linecap="round" fill="none"/><path d="M15.2 31.4Q18 30.6 18.4 28.3H21.6Q22 30.6 24.8 31.4Q24.6 32.6 20 32.6Q15.4 32.6 15.2 31.4z" fill="#D9A21B"/></g></svg></span>
+              <div style="flex:1 0 auto">
+                <div style="font-family:var(--cp-font-accent);font-weight:700;font-size:24px;line-height:28px;color:var(--cp-color-gold)">Buen Camino!</div>
+                <div style="font-family:var(--cp-font-title);font-weight:600;font-size:17px;line-height:21px;color:var(--cp-color-gold-soft)">My Camino</div>
+              </div>
+              <span style="margin-left:auto;height:40px;padding:0 16px;border-radius:999px;background:var(--cp-color-gold);color:var(--cp-color-blue);font-size:17px;font-weight:600;display:inline-flex;align-items:center">Change</span>
             </div>
-            <span style="height:40px;padding:0 16px;border-radius:999px;background:var(--cp-color-gold);color:var(--cp-color-blue);font-size:17px;font-weight:600;display:inline-flex;align-items:center;flex:none">Change</span>
+            <div>
+              <div style="font-size:17px;line-height:22px;font-weight:600">Camino Francés</div>
+              <div style="font-size:15px;line-height:21px;font-weight:500;letter-spacing:.4px;opacity:.85">From stage 1 · 11 stages done</div>
+            </div>
           </div>
           <div class="hl-row"><div class="hl-all"><span class="all-ring"><span class="in"><svg class="cp-icon"><use href="#i-shell"/></svg></span></span>All</div><div class="highlights">
             <div><span class="cp-ring seen"><span class="cp-avatar" style="background:linear-gradient(150deg,#F2D8B6,#A0583F)"></span></span>Pamplona</div>
             <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#9DB4CC,#14365D)"></span></span>Logroño</div>
             <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#D7C6E0,#6E5470)"></span></span>Burgos</div>
-            <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Hornillos</div>
+            <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Hornillos del Camino</div>
             <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Castrojeriz</div>
           </div></div>
             <div class="cp-subtabs" style="margin:22px -24px 0;padding:0 12px"><span class="on">Notes</span><span>Journey</span><span>Plan</span><span>Health</span></div>
@@ -4497,21 +4602,25 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           </div>
           <div style="margin-top:14px"><div style="font-weight:600;font-size:17px">Ana García</div>
           <div style="font-size:15px;line-height:22px">Camino Francés, day 12. Walking for my grandmother. Ultreia!</div></div>
-          <div style="margin-top:14px;display:flex;align-items:center;gap:14px;padding:14px;border-radius:var(--cp-radius-lg);background:var(--cp-surface-inverse);color:var(--cp-text-inverse);box-shadow:var(--cp-shadow-md)">
-            <span style="width:52px;height:52px;border-radius:50%;border:1.5px solid rgba(217,162,27,.55);display:grid;place-items:center;flex:none"><svg width="48" height="48" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="20" fill="#14365D"/><g transform="translate(0 -2.12)"><path d="M20 28.5L5.84 22.20A2.84 2.84 0 0 1 8.64 17.96A2.84 2.84 0 0 1 12.66 14.85A2.84 2.84 0 0 1 17.46 13.21A2.84 2.84 0 0 1 22.54 13.21A2.84 2.84 0 0 1 27.34 14.85A2.84 2.84 0 0 1 31.36 17.96A2.84 2.84 0 0 1 34.16 22.20z" fill="#D9A21B"/><path d="M20 29.0Q14.09 22.35 8.49 17.82M20 29.0Q16.22 20.86 12.56 14.67M20 29.0Q18.70 20.07 17.43 13.01M20 29.0Q21.30 20.07 22.57 13.01M20 29.0Q23.78 20.86 27.44 14.67M20 29.0Q25.91 22.35 31.51 17.82" stroke="#14365D" stroke-width="1.15" stroke-linecap="round" fill="none"/><path d="M15.2 31.4Q18 30.6 18.4 28.3H21.6Q22 30.6 24.8 31.4Q24.6 32.6 20 32.6Q15.4 32.6 15.2 31.4z" fill="#D9A21B"/></g></svg></span>
-            <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
-              <div style="font-family:var(--cp-font-accent);font-weight:700;font-size:24px;line-height:28px;color:var(--cp-color-gold)">Buen Camino!</div>
-              <div style="font-family:var(--cp-font-title);font-weight:600;font-size:17px;line-height:21px;color:var(--cp-color-gold-soft)">My Camino</div>
-              <div style="font-size:17px;line-height:22px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Camino Francés</div>
-              <div style="font-size:15px;line-height:21px;font-weight:500;letter-spacing:.4px;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">From stage 1 · 11 stages done</div>
+          <div style="margin-top:8px;display:flex;flex-direction:column;gap:4px;padding:12px;border-radius:var(--cp-radius-lg);background:var(--cp-surface-inverse);color:var(--cp-text-inverse);box-shadow:var(--cp-shadow-md)">
+            <div style="display:flex;flex-wrap:wrap;align-items:center;column-gap:12px;row-gap:8px">
+              <span style="width:52px;height:52px;border-radius:50%;border:1.5px solid rgba(217,162,27,.55);display:grid;place-items:center;flex:none"><svg width="48" height="48" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="20" fill="#14365D"/><g transform="translate(0 -2.12)"><path d="M20 28.5L5.84 22.20A2.84 2.84 0 0 1 8.64 17.96A2.84 2.84 0 0 1 12.66 14.85A2.84 2.84 0 0 1 17.46 13.21A2.84 2.84 0 0 1 22.54 13.21A2.84 2.84 0 0 1 27.34 14.85A2.84 2.84 0 0 1 31.36 17.96A2.84 2.84 0 0 1 34.16 22.20z" fill="#D9A21B"/><path d="M20 29.0Q14.09 22.35 8.49 17.82M20 29.0Q16.22 20.86 12.56 14.67M20 29.0Q18.70 20.07 17.43 13.01M20 29.0Q21.30 20.07 22.57 13.01M20 29.0Q23.78 20.86 27.44 14.67M20 29.0Q25.91 22.35 31.51 17.82" stroke="#14365D" stroke-width="1.15" stroke-linecap="round" fill="none"/><path d="M15.2 31.4Q18 30.6 18.4 28.3H21.6Q22 30.6 24.8 31.4Q24.6 32.6 20 32.6Q15.4 32.6 15.2 31.4z" fill="#D9A21B"/></g></svg></span>
+              <div style="flex:1 0 auto">
+                <div style="font-family:var(--cp-font-accent);font-weight:700;font-size:24px;line-height:28px;color:var(--cp-color-gold)">Buen Camino!</div>
+                <div style="font-family:var(--cp-font-title);font-weight:600;font-size:17px;line-height:21px;color:var(--cp-color-gold-soft)">My Camino</div>
+              </div>
+              <span style="margin-left:auto;height:40px;padding:0 16px;border-radius:999px;background:var(--cp-color-gold);color:var(--cp-color-blue);font-size:17px;font-weight:600;display:inline-flex;align-items:center">Change</span>
             </div>
-            <span style="height:40px;padding:0 16px;border-radius:999px;background:var(--cp-color-gold);color:var(--cp-color-blue);font-size:17px;font-weight:600;display:inline-flex;align-items:center;flex:none">Change</span>
+            <div>
+              <div style="font-size:17px;line-height:22px;font-weight:600">Camino Francés</div>
+              <div style="font-size:15px;line-height:21px;font-weight:500;letter-spacing:.4px;opacity:.85">From stage 1 · 11 stages done</div>
+            </div>
           </div>
           <div class="hl-row"><div class="hl-all"><span class="all-ring"><span class="in"><svg class="cp-icon"><use href="#i-shell"/></svg></span></span>All</div><div class="highlights">
             <div><span class="cp-ring seen"><span class="cp-avatar" style="background:linear-gradient(150deg,#F2D8B6,#A0583F)"></span></span>Pamplona</div>
             <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#9DB4CC,#14365D)"></span></span>Logroño</div>
             <div><span class="cp-ring"><span class="cp-avatar" style="background:linear-gradient(150deg,#D7C6E0,#6E5470)"></span></span>Burgos</div>
-            <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Hornillos</div>
+            <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Hornillos del Camino</div>
             <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Castrojeriz</div>
           </div></div>
             <div class="cp-subtabs" style="margin:22px -24px 0;padding:0 12px"><span class="on">Notes</span><span>Journey</span><span>Plan</span><span>Health</span></div>
