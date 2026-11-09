@@ -17,7 +17,7 @@ import { COLOUR_NAMES, LITURGY_NOTE, RANK_NAMES, SEASON_NAMES, liturgicalDay } f
 import { WEEKDAY_LETTERS, canMoveWeek, dayCellLabel, nextWeekLabel, previousWeekLabel, weekDays, weekSpoken, weekTitle } from '../daily/week';
 import { arrows, dailyReducer, initDaily, type DailyAction, type DailyState } from '../daily/state';
 import { BANNER_WIDTH, MARKERS, applyDaily, dayOf, screenHtml } from './designDaily';
-import { NO_READINGS, READINGS_SOURCE, WHOLE_PSALM_NOTE } from '../daily/content';
+import { NO_READINGS, NO_SECOND_READING, NO_WORDS, PASSAGE_NOTES, READINGS_DIFFER, READINGS_SOURCE, WHOLE_PSALM_NOTE } from '../daily/content';
 import './liturgy.test'; // the liturgical calendar (daily/liturgy.ts): its own file, run here so no script has to name it
 import './weekstrip.test'; // the week strip, the date of a bookmark and the bookmark key of a day: its own file, run here too
 import './readings.test'; // the readings of the days: the references, the words from the Bible in the app, the files, the data of 2026 against the calendar: its own file, run here too
@@ -692,7 +692,7 @@ check('the route is registered once, in the block for someone with a journey, ne
   assert.deepEqual(layouts.filter((f) => /name="library\/daily"/.test(read(f))), ['app/_layout.tsx'], 'no other layout registers it');
 });
 
-check('the reading under the strip: the liturgical day, then the readings with their references and the words from the Bible, then one line of small print; nothing is a sample, and there is no handwritten line', () => {
+check('the reading under the strip: the liturgical day, then the readings with their references and the words from the Bible (a note over words that are not what the reference names), a line under a reference with no words, one line of small print; nothing is a sample, and there is no handwritten line', () => {
   const src = source(`${DIR}/DayReading.tsx`);
   assert.match(src, /const content = useMemo\(\(\) => dayContent\(key\), \[key\]\);/, 'the screen asks the one provider function for the day, and nothing else');
   assert.match(src, /import \{ dayContent \} from '\.\/dayData';/, 'the real readings and the real Bible, through dayData.ts');
@@ -701,14 +701,20 @@ check('the reading under the strip: the liturgical day, then the readings with t
   assert.match(src, /<LiturgicalCard day=\{day\} title=\{content\.title\} under=\{content\.under\} \/>/);
   assert.match(src, /accessibilityRole="button"[\s\S]*aria-expanded=\{open\}/, 'a reading is a button that says whether its text is open');
   assert.match(src, /accessibilityLabel=\{label\}\s+accessibilityHint=\{open \? 'Hides the text' : 'Shows the text'\}/);
-  assert.match(src, /const label = `\$\{reading\.title\}, \$\{reading\.reference\}`;/, 'a screen reader says the name and the reference');
+  assert.match(src, /const label = `\$\{reading\.title\}, \$\{reading\.spoken\}`;/, 'a screen reader says the name and the reference in words ("Wisdom, chapter 6, verses 12 to 16"), not as it is written');
   assert.match(src, /<AppText variant="label">\{reading\.title\}<\/AppText>\s*<AppText variant="mono" muted>\{reading\.reference\}<\/AppText>/, 'the name in Inter, the reference in JetBrains Mono');
   assert.match(src, /<AppText key=\{r\} variant="body">/, 'the words are at the body size of the Bible reader (19)');
   assert.match(src, /<AppText variant="caption" muted>\{`\$\{line\.n\} `\}<\/AppText>/, 'the verse numbers are small and muted');
-  assert.match(src, /\{text\.whole && <AppText variant="caption" muted>\{WHOLE_PSALM_NOTE\}<\/AppText>\}/, 'a psalm shown whole says so');
-  assert.match(src, /<AppText variant="small" muted style=\{\{ paddingVertical: space\[3\] \}\}>\{NO_READINGS\}<\/AppText>/, 'a day with no readings says so');
+  assert.match(src, /\{!!text\.note && <AppText variant="caption" muted>\{PASSAGE_NOTES\[text\.note\]\}<\/AppText>\}/, 'words that are not what the reference names say so (a psalm shown whole, a psalm named with no verses, a verse shown whole)');
+  assert.ok(src.indexOf('PASSAGE_NOTES[text.note]') < src.indexOf('variant="body"'), 'the note is over the words, where it is read before them');
+  assert.match(src, /<AppText variant="small" muted style=\{\{ paddingVertical: space\[3\] \}\}>\{content\.unavailable\}<\/AppText>/, 'a day with no readings says so (not in the app yet, or differing from country to country)');
+  assert.doesNotMatch(src, /\bNO_READINGS\b|READINGS_DIFFER/, 'the words of that line come from content.ts with the day: the screen does not choose between them');
+  assert.match(src, /const why = reading\.noWords \? NO_WORDS\[reading\.noWords\] : null;/, 'a reference with no words says why');
+  assert.match(src, /\{!!why && <AppText variant="caption" muted>\{why\}<\/AppText>\}/, 'under the reference, in the small print size');
+  assert.match(src, /accessibilityLabel=\{why \? `\$\{label\}\. \$\{why\}` : label\}/, 'and a screen reader says it with the reference');
+  assert.match(src, /\{content\.noSecond && reading\.kind === 'gospel' && \(\s*<View style=\{\{ borderTopWidth: 1, borderTopColor: role\.border, paddingVertical: space\[3\] \}\}><AppText variant="caption" muted>\{NO_SECOND_READING\}<\/AppText><\/View>\s*\)\}/, 'a Sunday or a solemnity with no second reading in the source says so where the second reading would be: before the Gospel');
   assert.match(src, /\{!!content\.readings && <AppText variant="caption" muted>\{READINGS_SOURCE\}<\/AppText>\}/, 'the source line is under readings that are there, and only then');
-  assert.match(src, /if \(!reading\.text\) \{\s*return <View accessible accessibilityLabel=\{label\}/, 'a reference with no words is a line, not a button');
+  assert.match(src, /if \(!reading\.text\) \{\s*return <View accessible accessibilityLabel=\{why \? `\$\{label\}\. \$\{why\}` : label\}/, 'a reference with no words is a line, not a button');
   assert.match(src, /<Card key=\{key\} style=\{\{ paddingVertical: space\[3\] \}\}>/, 'keyed by the day, so that a text opened on one day is closed again on the next');
   const card = source(`${DIR}/LiturgicalCard.tsx`);
   assert.match(card, /const lit = liturgicalDayOf\(day\);/, 'the season, the colour, the rank and the cycles are worked out from the day');
@@ -803,9 +809,10 @@ const plain = (s: string) => s.replace(/&nbsp;/g, ' ').replace(/&lt;/g, '<').re
 // phone is drawn by designDaily.ts from the functions of the app, so the checks below read the page to see that it is what they say.
 const PHONE_LABELS = [
   'Daily reading', 'Daily reading · Another day', 'Daily reading · The reading', 'Daily reading · Calendar', 'Daily reading · Dark', 'Daily reading · Dark, the reading', 'Daily reading · Dark, calendar',
-  'Daily reading · 320 wide', 'Daily reading · Solemnity', 'Daily reading · No readings yet', 'Daily reading · In Bookmarks',
+  'Daily reading · 320 wide', 'Daily reading · Solemnity', 'Daily reading · No readings yet', 'Daily reading · Differs by country', 'Daily reading · No words', 'Daily reading · No second reading',
+  'Daily reading · A verse in two halves', 'Daily reading · In Bookmarks',
 ];
-const SCREEN_NAMES = ['daily', 'memorial', 'reading', 'calendar', 'dark', 'darkreading', 'darkcalendar', 'narrow', 'solemnity', 'none'] as const;
+const SCREEN_NAMES = ['daily', 'memorial', 'reading', 'calendar', 'dark', 'darkreading', 'darkcalendar', 'narrow', 'solemnity', 'none', 'differ', 'nowords', 'nosecond', 'halves'] as const;
 const SCREENS = phones.filter((p) => labelOf(p) !== 'Daily reading · In Bookmarks');
 const BOOKMARKS_PHONE = phones.find((p) => labelOf(p) === 'Daily reading · In Bookmarks') ?? '';
 const TODAY = day(2026, 11, 8);
@@ -904,7 +911,7 @@ check('each phone draws the screen of the app: the header row (Back, the title, 
     assert.ok(!/class="dr-hand"|lib-notice|lib-chip sample|Sample|Preview|Buen Camino/.test(p), `${where}: nothing of the sample, and no handwritten line`);
   });
   // today picked on the first, a weekday with a memorial on the second, and the reading phones keep today; the 320 phone has the third Sunday of Advent, then a solemnity and a day with no readings
-  assert.deepEqual(picked.map(iso), ['2026-11-08', '2026-11-11', '2026-11-08', '2026-11-08', '2026-11-08', '2026-11-08', '2026-11-08', '2026-12-13', '2026-12-08', '2027-01-17']);
+  assert.deepEqual(picked.map(iso), ['2026-11-08', '2026-11-11', '2026-11-08', '2026-11-08', '2026-11-08', '2026-11-08', '2026-11-08', '2026-12-13', '2026-12-08', '2027-01-17', '2026-11-26', '2026-11-29', '2026-05-31', '2026-11-12']);
   assert.match(SCREENS[1], /<button class="dr-hb on" aria-label="Remove bookmark" aria-selected="true">/, 'a bookmarked day shows its bookmark filled');
   assert.match(SCREENS[7], /<div class="dr-strip fit">/, 'the card of the 320 phone reaches into the margins');
   assert.ok(SCREENS.filter((_, i) => i !== 7).every((p) => /<div class="dr-strip">/.test(p)), 'the others stay inside them');
@@ -912,42 +919,66 @@ check('each phone draws the screen of the app: the header row (Back, the title, 
 });
 
 check('the phones show what the screen shows for each kind of day: the Sunday with four readings, a weekday with a memorial and three, a solemnity, a canticle in the place of the psalm, and a day with no readings', () => {
-  const rows = (p: string) => [...p.matchAll(/<(?:button|div) class="dr-rb(?: plain)?"(?: aria-expanded="(true|false)")?(?: role="group")? aria-label="([^"]+)"><span class="tx"><span class="t">([^<]+)<\/span><span class="c">([^<]+)<\/span><\/span>/g)];
+  const rows = (p: string) => [...p.matchAll(/<(?:button|div) class="dr-rb(?: plain)?"(?: aria-expanded="(true|false)")?(?: role="group")? aria-label="([^"]+)"><span class="tx"><span class="t">([^<]+)<\/span><span class="c">([^<]+)<\/span>(?:<span class="dr-cap">[^<]*<\/span>)?<\/span>/g)];
   const sunday = rows(SCREENS[0]);
-  assert.deepEqual(sunday.map((m) => plain(m[2])), ['First Reading, Wisdom 6:12-16', 'Responsorial Psalm, Psalm 63:2, 3-4, 5-6, 7-8', 'Second Reading, 1 Thessalonians 4:13-18', 'Gospel, Matthew 25:1-13']);
+  assert.deepEqual(sunday.map((m) => plain(m[2])), ['First Reading, Wisdom, chapter 6, verses 12 to 16', 'Responsorial Psalm, Psalm 63, verses 2, 3 to 4, 5 to 6 and 7 to 8', 'Second Reading, First Thessalonians, chapter 4, verses 13 to 18', 'Gospel, Matthew, chapter 25, verses 1 to 13'], 'a screen reader hears the references in words');
+  assert.deepEqual(sunday.map((m) => plain(m[4])), ['Wisdom 6:12-16', 'Psalm 63:2, 3-4, 5-6, 7-8', '1 Thessalonians 4:13-18', 'Matthew 25:1-13'], 'and the eye reads them as they are written');
   assert.ok(sunday.every((m) => m[1] === 'false'), 'nothing is open when the screen opens');
   assert.ok(SCREENS[0].includes('<div class="dr-eyebrow">Liturgical day</div><div class="dr-titles"><div class="dr-title" role="heading" aria-level="3">32nd Sunday in Ordinary Time</div></div>'));
   assert.ok(SCREENS[0].includes(`<div class="dr-src">${READINGS_SOURCE}</div>`), 'where readings and words come from');
   // a weekday with a memorial: the saint is the title, the day of the calendar under it, no second reading
   assert.ok(SCREENS[1].includes('<div class="dr-title" role="heading" aria-level="3">Saint Martin of Tours, Bishop</div><div class="dr-under">Wednesday of the 32nd Week in Ordinary Time</div>'));
-  assert.deepEqual(rows(SCREENS[1]).map((m) => plain(m[2])), ['First Reading, Titus 3:1-7', 'Responsorial Psalm, Psalm 23:1b-3a, 3bc-4, 5, 6', 'Gospel, Luke 17:11-19']);
+  assert.deepEqual(rows(SCREENS[1]).map((m) => plain(m[2])), ['First Reading, Titus, chapter 3, verses 1 to 7', 'Responsorial Psalm, Psalm 23, verses 1b to 3a, 3bc to 4, 5 and 6', 'Gospel, Luke, chapter 17, verses 11 to 19']);
   // the Psalm opened: the whole psalm, a verse to a line, and it says so
   const reading = SCREENS[2];
   assert.equal(rows(reading).filter((m) => m[1] === 'true').map((m) => m[3]).join(), 'Responsorial Psalm', 'one reading is open: the Psalm');
   const opened = reading.slice(reading.indexOf('<div class="dr-rt">'));
-  const psalmWords = opened.slice(0, opened.indexOf('</div></div>', opened.indexOf('class="dr-cap"')) + '</div>'.length);
+  const psalmWords = opened.slice(0, opened.indexOf('</div></div>') + '</div>'.length);
   assert.equal([...psalmWords.matchAll(/<p class="dr-v">/g)].length, 11, 'the 11 verses of the psalm, one to a line');
   assert.match(psalmWords, /<p class="dr-v">God, you are my God\. I will earnestly seek you/);
   assert.ok(!/<i>\d+<\/i>/.test(psalmWords), 'a psalm shown whole has no verse numbers: they would not be the lectionary\'s');
-  assert.ok(psalmWords.includes(`<div class="dr-cap">${WHOLE_PSALM_NOTE}</div>`), 'and it says so');
+  assert.ok(psalmWords.startsWith(`<div class="dr-rt"><div class="dr-cap">${WHOLE_PSALM_NOTE}</div><p class="dr-v">`), 'and it says so, over the words');
   // the Gospel opened: prose, a paragraph with its small verse numbers
   const gospel = SCREENS[5].slice(SCREENS[5].indexOf('aria-expanded="true"'));
   assert.match(gospel, /<p class="dr-v"><i>1<\/i> “Then the Kingdom of Heaven will be like ten virgins/);
   assert.match(gospel, /<i>13<\/i> Watch therefore, for you don’t know the day nor the hour in which the Son of Man is coming\.<\/p><\/div><\/div>/);
+  assert.ok(gospel.startsWith('aria-expanded="true"'));
+  assert.ok(!/class="dr-cap"/.test(gospel.slice(0, gospel.indexOf('<div class="dr-rt">') + 400)), 'a Gospel whose words are what the reference names has no note');
   // a solemnity: the title of the calendar, no memorial; four readings
   assert.ok(SCREENS[8].includes('<div class="dr-title" role="heading" aria-level="3">The Immaculate Conception of the Blessed Virgin Mary</div></div>'));
   assert.deepEqual(rows(SCREENS[8]).map((m) => plain(m[3])), ['First Reading', 'Responsorial Psalm', 'Second Reading', 'Gospel']);
   assert.equal(rows(SCREENS[8]).filter((m) => m[1] === 'true').length, 1);
   // the third Sunday of Advent: a canticle (the Magnificat) in the place of the psalm, kept as the lectionary writes it, and shown whole only for a psalm
-  assert.ok(plain(SCREENS[7]).includes('Responsorial Psalm, Luke 1:46-48, 49-50, 53-54'));
+  assert.ok(plain(SCREENS[7]).includes('Responsorial Psalm, Luke, chapter 1, verses 46 to 48, 49 to 50 and 53 to 54'));
+  assert.ok(plain(SCREENS[7]).includes('>Luke 1:46-48, 49-50, 53-54<'), 'a canticle in the place of the psalm is written as the lectionary writes it');
   assert.ok(SCREENS[7].includes('<div class="dr-title" role="heading" aria-level="3">3rd Sunday of Advent</div>') || SCREENS[7].includes('Third Sunday of Advent'));
   // no readings: the card and one honest line; no small print under it
   assert.ok(SCREENS[9].includes(`<div class="dr-none">${NO_READINGS}</div>`));
   assert.equal(rows(SCREENS[9]).length, 0);
   assert.ok(!SCREENS[9].includes('class="dr-src"'));
   assert.ok(SCREENS[9].includes('<div class="dr-title" role="heading" aria-level="3">2nd Sunday in Ordinary Time</div>'), 'the day of the calendar, worked out on the phone');
+  // a day whose readings in the source are those of one country: the day of the calendar and one honest line, not the name the source gives it
+  assert.ok(SCREENS[10].includes(`<div class="dr-none">${READINGS_DIFFER}</div>`));
+  assert.equal(rows(SCREENS[10]).length, 0);
+  assert.ok(!SCREENS[10].includes('class="dr-src"'));
+  assert.ok(SCREENS[10].includes('<div class="dr-title" role="heading" aria-level="3">Thursday of the 34th Week in Ordinary Time</div></div>'), 'the day of the calendar, not Thanksgiving Day');
+  // a reference with no words is a line with the reason under it; the psalm opened has its note over the words
+  const nowords = rows(SCREENS[11]);
+  assert.deepEqual(nowords.map((m) => m[3]), ['First Reading', 'Responsorial Psalm', 'Second Reading', 'Gospel']);
+  assert.ok(SCREENS[11].includes(`<span class="c">Isaiah 63:16b-17, 19b; 64:2-7</span><span class="dr-cap">${NO_WORDS.numbering}</span></span>`), 'the reason under the reference');
+  assert.ok(plain(nowords[0][2]).endsWith(NO_WORDS.numbering), 'and a screen reader says it with the reference');
+  assert.ok(/<div class="dr-rb plain" role="group"/.test(SCREENS[11]) && !/<button class="dr-rb" aria-expanded="(true|false)" aria-label="First Reading/.test(SCREENS[11]), 'a line, not a button');
+  assert.ok(SCREENS[11].includes(`<div class="dr-rt"><div class="dr-cap">${WHOLE_PSALM_NOTE}</div><p class="dr-v">`), 'the note over the words of the psalm');
+  // a Sunday with no second reading in the source says so, where the second reading would be
+  assert.deepEqual(rows(SCREENS[12]).map((m) => m[3]), ['First Reading', 'Responsorial Psalm', 'Gospel']);
+  assert.ok(SCREENS[12].includes(`<div class="dr-rr dr-miss"><span class="dr-cap">${NO_SECOND_READING}</span></div><div class="dr-rr"><button class="dr-rb" aria-expanded="true" aria-label="Gospel`), 'before the Gospel');
+  assert.equal((SCREENS.filter((p) => p.includes(NO_SECOND_READING))).length, 1, 'on one phone: the others have the readings they have');
+  // a verse that the lectionary reads in two halves is in the words once: 7, 8, 9, 10, and the note that a verse with a letter is shown whole
+  const halves = SCREENS[13].slice(SCREENS[13].indexOf('<div class="dr-rt">'));
+  assert.ok(halves.startsWith(`<div class="dr-rt"><div class="dr-cap">${PASSAGE_NOTES.part}</div>`));
+  assert.deepEqual([...halves.slice(0, halves.indexOf('</div></div>')).matchAll(/<p class="dr-v"><i>(\d+)<\/i> /g)].map((m) => m[1]), ['7', '8', '9', '10']);
   // the phones that are scrolled to the readings are those with a reading open
-  assert.deepEqual(SCREENS.map((p) => /data-scroll-card="1"/.test(p)), [false, false, true, false, false, true, false, false, true, false]);
+  assert.deepEqual(SCREENS.map((p) => /data-scroll-card="1"/.test(p)), [false, false, true, false, false, true, false, false, true, false, false, true, true, true]);
 });
 
 check('the calendar sheet of the page is the one of the app: a dimmed page, the sheet with "Calendar" and Close, and the month calendar of the picked day with its Today', () => {
@@ -991,7 +1022,7 @@ check('the Bible tab banner of the page is the daily banner of the app, with no 
   });
   assert.deepEqual(library.map((b) => b.includes('class="cp-banner cmp dl below"')), [false, false, false, false, true], 'the pill is beside the title on 390 and under the last line on 320');
   for (const b of library) {
-    assert.match(b, /role="button" aria-label="Read today\. Daily reading\. Sunday 8 November\. 32nd Sunday in Ordinary Time\. Readings: Wisdom 6:12-16; Psalm 63:2, 3-4, 5-6, 7-8; 1 Thessalonians 4:13-18; Matthew 25:1-13">/, 'one button, and what it says');
+    assert.match(b, /role="button" aria-label="Read today\. Daily reading\. Sunday 8 November\. 32nd Sunday in Ordinary Time\. Readings: Wisdom, chapter 6, verses 12 to 16; Psalm 63; First Thessalonians, chapter 4, verses 13 to 18; Matthew, chapter 25, verses 1 to 13">/, 'one button, and what it says: each reference in words, a psalm by its number');
     assert.match(b, /<div class="ey">Sunday 8 November<\/div>/);
     assert.match(b, /<div class="dd">32nd Sunday in Ordinary Time<\/div>\s*<div class="rf">Wisdom&nbsp;6:12-16&nbsp;· Psalm&nbsp;63&nbsp;· 1&nbsp;Thessalonians&nbsp;4:13-18&nbsp;· Matthew&nbsp;25:1-13<\/div>/);
     assert.doesNotMatch(b, /class="hw"|Buen Camino/, 'no handwritten note');

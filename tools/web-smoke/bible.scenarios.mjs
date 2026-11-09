@@ -76,7 +76,7 @@ export const BIBLE_SCENARIOS = [
       await page.getByText(/^(Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday) \d{1,2} (January|February|March|April|May|June|July|August|September|October|November|December)$/i).first().waitFor();
       await eventually(() => page.getByText('Buen Camino!', { exact: true }).count(), (n) => n === 0, { what: 'the number of handwritten notes on the banner of the Bible tab' });
       const said = await banner.getAttribute('aria-label');
-      assert(/^Read today\. Daily reading\. (Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday) \d{1,2} \w+\. .+\. (Readings: .+|The readings for this day are not in the app yet\.)$/.test(said), `what the banner says: ${said}`);
+      assert(/^Read today\. Daily reading\. (Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday) \d{1,2} \w+\. .+\. (Readings: .+|The readings for this day (are|differ from country to country and are) not in the app yet\.)$/.test(said), `what the banner says: ${said}`);
       const pill = await box(page.getByText('Read today', { exact: true }).first(), 'the pill');
       assert(Math.abs((pill.y + pill.height / 2) - (title.y + title.height / 2)) < 12 && pill.x > title.x + title.width, 'on a phone of 390 the pill is in the row of the title, at its right');
       const dayTitle = /^Read today\. Daily reading\. [^.]+\. (.+?)\. (?:Readings: |The readings for this day)/.exec(said)[1];

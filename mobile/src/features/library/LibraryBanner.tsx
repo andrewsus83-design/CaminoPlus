@@ -1,12 +1,12 @@
-import { useCallback, useMemo, useState } from 'react';
-import { Pressable, View, useWindowDimensions } from 'react-native';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { AppState, Pressable, View, useWindowDimensions } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import { AppText } from '@/components/AppText';
 import { c, radius, role, space } from '@/theme';
-import { todayLine } from './bible/today';
+import { msUntilTomorrow, todayLine } from './bible/today';
 import { todayOf } from './daily/calendar';
 import { pillBesideTitle } from './daily/bannerLayout';
-import { NO_READINGS, readingsLine, readingsSpoken } from './daily/content';
+import { readingsLine, readingsSpoken } from './daily/content';
 import { dateKey } from './daily/datekey';
 import { dayBrief } from './daily/dayData';
 
@@ -101,17 +101,26 @@ export const DAILY_BANNER_MAX_HEIGHT_NARROW = 276;
  * the same place. The pill moves under the last line on a phone too narrow, or with text too big, for the title and the pill to share a row (pillBesideTitle).
  *
  * The whole card is ONE button for a screen reader (the pill is its look, not a second stop) and opens the daily reading (the screen decides where: app/(tabs)/library.tsx); what it says
- * is the pill's words, the title, the date, the day and the readings. The date is read again each time the Library comes into view, so the banner never says yesterday after a night
- * with the app open. It has no handwritten note: Buen Camino! is said on the screens that have room for a greeting.
+ * is the pill's words, the title, the date, the day and the readings, each reference in words ("Wisdom, chapter 6, verses 12 to 16"), a psalm by its number. The date is read again each
+ * time the Library comes into view, when the app comes back to the front and when the day changes under an app that stays open (a timer to the next midnight), so the banner never says
+ * yesterday. It has no handwritten note: Buen Camino! is said on the screens that have room for a greeting.
  */
 export function DailyBanner({ onOpen }: { onOpen: () => void }) {
   const [now, setNow] = useState(() => new Date());
   useFocusEffect(useCallback(() => { setNow(new Date()); }, []));
+  useEffect(() => {
+    const sub = AppState.addEventListener('change', (state) => { if (state === 'active') setNow(new Date()); });
+    return () => sub.remove();
+  }, []);
+  useEffect(() => {
+    const timer = setTimeout(() => setNow(new Date()), msUntilTomorrow(now) + 1000);
+    return () => clearTimeout(timer);
+  }, [now]);
   const { width, fontScale } = useWindowDimensions();
   const label = todayLine(now);
   const brief = useMemo(() => dayBrief(dateKey(todayOf(now))), [now]);
-  const line = brief.readings ? readingsLine(brief.readings) : NO_READINGS;
-  const spoken = brief.readings ? `Readings: ${readingsSpoken(brief.readings)}` : NO_READINGS;
+  const line = brief.readings ? readingsLine(brief.readings) : brief.unavailable;
+  const spoken = brief.readings ? `Readings: ${readingsSpoken(brief.readings)}` : brief.unavailable;
   const beside = pillBesideTitle(width, fontScale, COMPACT_BANNER_MAX_FONT_SCALE);
   const pill = (
     <View style={{ height: 44, paddingHorizontal: space[4], borderRadius: radius.pill, backgroundColor: c.gold, alignItems: 'center', justifyContent: 'center' }}>

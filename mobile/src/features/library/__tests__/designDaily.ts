@@ -18,7 +18,7 @@ import { makeBibleText, type TextIndex } from '../bible/textCore';
 import { BOOKMARK_DAY, UNBOOKMARK_DAY } from '../daily/bookmarks';
 import { pillBesideTitle } from '../daily/bannerLayout';
 import { rangeAround, sameDay, type Ymd } from '../daily/calendar';
-import { NO_READINGS, READINGS_SOURCE, WHOLE_PSALM_NOTE, makeContent, readingsLine, readingsSpoken, type DayContent, type Reading } from '../daily/content';
+import { NO_SECOND_READING, NO_WORDS, PASSAGE_NOTES, READINGS_SOURCE, makeContent, readingsLine, readingsSpoken, type DayContent, type Reading } from '../daily/content';
 import { dateKey } from '../daily/datekey';
 import { COLOUR_NAMES, LITURGY_NOTE, RANK_NAMES, SEASON_NAMES, liturgicalDayOf } from '../daily/liturgy';
 import { makeReadingsLookup } from '../daily/readingsCore';
@@ -45,7 +45,7 @@ const ymd = (y: number, m: number, d: number): Ymd => ({ y, m, d });
 
 /* ============================================================================================ the Daily reading phones */
 
-export type ScreenName = 'daily' | 'memorial' | 'reading' | 'calendar' | 'dark' | 'darkreading' | 'darkcalendar' | 'narrow' | 'solemnity' | 'none';
+export type ScreenName = 'daily' | 'memorial' | 'reading' | 'calendar' | 'dark' | 'darkreading' | 'darkcalendar' | 'narrow' | 'solemnity' | 'none' | 'differ' | 'nowords' | 'nosecond' | 'halves';
 
 export type ScreenSpec = {
   /** The day that is picked. */
@@ -68,6 +68,10 @@ export const SCREENS: Record<ScreenName, ScreenSpec> = {
   narrow: { picked: ymd(2026, 12, 13), fit: true },
   solemnity: { picked: ymd(2026, 12, 8), open: 'gospel' },
   none: { picked: ymd(2027, 1, 17) },
+  differ: { picked: ymd(2026, 11, 26) },
+  nowords: { picked: ymd(2026, 11, 29), open: 'psalm' },
+  nosecond: { picked: ymd(2026, 5, 31), open: 'gospel' },
+  halves: { picked: ymd(2026, 11, 12), open: 'psalm' },
 };
 
 const INDENT = '            ';
@@ -108,7 +112,7 @@ export function litHtml(picked: Ymd, c: DayContent): string {
   return `<div class="cp-card dr-lit"><div class="dr-eyebrow">Liturgical day</div>${titles}<div class="dr-facts">${facts}</div><div class="dr-cap">${html(LITURGY_NOTE)}</div></div>`;
 }
 
-/** The words of a reading, as PassageBody draws them: a psalm one verse to a line, the rest in paragraphs, a psalm shown whole says so. */
+/** The words of a reading, as PassageBody draws them: the note over them when they are not what the reference names, a psalm one verse to a line, the rest in paragraphs. */
 function passageHtml(r: Reading): string {
   const text = r.text!;
   const runs = runsOf(text.lines);
@@ -116,19 +120,22 @@ function passageHtml(r: Reading): string {
   const body = r.kind === 'psalm'
     ? runs.flat().map((l) => `<p class="dr-v">${verse(l.n, l.text)}</p>`).join('')
     : runs.map((run) => `<p class="dr-v">${run.map((l) => verse(l.n, l.text)).join(' ')}</p>`).join('');
-  return `<div class="dr-rt">${body}${text.whole ? `<div class="dr-cap">${html(WHOLE_PSALM_NOTE)}</div>` : ''}</div>`;
+  return `<div class="dr-rt">${text.note ? `<div class="dr-cap">${html(PASSAGE_NOTES[text.note])}</div>` : ''}${body}</div>`;
 }
 
 /** The readings card and the small print under it, as DayReading.tsx draws them. */
 export function readingsHtml(c: DayContent, open?: string): string {
   const top = '<div class="dr-top"><span class="dr-eyebrow">Readings</span></div>';
-  if (!c.readings) return `<div class="cp-card dr-card dr-readings">${top}<div class="dr-none">${html(NO_READINGS)}</div></div>`;
+  if (!c.readings) return `<div class="cp-card dr-card dr-readings">${top}<div class="dr-none">${html(c.unavailable ?? '')}</div></div>`;
   const rows = c.readings.map((r) => {
-    const label = `${esc(`${r.title}, ${r.reference}`)}`;
-    const head = `<span class="tx"><span class="t">${r.title}</span><span class="c">${html(r.reference)}</span></span>`;
-    if (!r.text) return `<div class="dr-rr"><div class="dr-rb plain" role="group" aria-label="${label}">${head}</div></div>`;
+    const why = r.noWords ? NO_WORDS[r.noWords] : null;
+    const label = esc(`${r.title}, ${r.spoken}`);
+    const head = `<span class="tx"><span class="t">${r.title}</span><span class="c">${html(r.reference)}</span>${why ? `<span class="dr-cap">${html(why)}</span>` : ''}</span>`;
+    // a Sunday or a solemnity with no second reading in the source says so, where the second reading would be: before the Gospel
+    const missing = c.noSecond && r.kind === 'gospel' ? `<div class="dr-rr dr-miss"><span class="dr-cap">${html(NO_SECOND_READING)}</span></div>` : '';
+    if (!r.text) return `${missing}<div class="dr-rr"><div class="dr-rb plain" role="group" aria-label="${why ? `${label}. ${esc(why)}` : label}">${head}</div></div>`;
     const isOpen = r.kind === open;
-    return `<div class="dr-rr"><button class="dr-rb" aria-expanded="${isOpen}" aria-label="${label}">${head}${icon('chev')}</button>${isOpen ? passageHtml(r) : ''}</div>`;
+    return `${missing}<div class="dr-rr"><button class="dr-rb" aria-expanded="${isOpen}" aria-label="${label}">${head}${icon('chev')}</button>${isOpen ? passageHtml(r) : ''}</div>`;
   }).join('');
   return `<div class="cp-card dr-card dr-readings">${top}${rows}</div><div class="dr-src">${html(READINGS_SOURCE)}</div>`;
 }
@@ -151,8 +158,8 @@ export const BANNER_WIDTH: Record<BannerName, number> = { library: 390, continue
 export function bannerHtml(day: Ymd, width: number): string {
   const brief = content.dayBrief(dateKey(day));
   const label = todayLine(new Date(day.y, day.m - 1, day.d));
-  const line = brief.readings ? readingsLine(brief.readings) : NO_READINGS;
-  const spoken = brief.readings ? `Readings: ${readingsSpoken(brief.readings)}` : NO_READINGS;
+  const line = brief.readings ? readingsLine(brief.readings) : (brief.unavailable ?? '');
+  const spoken = brief.readings ? `Readings: ${readingsSpoken(brief.readings)}` : (brief.unavailable ?? '');
   const beside = pillBesideTitle(width, 1, 1.2);
   const pill = '<span class="pill">Read today</span>';
   const aria = ['Read today', 'Daily reading', label, brief.title, spoken].filter(Boolean).join('. ');

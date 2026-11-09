@@ -134,14 +134,16 @@ which never name a date (the browser's clock is the phone's, and "today" is foun
 
 - the header is one row (Back, the title, the Calendar button, the Bookmark button), every button at least 44 by 44 (they are 48); the strip has exactly seven
   days, each at least 44 by 44; a tap on a day picks it and changes the liturgical title, Today brings it back, the arrows move a week; under it
-  the liturgical card and the readings card (no sample, no notice, no handwritten line); a reading opens and closes, or the day says the readings are not in the app yet;
+  the liturgical card and the readings card (no sample, no notice, no handwritten line); a reading opens and closes, or the day says the readings are not in the app yet (or that they differ from country to country);
 - the Calendar button opens the sheet; Escape, Close and a tap outside close it; a day chosen in it closes it and moves the strip to its week; its
   Today picks today;
 - the Bookmark button toggles and is kept; the day is a row of Bookmarks ("Daily reading", the date, the liturgical title) that opens
   `/library/daily?date=YYYY-MM-DD`; taking it off there removes the row;
-- the readings (the one walk that names days, in `?date=`, because it knows their readings): a Sunday has its four references and the source line, the Gospel opens to its words from the Bible in the app, the Psalm
-  opens whole with its note, nothing on the screen is under 15 px and nothing runs out of a phone of 320; a weekday with a memorial has the saint as its title and the day of the calendar under it; a reference with no
-  words is a line, not a button; a day with no readings says so in one line and has no small print;
+- the readings (the one walk that names days, in `?date=`, because it knows their readings): a Sunday has its four references (said in words to a screen reader) and the source line ("the Lectionary for Mass used in the United
+  States"), the Gospel opens to its words from the Bible in the app, the Psalm opens whole with its note over the words, nothing on the screen is under 15 px and nothing runs out of a phone of 320; a weekday with a memorial
+  has the saint as its title and the day of the calendar under it; a reference with no words is a line, not a button, and the line under it says why; Trinity Sunday says that the source lists no second reading, between the
+  psalm and the Gospel; a psalm that reads a verse in two halves (12 November, Psalm 146) has the verse once, with the note that a verse with a letter is shown whole; Thanksgiving Day (26 November) shows the day of the calendar
+  and says that the readings differ from country to country; a day with no readings says so in one line and has no small print;
 - `?date=` opens that day (also one far outside the five years) and anything that is not a day opens today.
 
 The Bible screens are the Bible feature's own, and they run on the real text (Psalm 121, John 1,

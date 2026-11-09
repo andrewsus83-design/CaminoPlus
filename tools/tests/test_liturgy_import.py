@@ -38,6 +38,20 @@ class CleanRef(unittest.TestCase):
         self.assertEqual(imp.clean_ref("Psalm/Deuteronomy 32", "x"), "Deuteronomy 32", "the book of a canticle in the place of the psalm")
         self.assertEqual(imp.clean_ref("Psalm 4:2-4:3, 4:4-4:5", "x"), "Psalm 4:2-4:3, 4:4-4:5", "the forms of the source are the parser's business, not the importer's")
 
+    def test_a_psalm_with_a_run_of_four_numbers_joined_by_hyphens_is_the_psalm_alone(self):
+        notes = []
+        self.assertEqual(imp.clean_ref("Psalm 85:9-10-11-12, 13-14", "2026-12-06 psalm_ref", notes), "Psalm 85", "no lectionary writes 9-10-11-12: the verses cannot be told, the psalm can")
+        self.assertEqual(len(notes), 1)
+        self.assertIn("2026-12-06 psalm_ref", notes[0])
+        self.assertIn("'Psalm 85'", notes[0], "the change is said")
+        self.assertEqual(imp.clean_ref("Psalm 23:1-2-3-4 [^2]", "x", notes), "Psalm 23", "after the footnote marker is gone")
+        self.assertEqual(imp.clean_ref("Psalm 118:1-2-3-4-5", "x"), "Psalm 118", "a longer chain too, and with no list to write to it still works")
+        for fine in ("Psalm 85:9-10, 11-12, 13-14", "Psalm 85:9ab and 10, 11-12, 13-14", "Psalm 4:2-4:3, 4:4-4:5", "Psalm 85", "Isaiah 52:13—53:12", "Psalm 90:3-4, 5-6, 12-13, 14 and 17"):
+            before = len(notes)
+            self.assertEqual(imp.clean_ref(fine, "x", notes), fine, fine)
+            self.assertEqual(len(notes), before, f"{fine}: nothing changed, nothing said")
+        self.assertEqual(imp.clean_ref("Isaiah 5:1-2-3-4", "x", notes), "Isaiah 5:1-2-3-4", "a book that is not the Psalms is left as it is: the app shows it as written, with no words, and says so")
+
     def test_nothing_is_nothing(self):
         for empty in (None, "", "   ", "[^3]"):
             self.assertIsNone(imp.clean_ref(empty, "x"), repr(empty))
@@ -79,6 +93,24 @@ class Convert(unittest.TestCase):
     def test_the_name_is_compared_without_case_or_spacing(self):
         day = convert([row(liturgical_day="thirty-second  SUNDAY in ordinary time")])[2026]["2026-11-08"]
         self.assertEqual(day["o"], 1)
+
+    def test_a_day_that_is_not_the_general_calendars_is_left_out_and_listed(self):
+        left = sorted(imp.NOT_GENERAL)
+        self.assertEqual(left, ["2026-06-04", "2026-06-07", "2026-11-26", "2026-12-12"], "what a reviewer found, and nothing else")
+        years = convert([row("2026-06-03"), row("2026-06-04"), row("2026-11-26"), row("2026-11-27"), row("2027-01-01")])
+        self.assertEqual(sorted(years[2026]), ["2026-06-03", "2026-11-27"], "the days that differ are not days with readings")
+        self.assertEqual(years.differ, {2026: ["2026-06-04", "2026-11-26"]}, "they are listed, in order, for their year")
+        self.assertEqual(years[2027].keys(), {"2027-01-01"})
+        self.assertNotIn(2027, years.differ)
+
+    def test_a_listed_day_that_the_export_does_not_have_is_ignored_and_a_listed_day_is_still_checked(self):
+        years = convert([row("2026-05-25")])
+        self.assertEqual(years.differ, {}, "the list is of the dates of one export: another export has its own days to look at")
+        for bad in (row("2026-06-04", first_reading_ref=None, psalm_ref=None, second_reading_ref=None, gospel_ref=None), row("2026-11-26", gospel_ref=5)):
+            with self.assertRaises(imp.Refused, msg="a listed day is refused when it is not a day with a reading"):
+                convert([bad])
+        with self.assertRaises(imp.Refused):
+            convert([row("2026-06-04"), row("2026-06-04")])
 
     def test_days_are_grouped_by_year(self):
         years = convert([row("2026-12-31"), row("2027-01-01"), row("2027-01-02")])
@@ -130,9 +162,43 @@ class Files(unittest.TestCase):
         about = json.loads(imp.outputs(export, d / "out", d / "x.ts")[0][d / "out" / "readings-2026.json"])["about"]
         self.assertEqual(about["read"], "2026-11-08")
         self.assertIn("Pascua", about["source"])
-        self.assertIn("facts of the Roman Lectionary", about["nature"])
+        self.assertIn("facts of the Lectionary for Mass used in the United States", about["nature"], "the lectionary of one country is not called the Roman one")
+        self.assertNotIn("facts of the Roman Lectionary", about["nature"])
+        self.assertIn("left out and listed in 'differ'", about["nature"])
         self.assertIn("not used", about["nature"])
         self.assertIn("Bible inside the app", about["nature"])
+
+    def test_the_days_that_differ_are_in_the_file_sorted_and_not_among_the_days(self):
+        d, export = self.make([row("2026-12-12"), row("2026-11-27"), row("2026-06-04"), row("2026-11-26")])
+        text = imp.outputs(export, d / "out", d / "x.ts")[0][d / "out" / "readings-2026.json"]
+        data = json.loads(text)
+        self.assertEqual(data["differ"], ["2026-06-04", "2026-11-26", "2026-12-12"])
+        self.assertEqual(list(data["days"]), ["2026-11-27"])
+        self.assertEqual(list(data), ["about", "differ", "v", "year", "days"], "sorted keys, the days last")
+        plain = json.loads(imp.outputs(self.make([row("2026-11-27")])[1], d / "out", d / "x.ts")[0][d / "out" / "readings-2026.json"])
+        self.assertNotIn("differ", plain, "a year with none has no key for it")
+
+    def test_both_modes_print_the_days_that_are_left_out_and_what_was_changed(self):
+        d, export = self.make([row("2026-06-04"), row("2026-12-12"), row("2026-12-06", psalm_ref="Psalm 85:9-10-11-12, 13-14")])
+        out, ts = d / "out", d / "x.ts"
+        code, text, _ = self.run_main("--export", str(export), "--out", str(out), "--ts", str(ts))
+        self.assertEqual(code, 0)
+        for must in ("left out (2 days)", "2026-06-04", "2026-12-12", "Corpus Christi", "Guadalupe", "only what a reviewer found", "changed in a reference (1)", "'Psalm 85'"):
+            self.assertIn(must, text, "the write says: " + must)
+        code, text, _ = self.run_main("--export", str(export), "--out", str(out), "--ts", str(ts), "--check")
+        self.assertEqual(code, 0)
+        for must in ("ok: the committed files are what the export makes", "2026-06-04", "2026-12-12", "left out (2 days)", "a person with a lectionary has to check every day of the export", "changed in a reference (1)"):
+            self.assertIn(must, text, "the check says: " + must)
+        (out / "readings-2026.json").write_text("edited by hand\n", encoding="utf8")
+        code, text, _ = self.run_main("--export", str(export), "--out", str(out), "--ts", str(ts), "--check")
+        self.assertEqual(code, 1)
+        self.assertIn("2026-06-04", text, "a red check prints the list too")
+        quiet = self.make([row("2026-11-27")])[1]
+        code, text, _ = self.run_main("--export", str(quiet), "--out", str(d / "out2"), "--ts", str(d / "y.ts"))
+        self.assertEqual(code, 0)
+        self.assertNotIn("left out", text, "nothing is said when nothing was left out")
+        self.assertNotIn("changed in a reference", text)
+        self.assertFalse(text.endswith("\n\n"), "and no empty line")
 
     def test_a_plain_list_is_an_export_too(self):
         d, export = self.make([row()], as_list=True)
@@ -226,6 +292,30 @@ class CommittedFiles(unittest.TestCase):
         self.assertEqual((days[0], days[-1]), ("2026-05-25", "2026-12-31"))
         self.assertEqual(len(days), (last - first).days + 1, "every day between the first and the last is there")
         self.assertEqual(len(set(days)), len(days))
+
+    def test_the_days_left_out_are_the_listed_ones_and_they_are_in_the_export(self):
+        dates = {r["date"] for r in self.rows}
+        self.assertTrue(set(imp.NOT_GENERAL) <= dates, "every day of the list is a day of the committed export")
+        data = json.loads((imp.DEFAULT_OUT / "readings-2026.json").read_text(encoding="utf8"))
+        self.assertEqual(data["differ"], sorted(imp.NOT_GENERAL))
+        self.assertFalse(set(data["differ"]) & set(data["days"]), "a day that differs has no readings in the file")
+        self.assertEqual(len(data["days"]) + len(data["differ"]), len(self.rows), "every day of the export is one or the other")
+        for key, reason in imp.NOT_GENERAL.items():
+            self.assertGreater(len(reason), 40, key)
+            self.assertTrue(any(w in reason for w in ("United States", "Thanksgiving")), f"{key}: the reason says whose readings these are")
+        by_date = {r["date"]: r for r in self.rows}
+        self.assertEqual(by_date["2026-11-26"]["second_reading_ref"], "1 Corinthians 1:3-9", "Thanksgiving: four readings on a weekday")
+        self.assertEqual(by_date["2026-06-07"]["gospel_ref"], "John 6:51-58", "the Gospel of Corpus Christi on the 10th Sunday")
+
+    def test_the_committed_asset_has_no_run_of_four_numbers_and_the_psalm_the_export_wrote_that_way_is_the_psalm_alone(self):
+        raw = {r["date"]: r["psalm_ref"] for r in self.rows}
+        self.assertEqual(raw["2026-12-06"], "Psalm 85:9-10-11-12, 13-14", "the export keeps what the source wrote")
+        data = json.loads((imp.DEFAULT_OUT / "readings-2026.json").read_text(encoding="utf8"))
+        self.assertEqual(data["days"]["2026-12-06"]["r"][1], "Psalm 85")
+        for key, day in data["days"].items():
+            for ref in day["r"]:
+                if ref is not None:
+                    self.assertIsNone(imp.RUN_OF_FOUR.search(ref), f"{key}: {ref}")
 
     def test_no_reference_of_the_asset_has_a_footnote_marker_or_a_slash_book(self):
         data = json.loads((imp.DEFAULT_OUT / "readings-2026.json").read_text(encoding="utf8"))

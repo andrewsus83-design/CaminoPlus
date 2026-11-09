@@ -13,10 +13,15 @@ import { makeBibleText, type TextIndex } from '../bible/textCore';
 import type { TextSource } from '../bible/verseRows';
 import { pillBesideTitle, INSIDE, OUTSIDE, PILL_WIDTH, ROW_GAP, TITLE_WIDTH } from '../daily/bannerLayout';
 import { parseDateKey } from '../daily/datekey';
-import { NO_READINGS, READING_KINDS, READING_TITLES, READINGS_SOURCE, WHOLE_PSALM_NOTE, celebrationOf, makeContent, readingsLine, readingsSpoken } from '../daily/content';
+import {
+  FEASTS_ON_PRIVILEGED_DAYS, NO_READINGS, NO_SECOND_READING, NO_WORDS, PART_VERSE_NOTE, PASSAGE_NOTES, PSALM_ONLY_NOTE, READING_KINDS, READING_TITLES, READINGS_DIFFER, READINGS_SOURCE, WHOLE_PSALM_NOTE,
+  celebrationOf, hasSecondReading, makeContent, readingsLine, readingsSpoken,
+} from '../daily/content';
 import { liturgicalDay, type LiturgicalDay } from '../daily/liturgy';
 import { makeReadingsLookup, parseReadingsFile, type DayRecord } from '../daily/readingsCore';
-import { NUMBERING_DIFFERS, formatReference, parseReference, psalmOfText, readPassage, runsOf, shortReference, touchesDifferingChapter, type PassageLine } from '../daily/reference';
+import {
+  NUMBERING_DIFFERS, formatReference, parseReference, psalmOfText, readPassage, runsOf, shortReference, spokenReference, spokenShort, touchesDifferingChapter, type PassageLine,
+} from '../daily/reference';
 import { run } from './runTs';
 
 let n = 0;
@@ -40,7 +45,14 @@ type Row = { date: string; liturgical_day: string; feast: string | null; liturgi
 const EXPORT = JSON.parse(read('../tools/liturgy/data/pascua-daily-readings.json')) as { about: { read: string }; rows: Row[] };
 const ymd = (key: string) => parseDateKey(key)!;
 const litOf = (key: string): LiturgicalDay => liturgicalDay(ymd(key).y, ymd(key).m, ymd(key).d);
-const texts = (lines: readonly PassageLine[]) => lines.filter((l): l is { n: string; text: string } => !('gap' in l));
+type Verse = { n: string; c: number; text: string };
+const texts = (lines: readonly PassageLine[]) => lines.filter((l): l is Verse => !('gap' in l));
+/** The labels of a passage as it is drawn: a verse is its label, a gap between two runs is "-". */
+const drawn = (lines: readonly PassageLine[]) => lines.map((l) => ('gap' in l ? '-' : l.n));
+/** The days the importer leaves out because the source has the readings of the United States there (tools/liturgy/import_readings.py, NOT_GENERAL). */
+const LEFT_OUT = ['2026-06-04', '2026-06-07', '2026-11-26', '2026-12-12'];
+/** The days of the export that have readings in the app. */
+const KEPT = EXPORT.rows.filter((r) => !LEFT_OUT.includes(r.date));
 
 /* ================================================================================================== the references */
 
@@ -116,6 +128,41 @@ check('the short form is for a line with little room: a psalm is its number, eve
   assert.equal(shortReference(parseReference('Isaiah 12:2-6')!), 'Isaiah 12:2-6', 'a canticle in the place of the psalm is not a psalm');
 });
 
+check('a reference is said in words for a screen reader: chapter and verses, "to" and "and", the letters kept, a psalm by its number, a book of one chapter with no chapter', () => {
+  const said: Array<[string, string]> = [
+    ['Wisdom 6:12-16', 'Wisdom, chapter 6, verses 12 to 16'],
+    ['Psalm 63:2, 3-4, 5-6, 7-8', 'Psalm 63, verses 2, 3 to 4, 5 to 6 and 7 to 8'],
+    ['1 Thessalonians 4:13-18', 'First Thessalonians, chapter 4, verses 13 to 18'],
+    ['2 Peter 3:8-14', 'Second Peter, chapter 3, verses 8 to 14'],
+    ['3 John 5-8', 'Third John, verses 5 to 8'],
+    ['Genesis 3:9-15, 3:20', 'Genesis, chapter 3, verses 9 to 15 and 20'],
+    ['Acts 11:21b-26; 13:1-3', 'Acts, chapter 11, verses 21b to 26; chapter 13, verses 1 to 3'],
+    ['Matthew 9:36-10:8', 'Matthew, chapter 9, verse 36 to chapter 10, verse 8'],
+    ['Galatians 4:22-24, 26-27, 31–5:1', 'Galatians, chapter 4, verses 22 to 24 and 26 to 27; chapter 4, verse 31 to chapter 5, verse 1'],
+    ['Philemon 7-20', 'Philemon, verses 7 to 20'],
+    ['Jude 1:17, 1:20b-1:25', 'Jude, verses 17 and 20b to 25'],
+    ['John 3:16', 'John, chapter 3, verse 16'],
+    ['Psalm 87', 'Psalm 87'],
+    ['Jeremiah 31', 'Jeremiah, chapter 31'],
+    ['Psalm 146:7, 8-9a, 9bc-10', 'Psalm 146, verses 7, 8 to 9a and 9bc to 10'],
+    ['Song of Solomon 3:1-3:4b', 'Song of Songs, chapter 3, verses 1 to 4b'],
+    ['Wisdom 3:1-6, 9', 'Wisdom, chapter 3, verses 1 to 6 and 9'],
+  ];
+  for (const [text, want] of said) assert.equal(spokenReference(parseReference(text)!), want, text);
+  assert.equal(spokenShort(parseReference('Psalm 63:2, 3-4, 5-6, 7-8')!), 'Psalm 63', 'a psalm by its number');
+  assert.equal(spokenShort(parseReference('Luke 1:46-48, 49-50, 53-54')!), 'Luke, chapter 1, verses 46 to 48, 49 to 50 and 53 to 54', 'a canticle in the place of the psalm is said in full');
+  assert.equal(spokenShort(parseReference('Wisdom 6:12-16')!), 'Wisdom, chapter 6, verses 12 to 16');
+  // every reference of the data is said in words: no colon, no pair of numbers joined by a hyphen, nothing a voice would read as a time or a sum
+  const parsed = [...parseReadingsFile(FILE_2026)!.days.values()].flatMap((d) => d.refs.filter((r): r is string => r !== null).map((r) => parseReference(r)));
+  assert.ok(parsed.every((p) => p !== null), 'every reference of the data is read');
+  for (const ref of parsed) {
+    const words = spokenReference(ref!);
+    assert.doesNotMatch(words, /:|\d-\d|\d–\d|undefined|null/, words);
+    assert.match(words, /^(First |Second |Third )?[A-Z][A-Za-z ]+(?:, | \d)/, words);
+  }
+  assert.equal(parsed.length, 689, 'the references of the 217 days that have readings');
+});
+
 check('NUMBERING_DIFFERS names books of the list and chapters they have, each once and in order', () => {
   for (const [code, chapters] of Object.entries(NUMBERING_DIFFERS)) {
     const book = BIBLE_BOOKS.find((b) => b.code === code);
@@ -136,7 +183,7 @@ check('NUMBERING_DIFFERS names books of the list and chapters they have, each on
 check('a passage is read from the Bible inside the app, word for word, every verse of the run and no other', () => {
   const wisdom = readPassage(parseReference('Wisdom 6:12-16')!, source)!;
   assert.deepEqual(texts(wisdom.lines).map((l) => l.n), ['12', '13', '14', '15', '16']);
-  assert.equal(wisdom.whole, false);
+  assert.equal(wisdom.note, null, 'the words are what the reference names: no note');
   assert.ok(!wisdom.lines.some((l) => 'gap' in l), 'one run, no gap');
   assert.match(texts(wisdom.lines)[0].text, /^Wisdom is radiant and doesn’t fade away; and is easily seen by those who love her/);
   assert.equal(texts(wisdom.lines)[1].text, 'She anticipates those who desire her, making herself known.');
@@ -168,7 +215,51 @@ check('the runs of a reference that skips verses have a gap between them, and a 
   assert.equal(texts(over.lines).length, 3 + 8, 'the end of one chapter and the start of the next');
   assert.ok(!over.lines.some((l) => 'gap' in l), 'a run over a chapter has no gap in it');
   assert.deepEqual(texts(over.lines).map((l) => l.n).slice(2, 4), ['38', '1']);
-  assert.equal(runsOf([{ gap: true }, { n: '1', text: 'a' }, { gap: true }, { gap: true }, { n: '3', text: 'b' }]).length, 2, 'a gap at the start or two in a row make no empty run');
+  assert.equal(runsOf([{ gap: true }, { n: '1', c: 1, text: 'a' }, { gap: true }, { gap: true }, { n: '3', c: 1, text: 'b' }]).length, 2, 'a gap at the start or two in a row make no empty run');
+});
+
+check('a verse that two runs share (the lectionary reads it in two halves: "8-9a, 9bc-10") is shown once, and the two runs join with no gap between them', () => {
+  const psalm146 = readPassage(parseReference('Psalm 146:7, 8-9a, 9bc-10')!, source)!; // 12 November 2026: it showed 7, 8, 9, 9, 10
+  assert.deepEqual(texts(psalm146.lines).map((l) => l.n), ['7', '8', '9', '10']);
+  assert.deepEqual(drawn(psalm146.lines), ['7', '8', '9', '10'], 'no gap: the second half of 9 follows its first half');
+  assert.equal(runsOf(psalm146.lines).length, 1, 'one run');
+  assert.equal(psalm146.note, 'part', 'and it says that a verse with a letter is shown whole');
+  assert.ok(texts(psalm146.lines).every((l) => l.text.length > 10), 'every verse has its words');
+  assert.deepEqual(drawn(readPassage(parseReference('Psalm 96:1-2a, 2b-3, 5b-6')!, source)!.lines), ['1', '2', '3', '-', '5', '6'], '29 December: 2a and 2b are one verse, 4 is skipped');
+  assert.deepEqual(drawn(readPassage(parseReference('Psalm 96:7-8a, 8b-9, 10')!, source)!.lines), ['7', '8', '9', '10'], '30 December');
+  assert.deepEqual(drawn(readPassage(parseReference('Psalm 93:1ab, 1cd-2, 5')!, source)!.lines), ['1', '2', '-', '5'], '11 July: 1ab and 1cd are one verse, 3 and 4 are skipped');
+  assert.deepEqual(drawn(readPassage(parseReference('Deuteronomy 32:26-27ab, 27cd-28, 30, 35cd-36ab')!, source)!.lines), ['26', '27', '28', '-', '30', '-', '35', '36'], '18 August');
+  // a run made only of a verse already given adds nothing and breaks nothing; a verse is in the words once however the runs are cut
+  assert.deepEqual(drawn(readPassage(parseReference('Psalm 93:1ab, 1cd, 2')!, source)!.lines), ['1', '2']);
+  assert.deepEqual(drawn(readPassage(parseReference('Wisdom 6:12a, 12b-13, 15')!, source)!.lines), ['12', '13', '-', '15']);
+  // the same chapter and verse is never twice in the words of a reading, and a gap is only ever where verses are skipped: checked on every reference of the data (the test of the sentences below
+  // leaves out every reference with a letter, which is where a verse was given twice)
+  let checked = 0, withLetters = 0;
+  for (const day of parseReadingsFile(FILE_2026)!.days.values()) {
+    for (const text of day.refs) {
+      if (text === null) continue;
+      const parsed = parseReference(text)!;
+      const words = readPassage(parsed, source);
+      if (!words) continue;
+      checked += 1;
+      if (parsed.segments.some((s) => s.l1 || s.l2)) withLetters += 1;
+      const seen = new Set<string>();
+      let last: Verse | null = null;
+      let skipped = false;
+      for (const line of words.lines) {
+        if ('gap' in line) { skipped = true; continue; }
+        if (words.note !== 'whole') assert.ok(!seen.has(`${line.c}:${line.n}`), `${text}: ${line.c}:${line.n} is in the words twice`);
+        seen.add(`${line.c}:${line.n}`);
+        const from: number = Number(line.n.split('-')[0]);
+        const prevEnd: number = last ? Number(last.n.split('-').pop()) : 0;
+        if (skipped && last && last.c === line.c && words.note !== 'whole') assert.notEqual(from, prevEnd + 1, `${text}: a gap before ${line.c}:${line.n}, which follows the verse before it (the lectionary may read out of order: Isaiah 38:1-6, 21-22, 7-8)`);
+        skipped = false;
+        last = line;
+      }
+    }
+  }
+  assert.equal(checked, 689 - 14, 'the references of the data that have words');
+  assert.equal(withLetters, 89, 'of them have a letter in them: the check covers the references that the test of the sentences leaves out');
 });
 
 check('a verse that the Bible prints with no words is left out, as the lectionary leaves it, and a joined label stands for its verses', () => {
@@ -180,15 +271,15 @@ check('a verse that the Bible prints with no words is left out, as the lectionar
 
 check('a psalm with a title in the Bible is shown whole (the numbers of the lectionary count the title), a psalm with none keeps its verses', () => {
   const titled = readPassage(parseReference('Psalm 63:2, 3-4, 5-6, 7-8')!, source)!;
-  assert.equal(titled.whole, true);
+  assert.equal(titled.note, 'whole', 'the note over a psalm shown whole although verses are named');
   assert.equal(texts(titled.lines).length, 11, 'the 11 verses of the English Psalm 63: the lectionary says 63:2-9');
   assert.ok(texts(titled.lines).every((l) => l.n === ''), 'no verse numbers: they would be the Bible\'s, not the lectionary\'s');
   assert.match(texts(titled.lines)[0].text, /^God, you are my God\. I will earnestly seek you/);
   const bare = readPassage(parseReference('Psalm 87')!, source)!;
-  assert.equal(bare.whole, false, 'a whole psalm named whole is not "widened"');
+  assert.equal(bare.note, 'psalm', 'a psalm named with no verses: shown whole, and the note says the source names the psalm only');
   assert.deepEqual(texts(bare.lines).map((l) => l.n), ['1', '2', '3', '4', '5', '6', '7'], 'the numbers of a psalm named whole are the Bible\'s own');
   const untitled = readPassage(parseReference('Psalm 118:1 and 8-9, 19-21, 25-27a')!, source)!;
-  assert.equal(untitled.whole, false, 'Psalm 118 has no title: its numbers are the same in both');
+  assert.equal(untitled.note, 'part', 'Psalm 118 has no title: its numbers are the same in both, so it keeps its verses; it has a letter (27a), and the note says that verse is whole');
   assert.deepEqual(untitled.lines.map((l) => ('gap' in l ? '-' : l.n)), ['1', '-', '8', '9', '-', '19', '20', '21', '-', '25', '26', '27']);
   assert.match(texts(untitled.lines)[1].text, /^It is better to take refuge in the LORD, than to put confidence in man/);
   const long = readPassage(parseReference('Psalm 119:1, 2, 10, 11, 17, 18')!, source)!;
@@ -226,7 +317,13 @@ check('a readings file is accepted only when it is exactly what the importer wri
   assert.equal(ok.year, 2026);
   assert.deepEqual(ok.days.get('2026-11-08'), { refs: ['Wisdom 6:12-16', 'Psalm 63', null, 'Matthew 25:1-13'], name: 'A name', own: true });
   assert.deepEqual(ok.days.get('2026-11-09'), { refs: ['Ezekiel 47:1-2', 'Psalm 46', null, 'John 2:13-22'], name: null, own: false });
+  assert.deepEqual([...ok.differ], [], 'no day that differs, unless the file lists it');
+  assert.deepEqual([...parseReadingsFile(mutate((f) => { f.differ = ['2026-11-10', '2026-12-12']; }))!.differ], ['2026-11-10', '2026-12-12'], 'the days that differ are listed, in order');
   const bad: Array<[string, unknown]> = [
+    ['"differ" that is not a list', mutate((f) => { f.differ = '2026-11-10'; })], ['an empty "differ"', mutate((f) => { f.differ = []; })], ['a day of "differ" that is a number', mutate((f) => { f.differ = [20261110]; })],
+    ['a day of "differ" in another year', mutate((f) => { f.differ = ['2027-01-01']; })], ['a day of "differ" that does not exist', mutate((f) => { f.differ = ['2026-02-30']; })],
+    ['a day of "differ" that is a day with readings', mutate((f) => { f.differ = ['2026-11-08']; })], ['"differ" not in order', mutate((f) => { f.differ = ['2026-12-12', '2026-11-10']; })],
+    ['a day twice in "differ"', mutate((f) => { f.differ = ['2026-11-10', '2026-11-10']; })], ['more days in "differ" than a year has', mutate((f) => { f.differ = Array.from({ length: 400 }, () => '2026-11-10'); })],
     ['not an object', 5], ['null', null], ['an array', []], ['a string', 'x'],
     ['another version', mutate((f) => { f.v = 2; })], ['no version', mutate((f) => { delete f.v; })], ['a year that is a text', mutate((f) => { f.year = '2026'; })], ['a year that is not whole', mutate((f) => { f.year = 2026.5; })],
     ['a year before the calendar', mutate((f) => { f.year = 1500; })], ['no about', mutate((f) => { delete f.about; })], ['an about with no source', mutate((f) => { delete f.about.source; })],
@@ -265,17 +362,29 @@ check('the lookup reads its files when first asked, leaves out one that is broke
   assert.equal(makeReadingsLookup([]).recordFor('2026-11-08'), null);
   assert.deepEqual(makeReadingsLookup([]).years(), []);
   assert.equal(makeReadingsLookup([() => GOOD]).recordFor('nonsense'), null);
+  const differing = makeReadingsLookup([() => mutate((f) => { f.differ = ['2026-11-10']; })]);
+  assert.equal(differing.differs('2026-11-10'), true, 'a day the file lists as one that differs');
+  assert.equal(differing.recordFor('2026-11-10'), null, 'and it has no readings');
+  assert.equal(differing.differs('2026-11-08'), false, 'a day with readings does not differ');
+  assert.equal(differing.differs('2026-11-11'), false, 'a day the file does not know is not one that differs, it is one we have nothing for');
+  assert.equal(differing.differs('2027-11-10'), false, 'a year no file has');
+  assert.equal(makeReadingsLookup([]).differs('2026-11-10'), false);
+  assert.equal(makeReadingsLookup([() => ({ nonsense: true })]).differs('2026-11-10'), false, 'a file that is broken lists nothing');
 });
 
-check('the file of 2026 is valid, has the 221 days from 25 May to 31 December, and every day has at least one reading', () => {
+check('the file of 2026 is valid, has the 217 days from 25 May to 31 December that have readings, lists the 4 that differ, and every day has at least one reading', () => {
   const file = parseReadingsFile(FILE_2026)!;
   assert.ok(file, 'readings-2026.json passes the strict check');
   assert.deepEqual(lookup.years(), [2026]);
-  assert.equal(file.days.size, 221);
+  assert.equal(file.days.size, 217);
+  assert.deepEqual([...file.differ], LEFT_OUT, 'the days that the importer leaves out (tools/liturgy/import_readings.py, NOT_GENERAL), in order');
+  assert.ok(LEFT_OUT.every((key) => !file.days.has(key)), 'none of them is a day with readings');
   const keys = [...file.days.keys()].sort();
   assert.deepEqual([keys[0], keys[keys.length - 1]], ['2026-05-25', '2026-12-31']);
   assert.equal(EXPORT.rows.length, 221);
-  assert.deepEqual(keys, EXPORT.rows.map((r) => r.date).sort(), 'the days of the file are the days of the export');
+  assert.equal(KEPT.length, 217);
+  assert.deepEqual(keys, KEPT.map((r) => r.date).sort(), 'the days of the file are the days of the export, less the days that differ');
+  assert.deepEqual([...keys, ...file.differ].sort(), EXPORT.rows.map((r) => r.date).sort(), 'and together with them, all of them');
   let second = 0, names = 0, own = 0;
   for (const [key, record] of file.days) {
     assert.ok(record.refs.some((r) => r !== null), key);
@@ -283,20 +392,23 @@ check('the file of 2026 is valid, has the 221 days from 25 May to 31 December, a
     if (record.name) names += 1;
     if (record.own) own += 1;
   }
-  assert.equal(second, EXPORT.rows.filter((r) => r.second_reading_ref && r.second_reading_ref.trim()).length, 'the days with a second reading');
-  assert.equal(names, EXPORT.rows.filter((r) => r.feast && r.feast.trim()).length, 'the days with the name of a celebration');
-  assert.equal(second, 40);
-  assert.equal(names, 152);
-  assert.equal(own, 82, 'the days the source calls by the name of the celebration: the Sundays, the solemnities, the feasts and the memorials it keeps');
+  assert.equal(second, KEPT.filter((r) => r.second_reading_ref && r.second_reading_ref.trim()).length, 'the days with a second reading');
+  assert.equal(names, KEPT.filter((r) => r.feast && r.feast.trim()).length, 'the days with the name of a celebration');
+  assert.equal(second, 38);
+  assert.equal(names, 149);
+  assert.equal(own, 80, 'the days the source calls by the name of the celebration: the Sundays, the solemnities, the feasts and the memorials it keeps');
   assert.ok(own < names);
   assert.equal(file.days.get('2026-11-08')!.refs[2], '1 Thessalonians 4:13-18');
   assert.equal(file.days.get('2026-07-28')!.refs[0], 'Jeremiah 14:17-22', 'the footnote markers of the source are gone');
   assert.equal(file.days.get('2026-07-27')!.refs[1], 'Deuteronomy 32', 'the book of a canticle in the place of the psalm, without "Psalm/"');
+  assert.equal(file.days.get('2026-12-06')!.refs[1], 'Psalm 85', 'a psalm whose verses are written in a form no lectionary writes (9-10-11-12) is the psalm alone');
   const text = read('assets/library/daily/readings-2026.json');
   assert.match(text, /^\{"about":\{"made":"tools\/liturgy\/import_readings\.py/);
   assert.match(text, /"read":"2026-11-08"/, 'the header says when it was read');
   assert.match(text, /Pascua, Supabase project diyimabdmsjykvitomgd, table public\.pascua_daily_readings/, 'where it comes from');
-  assert.match(text, /facts of the Roman Lectionary[^"]*Pascua's own writing[^"]*is not used/, 'what is used and what is not');
+  assert.match(text, /facts of the Lectionary for Mass used in the United States[^"]*Pascua's own writing[^"]*is not used/, 'what is used (the lectionary of the United States, not the Roman Lectionary of every country) and what is not');
+  assert.doesNotMatch(text, /facts of the Roman Lectionary/, 'the header does not call the lectionary of one country the Roman one');
+  assert.match(text, /"differ":\["2026-06-04","2026-06-07","2026-11-26","2026-12-12"\]/, 'the days that differ are in the file');
   assert.ok(text.length < 40000, `${text.length} bytes: compact`);
   assert.doesNotMatch(text.slice(text.indexOf('"days":')), /snippet|reflection|prayer|family_story|audio_url|saint_name/i, 'no field of Pascua\'s own writing (the header names them, to say they are not used)');
 });
@@ -321,27 +433,53 @@ check('the generated list of files names the file of every year the importer wro
 
 /* ================================================================================================ what a day is called */
 
-check('a Sunday, a solemnity and a feast of the Lord keep the title of the calendar; a weekday takes the memorial the file names, unless the day is privileged', () => {
+check('a Sunday, a solemnity and a feast of the Lord keep the title of the calendar; a weekday takes the memorial the file names; a privileged weekday takes only the feasts of the General Calendar, on their date', () => {
   const sunday = litOf('2026-11-08');
   const weekday = litOf('2026-11-11');
   const advent = litOf('2026-12-21');
   const octave = litOf('2026-12-26');
   const lent = litOf('2027-03-10');
   const record = (name: string | null, own = false): DayRecord => ({ refs: ['a 1:1', null, null, null], name, own });
-  assert.deepEqual(celebrationOf(sunday, record('Thirty-second Sunday in Ordinary Time', true)), { title: '32nd Sunday in Ordinary Time', under: null });
-  assert.deepEqual(celebrationOf(sunday, record('Some Saint')), { title: '32nd Sunday in Ordinary Time', under: null }, 'a Sunday is never renamed');
-  assert.deepEqual(celebrationOf(litOf('2026-12-08'), record('Another name', true)), { title: 'The Immaculate Conception of the Blessed Virgin Mary', under: null }, 'a solemnity is never renamed');
-  assert.deepEqual(celebrationOf(litOf('2026-11-09'), record('Another name')), { title: 'The Dedication of the Lateran Basilica', under: null }, 'a feast of the Lord');
-  assert.deepEqual(celebrationOf(weekday, record('Saint Martin of Tours, Bishop', true)), { title: 'Saint Martin of Tours, Bishop', under: 'Wednesday of the 32nd Week in Ordinary Time' });
-  assert.deepEqual(celebrationOf(weekday, record('Saint Martin of Tours, Bishop')), { title: 'Saint Martin of Tours, Bishop', under: 'Wednesday of the 32nd Week in Ordinary Time' }, 'a memorial beside a weekday is the title too');
-  assert.deepEqual(celebrationOf(weekday, record(null)), { title: 'Wednesday of the 32nd Week in Ordinary Time', under: null });
-  assert.deepEqual(celebrationOf(weekday, null), { title: 'Wednesday of the 32nd Week in Ordinary Time', under: null });
-  assert.deepEqual(celebrationOf(advent, record('Saint Peter Canisius, Priest and Doctor of the Church')), { title: 'Advent weekday, 21 December', under: null }, '17 to 24 December keep no memorial');
-  assert.deepEqual(celebrationOf(octave, record('Saint Stephen, the First Martyr', true)), { title: 'Saint Stephen, the First Martyr', under: 'Second Day in the Octave of Christmas' }, 'unless the source says the day IS the celebration');
-  assert.deepEqual(celebrationOf(litOf('2026-12-29'), record('Saint Thomas Becket, Bishop and Martyr')), { title: 'Fifth Day in the Octave of Christmas', under: null });
+  const at = (key: string) => ymd(key);
+  assert.deepEqual(celebrationOf(sunday, record('Thirty-second Sunday in Ordinary Time', true), at('2026-11-08')), { title: '32nd Sunday in Ordinary Time', under: null });
+  assert.deepEqual(celebrationOf(sunday, record('Some Saint'), at('2026-11-08')), { title: '32nd Sunday in Ordinary Time', under: null }, 'a Sunday is never renamed');
+  assert.deepEqual(celebrationOf(litOf('2026-12-08'), record('Another name', true), at('2026-12-08')), { title: 'The Immaculate Conception of the Blessed Virgin Mary', under: null }, 'a solemnity is never renamed');
+  assert.deepEqual(celebrationOf(litOf('2026-11-09'), record('Another name'), at('2026-11-09')), { title: 'The Dedication of the Lateran Basilica', under: null }, 'a feast of the Lord');
+  assert.deepEqual(celebrationOf(weekday, record('Saint Martin of Tours, Bishop', true), at('2026-11-11')), { title: 'Saint Martin of Tours, Bishop', under: 'Wednesday of the 32nd Week in Ordinary Time' });
+  assert.deepEqual(celebrationOf(weekday, record('Saint Martin of Tours, Bishop'), at('2026-11-11')), { title: 'Saint Martin of Tours, Bishop', under: 'Wednesday of the 32nd Week in Ordinary Time' }, 'a memorial beside a weekday is the title too');
+  assert.deepEqual(celebrationOf(weekday, record(null), at('2026-11-11')), { title: 'Wednesday of the 32nd Week in Ordinary Time', under: null });
+  assert.deepEqual(celebrationOf(weekday, null, at('2026-11-11')), { title: 'Wednesday of the 32nd Week in Ordinary Time', under: null });
+  assert.deepEqual(celebrationOf(advent, record('Saint Peter Canisius, Priest and Doctor of the Church'), at('2026-12-21')), { title: 'Advent weekday, 21 December', under: null }, '17 to 24 December keep no memorial');
+  assert.deepEqual(celebrationOf(advent, record('Saint Peter Canisius, Priest and Doctor of the Church', true), at('2026-12-21')), { title: 'Advent weekday, 21 December', under: null }, 'not even one the source calls the day itself');
+  assert.deepEqual(celebrationOf(octave, record('Saint Stephen, the First Martyr', true), at('2026-12-26')), { title: 'Saint Stephen, the First Martyr', under: 'Second Day in the Octave of Christmas' }, 'a feast of the General Calendar on its own date, when the source says the day IS the celebration');
+  assert.deepEqual(celebrationOf(octave, record('Saint Stephen, the First Martyr'), at('2026-12-26')), { title: 'Second Day in the Octave of Christmas', under: null }, 'but only then');
+  assert.deepEqual(celebrationOf(litOf('2026-12-29'), record('Saint Thomas Becket, Bishop and Martyr', true), at('2026-12-29')), { title: 'Fifth Day in the Octave of Christmas', under: null }, 'a memorial in the octave is not a feast: not even when the source calls the day by its name');
   assert.equal(lent.season, 'lent');
-  assert.deepEqual(celebrationOf(lent, record('Saint Somebody')), { title: lent.title, under: null }, 'Lent keeps no optional memorial');
-  assert.deepEqual(celebrationOf(litOf('2027-02-10'), record('Ash Wednesday names')), { title: 'Ash Wednesday', under: null });
+  assert.deepEqual(celebrationOf(lent, record('Saint Somebody'), at('2027-03-10')), { title: lent.title, under: null }, 'Lent keeps no optional memorial');
+  assert.deepEqual(celebrationOf(lent, record('Saint Somebody', true), at('2027-03-10')), { title: lent.title, under: null }, 'an obligatory memorial that the source calls by its name keeps no Lent weekday either');
+  assert.deepEqual(celebrationOf(litOf('2027-02-10'), record('Ash Wednesday names', true), at('2027-02-10')), { title: 'Ash Wednesday', under: null });
+  // the Chair of Saint Peter is a feast: it takes a weekday of Lent on 22 February and no other day of it
+  const chair = litOf('2027-02-22');
+  assert.equal(chair.season, 'lent');
+  assert.equal(chair.rank, 'weekday');
+  assert.deepEqual(celebrationOf(chair, record('The Chair of Saint Peter the Apostle', true), at('2027-02-22')), { title: 'The Chair of Saint Peter the Apostle', under: chair.title }, 'a feast on a weekday of Lent');
+  assert.deepEqual(celebrationOf(litOf('2027-02-23'), record('The Chair of Saint Peter the Apostle', true), at('2027-02-23')), { title: litOf('2027-02-23').title, under: null }, 'on its date only');
+  assert.deepEqual(celebrationOf(litOf('2027-03-23'), record('The Chair of Saint Peter the Apostle', true), { m: 2, d: 22 }), { title: litOf('2027-03-23').title, under: null }, 'no feast takes Holy Week');
+  assert.deepEqual(celebrationOf(litOf('2027-02-10'), record('The Chair of Saint Peter the Apostle', true), { m: 2, d: 22 }), { title: 'Ash Wednesday', under: null }, 'and none takes Ash Wednesday');
+  assert.deepEqual([...FEASTS_ON_PRIVILEGED_DAYS].sort(), ['12-26', '12-27', '12-28', '2-22'], 'the feasts of the General Calendar that fall on a privileged weekday');
+  // a sweep from 1 December 2026 to 30 April 2027, with a name and "own" on every day: the days that take the name are the weekdays that are not privileged, and three privileged ones (the two feasts
+  // of the octave that are weekdays this year, and the Chair of Saint Peter)
+  const privileged = /^(advent_december_|christmas_octave_day_|lent_|holy_|ash_wednesday$|.*_after_ash_wednesday$)/;
+  const named: string[] = [];
+  for (let t = Date.UTC(2026, 11, 1); t <= Date.UTC(2027, 3, 30); t += 86400000) {
+    const key = new Date(t).toISOString().slice(0, 10);
+    const lit = litOf(key);
+    const got = celebrationOf(lit, record('A name', true), at(key));
+    const takes = lit.rank === 'weekday' && (!privileged.test(lit.id) || ['2026-12-26', '2026-12-28', '2027-02-22'].includes(key));
+    assert.equal(got.title === 'A name', takes, key);
+    if (takes && privileged.test(lit.id)) named.push(key);
+  }
+  assert.deepEqual(named, ['2026-12-26', '2026-12-28', '2027-02-22']);
 });
 
 check('the day as the screens ask for it: the Sunday, a weekday with a memorial, a solemnity, a privileged weekday, Saint Stephen, and a day the file does not have', () => {
@@ -352,13 +490,17 @@ check('the day as the screens ask for it: the Sunday, a weekday with a memorial,
   assert.deepEqual(sunday.readings!.map((r) => r.title), ['First Reading', 'Responsorial Psalm', 'Second Reading', 'Gospel']);
   assert.deepEqual(sunday.readings!.map((r) => r.reference), ['Wisdom 6:12-16', 'Psalm 63:2, 3-4, 5-6, 7-8', '1 Thessalonians 4:13-18', 'Matthew 25:1-13']);
   assert.ok(sunday.readings!.every((r) => r.text && texts(r.text.lines).length > 0));
-  assert.equal(sunday.readings![1].text!.whole, true);
-  assert.equal(sunday.readings![0].text!.whole, false);
+  assert.equal(sunday.readings![1].text!.note, 'whole');
+  assert.equal(sunday.readings![0].text!.note, null);
   const line = readingsLine(sunday.readings!);
   assert.equal(line.replace(/\u00a0/g, ' '), 'Wisdom 6:12-16 · Psalm 63 · 1 Thessalonians 4:13-18 · Matthew 25:1-13');
   assert.equal(line, 'Wisdom\u00a06:12-16\u00a0· Psalm\u00a063\u00a0· 1\u00a0Thessalonians\u00a04:13-18\u00a0· Matthew\u00a025:1-13', 'a line that wraps does it between two references, never inside one');
   assert.equal(readingsLine([]), '');
-  assert.equal(readingsSpoken(sunday.readings!), 'Wisdom 6:12-16; Psalm 63:2, 3-4, 5-6, 7-8; 1 Thessalonians 4:13-18; Matthew 25:1-13');
+  assert.equal(readingsSpoken(sunday.readings!), 'Wisdom, chapter 6, verses 12 to 16; Psalm 63; First Thessalonians, chapter 4, verses 13 to 18; Matthew, chapter 25, verses 1 to 13', 'the banner says each reference in words, a psalm by its number');
+  assert.deepEqual(sunday.readings!.map((r) => r.spoken), ['Wisdom, chapter 6, verses 12 to 16', 'Psalm 63, verses 2, 3 to 4, 5 to 6 and 7 to 8', 'First Thessalonians, chapter 4, verses 13 to 18', 'Matthew, chapter 25, verses 1 to 13'], 'a row of the screen says the whole psalm reference');
+  assert.equal(readingsSpoken([]), '');
+  assert.equal(sunday.noSecond, false);
+  assert.equal(sunday.unavailable, null, 'a day with readings has nothing to apologise for');
 
   const memorial = content.dayContent('2026-11-11');
   assert.equal(memorial.title, 'Saint Martin of Tours, Bishop');
@@ -380,13 +522,22 @@ check('the day as the screens ask for it: the Sunday, a weekday with a memorial,
     assert.equal(none.readings, null, `${key}: no file has the day`);
     assert.equal(none.title, litOf(key).title, `${key}: the day of the calendar, worked out on the phone`);
     assert.equal(none.under, null);
-    assert.deepEqual(content.dayBrief(key), { dateKey: key, title: litOf(key).title, under: null, readings: null });
+    assert.deepEqual(content.dayBrief(key), { dateKey: key, title: litOf(key).title, under: null, readings: null, unavailable: NO_READINGS });
+    assert.equal(none.unavailable, NO_READINGS, `${key}: the honest line`);
+    assert.equal(none.noSecond, false);
   }
-  assert.deepEqual(content.dayContent('not a day'), { dateKey: 'not a day', title: '', under: null, readings: null });
-  assert.deepEqual(content.dayBrief('2026-02-30'), { dateKey: '2026-02-30', title: '', under: null, readings: null });
+  assert.deepEqual(content.dayContent('not a day'), { dateKey: 'not a day', title: '', under: null, readings: null, unavailable: NO_READINGS, noSecond: false });
+  assert.deepEqual(content.dayBrief('2026-02-30'), { dateKey: '2026-02-30', title: '', under: null, readings: null, unavailable: NO_READINGS });
   assert.equal(NO_READINGS, 'The readings for this day are not in the app yet.');
-  assert.equal(READINGS_SOURCE, 'Readings: the Roman Lectionary (general calendar; your country may differ). Words: World English Bible, Catholic edition, not the lectionary translation.');
+  assert.equal(READINGS_DIFFER, 'The readings for this day differ from country to country and are not in the app yet.');
+  assert.equal(READINGS_SOURCE, 'Readings: the Lectionary for Mass used in the United States. Words: World English Bible, Catholic edition, not the lectionary translation.', 'the source is named for what it is: the lectionary of one country');
+  assert.doesNotMatch(READINGS_SOURCE, /Roman|general calendar|may differ/, 'the small print does not call it the Roman one');
   assert.equal(WHOLE_PSALM_NOTE, 'This is the whole psalm. Mass uses only the verses named above.');
+  assert.equal(PSALM_ONLY_NOTE, 'The source names the psalm only, not the verses Mass uses: this is the whole psalm.');
+  assert.equal(PART_VERSE_NOTE, 'A verse with a letter after its number is shown whole; the reading uses only part of it.');
+  assert.deepEqual(PASSAGE_NOTES, { whole: WHOLE_PSALM_NOTE, psalm: PSALM_ONLY_NOTE, part: PART_VERSE_NOTE });
+  assert.equal(NO_SECOND_READING, 'The source lists no second reading for this day.');
+  assert.deepEqual(NO_WORDS, { numbering: 'Words not shown: this Bible numbers these verses differently.', chapter: 'Words not shown: the source names the chapter and no verses.', form: 'Words not shown: this reference could not be read.' });
   assert.deepEqual(READING_KINDS, ['first', 'psalm', 'second', 'gospel']);
   assert.deepEqual(READING_TITLES, { first: 'First Reading', psalm: 'Responsorial Psalm', second: 'Second Reading', gospel: 'Gospel' });
 });
@@ -401,18 +552,41 @@ check('the banner asks for the references only: the brief never opens a book of 
   assert.ok(opened > 0, 'the screen does read it');
 });
 
-check('a psalm whose verses cannot be read is shown as the source has it, named by its number, and whole; another reading that cannot be read has no words', () => {
+check('a psalm the source names with no verses (or whose verses it writes in a form nobody reads) is shown by its number and whole, with a note; a reference that cannot be read has no words and says so', () => {
   const day = content.dayContent('2026-12-06');
   const psalm = day.readings![1];
-  assert.equal(psalm.reference, 'Psalm 85:9-10-11-12, 13-14', 'as the source has it');
+  assert.equal(psalm.reference, 'Psalm 85', 'the importer reduced "Psalm 85:9-10-11-12, 13-14", a run no lectionary writes, to the psalm');
   assert.equal(psalm.short, 'Psalm 85');
-  assert.equal(psalm.text!.whole, true);
-  assert.ok(psalm.text!.lines.length >= 13 && psalm.text!.lines.every((l) => 'gap' in l || l.n === ''));
+  assert.equal(psalm.spoken, 'Psalm 85');
+  assert.equal(psalm.text!.note, 'psalm', 'the source names the psalm only');
+  assert.equal(psalm.noWords, null);
+  assert.ok(texts(psalm.text!.lines).length >= 13, 'the whole psalm');
+  assert.equal(texts(psalm.text!.lines)[0].n, '1', 'with the numbers of the Bible, which are the Bible\'s own');
+  // the same psalm, if a file ever held the form nobody reads: the parser refuses it, the psalm is named by its number and shown whole, without numbers (they would be a guess)
   const odd = makeContent({
-    lookup: makeReadingsLookup([() => mutate((f) => { f.days['2026-11-08'].r = ['Nowhere 1:1', 'Canticle of nothing', null, 'Matthew 25:1-13']; })]),
+    lookup: makeReadingsLookup([() => mutate((f) => { f.days['2026-11-08'].r = ['Nowhere 1:1', 'Psalm 85:9-10-11-12, 13-14', null, 'Matthew 25:1-13']; })]),
     source,
   }).dayContent('2026-11-08');
-  assert.deepEqual(odd.readings!.map((r) => [r.reference, r.short, r.text === null]), [['Nowhere 1:1', 'Nowhere 1:1', true], ['Canticle of nothing', 'Canticle of nothing', true], ['Matthew 25:1-13', 'Matthew 25:1-13', false]]);
+  assert.deepEqual(odd.readings!.map((r) => [r.reference, r.short, r.spoken, r.text === null, r.noWords]), [['Nowhere 1:1', 'Nowhere 1:1', 'Nowhere 1:1', true, 'form'], ['Psalm 85', 'Psalm 85', 'Psalm 85', false, null], ['Matthew 25:1-13', 'Matthew 25:1-13', 'Matthew, chapter 25, verses 1 to 13', false, null]]);
+  assert.equal(odd.readings![1].text!.note, 'psalm');
+  assert.ok(texts(odd.readings![1].text!.lines).every((l) => l.n === ''));
+  // a canticle the file gives in a form that is not read: the reference as it is, no words, and the line that says it could not be read
+  const canticle = makeContent({
+    lookup: makeReadingsLookup([() => mutate((f) => { f.days['2026-11-08'].r = ['Wisdom 6:12-16', 'Canticle of nothing', null, 'Matthew 25:1-13']; })]),
+    source,
+  }).dayContent('2026-11-08');
+  assert.deepEqual(canticle.readings!.map((r) => [r.reference, r.text === null, r.noWords]), [['Wisdom 6:12-16', false, null], ['Canticle of nothing', true, 'form'], ['Matthew 25:1-13', false, null]]);
+});
+
+check('a reference with no words says why: the numbers of this Bible differ, the source names a chapter and no verses, or the form is not read', () => {
+  const lonely = (key: string) => content.dayContent(key).readings!.filter((r) => r.text === null).map((r) => [r.reference, r.noWords]);
+  assert.deepEqual(lonely('2026-09-08'), [['Micah 5:1-4a', 'numbering']], 'Micah 5:1 of the lectionary is 5:2 of this Bible');
+  assert.deepEqual(lonely('2026-11-29'), [['Isaiah 63:16b-17, 19b; 64:2-7', 'numbering']]);
+  assert.deepEqual(lonely('2026-07-24'), [['Jeremiah 31', 'chapter']], 'a canticle in the place of the psalm that the source gives as a chapter');
+  assert.deepEqual(lonely('2026-07-27'), [['Deuteronomy 32', 'chapter']]);
+  assert.deepEqual(lonely('2026-12-20'), [['Romans 16:25-27', 'numbering']]);
+  assert.deepEqual(lonely('2026-11-08'), [], 'a Sunday whose four readings all have words says nothing of the kind');
+  for (const key of ['2026-09-08', '2026-07-24']) assert.ok(content.dayContent(key).readings!.filter((r) => r.noWords).every((r) => !r.text));
 });
 
 /* ================================================================================ the data of 2026 against the calendar */
@@ -428,19 +602,20 @@ function plainTitle(title: string): string {
 }
 const COLOURS: Record<string, string> = { White: 'white', Green: 'green', Red: 'red', Violet: 'violet', Rose: 'rose' };
 
-check('every day of the data has the title, the week and the Sunday of the calendar of the app, except the days listed here, each for the reason given', () => {
-  // the days the two name in other words only (the same day): the parentheses of three solemnities, the days from 17 to 24 December that the source calls by their date, the octave of Christmas
-  const WORDING: Record<string, string> = {
-    '2026-06-04': 'Corpus Christi: the source leaves out "(Corpus Christi)"', '2026-11-02': 'All Souls: the source writes "All Soul’s Day"', '2026-12-25': 'Christmas: "(Christmas)" for "(Christmas Day)"',
-    '2026-12-17': 'a day of 17 to 24 December, called by its date', '2026-12-18': 'a day of 17 to 24 December, called by its date', '2026-12-19': 'a day of 17 to 24 December, called by its date',
-    '2026-12-21': 'a day of 17 to 24 December, called by its date', '2026-12-22': 'a day of 17 to 24 December, called by its date', '2026-12-23': 'a day of 17 to 24 December, called by its date',
-    '2026-12-24': 'a day of 17 to 24 December, called by its date', '2026-12-29': 'the octave of Christmas: "within the Octave of the Nativity of the Lord"',
-    '2026-12-30': 'the octave of Christmas: "within the Octave of the Nativity of the Lord"', '2026-12-31': 'the octave of Christmas: "within the Octave of the Nativity of the Lord"',
-  };
+// the days the two name in other words only (the same day): the parentheses of two solemnities, the days from 17 to 24 December that the source calls by their date, the octave of Christmas
+const WORDING: Record<string, string> = {
+  '2026-11-02': 'All Souls: the source writes "All Soul’s Day"', '2026-12-25': 'Christmas: "(Christmas)" for "(Christmas Day)"',
+  '2026-12-17': 'a day of 17 to 24 December, called by its date', '2026-12-18': 'a day of 17 to 24 December, called by its date', '2026-12-19': 'a day of 17 to 24 December, called by its date',
+  '2026-12-21': 'a day of 17 to 24 December, called by its date', '2026-12-22': 'a day of 17 to 24 December, called by its date', '2026-12-23': 'a day of 17 to 24 December, called by its date',
+  '2026-12-24': 'a day of 17 to 24 December, called by its date', '2026-12-29': 'the octave of Christmas: "within the Octave of the Nativity of the Lord"',
+  '2026-12-30': 'the octave of Christmas: "within the Octave of the Nativity of the Lord"', '2026-12-31': 'the octave of Christmas: "within the Octave of the Nativity of the Lord"',
+};
+
+check('every day of the data that has readings has the title, the week and the Sunday of the calendar of the app, except the days listed here, each for the reason given', () => {
   const wording: string[] = [];
   const saints: string[] = [];
   let same = 0;
-  for (const r of EXPORT.rows) {
+  for (const r of KEPT) {
     const lit = litOf(r.date);
     if (plainTitle(lit.title) === plainTitle(r.liturgical_day)) { same += 1; continue; }
     const own = !!r.feast && r.feast.toLowerCase() === r.liturgical_day.toLowerCase();
@@ -448,9 +623,9 @@ check('every day of the data has the title, the week and the Sunday of the calen
     wording.push(r.date);
   }
   assert.deepEqual(wording, Object.keys(WORDING).sort(), 'the days that are the same day in other words');
-  assert.equal(same, 169, 'days that have the same title, week and Sunday in both');
+  assert.equal(same, 166, 'days that have the same title, week and Sunday in both');
   assert.equal(saints.length, 39, 'days on which the source names a saint or a feast that the calendar of the app leaves out on purpose (liturgy.ts: WHAT IS NOT)');
-  assert.equal(same + wording.length + saints.length, EXPORT.rows.length);
+  assert.equal(same + wording.length + saints.length, KEPT.length);
   for (const key of saints) {
     const c = content.dayContent(key);
     assert.notEqual(c.under, null, `${key}: the name of the saint is the title, the day of the calendar goes under it`);
@@ -459,14 +634,48 @@ check('every day of the data has the title, the week and the Sunday of the calen
   assert.equal(EXPORT.about.read, '2026-11-08');
 });
 
+check('on every day that has readings a Sunday or a solemnity has the title the source gives it, a weekday has no second reading, and a Sunday or a solemnity has one but for the day listed', () => {
+  const titles: string[] = [];
+  const four: string[] = [];
+  const noSecond: string[] = [];
+  let big = 0;
+  for (const r of KEPT) {
+    const lit = litOf(r.date);
+    const hasSecond = !!r.second_reading_ref && !!r.second_reading_ref.trim();
+    if (lit.rank === 'sunday' || lit.rank === 'solemnity') {
+      big += 1;
+      if (plainTitle(lit.title) !== plainTitle(r.liturgical_day) && !(r.date in WORDING)) titles.push(`${r.date} ${lit.title} | ${r.liturgical_day}`);
+      if (hasSecondReading(lit) && !hasSecond) noSecond.push(r.date);
+      assert.equal(content.dayContent(r.date).noSecond, hasSecondReading(lit) && !hasSecond, `${r.date}: the screen says that the source lists no second reading exactly there`);
+    }
+    if (lit.rank === 'weekday' && hasSecond) four.push(`${r.date} ${lit.title}`);
+  }
+  assert.deepEqual(titles, [], 'a Sunday or a solemnity that the source calls by another name than the calendar does: the readings may be those of another day (these are the days the importer leaves out)');
+  assert.deepEqual(four, [], 'a weekday with four readings: the readings of a Mass of one country (the importer leaves such a day out)');
+  assert.deepEqual(noSecond, ['2026-05-31'], 'Trinity Sunday: the source lists no second reading (the lectionary has one); a person with a lectionary has to look at it');
+  assert.equal(big, 36, 'Sundays and solemnities looked at: 26 Sundays and 10 solemnities (Trinity, the Sacred Heart, John the Baptist, Peter and Paul, the Assumption, All Saints, All Souls, Christ the King, the Immaculate Conception, Christmas)');
+  // and the days the importer left out are exactly the ones this test would have found
+  assert.deepEqual(EXPORT.rows.filter((r) => LEFT_OUT.includes(r.date)).map((r) => [r.date, litOf(r.date).rank, !!r.second_reading_ref]), [
+    ['2026-06-04', 'solemnity', false], ['2026-06-07', 'sunday', true], ['2026-11-26', 'weekday', true], ['2026-12-12', 'weekday', false],
+  ]);
+  assert.equal(plainTitle(litOf('2026-06-07').title), plainTitle(EXPORT.rows.find((r) => r.date === '2026-06-07')!.liturgical_day), 'the 10th Sunday by title, Corpus Christi by readings (John 6)');
+  assert.equal(EXPORT.rows.find((r) => r.date === '2026-06-07')!.gospel_ref, 'John 6:51-58');
+  // the weekday weeks and the octave of Easter read as weekdays: no second reading is expected on them
+  assert.equal(hasSecondReading(litOf('2027-03-30')), false, 'Tuesday in the Octave of Easter (a solemnity of this calendar that reads as a weekday)');
+  assert.equal(hasSecondReading(litOf('2027-03-28')), true, 'Easter Sunday');
+  assert.equal(hasSecondReading(litOf('2027-04-04')), true, 'a Sunday of Easter');
+  assert.equal(hasSecondReading(litOf('2026-11-11')), false, 'a weekday');
+  assert.equal(hasSecondReading(litOf('2026-12-08')), true, 'a solemnity');
+});
+
 check('the colours agree on every day without a celebration name in the data; the days where they differ are the memorials of saints (their own colour) and four days where the source is wrong', () => {
   // the source says Green on four days that are violet or white: 21 and 23 December (Advent) and 29 and 31 December (Christmas time)
   const WRONG = ['2026-12-21', '2026-12-23', '2026-12-29', '2026-12-31'];
-  const differ = EXPORT.rows.filter((r) => COLOURS[r.liturgical_color] !== litOf(r.date).colour);
+  const differ = KEPT.filter((r) => COLOURS[r.liturgical_color] !== litOf(r.date).colour);
   const withName = differ.filter((r) => r.feast && r.feast.trim());
   const withoutName = differ.filter((r) => !(r.feast && r.feast.trim()));
   assert.deepEqual(withoutName.map((r) => r.date), [], 'no day without a name in the data has another colour than the calendar of the app');
-  assert.equal(differ.length, 109, 'days on which the colour of the data is not the colour of the calendar of the app: 105 of a saint, 4 wrong');
+  assert.equal(differ.length, 108, 'days on which the colour of the data is not the colour of the calendar of the app: 104 of a saint, 4 wrong');
   const wrong = differ.filter((r) => litOf(r.date).rank === 'weekday' && ['violet', 'white'].includes(litOf(r.date).colour) && r.liturgical_color === 'Green');
   assert.deepEqual(wrong.map((r) => r.date), WRONG);
   for (const r of withName.filter((x) => !WRONG.includes(x.date))) {
@@ -477,44 +686,74 @@ check('the colours agree on every day without a celebration name in the data; th
   assert.doesNotMatch(read('assets/library/daily/readings-2026.json'), /"(c|colour|color|liturgical_color)"/, 'the colour is not in the asset');
 });
 
-check('the Sunday cycle and the weekday cycle of the calendar agree with the readings of the data: the Gospel of each Sunday is the one of its cycle, bar three days', () => {
+check('the Sunday cycle and the weekday cycle of the calendar agree with the readings of the data: the Gospel of each Sunday is the one of its cycle, bar two days', () => {
   const book = { A: 'Matthew', B: 'Mark', C: 'Luke' } as const;
   const other: string[] = [];
   let sundays = 0;
-  for (const r of EXPORT.rows) {
+  for (const r of KEPT) {
     const lit = litOf(r.date);
     if (lit.rank !== 'sunday') continue;
     sundays += 1;
     if (!r.gospel_ref.startsWith(book[lit.sundayCycle])) other.push(`${r.date} ${r.gospel_ref}`);
   }
-  assert.equal(sundays, 27, 'the Sundays of Ordinary Time and of Advent in the data (Trinity, All Saints, Christ the King and the Holy Family are not Sundays of the calendar: a solemnity, a feast)');
-  // 7 June: the readings of Corpus Christi (the United States keeps it on the Sunday: John 6); 13 December: John 1 is the Gospel of the third Sunday of Advent of Year B; 20 December: Luke 1:26-38, the fourth
-  assert.deepEqual(other, ['2026-06-07 John 6:51-58', '2026-12-13 John 1:6-8, 19-28', '2026-12-20 Luke 1:26-38']);
+  assert.equal(sundays, 26, 'the Sundays of Ordinary Time and of Advent in the data that has readings (Trinity, All Saints, Christ the King and the Holy Family are not Sundays of the calendar: a solemnity, a feast; 7 June, the Sunday with the readings of Corpus Christi, is left out)');
+  // 13 December: John 1 is the Gospel of the third Sunday of Advent of Year B; 20 December: Luke 1:26-38, the fourth. (7 June had John 6, the readings of Corpus Christi, and is one of the days the importer leaves out.)
+  assert.deepEqual(other, ['2026-12-13 John 1:6-8, 19-28', '2026-12-20 Luke 1:26-38']);
   assert.equal(litOf('2026-11-28').sundayCycle, 'A');
   assert.equal(litOf('2026-11-29').sundayCycle, 'B', 'Advent 2026 begins Year B: the first Sunday of Advent has Mark 13:33-37');
   assert.equal(EXPORT.rows.find((r) => r.date === '2026-11-29')!.gospel_ref, 'Mark 13:33-37');
   // Year II: the weeks 10 to 16 of Ordinary Time of 2026 read 1 and 2 Kings, Amos, Hosea, Isaiah and Micah in their weekdays, on the days with no memorial (Year I reads Genesis, Exodus, Leviticus ...)
   const weekday = new Set<string>();
-  for (const r of EXPORT.rows) {
+  for (const r of KEPT) {
     const lit = litOf(r.date);
     if (lit.season === 'ordinary' && lit.rank === 'weekday' && lit.week && lit.week >= 10 && lit.week <= 16 && !r.feast) weekday.add(`${lit.weekdayCycle} ${r.first_reading_ref.replace(/ \d.*$/, '')}`);
   }
   assert.deepEqual([...weekday].sort(), ['II 1 Kings', 'II 2 Chronicles', 'II 2 Kings', 'II Amos', 'II Hosea', 'II Isaiah', 'II Micah', 'II Sirach']);
 });
 
-check('the days where the data and the calendar of the app disagree about WHAT is read are named, so that nobody finds them by surprise', () => {
-  // Corpus Christi: the calendar of the app keeps it on the Thursday (the universal date) and the source has the readings of the weekday that day, and the readings of Corpus Christi on the Sunday after
+check('the days where the source has the readings of the United States and not those of the General Roman Calendar are left out: the day of the calendar, and one line that says the readings differ from country to country', () => {
+  const row = (key: string) => EXPORT.rows.find((r) => r.date === key)!;
+  // what the calendar of the app says on those days, and what the source has instead
   assert.equal(litOf('2026-06-04').title, 'The Most Holy Body and Blood of Christ (Corpus Christi)');
-  assert.equal(content.dayContent('2026-06-04').readings![0].reference, '2 Timothy 2:8-15', 'weekday readings under the title of Corpus Christi');
+  assert.equal(row('2026-06-04').first_reading_ref, '2 Timothy 2:8-15', 'weekday readings on the day the calendar calls Corpus Christi (the United States keeps Corpus Christi on the Sunday)');
   assert.equal(litOf('2026-06-07').title, '10th Sunday in Ordinary Time');
-  assert.equal(content.dayContent('2026-06-07').readings![3].reference, 'John 6:51-58', 'the Gospel of Corpus Christi under the title of the 10th Sunday');
-  // Trinity Sunday has no second reading in the data, and the Transfiguration neither
+  assert.equal(row('2026-06-07').gospel_ref, 'John 6:51-58', 'the Gospel of Corpus Christi on the 10th Sunday');
+  assert.equal(litOf('2026-11-26').title, 'Thursday of the 34th Week in Ordinary Time');
+  assert.equal(row('2026-11-26').second_reading_ref, '1 Corinthians 1:3-9', 'four readings on a weekday: the Mass of Thanksgiving Day of the United States');
+  assert.equal(litOf('2026-12-12').title, 'Saturday of the 2nd Week of Advent');
+  assert.equal(row('2026-12-12').first_reading_ref, 'Zechariah 2:14-17', 'the readings of Our Lady of Guadalupe, a feast in the United States, on a weekday of Advent');
+  for (const key of LEFT_OUT) {
+    const c = content.dayContent(key);
+    assert.equal(c.readings, null, `${key}: no readings`);
+    assert.equal(c.unavailable, READINGS_DIFFER, `${key}: they differ from country to country`);
+    assert.equal(c.title, litOf(key).title, `${key}: the day of the calendar, worked out on the phone, not the name the source gives it`);
+    assert.equal(c.under, null);
+    assert.equal(c.noSecond, false);
+    assert.deepEqual(content.dayBrief(key), { dateKey: key, title: litOf(key).title, under: null, readings: null, unavailable: READINGS_DIFFER });
+    assert.equal(lookup.recordFor(key), null);
+    assert.equal(lookup.differs(key), true);
+  }
+  // the days next to them are the ordinary ones, with readings and nothing to apologise for
+  for (const key of ['2026-06-03', '2026-06-05', '2026-06-06', '2026-06-08', '2026-11-25', '2026-11-27', '2026-12-11', '2026-12-13']) {
+    assert.ok(content.dayContent(key).readings, key);
+    assert.equal(content.dayContent(key).unavailable, null, key);
+    assert.equal(lookup.differs(key), false, key);
+  }
+  // and the days outside the data are "not in the app yet", not "differ": we know nothing of them
+  assert.equal(content.dayContent('2027-01-17').unavailable, NO_READINGS);
+  assert.equal(content.dayContent('2026-05-24').unavailable, NO_READINGS);
+  // Trinity Sunday has no second reading in the data (it says so), and the Transfiguration neither (a feast: the rule of the line is for Sundays and solemnities)
   assert.equal(content.dayContent('2026-05-31').readings!.length, 3);
+  assert.equal(content.dayContent('2026-05-31').noSecond, true);
   assert.equal(content.dayContent('2026-08-06').readings!.length, 3);
-  // the only reference that is not one of the forms we read
+  assert.equal(content.dayContent('2026-08-06').noSecond, false);
+  // the only reference of the export that is not one of the forms we read: the importer reduces it to its psalm, so every reference of the file is read
   const unread = EXPORT.rows.flatMap((r) => [r.first_reading_ref, r.psalm_ref, r.second_reading_ref, r.gospel_ref].filter((x): x is string => !!x && !!x.trim()).map((x) => ({ date: r.date, ref: x })))
     .filter(({ ref }) => parseReference(ref.replace(/\s*\[\^[^\]\s]*\]/g, '').replace(/^Psalm\/(?=\S)/, '').trim()) === null);
   assert.deepEqual(unread, [{ date: '2026-12-06', ref: 'Psalm 85:9-10-11-12, 13-14' }]);
+  const inFile = [...parseReadingsFile(FILE_2026)!.days].flatMap(([key, d]) => d.refs.filter((x): x is string => x !== null).map((x) => ({ date: key, ref: x }))).filter(({ ref }) => parseReference(ref) === null);
+  assert.deepEqual(inFile, [], 'every reference of the file is read');
+  assert.doesNotMatch(read('assets/library/daily/readings-2026.json'), /\d+-\d+-\d+-\d+/, 'no run of four numbers joined by hyphens, which no lectionary writes');
 });
 
 /** The words that a reading of the data may start or end in the middle of a sentence with, because the lectionary does: an epistle or a canticle that begins on a verse that goes on from the one before. */
@@ -524,34 +763,38 @@ const MID_SENTENCE = new Set([
 ]);
 
 check('every reading of the data that gets words starts where a sentence starts and ends where one ends, or is one of the readings that the lectionary starts or ends inside a sentence', () => {
-  let shown = 0, alone = 0, whole = 0;
+  let shown = 0, alone = 0;
+  const notes = { whole: 0, psalm: 0, part: 0, none: 0 };
   const aloneList: string[] = [];
   const unexpected: string[] = [];
   for (const [key, record] of parseReadingsFile(FILE_2026)!.days) {
     const day = content.dayContent(key);
     for (const reading of day.readings!) {
       const parsed = parseReference(record.refs[READING_KINDS.indexOf(reading.kind)]!);
-      if (!reading.text) { alone += 1; aloneList.push(`${key} ${reading.reference}`); continue; }
+      if (!reading.text) { alone += 1; aloneList.push(`${key} ${reading.reference}`); assert.ok(reading.noWords, `${key} ${reading.reference}: a reference with no words says why`); continue; }
+      assert.equal(reading.noWords, null, `${key} ${reading.reference}: words, and nothing to say about their absence`);
       shown += 1;
-      if (reading.text.whole) { whole += 1; continue; }
+      notes[reading.text.note ?? 'none'] += 1;
+      if (reading.text.note === 'whole' || reading.text.note === 'psalm') continue;
       const letters = !!parsed && parsed.segments.some((s) => s.l1 || s.l2);
+      assert.equal(letters, reading.text.note === 'part', `${key} ${reading.reference}: the note that a verse is shown whole is there when the reference has a letter, and only then`);
       if (letters) continue; // a part of a verse: the whole verse is shown, and it may start or end anywhere
       const verses = texts(reading.text.lines);
       const first = verses[0].text, last = verses[verses.length - 1].text;
-      const starts = /^[A-Z\u201c\u2018"'(0-9]/.test(first);
-      const ends = /[.!?\u201d\u2019"')]$/.test(last);
+      const starts = /^[A-Z“‘"'(0-9]/.test(first);
+      const ends = /[.!?”’"')]$/.test(last);
       if ((!starts || !ends) && !MID_SENTENCE.has(`${key} ${reading.kind}`)) unexpected.push(`${key} ${reading.kind} ${reading.reference}: ${starts ? '' : `starts "${first.slice(0, 40)}" `}${ends ? '' : `ends "${last.slice(-40)}"`}`);
     }
   }
   assert.deepEqual(unexpected, [], 'a reading that starts or ends in the middle of a sentence and is not on the list: a verse may be shifted');
-  assert.equal(shown + alone, 703, 'the references of the data');
-  assert.equal(alone, 15);
-  assert.equal(whole, 66, 'psalms shown whole (65, and the one whose verses cannot be read)');
+  assert.equal(shown + alone, 689, 'the references of the 217 days that have readings');
+  assert.equal(alone, 14);
+  assert.deepEqual(notes, { whole: 63, psalm: 109, part: 60, none: 443 }, 'what the words say about themselves: a psalm shown whole for named verses, a psalm the source names with no verses, a verse shown whole where the reference has a letter, and words that are what the reference names');
   assert.deepEqual(aloneList, [
     '2026-06-19 2 Kings 11:1-4, 9-18, 20', '2026-07-06 Hosea 2:16, 17c-18, 21-22', '2026-07-09 Hosea 11:1-4, 8e-9', '2026-07-10 Hosea 14:2-10', '2026-07-24 Jeremiah 31', '2026-07-27 Deuteronomy 32',
     '2026-08-07 Nahum 2:1, 3; 3:1-3, 6-7', '2026-08-17 Deuteronomy 32', '2026-09-08 Micah 5:1-4a', '2026-10-02 Job 38:1, 12-21; 40:3-5', '2026-10-25 Exodus 22:20-26',
-    '2026-11-29 Isaiah 63:16b-17, 19b; 64:2-7', '2026-12-12 Zechariah 2:14-17', '2026-12-20 Romans 16:25-27', '2026-12-23 Malachi 3:1-4, 23-24',
-  ], 'the readings that are shown by their reference alone, and why: the numbers differ, or the Bible has no such verse, or the source gives a chapter and no verses');
+    '2026-11-29 Isaiah 63:16b-17, 19b; 64:2-7', '2026-12-20 Romans 16:25-27', '2026-12-23 Malachi 3:1-4, 23-24',
+  ], 'the readings that are shown by their reference alone, and why: the numbers differ, or the Bible has no such verse, or the source gives a chapter and no verses (a person with a lectionary has to look at each)');
 });
 
 /* ======================================================================================== the pill of the banner */
@@ -571,5 +814,32 @@ check('the pill of the daily banner shares the row of the title on a phone wide 
   let last = false;
   for (let w = 280; w <= 500; w += 4) { const now = pillBesideTitle(w, 1, 1.2); assert.ok(!last || now, `wider is never narrower: ${w}`); last = now; }
 });
+
+/* ===================================================================================== when the data runs out */
+
+/** Is `today` plus `within` days past the last day of the data? (Whole days on the phone's calendar: a date as the three numbers it is, no clock time.) */
+const runsOutSoon = (today: Date, last: string, within = 30): boolean => {
+  const end = ymd(last);
+  return Date.UTC(today.getFullYear(), today.getMonth(), today.getDate() + within) > Date.UTC(end.y, end.m - 1, end.d);
+};
+
+check('the notice that the readings run out is worked out in whole days, 30 before the last day of the data', () => {
+  assert.equal(runsOutSoon(new Date(2026, 10, 9), '2026-12-31'), false, '9 November 2026: 52 days to go');
+  assert.equal(runsOutSoon(new Date(2026, 11, 1), '2026-12-31'), false, '1 December: 30 days to go');
+  assert.equal(runsOutSoon(new Date(2026, 11, 2), '2026-12-31'), true, '2 December: 29 days to go');
+  assert.equal(runsOutSoon(new Date(2026, 11, 31, 23, 59), '2026-12-31'), true);
+  assert.equal(runsOutSoon(new Date(2027, 0, 5), '2026-12-31'), true, 'and after the last day');
+  assert.equal(runsOutSoon(new Date(2026, 11, 2), '2027-12-31'), false, 'a file of 2027 would put it off a year');
+});
+
+// A NOTICE and never a failure: a test that failed on a date would turn every pull request red from the first of December. It only says, in the output of the run, that the readings are running out.
+{
+  const last = [...parseReadingsFile(FILE_2026)!.days.keys()].sort().at(-1)!;
+  if (runsOutSoon(new Date(), last)) {
+    const end = ymd(last);
+    const left = Math.round((Date.UTC(end.y, end.m - 1, end.d) - Date.UTC(new Date().getFullYear(), new Date().getMonth(), new Date().getDate())) / 86400000);
+    console.log(`NOTICE (not a failure): the readings of the Daily reading ${left >= 0 ? `run out in ${left} days, on ${last}` : `ran out ${-left} days ago, on ${last}`}. Add the days after it to Pascua's table and run tools/liturgy/import_readings.py (tools/liturgy/README.md, "Dates after 31 December 2026").`);
+  }
+}
 
 console.log(`${n} of ${n} passed`);

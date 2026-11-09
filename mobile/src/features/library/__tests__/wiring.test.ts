@@ -162,10 +162,15 @@ check('the banner of the daily reading (the Bible tab) is ONE button for a scree
   const compact = src.slice(src.indexOf('export function CompactBanner'), src.indexOf('export const DAILY_BANNER_MAX_HEIGHT'));
   assert.equal((daily.match(/<Pressable\b/g) ?? []).length, 1, 'the card is the one Pressable; the gold pill inside it is a View');
   assert.match(daily, /accessibilityRole="button"\s+accessibilityLabel=\{\[DAILY_CTA, DAILY_TITLE, label, brief\.title, spoken\]\.filter\(Boolean\)\.join\('\. '\)\}\s+accessibilityHint="Opens today's reading and the calendar"\s+onPress=\{onOpen\}/, 'the pill\'s words, the title, the date, the day, then the readings');
-  assert.match(daily, /const spoken = brief\.readings \? `Readings: \$\{readingsSpoken\(brief\.readings\)\}` : NO_READINGS;/, 'the readings said with their references; a day with none says so');
+  assert.match(daily, /const spoken = brief\.readings \? `Readings: \$\{readingsSpoken\(brief\.readings\)\}` : brief\.unavailable;/, 'the readings said with their references in words; a day with none says so (not in the app yet, or differing from country to country)');
   assert.match(daily, /const brief = useMemo\(\(\) => dayBrief\(dateKey\(todayOf\(now\)\)\), \[now\]\);/, 'what the day is and its references: the same function as the screen, without opening a book of the Bible');
-  assert.match(daily, /const line = brief\.readings \? readingsLine\(brief\.readings\) : NO_READINGS;/);
+  assert.match(daily, /const line = brief\.readings \? readingsLine\(brief\.readings\) : brief\.unavailable;/);
+  assert.doesNotMatch(daily, /NO_READINGS|READINGS_DIFFER/, 'the words of a day with no readings come with the day: the banner does not choose between them');
   assert.match(daily, /const \[now, setNow\] = useState\(\(\) => new Date\(\)\);\s+useFocusEffect\(useCallback\(\(\) => \{ setNow\(new Date\(\)\); \}, \[\]\)\);/, 'the date is read again whenever the Library comes into view');
+  assert.match(daily, /const sub = AppState\.addEventListener\('change', \(state\) => \{ if \(state === 'active'\) setNow\(new Date\(\)\); \}\);\s+return \(\) => sub\.remove\(\);/, 'and when the app comes back to the front, and the listener goes with the card');
+  assert.match(daily, /const timer = setTimeout\(\(\) => setNow\(new Date\(\)\), msUntilTomorrow\(now\) \+ 1000\);\s+return \(\) => clearTimeout\(timer\);\s+\}, \[now\]\);/, 'and at the next midnight of the phone: one timer, set again each time the date is read, and cleared when the card goes');
+  assert.equal((daily.match(/setTimeout\(/g) ?? []).length, 1, 'one timer in the card');
+  assert.doesNotMatch(daily, /setInterval/, 'never an interval');
   assert.match(daily, /<AppText variant="mono"[^>]*numberOfLines=\{1\}[^>]*>\{label\}<\/AppText>/, 'the date and the weekday: JetBrains Mono');
   assert.match(daily, /<AppText variant="h4"[^>]*>\{DAILY_TITLE\}<\/AppText>/, 'the title: Fraunces');
   assert.match(daily, /<AppText variant="label"[^>]*>\{brief\.title\}<\/AppText>/, 'the day: Inter at 17');

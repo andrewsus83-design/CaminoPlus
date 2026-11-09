@@ -11,7 +11,8 @@
 //   "Exodus 34:4b-6,8-9", "Psalm 118:1-2, 12abcd"   a letter after a verse is a part of it (the lectionary reads the first or the second half)
 //   "Psalm 87"                         a whole psalm (a whole chapter of any other book is refused: the lectionary does not read one)
 //   "Philemon 7-20", "Jude 1:17"       a book of one chapter, with or without its chapter
-// A part of a verse (4b, 10a) is read as the whole verse: the text says so under it only where the words are wider than the reference (a psalm); the reference keeps its letter.
+// A part of a verse (4b, 10a) is read as the whole verse and the text says so (PassageText.note); the reference keeps its letter. A verse that two runs share ("8-9a, 9bc-10": the lectionary reads
+// the first half of 9, then the second) is shown once, and the two runs join with no gap between them.
 //
 // WHAT CAN GO WRONG WITH THE WORDS, AND WHAT IS DONE ABOUT IT. The numbers of the lectionary are those of the Hebrew Bible (the Catholic lectionaries follow them), and the words
 // of the app are the World English Bible, which numbers the verses the English way. The two agree nearly everywhere and differ in a known set of places, where a verse number of the
@@ -143,6 +144,41 @@ export function shortReference(ref: Reference): string {
   return ref.code === 'PSA' ? `${nameOf('PSA')} ${ref.segments[0].c1}` : formatReference(ref);
 }
 
+/** The name of a book as a voice says it: "1 Thessalonians" is "First Thessalonians"; every other name is as the list has it. */
+const spokenName = (code: string): string => nameOf(code).replace(/^([123]) /, (_, digit: string) => `${['', 'First', 'Second', 'Third'][Number(digit)]} `);
+
+/**
+ * The reference as a screen reader should say it: "Wisdom, chapter 6, verses 12 to 16". The written form ("6:12-16") is read as a time or a ratio by some voices, and "63:2, 3-4, 5-6" as a list of
+ * sums. A letter after a verse stays ("21b": the lectionary reads a part of the verse). A psalm is its number and its verses ("Psalm 63, verses 2, 3 to 4 and 5 to 6"); a whole chapter has no verses;
+ * a book of one chapter has no chapter ("Philemon, verses 7 to 20"); a run over a chapter says both ends ("chapter 9, verse 36 to chapter 10, verse 8").
+ */
+export function spokenReference(ref: Reference): string {
+  const psalm = ref.code === 'PSA';
+  const single = bookByCode(ref.code)?.chapters === 1;
+  type Piece = { chapter: number; items: string[] } | { span: string };
+  const pieces: Piece[] = [];
+  for (const s of ref.segments) {
+    if (s.v1 === null) { pieces.push({ chapter: s.c1, items: [] }); continue; }
+    const v2 = s.v2 ?? s.v1;
+    if (s.c1 !== s.c2) { pieces.push({ span: `chapter ${s.c1}, verse ${s.v1}${s.l1} to chapter ${s.c2}, verse ${v2}${s.l2}` }); continue; }
+    const item = s.v1 === v2 && s.l1 === s.l2 ? `${s.v1}${s.l1}` : `${s.v1}${s.l1} to ${v2}${s.l2}`;
+    const last = pieces[pieces.length - 1];
+    if (last && 'items' in last && last.chapter === s.c1 && last.items.length > 0) last.items.push(item);
+    else pieces.push({ chapter: s.c1, items: [item] });
+  }
+  const verses = (items: string[]): string => `${items.length > 1 || items[0].includes(' to ') ? 'verses' : 'verse'} ${items.length > 1 ? `${items.slice(0, -1).join(', ')} and ${items[items.length - 1]}` : items[0]}`;
+  const say = (piece: Piece): string => {
+    if ('span' in piece) return piece.span;
+    if (psalm) return `${nameOf('PSA')} ${piece.chapter}${piece.items.length > 0 ? `, ${verses(piece.items)}` : ''}`;
+    if (piece.items.length === 0) return `chapter ${piece.chapter}`;
+    return single ? verses(piece.items) : `chapter ${piece.chapter}, ${verses(piece.items)}`;
+  };
+  return psalm ? pieces.map(say).join('; ') : `${spokenName(ref.code)}, ${pieces.map(say).join('; ')}`;
+}
+
+/** The spoken form for a line with little room, like shortReference: a psalm is its number alone, every other reading is said in full. */
+export const spokenShort = (ref: Reference): string => (ref.code === 'PSA' ? shortReference(ref) : spokenReference(ref));
+
 /**
  * The chapters where the verse numbers of the lectionary (the Hebrew ones) and those of this Bible (the English ones) are known to differ, by the code of the book. A reference that
  * touches one has no words under it. The Psalms are not here: they have their own rule (the title). The first book of Moses to the second of Chronicles and Nehemiah are the places where
@@ -163,11 +199,23 @@ export const touchesDifferingChapter = (ref: Reference): boolean => {
   return !!list && ref.segments.some((s) => list.some((c) => c >= s.c1 && c <= s.c2));
 };
 
-/** One line of a passage: a verse with its label, or a gap where the lectionary skips verses. In a whole psalm shown for a selection of its verses the label is left out (the numbers are not the lectionary's). */
-export type PassageLine = { n: string; text: string } | { gap: true };
+/**
+ * One line of a passage: a verse with its label (`n`, as the Bible prints it) and the chapter it is in (`c`), or a gap where the lectionary skips verses. In a whole psalm shown for a selection of
+ * its verses the label is left out (the numbers are not the lectionary's).
+ */
+export type PassageLine = { n: string; c: number; text: string } | { gap: true };
 
-/** The words of a reference. `whole` is true when a psalm is shown whole although the reference names some of its verses. */
-export type PassageText = { lines: readonly PassageLine[]; whole: boolean };
+/**
+ * What the words say about themselves when they are not exactly what the reference names, to be shown above them:
+ *   'whole'  a psalm with a title shown whole, although the reference names some of its verses (the numbers of the lectionary count the title);
+ *   'psalm'  a psalm shown whole because the reference names the psalm and no verses;
+ *   'part'   a verse shown whole where the reference has a letter after its number (4b: the lectionary reads a part of it);
+ *   null     the words are what the reference names.
+ */
+export type PassageNote = 'whole' | 'psalm' | 'part' | null;
+
+/** The words of a reference. */
+export type PassageText = { lines: readonly PassageLine[]; note: PassageNote };
 
 /** The printed verses of a run that are in the chapters, or null when a chapter or an end of the run is not in the text. A verse with no words is left out, as the lectionary leaves it. */
 function versesOf(chapters: readonly Chapter[], s: Segment): Array<{ chapter: number; verse: Verse }> | null {
@@ -221,20 +269,27 @@ export function readPassage(ref: Reference, source: TextSource): PassageText | n
     } else if (segments.some((s) => s.v1 === null)) return null;
 
     const lines: PassageLine[] = [];
+    const given = new Set<string>(); // "chapter:label" of every verse already in `lines`
     let last: { chapter: number; end: number } | null = null;
     for (const s of segments) {
       const found = versesOf(chapters, s);
       if (!found) return null;
-      const first = found[0];
+      // a verse that an earlier run gave is not given again: "8-9a, 9bc-10" reads verse 9 in two halves, and its words are one
+      const fresh = found.filter(({ chapter, verse }) => !given.has(`${chapter}:${verse.n}`));
+      if (fresh.length === 0) continue;
+      const first = fresh[0];
       const startAt = labelEnds(first.verse.n)[0];
       const follows = !!last && ((last.chapter === first.chapter && startAt === last.end + 1) || (last.chapter + 1 === first.chapter && startAt === 1));
       if (last && !follows && !whole) lines.push({ gap: true });
-      for (const { chapter, verse } of found) {
-        lines.push({ n: whole ? '' : verse.n, text: verseText(verse) });
+      for (const { chapter, verse } of fresh) {
+        lines.push({ n: whole ? '' : verse.n, c: chapter, text: verseText(verse) });
+        given.add(`${chapter}:${verse.n}`);
         last = { chapter, end: labelEnds(verse.n)[1] };
       }
     }
-    return { lines, whole };
+    const named = ref.code === 'PSA' && ref.segments.every((s) => s.v1 === null);
+    const part = ref.segments.some((s) => s.v1 !== null && (s.l1 !== '' || s.l2 !== ''));
+    return { lines, note: whole ? 'whole' : named ? 'psalm' : part ? 'part' : null };
   } catch {
     return null;
   }
