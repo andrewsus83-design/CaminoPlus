@@ -252,7 +252,8 @@ export type PreparedMedia = {
 };
 
 /** Upload photos/videos of a post to the private user-media bucket and register them in post_media (with the storage key
- *  of the photo's thumbnail in thumb_path). Returns how many failed (the server refuses uploads over the plan's storage).
+ *  of the photo's thumbnail in thumb_path). Returns how many failed (the server refuses uploads over the plan's storage)
+ *  and the plain reasons this phone gave for refusing some.
  *  The order of the steps and when files are deleted: src/lib/postMediaUpload.ts. */
 export async function uploadPostMedia(userId: string, postId: string, items: PreparedMedia[]) {
   await assertOnline();

@@ -67,13 +67,13 @@ check('what a failed insert means: a clear refusal deletes, 23505 is stored, no 
 
 check('post media: the row is written with the thumbnail key and the size that is STORED', async () => {
   const log: string[] = [];
-  assert.equal(await uploadPostMediaWith(postDeps(log, { ok: true }), 'u1', 'p1', [item()]), 0);
+  assert.equal((await uploadPostMediaWith(postDeps(log, { ok: true }), 'u1', 'p1', [item()])).failed, 0);
   assert.deepEqual(log, ['upload u1/posts/p1-0.jpg', 'upload u1/posts/p1-0-thumb.jpg', 'insert u1/posts/p1-0.jpg u1/posts/p1-0-thumb.jpg 1234']);
 });
 
 check('post media: a clear refusal of the row deletes both files', async () => {
   const log: string[] = [];
-  assert.equal(await uploadPostMediaWith(postDeps(log, { ok: false, status: 403, code: '42501' }), 'u1', 'p1', [item()]), 1);
+  assert.equal((await uploadPostMediaWith(postDeps(log, { ok: false, status: 403, code: '42501' }), 'u1', 'p1', [item()])).failed, 1);
   assert.equal(log.at(-1), 'delete u1/posts/p1-0.jpg,u1/posts/p1-0-thumb.jpg');
   assert.ok(!log.includes('exists?'));
 });
@@ -81,7 +81,7 @@ check('post media: a clear refusal of the row deletes both files', async () => {
 check('post media: no answer, and the row IS there (the insert landed): nothing deleted, counted as uploaded', async () => {
   for (const insert of ['throw', { ok: false as const, status: 0, code: '' }, { ok: false as const, status: 503, code: null }] as Insert[]) {
     const log: string[] = [];
-    assert.equal(await uploadPostMediaWith(postDeps(log, insert, true), 'u1', 'p1', [item()]), 0);
+    assert.equal((await uploadPostMediaWith(postDeps(log, insert, true), 'u1', 'p1', [item()])).failed, 0);
     assert.ok(log.includes('exists?'));
     assert.ok(!log.some((l) => l.startsWith('delete')), log.join(' | '));
   }
@@ -89,19 +89,29 @@ check('post media: no answer, and the row IS there (the insert landed): nothing 
 
 check('post media: no answer and no row: the files are deleted; the question fails too: the files stay (the server sweep takes them)', async () => {
   const log: string[] = [];
-  assert.equal(await uploadPostMediaWith(postDeps(log, 'throw', false), 'u1', 'p1', [item()]), 1);
+  assert.equal((await uploadPostMediaWith(postDeps(log, 'throw', false), 'u1', 'p1', [item()])).failed, 1);
   assert.equal(log.at(-1), 'delete u1/posts/p1-0.jpg,u1/posts/p1-0-thumb.jpg');
   const log2: string[] = [];
-  assert.equal(await uploadPostMediaWith(postDeps(log2, 'throw', 'throw'), 'u1', 'p1', [item()]), 1);
+  assert.equal((await uploadPostMediaWith(postDeps(log2, 'throw', 'throw'), 'u1', 'p1', [item()])).failed, 1);
   assert.ok(!log2.some((l) => l.startsWith('delete')), log2.join(' | '));
 });
 
 check('post media: 23505 (an earlier try already stored the row) is uploaded, nothing deleted; names: photos .jpg, clips .mp4 / .mov', async () => {
   const log: string[] = [];
   const items = [item({ mimeType: 'image/heic' }), item({ type: 'video', mimeType: 'video/quicktime', thumbUri: null }), item({ type: 'video', mimeType: 'video/mp4', thumbUri: null })];
-  assert.equal(await uploadPostMediaWith(postDeps(log, { ok: false, status: 409, code: '23505' }), 'u1', 'p1', items), 0);
+  assert.equal((await uploadPostMediaWith(postDeps(log, { ok: false, status: 409, code: '23505' }), 'u1', 'p1', items)).failed, 0);
   assert.ok(!log.some((l) => l.startsWith('delete')));
   assert.ok(log.includes('upload u1/posts/p1-0.jpg') && log.includes('upload u1/posts/p1-1.mov') && log.includes('upload u1/posts/p1-2.mp4'), log.join(' | '));
+});
+
+check('post media: a file this phone refused (its place could not be removed) gives its own reason, not "check your connection"', async () => {
+  const d = postDeps([], { ok: true });
+  d.upload = async () => { throw Object.assign(new Error(VIDEO_LOCATION_REFUSED_MESSAGE), { refused: true }); };
+  const r = await uploadPostMediaWith(d, 'u1', 'p1', [item({ type: 'video', mimeType: 'video/mp4', thumbUri: null })]);
+  assert.deepEqual(r, { failed: 1, reasons: [VIDEO_LOCATION_REFUSED_MESSAGE] });
+  const net = postDeps([], { ok: true });
+  net.upload = async () => { throw new Error('Network request failed'); };
+  assert.deepEqual(await uploadPostMediaWith(net, 'u1', 'p1', [item()]), { failed: 1, reasons: [] });
 });
 
 /* ------------------------------------------------------------------ chat photos that are deleted from the outbox */

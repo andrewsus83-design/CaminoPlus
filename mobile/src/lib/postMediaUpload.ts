@@ -6,7 +6,7 @@
 // - a clear refusal (a 4xx answer other than 408 / 429, or a Postgres error code) means no row: delete;
 // - 23505 (the row is already there, an earlier try landed) means stored: keep, and count it as uploaded;
 // - anything else (no answer, a time-out, a 5xx) is unknown: ask the database whether the row is there. No row: delete.
-//   A row: keep, uploaded. The question fails too: keep the files (the server's orphan sweep will take them if needed).
+//   A row: keep, uploaded. The question fails too: keep the files (only a later server job, not built yet, can remove them).
 
 export type PreparedUpload = {
   uri: string; type: 'image' | 'video'; mimeType: string;
@@ -33,9 +33,13 @@ export function insertOutcome(a: { status?: number | null; code?: string | null 
   return 'unknown';
 }
 
-/** Returns how many items could not be uploaded. */
-export async function uploadPostMediaWith(d: PostMediaDeps, userId: string, postId: string, items: readonly PreparedUpload[]): Promise<number> {
+/** How many items could not be uploaded, and the plain reasons this phone gave for refusing some of them (the upload's own
+ *  refusal, for example a clip whose recording place could not be removed). */
+export type PostMediaResult = { failed: number; reasons: string[] };
+
+export async function uploadPostMediaWith(d: PostMediaDeps, userId: string, postId: string, items: readonly PreparedUpload[]): Promise<PostMediaResult> {
   let failed = 0;
+  const reasons: string[] = [];
   for (let i = 0; i < items.length; i++) {
     const m = items[i];
     const uploaded: string[] = [];
@@ -77,10 +81,11 @@ export async function uploadPostMediaWith(d: PostMediaDeps, userId: string, post
       if (outcome === 'stored') continue;
       failed++;
       if (outcome === 'rejected') await Promise.resolve(d.deleteFiles(uploaded)).catch(() => {});
-    } catch {
+    } catch (e) {
       failed++; // an upload failed: a file that went up before it has no row and never will
+      if (e && typeof e === 'object' && (e as { refused?: boolean }).refused === true && e instanceof Error) reasons.push(e.message);
       if (uploaded.length) await Promise.resolve(d.deleteFiles(uploaded)).catch(() => {});
     }
   }
-  return failed;
+  return { failed, reasons };
 }

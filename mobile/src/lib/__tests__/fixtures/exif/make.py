@@ -81,6 +81,30 @@ cases = {
     # MPF: a second JPEG with its own GPS EXIF appended after the first image's EOI
     'mpf_secondary': with_segments(j, [app(0xE1, b'Exif\0\0' + tiff(True))]) + with_segments(j, [app(0xE1, b'Exif\0\0' + tiff(True))]),
 }
+
+
+def thumb_then_gps(le=True):
+    """EXIF whose IFD1 thumbnail (a small JPEG with its own SOS) comes BEFORE the GPS block, and whose APP1 length is
+    broken (1): a reader that searches for the first FF DA finds the thumbnail's and must not stop there."""
+    e = '<' if le else '>'
+    thumb = base_jpeg(16, 12)
+    hdr = (b'II' if le else b'MM') + struct.pack(e + 'HI', 42, 8)
+    ifd0_at = 8
+    ifd1_at = ifd0_at + 2 + 1 * 12 + 4
+    thumb_at = ifd1_at + 2 + 2 * 12 + 4
+    gps_at = thumb_at + len(thumb)
+    data_at = gps_at + 2 + 2 * 12 + 4
+    ifd0 = struct.pack(e + 'H', 1) + struct.pack(e + 'HHII', 0x8825, 4, 1, gps_at) + struct.pack(e + 'I', ifd1_at)
+    ifd1 = struct.pack(e + 'H', 2) + struct.pack(e + 'HHII', 0x0201, 4, 1, thumb_at) + struct.pack(e + 'HHII', 0x0202, 4, 1, len(thumb)) + struct.pack(e + 'I', 0)
+    gps = struct.pack(e + 'H', 2) + struct.pack(e + 'HHII', 2, 5, 3, data_at) + struct.pack(e + 'HHII', 4, 5, 3, data_at + 24) + struct.pack(e + 'I', 0)
+    vals = struct.pack(e + 'IIIIII', 0x0A1B2C3D, 1, 0x0B2C3D4E, 1, 0x0C3D4E5F, 1) * 2
+    seg = app(0xE1, b'Exif\0\0' + hdr + ifd0 + ifd1 + thumb + gps + vals)
+    seg = seg[:2] + b'\x00\x01' + seg[4:]  # the broken length
+    return j[:2] + seg + j[2:]
+
+
+cases['broken_len_thumb_before_gps'] = thumb_then_gps()
+
 for k, v in cases.items():
     open(os.path.join(OUT, k + '.jpg'), 'wb').write(v)
 print('\n'.join(cases))

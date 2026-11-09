@@ -122,9 +122,25 @@ function clearGps(b: Uint8Array, tiff: number, end: number): number {
   return removed;
 }
 
-/** Where the picture data of the first image starts (its SOS marker, FF DA), or the end of the file. */
+/**
+ * Where the picture data of the first image starts (its SOS marker, FF DA), found by walking the segments from the start
+ * by their lengths, never by searching bytes (a thumbnail inside the EXIF block has an FF DA of its own). When the walk
+ * cannot go on (a broken length), the answer is "not known": the end of the file, so nothing is skipped.
+ */
 function firstScan(b: Uint8Array): number {
-  for (let i = 2; i + 1 < b.length; i++) if (b[i] === 0xff && b[i + 1] === 0xda) return i;
+  let i = 2;
+  while (i + 1 < b.length) {
+    if (b[i] === 0x00) { i++; continue; } // a padding byte between segments
+    if (b[i] !== 0xff) return b.length;
+    const m = b[i + 1];
+    if (m === 0xff) { i++; continue; } // fill byte
+    if (m === 0xda) return i;
+    if (m === 0x01 || (m >= 0xd0 && m <= 0xd8)) { i += 2; continue; } // markers without a length
+    if (i + 4 > b.length) return b.length;
+    const len = (b[i + 2] << 8) | b[i + 3];
+    if (len < 2 || i + 2 + len > b.length) return b.length;
+    i += 2 + len;
+  }
   return b.length;
 }
 
@@ -148,7 +164,7 @@ export function stripJpegLocation(input: Uint8Array): { bytes: Uint8Array; remov
     // Without a proper segment header, only a block before the first picture data is touched: compressed picture data
     // that happens to contain these bytes is never changed.
     if (end < 0 && id > sos) continue;
-    const bound = end > 0 ? end : Math.min(b.length, id + MAX_SEGMENT, sos);
+    const bound = end > 0 ? end : Math.min(b.length, id + MAX_SEGMENT);
     if (clearGps(b, id + EXIF_ID.length, bound) > 0) removed = true;
   }
   for (const [ids, markers] of [[XMP_IDS, [0xe1]], [[PHOTOSHOP_ID], [0xed]]] as const) {
