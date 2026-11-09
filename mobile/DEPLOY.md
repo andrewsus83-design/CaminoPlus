@@ -88,6 +88,104 @@ Two things only the owner can do, in the GitHub settings of the repository (and,
 | **Offline map packs** | Settings > Environments > New environment `pack-publish`; limit its deployment branches to `main`; put the secrets `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` into **that environment** (not into the repository secrets). Then Actions > offline-maps > Run workflow: branch `main`, tick `publish`, `stages` = `camino-frances-01`, and check that `offline_packs` has one current row. The whole sequence: [tools/offline-maps/README.md](../tools/offline-maps/README.md#first-publish-step-by-step). | `offline_packs` is empty (read on 8 November 2026) and the `offline-maps` workflow has never run, by hand or on its schedule, so no stage can be downloaded and the Offline maps screen says "Map not published yet". |
 | **Updates over the air** | Settings > Secrets and variables > Actions: the secret `EXPO_TOKEN` (made at expo.dev > Account settings > Access tokens) and the variable `EAS_UPDATE_ENABLED` with the value `true`. A preview build made now already carries the update address, so it takes the updates that follow. | The `eas-update` runs after the latest merges to `main` all show `skipped`: a merge reaches no phone by itself, and every JavaScript change needs a new build. |
 
+## Release 1.2.0: the store build
+
+**Store build 1.2.0** is the first build meant for the App Store and Google Play. It fixes what the two stores look at first: the icon, the launch screen, the permission texts and the permissions themselves. All of it is native, so **it needs a new build and no update can carry it**. The native fingerprint of 1.1.0 stays `ef37d5816b2829366ff35defbb05f59fb13c3705`. The fingerprint of 1.2.0 is a different one, on purpose: these changes, Sign in with Apple and the photo and video modules each move it. Read the new value with the command in "Release 1.1.0" above when all three are merged, and put it in the CHANGELOG entry of 1.2.0. A phone with a 1.1.0 build takes no update made for 1.2.0, and the other way round.
+
+### What changed natively, and why
+
+| Part | In 1.1.0 | In the store build | Why |
+|---|---|---|---|
+| iOS app icon (`assets/icon.png`) | The blue chevron of the Expo template | The brand shell on Atlantic Blue, 1024 x 1024, no alpha channel, square corners | A template icon is a review risk. App Store Connect refuses an icon with transparency, and iOS rounds the corners itself. |
+| Android icon (`assets/android-icon-*.png`) | The template | An adaptive icon: the shell in front, a blue layer behind, and a one-colour shell for Android 13 themed icons. The art stays inside the safe circle (66 dp of 108). | The launcher cuts the icon to its own shape and keeps only the middle. |
+| Launch screen | White, no picture | The shell in its blue circle (the picture is 200 wide, the circle in it about 117) on parchment (`#F6EFE2`, the colour of `role.bg`). On Android, when the phone is in dark mode, the page colour of dark mode (`#0F1A2B`). | The first thing a person sees. The iPhone has no dark launch screen: the app is pinned to light (`userInterfaceStyle`), so it would never show. |
+| Play Store icon | None | `brand/store/play-store-icon-512.png`, not in the app | Play Console asks for a 512 x 512 PNG with alpha. |
+| Devices | iPhone and iPad | iPhone only (`supportsTablet: false`) | The layouts are phone layouts, stretched on an iPad. People with an iPad can still install the app and use it in an iPhone-size window. To offer a real iPad version later, set it back to `true` after the screens have been looked at on an iPad. |
+| iOS permission texts | Generic ("Allow CaminoPlus to access your location", camera, microphone, motion) | The location texts say what the app does and that it never tracks in the background. No microphone key, no motion key. The camera key says CaminoPlus does not use the camera. | Apple asks for accurate purpose strings. The texts are in `app.json` and pinned by `tools/tests/test_store_config.py`. |
+| Android permissions | CAMERA, RECORD_AUDIO, SYSTEM_ALERT_WINDOW, VIBRATE, READ_EXTERNAL_STORAGE and WRITE_EXTERNAL_STORAGE came in from the template and from libraries | All six are blocked in `app.json` (`blockedPermissions`, and the plugins' own switches), so no library can bring them back. Left: location, internet, and the state of the network and of Wi-Fi. | Nothing in the app uses them. People see the list when they install. |
+| Location on Android | Two services of expo-location, declared with `foregroundServiceType="location"` | Removed from the merged manifest, and GPS is declared as wanted, not required (`plugins/withStoreManifest.js`) | The app never tracks in the background. Those services bring Google Play's foreground-service questions with them. Without the GPS line, Google Play hides the app from tablets without GPS. |
+| Auto Backup (Android) | On | Off (`allowBackup: false`) | It would copy the diary on the phone to the cloud and put it on another phone, where the keys of `expo-secure-store` do not exist. The price: a new phone starts without the diary pages that were never published (what was published is in the cloud). |
+| Android build | The EAS default | `production` builds an app bundle (`app-bundle`), `preview` stays an APK | Google Play takes bundles. |
+
+### What depends on what
+
+- **The storage permissions and the photo picker.** READ_EXTERNAL_STORAGE and WRITE_EXTERNAL_STORAGE can only be blocked when no screen asks for the media-library permission. Before the media change (photo and video modules) three places do: `app/write.tsx`, `src/features/social/pick.ts` and `src/lib/avatar.ts` call `requestMediaLibraryPermissionsAsync()` before they open the picker. On Android 12 and older, with the permission removed, that question is answered "no" and the picker never opens. The picker itself needs no permission (it is the system's photo picker). The media change deletes those three calls, so **both changes must be in the same build.** `tools/tests/test_store_config.py` lists those three files, allows nothing else, and says to empty the list once they are gone.
+- **The camera.** CAMERA is blocked on Android. On iOS the camera key stays (with its true text) because the picker library contains a camera permission helper that the app never calls, and App Store Connect reads the binary, not the code that runs: it asks for a purpose string for every protected API a library mentions. If the store build is still refused with "Missing Purpose String" for another key (for example `NSMicrophoneUsageDescription`), add that key with a true text as a plugin option in `app.json` and build again with a new build number.
+- **Photos.** `NSPhotoLibraryUsageDescription` stays, for the same reason.
+- **A new feature that uses the camera, the microphone or the background** has to change `app.json` first. The tests fail until it does.
+
+### See it before a store sees it
+
+On a scratch copy of what is committed, never in the repository: `ios/` and `android/` are generated and are not committed.
+
+```bash
+mkdir /tmp/store-check && git archive HEAD mobile | tar -x -C /tmp/store-check && cd /tmp/store-check/mobile
+npm ci
+npx expo prebuild --no-install --clean
+grep -A1 UsageDescription ios/CaminoPlus/Info.plist                    # no microphone, no motion; the location texts; the camera text
+grep TARGETED_DEVICE_FAMILY ios/CaminoPlus.xcodeproj/project.pbxproj   # "1" (iPhone only)
+grep -E "uses-permission|uses-feature|allowBackup|<service" android/app/src/main/AndroidManifest.xml
+npx expo-doctor                                                         # 20 of 20 checks
+```
+
+To prove that the iOS project compiles, with **no Apple account** (a simulator build is not signed: no certificate, no profile, no device):
+
+```bash
+cd mobile
+npx eas-cli build --platform ios --profile development-simulator
+```
+
+It builds the development client in the Debug configuration, so it shows a compile error in the native code now and not on the day of the store build. The Release configuration (optimised, and the one that removes the dev launcher's local-network keys) is first built by the production build.
+
+### The store builds and the submit
+
+Run in `mobile/`, signed in with `npx eas-cli login`. `eas.json` has no `submit` details on purpose: an id that is made up to fill the file would send a build to the wrong place. The real ones go in only when they are known, or `eas submit` asks for them.
+
+| Store | Before the first build | Build | Submit |
+|---|---|---|---|
+| App Store | An Apple Developer Program membership (paid, by the owner). The app made in App Store Connect with the bundle identifier `plus.camino.app`. The first build asks to sign in with that Apple account and makes the certificates and the profile itself. | `npx eas-cli build --profile production --platform ios` | `npx eas-cli submit --profile production --platform ios`. If it asks for the app's numeric Apple ID (App Store Connect > the app > App Information), that number can go in `eas.json` as `submit.production.ios.ascAppId` once it is known. |
+| Google Play | A Google Play developer account. The app made in Play Console with the package name `plus.camino.app`. A service account of that Play Console account with a JSON key (Expo's guide: [docs.expo.dev/submit/android](https://docs.expo.dev/submit/android/)). The key stays on the owner's computer or in EAS (`npx eas-cli credentials`), never in this repository. | `npx eas-cli build --profile production --platform android` (an `.aab`) | `npx eas-cli submit --profile production --platform android`. A first submission lands on the internal testing track. A key kept as a file goes in `eas.json` as `submit.production.android.serviceAccountKeyPath`, a path outside the repository. |
+
+A personal Google Play developer account made after 13 November 2023 must run a closed test with at least 12 testers, opted in for at least 14 days, before it can ask for production access (Google's rule, [support.google.com/googleplay/android-developer/answer/14151465](https://support.google.com/googleplay/android-developer/answer/14151465)). The listing, the Data safety form and the review notes are not part of this build.
+
+### The first Android bundle: check it before it goes up
+
+Nobody has run these on a real bundle yet. You need `bundletool` (the jar from Google's GitHub releases), `zipalign` from Android build-tools 35 or newer, and `objdump`. Download the `.aab` from the page of the build on expo.dev.
+
+```bash
+# 1. The bundle is well formed, and the manifest in it is the one you expect
+java -jar bundletool.jar validate --bundle=app.aab
+java -jar bundletool.jar dump manifest --bundle=app.aab | grep -E "uses-permission|uses-feature|allowBackup|targetSdkVersion|foregroundServiceType"
+#    Expected: location, internet, and the state of the network and of Wi-Fi (and AndroidX's own DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION, which
+#    every app has). No CAMERA, RECORD_AUDIO, SYSTEM_ALERT_WINDOW, VIBRATE, READ/WRITE_EXTERNAL_STORAGE, FOREGROUND_SERVICE*. allowBackup false.
+#    targetSdkVersion 36. The GPS feature with required false. No foregroundServiceType.
+
+# 2. A universal APK made from the bundle, for the next two checks
+java -jar bundletool.jar build-apks --bundle=app.aab --mode=universal --output=app.apks
+unzip -o app.apks universal.apk -d check
+
+# 3. Native libraries aligned for 16 KB memory pages (Google's rule: from 1 February 2027 an update without it cannot be released)
+zipalign -c -P 16 -v 4 check/universal.apk
+
+# 4. And inside each 64-bit library: a line is printed only for a library with a segment smaller than 16 KB (align 2**13 and below)
+unzip -o check/universal.apk 'lib/arm64-v8a/*.so' 'lib/x86_64/*.so' -d check/libs
+for f in check/libs/lib/*/*.so; do objdump -p "$f" | grep -q 'LOAD.*align 2\*\*1[0-3]' && echo "not 16 KB: $f"; done
+```
+
+The two 32-bit ABIs (`armeabi-v7a`, `x86`) may stay at 4 KB: the rule is for 64-bit libraries. Check 4 prints nothing when all is well. Google's page: [developer.android.com/guide/practices/page-sizes](https://developer.android.com/guide/practices/page-sizes).
+
+### What to look at on the phone
+
+Nobody has looked at these on a phone yet. When the build runs:
+
+| Where | What you should see |
+|---|---|
+| Home screen | The shell on blue. On Android 13 or newer with themed icons switched on (on a Pixel: Settings > Wallpaper & style): a one-colour shell. |
+| Opening the app | A parchment screen with the blue circle and the gold shell in the middle, not a white screen. On Android with dark mode on: the dark page colour. |
+| First time Maps asks for the location | The text of `locationWhenInUsePermission` in `app.json`. |
+| Phone settings > CaminoPlus | Location, and on iPhone Photos. No Camera, Microphone or Motion. On Android, Location only. |
+| An iPad (compatibility mode) | The app opens in an iPhone-size window. |
+
 ## How a phone knows an update fits
 
 Every build carries the **fingerprint** of its native code (Expo computes it from the native modules, permissions and
