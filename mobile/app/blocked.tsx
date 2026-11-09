@@ -11,7 +11,7 @@ import { EmptyState, ErrorState, LoadingRows, Notice } from '@/features/social/c
 import { personName, shortDate, unblockMessage } from '@/features/social/logic';
 import { goBack } from '@/features/social/nav';
 import type { BlockedPilgrim } from '@/features/social/types';
-import { c, layout, role } from '@/theme';
+import { layout, role, space } from '@/theme';
 
 // Settings > Privacy and safety > Blocked pilgrims: who you blocked, and a way to undo it. The list comes from a
 // database function that a server may not have yet; then this screen says so in one friendly sentence and nothing
@@ -37,19 +37,19 @@ export default function BlockedPilgrims() {
 
   return (
     <View style={{ flex: 1, backgroundColor: role.bg }}>
-      <View style={{ paddingTop: insets.top + layout.screenTop, paddingHorizontal: layout.screenMargin, paddingBottom: 12 }}>
+      <View style={{ paddingTop: insets.top + layout.screenTop, paddingHorizontal: layout.screenMargin, paddingBottom: space[3] }}>
         <ScreenHeader title="Blocked pilgrims" variant="h3" onBack={() => goBack(router)} />
       </View>
       <FlatList
         data={items ?? []}
         keyExtractor={(p) => p.user_id}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} tintColor={c.blue} colors={[c.blue]} />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} tintColor={role.action} colors={[role.action]} />}
         contentContainerStyle={{ paddingBottom: insets.bottom + 40, flexGrow: 1 }}
         ListHeaderComponent={
           !!items && items.length > 0 ? (
             <View>
               {!!error && <Notice icon="info" tone="warn" text={error} />}
-              <AppText variant="small" muted style={{ paddingHorizontal: 24, paddingTop: 4, paddingBottom: 8 }}>
+              <AppText variant="small" muted style={{ paddingHorizontal: space[6], paddingTop: space[1], paddingBottom: space[2] }}>
                 Blocked pilgrims cannot find you in search, send you friend requests or message you directly. Unblocking someone does not make you friends again.
               </AppText>
             </View>

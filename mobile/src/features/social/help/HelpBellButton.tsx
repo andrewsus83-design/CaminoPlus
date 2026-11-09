@@ -9,8 +9,11 @@ import { clockTime } from '../logic';
 import { getAlert, subscribeAlert } from './alertStore';
 import { activeAlert, alertLastAt } from './logic';
 
+// design-lint-ignore: color the night button of the Walk view, the same navy as `button` in the night palette of features/map/WalkUi.tsx: a colour of the map, not of the interface
 const NIGHT_BUTTON = '#13243C';
+// design-lint-ignore: color the hairline of the night buttons of the Walk view (parchment at 24 %), as WalkUi.tsx draws it
 const NIGHT_BORDER = 'rgba(246,239,226,0.24)';
+// design-lint-ignore: color Cross Red lightened to 5.4 : 1 on the night button, where the plain red is 2.5 : 1; no token has it
 const NIGHT_BELL = '#E8776A';
 
 export function HelpBellButton({ tone = 'day', onPress, size = 56 }: { tone?: 'day' | 'night'; onPress: () => void; size?: number }) {

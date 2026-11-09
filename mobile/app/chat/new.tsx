@@ -12,7 +12,7 @@ import { EmptyState, ErrorState, LoadingRows } from '@/features/social/component
 import { filterPeople, friendlyError, personName } from '@/features/social/logic';
 import { goBack } from '@/features/social/nav';
 import type { Friend } from '@/features/social/types';
-import { c, layout, radius, role } from '@/theme';
+import { layout, radius, role, space } from '@/theme';
 
 // Pick a friend, open (or find) the chat with them, and replace this screen with it.
 export default function NewChat() {
@@ -37,7 +37,7 @@ export default function NewChat() {
 
   return (
     <View style={{ flex: 1, backgroundColor: role.bg }}>
-      <View style={{ paddingTop: insets.top + layout.screenTop, paddingHorizontal: layout.screenMargin, paddingBottom: 12 }}>
+      <View style={{ paddingTop: insets.top + layout.screenTop, paddingHorizontal: layout.screenMargin, paddingBottom: space[3] }}>
         <ScreenHeader title="New chat" onBack={() => goBack(router)} />
       </View>
       {loading && <LoadingRows />}
@@ -52,24 +52,24 @@ export default function NewChat() {
             <View>
               <Pressable
                 accessibilityRole="button" accessibilityLabel="New group" accessibilityHint="Chat with several friends at once" onPress={() => router.push('/chat/new-group')}
-                style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: layout.screenMargin, minHeight: 76, backgroundColor: pressed ? c.sand200 : 'transparent' })}
+                style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: space[4], paddingHorizontal: layout.screenMargin, minHeight: 76, backgroundColor: pressed ? role.sunken : 'transparent' })}
               >
-                <View style={{ width: 52, height: 52, borderRadius: radius.pill, backgroundColor: c.gold, alignItems: 'center', justifyContent: 'center' }}><Icon name="group" color={role.onHighlight} size={26} /></View>
+                <View style={{ width: 52, height: 52, borderRadius: radius.pill, backgroundColor: role.highlight, alignItems: 'center', justifyContent: 'center' }}><Icon name="group" color={role.onHighlight} size={28} /></View>
                 <View style={{ flex: 1 }}>
-                  <AppText variant="label" style={{ fontSize: 18, lineHeight: 24 }}>New group</AppText>
-                  <AppText variant="caption" muted style={{ letterSpacing: 0 }}>Chat with several friends at once</AppText>
+                  <AppText variant="label">New group</AppText>
+                  <AppText variant="caption" muted>Chat with several friends at once</AppText>
                 </View>
-                <Icon name="chevron" color={role.muted} size={22} />
+                <Icon name="chevron" color={role.muted} size={24} />
               </Pressable>
-              {friends.length > 0 && <View style={{ paddingHorizontal: layout.screenMargin, paddingVertical: 10 }}><SearchField value={query} onChangeText={setQuery} placeholder="Search your friends" label="Search your friends" /></View>}
-              {friends.length > 0 && <AppText variant="mono" muted style={{ textTransform: 'uppercase', letterSpacing: 1.4, fontSize: 12, paddingHorizontal: layout.screenMargin, paddingTop: 10, paddingBottom: 2 }} accessibilityRole="header">Friends</AppText>}
+              {friends.length > 0 && <View style={{ paddingHorizontal: layout.screenMargin, paddingVertical: space[3] }}><SearchField value={query} onChangeText={setQuery} placeholder="Search your friends" label="Search your friends" /></View>}
+              {friends.length > 0 && <AppText variant="mono" muted style={{ textTransform: 'uppercase', paddingHorizontal: layout.screenMargin, paddingTop: space[3], paddingBottom: space[1] }} accessibilityRole="header">Friends</AppText>}
             </View>
           }
           renderItem={({ item: f }) => (
             <PersonRow
               name={personName(f)} username={f.username} uri={f.avatar_url} seed={f.id} onPress={() => start(f)}
               accessibilityLabel={`Chat with ${personName(f)}`}
-              trailing={starting === f.id ? <ActivityIndicator color={role.action} /> : <Icon name="chat" color={c.blue} size={24} />}
+              trailing={starting === f.id ? <ActivityIndicator color={role.action} /> : <Icon name="chat" color={role.action} size={24} />}
             />
           )}
           ListEmptyComponent={

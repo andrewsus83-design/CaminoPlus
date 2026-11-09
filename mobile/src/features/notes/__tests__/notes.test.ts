@@ -689,7 +689,7 @@ check('the pairs the Notes tab draws keep their contrast in light and in dark, r
   }
   // the initials of the avatar sit on six soft colours that are the same in dark mode: they are the fixed navy, never c.blue
   for (const tint of AVATAR_TINTS) assert.ok(ratio(tokens.color.blue, tint) >= 4.5, `the fixed navy on ${tint}`);
-  assert.match(read('src/features/social/components/primitives.tsx'), /<AppText variant="label" color=\{FIXED\.blue\} style=\{\{ fontSize: Math\.round\(size \* 0\.36\)/, 'the initials are FIXED.blue (c.blue is light blue in dark mode: 1 : 1 on these colours)');
+  assert.match(read('src/features/social/components/primitives.tsx'), /<AppText variant="label" color=\{FIXED\.blue\} style=\{\{ \.\.\.initialsText\(size\)/, 'the initials are FIXED.blue (c.blue is light blue in dark mode: 1 : 1 on these colours)');
   // "+N" on the last tile is white on the 45 % black chip of a photo: over the lightest photo that is 3.4 : 1, and it is large text (needs 3)
   const worst = 255 * (1 - 0.45);
   const grey = `#${Math.round(worst).toString(16).repeat(3)}`;
