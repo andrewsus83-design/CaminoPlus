@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { NBSP, caminoLine, stagesDoneText } from '../caminoCard';
-import { CARD_WIDE, DENSITY, FAB_ABOVE_BAR, FAB_SIZE, ROOMY_STRIP_BOTTOM, STRIP_AIR, TAB_BAR_HEIGHT, chatButtonTop, headerDensity, headerRoom, stripOverflows } from '../headerFit';
+import { CARD_WIDE, DENSITY, FAB_ABOVE_BAR, FAB_SIZE, ROOMY_STRIP_BOTTOM, STRIP_AIR, TAB_BAR_HEIGHT, cardWide, chatButtonTop, headerContentKey, headerDensity, headerRoom, stripOverflows } from '../headerFit';
 
 let n = 0;
 const check = (name: string, fn: () => void) => { fn(); n += 1; console.log(`ok   ${name}`); };
@@ -81,29 +81,33 @@ check('the room is counted from the top of the content, below the status bar, up
 check('what the two headers are made of: spacing from the space scale, the compact one smaller in every number that takes height, the gear never under the hard minimum of 48', () => {
   const steps = new Set(Object.values(tokens.space));
   for (const [density, m] of Object.entries(DENSITY)) {
-    for (const k of ['afterHeader', 'beforeStrip', 'avatarGap', 'cardLift', 'cardGap', 'hlLift', 'hlLabelGap'] as const) assert.ok(steps.has(m[k]), `${density}.${k} = ${m[k]} is a step of the space scale`);
+    for (const k of ['afterHeader', 'beforeStrip', 'avatarGap', 'cardLift', 'cardGap'] as const) assert.ok(steps.has(m[k]), `${density}.${k} = ${m[k]} is a step of the space scale`);
     assert.ok(m.gear >= tokens.layout.touchHard, `${density}: the gear is a touch target of at least 48`);
     assert.ok(m.avatar >= tokens.layout.touchHard, `${density}: the picture is a button (change profile picture), at least 48`);
     assert.ok(m.cardRing - 4 >= 36, `${density}: the shell on the card is at least 36`);
   }
   const [r, c] = [DENSITY.roomy, DENSITY.compact];
-  for (const k of ['afterHeader', 'beforeStrip', 'gear', 'avatar', 'avatarGap', 'bioLines', 'cardLift', 'cardGap', 'cardRing', 'hlLift', 'hlLabelGap', 'hlLines'] as const) assert.ok(c[k] <= r[k], `compact.${k} (${c[k]}) is not more than roomy.${k} (${r[k]})`);
+  for (const k of ['afterHeader', 'beforeStrip', 'gear', 'avatar', 'avatarGap', 'bioLines', 'cardLift', 'cardGap', 'cardRing'] as const) assert.ok(c[k] <= r[k], `compact.${k} (${c[k]}) is not more than roomy.${k} (${r[k]})`);
   assert.deepEqual([r.afterHeader, r.beforeStrip, r.gear, r.avatar, r.avatarGap, r.bioLines, r.cardRing], [16, 16, 52, 92, 20, 4, 52], 'the roomy header is the header as it was: 16 between its blocks, the 52 gear, the 92 picture, 4 lines of description, the 52 ring');
   assert.equal(r.statNumber, 'h3');
   assert.equal(r.statLabel, 'small');
   assert.equal(c.statNumber, 'h4', 'the counters of the compact header: the numbers one step smaller (24), the words the caption (15)');
   assert.equal(c.statLabel, 'caption');
   assert.ok(c.statLabel === 'caption' && c.avatar >= 56, 'and nothing is under 15 px');
-  assert.equal(r.hlLines, 2);
-  assert.equal(c.hlLines, 1);
+  assert.deepEqual([r.bioLines, c.bioLines], [4, 1], 'the description: four lines when roomy, ONE when compact, so that the compact header does not grow with the text');
+  assert.deepEqual(Object.keys(r).sort(), Object.keys(c).sort(), 'one table of the same fields for both');
+  // Updated on purpose (2026-11-09, review): hlLift, hlLabelGap and hlLines were in this table and read by no code (Highlights.tsx draws the row from its `dense` alone, and the table said 0 where the
+  // row used 4): one source of truth, so the three are gone from here
+  for (const gone of ['hlLift', 'hlLabelGap', 'hlLines']) assert.ok(!(gone in r) && !(gone in c), `${gone} is not in the table: the row of highlights has its own numbers (Highlights.tsx, dense), not a copy that nothing reads`);
 });
 
 check('Me draws the header in the density it is given: the numbers of the table, never its own, and both hosts get the same one', () => {
   const src = code(me);
-  assert.match(src, /import \{ CARD_WIDE, DENSITY, headerDensity, stripOverflows \} from '@\/features\/me\/headerFit';/);
+  assert.match(src, /import \{ DENSITY, cardWide, headerContentKey, headerDensity, stripOverflows \} from '@\/features\/me\/headerFit';/);
+  assert.match(src, /const \{ width: windowWidth, height: windowHeight, fontScale \} = useWindowDimensions\(\);/, 'the text size is the window\'s: the screen is drawn again when the setting changes');
   assert.match(src, /const predicted = headerDensity\(fit\);/);
   assert.match(src, /const hm = DENSITY\[density\];/);
-  assert.match(src, /const fit = \{ screenHeight: host\?\.height \?\? windowHeight, insets, fontScale: PixelRatio\.getFontScale\(\) \};/, 'the height the chat button floats over is the root view\'s own (measured), the window\'s until then');
+  assert.match(src, /const fit = \{ screenHeight: host\?\.height \?\? windowHeight, insets, fontScale \};/, 'the height the chat button floats over is the root view\'s own (measured), the window\'s until then');
   assert.match(src, /<View style=\{\{ flex: 1 \}\} onLayout=\{\(e\) => setHost\(\{ width: e\.nativeEvent\.layout\.width, height: e\.nativeEvent\.layout\.height \}\)\}>/, 'the root view is the one the button floats over');
   // the strip is measured once it is drawn: a roomy header that came out too tall turns compact, and the height it measured is kept (so it is not worked out again from the compact one, which would flip it back)
   assert.match(src, /const density = predicted === 'roomy' && roomyBottom !== null && stripOverflows\(\{ \.\.\.fit, stripBottom: roomyBottom, screenTop: layout\.screenTop \}\) \? 'compact' : predicted;/);
@@ -112,7 +116,8 @@ check('Me draws the header in the density it is given: the numbers of the table,
   assert.match(src, /<View style=\{\{ marginTop: hm\.beforeStrip \}\}>\s*<SubTabs tabs=\{ME_TABS\} value=\{tab\} onChange=\{setTab\} \/>\s*<\/View>\s*<\/View>\s*\);/, 'the strip is still the four tabs of ME_TABS, in one strip, the last thing of the header');
   // every number of the header that changes with the density comes from the table
   for (const use of ['hm.afterHeader', 'hm.beforeStrip', 'hm.gear', 'hm.avatar', 'hm.avatarGap', 'hm.bioLines', 'hm.cardLift', 'hm.cardGap', 'hm.cardRing', 'hm.statNumber', 'hm.statLabel']) assert.ok(src.includes(use), `me.tsx uses ${use}`);
-  assert.match(src, /<Highlights [^\n]*dense=\{density === 'compact'\} \/>/, 'the row is told');
+  assert.match(src, /<Highlights [^\n]*dense=\{compact\} \/>/, 'the row is told');
+  assert.match(src, /const compact = density === 'compact';/);
   // the hosts: `top` is one view, drawn once in each host, and it is the same node in both
   assert.equal((src.match(/\{top\}/g) ?? []).length, 2, 'drawn in the two hosts: once in each');
   assert.doesNotMatch(src, /Dimensions\.get|useWindowDimensions\(\)\.width < |Platform\.OS === 'web' \? /, 'no size and no platform decides the density but the maths of headerFit.ts');
@@ -156,9 +161,76 @@ check('the card keeps its words and its look on every phone: Buen Camino! in the
   assert.match(me, /const change = \(\s*<View style=\{\{ height: 40, paddingHorizontal: space\[4\], borderRadius: radius\.pill, backgroundColor: c\.gold, justifyContent: 'center' \}\}>\s*<AppText variant="label" color=\{role\.onHighlight\}>Change<\/AppText>/, 'the gold pill, 40 high');
   assert.match(card, /\{!narrow && <View style=\{\{ marginLeft: 'auto' \}\}>\{change\}<\/View>\}/, 'at the end of the head ...');
   assert.match(card, /\{narrow && change\}/, '... or at the end of the body on a very narrow phone');
-  assert.ok(CARD_WIDE >= 336 && CARD_WIDE <= 360, 'the switch lies between 320 (the pill would squeeze "Buen Camino!" into two lines) and 360, where the head holds the shell, the words and the pill');
+  assert.match(src, /const narrow = \(host\?\.width \?\? windowWidth\) < cardWide\(fontScale\);/, 'the switch follows the width of the card and the text size of the phone');
+  assert.equal(CARD_WIDE, 352, 'the switch is at 352 wide at the normal text size: between 320 (the pill would squeeze "Buen Camino!" into two lines) and 360, with room to spare');
   assert.equal((card.match(/Buen Camino!/g) ?? []).length, 1, 'once, in the card: the owner only asked to take it off the daily card');
   assert.match(card, /alignItems: 'center', columnGap: space\[3\], rowGap: space\[2\]/, 'the head wraps by itself when the phone is narrower than its three parts');
+});
+
+/* ================================================================ the description does not set the height of the compact header */
+
+check('the compact header does not grow with the description: one line, nothing under it, and the line itself opens the rest (a button) when there is more of it', () => {
+  assert.equal(DENSITY.compact.bioLines, 1, 'one line when compact');
+  assert.equal(DENSITY.roomy.bioLines, 4, 'the roomy header keeps its four lines and its Read more row');
+  const src = code(me);
+  assert.match(src, /const bio = <AppText variant="small" muted=\{!profile\?\.bio\} numberOfLines=\{bioOpen \? undefined : hm\.bioLines\}>\{profile\?\.bio \|\| 'Add a short description about you'\}<\/AppText>;/, 'the description is one element, with the lines of the density: nothing else sets its height');
+  assert.match(src, /const bioMore = bioLines > hm\.bioLines;/, 'there is more when the whole text takes more lines than the density shows');
+  // the block of the description, from its view to the card: when compact it is the clamped line alone
+  const block = src.slice(src.indexOf('<View>\n          {compact && bioMore ? ('), src.indexOf('{journey?.route ? ('));
+  assert.ok(block.length > 300, 'the block of the description was found');
+  assert.match(block, /\{compact && bioMore \? \(\s*<Pressable accessibilityRole="button" accessibilityHint=\{bioOpen \? 'Shows less of your description' : 'Shows all of your description'\} accessibilityState=\{\{ expanded: bioOpen \}\} hitSlop=\{\{ bottom: space\[2\] \}\} onPress=\{\(\) => setBioOpen\(\(v\) => !v\)\}>\{bio\}<\/Pressable>\s*\) : bio\}/, 'compact: the line is a button with a hint and an expanded state, and it opens and closes the whole text');
+  // the only row that can come under the description is the Read more row, and only when the header is not compact
+  assert.equal((block.match(/Read more/g) ?? []).length, 1, 'one Read more');
+  assert.match(block, /\{!compact && bioMore && \(\s*<Pressable [\s\S]*?\{bioOpen \? 'Show less' : 'Read more'\}<\/AppText>\s*<\/Pressable>\s*\)\}/, 'the Read more row is for the roomy header alone');
+  assert.equal((block.match(/<Pressable\b/g) ?? []).length, 2, 'two buttons in the block: the line (compact) and the Read more row (roomy), never both');
+  assert.equal((block.match(/<AppText\b/g) ?? []).length, 2, 'the invisible copy that measures, and the Read more row: the description itself is `bio`');
+  assert.match(block, /onTextLayout=\{\(e\) => setBioLines\(e\.nativeEvent\.lines\.length\)\}/, 'a phone measures the full text with the invisible copy');
+  // a description that is opened is the person's own choice: it is not measured, so closing it again does not leave the header compact
+  assert.match(src, /if \(density === 'roomy' && !bioOpen\) setRoomyBottom/);
+  // the touch target: the line is 25 high, 8 px of hitSlop below it (the card is 8 away) and none above (the pen over it already reaches 4 px into it): 33, as much as it can have without taking a tap from a
+  // neighbour. It is under the hard minimum of 48 on purpose: a taller line would cost the header 23 px, which is what the compact header does not have (the scanner cannot read the size of a line of text, so no ignore comment)
+  assert.equal(tokens.space['2'], 8);
+  assert.ok(25 + 8 < tokens.layout.touchHard);
+});
+
+/* ================================================================ the card's switch, with room to spare */
+
+check('the card puts the Change button at the end of its head from 352 wide at the normal text size, with more than 4 percent to spare, and later for larger text (it was 340, with none)', () => {
+  const ACCENT = 112.25; // "Buen Camino!", Caveat Bold 24, measured in the browser
+  const PILL = 63.8 + 2 * 16; // the word Change in Inter SemiBold 17, and 16 either side
+  const need = 52 + 12 + ACCENT + 12 + PILL; // the head: the ring, "Buen Camino!", the button and two gaps: 284.05
+  assert.equal(cardWide(1), 352);
+  assert.equal(CARD_WIDE, cardWide(1));
+  for (const scale of [1, 1.15, 1.3, 1.5, 2]) {
+    const have = cardWide(scale) - (2 * 16 + 2 * 12); // what the head has at the narrowest phone that gets it
+    assert.ok(have >= need + (ACCENT + PILL) * (scale - 1), `${scale}: the head has ${have} px and needs ${(need + (ACCENT + PILL) * (scale - 1)).toFixed(1)}`);
+    assert.ok((have - 76) / ((ACCENT + PILL) * scale) >= 1.04, `${scale}: at least 4 percent to spare on the two texts (${((have - 76) / ((ACCENT + PILL) * scale)).toFixed(3)})`);
+  }
+  assert.ok((340 - 56 - 76) / (ACCENT + PILL) < 1.04, 'the old 340 had less than 4 percent: 1 percent of text width wrapped the button');
+  assert.deepEqual([1, 1.15, 1.3, 1.5].map(cardWide), [352, 385, 418, 462], 'it grows with the text size of the phone');
+  assert.equal(cardWide(0.8), 352, 'smaller text is not smaller than the card');
+  assert.equal(cardWide(undefined), 352);
+  assert.equal(cardWide(Number.NaN), 352);
+  let last = 0;
+  for (let s = 1; s <= 3; s += 0.05) { const w = cardWide(s); assert.ok(w >= last, `cardWide does not go down at ${s.toFixed(2)}`); last = w; }
+});
+
+/* ================================================================ a header that went compact for a text that is gone */
+
+check('the measurement of a roomy header is forgotten when what its height depends on changes (the description, the names under the highlights), so compact is not sticky', () => {
+  const k = headerContentKey('Walking for my family', ['Zubiri', 'Pamplona']);
+  assert.equal(headerContentKey('Walking for my family', ['Zubiri', 'Pamplona']), k, 'the same description and names: the same key, the measurement stays');
+  assert.notEqual(headerContentKey('Walking for my family.', ['Zubiri', 'Pamplona']), k, 'an edited description');
+  assert.notEqual(headerContentKey(null, ['Zubiri', 'Pamplona']), k, 'no description');
+  assert.notEqual(headerContentKey('Walking for my family', ['Zubiri']), k, 'a shorter plan');
+  assert.notEqual(headerContentKey('Walking for my family', ['Pamplona', 'Zubiri']), k, 'the order of the plan');
+  assert.notEqual(headerContentKey('Walking for my family', ['Zubiri Pamplona']), k, 'a name that holds a space is not two names');
+  assert.equal(headerContentKey(undefined, []), headerContentKey(null, []), 'no description is no description');
+  assert.notEqual(headerContentKey('', []), headerContentKey(null, []), 'an empty text and no text are two keys (the cost of telling them apart is one measurement, once)');
+  // the wiring is code only (a React effect); the key is the tested part
+  const src = code(me);
+  assert.match(src, /const contentKey = headerContentKey\(profile\?\.bio, highlights\.map\(\(h\) => h\.name\)\);\s*useEffect\(\(\) => \{ setRoomyBottom\(null\); \}, \[contentKey\]\);/);
+  assert.ok(src.indexOf('const contentKey') > src.indexOf('const highlights = useMemo'), 'after the highlights it reads are known');
 });
 
 console.log(`${n} of ${n} passed (Me header fit)`);

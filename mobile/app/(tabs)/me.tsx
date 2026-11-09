@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, Alert, Image, KeyboardAvoidingView, Modal, PixelRatio, Platform, Pressable, TextInput, View, useWindowDimensions, type LayoutChangeEvent } from 'react-native';
+import { ActivityIndicator, Alert, Image, KeyboardAvoidingView, Modal, Platform, Pressable, TextInput, View, useWindowDimensions, type LayoutChangeEvent } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Screen } from '@/components/Screen';
@@ -21,7 +21,7 @@ import { JourneyGrid } from '@/features/me/JourneyGrid';
 import { SampleJourney } from '@/features/me/SampleJourney';
 import { Highlights, ShowAllBar } from '@/features/me/Highlights';
 import { caminoLine } from '@/features/me/caminoCard';
-import { CARD_WIDE, DENSITY, headerDensity, stripOverflows } from '@/features/me/headerFit';
+import { DENSITY, cardWide, headerContentKey, headerDensity, stripOverflows } from '@/features/me/headerFit';
 import { AllPlaces, PlaceHeader } from '@/features/me/AllPlaces';
 import { buildHighlights } from '@/features/me/highlights';
 import { buildRoutePlaces, emptyPlaceLine, visitedCount } from '@/features/me/routePoints';
@@ -129,14 +129,15 @@ export default function Me() {
   // at the bottom right of THIS view. The height is the view's own (measured), the window's until then; the status bar and the home bar are the insets.
   // It is worked out from the numbers first (no flash on a short phone) and checked once it is drawn: a roomy header that came out taller than its room (a long description, a larger text size than
   // the phone reported) turns compact. The height the roomy header measured is kept, so it is roomy again when the screen gets taller, and never flips back and forth.
-  const { width: windowWidth, height: windowHeight } = useWindowDimensions();
+  const { width: windowWidth, height: windowHeight, fontScale } = useWindowDimensions(); // the text size is the window's: the screen is drawn again when the setting changes
   const [host, setHost] = useState<{ width: number; height: number } | null>(null);
   const [roomyBottom, setRoomyBottom] = useState<number | null>(null);
-  const fit = { screenHeight: host?.height ?? windowHeight, insets, fontScale: PixelRatio.getFontScale() };
-  const narrow = (host?.width ?? windowWidth) < CARD_WIDE; // the My Camino card: the Change button goes under the words on a very narrow phone
+  const fit = { screenHeight: host?.height ?? windowHeight, insets, fontScale };
+  const narrow = (host?.width ?? windowWidth) < cardWide(fontScale); // the My Camino card: the Change button goes under the words on a narrow phone (352 at the normal text size, wider for larger text)
   const predicted = headerDensity(fit);
   const density = predicted === 'roomy' && roomyBottom !== null && stripOverflows({ ...fit, stripBottom: roomyBottom, screenTop: layout.screenTop }) ? 'compact' : predicted;
   const hm = DENSITY[density]; // the numbers of the header in this density
+  const compact = density === 'compact';
   // The header ends with the strip, so the height of the header is where the strip ends. A height is what the web reports when something changes (a position alone is not reported there), and a phone too.
   // A description that was opened with Read more is the person's own choice and is not measured: closing it again must not leave the header compact.
   const checkStrip = (e: LayoutChangeEvent) => {
@@ -158,6 +159,10 @@ export default function Me() {
   // every place would look "not visited yet". The pictures are read once (usePostMedia) and shared by the row and the grid.
   const media = usePostMedia(posts);
   const highlights = useMemo(() => (days && posts ? buildHighlights(days, posts) : []), [days, posts]);
+  // The height a roomy header measured is kept, so that it never flips back and forth; it is forgotten when what the height depends on changes (the description, the names under the highlights),
+  // so a header that went compact for a text that is gone does not stay compact until the app restarts.
+  const contentKey = headerContentKey(profile?.bio, highlights.map((h) => h.name));
+  useEffect(() => { setRoomyBottom(null); }, [contentKey]);
   // The places of the whole route (not only the plan) with the posts at each: the stamps of the All view, the first item of the row. Also only once the posts are known.
   const places = useMemo(() => (posts ? buildRoutePlaces(stages, posts) : []), [stages, posts]);
   // What the Journey area shows: all the posts, one destination of the row, the stamps of the All view, or one place of them (features/me/journeyView.ts). A key that
@@ -245,6 +250,9 @@ export default function Me() {
       <AppText variant="label" color={role.onHighlight}>Change</AppText>
     </View>
   );
+  // The description. `bioMore`: it is longer than the lines it is drawn in (measured by the invisible copy below; a phone knows, the web does not: it has no onTextLayout).
+  const bio = <AppText variant="small" muted={!profile?.bio} numberOfLines={bioOpen ? undefined : hm.bioLines}>{profile?.bio || 'Add a short description about you'}</AppText>;
+  const bioMore = bioLines > hm.bioLines;
   // Everything above the content of a sub-tab: the header (handle and gear, avatar and stats, name and bio, the My Camino card, the highlights) and the strip
   // of sub-tabs. Both hosts below draw it, so it looks the same on every sub-tab. One view; the space between its blocks is the density's (16, or 4 when compact).
   const top = (
@@ -292,14 +300,18 @@ export default function Me() {
             <AppText variant="caption" color={isPrivate ? role.text : c.success} style={{ fontFamily: 'Inter_600SemiBold' }}>{isPrivate ? 'Private' : 'Public'}</AppText>
           </Pressable>
         </View>
-        {/* Smaller text, 4 lines, then "Read more". The invisible copy measures the full length. */}
+        {/* The description. Roomy: up to 4 lines and a "Read more" row under them. Compact: ONE line and no row, so that the header is as tall for a description of 160 characters as for a short one: the line
+            itself is the button that opens and closes the rest, and its "…" says there is more. The invisible copy measures the full length. */}
         <View>
-          <AppText variant="small" muted={!profile?.bio} numberOfLines={bioOpen ? undefined : hm.bioLines}>{profile?.bio || 'Add a short description about you'}</AppText>
+          {compact && bioMore ? (
+            // The line is 25 high; below it 8 px of hitSlop (the card is 8 away), above it none (the pen over it already reaches 4 px into the line): 33 px is as much as it can have without taking a tap from a neighbour.
+            <Pressable accessibilityRole="button" accessibilityHint={bioOpen ? 'Shows less of your description' : 'Shows all of your description'} accessibilityState={{ expanded: bioOpen }} hitSlop={{ bottom: space[2] }} onPress={() => setBioOpen((v) => !v)}>{bio}</Pressable>
+          ) : bio}
           {!!profile?.bio && (
             <AppText variant="small" accessibilityElementsHidden importantForAccessibility="no-hide-descendants" onTextLayout={(e) => setBioLines(e.nativeEvent.lines.length)} style={{ position: 'absolute', left: 0, right: 0, opacity: 0 }} pointerEvents="none">{profile.bio}</AppText>
           )}
         </View>
-        {bioLines > hm.bioLines && (
+        {!compact && bioMore && (
           <Pressable accessibilityRole="button" onPress={() => setBioOpen((v) => !v)} hitSlop={8} style={{ alignSelf: 'flex-start' }}>
             <AppText variant="small" color={role.accentText} style={{ fontFamily: 'Inter_600SemiBold' }}>{bioOpen ? 'Show less' : 'Read more'}</AppText>
           </Pressable>
@@ -328,7 +340,7 @@ export default function Me() {
             </View>
           </Pressable>
         ) : <AppText variant="accent" color={role.accentText}>Buen Camino!</AppText>}
-        <Highlights key={session?.user.id ?? 'none'} items={highlights} days={days ?? []} media={media} activeKey={activeKey} userId={session?.user.id} onPick={pickHighlight} all={places.length > 0 ? { visited: visitedCount(places), total: places.length, on: shown.kind === 'stamps' || shown.kind === 'place', onPress: pickAll } : null} dense={density === 'compact'} />
+        <Highlights key={session?.user.id ?? 'none'} items={highlights} days={days ?? []} media={media} activeKey={activeKey} userId={session?.user.id} onPick={pickHighlight} all={places.length > 0 ? { visited: visitedCount(places), total: places.length, on: shown.kind === 'stamps' || shown.kind === 'place', onPress: pickAll } : null} dense={compact} />
       </View>
       <View style={{ marginTop: hm.beforeStrip }}>
         <SubTabs tabs={ME_TABS} value={tab} onChange={setTab} />

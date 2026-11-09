@@ -3,7 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { CHAT_ID, JOURNEY, PROFILE, UID, authKey, filterRows, makeSession, realtimeReply, respond, storageSeed, supabaseUrl } from '../fixtures.mjs';
+import { CHAT_ID, JOURNEY, LONG_BIO, PROFILE, UID, authKey, filterRows, makeSession, realtimeReply, respond, storageSeed, supabaseUrl } from '../fixtures.mjs';
 import { SAMPLE_PARAM } from '../routes.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -36,6 +36,24 @@ test('an empty account has the account and the journey and nothing else: no days
     assert.deepEqual(rpc(fn, 'empty'), [], `${fn}: empty`);
   }
   assert.equal(rpc('get_unread_totals', 'empty')[0].chats, 0);
+});
+
+test('the long description is a kind of data of its own, `longbio`: the full account with a description of 160 characters, for the walks of Me on small phones; every other kind keeps the one line', () => {
+  const ask = (path, data) => respond({ method: 'GET', url: `${URL_}${path}`, persona: 'in', data }).body;
+  const mine = (data) => ask('/rest/v1/profiles', data).find((p) => p.id === UID);
+  assert.equal(LONG_BIO.length, 160, 'the limit of the field (Me: maxLength 160): the longest description a pilgrim can write');
+  assert.ok(!LONG_BIO.includes('\n'));
+  assert.equal(mine('longbio').bio, LONG_BIO);
+  assert.equal(mine('full').bio, PROFILE.bio, 'the default account keeps its one line');
+  assert.equal(mine('empty').bio, PROFILE.bio);
+  assert.ok(PROFILE.bio.length < 40, 'one line on any phone');
+  assert.equal(PROFILE.bio, 'Walking for my family', 'and the same line as before: nothing else changed');
+  assert.deepEqual({ ...mine('longbio'), bio: PROFILE.bio }, { ...PROFILE }, 'only the description differs');
+  for (const t of ['journey_days', 'user_stamps', 'posts', 'routes', 'stages', 'journeys']) assert.deepEqual(ask(`/rest/v1/${t}`, 'longbio'), ask(`/rest/v1/${t}`, 'full'), `${t}: as in the full account`);
+  // the phone that was offline has the same description saved
+  const seed = storageSeed({ persona: 'in', scheme: 'light', offline: true, url: URL_, data: 'longbio' });
+  assert.equal(JSON.parse(seed.find(([k]) => k === `kv:u.${UID}.account`)[1]).profile.bio, LONG_BIO);
+  assert.ok(seed.some(([k]) => k === `kv:u.${UID}.me`), 'and the Me tab, as in the full account');
 });
 
 test('filters of the query string are applied (the plan\'s next open day is day 2, limit 1)', () => {

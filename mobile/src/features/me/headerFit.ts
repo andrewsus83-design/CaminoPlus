@@ -4,7 +4,13 @@
 // Plan, Health) is the LAST thing of the header, and on a short phone the header is as tall as the room above the button: the button sat over "Health", and on a
 // shorter one the whole strip sat under the tab bar. The button is the owner's design and must stay at the bottom right, and the strip must stay four tabs, so the one
 // thing that can give is the header. When the strip would end below the top edge of the button, the header is drawn COMPACT: a smaller avatar, tighter spacing, the My Camino card
-// and the highlights with less air. Nothing is taken out of it; every word and every button stays.
+// and the highlights with less air.
+//
+// What compact keeps and what it shortens, exactly. It keeps every button, the four tabs of the strip and every word of the My Camino card and of the counters. It shortens two things, and says so:
+// the name under a highlight is one line and ends in "…" when it needs more (the screen reader says it whole, and so does the bar over the grid), and the description is ONE line (its "…" says
+// there is more, and a tap on the line opens the rest of it). The second one is what keeps the budget: the compact header is as tall with a description of 160 characters (the limit of the field) as
+// with none, because nothing in it grows with the text (the walk "a long description" of tools/web-smoke/mesmall.scenarios.mjs measures it). A description that is opened is the person's own choice
+// and is not part of the budget.
 //
 // The button's own numbers (the tab bar's 88 and its 14 and 10, the 8 between them, the button's 60) are copied here; src/features/me/__tests__/headerFit.test.ts
 // reads components/Fab.tsx and components/TabBar.tsx and fails when they drift apart.
@@ -63,6 +69,15 @@ export function stripOverflows(input: FitInput & { stripBottom: number; screenTo
 }
 
 /**
+ * What the height of the roomy header depends on, as one string: the description and the names under the highlights (a long one takes a second line). The measurement of a roomy header is kept so that it
+ * never flips back and forth; when this string changes (the description was edited, the plan changed) the measurement is forgotten and made again, so a header that went compact because of a text that is
+ * gone does not stay compact until the app restarts.
+ */
+export function headerContentKey(bio: string | null | undefined, names: readonly string[]): string {
+  return JSON.stringify([bio ?? null, names]);
+}
+
+/**
  * What the two headers are made of: every number is a step of the space scale (design/tokens.json), a size of the picture or the gear, or a line count.
  *  afterHeader  the space between the handle row and the avatar row
  *  beforeStrip  the space between the highlights and the strip of sub-tabs
@@ -70,23 +85,36 @@ export function stripOverflows(input: FitInput & { stripBottom: number; screenTo
  *  avatar       the profile picture
  *  avatarGap    between the picture and the three counters
  *  statNumber   the type of the numbers of the counters (the title type), and statLabel the words under them
- *  bioLines     lines of the description before "Read more"
+ *  bioLines     lines of the description: four and a "Read more" row under them when roomy; ONE and NO row when compact (the line itself opens the rest), which is what keeps the height of the compact header
+ *               the same for every description
  *  cardLift     the My Camino card's own space above it (on top of the 4 of the name block)
  *  cardGap      between the head of the card and its body
  *  cardRing     the ring round the shell on the card, and the shell inside it (4 less)
- *  hlLift       the highlights' own space above them
- *  hlLabelGap   between a round picture and its name
- *  hlLines      lines for the name under a round: two, and one when compact (a name that needs more ends in "…"; the screen reader and the bar over the grid say it whole)
+ * The row of highlights has its own numbers and takes only `dense` (features/me/Highlights.tsx: 4 above it instead of 8, 4 between a round and its name instead of 8, the name on one line instead of two).
  */
 export type HeaderMetrics = {
   afterHeader: number; beforeStrip: number; gear: number; avatar: number; avatarGap: number; statNumber: 'h3' | 'h4'; statLabel: 'small' | 'caption'; bioLines: number;
-  cardLift: number; cardGap: number; cardRing: number; hlLift: number; hlLabelGap: number; hlLines: number;
+  cardLift: number; cardGap: number; cardRing: number;
 };
 
 export const DENSITY: Record<Density, HeaderMetrics> = {
-  roomy: { afterHeader: 16, beforeStrip: 16, gear: 52, avatar: 92, avatarGap: 20, statNumber: 'h3', statLabel: 'small', bioLines: 4, cardLift: 8, cardGap: 4, cardRing: 52, hlLift: 8, hlLabelGap: 8, hlLines: 2 },
-  compact: { afterHeader: 4, beforeStrip: 4, gear: 48, avatar: 56, avatarGap: 16, statNumber: 'h4', statLabel: 'caption', bioLines: 2, cardLift: 4, cardGap: 0, cardRing: 40, hlLift: 0, hlLabelGap: 4, hlLines: 1 },
+  roomy: { afterHeader: 16, beforeStrip: 16, gear: 52, avatar: 92, avatarGap: 20, statNumber: 'h3', statLabel: 'small', bioLines: 4, cardLift: 8, cardGap: 4, cardRing: 52 },
+  compact: { afterHeader: 4, beforeStrip: 4, gear: 48, avatar: 56, avatarGap: 16, statNumber: 'h4', statLabel: 'caption', bioLines: 1, cardLift: 4, cardGap: 0, cardRing: 40 },
 };
 
-/** The My Camino card puts the Change button at the end of its head when the phone is at least this wide, and at the end of its body (the words beside it wrap) when it is narrower. */
-export const CARD_WIDE = 340;
+/**
+ * The width of a phone from which the head of the My Camino card holds the shell, "Buen Camino!" and the Change button on one line (the button at the end of the head); a narrower phone puts the
+ * button at the end of the body, under the words, where the text beside it wraps. The head needs, at the normal text size: the 52 ring and two gaps of 12, "Buen Camino!" (Caveat Bold 24: 112.3 px,
+ * measured in the browser) and the button (the word "Change" in Inter SemiBold 17: 63.8 px, and 16 either side); the screen's margins (16 + 16) and the card's padding (12 + 12) are outside it.
+ * It is worked out with 5 percent to spare on the two texts, so that a font that draws a little wider does not drop the button to a line of its own (the card is 48 px taller then), and it
+ * grows with the text size of the phone, because both texts do: 352 at the normal size, 385 at 1.15 times, 418 at 1.3.
+ */
+export function cardWide(fontScale?: number): number {
+  const scale = Number.isFinite(fontScale ?? Number.NaN) ? Math.max(1, fontScale as number) : 1;
+  const outside = 2 * 16 + 2 * 12;
+  const head = 52 + 2 * 12 + (113 + 96) * 1.05 * scale; // the ring and the gaps, then "Buen Camino!" and the button, rounded up, with 5 percent over
+  return Math.ceil(outside + head);
+}
+
+/** `cardWide` at the normal text size. */
+export const CARD_WIDE = cardWide(1);

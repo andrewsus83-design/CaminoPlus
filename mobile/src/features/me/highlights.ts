@@ -142,6 +142,19 @@ export function nextHighlightIndex(days: readonly DayLike[], items: readonly { n
   return -1;
 }
 
+/** The most the name under a highlight may grow with the text size of the phone, as a multiple of its size. The app sets no limit on its text as a whole, so Highlights.tsx sets this one on the name (maxFontSizeMultiplier) and sizes the cell by it. */
+export const NAME_TEXT_CAP = 1.5;
+
+/**
+ * The width of the cell of a destination. `base` px at the normal text size (the widest word of a Camino name, "Roncesvalles", is 99.4 px in Inter Medium 15 and 101 in the bold of the open one, so the cell
+ * holds it whole); the text of the name grows with the text size of the phone and the cell grows with it, round(base x the text size), between 1 and NAME_TEXT_CAP, so that a word that fits at the normal size
+ * still fits (at 1.15, Android's "Large", the cell is 124).
+ */
+export function highlightCell(base: number, fontScale: number | undefined): number {
+  const scale = Number.isFinite(fontScale ?? Number.NaN) ? Math.min(NAME_TEXT_CAP, Math.max(1, fontScale as number)) : 1;
+  return Math.round(base * scale);
+}
+
 /**
  * Where the row of destinations opens, as the x it is scrolled to (0 = at its start). On a long plan it opens at the next destination, with half of the one
  * before it showing so it can be seen that the row goes on to the left; if the next destination is already on the first screen the row stays at its start.
@@ -149,11 +162,12 @@ export function nextHighlightIndex(days: readonly DayLike[], items: readonly { n
  * `item` and `gap` are a destination's cell and the space between two; the All item has a cell of its own (`allItem`, `allGap` after it), which is the same as a destination's when they are not given.
  * `shown` is how much of the next destination's cell has to be on the first screen (from the start of the cell): the whole cell when it is not given; with a cell wider than its round it is the round's right edge,
  * because the rest of the cell is only air round a name.
+ * `pad` is the room before the first destination inside the scrolling part when there is no All item: the margin when it is not given, and what the row really pads when it is (Highlights.tsx: ROW_PAD, 4).
  */
-export function rowStartOffset(o: { nextAt: number; width: number; pinned: boolean; item: number; gap: number; margin: number; allItem?: number; allGap?: number; shown?: number }): number {
+export function rowStartOffset(o: { nextAt: number; width: number; pinned: boolean; item: number; gap: number; margin: number; allItem?: number; allGap?: number; shown?: number; pad?: number }): number {
   if (!(o.nextAt > 0)) return 0;
   const stride = o.item + o.gap;
-  const pad = o.pinned ? 0 : o.margin; // the room before the first destination, inside the scrolling part
+  const pad = o.pinned ? 0 : o.pad ?? o.margin; // the room before the first destination, inside the scrolling part
   const pinnedWidth = (o.allItem ?? o.item) + (o.allGap ?? o.gap); // the All item and the space after it
   const room = o.pinned ? o.width - o.margin - pinnedWidth : o.width; // the width of the scrolling part
   const onFirstScreen = pad + o.nextAt * stride + (o.shown ?? o.item) <= room - o.margin;
