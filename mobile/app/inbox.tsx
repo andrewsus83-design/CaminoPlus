@@ -15,7 +15,7 @@ import { EmptyState, ErrorState, LoadingRows, Notice, Section } from '@/features
 import { filterConversations, friendlyError, notificationAction, notificationPeer, personName } from '@/features/social/logic';
 import { goBack } from '@/features/social/nav';
 import type { Conversation, NotificationItem } from '@/features/social/types';
-import { c, layout, radius, role } from '@/theme';
+import { c, layout, radius, role, space } from '@/theme';
 
 type InboxTab = 'notifications' | 'messages' | 'groups';
 const parseTab = (v: unknown): InboxTab => (v === 'messages' || v === 'groups' ? v : 'notifications');
@@ -93,7 +93,7 @@ export default function Inbox() {
   const bottom = insets.bottom + 32;
   return (
     <View style={{ flex: 1, backgroundColor: role.bg }}>
-      <View style={{ paddingTop: insets.top + layout.screenTop, paddingHorizontal: layout.screenMargin, paddingBottom: 12 }}>
+      <View style={{ paddingTop: insets.top + layout.screenTop, paddingHorizontal: layout.screenMargin, paddingBottom: space[3] }}>
         <ScreenHeader title="Inbox" onBack={() => goBack(router)} right={<IconButton name="compose" label="New chat" onPress={() => router.push('/chat/new')} />} />
       </View>
       <View style={{ paddingHorizontal: layout.screenMargin }}><SegmentedTabs tabs={tabs} value={tab} onChange={(k) => { setTab(k); router.setParams({ tab: k }); }} /></View>
@@ -141,16 +141,16 @@ function NotificationsTab({ notifs, now, bottom, onOpen, onMore, onAccept, onDec
     <SectionList
       sections={data}
       keyExtractor={(n) => n.id}
-      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} tintColor={c.blue} colors={[c.blue]} />}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} tintColor={role.action} colors={[role.action]} />}
       contentContainerStyle={{ paddingBottom: bottom, flexGrow: 1 }}
       stickySectionHeadersEnabled={false}
       ListHeaderComponent={error ? <Notice icon="info" tone="warn" text="Could not refresh. Pull down to try again." /> : undefined}
       renderSectionHeader={({ section }) => (
         <Section
           right={section.key === 'new' && hasUnread ? (
-            <Pressable accessibilityRole="button" accessibilityLabel="Mark all as read" onPress={markAllRead} hitSlop={6} style={{ minHeight: 48, flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-              <Icon name="check-double" color={c.goldInk} size={20} />
-              <AppText variant="label" color={c.goldInk} style={{ fontSize: 16 }}>Mark all as read</AppText>
+            <Pressable accessibilityRole="button" accessibilityLabel="Mark all as read" onPress={markAllRead} hitSlop={6} style={{ minHeight: 48, flexDirection: 'row', alignItems: 'center', gap: space[2] }}>
+              <Icon name="check-double" color={role.accentText} size={20} />
+              <AppText variant="label" color={role.accentText}>Mark all as read</AppText>
             </Pressable>
           ) : undefined}
         >
@@ -184,19 +184,19 @@ function MessagesTab({ list, convs, meId, now, bottom, requests, onOpen, onReque
     <FlatList
       data={shown}
       keyExtractor={(cv) => cv.id}
-      refreshControl={<RefreshControl refreshing={convs.refreshing} onRefresh={convs.refresh} tintColor={c.blue} colors={[c.blue]} />}
+      refreshControl={<RefreshControl refreshing={convs.refreshing} onRefresh={convs.refresh} tintColor={role.action} colors={[role.action]} />}
       contentContainerStyle={{ paddingBottom: bottom, flexGrow: 1 }}
       keyboardShouldPersistTaps="handled"
       ListHeaderComponent={
         <View>
           {convs.error && <Notice icon="info" tone="warn" text="Could not refresh. Pull down to try again." />}
-          {list.length > 0 && <View style={{ paddingHorizontal: layout.screenMargin, paddingTop: 14, paddingBottom: 6 }}><SearchField value={query} onChangeText={setQuery} placeholder="Search chats" label="Search chats" /></View>}
+          {list.length > 0 && <View style={{ paddingHorizontal: layout.screenMargin, paddingTop: space[4], paddingBottom: space[2] }}><SearchField value={query} onChangeText={setQuery} placeholder="Search chats" label="Search chats" /></View>}
           {requests > 0 && (
             <Pressable
               accessibilityRole="button" accessibilityLabel={`Friend requests, ${requests} waiting`} accessibilityHint="Opens your friend requests" onPress={onRequests}
-              style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 12, marginHorizontal: layout.screenMargin, marginTop: 10, marginBottom: 4, minHeight: 64, paddingHorizontal: 16, borderRadius: radius.md, backgroundColor: pressed ? c.goldSoft : c.goldWash })}
+              style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: space[3], marginHorizontal: layout.screenMargin, marginTop: space[3], marginBottom: space[1], minHeight: 64, paddingHorizontal: space[4], borderRadius: radius.md, backgroundColor: pressed ? c.goldSoft : c.goldWash })}
             >
-              <View style={{ width: 40, height: 40, borderRadius: radius.pill, backgroundColor: role.action, alignItems: 'center', justifyContent: 'center' }}><Icon name="user-plus" color={c.parchment} size={20} /></View>
+              <View style={{ width: 40, height: 40, borderRadius: radius.pill, backgroundColor: role.action, alignItems: 'center', justifyContent: 'center' }}><Icon name="user-plus" color={role.onAction} size={20} /></View>
               <AppText variant="label" style={{ flex: 1 }}>Friend requests</AppText>
               <CountBadge count={requests} />
               <Icon name="chevron" color={role.muted} size={20} />
@@ -223,12 +223,12 @@ function GroupsTab({ list, convs, meId, now, bottom, onOpen, onNew }: ListProps 
     <FlatList
       data={list}
       keyExtractor={(cv) => cv.id}
-      refreshControl={<RefreshControl refreshing={convs.refreshing} onRefresh={convs.refresh} tintColor={c.blue} colors={[c.blue]} />}
+      refreshControl={<RefreshControl refreshing={convs.refreshing} onRefresh={convs.refresh} tintColor={role.action} colors={[role.action]} />}
       contentContainerStyle={{ paddingBottom: bottom, flexGrow: 1 }}
       ListHeaderComponent={
         <View>
           {convs.error && <Notice icon="info" tone="warn" text="Could not refresh. Pull down to try again." />}
-          {list.length > 0 && <View style={{ paddingHorizontal: layout.screenMargin, paddingTop: 16, paddingBottom: 6 }}><Btn label="New group" icon="group" variant="gold" full onPress={onNew} /></View>}
+          {list.length > 0 && <View style={{ paddingHorizontal: layout.screenMargin, paddingTop: space[4], paddingBottom: space[2] }}><Btn label="New group" icon="group" variant="gold" full onPress={onNew} /></View>}
         </View>
       }
       renderItem={({ item: cv }) => <ConversationRow conversation={cv} meId={meId ?? ''} now={now} onPress={() => onOpen(cv)} />}

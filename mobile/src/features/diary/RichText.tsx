@@ -3,13 +3,14 @@ import { Platform, Text, View } from 'react-native';
 import { useFonts } from 'expo-font';
 import { Inter_400Regular_Italic, Inter_600SemiBold_Italic } from '@expo-google-fonts/inter';
 import { AppText } from '@/components/AppText';
-import { c, fonts, role } from '@/theme';
+import { fonts, role, space } from '@/theme';
 import { parseRich, type Block, type Span } from './richtext';
 
 // A page of the diary as it is read: the small Markdown-style subset of richtext.ts drawn with plain Text, no HTML and no WebView.
-// Any string draws (parseRich never throws): marks that do not pair up show as typed. Bold is Inter semibold, italic Inter italic;
-// the italic faces are part of the font package the app already bundles, and are loaded the first time a page is read (until
-// then italic falls back to the system's slant, so a page is never held up by a font).
+// Any string draws (parseRich never throws): marks that do not pair up show as typed. Bold is Inter semibold, italic Inter italic: always
+// the real faces, never a slant or a weight made up by the system (no fontStyle, no fontWeight). The italic faces are part of the font
+// package the app already bundles, and are loaded the first time a page is read (until then italic text is drawn upright, so a page is
+// never held up by a font).
 const ITALIC = 'Inter_400Regular_Italic';
 const BOLD_ITALIC = 'Inter_600SemiBold_Italic';
 
@@ -22,9 +23,9 @@ function useItalicFonts(): boolean {
 }
 
 function spanStyle(s: Span, italicReady: boolean) {
-  if (s.bold && s.italic) return italicReady ? { fontFamily: BOLD_ITALIC } : { fontFamily: fonts.bodyBold, fontStyle: 'italic' as const };
+  if (s.bold && s.italic) return { fontFamily: italicReady ? BOLD_ITALIC : fonts.bodyBold };
   if (s.bold) return { fontFamily: fonts.bodyBold };
-  if (s.italic) return italicReady ? { fontFamily: ITALIC } : { fontStyle: 'italic' as const };
+  if (s.italic && italicReady) return { fontFamily: ITALIC };
   return null;
 }
 
@@ -37,17 +38,17 @@ function BlockView({ block, italicReady }: { block: Block; italicReady: boolean 
     case 'gap':
       return <View style={{ height: 14 }} />;
     case 'h':
-      return <AppText variant="h4" accessibilityRole="header" style={[{ marginTop: 8 }, breakAnywhere]}><Spans spans={block.spans} italicReady={italicReady} /></AppText>;
+      return <AppText variant="h4" accessibilityRole="header" style={[{ marginTop: space[2] }, breakAnywhere]}><Spans spans={block.spans} italicReady={italicReady} /></AppText>;
     case 'li':
       return (
-        <View style={{ flexDirection: 'row', gap: 10 }}>
+        <View style={{ flexDirection: 'row', gap: space[3] }}>
           <AppText color={role.accentText} style={{ width: 14, textAlign: 'center' }} importantForAccessibility="no" accessibilityElementsHidden>•</AppText>
           <AppText style={[{ flex: 1 }, breakAnywhere]}><Spans spans={block.spans} italicReady={italicReady} /></AppText>
         </View>
       );
     case 'q':
       return (
-        <View style={{ borderLeftWidth: 3, borderLeftColor: c.gold, paddingLeft: 14, marginVertical: 2 }}>
+        <View style={{ borderLeftWidth: 3, borderLeftColor: role.highlight, paddingLeft: space[4], marginVertical: space[1] }}>
           <AppText style={breakAnywhere}><Spans spans={block.spans} italicReady={italicReady} /></AppText>
         </View>
       );

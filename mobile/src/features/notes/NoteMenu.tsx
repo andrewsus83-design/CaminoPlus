@@ -6,8 +6,8 @@ import { Pill } from '@/components/Pill';
 import { layout, radius, role, scrim } from '@/theme';
 import { TOUCH_MIN } from './timeline';
 
-// The "…" menu of a note: a sheet from the bottom, over everything (the tab bar too), like the menu of a post. Edit and Delete, and a way
-// out. It only says which one was chosen: the screen opens the page, or asks "Delete this page?" with the diary's own question first.
+// The "…" menu of a note: a sheet from the bottom, over everything (the tab bar too), like the menu of a post. Edit, Share link and Delete,
+// and a way out. Share link asks first (ShareLinkSheet) and then makes a link to a COPY of the words; the note itself stays on the phone. It only says which one was chosen: the screen opens the page, or asks "Delete this page?" with the diary's own question first.
 // A tap on the dimmed part, the phone's back button and Cancel all close it.
 
 function Item({ icon, label, danger, onPress }: { icon: IconName; label: string; danger?: boolean; onPress: () => void }) {
@@ -25,7 +25,7 @@ function Item({ icon, label, danger, onPress }: { icon: IconName; label: string;
   );
 }
 
-export function NoteMenu({ title, onClose, onEdit, onDelete }: { title: string; onClose: () => void; onEdit: () => void; onDelete: () => void }) {
+export function NoteMenu({ title, onClose, onEdit, onShareLink, onDelete }: { title: string; onClose: () => void; onEdit: () => void; onShareLink?: () => void; onDelete: () => void }) {
   const insets = useSafeAreaInsets();
   return (
     <Modal visible transparent animationType="fade" onRequestClose={onClose} statusBarTranslucent>
@@ -38,6 +38,7 @@ export function NoteMenu({ title, onClose, onEdit, onDelete }: { title: string; 
         >
           <AppText variant="small" muted numberOfLines={1} style={{ paddingHorizontal: 12, paddingBottom: 8 }}>{title}</AppText>
           <Item icon="pen" label="Edit" onPress={onEdit} />
+          {onShareLink && <Item icon="share" label="Share link" onPress={onShareLink} />}
           <Item icon="trash" label="Delete" danger onPress={onDelete} />
           <View style={{ marginTop: 12 }}>
             <Pill large variant="ghost" label="Cancel" onPress={onClose} />

@@ -21,8 +21,8 @@ export type NoteLike = Pick<DiaryEntry, 'id' | 'createdAt' | 'title' | 'body'> &
 export const WRITE_NOTE = 'Write a note';
 /** What a screen reader adds to the card: where it leads. */
 export const WRITE_NOTE_HINT = 'Opens a blank page';
-/** The card is at least this tall, in pixels (a thing to touch that is easy to find, more than TOUCH_MIN). */
-export const WRITE_CARD_MIN = 64;
+/** The card is at least this tall, in pixels (a thing to touch that is easy to find, more than TOUCH_MIN). Its own padding and its content already make it taller, so this only holds a floor. */
+export const WRITE_CARD_MIN = 72;
 /** The one quiet line under the title of the card. It is true: the pages are kept only on this phone. */
 export const NOTES_PRIVACY = 'Notes stay on this phone.';
 /** The empty diary says this under the card, which is the way in: there is no second button to write. */
@@ -265,5 +265,8 @@ export function toggled(set: ReadonlySet<string>, id: string): Set<string> {
   return next;
 }
 
-/** The smallest a thing to touch is, in pixels: every button of the feed is at least this big, with or without the room around it. */
-export const TOUCH_MIN = 44;
+/**
+ * The smallest a thing to touch is, in pixels: every button of the feed is at least this big, with or without the room around it. It is 48, the hard
+ * minimum of the design (nothing tappable is drawn smaller); it is written here because this file imports nothing, not even the theme.
+ */
+export const TOUCH_MIN = 48;
