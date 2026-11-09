@@ -89,3 +89,17 @@ export async function uploadPostMediaWith(d: PostMediaDeps, userId: string, post
   }
   return { failed, reasons };
 }
+
+const CHECK_CONNECTION = 'Check your connection and your cloud storage in Settings.';
+
+/** What the composer says when some files did not go up: each reason this phone gave, with how many files it covers, and the
+ *  connection / storage sentence only for the others. */
+export function mediaFailureText(failed: number, total: number, reasons: readonly string[]): string {
+  const head = `${failed} of ${total} photos or videos could not be uploaded.`;
+  const byReason = new Map<string, number>();
+  for (const r of reasons) byReason.set(r, (byReason.get(r) ?? 0) + 1);
+  const parts = [...byReason].map(([r, n]) => (n === failed ? r : `${n === 1 ? '1 file' : `${n} files`}: ${r}`));
+  const others = failed - reasons.length;
+  if (others > 0) parts.push(reasons.length ? `Others: ${CHECK_CONNECTION.charAt(0).toLowerCase()}${CHECK_CONNECTION.slice(1)}` : CHECK_CONNECTION);
+  return [head, ...parts].join(' ');
+}

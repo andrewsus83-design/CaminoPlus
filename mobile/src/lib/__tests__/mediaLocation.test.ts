@@ -120,15 +120,22 @@ for (const f of [...fixtures.map((x) => join('exif', x)), 'gps-exif.jpg']) {
   });
 }
 
-check('a damaged EXIF block (length 1) whose thumbnail comes before the GPS block: the thumbnail\'s own picture data does not stop the cleaning', () => {
-  const src = new Uint8Array(readFileSync(join(FIX, 'exif', 'broken_len_thumb_before_gps.jpg')));
-  const out = B(stripJpegLocation(src).bytes);
-  for (const n of [0x0a1b2c3d, 0x0b2c3d4e, 0x0c3d4e5f]) {
-    const le = Buffer.alloc(4); le.writeUInt32LE(n);
-    assert.ok(B(src).includes(le), 'the fixture has the value');
-    assert.ok(!out.includes(le), `the GPS value ${n.toString(16)} is gone`);
-  }
-});
+// The first picture data (SOS) is found by walking the segments by their lengths, never by searching for FF DA: a thumbnail
+// inside a damaged EXIF block, or a valid comment segment, can hold those bytes too.
+for (const [f, what] of [
+  ['broken_len_thumb_before_gps.jpg', 'a damaged EXIF block (length 1) whose thumbnail comes before the GPS block'],
+  ['com_with_ffda_then_broken_exif.jpg', 'a valid comment segment holding FF DA, before a damaged EXIF block with GPS'],
+]) {
+  check(`${what}: the GPS values are removed (bytes FF DA before the GPS block do not stop the cleaning)`, () => {
+    const src = new Uint8Array(readFileSync(join(FIX, 'exif', f)));
+    const out = B(stripJpegLocation(src).bytes);
+    for (const n of [0x0a1b2c3d, 0x0b2c3d4e, 0x0c3d4e5f]) {
+      const le = Buffer.alloc(4); le.writeUInt32LE(n);
+      assert.ok(B(src).includes(le), 'the fixture has the value');
+      assert.ok(!out.includes(le), `${f}: the GPS value ${n.toString(16)} is gone`);
+    }
+  });
+}
 
 check('the orientation stays (the photo is not turned on its side)', () => {
   const be = stripJpegLocation(new Uint8Array(readFileSync(join(FIX, 'exif', 'be.jpg')))).bytes;
@@ -309,18 +316,26 @@ function sefTrailer(name: string, data: string): Buffer {
   return Buffer.concat([block, dir, len, Buffer.from('SEFT', 'latin1')]);
 }
 
-check('a clip with a Samsung SEF trailer goes up (without its place, the trailer untouched); a trailer with a position, or a tail that is not SEF, is refused', () => {
+check('a Samsung SEF trailer is blanked whole (zeros, same length), whatever it holds; the clip before it is cleaned as usual; a tail that is not SEF is refused', () => {
   const clip = vfile('ff_android_like.mp4');
-  for (const [name, data] of [['Slow_Motion_Data', '0x0001'], ['Image_UTC_Data', '1699999999000'], ['Video_Info', 'Auto_Enhance']]) {
+  const cleanClip = cleanForUpload(new Uint8Array(clip), 'video/mp4').bytes;
+  const gpsExif = Buffer.concat([Buffer.from('Exif\0\0II*\0', 'latin1'), Buffer.from([0x25, 0x88, 4, 0, 1, 0, 0, 0, 26, 0, 0, 0]), Buffer.from([2, 0, 5, 0, 3, 0, 0, 0])]).toString('latin1');
+  const trailers: Array<[string, string]> = [
+    ['Slow_Motion_Data', '0x0001'], ['Image_UTC_Data', '1699999999000'], ['Video_Info', 'Auto_Enhance'],
+    ['Location', '+42.8800-008.5450/'], ['Location', '+42.88-008.54/'], ['Location', 'lat=42.880000,lon=-8.545000'],
+    ['MCC_Data', '214'], ['Exif_GPS', gpsExif],
+  ];
+  for (const [name, data] of trailers) {
     const tail = sefTrailer(name, data);
     const withSef = new Uint8Array(Buffer.concat([B(clip), tail]));
-    const out = cleanForUpload(withSef, 'video/mp4');
-    assert.deepEqual(whereFrom(out.bytes), []);
-    assert.equal(lociNumbers(out.bytes), false);
-    assert.ok(B(out.bytes).subarray(clip.length).equals(tail), 'the trailer is not changed');
+    const out = cleanForUpload(withSef, 'video/mp4').bytes;
+    assert.equal(out.length, clip.length + tail.length, `${name}: same length`);
+    assert.ok(out.subarray(clip.length).every((x) => x === 0), `${name}: the trailer is all zeros`);
+    assert.ok(B(out).subarray(0, clip.length).equals(B(cleanClip)), `${name}: the clip itself is cleaned exactly as without a trailer`);
+    assert.deepEqual(whereFrom(out), []);
+    assert.equal(lociNumbers(out), false);
+    for (const word of ['42.88', 'lat=', '214', 'Exif']) assert.ok(!B(out).subarray(clip.length).includes(Buffer.from(word, 'latin1')), `${name}: ${word}`);
   }
-  const located = new Uint8Array(Buffer.concat([B(clip), sefTrailer('Location', '+42.8800-008.5450/')]));
-  assert.throws(() => cleanForUpload(located, 'video/mp4'), UploadRefused);
   const junk = new Uint8Array(Buffer.concat([B(clip), Buffer.from('this is not a trailer', 'latin1')]));
   assert.throws(() => cleanForUpload(junk, 'video/mp4'), UploadRefused);
 });

@@ -2,7 +2,7 @@
 // message may still use, Cancel adds nothing, and a photo that would keep its location is refused. Run: npm run test:lib
 import assert from 'node:assert/strict';
 import { storeAvatar, AvatarDeps } from '../avatarFlow';
-import { PostMediaDeps, PreparedUpload, insertOutcome, uploadPostMediaWith } from '../postMediaUpload';
+import { PostMediaDeps, PreparedUpload, insertOutcome, mediaFailureText, uploadPostMediaWith } from '../postMediaUpload';
 import { ImageManipulatorLike, MediaCancelled, MediaDeps, MediaRejected, createMedia } from '../media/core';
 import { BatchDeps, COULD_NOT_READ, PickedFile, prepareBatch, withTimeout } from '../media/batch';
 import { LOCATION_REFUSED_MESSAGE, UNSUPPORTED_TYPE_MESSAGE, VIDEO_LOCATION_REFUSED_MESSAGE, isSupportedPick, looksLikeJpeg } from '../media/limits';
@@ -112,6 +112,14 @@ check('post media: a file this phone refused (its place could not be removed) gi
   const net = postDeps([], { ok: true });
   net.upload = async () => { throw new Error('Network request failed'); };
   assert.deepEqual(await uploadPostMediaWith(net, 'u1', 'p1', [item()]), { failed: 1, reasons: [] });
+});
+
+check('the failure sentence: one reason for all, a reason with its count, and the connection sentence only for the others', () => {
+  const V = VIDEO_LOCATION_REFUSED_MESSAGE;
+  assert.equal(mediaFailureText(1, 3, [V]), `1 of 3 photos or videos could not be uploaded. ${V}`);
+  assert.equal(mediaFailureText(2, 3, []), '2 of 3 photos or videos could not be uploaded. Check your connection and your cloud storage in Settings.');
+  assert.equal(mediaFailureText(3, 4, [V]), `3 of 4 photos or videos could not be uploaded. 1 file: ${V} Others: check your connection and your cloud storage in Settings.`);
+  assert.equal(mediaFailureText(3, 3, [V, V, LOCATION_REFUSED_MESSAGE]), `3 of 3 photos or videos could not be uploaded. 2 files: ${V} 1 file: ${LOCATION_REFUSED_MESSAGE}`);
 });
 
 /* ------------------------------------------------------------------ chat photos that are deleted from the outbox */

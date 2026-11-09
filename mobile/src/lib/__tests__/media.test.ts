@@ -93,7 +93,7 @@ check('the quota check: unknown lets the server decide, no storage and too littl
 check('a refusal says what we could not do, not that the app needs the place; the composer shows that reason after Share', () => {
   assert.match(L.LOCATION_REFUSED_MESSAGE, /^We could not remove the place where this photo was taken, so it cannot be shared\./);
   assert.match(L.VIDEO_LOCATION_REFUSED_MESSAGE, /^We could not remove the place where this video was recorded, so it cannot be shared\./);
-  assert.match(read(join('app', 'write.tsx')), /\$\{reasons\[0\] \?\? 'Check your connection and your cloud storage in Settings\.'\}/);
+  assert.match(read(join('app', 'write.tsx')), /Alert\.alert\('Posted without some media', mediaFailureText\(failed, media\.length, reasons\)\)/);
 });
 
 check('no sentence suggests that something can be bought today', () => {

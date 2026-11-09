@@ -104,6 +104,10 @@ def thumb_then_gps(le=True):
 
 
 cases['broken_len_thumb_before_gps'] = thumb_then_gps()
+# a VALID comment segment that holds the bytes FF DA, before the damaged EXIF block: a reader that searches bytes for the
+# first SOS stops in the comment; one that walks the segments by their lengths does not
+_com = b'\xff\xfe' + struct.pack('>H', 2 + 8) + b'ab\xff\xdacdef'
+cases['com_with_ffda_then_broken_exif'] = thumb_then_gps()[:2] + _com + thumb_then_gps()[2:]
 
 for k, v in cases.items():
     open(os.path.join(OUT, k + '.jpg'), 'wb').write(v)
