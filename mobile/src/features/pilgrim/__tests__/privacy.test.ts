@@ -78,7 +78,9 @@ check('SHARE LINKS: no file of another pilgrim\'s profile reads a private table,
 check('the data: three small reads under the row level security that is already there, and exactly these columns', () => {
   const api = code(read(`${FEATURE}/api.ts`));
   assert.deepEqual([...api.matchAll(/\.from\('(\w+)'\)/g)].map((m) => m[1]).sort(), ['friendships', 'posts', 'profiles'], 'the tables it reads');
-  assert.doesNotMatch(api, /\.rpc\(|\.storage\b|\.insert\(|\.update\(|\.upsert\(|\.delete\(/, 'it only reads, and asks no function of the database');
+  // the one function it asks is list_friend_requests (read only, my own requests): a declined request of mine still reads "Requested" (30 days)
+  assert.deepEqual([...api.matchAll(/\.rpc\('(\w+)'/g)].map((m) => m[1]), ['list_friend_requests'], 'the only function it asks');
+  assert.doesNotMatch(api.replace(/\.rpc\('list_friend_requests'\)/g, ''), /\.rpc\(|\.storage\b|\.insert\(|\.update\(|\.upsert\(|\.delete\(/, 'it only reads');
   const cols = (name: string) => new RegExp(`${name} = '([^']+)'`).exec(api)?.[1].split(',').map((c) => c.trim());
   assert.deepEqual(cols('PILGRIM_COLS'), ['id', 'username', 'display_name', 'bio', 'avatar_url', 'is_private', 'km_walked', 'posts_count', 'stamps_count']);
   assert.deepEqual(cols('FRIENDSHIP_COLS'), ['status', 'requested_by']);

@@ -3,18 +3,19 @@
 -- Supabase branch database (run as postgres, then roll back).
 \set ON_ERROR_STOP 1
 
--- Users: A (Google style metadata), B (email), C (email that collides with A's username)
+-- Users: A (Google style metadata), B (email), C asks for a username that D asked for first.
+-- Since 20261120020000 the username never comes from the e-mail address.
 insert into auth.users (id, email, raw_user_meta_data) values
-  ('aaaaaaaa-0000-0000-0000-000000000001', 'ana.garcia@gmail.com', '{"full_name": "Ana Garcia", "avatar_url": "https://example.com/a.png"}'),
+  ('aaaaaaaa-0000-0000-0000-000000000001', 'ana.garcia@gmail.com', '{"full_name": "Ana Garcia", "avatar_url": "https://lh3.googleusercontent.com/a/ana"}'),
   ('bbbbbbbb-0000-0000-0000-000000000002', 'ben@example.com', '{}'),
-  ('cccccccc-0000-0000-0000-000000000003', 'ana.garcia@example.com', '{}');
+  ('cccccccc-0000-0000-0000-000000000003', 'ana.garcia@example.com', '{"username": "rls_smoke_name"}');
 
 do $$
 begin
-  assert (select username from public.profiles where id = 'aaaaaaaa-0000-0000-0000-000000000001') = 'ana.garcia', 'username from email';
+  assert (select username from public.profiles where id = 'aaaaaaaa-0000-0000-0000-000000000001') ~ '^pilgrim[0-9]{8}$', 'neutral username, nothing from the e-mail';
   assert (select display_name from public.profiles where id = 'aaaaaaaa-0000-0000-0000-000000000001') = 'Ana Garcia', 'google full_name';
-  assert (select avatar_url from public.profiles where id = 'aaaaaaaa-0000-0000-0000-000000000001') = 'https://example.com/a.png', 'google avatar';
-  assert (select username from public.profiles where id = 'cccccccc-0000-0000-0000-000000000003') <> 'ana.garcia', 'username collision resolved';
+  assert (select avatar_url from public.profiles where id = 'aaaaaaaa-0000-0000-0000-000000000001') = 'https://lh3.googleusercontent.com/a/ana', 'google avatar';
+  assert (select username from public.profiles where id = 'cccccccc-0000-0000-0000-000000000003') = 'rls_smoke_name', 'username asked for at sign-up';
   assert (select count(*) from public.user_settings) = 3, 'settings rows';
   assert (select count(*) from public.storage_usage) = 3, 'storage usage rows';
   assert (select count(*) from public.subscriptions where status = 'none') = 3, 'subscription rows';

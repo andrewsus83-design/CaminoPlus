@@ -25,8 +25,15 @@ export type Post = { id: string; body: string | null; place_name: string | null;
 
 const PROFILE_COLS = 'id, username, display_name, bio, avatar_url, xp, level, followers_count, following_count, friends_count, posts_count, stamps_count, km_walked, is_private';
 
-function must<T>(res: { data: T | null; error: { message: string } | null }): T {
-  if (res.error) throw new Error(res.error.message);
+type DbError = { message: string; code?: string; hint?: string | null };
+
+// The error keeps the database's code and hint: a rate limit (code 54000, hint rate_limited_*) carries a sentence for people.
+function dbError(e: DbError): Error {
+  return Object.assign(new Error(e.message), { code: e.code, hint: e.hint ?? undefined });
+}
+
+function must<T>(res: { data: T | null; error: DbError | null }): T {
+  if (res.error) throw dbError(res.error);
   return res.data as T;
 }
 
@@ -236,7 +243,7 @@ export async function listPostComments(postId: string): Promise<PostComment[]> {
 export async function addPostComment(o: { id: string; userId: string; postId: string; body: string }) {
   await assertOnline();
   const res = await supabase.from('post_comments').insert({ id: o.id, post_id: o.postId, user_id: o.userId, body: o.body, client_created_at: new Date().toISOString() });
-  if (res.error && (res.error as { code?: string }).code !== '23505') throw new Error(res.error.message);
+  if (res.error && (res.error as { code?: string }).code !== '23505') throw dbError(res.error);
 }
 
 /** Text journal post (photos come with the media upload flow). Followers only by default. */

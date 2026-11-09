@@ -76,7 +76,7 @@ export function useFriendsData() {
   return { friends, incoming, outgoing, error, loading: (friends === null || requests === null) && !error, refreshing, refresh, retry, reload: load, busy, accept, decline, cancel, unfriend };
 }
 
-/** Find tab: search as you type (350 ms pause, at least 2 letters), newest answer wins. */
+/** Find tab: search as you type (350 ms pause, at least 3 letters), newest answer wins. */
 export function usePilgrimSearch(query: string) {
   const uid = useMeId();
   const clean = normalizeQuery(query);
