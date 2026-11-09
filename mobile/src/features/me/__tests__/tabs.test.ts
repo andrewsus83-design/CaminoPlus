@@ -140,7 +140,8 @@ check('the bell is gone: the header of Me has Settings at the top right and noth
   assert.equal((src.match(/<IconButton\b/g) ?? []).length, 1, 'one IconButton in the screen: the gear');
   const gear = src.indexOf('<IconButton name="settings"');
   assert.ok(gear > 0);
-  assert.match(src.slice(gear, gear + 200), /label="Settings" onPress=\{\(\) => router\.push\('\/settings'\)\} size=\{52\} \/>/);
+  // Updated on purpose (2026-11-09, small phones): the gear is the size of the header's density (features/me/headerFit.ts): 52, and 48 (the hard minimum) when the header is compact
+  assert.match(src.slice(gear, gear + 200), /label="Settings" onPress=\{\(\) => router\.push\('\/settings'\)\} size=\{hm\.gear\} \/>/);
   const row = src.slice(src.indexOf("style={{ marginLeft: 'auto', flexDirection: 'row'"), gear + 200);
   assert.doesNotMatch(row, /badge=/, 'no badge in the header: it moved to the chat button');
   assert.match(src, /accessibilityLabel=\{copied \? 'Username copied' : 'Copy username'\}/, 'the left of the row is as it was');
@@ -245,6 +246,53 @@ check('the card keeps its contrast in light and in dark: the words on the card a
   assert.match(read('src/components/Fab.tsx'), /<Icon name=\{icon\} color=\{role\.onHighlight\}/);
 });
 
+check('the captions of the Journey grid are 15 px or more and keep 4.5 : 1 over ANY picture and over every flat colour of the text cards (the 13 px white on the gold and tan tiles was 2.45 : 1)', () => {
+  const grid = read('src/features/me/JourneyGrid.tsx');
+  const colours = read('src/components/fixedColors.ts');
+  type Tokens = { color: Record<string, string> };
+  const palette = (JSON.parse(read('src/theme/tokens.json')) as Tokens).color; // the light palette: a tile's colours never change with the mode (fixed.*, FIXED.*)
+  const rgb = (hex: string) => [0, 2, 4].map((i) => parseInt(hex.replace('#', '').slice(i, i + 2), 16));
+  const lin = (v: number) => { const x = v / 255; return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4; };
+  const lum = (c: number[]) => 0.2126 * lin(c[0]) + 0.7152 * lin(c[1]) + 0.0722 * lin(c[2]);
+  const ratio = (a: number[], b: number[]) => { const [hi, lo] = [lum(a), lum(b)].sort((x, y) => y - x); return (hi + 0.05) / (lo + 0.05); };
+  const under = (bg: number[], alpha: number) => bg.map((v) => v * (1 - alpha)); // a black scrim of `alpha` over a background
+  const scrim = Number(/tileScrim: 'rgba\(0,0,0,([0-9.]+)\)'/.exec(colours)?.[1]);
+  const white = rgb(/onPhoto: '(#[0-9A-Fa-f]{6})'/.exec(colours)![1]);
+  assert.ok(scrim >= 0.54 && scrim <= 0.75, `the band is ${scrim}: at least 54 % black to hold 4.5 : 1 over a white picture, and not so black that it eats the tile`);
+  // ANY picture: every grey from black to white under the band (the brightest, white, is the worst case: nothing gives less contrast to white words)
+  let worst = Infinity;
+  for (let g = 0; g <= 255; g += 1) worst = Math.min(worst, ratio(white, under([g, g, g], scrim)));
+  assert.ok(worst >= 4.5, `the words over the band over the whitest picture are ${worst.toFixed(2)} : 1, they need 4.5 : 1`);
+  // the colours of the picture count too (a saturated one is darker than white, so it is never worse than white, but the check does not take that on trust)
+  for (const hex of ['#FF0000', '#00FF00', '#FFFF00', '#00FFFF', '#FFFFFF', '#F6EFE2', '#E9C987', '#D9A21B']) assert.ok(ratio(white, under(rgb(hex), scrim)) >= 4.5, `over ${hex}`);
+  // the flat colours of the text cards, read from the source
+  const colour = (ref: string) => (ref.startsWith("'") ? ref.slice(1, -1) : palette[ref.replace('fixed.', '')]);
+  const cards = [...grid.matchAll(/\{ bg: (fixed\.\w+|'#[0-9A-Fa-f]{6}'), fg: (fixed\.\w+|'#[0-9A-Fa-f]{6}') \}/g)].map((m) => ({ bg: colour(m[1]), fg: colour(m[2]) }));
+  assert.equal(cards.length, 5, 'the five colours of the text cards');
+  for (const { bg, fg } of cards) {
+    const got = ratio(white, under(rgb(bg), scrim));
+    assert.ok(got >= 4.5, `the caption on the card ${bg} is ${got.toFixed(2)} : 1`);
+    const body = ratio(rgb(fg), rgb(bg));
+    assert.ok(body >= 4.5, `the words of the card ${bg} (${fg}) are ${body.toFixed(2)} : 1`);
+  }
+  // the old band (28 % black) did not hold the gold and the tan tiles: this check can fail
+  const oldGold = ratio(white, under(rgb('#E9C987'), 0.28));
+  assert.ok(oldGold < 4.5, `at 28 % the tan tile gave ${oldGold.toFixed(2)} : 1: the check would have caught it`);
+  assert.ok(ratio(white, under(rgb(palette.gold), 0.28)) < 4.5, 'and the gold tile too (4.2 : 1)');
+  assert.ok(ratio(white, under([255, 255, 255], 0.28)) < 2.5, 'and a white picture even more (2.0 : 1)');
+  // the size: the caption variant (15 px on 21), no size of its own, on up to two lines; the slide count is the same size
+  const src = code(grid);
+  assert.match(src, /<AppText variant="caption" color=\{FIXED\.onPhoto\} numberOfLines=\{2\}>\{p\.place_name \|\| dateOf\(p\.published_at\) \|\| 'On the Camino'\}<\/AppText>/, 'the caption of a tile');
+  assert.match(src, /<AppText variant="caption" color=\{FIXED\.onPhoto\}>\{count\}<\/AppText>/, 'the slide count');
+  assert.match(src, /paddingHorizontal: space\[3\], paddingVertical: space\[2\], backgroundColor: FIXED\.tileScrim/, 'the band keeps 8 px above and below the words and 12 beside them (steps of the space scale)');
+  assert.match(src, /minWidth: 28, height: 28, alignItems: 'center', justifyContent: 'center', paddingHorizontal: space\[2\], borderRadius: radius\.pill, backgroundColor: FIXED\.tileScrim/, 'the count sits on the same band colour');
+  assert.doesNotMatch(src.slice(src.indexOf('count > 1 &&'), src.indexOf('<Viewer posts={shown}')), /fontSize: 1[0-4]\b/, 'nothing on a tile is under 15 px');
+  assert.ok(JSON.parse(read('src/theme/tokens.json')).text.caption.size >= 15, 'and the caption variant itself is not under 15');
+  assert.doesNotMatch(colours, /tileScrim: 'rgba\(0,0,0,0\.28\)'/, 'the 28 % band is gone');
+  // the cards of the sample journey and of another pilgrim's journey are this same grid, so they are covered too
+  assert.match(code(read('src/features/me/SampleJourney.tsx')), /<JourneyGrid posts=\{SAMPLE\.posts\} sample=\{SAMPLE\.media\} \/>/);
+});
+
 /* ================================================================ the rest of the screen */
 
 check('the Notes sub-tab is the feed in the screen: NotesTab owns the scroll, gets the header and the strip as `top` with the margins Screen gives, and the messages about Me\'s data stay out of it', () => {
@@ -271,7 +319,8 @@ check('the header (handle, gear, avatar, bio, My Camino, highlights) is one piec
   const gear = src.indexOf('<IconButton name="settings"', top);
   assert.ok(top > 0 && gear > top && hl > gear && strip > hl, 'the gear, then the highlights, then the strip, all in `top`');
   assert.equal((src.match(/\{top\}/g) ?? []).length, 2, 'drawn in the two hosts: once in each');
-  assert.doesNotMatch(src.slice(strip, src.indexOf('</>', strip)), /<Fab|<JourneyGrid|<Health/, 'nothing but the strip after the highlights, inside the header');
+  // Updated on purpose (2026-11-09, small phones): the header is one view (with the spacing of its density), no longer a fragment, so it ends at the `);` after the strip
+  assert.doesNotMatch(src.slice(strip, src.indexOf('\n  );', strip)), /<Fab|<JourneyGrid|<Health/, 'nothing but the strip after the highlights, inside the header');
 });
 
 check('four labels fit in a row at 320: the strip gives each one a quarter of the width with no side padding of its own, and a label is one short word', () => {

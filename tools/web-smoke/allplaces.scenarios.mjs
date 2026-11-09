@@ -101,7 +101,7 @@ export const ALL_PLACES_SCENARIOS = [
       const boxes = await Promise.all([0, 1, 2].map((i) => box(dest.nth(i), `destination ${i}`)));
       for (const b of boxes) assert(b.x >= a.x + a.width - 1, `a destination starts at ${b.x}, under or left of the All item that ends at ${a.x + a.width}`);
       near(a.x, 16, 6, 'the All item is at the left margin');
-      near(a.width, 72, 2, 'it is as wide as the other items (72)');
+      near(a.width, 72, 2, 'its cell is 72 wide: its label is one short word (a destination has a wider cell, 108, for names on two lines)');
       near(boxes[0].y, a.y, 4, 'the destinations are on the row of the All item');
       assert.deepEqual(await dest.evaluateAll((els) => els.map((e) => e.getAttribute('aria-label'))), ['Roncesvalles, no posts yet, open the day plan', 'Zubiri, 2 posts, show them', 'Pamplona, 1 post, show it'], 'the destinations are unchanged');
       step('it is not selected, and there are no stamps yet; the Journey grid is the plain one');

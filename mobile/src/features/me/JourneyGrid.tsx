@@ -159,12 +159,14 @@ export function JourneyGrid({ posts, margin = layout.screenMargin, sample, media
                 <Pressable key={p.id} accessibilityRole="button" accessibilityLabel={`Open post from ${p.place_name ?? 'the Camino'}`} onPress={() => setOpenAt(i)} style={{ width: colW, height: tileH, overflow: 'hidden', backgroundColor: c.sand200 }}>
                   <PostVisual post={p} media={first} index={i} active={false} small />
                   {count > 1 && (
-                    <View style={{ position: 'absolute', top: 8, right: 8, flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 8, height: 24, borderRadius: radius.pill, backgroundColor: FIXED.photoChip }}>
-                      <AppText variant="caption" color={FIXED.onPhoto} style={{ fontSize: 12, lineHeight: 14 }}>{count}</AppText>
+                    // design-lint-ignore: inset the slide count is a badge as small as its number: 28 high, the number of the caption variant
+                    <View style={{ position: 'absolute', top: space[2], right: space[2], minWidth: 28, height: 28, alignItems: 'center', justifyContent: 'center', paddingHorizontal: space[2], borderRadius: radius.pill, backgroundColor: FIXED.tileScrim }}>
+                      <AppText variant="caption" color={FIXED.onPhoto}>{count}</AppText>
                     </View>
                   )}
-                  <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, padding: 10, backgroundColor: FIXED.tileScrim }}>
-                    <AppText variant="caption" color={FIXED.onPhoto} numberOfLines={1} style={{ fontSize: 13, lineHeight: 16 }}>{p.place_name || dateOf(p.published_at) || 'On the Camino'}</AppText>
+                  {/* The place or the date, over a dark band: the caption variant (15 px, white) on up to two lines. The band is dark enough (FIXED.tileScrim) that the words keep 4.5 : 1 over ANY picture, even a white one, and over every flat colour of the text cards (tabs.test.ts mixes them). */}
+                  <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: space[3], paddingVertical: space[2], backgroundColor: FIXED.tileScrim }}>
+                    <AppText variant="caption" color={FIXED.onPhoto} numberOfLines={2}>{p.place_name || dateOf(p.published_at) || 'On the Camino'}</AppText>
                   </View>
                 </Pressable>
               );

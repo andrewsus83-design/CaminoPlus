@@ -4,12 +4,14 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import {
-  MAX_HIGHLIGHTS, buildHighlights, coverUrl, destinationName, firstLetter, highlightLabel, nextHighlightIndex, parseSeen, placeMatch,
+  MAX_HIGHLIGHTS, NAME_TEXT_CAP, buildHighlights, coverUrl, destinationName, firstLetter, highlightLabel, highlightCell, nextHighlightIndex, parseSeen, placeMatch, rowStartOffset,
   type DayLike, type PostLike,
 } from '../highlights';
+import { DENSITY } from '../headerFit';
 // The sub-tabs of Me and the Notes feed have their own files. They run from here, so the package's test script (which names the five files
 // of this suite) runs them without being edited.
 import './tabs.test';
+import './headerFit.test';
 import './allPlaces.test';
 import '../../notes/__tests__/notes.test';
 
@@ -222,13 +224,18 @@ check('Me still has the My Camino card, as it was: shell mark in its ring, the t
   const line = me.split('\n').find((l) => l.includes('accessibilityLabel="Change Camino"'));
   assert.ok(line, 'the card (a button labelled "Change Camino") is gone: the owner asked for it to stay');
   assert.match(line!, /onPress=\{\(\) => router\.push\('\/change-camino'\)\}/);
-  assert.match(line!, /marginTop: 8,.*padding: 14,.*backgroundColor: role\.inverse/, 'the card keeps its size and colour');
-  assert.match(me, /<ShellMark size=\{48\} \/>/, 'the shell logo stays');
-  assert.match(me, /width: 52, height: 52, borderRadius: radius\.pill, borderWidth: 1\.5/, 'in its 52 px ring');
+  // Updated on purpose (2026-11-09, small phones): the card is two bands, the head (the shell in its ring, "Buen Camino!" over "My Camino", the Change button) and the body (the route and
+  // how far along it is, with the whole width of the card, so that no word is cut); its padding is a step of the space scale (it was 14, which is not one); the ring is 52, and 40 when the header is compact
+  assert.match(line!, /marginTop: hm\.cardLift, gap: hm\.cardGap, padding: space\[3\].*backgroundColor: role\.inverse/, 'the card keeps its colour, its radius and its shadow');
+  assert.match(me, /<ShellMark size=\{hm\.cardRing - 4\} \/>/, 'the shell logo stays');
+  assert.match(me, /width: hm\.cardRing, height: hm\.cardRing, borderRadius: radius\.pill, borderWidth: 1\.5/, 'in its ring');
+  assert.equal(DENSITY.roomy.cardRing, 52, 'a 52 px ring when roomy, as it was');
   assert.match(me, />Change<\/AppText>/, 'the gold Change button');
   assert.match(me, />My Camino<\/AppText>/);
   assert.match(me, />Buen Camino!<\/AppText>/);
-  assert.match(me, /\{journey\.start_stage \? `From stage \$\{journey\.start_stage\.stage_number\} · ` : ''\}\{stagesDone\} stages done/);
+  // Updated on purpose (2026-11-09): the line is built by features/me/caminoCard.ts, which says "1 stage done" (it said "1 stages done") and keeps the parts of the line together
+  assert.match(me, /\{caminoLine\(journey\.start_stage\?\.stage_number, stagesDone\)\}/);
+  assert.doesNotMatch(me, /stages done/, 'the words are not written a second time in the screen');
 });
 
 check('the highlights sit directly under the card: after it, before the strip of sub-tabs (Notes, Journey, Plan, Health), once', () => {
@@ -265,22 +272,37 @@ check('Me filters the Journey grid to the picked destination, with a bar that cl
   assert.match(grid, /<Viewer posts=\{shown\}/);
 });
 
-check('the row: 60 px pictures in a 66 px ring, 72 px wide items 16 apart, names in the caption variant (15 px, the smallest text there is), the screen\'s margin as padding', () => {
+check('the row: 60 px pictures in a 66 px ring, a destination in a 108 px cell and All in a 72 px one, names in the caption variant (15 px, the smallest text there is) on two lines, the screen\'s margin as padding', () => {
   const src = code(read('src/features/me/Highlights.tsx'));
   assert.match(src, /const RING = 66;/);
   assert.match(src, /const PICTURE = 60;/);
-  assert.match(src, /const ITEM_W = 72;/);
-  assert.match(src, /const GAP = space\[4\];/, '16 apart: a step of the space scale');
+  // Updated on purpose (2026-11-09, small phones): the names take up to two lines in a wider cell. The widest word of the Camino names, "Roncesvalles", measures 99.4 px in Inter Medium 15 px
+  // (the caption variant) in a real browser, and 100.8 px in the bold of the open destination: a cell of 72 cut the first stop of the Camino Francés in the middle of the word. 108 holds it,
+  // and of 54 names of the Caminos tried at 108, every one wraps at a word in two lines but two ("Santo Domingo de la Calzada", "Terradillos de los Templarios"), which end in "…".
+  assert.match(src, /const ALL_W = 72;/, 'the All item keeps its 72 px cell: its label is one short word');
+  assert.match(src, /const ITEM_W = 108;/);
+  assert.ok(108 >= Math.ceil(100.81) + 3, 'the cell holds "Roncesvalles" in bold (100.8 px), whole, with 7 px to spare');
+  assert.match(src, /const GAP = space\[4\];/, '16 between the All item and the first destination: a step of the space scale');
+  assert.match(src, /const ITEM_GAP = space\[1\];/, '4 between two destinations: the round to the next round is 108 - 66 + 4 = 46');
   // Updated on purpose with the standard (nothing under 15 px): the names were 12 px with a line height of 16 of their own; they are the caption variant now, which
   // is 15 px on 21, so the row is a little taller (the label of an item was 16 high, it is 21) and a long name ends in "…" two letters sooner
-  assert.match(src, /<AppText variant="caption" numberOfLines=\{1\} style=\{\{ width: ITEM_W, textAlign: 'center', fontFamily: active \? fonts\.bodyBold : fonts\.bodyMedium \}\}>\{h\.name\}<\/AppText>/, 'the name of a destination: the caption variant, one line of the item\'s width');
+  // Updated on purpose (2026-11-09, review): the cell follows the text size of the phone (`cell`, highlightCell), and the name is held to the same cap, so a word that fits at the normal size still fits
+  assert.match(src, /<AppText variant="caption" numberOfLines=\{dense \? 1 : 2\} maxFontSizeMultiplier=\{NAME_TEXT_CAP\} style=\{\{ width: cell, textAlign: 'center', fontFamily: active \? fonts\.bodyBold : fonts\.bodyMedium \}\}>\{h\.name\}<\/AppText>/, 'the name of a destination: the caption variant, centred, two lines of the cell\'s width (one when the header is compact: the screen reader, and the bar over the grid, say it whole), held to the cap the cell is worked out with');
+  assert.match(src, /const \{ width, fontScale \} = useWindowDimensions\(\);\s*const cell = highlightCell\(ITEM_W, fontScale\);/, 'the cell is worked out from the text size of the window, which draws the row again when the setting changes');
+  assert.match(src, /accessibilityLabel=\{highlightLabel\(h, active\)\} onPress=\{onPress\} style=\{\{ width: cell,/, 'the whole cell is the button');
+  assert.match(src, /item: cell, gap: ITEM_GAP, margin: layout\.screenMargin, allItem: ALL_W, allGap: GAP, shown: \(cell \+ RING\) \/ 2, pad: ROW_PAD \}\)/, 'the offset of the row is worked out with the same cell, the round\'s edge in it, and the pad the row really has (one constant for both)');
+  assert.match(src, /const plan = `\$\{items\[0\]\.key\}:\$\{cell\}`;/, 'a new text size places the row again');
+  assert.doesNotMatch(src, /hlLift|hlLabelGap|hlLines/, 'no number of the row is read from the header table: the row has its own (dense)');
   assert.doesNotMatch(src, /fontSize|lineHeight|letterSpacing/, 'no size of its own anywhere in the row: every text is a variant of the type scale');
   assert.ok(tokens.text.caption.size >= 15, 'and the caption variant is not under 15');
   assert.doesNotMatch(src, /\b(?:padding|margin|gap|paddingHorizontal|paddingVertical)\w*: \d/, 'no padding, margin or gap written as a number: the steps of the space scale');
   assert.match(src, /marginHorizontal: -layout\.screenMargin/, 'it reaches the screen edges');
   // Updated on purpose with the All item: the margins are the screen's on both sides, but on the left they belong to the All item when it is there
   assert.match(src, /paddingLeft: pinned \? layout\.screenMargin : 0/, 'the All item has the margin on the left ...');
-  assert.match(src, /paddingLeft: pinned \? 0 : layout\.screenMargin, paddingRight: layout\.screenMargin/, '... and the destinations have it when there is none');
+  // Updated on purpose (2026-11-09): a destination's round sits 21 px inside its 108 px cell, so with no All item the row starts 4 px from the margin and the first round is 25 from the edge.
+  // Updated on purpose (2026-11-09, review): the 4 is one constant, ROW_PAD, and rowStartOffset is given it (it was told the margin, 16, which put the scroll target 12 px off)
+  assert.match(src, /const ROW_PAD = space\[1\];/);
+  assert.match(src, /contentContainerStyle=\{\{ paddingLeft: pinned \? 0 : ROW_PAD, paddingRight: layout\.screenMargin, gap: ITEM_GAP \}\}/, '... and the destinations have it when there is none');
   assert.match(src, /showsHorizontalScrollIndicator=\{false\}/);
   assert.match(src, /if \(items\.length === 0 && !pinned\) return null;/, 'no destinations and no All item: nothing is drawn, not even the space (with places and no destination the All item is drawn alone)');
 });
@@ -298,7 +320,7 @@ check('the All item: the first item of the row, pinned at its left (outside the 
   assert.match(src, /accessibilityLabel=\{allLabel\(visited, total\)\} accessibilityHint=\{allHint\(on\)\} accessibilityState=\{\{ selected: on \}\} aria-selected=\{on\}/, '"All places, N of M with journeys", selected while its view is on (the state for the phone, aria-selected for the web)');
   const item = src.slice(src.indexOf('function AllItem'), src.indexOf('function Item('));
   assert.doesNotMatch(item, /seen|mark\(/, 'it is never seen or unseen');
-  assert.match(item, /width: ITEM_W/, 'as wide as the other items');
+  assert.match(item, /width: ALL_W/, 'its own cell, 72 px');
 });
 
 check('the row\'s colours are theme roles: gold ring until it is opened, then the strong border; dashed circle and pin when ahead', () => {
@@ -348,6 +370,46 @@ check('the logic files import nothing from React, React Native or the app: plain
   }
   assert.match(read('src/features/me/shared.tsx'), /export \{ norm \} from '\.\/text';/, 'norm is still exported from shared for the passport');
   assert.match(read('app/passport.tsx'), /import \{ Empty, ProgressBar, norm, shortDate \} from '@\/features\/me\/shared';/);
+});
+
+check('the row opens at the next destination with the All item and the destinations in cells of their own (72 and 108): on the first screen when the round of the next one is, else with half of the one before showing', () => {
+  const o = { pinned: true, item: 108, gap: 4, margin: 16, allItem: 72, allGap: 16, shown: 87 };
+  // 390: the scrolling part is 390 - 16 - 72 - 16 = 286 wide, and the round of a destination ends 87 px into its cell (21 of air, 66 of round)
+  assert.equal(rowStartOffset({ ...o, width: 390, nextAt: 0 }), 0);
+  assert.equal(rowStartOffset({ ...o, width: 390, nextAt: 1 }), 0, 'the second: 112 + 87 = 199 is inside 270');
+  assert.equal(rowStartOffset({ ...o, width: 390, nextAt: 2 }), 2 * 112 - (54 + 4), 'the third: 224 + 87 = 311 is not');
+  // 320: 200 of room before the margin: the round of the second destination (199) still shows whole, the third does not
+  assert.equal(rowStartOffset({ ...o, width: 320, nextAt: 1 }), 0);
+  assert.equal(rowStartOffset({ ...o, width: 320, nextAt: 2 }), 2 * 112 - (54 + 4));
+  // the cell of the next destination is not asked for whole: only its round (the rest is air round a name)
+  assert.equal(rowStartOffset({ ...o, width: 320, nextAt: 1, shown: 108 }), 1 * 112 - (54 + 4), 'asked for whole at 320 the row would open scrolled and cut the name of the first stop');
+  // without the extra numbers it is the formula it was: the All item is as wide as a destination and the whole cell has to show
+  assert.equal(rowStartOffset({ width: 390, nextAt: 3, pinned: true, item: 72, gap: 16, margin: 16 }), 3 * 88 - 52, 'as allPlaces.test.ts has it: 3 x 88 + 72 = 336 is more than 270');
+  assert.equal(rowStartOffset({ width: 390, nextAt: 3, pinned: false, item: 72, gap: 16, margin: 16 }), 0, '16 + 3 x 88 + 72 = 352 is inside 374');
+});
+
+check('the cell of a destination follows the text size of the phone: 108 at the normal size, 124 at 1.15, 140 at 1.3, 162 at 1.5 and no more, and rowStartOffset gets the same cell', () => {
+  assert.equal(NAME_TEXT_CAP, 1.5);
+  assert.deepEqual([1, 1.15, 1.3, 1.5].map((s) => highlightCell(108, s)), [108, 124, 140, 162]);
+  assert.equal(highlightCell(108, 2), 162, 'the name is held to 1.5 (maxFontSizeMultiplier), so the cell stops there');
+  assert.equal(highlightCell(108, 3.1), 162);
+  assert.equal(highlightCell(108, 0.85), 108, 'smaller text does not shrink the cell: the circle and the tap target stay');
+  assert.equal(highlightCell(108, undefined), 108);
+  assert.equal(highlightCell(108, Number.NaN), 108);
+  // "Roncesvalles" is 99.44 px in Inter Medium and 100.81 in SemiBold at the normal size and grows with the text: it fits the cell at every size up to the cap (it broke at about 1.07 in a cell of 108)
+  for (const s of [1, 1.07, 1.1, 1.15, 1.2, 1.3, 1.4, 1.5]) assert.ok(highlightCell(108, s) >= 100.81 * s + 3, `${s}: the cell holds the bold word whole`);
+  assert.ok(108 / 100.81 < 1.075, 'a fixed cell of 108 stops holding it at 1.07: that is the bug this fixes');
+  // the offset of the row uses the same cell, the round's edge inside it, and the same All item: a plan with the next stop at the 4th place scrolls further as the cells grow
+  const o = { pinned: true, gap: 4, margin: 16, allItem: 72, allGap: 16, width: 390, nextAt: 3 };
+  const at = (s: number) => { const cell = highlightCell(108, s); return rowStartOffset({ ...o, item: cell, shown: (cell + 66) / 2 }); };
+  assert.deepEqual([1, 1.15, 1.3, 1.5].map(at), [3 * 112 - (54 + 4), 3 * 128 - (62 + 4), 3 * 144 - (70 + 4), 3 * 166 - (81 + 4)]);
+  // without an All item the real pad is used: the row pads 4 (ROW_PAD), not the margin of 16 that used to be assumed, so the next stop is 12 px nearer than that (the scroll target was 12 px too far)
+  const free = { pinned: false, gap: 4, margin: 16, item: 108, shown: 87, width: 390, nextAt: 3 };
+  assert.equal(rowStartOffset({ ...free, pad: 4 }), 4 + 3 * 112 - (54 + 4));
+  assert.equal(rowStartOffset({ ...free }), 16 + 3 * 112 - (54 + 4), 'without `pad` the margin is the pad, as it always was (old calls and their tests)');
+  assert.equal(rowStartOffset({ ...free, pad: 4 }) - rowStartOffset({ ...free }), -12, 'the two differ by margin - pad');
+  assert.equal(rowStartOffset({ ...free, pad: 4, nextAt: 1 }), 0, 'on the first screen: the row stays at its start');
+  assert.equal(rowStartOffset({ ...o, item: 108, shown: 87, pad: 4 }), rowStartOffset({ ...o, item: 108, shown: 87 }), 'with the All item pinned there is no pad: the argument changes nothing');
 });
 
 console.log(`${n} of ${n} passed`);

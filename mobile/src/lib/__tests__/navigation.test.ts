@@ -16,6 +16,7 @@ import { BOOK_CATALOG } from '../../features/library/books/catalog';
 import { shelves } from '../../features/library/books/copy';
 import { coverLabel } from '../../features/library/books/cover';
 import { BIBLE_SOURCE_LINE, LIBRARY_TABS, ROW_TABS } from '../../features/library/sample';
+import { DENSITY } from '../../features/me/headerFit';
 import { ME_FAB } from '../../features/me/tabs';
 
 let n = 0;
@@ -203,7 +204,10 @@ check('Library has no title and no diary button: its first row is the search fie
   assert.match(row, /import \{ IconButton \} from '@\/components\/ui';/, 'the same button as Me\'s');
   assert.match(row, /flexDirection: 'row', alignItems: 'center', gap: 8/);
   const me = read(join('app', '(tabs)', 'me.tsx'));
-  assert.match(me.slice(me.indexOf('<IconButton name="settings"')), /size=\{52\}/, 'Me\'s gear is 52 too');
+  // Updated on purpose (2026-11-09, small phones): Me's gear is 52 on a phone with room for the whole header, and 48 (the hard minimum for a touch target) on a short one, where the header is compact
+  assert.match(me.slice(me.indexOf('<IconButton name="settings"')), /size=\{hm\.gear\}/, 'Me\'s gear takes the size of the density');
+  assert.equal(DENSITY.roomy.gear, 52, 'Me\'s gear is 52 too, when the header is roomy');
+  assert.equal(DENSITY.compact.gear, 48, 'and 48 when it is compact');
   assert.match(read(join('src', 'components', 'ui.tsx')), /accessibilityHint=\{hint\}/);
   // the glyphs stay: the diary's spiral notebook is its own drawing, not the Bible's closed book with a cross, not the open book of the tab,
   // and not the bookmark next to it (the Notes feed of Me, or anything else, may use it)

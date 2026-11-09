@@ -23,6 +23,7 @@ import { BIBLE_SCENARIOS } from './bible.scenarios.mjs';
 import { BOOKS_SCENARIOS, CATALOG, COVER_LABEL } from './books.scenarios.mjs';
 import { CONTINUE_SCENARIOS } from './continue.scenarios.mjs';
 import { ME_SCENARIOS } from './me.scenarios.mjs';
+import { ME_SMALL_SCENARIOS } from './mesmall.scenarios.mjs';
 import { PILGRIM_SCENARIOS } from './pilgrim.scenarios.mjs';
 import { SHARE_SCENARIOS } from './share.scenarios.mjs';
 import { ALL_PLACES_SCENARIOS } from './allplaces.scenarios.mjs';
@@ -289,6 +290,7 @@ export const SCENARIOS = [
     },
   },
   ...ME_SCENARIOS,
+  ...ME_SMALL_SCENARIOS,
   ...PILGRIM_SCENARIOS,
   ...SHARE_SCENARIOS,
   {

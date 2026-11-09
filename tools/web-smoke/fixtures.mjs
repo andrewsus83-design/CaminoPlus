@@ -48,6 +48,14 @@ export const PROFILE = {
   followers_count: 3, following_count: 5, friends_count: 2, posts_count: 2, stamps_count: 2, km_walked: 41.5, is_private: false,
 };
 
+/**
+ * A description at the limit of the field (160 characters): four lines at the width of a small phone. The walks of Me on small phones that try the header with a long description ask for it
+ * with `data: 'longbio'` (a full account whose profile has this text; mesmall.scenarios.mjs only). Every other walk keeps the one line of PROFILE.bio, so nothing else sees a long description.
+ */
+export const LONG_BIO = 'Walking the Camino Frances for my family in Surabaya, one stage at a time. I carry a small stone from home for the Cruz de Ferro and write every night. Ultreia!';
+/** The pilgrim's own profile in a kind of data: the long description for 'longbio', the usual one otherwise. */
+const myProfile = (data) => (data === 'longbio' ? { ...PROFILE, bio: LONG_BIO } : PROFILE);
+
 const STAGE_1 = '40000000-0000-0000-0000-000000000001';
 const STAGE_2 = '40000000-0000-0000-0000-000000000002';
 const STAGE_3 = '40000000-0000-0000-0000-000000000003';
@@ -178,13 +186,14 @@ export const POIS = [
 //   full  (the default) a pilgrim who has walked a day, posted, made friends: every list has rows
 //   empty a pilgrim with an account and a journey and NOTHING else: no days, stamps, posts, friends, chats, stays, no list of
 //         Caminos. This is what the earlier hand-run sweeps used (everything but the profile and the journey was an empty list).
+//   longbio the full account, with a description of 160 characters (LONG_BIO) instead of one line: for the walks of Me on small phones only
 // `new` (signed in, no journey yet) has no journey in either; only its list of Caminos differs.
 
 /** What the account holds. `new` = signed in, onboarding not done: no journey. */
 function tables({ persona, data }) {
   const full = persona === 'in' && data !== 'empty';
   return {
-    profiles: [PROFILE, { ...HANNAH, ...HANNAH_CARD }, { ...LUCAS, ...LUCAS_CARD }, MARTA, INES].map((p) => ({ ...p })),
+    profiles: [myProfile(data), { ...HANNAH, ...HANNAH_CARD }, { ...LUCAS, ...LUCAS_CARD }, MARTA, INES].map((p) => ({ ...p })),
     friendships: full ? FRIENDSHIPS : [],
     post_comments: full ? HANNAH_COMMENTS : [],
     journeys: persona === 'in' ? [{ ...JOURNEY, user_id: UID, deleted_at: null }] : [],
@@ -297,7 +306,7 @@ export function storageSeed({ persona, scheme, offline = false, url, expiredLogi
   seed.push([authKey(url), JSON.stringify(makeSession({ expired: expiredLogin }))]);
   if (savedAccount) {
     const journey = persona === 'in' ? JOURNEY : null;
-    seed.push([`kv:u.${UID}.account`, JSON.stringify({ v: 1, profile: PROFILE, journey, savedAt: Date.now() })]);
+    seed.push([`kv:u.${UID}.account`, JSON.stringify({ v: 1, profile: myProfile(data), journey, savedAt: Date.now() })]);
     if (journey && data !== 'empty') seed.push([`kv:u.${UID}.me`, JSON.stringify({ v: 1, journeyId: JOURNEY.id, posts: POSTS, stamps: STAMPS, days: JOURNEY_DAYS, stages: STAGES })]);
   }
   return seed;

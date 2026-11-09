@@ -59,6 +59,17 @@ too small for many readers. If a name does not fit at 15, the layout changes (fe
 `borderRadius` is `radius.*` (anything you tap is `radius.pill`; cards are `radius.lg`), or half the width of a circle. A shadow is `shadowStyle('md')`,
 never `shadowColor`, `shadowOpacity` and `shadowRadius` written by hand.
 
+## Short phones: nothing floats over what you read
+
+Something that floats over the corner of a screen (the gold chat button of Me, 60 px, 8 px above the tab bar) must not cover anything the person has to reach. On Me the strip of sub-tabs
+is the last thing of the header, so the header is drawn compact when the strip would end under the button (`features/me/headerFit.ts`: a smaller picture, tighter space, the names under the
+highlights and the description on one line each; every button, the four tabs of the strip and every word of the card stay). A compact header is budgeted for the most the person can write into
+it, not for the sample: the description is ONE line however long it is (its "…" says there is more, and the line itself, a button, opens the rest and closes it again), so the header is as tall
+for 160 characters as for ten. The room is counted from the real numbers of the phone: its height, the status bar, the home bar, the text size; what holds a word follows the text size too (the
+cell under a highlight grows with it, `highlightCell`). A new floating button or a new tall header gets the same care, and the web smoke measures it with the longest text the field allows
+(`tools/web-smoke/mesmall.scenarios.mjs`). A line of text that is a button (the description) cannot have 48 px without a taller header: it has the 25 px of the line and 8 px of `hitSlop` below it,
+the most that takes no tap from the pen above it and the card under it, and the comment beside it says so.
+
 ## Insets: room between text and the edge
 
 Text inside a box with a border or a fill keeps **8 px or more** from the outline on every side. A card holds its content at `layout.cardPadding` (20).

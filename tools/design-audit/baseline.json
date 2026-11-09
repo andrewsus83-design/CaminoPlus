@@ -1,34 +1,34 @@
 {
  "$comment": "The design-lint baseline: how far the app code is from design/tokens.json today. Written by `python3 tools/design-audit/scan.py --update-baseline`, never by hand. `python3 tools/design-audit/scan.py --check` fails when a category total goes up, or when a file that has no entry here gets a violation (code that only moved to it is not one). `fp` is one short fingerprint per violation (its rule, value and source line, not its line number), so a failure can name the new violations and a move between files is told from a new violation. tools/design-audit/README.md has the rest.",
  "version": 1,
- "commit": "bba78733447c31b948d3dd5b0fd27167a90c82f7",
+ "commit": "54463b79e52387740f6feb9051b1610ead73cd33",
  "totals": {
-  "color": 164,
-  "font": 43,
-  "spacing": 92,
+  "color": 163,
+  "font": 39,
+  "spacing": 88,
   "size": 44,
-  "inset": 12,
+  "inset": 11,
   "ignore": 0
  },
  "kinds": {
-  "color/raw": 164,
+  "color/raw": 163,
   "font/letter-spacing": 7,
-  "font/line-height": 19,
+  "font/line-height": 17,
   "font/size": 3,
-  "font/small": 14,
-  "inset/text-near-edge": 12,
+  "font/small": 12,
+  "inset/text-near-edge": 11,
   "size/icon": 30,
   "size/radius": 4,
   "size/touch": 10,
-  "spacing/gap": 37,
+  "spacing/gap": 35,
   "spacing/margin": 8,
-  "spacing/padding": 47
+  "spacing/padding": 45
  },
  "apart": {
   "color/role-first": 107,
   "spacing/offset": 47,
-  "spacing/negative": 9,
-  "size/touch-below-primary": 64
+  "spacing/negative": 8,
+  "size/touch-below-primary": 63
  },
  "duplicates": {
   "pill": 28,
@@ -56,13 +56,12 @@
   },
   "app/(tabs)/me.tsx": {
    "counts": {
-    "color": 1,
     "font": 2,
-    "spacing": 9,
+    "spacing": 6,
     "size": 6,
     "inset": 2
    },
-   "fp": "029062f5b0 179ab52fb5 29b91bb612 2d9c542da6 348d0c9df0 3abca9c3bf 449b55b5a8 4ab02e2810 57c605ea71 6bc506c39c 73fc04110d 8be347ede8 a70ef545a9 af78e9695d b3b78c549b c5fc08cfc0 c89969a82c cf9577380a da013d3fe8 f410257a17"
+   "fp": "029062f5b0 179ab52fb5 29b91bb612 2d9c542da6 3abca9c3bf 449b55b5a8 4ab02e2810 57c605ea71 6bc506c39c 73fc04110d a70ef545a9 af78e9695d c5fc08cfc0 c89969a82c cf9577380a da013d3fe8"
   },
   "app/friends.tsx": {
    "counts": {
@@ -313,12 +312,11 @@
   "src/features/me/JourneyGrid.tsx": {
    "counts": {
     "color": 3,
-    "font": 7,
-    "spacing": 7,
-    "size": 1,
-    "inset": 1
+    "font": 3,
+    "spacing": 6,
+    "size": 1
    },
-   "fp": "0b31a36b38 16aecd7377 1b7374f270 4d80f556cc 5af229d018 635c8c562d 6d62beb937 83b7457520 845b03876b 89d295b6e5 8a1fb012e3 91f54ef100 9ad308ef2d 9c36db6ef1 9dea6ed602 aeaaa84f06 da479d332d f2a8b55699 fff1145eef"
+   "fp": "0b31a36b38 16aecd7377 635c8c562d 6d62beb937 89d295b6e5 8a1fb012e3 91f54ef100 9ad308ef2d 9c36db6ef1 9dea6ed602 aeaaa84f06 f2a8b55699 fff1145eef"
   },
   "src/features/me/shared.tsx": {
    "counts": {
