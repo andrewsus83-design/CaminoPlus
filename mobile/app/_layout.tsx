@@ -117,6 +117,7 @@ function RootStack() {
         <Stack.Screen name="friends" />
         <Stack.Screen name="pilgrim/[id]" />
         <Stack.Screen name="blocked" />
+        <Stack.Screen name="shared-links" />
         <Stack.Screen name="business/index" />
         <Stack.Screen name="business/register" />
         <Stack.Screen name="business/status" />
