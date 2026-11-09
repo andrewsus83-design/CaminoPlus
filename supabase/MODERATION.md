@@ -170,3 +170,7 @@ Resend), change the `fetch` in the function to that sender's API, with its key i
 Migration `20261120010000_rate_limits.sql` caps what one account can do: 20 posts a day, 60 comments an hour,
 300 likes and 300 saves an hour, 100 follows a day, 30 reports a day, 30 friend requests a day (and 30 days of
 quiet after a request is declined), 30 searches a minute. A spammer hits these quickly; real pilgrims do not.
+
+A known limit of the 30 days of quiet: during them, the sender still sees "Requested" (in the Friends list, in search
+and on the profile), as if the other pilgrim had not answered yet. After 30 days that "Requested" disappears, so a
+patient sender could guess, a month later, that the request was declined. This is accepted for now.

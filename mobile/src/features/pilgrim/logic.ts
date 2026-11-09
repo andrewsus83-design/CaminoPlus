@@ -76,6 +76,13 @@ export function readRelation(rows: unknown, me: string): FriendStatus {
   return 'none';
 }
 
+/** Rows of list_friend_requests(): is one of them a request I sent to this pilgrim? (The server keeps a request that was
+ *  declined looking unanswered to the sender for 30 days, and only that list knows it.) */
+export function hasOutgoingRequest(rows: unknown, other: string): boolean {
+  if (!Array.isArray(rows)) return false;
+  return rows.some((r) => !!r && typeof r === 'object' && (r as { direction?: unknown }).direction === 'outgoing' && sameId((r as { id?: unknown }).id, other));
+}
+
 /** The name of the pilgrim: the display name, else @username, else "Pilgrim". */
 export const pilgrimName = (p: Pick<Pilgrim, 'display_name' | 'username'> | null | undefined): string => personName(p);
 
