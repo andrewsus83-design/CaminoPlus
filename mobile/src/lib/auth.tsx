@@ -4,6 +4,7 @@ import type { Session } from '@supabase/supabase-js';
 import { readStoredSession, supabase } from './supabase';
 import { getCurrentJourney, getProfile, Journey, Profile } from './api';
 import { clearUserData, localStore, userKey } from './localStore';
+import { clearSignedUrlMemo } from './mediaStorage';
 import { errorMessage, isOfflineError, withTimeout } from './net';
 import { latestGate, reloadCurrent } from './accountLoad';
 import { finishPendingAppleName } from './authApple';
@@ -70,7 +71,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
     readStoredSession().then((s) => { if (alive) { setSession(s); setSessionReady(true); } });
     // Only synchronous work in this callback (supabase-js holds a lock while it runs).
-    const { data } = supabase.auth.onAuthStateChange((_event, s) => { void reconcile(s).then(() => { if (alive) setSessionReady(true); }); });
+    let linksFor: string | null = null; // the account the remembered signed links belong to
+    const { data } = supabase.auth.onAuthStateChange((event, s) => {
+      // Links signed for one account are never reused for another: forget them when it leaves, or when another signs in.
+      const uid = s?.user?.id ?? null;
+      if (event === 'SIGNED_OUT' || (uid && linksFor && uid !== linksFor)) clearSignedUrlMemo();
+      if (uid) linksFor = uid;
+      void reconcile(s).then(() => { if (alive) setSessionReady(true); });
+    });
     return () => { alive = false; data.subscription.unsubscribe(); };
   }, []);
 
@@ -143,6 +151,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     refresh: reloadCurrent(() => currentUid.current, (uid) => loadRef.current(uid)),
     signOut: async () => {
       const uid = userId;
+      clearSignedUrlMemo(); // the next account on this phone must never get links signed for this one
       // Offline the server-side logout cannot be reached: fall back to signing out on this phone only.
       const { error } = await supabase.auth.signOut();
       if (error) await supabase.auth.signOut({ scope: 'local' });

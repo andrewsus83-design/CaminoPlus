@@ -24,6 +24,7 @@ export const NativeName = {
   imagePicker: 'ExponentImagePicker',
   location: 'ExpoLocation',
   appleAuthentication: 'ExpoAppleAuthentication',
+  imageManipulator: 'ExpoImageManipulator',
 } as const;
 
 export function hasNativeModule(name: string): boolean {
