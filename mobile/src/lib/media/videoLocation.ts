@@ -13,8 +13,10 @@
 // stco / co64 stay right) and the clip plays as before. The bytes are changed IN PLACE (a clip can be 45 MB).
 //
 // A file whose boxes do not add up (cut short, a size that lies, nesting deeper than we read) is not "clean": `complete`
-// is false and clean.ts refuses it, because a position may sit in the part we could not read. After cleaning, everything
-// outside the picture data is searched once more for a position or XMP GPS text; any left also makes it incomplete.
+// is false and clean.ts refuses it, because a position may sit in the part we could not read. One exception: a Samsung
+// SEF trailer after the last box, when no position is written in it. After cleaning, every box that holds text (udta,
+// meta, uuid, XMP_; not the sample tables) is searched once more for a position or an XMP GPS property; any left also
+// makes it incomplete.
 
 const SPACE = 0x20;
 const MAX_DEPTH = 8;
@@ -31,7 +33,7 @@ const u32 = (b: Uint8Array, at: number) => b[at] * 0x1000000 + ((b[at + 1] << 16
 class Incomplete extends Error {}
 
 /** The boxes between `from` and `to`. Throws Incomplete unless they fill the range exactly. */
-function boxes(b: Uint8Array, from: number, to: number): Box[] {
+function boxes(b: Uint8Array, from: number, to: number, stoppedAt?: { at: number }): Box[] {
   const out: Box[] = [];
   let at = from;
   while (at + 8 <= to) {
@@ -48,6 +50,7 @@ function boxes(b: Uint8Array, from: number, to: number): Box[] {
     out.push({ type: typeAt(b, at + 4), start: at, body, end: at + size });
     at += size;
   }
+  if (stoppedAt) { stoppedAt.at = at; return out; }
   // QuickTime may end a list of boxes with a 32-bit zero; any other leftover means the sizes do not add up.
   if (at !== to && !(to - at < 8 && b.subarray(at, to).every((x) => x === 0))) throw new Incomplete();
   return out;
@@ -115,38 +118,56 @@ function walkMeta(b: Uint8Array, meta: Box): number {
 
 const isXmpUuid = (b: Uint8Array, box: Box) => box.body + 16 <= box.end && XMP_UUID.every((v, i) => b[box.body + i] === v);
 
-function walk(b: Uint8Array, from: number, to: number, depth: number): number {
+/** Boxes that hold text (titles, tags, XMP), where a position could be written; sample tables (stbl …) are not among them. */
+const TEXT_BOXES = new Set(['udta', 'meta', 'uuid', 'XMP_']);
+
+function walk(b: Uint8Array, from: number, to: number, depth: number, text: Box[]): number {
   if (depth > MAX_DEPTH) throw new Incomplete();
   let n = 0;
   for (const box of boxes(b, from, to)) {
     if (box.type === 'mdat') continue;
+    if (TEXT_BOXES.has(box.type)) text.push(box);
     // gone, not just emptied: a loci of zeros would read as a real place (0° N 0° E)
     if (box.type === XYZ || box.type === 'loci' || box.type === 'XMP_') { toFree(b, box, 0); n += 1; }
     else if (box.type === 'uuid' && isXmpUuid(b, box)) { b.fill(SPACE, box.body + 16, box.end); n += 1; }
     else if (box.type === 'meta') n += walkMeta(b, box);
-    else if (box.type === 'moov' || box.type === 'trak' || box.type === 'udta') n += walk(b, box.body, box.end, depth + 1);
+    else if (box.type === 'moov' || box.type === 'trak' || box.type === 'udta') n += walk(b, box.body, box.end, depth + 1, text);
   }
   return n;
 }
 
-/** A position (ISO 6709, like +42.8800-008.5450) or XMP GPS text between `from` and `to`. */
+const GPS_WORDS = ['GPSLatitude', 'GPSLongitude', 'GPSAltitude', 'GPSCoordinates'].map((w) => Array.from(w, (ch) => ch.charCodeAt(0)));
+
+/**
+ * A position between `from` and `to`: the ISO 6709 form phones write (+DD.DDDD+DDD.DDDD, at least four decimals, like
+ * +42.8800-008.5450) or an XMP GPS property name. A title such as "Day 3 +2.50-1 km" is not a position.
+ */
 function positionLeft(b: Uint8Array, from: number, to: number): boolean {
   const digit = (c: number) => c >= 0x30 && c <= 0x39;
-  for (let i = from; i < to; i++) {
-    const c = b[i];
-    if (c === 0x47 && b[i + 1] === 0x50 && b[i + 2] === 0x53 && (b[i + 3] === 0x4c || b[i + 3] === 0x41)) return true; // GPSL(at|ong), GPSA(ltitude)
-    if (c !== 0x2b && c !== 0x2d) continue; // + or -
-    let k = i + 1;
-    let d = 0;
-    while (k < to && digit(b[k]) && d < 3) { k++; d++; }
-    if (d === 0 || b[k] !== 0x2e) continue;
+  const sign = (c: number) => c === 0x2b || c === 0x2d;
+  /** `ints` digits, a dot, at least four digits; the index after them, or -1. */
+  const number = (k: number, ints: number) => {
+    for (let d = 0; d < ints; d++) if (!digit(b[k + d])) return -1;
+    k += ints;
+    if (b[k] !== 0x2e) return -1;
     k++;
     let f = 0;
     while (k < to && digit(b[k])) { k++; f++; }
-    if (f >= 2 && (b[k] === 0x2b || b[k] === 0x2d) && digit(b[k + 1])) return true;
+    return f >= 4 ? k : -1;
+  };
+  for (let i = from; i < to; i++) {
+    const c = b[i];
+    if (c === 0x47 && GPS_WORDS.some((w) => w.every((x, j) => b[i + j] === x))) return true;
+    if (!sign(c)) continue;
+    const lat = number(i + 1, 2);
+    if (lat < 0 || !sign(b[lat])) continue;
+    if (number(lat + 1, 3) > 0) return true;
   }
   return false;
 }
+
+/** A Samsung "SEF" trailer after the last box (it ends with the letters SEFT): data the phone keeps for itself. */
+const isSefTrailer = (b: Uint8Array, from: number) => b.length - from >= 8 && typeAt(b, b.length - 4) === 'SEFT';
 
 /**
  * Overwrite the recording place of an MP4 / MOV in place. `removed`: something was there. `complete`: the whole file was
@@ -157,10 +178,18 @@ export function stripVideoLocation(b: Uint8Array): { bytes: Uint8Array; removed:
   if (!isIsoMedia(b)) return { bytes: b, removed: false, complete: false };
   let removed = false;
   try {
-    const top = boxes(b, 0, b.length);
+    const stop = { at: b.length };
+    const top = boxes(b, 0, b.length, stop);
     if (!top.some((x) => x.type === 'moov')) throw new Incomplete();
-    removed = walk(b, 0, b.length, 0) > 0;
-    for (const x of top) if (x.type !== 'mdat' && positionLeft(b, x.start, x.end)) throw new Incomplete();
+    // After the last box only a Samsung SEF trailer is accepted, and only when no position is written in it.
+    let end = b.length;
+    if (stop.at !== b.length) {
+      if (!isSefTrailer(b, stop.at) || positionLeft(b, stop.at, b.length)) throw new Incomplete();
+      end = stop.at;
+    }
+    const text: Box[] = [];
+    removed = walk(b, 0, end, 0, text) > 0;
+    for (const x of text) if (positionLeft(b, x.start, x.end)) throw new Incomplete();
   } catch (e) {
     if (e instanceof Incomplete) return { bytes: b, removed, complete: false };
     throw e;

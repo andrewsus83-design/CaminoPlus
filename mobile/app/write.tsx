@@ -194,9 +194,10 @@ export default function Write() {
       const place = slides.map((s) => s.place.trim()).find(Boolean) ?? null;
       const post = await createJournalPost({ userId: session.user.id, body, journeyId: journey?.id ?? null, routeId: journey?.route_id ?? null, placeName: place, visibility: audience });
       const media = slides.flatMap((s) => (s.media ? [s.media] : []));
-      const failed = media.length ? await uploadPostMedia(session.user.id, post.id, media) : 0;
+      const { failed, reasons } = media.length ? await uploadPostMedia(session.user.id, post.id, media) : { failed: 0, reasons: [] as string[] };
       await refresh();
-      if (failed > 0) Alert.alert('Posted without some media', `${failed} of ${media.length} photos or videos could not be uploaded. Check your connection and your cloud storage in Settings.`);
+      // The real reason when this phone refused a file (its place could not be removed); otherwise connection or storage.
+      if (failed > 0) Alert.alert('Posted without some media', `${failed} of ${media.length} photos or videos could not be uploaded. ${reasons[0] ?? 'Check your connection and your cloud storage in Settings.'}`);
       router.back();
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));

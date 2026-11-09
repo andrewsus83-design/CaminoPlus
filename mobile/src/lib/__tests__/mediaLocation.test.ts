@@ -84,7 +84,7 @@ function metadataRanges(x: Uint8Array): Array<[number, number]> {
   const out: Array<[number, number]> = [];
   for (const id of ['Exif\0\0', 'http://ns.adobe.com/xap/1.0/', 'http://ns.adobe.com/xmp/extension/', 'Photoshop 3.0\0']) {
     for (const at of every(b, Buffer.from(id, 'latin1'))) {
-      const header = at >= 4 && b[at - 4] === 0xff;
+      const header = at >= 4 && b[at - 4] === 0xff && b.readUInt16BE(at - 2) >= 8; // a length under 8 is broken
       const end = header ? at - 2 + b.readUInt16BE(at - 2) : at + 0x10000;
       out.push([at - 4, Math.min(b.length, end)]);
     }
@@ -119,6 +119,16 @@ for (const f of [...fixtures.map((x) => join('exif', x)), 'gps-exif.jpg']) {
     if (!f.includes('truncated')) changesOnlyIn(src, bytes, metadataRanges(src), f);
   });
 }
+
+check('a damaged EXIF block (length 1) whose thumbnail comes before the GPS block: the thumbnail\'s own picture data does not stop the cleaning', () => {
+  const src = new Uint8Array(readFileSync(join(FIX, 'exif', 'broken_len_thumb_before_gps.jpg')));
+  const out = B(stripJpegLocation(src).bytes);
+  for (const n of [0x0a1b2c3d, 0x0b2c3d4e, 0x0c3d4e5f]) {
+    const le = Buffer.alloc(4); le.writeUInt32LE(n);
+    assert.ok(B(src).includes(le), 'the fixture has the value');
+    assert.ok(!out.includes(le), `the GPS value ${n.toString(16)} is gone`);
+  }
+});
 
 check('the orientation stays (the photo is not turned on its side)', () => {
   const be = stripJpegLocation(new Uint8Array(readFileSync(join(FIX, 'exif', 'be.jpg')))).bytes;
@@ -287,6 +297,45 @@ check('a clip cut short by 1, 3 or 8 bytes is refused (its place may sit in the 
   for (const cut of [1, 3, 8]) {
     assert.throws(() => cleanForUpload(new Uint8Array(whole.subarray(0, whole.length - cut)), 'video/mp4'), (e: unknown) => e instanceof UploadRefused, `cut ${cut}`);
   }
+});
+
+/** A Samsung-style SEF trailer (blocks, the SEFH directory, its length and SEFT), as the review's sef.py builds it. */
+function sefTrailer(name: string, data: string): Buffer {
+  const block = Buffer.concat([Buffer.from([0, 0, 0x01, 0x0a]), (() => { const x = Buffer.alloc(4); x.writeUInt32LE(name.length); return x; })(), Buffer.from(name + data, 'latin1')]);
+  const dir = Buffer.alloc(16 + 12);
+  dir.write('SEFH', 0, 'latin1'); dir.writeUInt32LE(106, 4); dir.writeUInt32LE(1, 8); dir.writeUInt32LE(0, 12);
+  dir.writeUInt16LE(0, 16); dir.writeUInt16LE(0x0a01, 18); dir.writeUInt32LE(block.length, 20); dir.writeUInt32LE(block.length, 24);
+  const len = Buffer.alloc(4); len.writeUInt32LE(dir.length);
+  return Buffer.concat([block, dir, len, Buffer.from('SEFT', 'latin1')]);
+}
+
+check('a clip with a Samsung SEF trailer goes up (without its place, the trailer untouched); a trailer with a position, or a tail that is not SEF, is refused', () => {
+  const clip = vfile('ff_android_like.mp4');
+  for (const [name, data] of [['Slow_Motion_Data', '0x0001'], ['Image_UTC_Data', '1699999999000'], ['Video_Info', 'Auto_Enhance']]) {
+    const tail = sefTrailer(name, data);
+    const withSef = new Uint8Array(Buffer.concat([B(clip), tail]));
+    const out = cleanForUpload(withSef, 'video/mp4');
+    assert.deepEqual(whereFrom(out.bytes), []);
+    assert.equal(lociNumbers(out.bytes), false);
+    assert.ok(B(out.bytes).subarray(clip.length).equals(tail), 'the trailer is not changed');
+  }
+  const located = new Uint8Array(Buffer.concat([B(clip), sefTrailer('Location', '+42.8800-008.5450/')]));
+  assert.throws(() => cleanForUpload(located, 'video/mp4'), UploadRefused);
+  const junk = new Uint8Array(Buffer.concat([B(clip), Buffer.from('this is not a trailer', 'latin1')]));
+  assert.throws(() => cleanForUpload(junk, 'video/mp4'), UploadRefused);
+});
+
+check('a title like "Day 3 +2.50-1 km" is not taken for a position', () => {
+  const nam = box('\u00a9nam', Buffer.from([0, 16, 0x15, 0xc7]), Buffer.from('Day 3 +2.50-1 km', 'latin1'));
+  const clip = new Uint8Array(Buffer.concat([box('ftyp', Buffer.from('isom', 'latin1'), u32(0)), box('moov', box('mvhd', full(), Buffer.alloc(96)), box('udta', nam)), box('mdat', Buffer.alloc(64, 5))]));
+  const out = cleanForUpload(clip, 'video/mp4');
+  assert.ok(B(out.bytes).includes(Buffer.from('Day 3 +2.50-1 km', 'latin1')), 'the title stays');
+});
+
+check('bytes that happen to spell GPSL inside the sample tables do not refuse a clip', () => {
+  const stbl = box('stbl', box('stco', full(), u32(2), Buffer.from('GPSLGPSA', 'latin1')));
+  const clip = new Uint8Array(Buffer.concat([box('ftyp', Buffer.from('isom', 'latin1'), u32(0)), box('moov', box('mvhd', full(), Buffer.alloc(96)), box('trak', box('mdia', box('minf', stbl)))), box('mdat', Buffer.alloc(64, 5))]));
+  assert.doesNotThrow(() => cleanForUpload(clip, 'video/mp4'));
 });
 
 check('a HEIC photo that says it is a video is refused (its brands are those of a photo)', () => {

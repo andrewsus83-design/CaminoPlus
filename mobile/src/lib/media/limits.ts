@@ -111,9 +111,9 @@ export function estimateVideoBytes(seconds: number, tier: MediaTier): number {
 export type MediaProblem = 'too_long' | 'too_big' | 'quota' | 'location' | 'video_location' | 'unsupported';
 
 /** A photo that could not be saved again and is not a JPEG (HEIC above all) would go up with its position: refused. */
-export const LOCATION_REFUSED_MESSAGE = 'This photo format cannot be shared without its location. Try another photo.';
+export const LOCATION_REFUSED_MESSAGE = 'We could not remove the place where this photo was taken, so it cannot be shared. Try another photo.';
 /** A clip that cannot be read to the end (cut short, sizes that do not add up) may keep its place: refused. */
-export const VIDEO_LOCATION_REFUSED_MESSAGE = 'This video cannot be shared without the place where it was recorded. Try another video.';
+export const VIDEO_LOCATION_REFUSED_MESSAGE = 'We could not remove the place where this video was recorded, so it cannot be shared. Try another video.';
 /** The cloud takes JPEG photos (every photo is turned into one) and MP4 or MOV videos. */
 export const UNSUPPORTED_TYPE_MESSAGE = 'This file type is not supported. Use a photo or an MP4 or MOV video.';
 /** How long the composer waits for the plan before it opens the picker (ms); then it uses the saved answer or the Free sizes. */
