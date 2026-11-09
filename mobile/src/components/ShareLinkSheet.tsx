@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Modal, Pressable, ScrollView, Share, View } from 'react-native';
+import { Modal, Platform, Pressable, ScrollView, Share, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
 import { Pill } from '@/components/Pill';
+import { copyText } from '@/lib/clipboard';
 import { shareAndRecord } from '@/lib/postShare';
 import { SHEET, shareText, type Made, type ShareKind } from '@/lib/shareLinks';
 import { icon, layout, radius, role, scrim, space } from '@/theme';
@@ -27,6 +28,9 @@ export function ShareLinkSheet({ kind, onClose, make }: { kind: ShareKind; onClo
   const [stays, setStays] = useState(false);
   const [busy, setBusy] = useState(false);
   const [problem, setProblem] = useState<string | null>(null);
+  // The link, once it exists and the share sheet did not take it (closed, failed, or none on this device): shown here to copy.
+  const [ready, setReady] = useState<string | null>(null);
+  const [copied, setCopied] = useState<'yes' | 'no' | null>(null);
 
   const go = async () => {
     if (busy) return;
@@ -38,10 +42,22 @@ export function ShareLinkSheet({ kind, onClose, make }: { kind: ShareKind; onClo
       setProblem(made.message);
       return;
     }
-    // The link exists now. The share sheet is the phone's; closing it without sharing keeps the link (it is listed in Settings).
-    await shareAndRecord({ share: () => Share.share({ message: shareText(kind, made.url) }) });
+    // The link exists now (and counts toward the 50). When the share sheet takes it, done; when it was closed, failed or is not there
+    // (a computer's browser), the link stays on this sheet with a Copy button: it is never lost silently.
+    const text = shareText(kind, made.url);
+    const res = typeof Share?.share === 'function' ? await shareAndRecord({ share: () => Share.share({ message: text }) }) : { outcome: 'failed' as const };
     setBusy(false);
-    onClose();
+    if (res.outcome === 'shared') { onClose(); return; }
+    setReady(text);
+  };
+
+  const copy = async () => {
+    if (!ready) return;
+    let ok = false;
+    const nav = Platform.OS === 'web' && typeof navigator !== 'undefined' ? (navigator as { clipboard?: { writeText?: (t: string) => Promise<void> } }) : null;
+    if (nav?.clipboard?.writeText) ok = await nav.clipboard.writeText(ready).then(() => true, () => false);
+    else ok = await copyText(ready);
+    setCopied(ok ? 'yes' : 'no');
   };
 
   return (
@@ -80,11 +96,25 @@ export function ShareLinkSheet({ kind, onClose, make }: { kind: ShareKind; onClo
               <AppText variant="small" style={{ flex: 1 }}>{SHEET.anyone}</AppText>
             </View>
             {!!problem && <AppText variant="small" color={role.danger} accessibilityRole="alert">{problem}</AppText>}
-            <View style={{ gap: space[2] }}>
-              <Pill label={SHEET.make} onPress={go} loading={busy} />
-              <Pill label={SHEET.cancel} variant="ghost" onPress={onClose} disabled={busy} />
-            </View>
-            <AppText variant="caption" muted style={{ textAlign: 'center' }}>{SHEET.needsNetwork}</AppText>
+            {ready ? (
+              <View style={{ gap: space[3] }}>
+                <AppText variant="label" accessibilityRole="alert">{SHEET.ready}</AppText>
+                <View style={{ padding: space[3], borderRadius: radius.md, borderWidth: 1, borderColor: role.border, backgroundColor: role.bg }}>
+                  <AppText variant="small" selectable>{ready}</AppText>
+                </View>
+                {copied && <AppText variant="small" muted>{copied === 'yes' ? SHEET.copied : SHEET.copyByHand}</AppText>}
+                <Pill label={SHEET.copy} onPress={copy} />
+                <Pill label={SHEET.done} variant="ghost" onPress={onClose} />
+              </View>
+            ) : (
+              <>
+                <View style={{ gap: space[2] }}>
+                  <Pill label={SHEET.make} onPress={go} loading={busy} />
+                  <Pill label={SHEET.cancel} variant="ghost" onPress={onClose} disabled={busy} />
+                </View>
+                <AppText variant="caption" muted style={{ textAlign: 'center' }}>{SHEET.needsNetwork}</AppText>
+              </>
+            )}
           </ScrollView>
         </View>
       </Pressable>

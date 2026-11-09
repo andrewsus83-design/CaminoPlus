@@ -29,6 +29,7 @@ import { usePostMedia } from '@/features/me/usePostMedia';
 import { NotesTab } from '@/features/notes/NotesTab';
 import { ShareLinkSheet } from '@/components/ShareLinkSheet';
 import { shareLinks } from '@/lib/shareLinksClient';
+import { linkLabel } from '@/lib/shareLinks';
 import { updateProfile } from '@/lib/api';
 import { copyText } from '@/lib/clipboard';
 import { PickerUnavailable, pickAndUploadAvatar } from '@/lib/avatar';
@@ -40,7 +41,7 @@ type DayT = NonNullable<ReturnType<typeof useMeData>['days']>[number];
 
 
 /** Plan as a tracker: overall progress on top, then a timeline of days. */
-function PlanTracker({ days, journeyId }: { days: DayT[]; journeyId: string | null }) {
+function PlanTracker({ days, journeyId, routeName }: { days: DayT[]; journeyId: string | null; routeName: string | null }) {
   const router = useRouter();
   const [sharing, setSharing] = useState(false);
   if (days.length === 0) return <Empty text="Stages for your route are coming soon. Your day plan will appear here." />;
@@ -75,7 +76,7 @@ function PlanTracker({ days, journeyId }: { days: DayT[]; journeyId: string | nu
           <Icon name="chevron" color={role.action} size={icon.smPlus} />
         </Pressable>
       )}
-      {sharing && journeyId && <ShareLinkSheet kind="plan" onClose={() => setSharing(false)} make={({ stays }) => shareLinks.sharePlan(journeyId, { stays })} />}
+      {sharing && journeyId && <ShareLinkSheet kind="plan" onClose={() => setSharing(false)} make={({ stays }) => shareLinks.sharePlan(journeyId, { stays, label: linkLabel(routeName) })} />}
       {next && (
         <Card style={{ gap: 6, backgroundColor: role.inverse }} onPress={() => router.push({ pathname: '/planner', params: { day: next.id } })}>
           <AppText variant="mono" color={role.onInverseAccent} style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 1.2 }}>Up next · Day {next.day_number}</AppText>
@@ -322,7 +323,7 @@ export default function Me() {
             ? <SampleJourney />
             : <JourneyGrid posts={posts} media={media} only={onlyIds} />)}
 
-          {tab === 'Plan' && (!days ? (offline ? <Empty text="You are offline and your plan is not saved on this phone yet. Open it once with a connection." /> : loading) : <PlanTracker days={days} journeyId={journey?.id ?? null} />)}
+          {tab === 'Plan' && (!days ? (offline ? <Empty text="You are offline and your plan is not saved on this phone yet. Open it once with a connection." /> : loading) : <PlanTracker days={days} journeyId={journey?.id ?? null} routeName={journey?.route?.name ?? null} />)}
 
           {tab === 'Health' && <Health />}
           {/* Room under the last thing for the chat button over the corner: with the gap above it, 56 more, so the room is the one the Notes feed leaves (the bar, the button, a margin). */}

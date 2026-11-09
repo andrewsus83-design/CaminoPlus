@@ -17,7 +17,7 @@ import { shareAndRecord } from '@/lib/postShare';
 import { layout, radius, role } from '@/theme';
 import { NoteMenu } from './NoteMenu';
 import { ShareLinkSheet } from '@/components/ShareLinkSheet';
-import { MESSAGES, noteCopy } from '@/lib/shareLinks';
+import { MESSAGES, linkLabel, noteCopy } from '@/lib/shareLinks';
 import { shareLinks } from '@/lib/shareLinksClient';
 import { NoteRow, type NoteActions, type NoteWho } from './NoteRow';
 import { NotesHeader } from './NotesHeader';
@@ -168,7 +168,7 @@ export function NotesTab({ top }: { top?: ReactNode }) {
       {linkFor !== null && (
         <ShareLinkSheet kind="note" onClose={() => setLinkFor(null)} make={async () => {
           const copy = noteCopy(linkFor);
-          return copy ? shareLinks.shareNote(copy) : { ok: false, message: MESSAGES.empty };
+          return copy ? shareLinks.shareNote(copy, { label: linkLabel(linkFor.title) }) : { ok: false, message: MESSAGES.empty };
         }} />
       )}
       {viewing !== null && viewed.length > 0 && <MediaViewer uid={owner} items={viewed} start={viewing.start} onClose={() => setViewing(null)} />}

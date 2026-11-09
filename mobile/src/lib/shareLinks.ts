@@ -55,14 +55,14 @@ export function noteCopy(entry: { title?: unknown; body?: unknown; createdAt?: u
 export const SHEET = {
   plan: {
     title: 'Share your plan by link',
-    shows: ['The route and the start date', 'Each day: the date, where it starts and ends, the distance, and if it is walked'],
+    shows: ['Your name', 'The route and the start date', 'Each day: the date, where it starts and ends, the distance, and if it is walked'],
     staysOption: 'Also show where I sleep each night',
     hides: 'Not shown: the notes of each day, bookings, health, GPS tracks and stamps.',
     live: 'The link always shows your plan as it is now. If you change the plan, the link changes too.',
   },
   note: {
     title: 'Share this note by link',
-    shows: ['A copy of the title, the words and the date of this note'],
+    shows: ['Your name', 'A copy of the title, the words and the date of this note'],
     hides: 'Not shown: photos, videos, the place, and your other notes. The note itself stays on this phone.',
     live: 'The link shows the note as it is now. If you change the note later, the link does not change.',
   },
@@ -70,7 +70,21 @@ export const SHEET = {
   make: 'Make link',
   cancel: 'Cancel',
   needsNetwork: 'Making a link needs a connection.',
+  ready: 'Your link is ready. Copy it and send it to the people you choose.',
+  copy: 'Copy link',
+  copied: 'Copied.',
+  copyByHand: 'Could not copy here. Select the link and copy it.',
+  done: 'Done',
 } as const;
+
+/** The label of a link, so the rows of Settings > Shared links can be told apart: the route name of a plan, the TITLE of a note
+ *  (never its words), 80 characters at most. Nothing when there is none. */
+export const LABEL_MAX = 80;
+export function linkLabel(text: unknown): string | null {
+  if (typeof text !== 'string') return null;
+  const t = text.replace(/\s+/g, ' ').trim();
+  return t ? t.slice(0, LABEL_MAX).trim() : null;
+}
 
 export const shareText = (kind: ShareKind, url: string) =>
   kind === 'plan' ? `My Camino plan on CaminoPlus: ${url}` : `A note from my Camino on CaminoPlus: ${url}`;
@@ -100,7 +114,7 @@ export const MESSAGES = {
   notReady: 'Sharing by link is not ready yet. Please try again later.',
   tooMany: `You have ${LINKS_MAX} links. Stop sharing one first, in Settings, Privacy and safety, Shared links.`,
   notYours: 'This plan could not be shared. Open your plan again and try once more.',
-  tooLong: 'This note is too long to share by link.',
+  tooLong: 'This note is too long to share.',
   empty: 'This note is empty. Write something first.',
   failed: 'Something went wrong. Please try again.',
 } as const;

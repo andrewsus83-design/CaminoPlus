@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import {
-  LINKS_MAX, MESSAGES, RPC_COLUMNS, SHARE_LINK_BASE, SHEET, TOKEN, createShareLinks, linkState, linkTitle, messageFor, noteCopy, parseLinks,
+  LABEL_MAX, LINKS_MAX, MESSAGES, linkLabel, RPC_COLUMNS, SHARE_LINK_BASE, SHEET, TOKEN, createShareLinks, linkState, linkTitle, messageFor, noteCopy, parseLinks,
   shareText, shareUrl, viewsLine, type Rpc,
 } from '../shareLinks';
 
@@ -158,6 +158,30 @@ check('the question before a link says what it shows, what it does not, and who 
   assert.match(SHEET.note.live, /If you change the note later, the link does not change/);
   const words = JSON.stringify(SHEET) + JSON.stringify(MESSAGES);
   assert.doesNotMatch(words, /friends? can|public|everyone|forever/i, 'no word suggests the plan or the note is open to anyone but the holder of the link');
+});
+
+check('labels: the route name or the note TITLE, 80 characters at most, never the words of a note', () => {
+  assert.equal(LABEL_MAX, 80);
+  assert.equal(linkLabel('  Camino   Francés '), 'Camino Francés');
+  assert.equal(linkLabel('T'.repeat(120)), 'T'.repeat(80));
+  assert.equal(linkLabel(''), null);
+  assert.equal(linkLabel('   '), null);
+  assert.equal(linkLabel(undefined), null);
+  const root = process.cwd();
+  const notes = fs.readFileSync(path.join(root, 'src/features/notes/NotesTab.tsx'), 'utf8');
+  assert.match(notes, /shareLinks\.shareNote\(copy, \{ label: linkLabel\(linkFor\.title\) \}\)/, 'a note link is labelled by its title');
+  assert.doesNotMatch(notes, /linkLabel\([^)]*body/, 'never by its words');
+  assert.match(fs.readFileSync(path.join(root, 'app/(tabs)/me.tsx'), 'utf8'), /shareLinks\.sharePlan\(journeyId, \{ stays, label: linkLabel\(routeName\) \}\)/, 'a plan link by its route');
+});
+
+check('the sheet never closes silently on a link that exists: closed, failed or no share sheet shows it with Copy', () => {
+  const sheet = fs.readFileSync(path.join(process.cwd(), 'src/components/ShareLinkSheet.tsx'), 'utf8');
+  assert.match(sheet, /if \(res\.outcome === 'shared'\) \{ onClose\(\); return; \}\s*setReady\(text\);/);
+  assert.match(sheet, /typeof Share\?\.share === 'function'/, 'a device with no share sheet');
+  assert.match(sheet, /<Pill label=\{SHEET\.copy\} onPress=\{copy\} \/>/);
+  assert.equal(SHEET.copy, 'Copy link');
+  assert.deepEqual([SHEET.plan.shows[0], SHEET.note.shows[0]], ['Your name', 'Your name'], 'the page says who shared it');
+  assert.equal(MESSAGES.tooLong, 'This note is too long to share.');
 });
 
 Promise.all(pending).then(() => console.log(`${n} of ${n} passed`), (e) => { console.error(e); process.exit(1); });
