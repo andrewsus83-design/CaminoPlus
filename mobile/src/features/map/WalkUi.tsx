@@ -1,12 +1,15 @@
 // Walk view overlay: instruction banner, round buttons, "What is near" chips, Re-center pill and the bottom card.
 // Plain React Native views on top of the map, so the same UI shows over the native map and over the SVG preview
-// on web and in Expo Go. Day = parchment / Atlantic Blue, night = deep navy. Touch targets are 48 dp or more.
-import { ReactNode, useEffect, useMemo, useRef, useState } from 'react';
+// on web and in Expo Go. Day = parchment / Atlantic Blue, night = deep navy.
+// The controls that sit on the map (here and on the whole-route map in app/(tabs)/maps.tsx) are ONE family, big enough to hit with a thumb while walking:
+// round buttons of BTN (56) with an icon of ICON (28), GAP (12) apart, EDGE (16) from the side of the screen; the zoom pair is one BTN x 2 BTN capsule;
+// the Re-center pill is BTN high with a 24 arrow and its label at the `label` variant. controlLayout.ts says how many of them a short phone can hold.
+import { Children, ReactNode, isValidElement, useEffect, useMemo, useRef, useState } from 'react';
 import { AccessibilityInfo, Animated, PanResponder, Platform, Pressable, ScrollView, Switch, View } from 'react-native';
 import Svg, { Circle, G, Polygon } from 'react-native-svg';
 import { AppText } from '@/components/AppText';
 import { Icon, IconName } from '@/components/Icon';
-import { c, layout, radius, role, shadowStyle } from '@/theme';
+import { c, fixed, fonts, icon, layout, radius, role, shadowStyle, space } from '@/theme';
 import type { Banner, Card, AheadItem } from './nav';
 import type { PoiKind } from './sampleRoute';
 import { POI_KINDS, kindHex } from './walkLayers';
@@ -14,20 +17,31 @@ import { MapIcon } from './MapIcon';
 import type { GpsMode } from './useWalkerLocation';
 import type { PackStatus } from './useMapModel';
 
-/** Colours of the overlay in each light. */
+/** The family of round map controls: a round button is BTN wide and high (layout.touchPrimary), its icon ICON (icon.mdPlus), GAP between two, EDGE from the screen. */
+export const BTN = layout.touchPrimary;
+export const ICON = icon.mdPlus;
+export const GAP = space[3];
+export const EDGE = layout.screenMargin;
+/** The labels of the map's controls grow with the text setting up to this much, so a control never outgrows its place; the cards and sheets grow without a limit. */
+export const CONTROL_TEXT_MAX = 1.3;
+
+/**
+ * Colours of the overlay in each light. The map has its own day and night, and they do not follow the app's light and dark mode: a pilgrim whose phone is dark
+ * can walk by day, and the night overlay must read the same in a light app. So this reads the fixed palette, never `c.*`, which flips with the mode.
+ */
 export function walkTheme(night: boolean) {
   return night
     ? {
-        banner: '#0C2340', bannerBorder: 'rgba(246,239,226,0.24)', onBanner: c.parchment, onBannerMuted: 'rgba(246,239,226,0.82)', arrowTile: 'rgba(246,239,226,0.14)',
-        button: '#13243C', buttonActive: '#1E3A63', buttonBorder: 'rgba(246,239,226,0.24)', icon: c.parchment,
-        card: '#101F36', cardText: c.parchment, cardMuted: '#B3C1D6', cardBorder: 'rgba(246,239,226,0.16)', handle: 'rgba(246,239,226,0.4)',
-        chipOn: '#13243C', chipOff: 'rgba(16,31,54,0.82)', chipText: c.parchment, chipTextOff: '#9FB0C8', pill: '#13243C', pillText: c.parchment,
+        banner: '#0C2340', bannerBorder: 'rgba(246,239,226,0.24)', onBanner: fixed.parchment, onBannerMuted: 'rgba(246,239,226,0.82)', arrowTile: 'rgba(246,239,226,0.14)',
+        button: '#13243C', buttonActive: '#1E3A63', buttonBorder: 'rgba(246,239,226,0.24)', icon: fixed.parchment,
+        card: '#101F36', cardText: fixed.parchment, cardMuted: '#B3C1D6', cardBorder: 'rgba(246,239,226,0.16)', handle: 'rgba(246,239,226,0.4)',
+        chipOn: '#13243C', chipOff: 'rgba(16,31,54,0.82)', chipText: fixed.parchment, chipTextOff: '#9FB0C8', pill: '#13243C', pillText: fixed.parchment,
       }
     : {
-        banner: c.blue, bannerBorder: 'transparent', onBanner: c.parchment, onBannerMuted: 'rgba(246,239,226,0.85)', arrowTile: 'rgba(246,239,226,0.16)',
-        button: c.parchment, buttonActive: c.goldWash, buttonBorder: c.sand300, icon: c.blue,
-        card: c.white, cardText: c.ink, cardMuted: c.stone600, cardBorder: c.sand300, handle: c.sand400,
-        chipOn: c.white, chipOff: 'rgba(255,253,248,0.82)', chipText: c.ink, chipTextOff: c.stone600, pill: c.blue, pillText: c.parchment,
+        banner: fixed.blue, bannerBorder: 'transparent', onBanner: fixed.parchment, onBannerMuted: 'rgba(246,239,226,0.85)', arrowTile: 'rgba(246,239,226,0.16)',
+        button: fixed.parchment, buttonActive: fixed.goldWash, buttonBorder: fixed.sand300, icon: fixed.blue,
+        card: fixed.white, cardText: fixed.ink, cardMuted: fixed.stone600, cardBorder: fixed.sand300, handle: fixed.sand400,
+        chipOn: fixed.white, chipOff: 'rgba(255,253,248,0.82)', chipText: fixed.ink, chipTextOff: fixed.stone600, pill: fixed.blue, pillText: fixed.parchment,
       };
 }
 export type WalkTheme = ReturnType<typeof walkTheme>;
@@ -81,8 +95,43 @@ export function Notice({ tone, children }: { tone: 'gold' | 'blue' | 'red'; chil
   const bg = tone === 'gold' ? c.goldWash : tone === 'red' ? c.red100 : c.blue50;
   const fg = tone === 'gold' ? c.goldInk : tone === 'red' ? c.red700 : c.blue;
   return (
-    <View style={{ alignSelf: 'flex-start', maxWidth: '100%', paddingHorizontal: 14, minHeight: 32, paddingVertical: 5, justifyContent: 'center', borderRadius: 16, backgroundColor: bg }}>
+    <View style={{ alignSelf: 'flex-start', maxWidth: '100%', paddingHorizontal: space[3], paddingVertical: space[2], justifyContent: 'center', borderRadius: radius.md, backgroundColor: bg }}>
       <AppText variant="caption" color={fg} style={{ flexShrink: 1 }}>{children}</AppText>
+    </View>
+  );
+}
+
+/**
+ * The notices under the banner, in order of importance, as many as fit in `maxH`: a whole notice or none, never one cut in half. On a short phone the notices, the
+ * Re-center pill and the bottom card share one band, and a notice must not run under the pill or the card. The ones that do not fit stay laid out (so they are
+ * measured) but are not drawn.
+ */
+export function NoticeStack({ maxH, children }: { maxH: number; children: ReactNode }) {
+  const items = Children.toArray(children);
+  const [heights, setHeights] = useState<Record<string, number>>({});
+  let used = 0;
+  return (
+    <View pointerEvents="box-none" style={{ gap: space[2] }}>
+      {items.map((child, i) => {
+        const key = isValidElement(child) && child.key != null ? String(child.key) : String(i);
+        const h = heights[key];
+        const gap = used > 0 ? space[2] : 0;
+        const fits = h == null || used + gap + h <= maxH;
+        if (h != null && fits) used += gap + h;
+        return (
+          <View
+            key={key}
+            pointerEvents={fits ? 'box-none' : 'none'}
+            onLayout={(e) => {
+              const next = Math.round(e.nativeEvent.layout.height);
+              setHeights((prev) => (prev[key] === next ? prev : { ...prev, [key]: next }));
+            }}
+            style={fits ? undefined : { position: 'absolute', opacity: 0 }}
+          >
+            {child}
+          </View>
+        );
+      })}
     </View>
   );
 }
@@ -90,11 +139,12 @@ export function Notice({ tone, children }: { tone: 'gold' | 'blue' | 'red'; chil
 /* ------------------------------------------------------------------ the stack of round buttons */
 
 type BtnProps = {
-  label: string; onPress: () => void; night: boolean; size?: number; active?: boolean; children: ReactNode;
+  label: string; onPress: () => void; night: boolean; active?: boolean; children: ReactNode;
   role?: 'button' | 'switch'; checked?: boolean; expanded?: boolean;
 };
 
-export function RoundBtn({ label, onPress, night, size = 56, active, children, role = 'button', checked, expanded }: BtnProps) {
+/** A round control of the map: BTN wide and high, the icon inside is ICON. */
+export function RoundBtn({ label, onPress, night, active, children, role = 'button', checked, expanded }: BtnProps) {
   const t = walkTheme(night);
   const state = { ...(checked != null ? { checked } : {}), ...(expanded != null ? { expanded } : {}) };
   return (
@@ -106,7 +156,7 @@ export function RoundBtn({ label, onPress, night, size = 56, active, children, r
       aria-expanded={expanded}
       onPress={onPress}
       style={({ pressed }) => ({
-        width: size, height: size, borderRadius: size / 2, backgroundColor: active ? t.buttonActive : t.button,
+        width: BTN, height: BTN, borderRadius: radius.pill, backgroundColor: active ? t.buttonActive : t.button,
         borderWidth: night || active ? 1.5 : 0, borderColor: active ? c.gold : t.buttonBorder, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.85 : 1,
         ...shadowStyle('md'),
       })}
@@ -117,46 +167,50 @@ export function RoundBtn({ label, onPress, night, size = 56, active, children, r
 }
 
 /** Compass: the red tip points to north on the map (so it turns with the map bearing). */
-export function CompassIcon({ bearing, night, size = 34 }: { bearing: number; night: boolean; size?: number }) {
+export function CompassIcon({ bearing, night, size = ICON }: { bearing: number; night: boolean; size?: number }) {
   const t = walkTheme(night);
   return (
     <Svg width={size} height={size} viewBox="-20 -20 40 40">
       <Circle r="17" fill="none" stroke={t.icon} strokeWidth="2" opacity={0.35} />
       <G transform={`rotate(${-bearing})`}>
         <Polygon points="0,-14 6,2 -6,2" fill={c.red} />
-        <Polygon points="0,14 6,-2 -6,-2" fill={night ? c.parchment : '#FFFFFF'} stroke={t.icon} strokeWidth="1.5" strokeLinejoin="round" />
+        <Polygon points="0,14 6,-2 -6,-2" fill={night ? fixed.parchment : '#FFFFFF'} stroke={t.icon} strokeWidth="1.5" strokeLinejoin="round" />
       </G>
     </Svg>
   );
 }
 
 /** Sun / moon: shows the light the map has now; the small A says it follows the sun by itself. */
-export function LightIcon({ night, auto, size = 26, color }: { night: boolean; auto: boolean; size?: number; color?: string }) {
+export function LightIcon({ night, auto, size = ICON, color }: { night: boolean; auto: boolean; size?: number; color?: string }) {
   const t = walkTheme(night);
   return (
-    <View style={{ width: size + 8, height: size + 8, alignItems: 'center', justifyContent: 'center' }}>
+    <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
       <Icon name={night ? 'moon' : 'sun'} color={color ?? t.icon} size={size} strokeWidth={2} />
       {auto && (
-        <View style={{ position: 'absolute', right: -6, bottom: -6, width: 20, height: 20, borderRadius: 10, backgroundColor: c.gold, alignItems: 'center', justifyContent: 'center' }}>
-          <AppText variant="caption" color={role.onHighlight} style={{ fontSize: 11, lineHeight: 14, letterSpacing: 0, fontFamily: 'Inter_600SemiBold' }}>A</AppText>
+        // design-lint-ignore: inset a fixed 20 px badge that holds one letter, the way a count badge does: the letter is about 4 px from the outline, only its 22 px line box is taller
+        <View style={{ position: 'absolute', right: -space[3], bottom: -space[3], width: 20, height: 20, borderRadius: radius.pill, backgroundColor: c.gold, alignItems: 'center', justifyContent: 'center' }}>
+          <AppText variant="label" color={role.onHighlight} allowFontScaling={false}>A</AppText>
         </View>
       )}
     </View>
   );
 }
 
-export function ZoomPair({ night, size, onIn, onOut }: { night: boolean; size: number; onIn: () => void; onOut: () => void }) {
+/** Zoom in and zoom out: one capsule, BTN wide and two buttons tall, each half a BTN x BTN button with the same icon as the round ones. */
+export function ZoomPair({ night, onIn, onOut }: { night: boolean; onIn: () => void; onOut: () => void }) {
   const t = walkTheme(night);
-  const half = (label: string, onPress: () => void, icon: 'plus' | 'minus') => (
-    <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} style={({ pressed }) => ({ width: size, height: size, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.8 : 1 })}>
-      <MapIcon name={icon} color={t.icon} size={26} />
+  const half = (label: string, onPress: () => void, name: 'plus' | 'minus') => (
+    <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} style={({ pressed }) => ({ width: BTN, height: BTN, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.8 : 1 })}>
+      <MapIcon name={name} color={t.icon} size={ICON} />
     </Pressable>
   );
+  // The outline and the line between the two halves are drawn over them, so the halves are exactly BTN high each.
   return (
-    <View style={{ borderRadius: size / 2, backgroundColor: t.button, borderWidth: night ? 1.5 : 0, borderColor: t.buttonBorder, overflow: 'hidden', ...shadowStyle('md') }}>
+    <View style={{ width: BTN, height: 2 * BTN, borderRadius: radius.pill, backgroundColor: t.button, ...shadowStyle('md') }}>
       {half('Zoom in', onIn, 'plus')}
-      <View style={{ height: 1, marginHorizontal: 10, backgroundColor: night ? t.buttonBorder : c.sand300 }} />
       {half('Zoom out', onOut, 'minus')}
+      <View pointerEvents="none" style={{ position: 'absolute', left: space[3], right: space[3], top: BTN, height: 1, backgroundColor: night ? t.buttonBorder : fixed.sand300 }} />
+      {night && <View pointerEvents="none" style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, borderRadius: radius.pill, borderWidth: 1.5, borderColor: t.buttonBorder }} />}
     </View>
   );
 }
@@ -167,7 +221,7 @@ export function NearChips({ night, hidden, onToggle }: { night: boolean; hidden:
   const t = walkTheme(night);
   const hex = kindHex(night);
   return (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={{ gap: 8, paddingVertical: 4, paddingRight: 8 }} style={{ flexGrow: 0 }}>
+    <ScrollView horizontal showsHorizontalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={{ gap: space[2], paddingVertical: space[1], paddingRight: space[2] }} style={{ flexGrow: 0 }}>
       {POI_KINDS.map(({ kind, label }) => {
         const on = !hidden.includes(kind);
         return (
@@ -178,7 +232,7 @@ export function NearChips({ night, hidden, onToggle }: { night: boolean; hidden:
             aria-checked={on}
             accessibilityLabel={`${label} pins`}
             onPress={() => onToggle(kind)}
-            style={{ height: 48, paddingHorizontal: 16, borderRadius: radius.pill, flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: on ? t.chipOn : t.chipOff, borderWidth: 1.5, borderColor: on ? hex[kind] : t.buttonBorder, ...shadowStyle('sm') }}
+            style={{ height: layout.touchHard, paddingHorizontal: space[4], borderRadius: radius.pill, flexDirection: 'row', alignItems: 'center', gap: space[2], backgroundColor: on ? t.chipOn : t.chipOff, borderWidth: 1.5, borderColor: on ? hex[kind] : t.buttonBorder, ...shadowStyle('sm') }}
           >
             <View style={{ width: 14, height: 14, borderRadius: 7, backgroundColor: on ? hex[kind] : 'transparent', borderWidth: 2, borderColor: hex[kind] }} />
             <AppText variant="label" color={on ? t.chipText : t.chipTextOff}>{label}</AppText>
@@ -191,17 +245,18 @@ export function NearChips({ night, hidden, onToggle }: { night: boolean; hidden:
 
 /* ------------------------------------------------------------------ Re-center */
 
-export function RecenterPill({ night, onPress }: { night: boolean; onPress: () => void }) {
+/** The pill at the bottom left: BTN high, a 24 arrow and "Re-center" at the `label` variant. `maxWidth` keeps a gap between it and the column at the right. */
+export function RecenterPill({ night, onPress, maxWidth }: { night: boolean; onPress: () => void; maxWidth: number }) {
   const t = walkTheme(night);
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel="Re-center the map on my position"
       onPress={onPress}
-      style={({ pressed }) => ({ height: 52, paddingHorizontal: 20, borderRadius: radius.pill, flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: t.pill, borderWidth: night ? 1.5 : 0, borderColor: t.buttonBorder, opacity: pressed ? 0.9 : 1, ...shadowStyle('md') })}
+      style={({ pressed }) => ({ height: BTN, maxWidth, paddingHorizontal: space[5], borderRadius: radius.pill, flexDirection: 'row', alignItems: 'center', gap: space[2], backgroundColor: t.pill, borderWidth: night ? 1.5 : 0, borderColor: t.buttonBorder, opacity: pressed ? 0.9 : 1, ...shadowStyle('md') })}
     >
-      <Icon name="navigation" color={t.pillText} size={22} strokeWidth={2.2} />
-      <AppText variant="label" color={t.pillText}>Re-center</AppText>
+      <Icon name="navigation" color={t.pillText} size={icon.md} strokeWidth={2.2} />
+      <AppText variant="label" color={t.pillText} numberOfLines={1} maxFontSizeMultiplier={CONTROL_TEXT_MAX} style={{ flexShrink: 1 }}>Re-center</AppText>
     </Pressable>
   );
 }
@@ -226,6 +281,10 @@ type CardProps = {
   expanded: boolean;
   onExpandedChange: (open: boolean) => void;
   onRouteDetails: () => void;
+  /** What the flag button says it opens: "Route details", or "Route details and map options" when the column folded some controls into the sheet. */
+  routeLabel?: string;
+  /** A control that the column at the right had no room for (the help bell on a short phone), shown in the row of buttons between the flag and Exit. */
+  extra?: ReactNode;
   onExit: () => void;
   /** height the card covers at rest, so the camera keeps the walker above it */
   onHeight: (h: number) => void;
@@ -313,28 +372,29 @@ export function WalkCard(p: CardProps) {
           <AppText variant="small" color={t.cardMuted} numberOfLines={2}>{glue(p.card.stage)}</AppText>
         </View>
 
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: layout.screenMargin, paddingTop: 12, paddingBottom: p.bottomInset + 14 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: GAP, paddingHorizontal: EDGE, paddingTop: space[3], paddingBottom: p.bottomInset + space[3] }}>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Route details"
+            accessibilityLabel={p.routeLabel ?? 'Route details'}
             onPress={p.onRouteDetails}
-            style={({ pressed }) => ({ width: 60, height: 60, borderRadius: 30, backgroundColor: c.gold, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.85 : 1, ...shadowStyle('gold') })}
+            style={({ pressed }) => ({ width: BTN, height: BTN, borderRadius: radius.pill, backgroundColor: c.gold, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.85 : 1, ...shadowStyle('gold') })}
           >
-            <Icon name="flag" color={role.onHighlight} size={28} strokeWidth={2.2} />
+            <Icon name="flag" color={role.onHighlight} size={ICON} strokeWidth={2.2} />
           </Pressable>
+          {p.extra}
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Exit Walk view and show the whole route"
             onPress={p.onExit}
-            style={({ pressed }) => ({ flex: 1, height: 60, borderRadius: 30, backgroundColor: c.red, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.88 : 1 })}
+            style={({ pressed }) => ({ flex: 1, height: BTN, borderRadius: radius.pill, backgroundColor: c.red, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.88 : 1 })}
           >
-            <AppText variant="lead" color={c.parchment} style={{ fontFamily: 'Inter_600SemiBold' }}>Exit</AppText>
+            <AppText variant="lead" color={c.parchment} maxFontSizeMultiplier={CONTROL_TEXT_MAX} style={{ fontFamily: fonts.bodyBold }}>Exit</AppText>
           </Pressable>
         </View>
       </View>
 
-      <ScrollView scrollEnabled={p.expanded} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: layout.screenMargin, paddingBottom: p.bottomInset + 24, gap: 10 }}>
-        <AppText variant="mono" color={t.cardMuted} style={{ textTransform: 'uppercase', letterSpacing: 1.2, fontSize: 12 }}>Next on the way</AppText>
+      <ScrollView scrollEnabled={p.expanded} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: layout.screenMargin, paddingBottom: p.bottomInset + space[6], gap: space[3] }}>
+        <AppText variant="mono" color={t.cardMuted} style={{ textTransform: 'uppercase' }}>Next on the way</AppText>
         {p.live ? (
           p.next.length ? (
             p.next.map((n) => (
