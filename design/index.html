@@ -405,7 +405,6 @@ textarea.cp-input { height: 120px; border-radius: var(--cp-radius-lg); padding: 
 .cp-alert .bubble { width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; flex: none; }
 .cp-alert .t { font-weight: 600; font-size: 17px; line-height: 20px; }
 .cp-alert .m { font-size: 15px; line-height: 18px; color: var(--cp-text-muted); }
-.cp-fab-stack { display: flex; flex-direction: column; gap: 12px; }
 .cp-report-fab { width: 64px; height: 64px; border-radius: 50%; background: var(--cp-color-gold); color: var(--cp-color-blue); display: grid; place-items: center; box-shadow: var(--cp-shadow-gold); border: 0; }
 .cp-report-fab .cp-icon { width: 30px; height: 30px; stroke-width: 2.2px; }
 .cp-eta { display: flex; align-items: center; gap: 14px; }
@@ -857,9 +856,18 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
 .jg .jt.txt p { margin: 0; font-family: var(--cp-font-title); font-weight: 600; font-size: 16px; line-height: 22px; text-align: center; }
 .jg .jt.txt.blue { background: var(--cp-color-blue); color: var(--cp-color-parchment); }
 .jg .jt.txt.gold { background: var(--cp-color-gold); color: var(--cp-color-blue); }
-.jg .jt.write { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 0 12px; background: var(--cp-surface); box-shadow: inset 0 0 0 1px var(--cp-border); font-weight: 600; font-size: 17px; line-height: 22px; text-align: center; cursor: pointer; }
+/* the card that writes a journey post (mobile/src/features/me/WriteCard.tsx): a faint gold wash, a large shell as art off the bottom right corner, the gold
+   circle with the pen, the invitation in Fraunces, a short gold rule, the action; the numbers are JOURNEY_WRITE_CARD of features/me/tabs.ts (wash 0.07, shell 0.22) */
+.jg .jt.write { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 0 12px; background: var(--cp-surface); box-shadow: inset 0 0 0 1px var(--cp-border); color: var(--cp-text); font-weight: 600; font-size: 17px; line-height: 22px; text-align: center; cursor: pointer; }
+.jg .jt.write::before { content: ""; position: absolute; inset: 0; background: var(--cp-highlight); opacity: .07; }
+.jg .jt.write > * { position: relative; }
+.jg .jt.write .art { position: absolute; width: 105%; aspect-ratio: 1; right: -36%; bottom: -21%; opacity: .22; color: var(--cp-highlight); }
+.jg .jt.write .art svg { width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: .6px; stroke-linecap: round; stroke-linejoin: round; }
 .jg .jt.write .ico { width: 64px; height: 64px; border-radius: 50%; background: var(--cp-highlight); color: var(--cp-on-highlight); display: grid; place-items: center; }
-.jg .jt.write .ico .cp-icon { width: 30px; height: 30px; stroke-width: 2.2px; }
+.jg .jt.write .ico .cp-icon { width: 32px; height: 32px; stroke-width: 2.2px; }
+.jg .jt.write .q { font-family: var(--cp-font-title); font-weight: 600; font-size: 24px; line-height: 30px; }
+.jg .jt.write .rule { width: 32px; height: 2px; border-radius: 1px; background: var(--cp-highlight); }
+.phone[style*="width:320px"] .jg .jt.write { gap: 8px; } .phone[style*="width:320px"] .jg .jt.write .ico { width: 56px; height: 56px; } .phone[style*="width:320px"] .jg .jt.write .ico .cp-icon { width: 28px; height: 28px; } /* the tile of a small phone, as the app draws it (compact) */
 /* ---- Pilgrim: the profile of another pilgrim (mobile/app/pilgrim/[id].tsx). Back, @username and the three dots; the card; Message, Add friend, Requested, or Accept and Decline; their journey in the
    grid of Me without the card that writes a post. A private profile that is not a friend's is a minimal card. Nothing private is on it: no Notes, Plan or Health, no tab strip. ---- */
 .pf-top { display: flex; align-items: center; gap: 12px; }
@@ -978,24 +986,45 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
 .cp-menu small { display: block; font-family: var(--cp-font-body); font-weight: 400; font-size: 15px; color: var(--cp-text-muted); }
 
 /* ---- v4: map layers (helicopter / city) ---- */
-.cp-layer-switch { align-self: flex-start; display: inline-flex; padding: 4px; border-radius: var(--cp-radius-pill); background: rgba(255,253,248,.94); backdrop-filter: blur(10px); box-shadow: var(--cp-shadow-md); }
-.cp-layer-switch span { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 14px; border-radius: var(--cp-radius-pill); font-size: 15px; font-weight: 600; color: var(--cp-text-muted); white-space: nowrap; }
+.cp-layer-switch { align-self: flex-start; display: inline-flex; padding: 4px; border-radius: var(--cp-radius-pill); background: var(--cp-color-parchment); box-shadow: var(--cp-shadow-md); }
+.cp-layer-switch span { display: inline-flex; align-items: center; gap: 8px; height: 48px; padding: 0 16px; border-radius: var(--cp-radius-pill); font-size: 17px; line-height: 22px; font-weight: 600; color: var(--cp-color-blue); white-space: nowrap; }
 .cp-layer-switch span .cp-icon { width: 18px; height: 18px; }
 .cp-layer-switch span.on { background: var(--cp-color-blue); color: var(--cp-color-parchment); }
 .cp-pin.sm { width: 34px; height: 34px; border-width: 2.5px; }
 .cp-pin.sm .cp-icon { width: 17px; height: 17px; }
 .cp-pin.iconic.md { width: 50px; height: 50px; }
-.cp-hint { display: inline-flex; align-items: center; gap: 8px; height: 34px; padding: 0 14px; border-radius: var(--cp-radius-pill); background: rgba(12,35,64,.82); color: var(--cp-color-parchment); font-family: var(--cp-font-mono); font-size: 11px; white-space: nowrap; }
-.cp-hint .cp-icon { width: 16px; height: 16px; }
+.cp-hint { display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 16px; border-radius: var(--cp-radius-pill); background: rgba(12,35,64,.82); color: var(--cp-color-parchment); font-family: var(--cp-font-mono); font-size: 15px; white-space: nowrap; }
+.cp-hint .cp-icon { width: 18px; height: 18px; }
 .cp-elev { display: block; width: 100%; height: 64px; }
 .cp-youhere { position: absolute; z-index: 3; display: flex; align-items: center; gap: 8px; }
 .cp-youhere .ring { width: 50px; height: 50px; border-radius: 50%; background: rgba(217,162,27,.28); display: grid; place-items: center; }
 .cp-youhere .dot { width: 30px; height: 30px; border-radius: 50%; background: var(--cp-color-blue); border: 3px solid var(--cp-color-white); box-shadow: var(--cp-shadow-md); display: grid; place-items: center; }
 .cp-youhere .dot .cp-icon { width: 14px; height: 14px; fill: var(--cp-color-gold); stroke: var(--cp-color-gold); }
-.cp-youhere .tag { background: var(--cp-color-white); border-radius: var(--cp-radius-pill); padding: 4px 10px; font-size: 11px; font-weight: 700; box-shadow: var(--cp-shadow-sm); white-space: nowrap; }
+.cp-youhere .tag { background: var(--cp-color-white); border-radius: var(--cp-radius-pill); padding: 4px 12px; font-size: 15px; font-weight: 700; box-shadow: var(--cp-shadow-sm); white-space: nowrap; }
 .cp-legend { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 20px; font-size: 16px; }
 .cp-legend div { display: flex; align-items: center; gap: 10px; }
 .cp-legend i { width: 26px; height: 0; display: block; flex: none; }
+
+/* ---- Map controls: ONE family on the map (mobile/src/features/map/WalkUi.tsx, controlLayout.ts). Round buttons of 56 (touchPrimary) with a 28 icon, 12 apart, 16 from the edge
+   of the screen; the zoom pair is one capsule of 56 x 112; the Re-center pill is 56 high with a 24 arrow and its label in Inter SemiBold 17. The map has its own day and night
+   (.map-night), and neither follows the app's dark mode. A short phone shows the controls that fit, most important first, and folds the rest into "Map options" of the route sheet. ---- */
+.cp-map-btn { position: relative; width: 56px; height: 56px; padding: 0; border: 0; border-radius: 50%; display: inline-grid; place-items: center; background: var(--cp-color-parchment); color: var(--cp-color-blue); box-shadow: var(--cp-shadow-md); cursor: pointer; }
+.cp-map-btn .cp-icon { width: 28px; height: 28px; stroke-width: 2px; }
+.cp-map-btn.bell { color: var(--cp-color-red); }
+.cp-map-btn.on { background: var(--cp-color-gold-wash); box-shadow: inset 0 0 0 1.5px var(--cp-color-gold), var(--cp-shadow-md); }
+.cp-map-btn .auto { position: absolute; right: 2px; bottom: 2px; width: 20px; height: 20px; border-radius: 50%; background: var(--cp-color-gold); color: var(--cp-color-blue); display: grid; place-items: center; font: 600 17px/20px var(--cp-font-body); }
+.cp-map-stack { display: flex; flex-direction: column; align-items: flex-end; gap: 12px; }
+.cp-map-zoom { position: relative; width: 56px; height: 112px; border-radius: 28px; display: grid; grid-template-rows: 56px 56px; background: var(--cp-color-parchment); color: var(--cp-color-blue); box-shadow: var(--cp-shadow-md); }
+.cp-map-zoom button { border: 0; padding: 0; background: none; color: inherit; display: grid; place-items: center; cursor: pointer; }
+.cp-map-zoom .cp-icon { width: 28px; height: 28px; stroke-width: 2px; }
+.cp-map-zoom::after { content: ""; position: absolute; left: 12px; right: 12px; top: 56px; height: 1px; background: var(--cp-color-sand-300); }
+.cp-recenter { display: inline-flex; align-items: center; gap: 8px; height: 56px; padding: 0 20px; border: 0; border-radius: 28px; background: var(--cp-color-blue); color: var(--cp-color-parchment); font: 600 17px/22px var(--cp-font-body); box-shadow: var(--cp-shadow-md); cursor: pointer; white-space: nowrap; }
+.cp-recenter .cp-icon { width: 24px; height: 24px; stroke-width: 2.2px; }
+.map-night .cp-map-btn, .map-night .cp-map-zoom { background: #13243C; color: #F6EFE2; box-shadow: inset 0 0 0 1.5px rgba(246,239,226,.24), var(--cp-shadow-md); }
+.map-night .cp-map-btn.bell { color: #E8776A; }
+.map-night .cp-map-btn.on { background: #1E3A63; box-shadow: inset 0 0 0 1.5px var(--cp-color-gold), var(--cp-shadow-md); }
+.map-night .cp-map-zoom::after { background: rgba(246,239,226,.24); }
+.map-night .cp-recenter { background: #13243C; box-shadow: inset 0 0 0 1.5px rgba(246,239,226,.24), var(--cp-shadow-md); }
 
 /* ---- v5: inbox, notifications, Instagram-style post flow ---- */
 .cp-inbox-top { display: flex; align-items: center; gap: 10px; }
@@ -1683,12 +1712,12 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
       <div class="cp-alert"><span class="bubble b-blue"><svg class="cp-icon"><use href="#i-crowd"/></svg></span><div style="flex:1"><div class="t">Busy at Hontanas</div><div class="m">Albergues filling fast after 14:00</div></div></div>
       <div class="cp-alert"><span class="bubble b-red"><svg class="cp-icon"><use href="#i-bed-full"/></svg></span><div style="flex:1"><div class="t">Albergue Municipal is full</div><div class="m">2 alternatives within 800 m</div></div></div>
       <div class="panel row" style="justify-content:space-between">
-        <div class="cp-fab-stack"><button class="cp-icon-btn"><svg class="cp-icon"><use href="#i-layers"/></svg></button><button class="cp-icon-btn"><svg class="cp-icon"><use href="#i-locate"/></svg></button></div>
+        <div class="cp-map-stack"><button class="cp-map-btn"><svg class="cp-icon"><use href="#i-layers"/></svg></button><button class="cp-map-btn"><svg class="cp-icon"><use href="#i-locate"/></svg></button></div>
         <span class="cp-badge glass" style="height:40px;padding:0 16px;font-size:15px"><svg class="cp-icon sm"><use href="#i-sun"/></svg>24° · Clear</span>
         <span class="cp-badge glass" style="height:40px;padding:0 16px;font-size:15px"><svg class="cp-icon sm"><use href="#i-offline"/></svg>Offline ready</span>
         <button class="cp-report-fab"><svg class="cp-icon"><use href="#i-plus"/></svg></button>
       </div>
-      <p class="spec" style="margin:0">.cp-alert (pill toast, shadow-lg) · floating .cp-icon-btn 48 · weather / offline glass pills · .cp-report-fab (gold, bottom-right)</p>
+      <p class="spec" style="margin:0">.cp-alert (pill toast, shadow-lg) · floating .cp-map-btn 56 with a 28 icon (see Map controls, in Map layers) · weather / offline glass pills · .cp-report-fab (gold, bottom-right)</p>
     </div>
   </div>
 </section>
@@ -1869,6 +1898,40 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     </div>
   </div>
 
+  <h3>Map controls: one family</h3>
+  <div class="grid g2" style="align-items:start">
+    <div class="panel" style="background:#E7E0CB">
+      <div style="display:flex;gap:28px;align-items:flex-end;flex-wrap:wrap">
+        <div class="cp-map-stack">
+          <button class="cp-map-btn bell" aria-label="Need help"><svg class="cp-icon"><use href="#i-bell"/></svg></button>
+          <button class="cp-map-btn" aria-label="Compass"><svg class="cp-icon"><use href="#i-compass"/></svg></button>
+          <button class="cp-map-btn on" aria-label="What is near"><svg class="cp-icon"><use href="#i-search"/></svg></button>
+          <button class="cp-map-btn" aria-label="Map light: automatic"><svg class="cp-icon"><use href="#i-sun"/></svg><span class="auto" aria-hidden="true">A</span></button>
+          <div class="cp-map-zoom"><button aria-label="Zoom in"><svg class="cp-icon"><use href="#i-plus"/></svg></button><button aria-label="Zoom out"><svg class="cp-icon" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:16px;align-items:flex-start">
+          <button class="cp-recenter"><svg class="cp-icon"><use href="#i-nav"/></svg>Re-center</button>
+          <div class="cp-layer-switch"><span class="on">Whole route</span><span class="">Near me</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="panel map-night" style="background:#0C1626">
+      <div style="display:flex;gap:28px;align-items:flex-end;flex-wrap:wrap">
+        <div class="cp-map-stack">
+          <button class="cp-map-btn bell" aria-label="Need help"><svg class="cp-icon"><use href="#i-bell"/></svg></button>
+          <button class="cp-map-btn" aria-label="Compass"><svg class="cp-icon"><use href="#i-compass"/></svg></button>
+          <button class="cp-map-btn on" aria-label="What is near"><svg class="cp-icon"><use href="#i-search"/></svg></button>
+          <button class="cp-map-btn" aria-label="Map light: night"><svg class="cp-icon"><use href="#i-moon"/></svg></button>
+          <div class="cp-map-zoom"><button aria-label="Zoom in"><svg class="cp-icon"><use href="#i-plus"/></svg></button><button aria-label="Zoom out"><svg class="cp-icon" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:16px;align-items:flex-start">
+          <button class="cp-recenter"><svg class="cp-icon"><use href="#i-nav"/></svg>Re-center</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="spec" style="margin:16px 0 0">.cp-map-btn 56 round, icon 28 (.bell red, .on gold ring, .auto the A of the automatic light) · .cp-map-stack 12 apart, 16 from the edge · .cp-map-zoom one capsule 56 x 112, the halves 56 · .cp-recenter 56 high, 24 arrow, label 17 SemiBold, 16 from the left edge and level with the bottom of the stack · .map-night is the night of the map (it does not follow the app's dark mode). The zoom pair never folds; the help bell is in the column or in the row of buttons of the bottom card. On a short phone the column shows the controls that fit, most important first (zoom pair, help bell, compass or locate, what is near, light, GPS), and the rest are rows of "Map options" in the route sheet that the flag button opens. Nothing under 15 px, nothing under 48 to tap.</p>
+
   <h3>Inbox & notifications</h3>
   <div class="grid g2" style="align-items:start">
     <div class="panel" style="padding:8px 24px 16px;overflow:hidden">
@@ -1964,7 +2027,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
     </div>
     <div class="panel" style="padding:12px 24px 0"><div class="cp-subtabs" style="margin:0"><span>Notes</span><span class="on">Journey</span><span>Plan</span><span>Health</span></div><p class="spec" style="margin:16px 0 20px">.cp-subtabs · 17/600 · 3px blue underline · Me: Notes, Journey, Plan, Health, and it opens on Journey</p></div>
   </div>
-  <p class="spec" style="margin-top:16px">.cp-tabbar · height 88 · radius pill · shadow-lg · icon 28 · label 14 · inactive: stroke 0.8 (0.93 px) and Inter Light, the stem of the label · active: stroke 3 and Bold in light mode, 2.6 and SemiBold in dark mode (tokens.tab)</p>
+  <p class="spec" style="margin-top:16px">.cp-tabbar · height 88 · radius pill · shadow-lg · icon 28 · label 14 · inactive: as thick as the stem of the label, stroke 1.05 (1.225 px) and Inter Regular in light mode, 0.8 (0.93 px) and Inter Light in dark mode · active: stroke 3 and Bold in light mode, 2.6 and SemiBold in dark mode (tokens.tab)</p>
   <p class="note" style="margin-top:12px;max-width:760px"><b>Settings is not a tab.</b> It opens from the gear at the top right of Me, the only button there, as a screen of its own: a back button on the left, light/dark and log out on the right, and no tab bar under it. <b>Library</b> is the fifth tab. It has no title: the row on top is a search field and the round Bookmarks button in the corner (the same size as the bell and the gear on Me), and directly under it the two tabs Bible and Books, then the banner of the tab. The Bible tab is real: the World English Bible, Catholic edition, all 73 books, in the app. It starts with a compact daily reading banner (one handwritten note and a gold pill), then a segmented pill that chooses the part (Old Testament, Deuterocanon, New Testament; it is in the page and scrolls with it), then the books of that part as compact tiles, two in a row. A tile opens the numbers of the chapters of the book, a number opens the words, and Previous and Next name where they go and carry on across the books. The Books tab is real too: the books written for the app, with their text in it (Library · Books and the reader, below). There is no gold button on the Library. <b>Me</b> has four sub-tabs under the highlights, left to right Notes, Journey, Plan and Health, and it opens on Journey. One gold button floats over all four, the chat button at the bottom right: it opens the inbox (notifications, messages and groups) and carries the unread badge, so the header keeps only the gear. Writing is a card, not a button that floats: the first tile of Journey is the card Write a journey post, and the card at the top of Notes is Write a note. <b>The diary</b> (Me, Notes) keeps its pages only on the phone: the list says so, nothing is uploaded, logging out keeps the pages, deleting the account deletes them, and a page is saved as it is typed and starts as a draft (Notes shows it with a Draft tag): <b>Publish</b>, the big button at the bottom, makes it a note, and <b>Save draft</b>, at the top right, keeps it as a draft and goes back. Read is the small button beside Publish, and the marks (bold, italic, heading, bullets, quote, photo, pin) sit inside the text box. All of it stays on the phone.</p>
   <p class="note" style="margin-top:12px;max-width:760px"><b>Library search</b> looks through the Bible and Books tabs at once, as you type (every book of the Bible and every book of the Library; the diary is not searched here, it is the Notes sub-tab of Me), and lists what it finds grouped by tab (Bible, Books) and then the verses. A word counts when it starts a word of a row (a name or title, the subtitle or the description of a book, a chapter title, the part of the Bible, the kind of book, or the name of the tab), so "new testament" lists the 27 books of the New Testament. With nothing found it says "Nothing found for ..." and offers Clear search; clearing the field brings the tabs and the banner back. <b>Bookmarks</b> is a screen of its own, opened from the round button in the corner: a back button, no tab bar, then two parts. Library lists the rows bookmarked from the tabs (books of the Bible, books of the Library, verses, and the passages of a book, which open the reader at them); they stay only on the phone and logging out clears them. Posts lists the posts bookmarked in the journey viewer; they stay with the account, and with no signal the list from the last visit is shown, with a line that says so. A row that is taken off stays in place, with an empty bookmark, until the screen is left, so a slip can be put back with one tap.</p>
 </section>
@@ -2228,7 +2291,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
             <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Castrojeriz</div>
           </div></div><div class="cp-subtabs" style="margin:22px -24px 20px;padding:0 12px"><span>Notes</span><span class="on">Journey</span><span>Plan</span><span>Health</span></div>
           <div class="jg">
-            <button class="jt write" aria-label="Write a journey post"><span class="ico"><svg class="cp-icon"><use href="#i-pen"/></svg></span>Write a journey post</button>
+            <button class="jt write" aria-label="Write a journey post"><span class="art" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 4C7 4 4 8 4 13c0 3 1.5 6 3 7h10c1.5-1 3-4 3-7 0-5-3-9-8-9Z"/><path d="M12 4v16M12 4 8 20M12 4l4 16"/></svg></span><span class="ico"><svg class="cp-icon"><use href="#i-pen"/></svg></span><span class="q">What did you see today?</span><span class="rule"></span>Write a journey post</button>
             <div class="jt"><div class="cp-img v4"></div><span class="cap">Burgos</span></div>
             <div class="jt txt blue"><p>Legs say no, heart says yes.</p><span class="cap">Hontanas</span></div>
             <div class="jt"><div class="cp-img v5"></div><span class="n">3</span><span class="cap">Logroño</span></div>
@@ -2282,7 +2345,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
             <div><span class="add" style="width:66px;height:66px"><svg class="cp-icon"><use href="#i-pin"/></svg></span>Castrojeriz</div>
           </div></div><div class="cp-subtabs" style="margin:22px -24px 20px;padding:0 12px"><span>Notes</span><span class="on">Journey</span><span>Plan</span><span>Health</span></div>
           <div class="jg">
-            <button class="jt write" aria-label="Write a journey post"><span class="ico"><svg class="cp-icon"><use href="#i-pen"/></svg></span>Write a journey post</button>
+            <button class="jt write" aria-label="Write a journey post"><span class="art" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 4C7 4 4 8 4 13c0 3 1.5 6 3 7h10c1.5-1 3-4 3-7 0-5-3-9-8-9Z"/><path d="M12 4v16M12 4 8 20M12 4l4 16"/></svg></span><span class="ico"><svg class="cp-icon"><use href="#i-pen"/></svg></span><span class="q">What did you see today?</span><span class="rule"></span>Write a journey post</button>
             <div class="jt"><div class="cp-img v4"></div><span class="cap">Burgos</span></div>
             <div class="jt txt blue"><p>Legs say no, heart says yes.</p><span class="cap">Hontanas</span></div>
             <div class="jt"><div class="cp-img v5"></div><span class="n">3</span><span class="cap">Logroño</span></div>
@@ -2385,7 +2448,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           </div></div><div class="cp-subtabs" style="margin:22px -24px 20px;padding:0 12px"><span>Notes</span><span class="on">Journey</span><span>Plan</span><span>Health</span></div>
           <div class="place-head"><button class="cp-icon-btn flat" aria-label="Back" title="Back to all places"><svg class="cp-icon"><use href="#i-back"/></svg></button><div class="t"><div class="h">Zubiri</div><div class="s">All places</div></div></div>
           <div class="jg">
-            <button class="jt write" aria-label="Write a journey post"><span class="ico"><svg class="cp-icon"><use href="#i-pen"/></svg></span>Write a journey post</button>
+            <button class="jt write" aria-label="Write a journey post"><span class="art" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 4C7 4 4 8 4 13c0 3 1.5 6 3 7h10c1.5-1 3-4 3-7 0-5-3-9-8-9Z"/><path d="M12 4v16M12 4 8 20M12 4l4 16"/></svg></span><span class="ico"><svg class="cp-icon"><use href="#i-pen"/></svg></span><span class="q">What did you see today?</span><span class="rule"></span>Write a journey post</button>
             <div class="jt"><div class="cp-img v2"></div><span class="cap">Zubiri</span></div>
             <div class="jt txt blue"><p>Over the bridge at Zubiri, the first evening.</p><span class="cap">Zubiri</span></div>
           </div>
@@ -2986,13 +3049,15 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
         <div style="position:absolute;top:62px;left:16px;right:16px;display:flex;flex-direction:column;gap:10px;z-index:4">
           <div style="display:flex;gap:10px;align-items:center">
             <div class="cp-hud" style="flex:1"><span class="cp-level">7</span><div style="flex:1"><div class="t">Peregrino<span>1,240 / 1,500 XP</span></div><div class="cp-xp"><span style="width:82%"></span></div></div></div>
-            <button class="cp-icon-btn" aria-label="Search"><svg class="cp-icon "><use href="#i-search"/></svg></button>
+            <button class="cp-map-btn" aria-label="Search"><svg class="cp-icon "><use href="#i-search"/></svg></button>
           </div>
-          <div class="cp-layer-switch"><span class="on"><svg class="cp-icon "><use href="#i-heli"/></svg>Helicopter</span><span class=""><svg class="cp-icon "><use href="#i-city"/></svg>City</span></div>
+          <div class="cp-layer-switch"><span class="on">Whole route</span><span class="">Near me</span></div>
         </div>
-        <div class="cp-fab-stack" style="position:absolute;right:16px;top:188px;z-index:4">
-          <button class="cp-icon-btn" style="align-self:flex-end"><svg class="cp-icon "><use href="#i-layers"/></svg></button>
-          <button class="cp-icon-btn" style="align-self:flex-end"><svg class="cp-icon "><use href="#i-locate"/></svg></button>
+        <div class="cp-map-stack" style="position:absolute;right:16px;bottom:340px;z-index:4">
+          <button class="cp-map-btn bell" aria-label="Need help"><svg class="cp-icon "><use href="#i-bell"/></svg></button>
+          <button class="cp-map-btn" aria-label="Show my position"><svg class="cp-icon "><use href="#i-locate"/></svg></button>
+          <button class="cp-map-btn" aria-label="Map light: automatic"><svg class="cp-icon "><use href="#i-sun"/></svg><span class="auto" aria-hidden="true">A</span></button>
+          <div class="cp-map-zoom"><button aria-label="Zoom in"><svg class="cp-icon "><use href="#i-plus"/></svg></button><button aria-label="Zoom out"><svg class="cp-icon" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button></div>
         </div>
         <div class="cp-sheet" style="position:absolute;left:0;right:0;bottom:0;padding-bottom:124px;z-index:5">
           <div class="grab"></div>
@@ -3035,7 +3100,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
           <g font-family="Inter" font-size="11" font-weight="600" fill="#8C8272" paint-order="stroke" stroke="#EDE5D3" stroke-width="3"><text x="70" y="114">Calle Mayor</text><text x="198" y="444">Rúa de San Juan</text><text x="308" y="228" transform="rotate(-90 308 228)">Camino Real</text></g>
         </svg>
         <div class="cp-pin iconic" style="position:absolute;left:222px;top:250px;z-index:2"><svg class="cp-icon "><use href="#i-landmark"/></svg><span class="xp">+80 XP</span><span class="cp-pin-label">Cathedral</span></div>
-        <div class="cp-pin church" style="position:absolute;left:107px;top:350px;z-index:2"><svg class="cp-icon "><use href="#i-church"/></svg><span class="cp-pin-label">San Juan</span></div>
+        <div class="cp-pin church" style="position:absolute;left:107px;top:336px;z-index:2"><svg class="cp-icon "><use href="#i-church"/></svg></div>
         <div class="cp-pin hunt" style="position:absolute;left:57px;top:277px;z-index:2"><svg class="cp-icon "><use href="#i-chest"/></svg><span class="cp-pin-label">Shell hunt</span></div>
         <div class="cp-pin story" style="position:absolute;left:236px;top:168px;z-index:2"><svg class="cp-icon "><use href="#i-headphones"/></svg></div>
         <div class="cp-pin water" style="position:absolute;left:26px;top:408px;z-index:2"><svg class="cp-icon "><use href="#i-drop"/></svg></div>
@@ -3045,18 +3110,18 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
         <div style="position:absolute;top:62px;left:16px;right:16px;display:flex;flex-direction:column;gap:10px;z-index:4">
           <div style="display:flex;gap:10px;align-items:center">
             <div class="cp-hud" style="flex:1"><span class="cp-level">7</span><div style="flex:1"><div class="t">Peregrino<span>1,240 / 1,500 XP</span></div><div class="cp-xp"><span style="width:82%"></span></div></div></div>
-            <button class="cp-icon-btn" aria-label="Search"><svg class="cp-icon"><use href="#i-search"/></svg></button>
+            <button class="cp-map-btn" aria-label="Search"><svg class="cp-icon"><use href="#i-search"/></svg></button>
           </div>
-          <div class="cp-layer-switch"><span class=""><svg class="cp-icon "><use href="#i-heli"/></svg>Helicopter</span><span class="on"><svg class="cp-icon "><use href="#i-city"/></svg>City</span></div>
+          <div class="cp-layer-switch"><span class="">Whole route</span><span class="on">Near me</span></div>
         </div>
-        <div class="cp-fab-stack" style="position:absolute;right:16px;top:188px;z-index:4">
-          <span class="cp-badge glass" style="height:40px;padding:0 12px;font-size:14px"><svg class="cp-icon sm"><use href="#i-sun"/></svg>24°</span>
-          <button class="cp-icon-btn" style="align-self:flex-end"><svg class="cp-icon"><use href="#i-layers"/></svg></button>
-          <button class="cp-icon-btn" style="align-self:flex-end"><svg class="cp-icon"><use href="#i-locate"/></svg></button>
+        <div class="cp-map-stack" style="position:absolute;right:16px;bottom:384px;z-index:4">
+          <button class="cp-map-btn bell" aria-label="Need help"><svg class="cp-icon"><use href="#i-bell"/></svg></button>
+          <button class="cp-map-btn" aria-label="Compass"><svg class="cp-icon"><use href="#i-compass"/></svg></button>
+          <div class="cp-map-zoom"><button aria-label="Zoom in"><svg class="cp-icon"><use href="#i-plus"/></svg></button><button aria-label="Zoom out"><svg class="cp-icon" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button></div>
         </div>
+        <div style="position:absolute;left:16px;bottom:384px;z-index:4"><button class="cp-recenter"><svg class="cp-icon"><use href="#i-nav"/></svg>Re-center</button></div>
         <div class="cp-sheet" style="position:absolute;left:0;right:0;bottom:0;padding-bottom:124px;z-index:5">
           <div class="grab"></div>
-          <button class="cp-report-fab" style="position:absolute;right:20px;top:-80px" aria-label="Report"><svg class="cp-icon"><use href="#i-plus"/></svg></button>
           <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
             <div><div style="font-family:var(--cp-font-title);font-weight:600;font-size:24px;line-height:28px">Iglesia de San Juan</div><div class="note" style="font-size:14px">Church · 12th century · 300 m</div></div>
             <span class="cp-badge gold">+40 XP</span>
@@ -5730,7 +5795,7 @@ footer .hand { font-family: var(--cp-font-accent); font-size: 36px; color: var(-
   <h3>Example: the tab bar</h3>
   <div class="grid g2">
     <div class="swatch"><div style="padding:20px;background:#0F1A2B"><div style="display:flex;justify-content:space-around;padding:14px 10px;border-radius:30px;background:#0A1220;border:1px solid #2B405C"><span style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#748092;font-size:14px;font-weight:var(--cp-tab-inactive-weight)"><svg class="cp-icon" style="width:28px;height:28px;stroke-width:var(--cp-tab-inactive-stroke)"><use href="#i-me"/></svg>Me</span><span style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#748092;font-size:14px;font-weight:var(--cp-tab-inactive-weight)"><svg class="cp-icon" style="width:28px;height:28px;stroke-width:var(--cp-tab-inactive-stroke)"><use href="#i-stays"/></svg>Stays</span><span style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#FFFFFF;font-size:14px;font-weight:600"><svg class="cp-icon" style="width:28px;height:28px;stroke-width:2.6"><use href="#i-maps"/></svg>Maps</span><span style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#748092;font-size:14px;font-weight:var(--cp-tab-inactive-weight)"><svg class="cp-icon" style="width:28px;height:28px;stroke-width:var(--cp-tab-inactive-stroke)"><use href="#i-compass"/></svg>Discover</span></div></div>
-      <div class="body"><p><b>Do</b> · inactive tab = <code>role.tabInactive</code> #748092 with a thin stroke (0.8) and a Light label (Inter 300), active = <code>role.tabActive</code> #FFFFFF with a thick stroke (2.6) and a SemiBold label (600), on the bar <code>role.tabBar</code> #0A1220 with its hairline <code>role.tabBarBorder</code> #2B405C.</p><p class="note">Inactive 4.7 : 1 on the bar, active 18.8 : 1: the active tab has at least 1.5 times the contrast of an inactive one, and the inactive ones recede (at most 5 : 1). In light mode the same roles are the card white, the blue (12.0 : 1) and a lighter stone, <code>stone550</code> #697584 (4.6 : 1). The active tab is drawn at stroke 2.6 and SemiBold in dark mode and a little heavier in light mode (stroke 3, Bold, <code>tokens.tab</code>): dark on light looks thinner than light on dark, although the ink is the same. The inactive tabs are as thin as each other: the stem of Inter Light is 136 of 2048 units, 0.93 px at 14 px, and an icon of 28 px with a stroke of 0.8 of its 24 units is 0.93 px (it was 1.3, which is 1.52 px, 1.56 times the label; measured on this page at 4x, see <code>tokens.tab</code>).</p></div></div>
+      <div class="body"><p><b>Do</b> · inactive tab = <code>role.tabInactive</code> #748092 with a thin stroke (0.8) and a Light label (Inter 300), active = <code>role.tabActive</code> #FFFFFF with a thick stroke (2.6) and a SemiBold label (600), on the bar <code>role.tabBar</code> #0A1220 with its hairline <code>role.tabBarBorder</code> #2B405C.</p><p class="note">Inactive 4.7 : 1 on the bar, active 18.8 : 1: the active tab has at least 1.5 times the contrast of an inactive one, and the inactive ones recede (at most 5 : 1). In light mode the same roles are the card white, the blue (12.0 : 1) and a lighter stone, <code>stone550</code> #697584 (4.6 : 1). The active tab is drawn at stroke 2.6 and SemiBold in dark mode and a little heavier in light mode (stroke 3, Bold, <code>tokens.tab</code>): dark on light looks thinner than light on dark, although the ink is the same. The inactive icon and label are as thin as each other: the stem of Inter Light is 136 of 2048 units, 0.93 px at 14 px, and an icon of 28 px with a stroke of 0.8 of its 24 units is 0.93 px (it was 1.3, which is 1.52 px, 1.56 times the label; measured on this page at 4x, see <code>tokens.tab</code>). In light mode the inactive tabs are one step heavier, for the same reason as the active one: Inter Regular (stem 1.23 px) and a stroke of 1.05 (1.225 px).</p></div></div>
     <div class="swatch"><div style="padding:20px;background:#0F1A2B"><div style="display:flex;justify-content:space-around;padding:14px 10px;border-radius:30px;background:#0A1220;border:1px solid #2B405C"><span style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#0E213A;font-size:14px;font-weight:var(--cp-tab-inactive-weight)"><svg class="cp-icon" style="width:28px;height:28px;stroke-width:var(--cp-tab-inactive-stroke)"><use href="#i-me"/></svg>Me</span><span style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#0E213A;font-size:14px;font-weight:var(--cp-tab-inactive-weight)"><svg class="cp-icon" style="width:28px;height:28px;stroke-width:var(--cp-tab-inactive-stroke)"><use href="#i-stays"/></svg>Stays</span><span style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#FFFFFF;font-size:14px;font-weight:600"><svg class="cp-icon" style="width:28px;height:28px;stroke-width:2.6"><use href="#i-maps"/></svg>Maps</span><span style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#0E213A;font-size:14px;font-weight:var(--cp-tab-inactive-weight)"><svg class="cp-icon" style="width:28px;height:28px;stroke-width:var(--cp-tab-inactive-stroke)"><use href="#i-compass"/></svg>Discover</span></div></div>
       <div class="body"><p><b>Don't</b> · a fixed navy at 42% for the inactive tab (#0E213A): 1.2 : 1 on the dark bar, the icons vanish. It was 2.4 : 1 in light mode too.</p><p class="note">A person walking in bright sun needs the inactive tabs as much as anyone: low contrast hides them.</p></div></div>
   </div>

@@ -80,9 +80,10 @@ export const liturgical: Record<keyof typeof LITURGICAL_LIGHT, string> = { ...LI
 
 /**
  * How heavy the tabs of the bottom tab bar are drawn (design/tokens.json: tab): the stroke of the icon and the font of the label, for the active tab
- * (`tabActiveWeight`) and for the inactive ones (`tabInactiveWeight`). The same stroke looks thinner dark on light than light on dark, so the active tab is
- * a little heavier in light mode. An inactive icon is drawn exactly as thick as the stem of its label (a stroke of 0.8 is 0.93 px at the size the tab bar draws
- * it, and the stem of Inter Light is 0.93 px at 14 px), so that the two look equally thin. Both are updated in place with the scheme, like `role`.
+ * (`tabActiveWeight`) and for the inactive ones (`tabInactiveWeight`). The same stroke looks thinner dark on light than light on dark, so light mode is drawn
+ * heavier, the active tab and the inactive ones. An inactive icon is drawn exactly as thick as the stem of its label, so that the two look equally thin: in
+ * dark mode a stroke of 0.8 is 0.93 px at the size the tab bar draws it and the stem of Inter Light is 0.93 px at 14 px; in light mode a stroke of 1.05 is
+ * 1.225 px and the stem of Inter Regular 1.23 px. Both are updated in place with the scheme, like `role`.
  */
 type TabWeights = { activeStroke: Record<Scheme, number>; activeLabelWeight: Record<Scheme, number>; inactiveStroke: Record<Scheme, number>; inactiveLabelWeight: Record<Scheme, number> };
 const TAB = tokens.tab as TabWeights;
@@ -148,7 +149,7 @@ export const motion = {
 
 export const fonts = {
   title: 'Fraunces_600SemiBold',
-  /** Only the inactive tab labels of the tab bar (tokens.tab.inactiveLabelWeight): the active one is heavier, so the weight says which is which as well as the colour. */
+  /** Only the inactive tab labels of the tab bar in dark mode (tokens.tab.inactiveLabelWeight; light mode: Regular): the active one is heavier, so the weight says which is which as well as the colour. */
   bodyLight: 'Inter_300Light',
   body: 'Inter_400Regular',
   bodyMedium: 'Inter_500Medium',
