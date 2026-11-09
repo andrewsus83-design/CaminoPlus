@@ -363,6 +363,10 @@ class SharePage(unittest.TestCase):
         self.assertNotIn('property="og:', self.page, "no preview card: a chat app that fetches the link learns nothing")
         self.assertNotIn("https://camino.plus", self.page, "works on whatever host serves web/")
         self.assertNotIn("/s<", PAGES["sitemap.xml"])
+        self.assertNotIn("expire", self.page, "no pilgrim can set an expiry, so the page does not talk of one")
+        for name in ("privacy.html", "faq.html"):
+            self.assertNotIn("expire", HTML[name].lower(), f"{name}: the app sets no expiry on a link")
+        self.assertIn("stored on our servers until you stop sharing it or delete your account", HTML["privacy.html"])
 
     def test_the_policy_allows_the_database_and_nothing_else(self):
         csp = dict(part.strip().split(" ", 1) for part in build_web.SHARE_CSP.split(";"))
@@ -380,7 +384,17 @@ class SharePage(unittest.TestCase):
         self.assertEqual(values["Content-Security-Policy"], build_web.SHARE_CSP + "; frame-ancestors 'none'")
         self.assertEqual(values["Referrer-Policy"], "no-referrer")
         self.assertEqual(values["X-Robots-Tag"], "noindex, nofollow")
-        self.assertIs(cfg["headers"][-1], rule, "after the catch-all rule, so its Referrer-Policy wins")
+        self.assertEqual(values["X-Content-Type-Options"], "nosniff")
+        self.assertEqual(values["X-Frame-Options"], "DENY")
+        # exactly ONE Referrer-Policy reaches /s and /s/...: the rule for every other page leaves them out
+        for path in ("/s", "/s/", "/s/index.html"):
+            policies = [h["value"] for r in cfg["headers"] if re.fullmatch(r["source"].replace("((?!", "(?:(?!"), path)
+                        for h in r["headers"] if h["key"] == "Referrer-Policy"]
+            self.assertEqual(policies, ["no-referrer"], path)
+        for path in ("/", "/faq", "/assets/site.css", "/sitemap.xml", "/support"):
+            policies = [h["value"] for r in cfg["headers"] if re.fullmatch(r["source"].replace("((?!", "(?:(?!"), path)
+                        for h in r["headers"] if h["key"] == "Referrer-Policy"]
+            self.assertEqual(policies, ["strict-origin-when-cross-origin"], path)
 
     def test_it_uses_the_public_config_of_the_app(self):
         config = (ROOT / "mobile" / "src" / "lib" / "config.ts").read_text(encoding="utf-8")
@@ -406,7 +420,7 @@ class SharePage(unittest.TestCase):
         for words in ("This link is not available", "What this link shows", "What it does not show",
                       "Notes, bookings, contact details, health, GPS tracks, stamps and photos.",
                       "A copy of this one note, made when it was shared.", "Photos, videos, the other notes and the rest of the journey.",
-                      "This plan is live"):
+                      "This plan is live", "These words come from a CaminoPlus pilgrim, not from CaminoPlus."):
             self.assertIn(words, text)
 
 

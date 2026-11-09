@@ -125,14 +125,16 @@ try {
         if (name === 'plan') {
           for (const words of ['Camino Francés', 'Shared by Maria', 'Starts Tue, 1 Dec 2026', '4 days', '45.7 km', 'Saint-Jean-Pied-de-Port to Roncesvalles',
             'Sleeps at Albergue de Roncesvalles', 'Walked', 'Walking', 'Planned', 'Rest day', 'What this link shows', 'the name of the place to sleep',
-            'What it does not show', 'Notes, bookings, contact details, health, GPS tracks, stamps and photos.', 'This plan is live']) {
+            'What it does not show', 'Notes, bookings, contact details, health, GPS tracks, stamps and photos.', 'This plan is live',
+            'These words come from a CaminoPlus pilgrim, not from CaminoPlus.']) {
             assert.ok(text.includes(words), `${tag}: shows "${words}"\n${text}`);
           }
           assert.equal(await page.title(), 'Camino Francés · CaminoPlus');
         }
         if (name === 'note') {
           for (const words of ['The bells at dawn', 'Shared by Maria <img src=x onerror=alert(1)>', '3 December 2026', '<script>alert(1)</script> is just words here.',
-            'A copy of this one note, made when it was shared.', 'Photos, videos, the other notes and the rest of the journey.']) {
+            'A copy of this one note, made when it was shared.', 'Photos, videos, the other notes and the rest of the journey.',
+            'These words come from a CaminoPlus pilgrim, not from CaminoPlus.']) {
             assert.ok(text.includes(words), `${tag}: shows "${words}"\n${text}`);
           }
           assert.equal(await page.locator('#share img, #share script').count(), 0, `${tag}: the words of a note are never HTML`);

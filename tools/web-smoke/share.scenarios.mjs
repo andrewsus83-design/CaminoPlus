@@ -53,10 +53,38 @@ export const SHARE_SCENARIOS = [
       assert.equal(await stays.getAttribute('aria-checked'), 'true');
       await button(page, 'Make link').click();
       await eventually(() => made.length, (n) => n === 1, { what: 'the calls to create_share_link' });
-      assert.deepEqual(made[0], { p_kind: 'plan', p_journey_id: JOURNEY.id, p_options: { stays: true }, p_label: null });
+      assert.deepEqual(made[0], { p_kind: 'plan', p_journey_id: JOURNEY.id, p_options: { stays: true }, p_label: JOURNEY.route.name }, 'the route name labels the link');
       const shared = await eventually(() => page.evaluate(() => window.__shared), (s) => Array.isArray(s) && s.length === 1, { what: 'what went to the share sheet' });
       assert.equal(shared[0].text ?? shared[0].message, `My Camino plan on CaminoPlus: https://caminoplus-web.vercel.app/s#${SHARE_TOKEN}`);
       await eventually(() => seen(page, 'Share your plan by link').count(), (n) => n === 0, { what: 'the sheet once the link is shared' });
+    },
+  },
+  {
+    name: 'Share plan link with no share sheet on the device (a computer): the link stays on the sheet with Copy link and Done, never closed silently',
+    persona: 'in',
+    async run(ctx) {
+      const { page, step, go } = ctx;
+      await page.addInitScript(() => {
+        Object.defineProperty(navigator, 'share', { configurable: true, value: undefined });
+        window.__copied = [];
+        Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: async (t) => { window.__copied.push(t); } } });
+      });
+      await go('/me');
+      await seen(page, 'Plan').click();
+      step('Make link');
+      await button(page, 'Share plan link').click();
+      await seen(page, 'Your name').waitFor();
+      await button(page, 'Make link').click();
+      const link = `My Camino plan on CaminoPlus: https://caminoplus-web.vercel.app/s#${SHARE_TOKEN}`;
+      await seen(page, 'Your link is ready. Copy it and send it to the people you choose.').waitFor();
+      await seen(page, link).waitFor();
+      step('Copy link');
+      await button(page, 'Copy link').click();
+      await seen(page, 'Copied.').waitFor();
+      assert.deepEqual(await page.evaluate(() => window.__copied), [link]);
+      step('Done closes it');
+      await button(page, 'Done').click();
+      await eventually(() => seen(page, 'Share your plan by link').count(), (n) => n === 0, { what: 'the sheet after Done' });
     },
   },
   {

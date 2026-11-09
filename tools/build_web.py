@@ -794,15 +794,15 @@ def privacy():
 <p>Friends are mutual: you become friends when you send a request and the other person accepts. We store the request, who sent it and when. Declining or cancelling a request deletes it, and so does removing a friend. People you block cannot send you friend requests or messages, and you do not appear in their search. A post you share with “Friends” is shown to your accepted friends and to your followers. On a public profile anyone can follow you without asking; on a private profile you approve each follower.</p>
 <h2>Who sees what</h2>
 <ul>
-<li><b>Your journey</b> (the posts you share, your profile card and its counts, and your route with its status, its planned start and end dates and its distance) is shown to the people each post or setting allows: only you, your friends and followers, or everyone.</li>
+<li><b>Your journey</b> (the posts you share, your profile card and its counts, and your route) is shown to the people each post or setting allows: only you, your friends and followers, or everyone. Friends and followers can also see the start and end dates, the distance and the status of your journey, as your visibility setting allows.</li>
 <li><b>Only for you:</b> your plan day by day (the date of each day, where it starts and ends, stays, bookings and the notes of each day), your passport stamps (their notes, places and photos), your GPS tracks and your health data. Friends and followers do not see them.</li>
 <li><b>Your notes</b> in the app stay on your phone and are not uploaded.</li>
 </ul>
 <h2>Share links</h2>
-<p>You can share one plan or one note through a link. Anyone who has the link can see what it shows, until you stop sharing it in the app. Links can also be made to expire.</p>
+<p>You can share one plan or one note through a link. Anyone who has the link can see what it shows, until you stop sharing it in the app. Every link shows your name as it is on your profile, also when your profile is private.</p>
 <ul>
 <li>A <b>plan link</b> shows your plan as it is when the link is opened: the route, the start date, the distance, and for each day the date, where it starts and ends, its distance and whether it is walked. The name of the place you sleep is shown only if you choose. It never shows the notes of a day, bookings, contact details, health, GPS tracks or stamps.</li>
-<li>A <b>note link</b> carries a copy of the words of that one note (its title, text and date), made when you share it and stored on our servers until you stop sharing it. Photos, videos and the place of the note are not included.</li>
+<li>A <b>note link</b> carries a copy of the words of that one note (its title, text and date), made when you share it and stored on our servers until you stop sharing it or delete your account. Photos, videos and the place of the note are not included.</li>
 <li>We store only a fingerprint (a hash) of each link, not the link itself, so we cannot give a lost link back; make a new one instead. We count how often a link is opened and when it was last opened, and show you both.</li>
 <li>The link page on this website reads the link only in your browser and does not use cookies or analytics. When you delete your account, your links stop working and are deleted.</li>
 </ul>
@@ -977,7 +977,7 @@ def share():
 </div></section>
 <template id="t-unavailable">
   <h1>This link is not available</h1>
-  <p class="lead">It may have been stopped by the person who shared it, or it may have expired. Ask them for a new link.</p>
+  <p class="lead">It may have been stopped by the person who shared it. Ask them for a new link.</p>
 </template>
 <template id="t-failed">
   <h1>We could not open the link</h1>
@@ -994,6 +994,7 @@ def share():
     <h2 class="share-box-title">What it does not show</h2>
     <p>Notes, bookings, contact details, health, GPS tracks, stamps and photos.</p>
     <p class="share-small">This plan is live: you see the latest version each time you open the link. <span data-f="owner"></span> can stop sharing it at any time.</p>
+    <p class="share-small">These words come from a CaminoPlus pilgrim, not from CaminoPlus.</p>
   </div>
   <ol class="share-days" data-f="days"></ol>
 </template>
@@ -1015,6 +1016,7 @@ def share():
     <h2 class="share-box-title">What it does not show</h2>
     <p>Photos, videos, the other notes and the rest of the journey.</p>
     <p class="share-small"><span data-f="owner"></span> can stop sharing it at any time.</p>
+    <p class="share-small">These words come from a CaminoPlus pilgrim, not from CaminoPlus.</p>
   </div>
 </template>'''
     PAGES["s/index.html"] = f'''<!doctype html>
