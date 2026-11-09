@@ -393,11 +393,13 @@ pilgrim stops sharing it. The web page `web/s/index.html` reads the token from t
   `anon` or `authenticated`: only the functions touch it.
 - `create_share_link(p_kind, p_journey_id, p_note, p_options, p_label, p_expires_days)` returns `{id, token, expires_at}`.
   The token (32 random bytes, base64url, 43 characters) is shown ONCE. Checks: signed in, your own journey, note body
-  at most 20,000 characters, title and place 200, label 80, expiry 1 to 365 days or none, at most 50 active links.
+  at most 20,000 characters and the copy at most 100 KB (both answer 22001), title and place 200, label 80 (the app sends the
+  route name or the note title), expiry 1 to 365 days or none (the app sets none), at most 50 active links.
 - `list_share_links()`: your links (no token, no hash). `revoke_share_link(id)`: stops one of yours (idempotent; a stopped
   note link loses its copy).
 - `get_shared(token)` (anon and signed in): `{kind, owner: {display_name}, plan, note}` or one generic `null` for an
-  unknown, stopped or expired link (or a deleted plan or account). A **plan** link is live and shows only the route name,
+  unknown, stopped or expired link (or a deleted plan or account). A view is counted at most once a minute; an expired note
+  link loses its copy when it is opened. A **plan** link is live and shows only the route name,
   start date, total km and per day: day number, planned date, from, to, planned km, status (and the stay name only when
   `options.stays` is true). Never day notes, booking, contacts, health, GPS, stamps or tasks. A **note** link is a copy
   made at sharing time (`title`, `body`, `place`, `written_at`); photos and videos are not part of a link in v1.

@@ -215,6 +215,27 @@ do $$ begin
 end $$;
 commit;
 
+\echo '== share links: a view is counted at most once a minute'
+begin;
+select share_test.anon();
+do $$ begin
+  assert public.get_shared(share_test.kept('plan')) is not null, 'opened again';
+  assert public.get_shared(share_test.kept('plan')) is not null, 'and again';
+end $$;
+select share_test.logout();
+do $$ begin
+  assert (select view_count from public.shared_links where id = share_test.kept('plan_id')::uuid) = 1, 'still one: no write on every open';
+end $$;
+update public.shared_links set last_viewed_at = now() - interval '2 minutes' where id = share_test.kept('plan_id')::uuid;
+select share_test.anon();
+do $$ begin perform public.get_shared(share_test.kept('plan')); end $$;
+select share_test.logout();
+do $$ begin
+  assert (select view_count from public.shared_links where id = share_test.kept('plan_id')::uuid) = 2, 'a minute later it counts';
+  assert (select last_viewed_at > now() - interval '1 minute' from public.shared_links where id = share_test.kept('plan_id')::uuid), 'and the time moves';
+end $$;
+rollback;
+
 \echo '== share links: a plan link is live, and shows stays only when asked'
 begin;
 select share_test.login('olga');
@@ -267,6 +288,57 @@ begin
   assert s::text not like '%x.jpg%' and s::text not like '%tired%', 'what is not in the whitelist was never kept';
 end $$;
 commit;
+
+\echo '== share links: bytes, not only characters: a note too big for the copy is 22001 with a hint, never the CHECK'
+begin;
+select share_test.login('olga');
+do $$
+declare
+  v_state text; v_hint text;
+begin
+  begin
+    -- 20,000 control characters pass the character limit but are 120 KB of JSON
+    perform public.create_share_link('note', null, jsonb_build_object('body', repeat(chr(1), 20000)));
+    raise exception 'a 120 KB copy was accepted';
+  exception when others then
+    get stacked diagnostics v_state = returned_sqlstate, v_hint = pg_exception_hint;
+    assert v_state = '22001', 'expected 22001, got ' || v_state;
+    assert v_hint = 'Make the note shorter and share it again.', 'a plain hint';
+  end;
+  assert (select count(*) from public.list_share_links() where created_at = now()) = 0, 'nothing was made';
+end $$;
+rollback;
+
+\echo '== share links: an expired note link loses its copy when it is opened'
+begin;
+select share_test.login('olga');
+do $$
+declare
+  r jsonb := public.create_share_link('note', null, '{"body":"soon gone"}', null, null, 1);
+begin
+  insert into share_test.kept values ('exp_note', r ->> 'token'), ('exp_note_id', r ->> 'id');
+end $$;
+select share_test.logout();
+update public.shared_links set expires_at = now() - interval '1 second' where id = share_test.kept('exp_note_id')::uuid;
+select share_test.anon();
+do $$ begin assert public.get_shared(share_test.kept('exp_note')) is null, 'expired: null'; end $$;
+select share_test.logout();
+do $$ begin
+  assert (select snapshot is null and revoked_at is not null from public.shared_links where id = share_test.kept('exp_note_id')::uuid), 'the copy is gone';
+  assert (select view_count from public.shared_links where id = share_test.kept('exp_note_id')::uuid) = 0, 'no view counted';
+end $$;
+rollback;
+
+\echo '== share links: the label is what the list shows (the app sends the route name or the note title)'
+begin;
+select share_test.login('olga');
+do $$ begin
+  perform public.create_share_link('note', null, '{"title":"The bells at dawn","body":"x"}', null, 'The bells at dawn');
+  perform public.create_share_link('plan', 'f5100000-0000-0000-0000-000000000001', null, '{}', repeat('R', 80));
+  assert (select count(*) from public.list_share_links() where label = 'The bells at dawn' and kind = 'note') = 1, 'the note title';
+  assert (select count(*) from public.list_share_links() where label = repeat('R', 80)) = 1, '80 characters fit';
+end $$;
+rollback;
 
 \echo '== share links: one answer, null, for unknown, malformed, stopped, expired and deleted'
 begin;

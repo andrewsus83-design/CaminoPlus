@@ -14,7 +14,8 @@
 --   list_share_links()    signed in; my links, without token or hash.
 --   revoke_share_link()   signed in; stops one of my links (idempotent). A stopped note link loses its copy.
 --   get_shared(token)     anon and signed in; what the link shows, or null. One generic null for an unknown,
---                         stopped or expired link (nobody learns which). Counts the view.
+--                         stopped or expired link (nobody learns which). Counts the view (once a minute at most). An expired
+--                         note link loses its copy when it is opened (and at its owner's next create_share_link).
 --
 --   A PLAN link is LIVE: it reads the plan when it is opened. It shows, field by field, ONLY: the route name,
 --   the start date, the total km, and per day: day number, planned date, from, to, planned km, status; the
@@ -23,7 +24,8 @@
 --   A NOTE link is a COPY made when it is shared ({title, body, place, written_at}); the note itself stays on
 --   the phone. Photos and videos are not part of a link (v1).
 --
--- Limits: note body 20,000 characters, title 200, place 200, label 80; at most 50 active links per person;
+-- Limits: note body 20,000 characters, title 200, place 200, label 80, the copy 100 KB (22001 with a hint); at most 50 active
+-- links per person; views are counted at most once a minute per link;
 -- expiry 1 to 365 days or none. Account deletion removes the links (owner_id references auth.users on
 -- delete cascade). Tests: supabase/dev/share_links_smoke.sql.
 -- Idempotent: if not exists / create or replace / drop policy if exists.
@@ -165,6 +167,10 @@ begin
     end if;
     -- whitelist: exactly these four keys are kept; anything else the app sends is dropped
     v_snapshot := jsonb_build_object('title', v_title, 'body', v_body, 'place', v_place, 'written_at', v_written);
+    -- characters are not bytes: 20,000 control characters are 120 KB of JSON. Say so plainly, before the 100 KB CHECK would.
+    if octet_length(v_snapshot::text) > 100000 then
+      raise exception 'the note is too long to share' using errcode = '22001', hint = 'Make the note shorter and share it again.';
+    end if;
     if p_options is not null and p_options <> '{}'::jsonb then
       raise exception 'a note link has no options' using errcode = '22023';
     end if;
@@ -257,6 +263,12 @@ begin
     return null;
   end if;
 
+  -- a note link that has expired loses its copy the first time anybody opens it (the answer is null either way)
+  update public.shared_links l
+  set snapshot = null, revoked_at = coalesce(l.revoked_at, now())
+  where l.token_hash = sha256(convert_to(p_token, 'UTF8'))
+    and l.kind = 'note' and l.snapshot is not null and l.expires_at is not null and l.expires_at <= now();
+
   select l.* into v_link
   from public.shared_links l
   where l.token_hash = sha256(convert_to(p_token, 'UTF8'))
@@ -307,7 +319,10 @@ begin
     return null;
   end if;
 
-  update public.shared_links set view_count = view_count + 1, last_viewed_at = now() where id = v_link.id;
+  -- counted at most once a minute: opening a link is not a write each time
+  if v_link.last_viewed_at is null or v_link.last_viewed_at < now() - interval '1 minute' then
+    update public.shared_links set view_count = view_count + 1, last_viewed_at = now() where id = v_link.id;
+  end if;
 
   return jsonb_build_object(
     'kind', v_link.kind,
