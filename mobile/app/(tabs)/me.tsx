@@ -27,10 +27,13 @@ import { POSTS_VIEW, resolveJourney, stepBack, tapAll, tapDestination, tapPlace,
 import { DEFAULT_ME_TAB, ME_FAB, ME_TABS, badgeText, inboxLabel, inboxTab, type MeTab } from '@/features/me/tabs';
 import { usePostMedia } from '@/features/me/usePostMedia';
 import { NotesTab } from '@/features/notes/NotesTab';
+import { ShareLinkSheet } from '@/components/ShareLinkSheet';
+import { shareLinks } from '@/lib/shareLinksClient';
+import { linkLabel } from '@/lib/shareLinks';
 import { updateProfile } from '@/lib/api';
 import { copyText } from '@/lib/clipboard';
 import { PickerUnavailable, pickAndUploadAvatar } from '@/lib/avatar';
-import { c, fonts, layout, radius, role, scrim, shadowStyle } from '@/theme';
+import { c, fonts, icon, layout, radius, role, scrim, shadowStyle, space } from '@/theme';
 
 type StampT = NonNullable<ReturnType<typeof useMeData>['stamps']>[number];
 type StageT = ReturnType<typeof useMeData>['stages'][number];
@@ -38,8 +41,9 @@ type DayT = NonNullable<ReturnType<typeof useMeData>['days']>[number];
 
 
 /** Plan as a tracker: overall progress on top, then a timeline of days. */
-function PlanTracker({ days }: { days: DayT[] }) {
+function PlanTracker({ days, journeyId, routeName }: { days: DayT[]; journeyId: string | null; routeName: string | null }) {
   const router = useRouter();
+  const [sharing, setSharing] = useState(false);
   if (days.length === 0) return <Empty text="Stages for your route are coming soon. Your day plan will appear here." />;
   // By kilometres when every day has a distance, otherwise by stages walked: some stages have no distance yet.
   const progress = planProgress(days);
@@ -64,6 +68,15 @@ function PlanTracker({ days }: { days: DayT[] }) {
           <AppText variant="small" muted>{last.planned_date ? `Santiago ${shortDate(last.planned_date)}` : `${days.length - doneN} stages left`}</AppText>
         </View>
       </Card>
+      {/* The plan is private (friends never see it). This makes ONE link to it, after a question that says what the link shows. */}
+      {journeyId && (
+        <Pressable accessibilityRole="button" accessibilityLabel="Share plan link" onPress={() => setSharing(true)} style={({ pressed }) => ({ minHeight: layout.touchPrimary, flexDirection: 'row', alignItems: 'center', gap: space[3], paddingHorizontal: space[4], borderRadius: radius.pill, borderWidth: 1, borderColor: role.border, backgroundColor: pressed ? role.sunken : role.surface })}>
+          <Icon name="share" color={role.action} size={icon.md} />
+          <AppText variant="label" style={{ flex: 1 }}>Share plan link</AppText>
+          <Icon name="chevron" color={role.action} size={icon.smPlus} />
+        </Pressable>
+      )}
+      {sharing && journeyId && <ShareLinkSheet kind="plan" onClose={() => setSharing(false)} make={({ stays }) => shareLinks.sharePlan(journeyId, { stays, label: linkLabel(routeName) })} />}
       {next && (
         <Card style={{ gap: 6, backgroundColor: role.inverse }} onPress={() => router.push({ pathname: '/planner', params: { day: next.id } })}>
           <AppText variant="mono" color={role.onInverseAccent} style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 1.2 }}>Up next · Day {next.day_number}</AppText>
@@ -310,7 +323,7 @@ export default function Me() {
             ? <SampleJourney />
             : <JourneyGrid posts={posts} media={media} only={onlyIds} />)}
 
-          {tab === 'Plan' && (!days ? (offline ? <Empty text="You are offline and your plan is not saved on this phone yet. Open it once with a connection." /> : loading) : <PlanTracker days={days} />)}
+          {tab === 'Plan' && (!days ? (offline ? <Empty text="You are offline and your plan is not saved on this phone yet. Open it once with a connection." /> : loading) : <PlanTracker days={days} journeyId={journey?.id ?? null} routeName={journey?.route?.name ?? null} />)}
 
           {tab === 'Health' && <Health />}
           {/* Room under the last thing for the chat button over the corner: with the gap above it, 56 more, so the room is the one the Notes feed leaves (the bar, the button, a margin). */}

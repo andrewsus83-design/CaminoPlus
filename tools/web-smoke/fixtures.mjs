@@ -200,6 +200,13 @@ function tables({ persona, data }) {
 }
 
 // Each function gets (body, state) where state = { persona, data, full }.
+/** What create_share_link answers: a token as the database makes it (43 base64url characters). */
+export const SHARE_TOKEN = 'T0kEn_' + 'x'.repeat(35) + '-9';
+export const SHARE_LINKS = [
+  { id: '70000000-0000-4000-8000-000000000001', kind: 'plan', label: null, created_at: iso(2 * 86_400_000), expires_at: null, revoked_at: null, last_viewed_at: iso(3_600_000), view_count: 3 },
+  { id: '70000000-0000-4000-8000-000000000002', kind: 'note', label: 'The bells at dawn', created_at: iso(5 * 86_400_000), expires_at: null, revoked_at: iso(86_400_000), last_viewed_at: null, view_count: 0 },
+];
+
 const RPC = {
   get_unread_totals: (_b, s) => [s.full ? { notifications: 1, chats: 2, groups: 0, friend_requests: 1 } : { notifications: 0, chats: 0, groups: 0, friend_requests: 0 }],
   get_my_storage: () => ({ has_plus: false, quota_bytes: 0, used_bytes: 0, object_count: 0, remaining_bytes: 0 }),
@@ -210,6 +217,10 @@ const RPC = {
   list_friend_requests: (_b, s) => (s.full ? [{ direction: 'incoming', id: LUCAS.id, username: LUCAS.username, display_name: LUCAS.display_name, avatar_url: null, created_at: iso(3_600_000) }] : []),
   list_stage_stays: (_b, s) => (s.full ? STAYS : []),
   list_stage_pois: (_b, s) => (s.full ? POIS : []),
+  // share links (supabase/migrations/20261114100100_share_links.sql): the list of Settings > Shared links, a new link, stopping one
+  list_share_links: (_b, s) => (s.full ? SHARE_LINKS : []),
+  create_share_link: () => ({ id: '70000000-0000-4000-8000-0000000000aa', token: SHARE_TOKEN, expires_at: null }),
+  revoke_share_link: () => null,
 };
 
 /** Applies the filters PostgREST puts in the query string (eq, neq, in, is, not.is) and limit. Anything it does not know is ignored. */

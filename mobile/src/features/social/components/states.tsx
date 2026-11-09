@@ -4,18 +4,18 @@ import { ReactNode, useEffect, useRef } from 'react';
 import { Animated, Platform, View } from 'react-native';
 import { AppText } from '@/components/AppText';
 import { Icon, IconName } from '@/components/Icon';
-import { c, radius, layout } from '@/theme';
+import { c, layout, radius, role, space } from '@/theme';
 import { Btn } from './primitives';
 
 export function EmptyState({ icon = 'shell', title, text, action, secondary }: { icon?: IconName; title: string; text: string; action?: { label: string; onPress: () => void; icon?: IconName }; secondary?: { label: string; onPress: () => void } }) {
   return (
-    <View style={{ alignItems: 'center', paddingHorizontal: 32, paddingTop: 56, paddingBottom: 32, gap: 12 }}>
-      <View style={{ width: 88, height: 88, borderRadius: radius.pill, backgroundColor: c.goldWash, alignItems: 'center', justifyContent: 'center', marginBottom: 6 }}>
-        <Icon name={icon} color={c.goldInk} size={40} strokeWidth={1.6} />
+    <View style={{ alignItems: 'center', paddingHorizontal: space[8], paddingTop: space[16], paddingBottom: space[8], gap: space[3] }}>
+      <View style={{ width: 88, height: 88, borderRadius: radius.pill, backgroundColor: c.goldWash, alignItems: 'center', justifyContent: 'center', marginBottom: space[2] }}>
+        <Icon name={icon} color={role.accentText} size={32} />
       </View>
       <AppText variant="h4" style={{ textAlign: 'center' }} accessibilityRole="header">{title}</AppText>
       <AppText variant="small" muted style={{ textAlign: 'center', maxWidth: 320 }}>{text}</AppText>
-      {action && <View style={{ marginTop: 10 }}><Btn label={action.label} icon={action.icon} onPress={action.onPress} variant="gold" /></View>}
+      {action && <View style={{ marginTop: space[3] }}><Btn label={action.label} icon={action.icon} onPress={action.onPress} variant="gold" /></View>}
       {secondary && <Btn label={secondary.label} onPress={secondary.onPress} variant="ghost" size="sm" />}
     </View>
   );
@@ -23,13 +23,13 @@ export function EmptyState({ icon = 'shell', title, text, action, secondary }: {
 
 export function ErrorState({ text, onRetry, title = 'That did not load' }: { text: string; onRetry: () => void; title?: string }) {
   return (
-    <View accessibilityRole="alert" style={{ alignItems: 'center', paddingHorizontal: 32, paddingTop: 56, paddingBottom: 32, gap: 12 }}>
-      <View style={{ width: 88, height: 88, borderRadius: radius.pill, backgroundColor: c.red100, alignItems: 'center', justifyContent: 'center', marginBottom: 6 }}>
-        <Icon name={/offline/i.test(text) ? 'wifi-off' : 'info'} color={c.red700} size={38} strokeWidth={1.7} />
+    <View accessibilityRole="alert" style={{ alignItems: 'center', paddingHorizontal: space[8], paddingTop: space[16], paddingBottom: space[8], gap: space[3] }}>
+      <View style={{ width: 88, height: 88, borderRadius: radius.pill, backgroundColor: c.red100, alignItems: 'center', justifyContent: 'center', marginBottom: space[2] }}>
+        <Icon name={/offline/i.test(text) ? 'wifi-off' : 'info'} color={c.red700} size={32} />
       </View>
       <AppText variant="h4" style={{ textAlign: 'center' }}>{title}</AppText>
       <AppText variant="small" muted style={{ textAlign: 'center', maxWidth: 320 }}>{text}</AppText>
-      <View style={{ marginTop: 10 }}><Btn label="Try again" icon="refresh" onPress={onRetry} /></View>
+      <View style={{ marginTop: space[3] }}><Btn label="Try again" icon="refresh" onPress={onRetry} /></View>
     </View>
   );
 }
@@ -37,11 +37,11 @@ export function ErrorState({ text, onRetry, title = 'That did not load' }: { tex
 /** A bar with an icon and a sentence: offline notice, "could not refresh", and so on. */
 export function Notice({ icon = 'info', text, tone = 'info', action }: { icon?: IconName; text: string; tone?: 'info' | 'warn'; action?: ReactNode }) {
   const bg = tone === 'warn' ? c.red100 : c.goldWash;
-  const fg = tone === 'warn' ? c.red700 : c.goldInk;
+  const fg = tone === 'warn' ? c.red700 : role.accentText;
   return (
-    <View accessibilityRole="alert" accessibilityLiveRegion="polite" style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 16, paddingVertical: 10, backgroundColor: bg }}>
+    <View accessibilityRole="alert" accessibilityLiveRegion="polite" style={{ flexDirection: 'row', alignItems: 'center', gap: space[3], paddingHorizontal: space[4], paddingVertical: space[3], backgroundColor: bg }}>
       <Icon name={icon} color={fg} size={20} />
-      <AppText variant="caption" color={fg} style={{ flex: 1, letterSpacing: 0, fontSize: 15, lineHeight: 20 }}>{text}</AppText>
+      <AppText variant="caption" color={fg} style={{ flex: 1 }}>{text}</AppText>
       {action}
     </View>
   );
@@ -63,11 +63,11 @@ export function LoadingRows({ count = 6, avatar = 56 }: { count?: number; avatar
   return (
     <Animated.View accessibilityRole="progressbar" accessibilityLabel="Loading" style={{ opacity: pulse }}>
       {Array.from({ length: count }, (_, i) => (
-        <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: layout.screenMargin, paddingVertical: 12 }}>
-          <View style={{ width: avatar, height: avatar, borderRadius: radius.pill, backgroundColor: c.sand200 }} />
-          <View style={{ flex: 1, gap: 10 }}>
-            <View style={{ height: 14, width: `${48 + ((i * 17) % 30)}%`, borderRadius: 7, backgroundColor: c.sand200 }} />
-            <View style={{ height: 12, width: `${62 + ((i * 11) % 28)}%`, borderRadius: 6, backgroundColor: c.sand200 }} />
+        <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: space[4], paddingHorizontal: layout.screenMargin, paddingVertical: space[3] }}>
+          <View style={{ width: avatar, height: avatar, borderRadius: radius.pill, backgroundColor: role.sunken }} />
+          <View style={{ flex: 1, gap: space[3] }}>
+            <View style={{ height: 14, width: `${48 + ((i * 17) % 30)}%`, borderRadius: radius.xs, backgroundColor: role.sunken }} />
+            <View style={{ height: 12, width: `${62 + ((i * 11) % 28)}%`, borderRadius: radius.xs, backgroundColor: role.sunken }} />
           </View>
         </View>
       ))}
@@ -76,8 +76,8 @@ export function LoadingRows({ count = 6, avatar = 56 }: { count?: number; avatar
 }
 
 export const Section = ({ children, right }: { children: string; right?: ReactNode }) => (
-  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: layout.screenMargin, paddingTop: 20, paddingBottom: 6 }}>
-    <AppText variant="mono" muted style={{ textTransform: 'uppercase', letterSpacing: 1.4, fontSize: 12 }} accessibilityRole="header">{children}</AppText>
+  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: layout.screenMargin, paddingTop: space[5], paddingBottom: space[2] }}>
+    <AppText variant="mono" muted style={{ textTransform: 'uppercase' }} accessibilityRole="header">{children}</AppText>
     {right}
   </View>
 );
