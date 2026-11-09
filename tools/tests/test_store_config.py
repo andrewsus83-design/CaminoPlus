@@ -234,11 +234,11 @@ class Eas(unittest.TestCase):
 
 
 class CodeMatchesPermissions(unittest.TestCase):
-    # The three places on main that ask the system for the media-library permission before they open the photo picker. The picker itself needs no
-    # permission (it is the system's photo picker), and the media change of release 1.2.0 deletes these questions. With READ_EXTERNAL_STORAGE and
-    # WRITE_EXTERNAL_STORAGE blocked, the question has nothing to ask for on Android 12 and older: it is answered "no" and the picker would never open
-    # there. Until that change has landed they stay here; once it has, empty this set, and nobody can bring the question back.
-    PENDING = {"mobile/app/write.tsx", "mobile/src/features/social/pick.ts", "mobile/src/lib/avatar.ts"}
+    # Before release 1.2.0, three places asked the system for the media-library permission before they opened the photo picker (app/write.tsx,
+    # features/social/pick.ts, lib/avatar.ts). The picker itself needs no permission (it is the system's photo picker), and the media change of
+    # release 1.2.0 deleted these questions. With READ_EXTERNAL_STORAGE and WRITE_EXTERNAL_STORAGE blocked, the question has nothing to ask for on
+    # Android 12 and older: it is answered "no" and the picker would never open there. The set is empty, so nobody can bring the question back.
+    PENDING: set[str] = set()
 
     def test_nothing_asks_for_a_media_library_permission_that_app_json_removed(self):
         found = calls(("requestMediaLibraryPermissionsAsync", "getMediaLibraryPermissionsAsync", "useMediaLibraryPermissions"))
