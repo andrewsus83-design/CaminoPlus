@@ -456,8 +456,10 @@ check('the rows that are opened out are a set that is changed by copying: the on
   assert.deepEqual([...two].sort(), ['a', 'b']);
 });
 
-check('a thing to touch is at least 44 pixels', () => {
-  assert.ok(TOUCH_MIN >= 44);
+check('a thing to touch is the hard minimum of the design, 48 pixels, and it is the number of tokens.json', () => {
+  const tokens = JSON.parse(read('src/theme/tokens.json')) as { layout: { touchHard: number } };
+  assert.equal(TOUCH_MIN, tokens.layout.touchHard, 'timeline.ts imports nothing, so it writes the number; this keeps it the one of the tokens (layout.touchHard)');
+  assert.ok(TOUCH_MIN >= 48);
 });
 
 /* ================================================================ the screens, read as source */
@@ -582,10 +584,10 @@ check('a row is one thing for a screen reader, with the actions of its parts as 
   assert.match(row, /onAccessibilityAction=\{/);
   for (const name of ['share', 'edit', 'delete']) assert.match(row, new RegExp(`name: '${name}'`), `the action ${name}`);
   assert.match(row, /accessibilityLabel="More: edit or delete this note"/, 'the "…" button says what it opens');
-  assert.match(row, /style=\{\[\{ fontSize: 20, lineHeight: 26, marginTop: 2 \}, breakAnywhere\]\}>\{row\.title\}/, 'a very long word in a title breaks on the web instead of widening the note');
+  assert.match(row, /<AppText variant="h4" style=\{breakAnywhere\}>\{row\.title\}/, 'the title is the h4 of the type scale (no size of its own), and a very long word in it breaks on the web instead of widening the note');
 });
 
-check('every control has a label and is at least 44 big: Pressables, buttons and the card', () => {
+check('every control has a label and is at least 48 big: Pressables, buttons and the card', () => {
   for (const f of tsx) {
     const src = code(f);
     for (const m of src.matchAll(/<Pressable\b/g)) assert.match(src.slice(m.index, (m.index ?? 0) + 700), /accessibilityLabel=/, `${f}: a Pressable without a label`);
@@ -593,11 +595,11 @@ check('every control has a label and is at least 44 big: Pressables, buttons and
     for (const m of src.matchAll(/<Pill\b/g)) assert.match(src.slice(m.index, (m.index ?? 0) + 200), /\blabel=/, `${f}: a Pill without a label`);
     for (const m of src.matchAll(/<TextInput\b/g)) assert.fail(`${f}: the feed has no text field`);
   }
-  // the sizes of the things to touch are TOUCH_MIN (44), never a smaller number written out
+  // the sizes of the things to touch are TOUCH_MIN (48), never a smaller number written out
   assert.equal((code('NoteRow.tsx').match(/width: TOUCH_MIN, height: TOUCH_MIN/g) ?? []).length, 2, 'the "…" button and the Share button');
   assert.match(code('NoteRow.tsx'), /minHeight: TOUCH_MIN, justifyContent: 'center', alignSelf: 'flex-start'/, '"Show more"');
   assert.match(code('NoteRow.tsx'), /maxWidth: '100%', minHeight: TOUCH_MIN/, 'the place chip');
-  assert.match(code('NotesHeader.tsx'), /minHeight: WRITE_CARD_MIN/, 'the card is at least WRITE_CARD_MIN (64) high, more than a thing to touch needs');
+  assert.match(code('NotesHeader.tsx'), /minHeight: WRITE_CARD_MIN/, 'the card is at least WRITE_CARD_MIN (72) high, more than a thing to touch needs');
   assert.ok(WRITE_CARD_MIN >= TOUCH_MIN + 20);
   assert.match(code('NoteMenu.tsx'), /minHeight: layout\.touchPrimary/, 'the items of the menu are 56');
 });
