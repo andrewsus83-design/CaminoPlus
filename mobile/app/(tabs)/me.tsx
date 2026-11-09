@@ -138,8 +138,9 @@ export default function Me() {
   const density = predicted === 'roomy' && roomyBottom !== null && stripOverflows({ ...fit, stripBottom: roomyBottom, screenTop: layout.screenTop }) ? 'compact' : predicted;
   const hm = DENSITY[density]; // the numbers of the header in this density
   // The header ends with the strip, so the height of the header is where the strip ends. A height is what the web reports when something changes (a position alone is not reported there), and a phone too.
+  // A description that was opened with Read more is the person's own choice and is not measured: closing it again must not leave the header compact.
   const checkStrip = (e: LayoutChangeEvent) => {
-    if (density === 'roomy') setRoomyBottom(e.nativeEvent.layout.height);
+    if (density === 'roomy' && !bioOpen) setRoomyBottom(e.nativeEvent.layout.height);
   };
   const { profile, journey, session, refresh, stale } = useAuth();
   const unread = useUnreadTotals();
