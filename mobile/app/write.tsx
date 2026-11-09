@@ -10,6 +10,7 @@ import { FormMessage } from '@/components/auth/Field';
 import { c, fixed, fonts, radius, role, layout } from '@/theme';
 import { useAuth } from '@/lib/auth';
 import { PickedMedia, PreparedMedia, createJournalPost, uploadPostMedia } from '@/lib/api';
+import { mediaFailureText } from '@/lib/postMediaUpload';
 import { cachedMyStorage, loadMyStorage, useMyStorage } from '@/lib/billing';
 import { MAX_VIDEO_SECONDS, MediaTier, PLAN_UNKNOWN_NOTE, PLAN_WAIT_MS, withTimeout, canResizePhotos, discardPrepared, pickerQuality, pickerVideoPreset, preparePicked, quotaCheck, tierFor } from '@/lib/media';
 import { MediaPreparing } from '@/components/MediaPreparing';
@@ -196,8 +197,8 @@ export default function Write() {
       const media = slides.flatMap((s) => (s.media ? [s.media] : []));
       const { failed, reasons } = media.length ? await uploadPostMedia(session.user.id, post.id, media) : { failed: 0, reasons: [] as string[] };
       await refresh();
-      // The real reason when this phone refused a file (its place could not be removed); otherwise connection or storage.
-      if (failed > 0) Alert.alert('Posted without some media', `${failed} of ${media.length} photos or videos could not be uploaded. ${reasons[0] ?? 'Check your connection and your cloud storage in Settings.'}`);
+      // The real reason for each file this phone refused (its place could not be removed); connection or storage for the others.
+      if (failed > 0) Alert.alert('Posted without some media', mediaFailureText(failed, media.length, reasons));
       router.back();
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));

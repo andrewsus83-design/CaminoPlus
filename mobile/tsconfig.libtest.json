@@ -32,7 +32,7 @@
     "src/lib/__tests__/accountLoad.test.ts",
     "src/lib/__tests__/media.test.ts",
     "src/lib/__tests__/mediaLocation.test.ts",
-    "src/lib/__tests__/mediaFlows.test.ts",
+    "src/lib/__tests__/mediaFlows.test.ts"
     "src/lib/__tests__/shareLinks.test.ts"
   ]
 }

@@ -14,7 +14,7 @@
 //
 // A file whose boxes do not add up (cut short, a size that lies, nesting deeper than we read) is not "clean": `complete`
 // is false and clean.ts refuses it, because a position may sit in the part we could not read. One exception: a Samsung
-// SEF trailer after the last box, when no position is written in it. After cleaning, every box that holds text (udta,
+// SEF trailer after the last box (it ends in SEFT), which is blanked whole. After cleaning, every box that holds text (udta,
 // meta, uuid, XMP_; not the sample tables) is searched once more for a position or an XMP GPS property; any left also
 // makes it incomplete.
 
@@ -181,14 +181,15 @@ export function stripVideoLocation(b: Uint8Array): { bytes: Uint8Array; removed:
     const stop = { at: b.length };
     const top = boxes(b, 0, b.length, stop);
     if (!top.some((x) => x.type === 'moov')) throw new Incomplete();
-    // After the last box only a Samsung SEF trailer is accepted, and only when no position is written in it.
-    let end = b.length;
-    if (stop.at !== b.length) {
-      if (!isSefTrailer(b, stop.at) || positionLeft(b, stop.at, b.length)) throw new Incomplete();
-      end = stop.at;
-    }
+    // After the last box only a Samsung SEF trailer is accepted. It can hold a position or the phone's country in forms no
+    // search can be sure of, so the whole of it is blanked (zeros, same length); players ignore data after the last box.
+    if (stop.at !== b.length && !isSefTrailer(b, stop.at)) throw new Incomplete();
     const text: Box[] = [];
-    removed = walk(b, 0, end, 0, text) > 0;
+    removed = walk(b, 0, stop.at, 0, text) > 0;
+    if (stop.at !== b.length) {
+      b.fill(0, stop.at, b.length);
+      removed = true;
+    }
     for (const x of text) if (positionLeft(b, x.start, x.end)) throw new Incomplete();
   } catch (e) {
     if (e instanceof Incomplete) return { bytes: b, removed, complete: false };
