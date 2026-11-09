@@ -104,6 +104,13 @@ Then the **scenarios** ([scenarios.mjs](scenarios.mjs)), each in light and dark,
     "3 of 34 places"; a stamp shows exactly the posts at that place with the card that writes a post once, the app's one Back button over it goes back to the stamps (not to all the posts), and
     All again closes the stamps; a place with no post says "No journeys at <place> yet" over the card alone; from Plan and Health All opens the stamps of Journey, and a destination of the row
     still shows its posts (the same one again clears it); a plan with no destination still has the All item, alone in the row; an account whose route has no places has no All item;
+  - Me on small phones ([mesmall.scenarios.mjs](mesmall.scenarios.mjs)): the gold chat button must not cover the strip. At 360 x 640, 375 x 667 and 390 x 844 the strip of four sub-tabs ends above the button on Notes, Journey,
+    Plan and Health: 0 percent of the Health cell is covered (the area of the button's box over the area of the cell), with 8 px of air above the button, and the four labels are one row above the tab bar; at 320 x 568, where the button's
+    top edge is at 402 and no header can end above it, the labels are still above the tab bar and Notes, Journey and Plan are clear of the button (Health is covered: the walk says so and does not pretend); a long description
+    at 390 x 760 makes the header compact after it is drawn and the strip clears the button. A strip under the tab bar can be 0 percent covered and still unreachable, so the walk also asks for the labels above the bar. The My Camino
+    card cuts no word at 320, 360, 375 and 390 wide: "Buen Camino!" is one line, nothing is clipped, ended in an ellipsis or outside the card, "1 stage done" agrees with its number. The words on a Journey tile are 15 px or more, white over a
+    band that holds 4.5 : 1 over a white picture; "Roncesvalles" under a highlight is one line, never broken in the middle, the long names take two lines (one when the header is compact). The web has no status bar and no home bar,
+    so a real phone is worse than these numbers; to see them, `Emulation.setSafeAreaInsetsOverride` of the Chrome DevTools Protocol gives Chromium a safe area, which the app reads like a phone's;
 - Notes, a page is a draft until it is published: on a blank page Read and Publish are off and there is no Save draft; with words in it Save draft is at the
   top right and the date says Draft; the marks (Bold, Italic, Heading, Bulleted list, Quote) sit inside the text box, under the text and above the bottom
   row; Read is a third and Publish two thirds of one row at the bottom (margin to margin, at least 48 high); Read turns into Edit in the same place; Save draft
@@ -244,6 +251,7 @@ Chromium; a test checks they agree). Bump both on purpose, with the tests looked
 | [plan.mjs](plan.mjs) | which checks exist (route x state x scheme x mode, then the scenarios), the redirect list |
 | [scenarios.mjs](scenarios.mjs) | the walks a person does |
 | [me.scenarios.mjs](me.scenarios.mjs) | the walks of Me: the header with the gear alone, the chat button and where it opens, the card of Journey (also in the sample journey), the card of Notes |
+| [mesmall.scenarios.mjs](mesmall.scenarios.mjs) | the walks of Me on small phones: the strip against the chat button at four phone sizes, the My Camino card on narrow phones, the captions of the Journey grid, the names under the highlights |
 | [pilgrim.scenarios.mjs](pilgrim.scenarios.mjs) | the walks of the profile of another pilgrim: a friend, a stranger, a private one, one that is not there, no signal, the name of a comment author, and that nothing private is on it |
 | [allplaces.scenarios.mjs](allplaces.scenarios.mjs) | the walks of the All item of Me: the row, the stamps of the route, the journeys at a place, the way back, Plan and Health, no destination, no places |
 | [bible.scenarios.mjs](bible.scenarios.mjs) | the walks of the Bible tab and the reader (kept apart so the other walks stay short) |

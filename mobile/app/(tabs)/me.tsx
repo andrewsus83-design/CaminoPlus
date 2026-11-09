@@ -125,8 +125,9 @@ export default function Me() {
   const predicted = headerDensity(fit);
   const density = predicted === 'roomy' && roomyBottom !== null && stripOverflows({ ...fit, stripBottom: roomyBottom, screenTop: layout.screenTop }) ? 'compact' : predicted;
   const hm = DENSITY[density]; // the numbers of the header in this density
+  // The header ends with the strip, so the height of the header is where the strip ends. A height is what the web reports when something changes (a position alone is not reported there), and a phone too.
   const checkStrip = (e: LayoutChangeEvent) => {
-    if (density === 'roomy') setRoomyBottom(e.nativeEvent.layout.y + e.nativeEvent.layout.height);
+    if (density === 'roomy') setRoomyBottom(e.nativeEvent.layout.height);
   };
   const { profile, journey, session, refresh, stale } = useAuth();
   const unread = useUnreadTotals();
@@ -234,7 +235,7 @@ export default function Me() {
   // Everything above the content of a sub-tab: the header (handle and gear, avatar and stats, name and bio, the My Camino card, the highlights) and the strip
   // of sub-tabs. Both hosts below draw it, so it looks the same on every sub-tab. One view; the space between its blocks is the density's (16, or 4 when compact).
   const top = (
-    <View>
+    <View onLayout={checkStrip}>
       {/* Header follows the design system: handle pill + gear, avatar with stats, name and bio. */}
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: hm.gear }}>
         <AppText variant="h4" numberOfLines={1} style={{ flexShrink: 1 }}>{profile?.username ?? name}</AppText>
@@ -316,7 +317,7 @@ export default function Me() {
         ) : <AppText variant="accent" color={role.accentText}>Buen Camino!</AppText>}
         <Highlights key={session?.user.id ?? 'none'} items={highlights} days={days ?? []} media={media} activeKey={activeKey} userId={session?.user.id} onPick={pickHighlight} all={places.length > 0 ? { visited: visitedCount(places), total: places.length, on: shown.kind === 'stamps' || shown.kind === 'place', onPress: pickAll } : null} dense={density === 'compact'} />
       </View>
-      <View onLayout={checkStrip} style={{ marginTop: hm.beforeStrip }}>
+      <View style={{ marginTop: hm.beforeStrip }}>
         <SubTabs tabs={ME_TABS} value={tab} onChange={setTab} />
       </View>
     </View>
