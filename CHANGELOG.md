@@ -33,7 +33,7 @@ How to build, test and submit it: [`mobile/DEPLOY.md`](mobile/DEPLOY.md), "Relea
 - **No Apple button on Android or the web.**
 - **Cloud storage for Free accounts is not switched on by this build.** Until it is, a Free account cannot save photos or videos to the cloud, and the app says so.
 - **No video compressor.**
-- The Apple table (migration `20261114020100_apple_sign_in_tokens.sql`) is not applied and the functions `apple-link` and `delete-account` are not deployed: the owner does that (`mobile/DEPLOY.md`, "Release 1.2.0", step 1).
+- The four Apple secrets (`APPLE_TEAM_ID`, `APPLE_KEY_ID`, `APPLE_PRIVATE_KEY`, `APPLE_BUNDLE_ID`) are not set. Until the owner sets them (`mobile/DEPLOY.md`, "Release 1.2.0", step 1), signing in with Apple works but deleting an account cannot revoke the token at Apple. The table `apple_sign_in_tokens` and the functions `apple-link` and `delete-account` are already live (9 November 2026).
 
 ### Not checked on a device
 

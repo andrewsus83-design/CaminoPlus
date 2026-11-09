@@ -46,7 +46,7 @@ Do the steps in this order. Each command runs in `mobile/` unless the step says 
    - `APPLE_KEY_ID`: the Key ID of step 3.
    - `APPLE_PRIVATE_KEY`: the whole `.p8` file, with the `BEGIN` and `END` lines.
    - `APPLE_BUNDLE_ID`: `plus.camino.app`.
-6. **Supabase, the table and the functions.** When you agree, apply the migration `supabase/migrations/20261114020100_apple_sign_in_tokens.sql` (it is not applied yet). Then deploy the two functions, from the root of the repository:
+6. **Supabase, the table and the functions.** Already done on 9 November 2026: the table `apple_sign_in_tokens` (migration `supabase/migrations/20261114020100_apple_sign_in_tokens.sql`) is applied and both functions are deployed. There is nothing to do here. Only if you change a function, deploy it again from the root of the repository:
 
    ```bash
    supabase functions deploy apple-link
@@ -77,7 +77,7 @@ Do the steps in this order. Each command runs in `mobile/` unless the step says 
 
 10. **Google Play (only for Android).** A Google Play developer account, the app made in Play Console with the package name `plus.camino.app`, and a service account with a JSON key ([docs.expo.dev/submit/android](https://docs.expo.dev/submit/android/)). The key stays on your computer or in EAS, never in this repository.
 
-Without the secrets of step 5, Sign in with Apple still works, but deleting an account cannot revoke the sign-in at Apple. So finish steps 4 to 6 before App Review.
+Without the secrets of step 5, Sign in with Apple still works, but deleting an account cannot revoke the sign-in at Apple. So finish steps 4 and 5 before App Review.
 
 #### 2. The commands
 

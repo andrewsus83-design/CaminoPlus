@@ -109,8 +109,8 @@ On a computer the easiest way to give the whole file is `supabase secrets set AP
 (type it in your own terminal, not in a chat). The functions make a fresh five-minute client secret for every call, so
 nothing here expires.
 
-Then apply the migration and deploy the functions (once you agree):
-`20261114020100_apple_sign_in_tokens.sql`, then `supabase functions deploy apple-link` and
+The table (`20261114020100_apple_sign_in_tokens.sql`) is applied and both functions are deployed (9 November 2026). Only
+if you change a function, deploy it again: `supabase functions deploy apple-link` and
 `supabase functions deploy delete-account`.
 
 ### 6. Emails to private relay addresses
