@@ -33,6 +33,10 @@ Not sure when a build was made? Build again: it costs one build and removes the 
 
 No migration and no edge function changed since the Library v2 merge, so there is nothing to apply to the database for this release (the places of stage 3 were loaded separately: CHANGELOG, "Data").
 
+### Build 1.2.0: new native code
+
+Build 1.2.0 brings native additions, so it needs **a new build** of every profile (an update cannot carry them). One of them is Sign in with Apple (`expo-apple-authentication` and its entitlement); its setup, the secrets it needs and how to test it are in [docs/APPLE-SIGN-IN.md](docs/APPLE-SIGN-IN.md). Builds older than 1.2.0 keep working and simply show no Apple button.
+
 ### The builds (the profiles of `eas.json`)
 
 Run these in `mobile/`, after `git pull` on `main`, signed in with `npx eas-cli login`. When a build is done, EAS prints the link of its page on expo.dev; for `development` and `preview` (internal distribution) that page has the link and the QR code to install it on a phone.

@@ -5,6 +5,7 @@ import { AppText } from '@/components/AppText';
 import { Pill } from '@/components/Pill';
 import { AuthShell } from '@/components/auth/AuthShell';
 import { Field, FormMessage } from '@/components/auth/Field';
+import { AppleButton } from '@/components/auth/AppleButton';
 import { GoogleButton } from '@/components/auth/GoogleButton';
 import { supabase } from '@/lib/supabase';
 import { role } from '@/theme';
@@ -36,6 +37,7 @@ export default function SignIn() {
       </Pressable>
       <Pill label="Sign in" onPress={submit} loading={busy} />
       <AppText variant="caption" muted style={{ textAlign: 'center' }}>or</AppText>
+      <AppleButton onError={setError} />
       <GoogleButton onError={setError} />
       <Pressable onPress={() => router.replace('/sign-up')} style={{ alignSelf: 'center', minHeight: 48, justifyContent: 'center' }}>
         <AppText variant="small" muted>New here? <AppText variant="label" color={role.accentText}>Create an account</AppText></AppText>

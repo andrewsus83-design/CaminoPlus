@@ -38,6 +38,17 @@ export async function updateProfile(userId: string, patch: Partial<Pick<Profile,
   return must(await supabase.from('profiles').update(patch).eq('id', userId).select(PROFILE_COLS).single()) as Profile;
 }
 
+/**
+ * Set the display name only while it is still `expected` (the value just read). A name the pilgrim typed in the meantime is
+ * never overwritten: then nothing changes and the answer is null. Used for the name Sign in with Apple shares once.
+ */
+export async function updateDisplayNameIf(userId: string, expected: string | null, displayName: string) {
+  await assertOnline();
+  const q = supabase.from('profiles').update({ display_name: displayName }).eq('id', userId);
+  const res = await (expected === null ? q.is('display_name', null) : q.eq('display_name', expected)).select(PROFILE_COLS).maybeSingle();
+  return (res.error ? must(res) : res.data) as Profile | null;
+}
+
 /** Latest journey that is not deleted. No journey yet = onboarding not done. */
 export async function getCurrentJourney(userId: string) {
   await assertOnline();

@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '@/components/AppText';
 import { Pill } from '@/components/Pill';
 import { Wordmark } from '@/components/auth/Wordmark';
+import { AppleButton } from '@/components/auth/AppleButton';
 import { GoogleButton } from '@/components/auth/GoogleButton';
 import { FormMessage } from '@/components/auth/Field';
 import { fonts, layout, role, space } from '@/theme';
@@ -50,6 +51,7 @@ export default function Welcome() {
         <View style={{ gap: space[3], marginTop: 'auto' }}>
           {!!error && <FormMessage>{error}</FormMessage>}
           <Pill large label="Create account" onPress={() => router.push('/sign-up')} />
+          <AppleButton large onError={setError} />
           <GoogleButton large onError={setError} />
           <Pressable accessibilityRole="link" onPress={() => router.push('/sign-in')} style={{ minHeight: 56, alignItems: 'center', justifyContent: 'center' }}>
             <AppText variant="lead" color={role.action} style={{ fontFamily: fonts.bodyBold }}>I already have an account</AppText>
