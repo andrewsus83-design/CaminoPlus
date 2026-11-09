@@ -1,37 +1,37 @@
 {
  "$comment": "The design-lint baseline: how far the app code is from design/tokens.json today. Written by `python3 tools/design-audit/scan.py --update-baseline`, never by hand. `python3 tools/design-audit/scan.py --check` fails when a category total goes up, or when a file that has no entry here gets a violation (code that only moved to it is not one). `fp` is one short fingerprint per violation (its rule, value and source line, not its line number), so a failure can name the new violations and a move between files is told from a new violation. tools/design-audit/README.md has the rest.",
  "version": 1,
- "commit": "7cc65fc304ed061e1a95ec18cf10fdb9b3a7377f",
+ "commit": "eb5627ee326d56e8caaabafdd3eca83e4d83d540",
  "totals": {
-  "color": 196,
-  "font": 220,
-  "spacing": 389,
-  "size": 133,
-  "inset": 37,
+  "color": 189,
+  "font": 201,
+  "spacing": 348,
+  "size": 125,
+  "inset": 33,
   "ignore": 0
  },
  "kinds": {
-  "color/raw": 196,
-  "font/letter-spacing": 24,
-  "font/line-height": 91,
+  "color/raw": 189,
+  "font/letter-spacing": 22,
+  "font/line-height": 85,
   "font/size": 31,
-  "font/small": 74,
-  "inset/text-near-edge": 37,
-  "size/icon": 100,
+  "font/small": 63,
+  "inset/text-near-edge": 33,
+  "size/icon": 92,
   "size/radius": 12,
   "size/touch": 21,
-  "spacing/gap": 181,
-  "spacing/margin": 40,
-  "spacing/padding": 168
+  "spacing/gap": 154,
+  "spacing/margin": 37,
+  "spacing/padding": 157
  },
  "apart": {
-  "color/role-first": 368,
-  "spacing/offset": 57,
-  "spacing/negative": 12,
-  "size/touch-below-primary": 61
+  "color/role-first": 326,
+  "spacing/offset": 55,
+  "spacing/negative": 10,
+  "size/touch-below-primary": 64
  },
  "duplicates": {
-  "pill": 27,
+  "pill": 30,
   "icon_button": 40,
   "card": 8,
   "notice": 1,
@@ -40,12 +40,6 @@
   "segment": 4
  },
  "files": {
-  "app/(auth)/welcome.tsx": {
-   "counts": {
-    "spacing": 1
-   },
-   "fp": "baaf7e6ec2"
-  },
   "app/(tabs)/explore.tsx": {
    "counts": {
     "spacing": 5,
@@ -65,13 +59,12 @@
   },
   "app/(tabs)/me.tsx": {
    "counts": {
-    "color": 1,
     "font": 2,
-    "spacing": 9,
+    "spacing": 6,
     "size": 6,
     "inset": 2
    },
-   "fp": "029062f5b0 179ab52fb5 29b91bb612 2d9c542da6 348d0c9df0 3abca9c3bf 449b55b5a8 4ab02e2810 57c605ea71 6bc506c39c 73fc04110d 8be347ede8 a70ef545a9 af78e9695d b3b78c549b c5fc08cfc0 c89969a82c cf9577380a da013d3fe8 f410257a17"
+   "fp": "029062f5b0 179ab52fb5 29b91bb612 2d9c542da6 3abca9c3bf 449b55b5a8 4ab02e2810 57c605ea71 6bc506c39c 73fc04110d a70ef545a9 af78e9695d c5fc08cfc0 c89969a82c cf9577380a da013d3fe8"
   },
   "app/(tabs)/stays.tsx": {
    "counts": {
@@ -145,12 +138,6 @@
    },
    "fp": "3d712c5b68 3fe3ed1026 46f5ecde73 5a9ee92626 76968c86d1 7ba4ba7091 8ebb6bb7e7 a260714cd0 b6e92c708c eb7e31a8e8"
   },
-  "app/delete-account.tsx": {
-   "counts": {
-    "spacing": 2
-   },
-   "fp": "2ae91bceda 32ab36a732"
-  },
   "app/diary/[id].tsx": {
    "counts": {
     "spacing": 8
@@ -162,12 +149,6 @@
     "size": 1
    },
    "fp": "6ca12d47f0"
-  },
-  "app/edit-account.tsx": {
-   "counts": {
-    "spacing": 3
-   },
-   "fp": "8cb46aeeb6 8cb46aeeb6 8cb46aeeb6"
   },
   "app/friends.tsx": {
    "counts": {
@@ -182,24 +163,11 @@
    },
    "fp": "2619d159fc 31f7722bca 6841135f4a 8d3fe9c756 8e3f163929 a05753b4cc"
   },
-  "app/journey.tsx": {
-   "counts": {
-    "font": 2,
-    "spacing": 3
-   },
-   "fp": "436d8aae0a 6f68dc979a 8cb46aeeb6 b615241fc3 ff5bc36ccb"
-  },
   "app/library/bible/[code]/index.tsx": {
    "counts": {
     "spacing": 1
    },
    "fp": "bdca41ce76"
-  },
-  "app/licences.tsx": {
-   "counts": {
-    "spacing": 1
-   },
-   "fp": "09ef1ecc13"
   },
   "app/offline-maps.tsx": {
    "counts": {
@@ -210,19 +178,6 @@
    },
    "fp": "171e3e024e 241b1ea859 348d0c9df0 4259ed3a7c 51a7d7cc5c 5adcf92410 8cb46aeeb6 a5e428194c b7f0b3bb5c c1afaca951 e25b00ae02"
   },
-  "app/onboarding.tsx": {
-   "counts": {
-    "font": 1
-   },
-   "fp": "2bfb1a15a1"
-  },
-  "app/passport.tsx": {
-   "counts": {
-    "font": 1,
-    "spacing": 1
-   },
-   "fp": "1b545adba3 fe0193c08a"
-  },
   "app/planner.tsx": {
    "counts": {
     "color": 1,
@@ -231,22 +186,6 @@
     "size": 1
    },
    "fp": "09ef1ecc13 2bb25d54c0 4bd6fe685f 691c195016 73a5b7dfe6 7593e04a40 87c6ae5016 8fae7c52c8 9698e9f63e f8fbfaf8c0"
-  },
-  "app/rate.tsx": {
-   "counts": {
-    "spacing": 1,
-    "size": 1
-   },
-   "fp": "d0fdd2e3c1 e307074246"
-  },
-  "app/settings.tsx": {
-   "counts": {
-    "color": 1,
-    "font": 1,
-    "spacing": 4,
-    "size": 3
-   },
-   "fp": "0e123762e3 171e3e024e 17325ed656 348d0c9df0 382495d330 404d7035f0 ad00ab9b17 cbbeb3f02d ebf6b8af9e"
   },
   "app/stay/[id].tsx": {
    "counts": {
@@ -343,44 +282,11 @@
    },
    "fp": "348d0c9df0 61eb1d37d9 84341f450d 8a917167dc 8b324cd38e ad25857c02 b02a638bbe"
   },
-  "src/components/TabBar.tsx": {
-   "counts": {
-    "font": 2,
-    "spacing": 1
-   },
-   "fp": "65a87f7c37 82a23b33c6 e90981e132"
-  },
-  "src/components/auth/AuthShell.tsx": {
-   "counts": {
-    "spacing": 2
-   },
-   "fp": "01e6ab5920 ae2d053fcc"
-  },
-  "src/components/auth/Choice.tsx": {
-   "counts": {
-    "spacing": 3
-   },
-   "fp": "348d0c9df0 940e1586c7 a881bb8961"
-  },
   "src/components/auth/Field.tsx": {
    "counts": {
     "spacing": 3
    },
    "fp": "30a1da72d7 7b1a830cfc cc037ed1d0"
-  },
-  "src/components/auth/RouteGuideCard.tsx": {
-   "counts": {
-    "spacing": 3,
-    "inset": 2
-   },
-   "fp": "022015a2d1 5b3fa1677c 5e982cd3ba 8cb46aeeb6 f3c6787be4"
-  },
-  "src/components/auth/Wordmark.tsx": {
-   "counts": {
-    "color": 4,
-    "spacing": 1
-   },
-   "fp": "3d154565a6 45ae021c55 48057068c2 7b6cd3ceb8 b8ba50a7b8"
   },
   "src/components/ui.tsx": {
    "counts": {
@@ -690,52 +596,14 @@
    },
    "fp": "0911608954 0a2ff3a3f0 0a2ff3a3f0 1a7529721f 46ad095181 4cfb6a020d 51a887a523 51a887a523 77ec318fb0 783e80b9a3 8060be8832 9384330f20 d23753758e d23753758e d23753758e df96d10c5b e3484b631f e9952da0be e9952da0be"
   },
-  "src/features/me/AllPlaces.tsx": {
-   "counts": {
-    "font": 2,
-    "spacing": 1,
-    "inset": 1
-   },
-   "fp": "1e2c3f4442 37f658d6bf c11baa4146 dbf022a8b4"
-  },
-  "src/features/me/Health.tsx": {
-   "counts": {
-    "color": 1,
-    "font": 2,
-    "spacing": 2,
-    "size": 3
-   },
-   "fp": "348d0c9df0 b203d55907 cf57098b49 d8f53cf69b e0b014c89c f06483e494 f203dc3a9d fdb452dde5"
-  },
-  "src/features/me/Highlights.tsx": {
-   "counts": {
-    "font": 4,
-    "spacing": 6
-   },
-   "fp": "417a9edc56 58c203648f 599117db21 69a20cab91 9a8a3c19b7 b9c39a73de c53b0a1d2c c8a3196e3e d68f9b4c09 edd9c91118"
-  },
   "src/features/me/JourneyGrid.tsx": {
    "counts": {
     "color": 3,
-    "font": 7,
-    "spacing": 7,
-    "size": 1,
-    "inset": 1
-   },
-   "fp": "0b31a36b38 16aecd7377 1b7374f270 4d80f556cc 5af229d018 635c8c562d 6d62beb937 83b7457520 845b03876b 89d295b6e5 8a1fb012e3 91f54ef100 9ad308ef2d 9c36db6ef1 9dea6ed602 aeaaa84f06 da479d332d f2a8b55699 fff1145eef"
-  },
-  "src/features/me/SampleJourney.tsx": {
-   "counts": {
-    "spacing": 1
-   },
-   "fp": "b953e5402e"
-  },
-  "src/features/me/WriteCard.tsx": {
-   "counts": {
-    "spacing": 1,
+    "font": 3,
+    "spacing": 6,
     "size": 1
    },
-   "fp": "6c146980f8 999b4b26ea"
+   "fp": "0b31a36b38 16aecd7377 635c8c562d 6d62beb937 89d295b6e5 8a1fb012e3 91f54ef100 9ad308ef2d 9c36db6ef1 9dea6ed602 aeaaa84f06 f2a8b55699 fff1145eef"
   },
   "src/features/me/shared.tsx": {
    "counts": {
