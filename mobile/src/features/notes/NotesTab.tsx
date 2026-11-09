@@ -14,7 +14,7 @@ import type { DiaryEntry } from '@/features/diary/store';
 import { useDiary } from '@/features/diary/useDiary';
 import { useAuth } from '@/lib/auth';
 import { shareAndRecord } from '@/lib/postShare';
-import { layout, radius, role } from '@/theme';
+import { icon, layout, radius, role, space } from '@/theme';
 import { NoteMenu } from './NoteMenu';
 import { NoteRow, type NoteActions, type NoteWho } from './NoteRow';
 import { NotesHeader } from './NotesHeader';
@@ -65,9 +65,9 @@ function tell(m: Telling) {
 /** The friendly page the feed shows when the diary has no note. It has no button of its own: the card above it is the way in. */
 function Empty({ title, text }: { title: string; text: string }) {
   return (
-    <View style={{ alignItems: 'center', gap: 12, paddingHorizontal: 32, paddingTop: 24, paddingBottom: 24 }}>
+    <View style={{ alignItems: 'center', gap: space[3], paddingHorizontal: space[8], paddingTop: space[6], paddingBottom: space[6] }}>
       <View style={{ width: 56, height: 56, borderRadius: radius.pill, backgroundColor: role.highlight, alignItems: 'center', justifyContent: 'center' }}>
-        <Icon name="compose" color={role.onHighlight} size={28} />
+        <Icon name="compose" color={role.onHighlight} size={icon.mdPlus} />
       </View>
       <AppText variant="h4" accessibilityRole="header" style={{ textAlign: 'center' }}>{title}</AppText>
       <AppText variant="small" muted style={{ textAlign: 'center' }}>{text}</AppText>
@@ -152,7 +152,7 @@ export function NotesTab({ top }: { top?: ReactNode }) {
     </>
   );
   const empty = state === 'loading' ? (
-    <ActivityIndicator accessibilityLabel={LOADING_LABEL} color={role.action} style={{ marginTop: 40 }} />
+    <ActivityIndicator accessibilityLabel={LOADING_LABEL} color={role.action} style={{ marginTop: space[10] }} />
   ) : state === 'empty' ? (
     <Empty title={EMPTY_TITLE} text={EMPTY_TEXT} />
   ) : undefined;

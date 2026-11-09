@@ -12,7 +12,7 @@ import { Card, IconButton, Photo, SectionLabel } from '@/components/ui';
 import { Badge } from '@/features/business/ui';
 import { OSM_COPYRIGHT_URL, OSM_CREDIT, amenityNames, kmIntoStageText, labelNames, mailtoUrl, offRouteText, openLink, osmObjectUrl, safeWebUrl, savedLine, telUrl, useStageStays, webLabel, type PlaceSource, type StayModel } from '@/features/places';
 import { reviews, rooms, stays } from '@/data/mock';
-import { c, radius, role, layout } from '@/theme';
+import { icon, layout, radius, role, space } from '@/theme';
 // Sample content is never shared outside the app: share the invitation instead of an invented place or caption.
 const SHARE_APP = 'Walking the Camino? CaminoPlus has offline maps, stays and a pilgrim passport: https://camino.plus';
 
@@ -22,7 +22,7 @@ function TopRow({ fav }: { fav: Fav }) {
   return (
     <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
       <BackButton fallback="/stays" />
-      <View style={{ flexDirection: 'row', gap: 8 }}>
+      <View style={{ flexDirection: 'row', gap: space[2] }}>
         <IconButton name="share" label="Share this stay" onPress={() => Share.share({ message: SHARE_APP }).catch(() => {})} />
         <IconButton name="heart" label={fav.on ? 'Remove favourite' : 'Add favourite'} active={fav.on} onPress={fav.toggle} />
       </View>
@@ -33,7 +33,7 @@ function TopRow({ fav }: { fav: Fav }) {
 function BottomBar({ children }: { children: React.ReactNode }) {
   const insets = useSafeAreaInsets();
   return (
-    <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: layout.screenMargin, paddingTop: 12, paddingBottom: insets.bottom + 12, backgroundColor: role.surface, borderTopWidth: 1, borderTopColor: role.border, flexDirection: 'row', alignItems: 'center', gap: 16 }}>
+    <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: layout.screenMargin, paddingTop: space[3], paddingBottom: insets.bottom + space[3], backgroundColor: role.surface, borderTopWidth: 1, borderTopColor: role.border, flexDirection: 'row', alignItems: 'center', gap: space[4] }}>
       {children}
     </View>
   );
@@ -49,15 +49,15 @@ function SampleStay({ s }: { s: (typeof stays)[number] }) {
         <Photo tint={s.tint} height={260} style={{ borderRadius: radius.lg }} />
         <SampleNotice title="Sample stay">This place, its rooms, prices and reviews are examples. Real stays are coming soon.</SampleNotice>
         <AppText variant="h2">{s.name}</AppText>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-          <Icon name="star" color={c.gold} size={18} />
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: space[2] }}>
+          <Icon name="star" color={role.highlight} size={icon.sm} />
           <AppText variant="label">{s.rating}</AppText>
           <AppText variant="small" muted>· {s.reviews} reviews · {s.town}</AppText>
         </View>
         <AppText variant="body" muted>A friendly pilgrim albergue on the Camino Francés. Communal dinner, laundry, and a quiet garden.</AppText>
         <SectionLabel>Beds and rooms</SectionLabel>
         {rooms.map((r) => (
-          <Card key={r.id} style={{ flexDirection: 'row', alignItems: 'center', padding: 16 }}>
+          <Card key={r.id} style={{ flexDirection: 'row', alignItems: 'center' }}>
             <View style={{ flex: 1 }}>
               <AppText variant="label">{r.name}</AppText>
               <AppText variant="caption" muted>{r.note}</AppText>
@@ -67,8 +67,8 @@ function SampleStay({ s }: { s: (typeof stays)[number] }) {
         ))}
         <SectionLabel>Reviews</SectionLabel>
         {reviews.map((v) => (
-          <Card key={v.id} style={{ padding: 16, gap: 4 }}>
-            <AppText variant="label">{v.who} <AppText variant="mono" muted style={{ fontSize: 12 }}>{v.when}</AppText></AppText>
+          <Card key={v.id} style={{ gap: space[1] }}>
+            <AppText variant="label">{v.who} <AppText variant="mono" muted>{v.when}</AppText></AppText>
             <AppText variant="small">{v.text}</AppText>
           </Card>
         ))}
@@ -87,14 +87,14 @@ function SampleStay({ s }: { s: (typeof stays)[number] }) {
 /** One line of the details: a small heading and what OpenStreetMap says; a link when it can be opened. */
 function Detail({ label, children, link }: { label: string; children: string; link?: string | null }) {
   const body = (
-    <View style={{ gap: 2 }}>
+    <View style={{ gap: space[1] }}>
       <AppText variant="caption" muted>{label}</AppText>
-      <AppText variant="body" color={link ? c.blue : undefined} style={link ? { textDecorationLine: 'underline' } : undefined}>{children}</AppText>
+      <AppText variant="body" color={link ? role.action : undefined} style={link ? { textDecorationLine: 'underline' } : undefined}>{children}</AppText>
     </View>
   );
   if (!link) return body;
   return (
-    <Pressable accessibilityRole="link" accessibilityLabel={`${label}: ${children}`} onPress={() => { void openLink(link); }} style={{ minHeight: 48, justifyContent: 'center' }}>
+    <Pressable accessibilityRole="link" accessibilityLabel={`${label}: ${children}`} onPress={() => { void openLink(link); }} style={{ minHeight: layout.touchHard, justifyContent: 'center' }}>
       {body}
     </Pressable>
   );
@@ -127,7 +127,7 @@ function RealStay({ m, source, savedAt }: { m: StayModel; source: PlaceSource; s
         <Photo tint={m.tint} height={260} style={{ borderRadius: radius.lg }} />
         <AppText variant="h2">{m.name}</AppText>
         {m.verifiedOwner && <Badge label="Verified owner" tone="blue" icon="shield" />}
-        <View style={{ gap: 2 }}>
+        <View style={{ gap: space[1] }}>
           <AppText variant="small" muted>{[m.kindLabel, m.town].filter(Boolean).join(' · ')}</AppText>
           <AppText variant="caption" muted>{m.sourceLine}</AppText>
           {source === 'cache' && <AppText variant="caption" muted>{savedLine(savedAt)}</AppText>}
@@ -135,13 +135,13 @@ function RealStay({ m, source, savedAt }: { m: StayModel; source: PlaceSource; s
         {row.description && <AppText variant="body" muted>{row.description}</AppText>}
         <SectionLabel>Details</SectionLabel>
         {facts.length > 0 ? (
-          <Card style={{ gap: 14, padding: 16 }}>{facts.map(([label, text]) => <Detail key={label} label={label}>{text}</Detail>)}</Card>
+          <Card style={{ gap: space[4] }}>{facts.map(([label, text]) => <Detail key={label} label={label}>{text}</Detail>)}</Card>
         ) : (
           <AppText variant="small" muted>OpenStreetMap has no more details about this place yet.</AppText>
         )}
         <SectionLabel>Contact</SectionLabel>
         {row.phone || row.email || row.website ? (
-          <Card style={{ gap: 6, padding: 16 }}>
+          <Card style={{ gap: space[2] }}>
             {row.phone && <Detail label="Phone" link={phone}>{row.phone}</Detail>}
             {row.email && <Detail label="E-mail" link={mail}>{row.email}</Detail>}
             {row.website && <Detail label="Website" link={web}>{web ? webLabel(web) : row.website}</Detail>}
@@ -150,13 +150,13 @@ function RealStay({ m, source, savedAt }: { m: StayModel; source: PlaceSource; s
           <AppText variant="small" muted>No contact details are listed yet.</AppText>
         )}
         {row.source === 'osm' && (
-          <View style={{ gap: 4 }}>
+          <View style={{ gap: space[1] }}>
             {osmPage && (
-              <Pressable accessibilityRole="link" accessibilityLabel="See this place on OpenStreetMap" onPress={() => { void openLink(osmPage); }} style={{ minHeight: 48, justifyContent: 'center' }}>
-                <AppText variant="small" color={c.blue}>See this place on OpenStreetMap, where anyone can correct it</AppText>
+              <Pressable accessibilityRole="link" accessibilityLabel="See this place on OpenStreetMap" onPress={() => { void openLink(osmPage); }} style={{ minHeight: layout.touchHard, justifyContent: 'center' }}>
+                <AppText variant="small" color={role.action}>See this place on OpenStreetMap, where anyone can correct it</AppText>
               </Pressable>
             )}
-            <Pressable accessibilityRole="link" accessibilityLabel="OpenStreetMap copyright and licence" onPress={() => { void openLink(OSM_COPYRIGHT_URL); }} style={{ minHeight: 48, justifyContent: 'center' }}>
+            <Pressable accessibilityRole="link" accessibilityLabel="OpenStreetMap copyright and licence" onPress={() => { void openLink(OSM_COPYRIGHT_URL); }} style={{ minHeight: layout.touchHard, justifyContent: 'center' }}>
               <AppText variant="caption" muted>{OSM_CREDIT}</AppText>
             </Pressable>
           </View>

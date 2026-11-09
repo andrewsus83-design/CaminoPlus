@@ -39,8 +39,10 @@ export function NoteMedia({ uid, items, onOpen }: { uid: string; items: DiaryMed
   const plan = mediaPlan(items.length);
   if (plan.kind === 'none') return null;
   return (
+    // design-lint-ignore: spacing the 2 px line between the photos of a note is a hairline of the grid (MEDIA_GAP in timeline.ts, like the lines of the Journey grid), not a space
     <View style={{ aspectRatio: MEDIA_RATIO, borderRadius: radius.md, overflow: 'hidden', flexDirection: 'row', gap: MEDIA_GAP, backgroundColor: role.bg }}>
       {plan.columns.map((column, c) => (
+        // design-lint-ignore: spacing the same 2 px line, between the tiles of one column
         <View key={c} style={{ flex: 1, gap: MEDIA_GAP }}>
           {column.map((k) => (
             <Tile key={items[k].id} uid={uid} m={items[k]} index={k} count={items.length} small={column.length > 1} more={k === plan.shown - 1 ? plan.more : 0} onOpen={onOpen} />

@@ -8,7 +8,7 @@ import { BackButton } from '@/components/BackButton';
 import { Photo } from '@/components/ui';
 import { Badge, Highlight } from '@/features/business/ui';
 import { tints } from '@/data/mock';
-import { radius } from '@/theme';
+import { radius, space } from '@/theme';
 
 // Settings > For business > List your business (Agoda-extranet style landing).
 export default function BusinessWelcome() {
@@ -21,7 +21,7 @@ export default function BusinessWelcome() {
       <AppText variant="h1">Welcome pilgrims to your door</AppText>
       <AppText variant="body" muted>Albergue, hotel, café, shop or service on the Camino? List it for free and reach pilgrims walking past today.</AppText>
       <Photo tint={tints[4]} height={160} style={{ borderRadius: radius.lg }} />
-      <View style={{ gap: 18, marginTop: 4 }}>
+      <View style={{ gap: space[5], marginTop: space[1] }}>
         <Highlight icon="shield" title="Verified owner badge" text="Stand out in Stays and on the map" />
         <Highlight icon="stays" title="Beds free or full, in one tap" text="Pilgrims see it live, even on the trail" />
         <Highlight icon="chat" title="Answer reviews and messages" text="Views, saves and taps on your dashboard" />

@@ -12,7 +12,7 @@ import { confirmDelete } from '@/features/diary/confirm';
 import { PRIVACY_LINE, dateLine, dateWithDraft, mediaUsageLine, metaLine, pagePreview, pageTitle, pagesLabel } from '@/features/diary/present';
 import { isDraft, type DiaryEntry } from '@/features/diary/store';
 import { useDiary } from '@/features/diary/useDiary';
-import { radius, role } from '@/theme';
+import { icon, radius, role, space } from '@/theme';
 
 // Me > Notes > My diary: the pages, newest first. They live only on this phone (src/features/diary/store.ts) and the screen says so.
 export default function DiaryList() {
@@ -26,7 +26,7 @@ export default function DiaryList() {
   return (
     <Screen tabBar={false}>
       <BackButton fallback="/me" />
-      <View style={{ gap: 8 }}>
+      <View style={{ gap: space[2] }}>
         <AppText variant="h2" accessibilityRole="header">My diary</AppText>
         {entries.length > 0 && <AppText variant="label" muted>{pagesLabel(entries.length)}</AppText>}
         {usage !== '' && <AppText variant="caption" muted>{usage}</AppText>}
@@ -36,13 +36,13 @@ export default function DiaryList() {
       {deleteFailed && <FormMessage>That page could not be deleted. Please try again.</FormMessage>}
 
       {ready && entries.length === 0 && (
-        <Card style={{ alignItems: 'center', gap: 12, paddingVertical: 32 }}>
+        <Card style={{ alignItems: 'center', gap: space[3], paddingVertical: space[8] }}>
           <View style={{ width: 64, height: 64, borderRadius: radius.pill, backgroundColor: role.highlight, alignItems: 'center', justifyContent: 'center' }}>
-            <Icon name="compose" color={role.onHighlight} size={30} />
+            <Icon name="compose" color={role.onHighlight} size={icon.lg} />
           </View>
           <AppText variant="h4" style={{ textAlign: 'center' }}>No pages yet</AppText>
           <AppText variant="small" muted style={{ textAlign: 'center' }}>Write a few lines about your day on the Way: what you saw, who you met, how you feel.</AppText>
-          <View style={{ alignSelf: 'stretch', marginTop: 8 }}>
+          <View style={{ alignSelf: 'stretch', marginTop: space[2] }}>
             <Pill large label="Write a new page" onPress={write} />
           </View>
         </Card>
@@ -51,7 +51,7 @@ export default function DiaryList() {
       {entries.length > 0 && (
         <>
           <Pill large label="Write a new page" onPress={write} />
-          <View style={{ gap: 12 }}>
+          <View style={{ gap: space[3] }}>
             {entries.map((e) => {
               const name = pageTitle(e);
               const preview = pagePreview(e);
@@ -59,13 +59,13 @@ export default function DiaryList() {
               const date = dateWithDraft(dateLine(e.createdAt), draft);
               const attached = metaLine(e);
               return (
-                <Card key={e.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingRight: 8 }}>
+                <Card key={e.id} style={{ flexDirection: 'row', alignItems: 'center', gap: space[1], paddingRight: space[2] }}>
                   <Pressable
                     accessibilityRole="button"
                     accessibilityLabel={attached ? `${name}. ${date}. ${attached}` : `${name}. ${date}`}
                     accessibilityHint="Opens this page"
                     onPress={() => router.push(`/diary/${e.id}`)}
-                    style={({ pressed }) => ({ flex: 1, gap: 4, minHeight: 56, justifyContent: 'center', opacity: pressed ? 0.8 : 1 })}
+                    style={({ pressed }) => ({ flex: 1, gap: space[1], minHeight: 56, justifyContent: 'center', opacity: pressed ? 0.8 : 1 })}
                   >
                     <AppText variant="label" numberOfLines={1}>{name}</AppText>
                     {!!preview && <AppText variant="small" muted numberOfLines={2}>{preview}</AppText>}
