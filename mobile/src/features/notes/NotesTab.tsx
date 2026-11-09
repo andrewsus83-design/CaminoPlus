@@ -14,15 +14,19 @@ import type { DiaryEntry } from '@/features/diary/store';
 import { useDiary } from '@/features/diary/useDiary';
 import { useAuth } from '@/lib/auth';
 import { shareAndRecord } from '@/lib/postShare';
-import { layout, radius, role } from '@/theme';
+import { icon, layout, radius, role, space } from '@/theme';
 import { NoteMenu } from './NoteMenu';
+import { ShareLinkSheet } from '@/components/ShareLinkSheet';
+import { MESSAGES, linkLabel, noteCopy } from '@/lib/shareLinks';
+import { shareLinks } from '@/lib/shareLinksClient';
 import { NoteRow, type NoteActions, type NoteWho } from './NoteRow';
 import { NotesHeader } from './NotesHeader';
 import { DELETE_FAILED, EMPTY_TEXT, EMPTY_TITLE, LOADING_LABEL, MAPS_FAILED, SHARE_FAILED, feedState, identity, toggled, type Telling } from './timeline';
 
 // The Notes feed of Me: the pages of the diary as a feed, like a timeline. They are the same pages as My diary (features/diary), private,
 // only on this phone: this tab reads them through useDiary and deletes through the same call; it writes nothing and sends nothing anywhere.
-// The only thing that can leave is the words of a note, when the person taps Share and chooses where in the system's share sheet.
+// The only thing that can leave is the words of a note: when the person taps Share and chooses where in the system's share sheet, or when
+// they make a share link (menu, Share link): then a COPY of the title, words and date goes to the server, after a question that says so.
 //
 // HOW ME HOSTS IT: while the Notes sub-tab is on, <NotesTab top={...} /> is the scroll of the screen. It is a virtualised list, so a diary of
 // 2,000 notes draws only the rows that are on screen, and pull to refresh belongs to it. Mount it in a box that has a height of its own (flex: 1,
@@ -65,9 +69,9 @@ function tell(m: Telling) {
 /** The friendly page the feed shows when the diary has no note. It has no button of its own: the card above it is the way in. */
 function Empty({ title, text }: { title: string; text: string }) {
   return (
-    <View style={{ alignItems: 'center', gap: 12, paddingHorizontal: 32, paddingTop: 24, paddingBottom: 24 }}>
+    <View style={{ alignItems: 'center', gap: space[3], paddingHorizontal: space[8], paddingTop: space[6], paddingBottom: space[6] }}>
       <View style={{ width: 56, height: 56, borderRadius: radius.pill, backgroundColor: role.highlight, alignItems: 'center', justifyContent: 'center' }}>
-        <Icon name="compose" color={role.onHighlight} size={28} />
+        <Icon name="compose" color={role.onHighlight} size={icon.mdPlus} />
       </View>
       <AppText variant="h4" accessibilityRole="header" style={{ textAlign: 'center' }}>{title}</AppText>
       <AppText variant="small" muted style={{ textAlign: 'center' }}>{text}</AppText>
@@ -84,6 +88,7 @@ export function NotesTab({ top }: { top?: ReactNode }) {
   const [now, tick] = useNow();
   const [opened, setOpened] = useState<ReadonlySet<string>>(() => new Set());
   const [menuFor, setMenuFor] = useState<DiaryEntry | null>(null);
+  const [linkFor, setLinkFor] = useState<DiaryEntry | null>(null);
   const [viewing, setViewing] = useState<{ id: string; start: number } | null>(null);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -125,6 +130,7 @@ export function NotesTab({ top }: { top?: ReactNode }) {
   // The menu closes first and the question comes a moment after: a system dialog opened while the sheet is still going away may not show.
   const chooseDelete = (e: DiaryEntry) => { setMenuFor(null); setTimeout(() => askDelete(e), 350); };
   const chooseEdit = (e: DiaryEntry) => { setMenuFor(null); open(e.id); };
+  const chooseLink = (e: DiaryEntry) => { setMenuFor(null); setTimeout(() => setLinkFor(e), 350); };
 
   const refresh = useCallback(async () => {
     setRefreshing(true);
@@ -152,13 +158,19 @@ export function NotesTab({ top }: { top?: ReactNode }) {
     </>
   );
   const empty = state === 'loading' ? (
-    <ActivityIndicator accessibilityLabel={LOADING_LABEL} color={role.action} style={{ marginTop: 40 }} />
+    <ActivityIndicator accessibilityLabel={LOADING_LABEL} color={role.action} style={{ marginTop: space[10] }} />
   ) : state === 'empty' ? (
     <Empty title={EMPTY_TITLE} text={EMPTY_TEXT} />
   ) : undefined;
   const overlays = (
     <>
-      {menuFor !== null && <NoteMenu title={pageTitle(menuFor)} onClose={() => setMenuFor(null)} onEdit={() => chooseEdit(menuFor)} onDelete={() => chooseDelete(menuFor)} />}
+      {menuFor !== null && <NoteMenu title={pageTitle(menuFor)} onClose={() => setMenuFor(null)} onEdit={() => chooseEdit(menuFor)} onShareLink={() => chooseLink(menuFor)} onDelete={() => chooseDelete(menuFor)} />}
+      {linkFor !== null && (
+        <ShareLinkSheet kind="note" onClose={() => setLinkFor(null)} make={async () => {
+          const copy = noteCopy(linkFor);
+          return copy ? shareLinks.shareNote(copy, { label: linkLabel(linkFor.title) }) : { ok: false, message: MESSAGES.empty };
+        }} />
+      )}
       {viewing !== null && viewed.length > 0 && <MediaViewer uid={owner} items={viewed} start={viewing.start} onClose={() => setViewing(null)} />}
     </>
   );

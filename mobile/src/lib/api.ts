@@ -1,6 +1,8 @@
 // Typed Supabase queries used by the app. Keep screens free of query strings so
 // the offline layer (local SQLite + outbox) can later wrap these same functions.
 import { supabase } from './supabase';
+import { MEDIA_BUCKET, deleteMedia, signedUrls, upload } from './mediaStorage';
+import { uploadPostMediaWith } from './postMediaUpload';
 import { assertOnline } from './net';
 import { uuid } from './uuid';
 import { isCount } from './engagement';
@@ -23,8 +25,15 @@ export type Post = { id: string; body: string | null; place_name: string | null;
 
 const PROFILE_COLS = 'id, username, display_name, bio, avatar_url, xp, level, followers_count, following_count, friends_count, posts_count, stamps_count, km_walked, is_private';
 
-function must<T>(res: { data: T | null; error: { message: string } | null }): T {
-  if (res.error) throw new Error(res.error.message);
+type DbError = { message: string; code?: string; hint?: string | null };
+
+// The error keeps the database's code and hint: a rate limit (code 54000, hint rate_limited_*) carries a sentence for people.
+function dbError(e: DbError): Error {
+  return Object.assign(new Error(e.message), { code: e.code, hint: e.hint ?? undefined });
+}
+
+function must<T>(res: { data: T | null; error: DbError | null }): T {
+  if (res.error) throw dbError(res.error);
   return res.data as T;
 }
 
@@ -36,6 +45,17 @@ export async function getProfile(userId: string) {
 export async function updateProfile(userId: string, patch: Partial<Pick<Profile, 'display_name' | 'bio' | 'username' | 'avatar_url' | 'is_private'>>) {
   await assertOnline();
   return must(await supabase.from('profiles').update(patch).eq('id', userId).select(PROFILE_COLS).single()) as Profile;
+}
+
+/**
+ * Set the display name only while it is still `expected` (the value just read). A name the pilgrim typed in the meantime is
+ * never overwritten: then nothing changes and the answer is null. Used for the name Sign in with Apple shares once.
+ */
+export async function updateDisplayNameIf(userId: string, expected: string | null, displayName: string) {
+  await assertOnline();
+  const q = supabase.from('profiles').update({ display_name: displayName }).eq('id', userId);
+  const res = await (expected === null ? q.is('display_name', null) : q.eq('display_name', expected)).select(PROFILE_COLS).maybeSingle();
+  return (res.error ? must(res) : res.data) as Profile | null;
 }
 
 /** Latest journey that is not deleted. No journey yet = onboarding not done. */
@@ -223,7 +243,7 @@ export async function listPostComments(postId: string): Promise<PostComment[]> {
 export async function addPostComment(o: { id: string; userId: string; postId: string; body: string }) {
   await assertOnline();
   const res = await supabase.from('post_comments').insert({ id: o.id, post_id: o.postId, user_id: o.userId, body: o.body, client_created_at: new Date().toISOString() });
-  if (res.error && (res.error as { code?: string }).code !== '23505') throw new Error(res.error.message);
+  if (res.error && (res.error as { code?: string }).code !== '23505') throw dbError(res.error);
 }
 
 /** Text journal post (photos come with the media upload flow). Followers only by default. */
@@ -240,42 +260,58 @@ export async function createJournalPost(opts: { userId: string; body: string; jo
 
 export type PickedMedia = { uri: string; type: 'image' | 'video'; mimeType?: string | null; width?: number; height?: number; durationMs?: number | null; fileSize?: number | null };
 
-/** Upload photos/videos of a post to the private user-media bucket and register them in post_media.
- *  Returns how many failed (cloud storage quota is 0 on the free plan, so uploads can be refused). */
-export async function uploadPostMedia(userId: string, postId: string, items: PickedMedia[]) {
+/** A photo or clip after prepareImage / prepareVideo (src/lib/media): the only kind uploadPostMedia takes. */
+export type PreparedMedia = {
+  prepared: true;
+  uri: string; type: 'image' | 'video'; mimeType: string;
+  width: number | null; height: number | null; durationMs: number | null; bytes: number | null;
+  /** the 480 px thumbnail of a photo, when this build could make one */
+  thumbUri: string | null;
+};
+
+/** Upload photos/videos of a post to the private user-media bucket and register them in post_media (with the storage key
+ *  of the photo's thumbnail in thumb_path). Returns how many failed (the server refuses uploads over the plan's storage)
+ *  and the plain reasons this phone gave for refusing some.
+ *  The order of the steps and when files are deleted: src/lib/postMediaUpload.ts. */
+export async function uploadPostMedia(userId: string, postId: string, items: PreparedMedia[]) {
   await assertOnline();
-  let failed = 0;
-  for (let i = 0; i < items.length; i++) {
-    const m = items[i];
-    try {
-      const ext = m.type === 'video' ? (m.mimeType === 'video/quicktime' ? 'mov' : 'mp4') : m.mimeType === 'image/png' ? 'png' : 'jpg';
-      const path = `${userId}/posts/${postId}-${i}.${ext}`;
-      const body = await (await fetch(m.uri)).arrayBuffer();
-      const up = await supabase.storage.from('user-media').upload(path, body, { contentType: m.mimeType ?? (m.type === 'video' ? 'video/mp4' : 'image/jpeg'), upsert: true });
-      if (up.error) throw new Error(up.error.message);
-      must(await supabase.from('post_media').insert({ post_id: postId, user_id: userId, sort_order: i, media_type: m.type, storage_path: path, width: m.width ?? null, height: m.height ?? null, duration_ms: m.durationMs ? Math.round(m.durationMs) : null, size_bytes: m.fileSize ?? body.byteLength, upload_status: 'uploaded' }));
-    } catch {
-      failed++;
-    }
-  }
-  return failed;
+  return uploadPostMediaWith({
+    upload: (path, uri, type) => upload(MEDIA_BUCKET.userMedia, path, uri, type),
+    insertRow: async (row) => {
+      const res = await supabase.from('post_media').insert(row);
+      if (!res.error) return { ok: true };
+      const e = res.error as { code?: string };
+      return { ok: false, status: res.status, code: e.code || null };
+    },
+    rowExists: async (postId_, sortOrder) => {
+      const res = await supabase.from('post_media').select('id').eq('post_id', postId_).eq('sort_order', sortOrder).limit(1);
+      if (res.error) throw new Error(res.error.message);
+      return (res.data ?? []).length > 0;
+    },
+    deleteFiles: (paths) => deleteMedia(MEDIA_BUCKET.userMedia, paths),
+  }, userId, postId, items);
 }
 
-export type PostMediaUrl = { type: 'image' | 'video'; url: string };
-/** Signed URLs (1 h) for the photos and videos of your posts, grouped by post id and in slide order. */
+export type PostMediaUrl = { type: 'image' | 'video'; url: string; thumbUrl?: string | null };
+/** Signed URLs (1 h, reused for 50 min) for the photos and videos of your posts, grouped by post id and in slide order.
+ *  thumbUrl is the small thumbnail for grids and lists; url is the photo itself for the viewer. */
 export async function listPostMediaUrls(postIds: string[]) {
   await assertOnline();
   const out: Record<string, PostMediaUrl[]> = {};
   if (postIds.length === 0) return out;
   const rows = must(
-    await supabase.from('post_media').select('post_id, media_type, storage_path, sort_order').in('post_id', postIds).is('deleted_at', null).order('sort_order'),
-  ) as { post_id: string; media_type: 'image' | 'video'; storage_path: string }[];
+    await supabase.from('post_media').select('post_id, media_type, storage_path, thumb_path, sort_order').in('post_id', postIds).is('deleted_at', null).order('sort_order'),
+  ) as { post_id: string; media_type: 'image' | 'video'; storage_path: string; thumb_path: string | null }[];
   if (rows.length === 0) return out;
-  const signed = await supabase.storage.from('user-media').createSignedUrls(rows.map((r) => r.storage_path), 3600);
-  if (signed.error || !signed.data) return out;
-  rows.forEach((r, i) => {
-    const url = signed.data[i]?.signedUrl;
-    if (url) (out[r.post_id] ??= []).push({ type: r.media_type, url });
-  });
+  let signed: Record<string, string>;
+  try {
+    signed = await signedUrls(MEDIA_BUCKET.userMedia, rows.flatMap((r) => (r.thumb_path ? [r.storage_path, r.thumb_path] : [r.storage_path])));
+  } catch {
+    return out;
+  }
+  for (const r of rows) {
+    const url = signed[r.storage_path];
+    if (url) (out[r.post_id] ??= []).push({ type: r.media_type, url, thumbUrl: r.thumb_path ? signed[r.thumb_path] ?? null : null });
+  }
   return out;
 }

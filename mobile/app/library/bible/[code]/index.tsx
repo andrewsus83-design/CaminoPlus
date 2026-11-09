@@ -11,7 +11,7 @@ import { CHAPTERS_NOTE } from '@/features/library/bible/credit';
 import { readerHref } from '@/features/library/bible/order';
 import { itemKey } from '@/features/library/search';
 import { useLibraryBookmarks } from '@/features/library/useLibraryBookmarks';
-import { role } from '@/theme';
+import { role, space } from '@/theme';
 
 // Library > Bible > a book: its chapters as a grid of numbered square tiles (4 in a row on a 320 wide phone, 5 on 390, 6 on 430), the name of the book as the
 // title, how many chapters it has, one handwritten note, and, in the corner, the bookmark of the BOOK (a tile of the Bible tab is too small to carry one). The
@@ -30,7 +30,7 @@ export default function BibleBook() {
         <BackButton fallback="/library" />
         <BookmarkToggle on={marks.has(key)} title={book.name} toggle={() => marks.toggle(key)} />
       </View>
-      <View style={{ gap: 2 }}>
+      <View style={{ gap: space[1] }}>
         <AppText variant="h2" accessibilityRole="header">{book.name}</AppText>
         <AppText variant="mono" muted style={{ fontSize: 15, lineHeight: 22 }}>{chaptersLabel(book.chapters)}</AppText>
         <AppText variant="accent" color={role.accentText}>{CHAPTERS_NOTE}</AppText>

@@ -38,7 +38,7 @@ end $$;
 grant execute on function saved_test.login(text) to authenticated;
 
 insert into auth.users (id, email, raw_user_meta_data)
-select id, 'zz1e.' || name || '@example.com', jsonb_build_object('full_name', initcap(name) || ' Zzcamino') from saved_test.users;
+select id, 'zz1e.' || name || '@example.com', jsonb_build_object('full_name', initcap(name) || ' Zzcamino', 'username', 'zz1e.' || name) from saved_test.users;
 update public.profiles set is_private = true where id = saved_test.u('gina');
 
 -- P1 public (alice), P2 public but deleted later, P3 public but hidden later, P4 public but made private later, P5 carol's own,

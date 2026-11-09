@@ -91,7 +91,7 @@ export function MonthCalendar({ shown, today, selected, range, canGoBack, canGoF
           <View aria-hidden style={{ flexDirection: 'row', height: 28, alignItems: 'center' }}>
             {WEEKDAYS_SHORT.map((w) => (
               <View key={w} style={{ flex: 1, alignItems: 'center' }}>
-                <AppText variant="caption" muted maxFontSizeMultiplier={FONT_LIMIT}>{w}</AppText>
+                <AppText variant="small" muted maxFontSizeMultiplier={FONT_LIMIT}>{w}</AppText>
               </View>
             ))}
           </View>

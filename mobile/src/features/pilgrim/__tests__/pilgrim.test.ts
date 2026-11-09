@@ -1,6 +1,8 @@
 // Plain-node checks for the profile of another pilgrim (no React Native): the address, reading the rows, where two pilgrims stand, who can be messaged, what the
 // card may show, the four states of the screen, and the words. Run: npm run test:social
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
 import { friendAction } from '../../social/logic';
 import type { FriendStatus } from '../../social/types';
 import {
@@ -202,4 +204,62 @@ check('what is said after a friend action', () => {
   assert.equal(friendDone('unfriend', 'Ana'), 'Ana is no longer your friend.');
 });
 
-console.log(`${n} of ${n} passed`);
+/* ------------------------------------------------------------------ fetchRelation against a stand-in for Supabase */
+
+// api.ts is read from its source and compiled in memory (plain node cannot import it: it pulls in React Native); only its imports
+// are replaced. The stand-in answers the friendships read and the rpc list_friend_requests from the script below.
+type Answer = { data: unknown; error: { message: string; code?: string } | null };
+function loadApi(friendships: Answer, requests: Answer, log: string[]) {
+  const query = (answer: Answer) => {
+    const q = { select: () => q, eq: () => q, limit: () => q, then: (res: (v: Answer) => unknown, rej: (e: unknown) => unknown) => Promise.resolve(answer).then(res, rej) };
+    return q;
+  };
+  const supabase = {
+    from(table: string) { log.push(`from ${table}`); return query(friendships); },
+    rpc(name: string) { log.push(`rpc ${name}`); return query(requests); },
+  };
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const ts = require('typescript') as typeof import('typescript');
+  const source = fs.readFileSync(path.join(process.cwd(), 'src/features/pilgrim/api.ts'), 'utf8');
+  const code = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText;
+  const mods: Record<string, unknown> = {
+    '@/lib/supabase': { supabase },
+    '@/lib/net': { assertOnline: async () => {} },
+    '@/lib/api': { listPostEngagement: async () => null },
+    '@/lib/postEngagement': { withEngagement: (p: unknown) => p },
+    '../social/api': { SocialError: class extends Error {} },
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    './logic': require('../logic'),
+  };
+  const m = { exports: {} as Record<string, unknown> };
+  new Function('exports', 'require', 'module', code)(m.exports, (id: string) => { if (id in mods) return mods[id]; throw new Error(`api.ts imports ${id}: add it to this test`); }, m);
+  return m.exports as { fetchRelation(me: string, other: string): Promise<FriendStatus> };
+}
+
+const asyncChecks: [string, () => Promise<void>][] = [
+  ['fetchRelation: a request of mine that they declined (cooling down on the server) reads "Requested" on their profile, like the Friends list', async () => {
+    const log: string[] = [];
+    const api = loadApi({ data: [], error: null }, { data: [{ direction: 'outgoing', id: ANA.toUpperCase(), username: 'ana_t' }], error: null }, log);
+    assert.equal(await api.fetchRelation(ME, ANA), 'pending_out');
+    assert.deepEqual(log, ['from friendships', 'rpc list_friend_requests']);
+  }],
+  ['fetchRelation: no row and no request of mine to them is none (an incoming request or one to somebody else does not count)', async () => {
+    const api = loadApi({ data: [], error: null }, { data: [{ direction: 'incoming', id: ANA }, { direction: 'outgoing', id: ME }], error: null }, []);
+    assert.equal(await api.fetchRelation(ME, ANA), 'none');
+    assert.equal(await loadApi({ data: [], error: null }, { data: [], error: null }, []).fetchRelation(ME, ANA), 'none');
+    // the list cannot be read: none, as before (the profile still opens)
+    assert.equal(await loadApi({ data: [], error: null }, { data: null, error: { message: 'boom' } }, []).fetchRelation(ME, ANA), 'none');
+  }],
+  ['fetchRelation: a friendship row answers at once (friends, incoming), without asking the list', async () => {
+    const log: string[] = [];
+    assert.equal(await loadApi({ data: [{ status: 'accepted', requested_by: ANA }], error: null }, { data: [], error: null }, log).fetchRelation(ME, ANA), 'friends');
+    assert.equal(await loadApi({ data: [{ status: 'pending', requested_by: ANA }], error: null }, { data: [], error: null }, log).fetchRelation(ME, ANA), 'pending_in');
+    assert.equal(await loadApi({ data: [{ status: 'pending', requested_by: ME }], error: null }, { data: [], error: null }, log).fetchRelation(ME, ANA), 'pending_out');
+    assert.ok(!log.includes('rpc list_friend_requests'), 'the list is only read when there is no row');
+  }],
+];
+
+(async () => {
+  for (const [name, fn] of asyncChecks) { await fn(); n += 1; console.log(`ok   ${name}`); }
+  console.log(`${n} of ${n} passed`);
+})().catch((e) => { console.error(e); process.exit(1); });

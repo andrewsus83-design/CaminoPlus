@@ -51,7 +51,8 @@ check('the chapter tiles: one button each ("Psalm 121", "Chapter 3"), square, at
   assert.match(src, /export const chapterTileLabel = \(book: BibleBook, n: number\): string => \(book\.code === 'PSA' \? `Psalm \$\{n\}` : `Chapter \$\{n\}`\);/);
   assert.match(src, /accessibilityRole="button"\s+accessibilityLabel=\{chapterTileLabel\(book, n\)\}\s+onPress=\{\(\) => onOpen\(n\)\}/);
   assert.match(src, /width: tile, height: tile/, 'square');
-  assert.match(src, /<AppText variant="mono" maxFontSizeMultiplier=\{1\.3\} numberOfLines=\{1\} style=\{\{ fontSize: 20, lineHeight: 26 \}\}>\{n\}<\/AppText>/);
+  assert.match(src, /<AppText variant="mono" maxFontSizeMultiplier=\{1\.3\} numberOfLines=\{1\} style=\{NUMBER\}>\{n\}<\/AppText>/);
+  assert.match(src, /const NUMBER = \{ fontSize: 19, lineHeight: 28 \} as const;/, 'the number of a chapter is the size and the line of the type scale\'s body (it was 20 on 26, which the scale does not have)');
   assert.match(src, /const grid = chapterGrid\(width\);/);
   assert.match(src, /Array\.from\(\{ length: book\.chapters \}, \(_, i\) => i \+ 1\)/);
   assert.match(src, /flexDirection: 'row', flexWrap: 'wrap', gap: grid\.gap/);
@@ -274,7 +275,7 @@ check('the search of verses never stands between a keystroke and the screen: it 
   assert.match(rows, /accessibilityRole="button" accessibilityLabel=\{verseRowLabel\(row\)\} accessibilityHint="Opens the chapter at this verse" onPress=\{\(\) => onOpen\(row\.ref\)\}/);
   assert.match(rows, /<\/Pressable>\s+\{marks && <BookmarkToggle on=\{marks\.has\(key\)\} title=\{row\.label\} toggle=\{\(\) => marks\.toggle\(key\)\} \/>\}/);
   assert.match(rows, /const key = verseKey\(row\.ref\);/);
-  assert.match(rows, /<AppText variant="mono" color=\{role\.accentText\} style=\{\{ fontSize: 14, lineHeight: 20 \}\}>\{row\.label\}<\/AppText>/);
+  assert.match(rows, /<AppText variant="mono" color=\{role\.accentText\}>\{row\.label\}<\/AppText>/);
   assert.match(rows, /backgroundColor: c\.goldSoft, textDecorationLine: 'underline'/);
   assert.match(rows, /numberOfLines=\{ROW_TEXT_LINES\}/);
   assert.match(rows, /excerpt\(row\.text, row\.marks\)/, 'a long verse is cut around the match');
@@ -290,7 +291,7 @@ check('the text of the Bible is imported only by the screens that read it and by
   const files = [...walk('app'), ...walk('src')];
   const resolve = (file: string, spec: string): string | null => (spec.startsWith('@/') ? `src/${spec.slice(2)}` : spec.startsWith('.') ? path.posix.normalize(path.posix.join(path.posix.dirname(file), spec)) : null);
   const importers = (target: string): string[] => files.filter((f) => [...read(f).matchAll(/from '([^']+)'/g)].some((m) => resolve(f, m[1]) === target)).sort();
-  assert.deepEqual(importers(`${BIBLE}/text`), [`${BIBLE}/Reader.tsx`, `${BIBLE}/searchText.ts`, 'app/library/bookmarks.tsx', 'src/features/library/noteStart.ts'].sort(), 'the reader, the search, Bookmarks (which shows the words of a verse) and the start of a note (which quotes a verse) read the text; nothing else does: not the Licences screen, not the tiles, not the Continue reading bar');
+  assert.deepEqual(importers(`${BIBLE}/text`), [`${BIBLE}/Reader.tsx`, `${BIBLE}/searchText.ts`, 'app/library/bookmarks.tsx', 'src/features/library/daily/dayData.ts', 'src/features/library/noteStart.ts'].sort(), 'the reader, the search, Bookmarks (which shows the words of a verse), the Daily reading (dayData.ts: the words of the readings of a day, read when a reading is opened) and the start of a note (which quotes a verse) read the text; nothing else does: not the Licences screen, not the tiles, not the Continue reading bar');
   assert.deepEqual(importers(`${BIBLE}/searchText`), [`${BIBLE}/useVerseSearch.ts`, 'app/(tabs)/library.tsx'].sort(), 'the search of verses, and the Library screen that makes it ready');
   assert.deepEqual(importers(`${BIBLE}/webc.generated`), [`${BIBLE}/text.ts`], 'the files of the text are reached through text.ts only');
   // the search is made ready when its field is touched, a beat before the first letter (the first search reads and folds the words of 35,408 verses: 100 to 135 ms on a laptop)

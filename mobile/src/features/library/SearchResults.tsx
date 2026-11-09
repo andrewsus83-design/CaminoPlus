@@ -4,7 +4,7 @@ import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
 import { Pill } from '@/components/Pill';
 import { Card } from '@/components/ui';
-import { radius, role, shadowStyle } from '@/theme';
+import { layout, radius, role, shadowStyle, space } from '@/theme';
 import { refLabel } from './bible/order';
 import { parseRef, type Ref } from './bible/ref';
 import { useVerseSearch } from './bible/useVerseSearch';
@@ -37,12 +37,12 @@ export function SearchResults({ query, marks, onClear, onOpenBook, onOpenVerse }
           accessibilityRole="button"
           accessibilityLabel={`Go to ${refLabel(goTo)}`}
           onPress={() => onOpenVerse(goTo)}
-          style={({ pressed }) => ({ minHeight: 64, flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10, paddingLeft: 20, paddingRight: 14, borderRadius: radius.lg, backgroundColor: pressed ? role.sunken : role.surface, borderWidth: 1, borderColor: role.border, ...shadowStyle('sm') })}
+          style={({ pressed }) => ({ minHeight: 64, flexDirection: 'row', alignItems: 'center', gap: space[3], paddingVertical: space[3], paddingLeft: layout.cardPadding, paddingRight: space[4], borderRadius: radius.lg, backgroundColor: pressed ? role.sunken : role.surface, borderWidth: 1, borderColor: role.border, ...shadowStyle('sm') })}
         >
           <AppText variant="label" style={{ flex: 1 }}>
-            Go to <AppText variant="mono" style={{ fontSize: 17, lineHeight: 24 }}>{refLabel(goTo)}</AppText>
+            Go to <AppText variant="mono">{refLabel(goTo)}</AppText>
           </AppText>
-          <Icon name="chevron" color={role.muted} size={22} />
+          <Icon name="chevron" color={role.muted} />
         </Pressable>
       )}
       {total > 0 ? (
@@ -55,13 +55,13 @@ export function SearchResults({ query, marks, onClear, onOpenBook, onOpenVerse }
       ) : looking ? (
         <AppText variant="small" muted accessibilityLiveRegion="polite">{SEARCHING}</AppText>
       ) : !goTo && (
-        <Card style={{ alignItems: 'center', gap: 12, paddingVertical: 32 }}>
+        <Card style={{ alignItems: 'center', gap: space[3], paddingVertical: space[8] }}>
           <View style={{ width: 64, height: 64, borderRadius: radius.pill, backgroundColor: role.sunken, alignItems: 'center', justifyContent: 'center' }}>
-            <Icon name="search" color={role.muted} size={30} />
+            <Icon name="search" color={role.muted} size={32} />
           </View>
           <AppText variant="h4" accessibilityLiveRegion="polite" style={{ textAlign: 'center' }}>{resultsLine({ ...found, total })}</AppText>
           <AppText variant="small" muted style={{ textAlign: 'center' }}>{NOTHING_FOUND_HINT}</AppText>
-          <View style={{ alignSelf: 'stretch', marginTop: 8 }}>
+          <View style={{ alignSelf: 'stretch', marginTop: space[2] }}>
             <Pill variant="ghost" label="Clear search" onPress={onClear} />
           </View>
         </Card>

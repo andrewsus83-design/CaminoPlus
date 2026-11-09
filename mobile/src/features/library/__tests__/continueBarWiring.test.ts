@@ -104,15 +104,15 @@ check('the close button is at least 44 by 44 (48), the bar at least 64 high, and
 });
 
 check('the words: "Continue reading" small over the place on one line each, cut with an ellipsis; at most 1.2 times the phone\'s text size, so the bar stays a bar', () => {
-  assert.match(bar, /<AppText variant="label" maxFontSizeMultiplier=\{1\.2\} numberOfLines=\{1\} color=\{role\.onInverseAccent\} style=\{\{ fontSize: 14, lineHeight: 18 \}\}>\{CONTINUE_TITLE\}<\/AppText>/);
+  assert.match(bar, /<AppText variant="caption" maxFontSizeMultiplier=\{1\.2\} numberOfLines=\{1\} color=\{role\.onInverseAccent\}>\{CONTINUE_TITLE\}<\/AppText>/);
   assert.match(bar, /<View style=\{\{ flex: 1, minWidth: 0 \}\}>/, 'minWidth 0: a long title is cut, it does not push the X out of the bar');
   assert.equal(count(bar, /<AppText\b/g), 3, 'the line over the place, and the place in two pieces');
 });
 
 check('the place is drawn in two pieces on one line: the name, which gives way (flexShrink 1, an ellipsis), and the chapter, which does not (flexShrink 0), so the books with long titles of the Library never lose the chapter', () => {
-  assert.match(bar, /<View style=\{\{ flexDirection: 'row', alignItems: 'baseline', gap: 5 \}\}>/, 'one row: the two pieces on one baseline, a space between');
-  assert.match(bar, /<AppText variant="h4" maxFontSizeMultiplier=\{1\.2\} numberOfLines=\{1\} color=\{role\.onInverse\} style=\{\{ flexShrink: 1, minWidth: 0, fontSize: 18, lineHeight: 24 \}\}>\{view\.head\}<\/AppText>/, 'the name is cut with an ellipsis');
-  assert.match(bar, /\{!!view\.tail && <AppText variant="h4" maxFontSizeMultiplier=\{1\.2\} numberOfLines=\{1\} color=\{role\.onInverse\} style=\{\{ flexShrink: 0, fontSize: 18, lineHeight: 24 \}\}>\{view\.tail\}<\/AppText>\}/, 'the chapter is never cut');
+  assert.match(bar, /<View style=\{\{ flexDirection: 'row', alignItems: 'baseline', gap: space\[1\] \}\}>/, 'one row: the two pieces on one baseline, a space of 4 between');
+  assert.match(bar, /<AppText variant="h5" maxFontSizeMultiplier=\{1\.2\} numberOfLines=\{1\} color=\{role\.onInverse\} style=\{\{ flexShrink: 1, minWidth: 0 \}\}>\{view\.head\}<\/AppText>/, 'the name is cut with an ellipsis');
+  assert.match(bar, /\{!!view\.tail && <AppText variant="h5" maxFontSizeMultiplier=\{1\.2\} numberOfLines=\{1\} color=\{role\.onInverse\} style=\{\{ flexShrink: 0 \}\}>\{view\.tail\}<\/AppText>\}/, 'the chapter is never cut');
   assert.doesNotMatch(bar, /view\.label/, 'the bar draws the two pieces; the whole label is for the tests, the design and the words a screen reader says');
   assert.match(src['spot.ts'], /head: book\.title,\s+tail: chapter \? `· \$\{chapter\}` : '',/, 'a book: its title, then "· Chapter 2"');
   assert.match(src['spot.ts'], /const tail = String\(spot\.chapter\);/, 'the Bible: the name of the book, then the number of the chapter');

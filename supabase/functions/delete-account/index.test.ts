@@ -8,6 +8,7 @@
 // FAKE_SUPABASE_PORT and FUNCTION_PORT pin a port when you want to debug with curl.
 // TEST_DEBUG=1 prints what the function logs to stderr and which requests the fake did not know.
 import { assert, assertEquals } from 'jsr:@std/assert@1';
+import { throwawayKey } from '../_shared/testKey.ts';
 
 const ME = 'd1000000-0000-4000-8000-000000000001';
 const NEIGHBOUR = 'd1000000-0000-4000-8000-000000000011'; // another pilgrim whose id starts the same way
@@ -35,6 +36,9 @@ const state = {
   failRemoveCall: 0, // the Nth remove call (1-based) fails once
   log: [] as string[],
   calls: 0, // every request that is not the Auth token check
+  appleTokens: {} as Record<string, string>, // user id -> stored Apple refresh token
+  failAppleLookup: false,
+  appleRevokeStatus: 200,
 };
 function reset() {
   state.tokens = { 'tok-me': ME };
@@ -50,6 +54,9 @@ function reset() {
   state.failRemoveCall = 0;
   state.log = [];
   state.calls = 0;
+  state.appleTokens = {};
+  state.failAppleLookup = false;
+  state.appleRevokeStatus = 200;
 }
 reset();
 
@@ -105,6 +112,22 @@ const fake = Deno.serve(
       return Response.json(rows.map((m) => ({ business_id: m.business_id })));
     }
 
+    if (u.pathname === '/rest/v1/apple_sign_in_tokens' && req.method === 'GET') {
+      if (bearer !== 'service') return unauthorised;
+      state.log.push('rest.apple_sign_in_tokens');
+      if (state.failAppleLookup) return Response.json({ code: '42P01', message: 'relation "public.apple_sign_in_tokens" does not exist' }, { status: 404 });
+      const id = (u.searchParams.get('user_id') ?? '').replace(/^eq\./, '');
+      const token = state.appleTokens[id];
+      return Response.json(token ? [{ refresh_token: token }] : []);
+    }
+
+    if (u.pathname === '/auth/revoke' && req.method === 'POST') {
+      const form = Object.fromEntries(new URLSearchParams(await req.text()));
+      state.log.push(`apple.revoke ${form.token} ${form.token_type_hint} ${form.client_id}`);
+      if (state.appleRevokeStatus !== 200) return Response.json({ error: 'invalid_client' }, { status: state.appleRevokeStatus });
+      return new Response(null, { status: 200 });
+    }
+
     let m = /^\/storage\/v1\/object\/list\/([^/]+)$/.exec(u.pathname);
     if (m && req.method === 'POST') {
       if (bearer !== 'service') return unauthorised;
@@ -148,6 +171,7 @@ type Running = { url: string; stop: () => Promise<void> };
 async function startFunction(extraEnv: Record<string, string> = {}, supabaseUrl = FAKE): Promise<Running> {
   const env = Deno.env.toObject();
   delete env.DELETE_ACCOUNT_STORAGE_BUDGET_MS;
+  for (const k of ['APPLE_TEAM_ID', 'APPLE_KEY_ID', 'APPLE_PRIVATE_KEY', 'APPLE_BUNDLE_ID', 'APPLE_AUTH_URL']) delete env[k];
   Object.assign(env, {
     SUPABASE_URL: supabaseUrl, SUPABASE_ANON_KEY: 'anon', SUPABASE_SERVICE_ROLE_KEY: 'service',
     DENO_SERVE_ADDRESS: `tcp:127.0.0.1:${Deno.env.get('FUNCTION_PORT') ?? 0}`,
@@ -401,6 +425,52 @@ Deno.test({ name: 'delete-account', sanitizeOps: false, sanitizeResources: false
       reset();
       state.deleteUserStatus = 404; // gone between the look-up and the delete
       assertEquals((await call(fn, 'tok-me', DELETE)).status, 200);
+    });
+
+    await t.step('Apple not configured: no Apple look-up, no call to Apple, the account is deleted as before', async () => {
+      reset();
+      state.appleTokens[ME] = 'r-apple-token';
+      const r = await call(fn, 'tok-me', DELETE);
+      assertEquals(r.status, 200);
+      assert(!state.log.some((l) => l.startsWith('rest.apple') || l.startsWith('apple.')), state.log.join('\n'));
+      assertEquals(deleted(), [`auth.deleteUser ${ME}`]);
+    });
+
+    const { pem } = await throwawayKey();
+    const apple = await start({ APPLE_TEAM_ID: 'TEAM123456', APPLE_KEY_ID: 'KEY1234567', APPLE_PRIVATE_KEY: pem, APPLE_BUNDLE_ID: 'plus.camino.app', APPLE_AUTH_URL: FAKE });
+
+    await t.step('Apple configured, an Apple account: its token is revoked at Apple before the user is deleted', async () => {
+      reset();
+      state.appleTokens[ME] = 'r-apple-token';
+      state.appleTokens[OTHER] = 'r-other-token';
+      const r = await call(apple, 'tok-me', DELETE);
+      assertEquals(r.status, 200);
+      assertEquals(r.body, { ok: true });
+      const revoke = state.log.indexOf('apple.revoke r-apple-token refresh_token plus.camino.app');
+      assert(revoke >= 0, state.log.join('\n'));
+      assert(revoke < state.log.indexOf(`auth.deleteUser ${ME}`), 'revoked before the user goes');
+      assert(!state.log.some((l) => l.includes('r-other-token')), 'only the token of the user of the JWT');
+    });
+
+    await t.step('Apple configured, not an Apple account (no stored token): nothing is sent to Apple', async () => {
+      reset();
+      const r = await call(apple, 'tok-me', DELETE);
+      assertEquals(r.status, 200);
+      assert(state.log.includes('rest.apple_sign_in_tokens'));
+      assert(!state.log.some((l) => l.startsWith('apple.')));
+      assertEquals(deleted(), [`auth.deleteUser ${ME}`]);
+    });
+
+    await t.step('Apple refuses or the table is missing: logged, and the account is still deleted', async () => {
+      reset();
+      state.appleTokens[ME] = 'r-apple-token';
+      state.appleRevokeStatus = 400;
+      assertEquals((await call(apple, 'tok-me', DELETE)).status, 200);
+      assertEquals(deleted(), [`auth.deleteUser ${ME}`]);
+      reset();
+      state.failAppleLookup = true;
+      assertEquals((await call(apple, 'tok-me', DELETE)).status, 200);
+      assertEquals(deleted(), [`auth.deleteUser ${ME}`]);
     });
 
     await t.step('the time budget for files caps the cleanup, the account is still deleted', async () => {

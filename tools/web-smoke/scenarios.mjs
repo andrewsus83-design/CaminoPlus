@@ -25,7 +25,9 @@ import { CONTINUE_SCENARIOS } from './continue.scenarios.mjs';
 import { ME_SCENARIOS } from './me.scenarios.mjs';
 import { ME_SMALL_SCENARIOS } from './mesmall.scenarios.mjs';
 import { PILGRIM_SCENARIOS } from './pilgrim.scenarios.mjs';
+import { SHARE_SCENARIOS } from './share.scenarios.mjs';
 import { ALL_PLACES_SCENARIOS } from './allplaces.scenarios.mjs';
+import { MAP_SCENARIOS } from './maps.scenarios.mjs';
 
 /** design/tokens.json: the weights of the tabs of the tab bar (section tab) are read from it, as the app reads them. */
 const TAB_TOKENS = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'design', 'tokens.json'), 'utf8')).tab;
@@ -172,7 +174,7 @@ export const SCENARIOS = [
       step('there are exactly two tabs: no Notes tab, and no gold pen (writing is on Me)');
       await eventually(() => page.getByText('Notes', { exact: true }).filter({ visible: true }).count(), (n) => n === 0, { what: 'the number of "Notes" labels on Library' });
       await eventually(() => page.getByRole('button', { name: /^Write a (note|journey post)$/ }).count(), (n) => n === 0, { what: 'the number of gold pens on Library' });
-      step('Bible: the banner (today\'s date, title, a handwritten note, a gold button), no Preview notice, and the one quiet line that says which translation it is');
+      step('Bible: the banner (today\'s date, title, the day of the Church and its readings, a gold button), no Preview notice, and the one quiet line that says which translation it is');
       await page.getByText(/^(Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday) \d{1,2} (January|February|March|April|May|June|July|August|September|October|November|December)$/i).waitFor();
       await page.getByRole('button', { name: /^Read today/ }).waitFor();
       await page.getByText('World English Bible, Catholic edition · public domain', { exact: true }).waitFor();
@@ -290,6 +292,7 @@ export const SCENARIOS = [
   ...ME_SCENARIOS,
   ...ME_SMALL_SCENARIOS,
   ...PILGRIM_SCENARIOS,
+  ...SHARE_SCENARIOS,
   {
     name: 'Notes: a page is a draft until it is published. The marks are inside the text box; Read (a third) and Publish (two thirds) are one row at the bottom; Save draft is at the top right and keeps a note with a Draft tag; Publish takes the tag away',
     persona: 'in',
@@ -634,4 +637,5 @@ export const SCENARIOS = [
   },
   ...DAILY_SCENARIOS,
   ...ALL_PLACES_SCENARIOS,
+  ...MAP_SCENARIOS,
 ];

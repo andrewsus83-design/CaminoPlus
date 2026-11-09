@@ -46,7 +46,7 @@ function Cell({ day, today, selected, enabled, onSelect }: { day: Ymd; today: bo
       onPress={() => onSelect(day)}
       style={({ pressed }) => ({ flex: 1, minHeight: 84, alignItems: 'center', justifyContent: 'center', gap: 2, opacity: pressed ? 0.6 : 1 })}
     >
-      <AppText variant="caption" muted maxFontSizeMultiplier={FONT_LIMIT}>{WEEKDAY_LETTERS[weekdayIndex(day)]}</AppText>
+      <AppText variant="small" muted maxFontSizeMultiplier={FONT_LIMIT}>{WEEKDAY_LETTERS[weekdayIndex(day)]}</AppText>
       {/* Today: a ring. Picked: filled. Both: filled, with a thin ring of the page colour inside it, so today still shows. */}
       <View style={{ width: MARKER, height: MARKER, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center', borderWidth: today ? 2 : 0, borderColor: role.action, backgroundColor: selected ? role.action : 'transparent' }}>
         {selected && today && <View pointerEvents="none" style={{ position: 'absolute', top: 3, left: 3, right: 3, bottom: 3, borderRadius: radius.pill, borderWidth: 2, borderColor: role.onAction }} />}

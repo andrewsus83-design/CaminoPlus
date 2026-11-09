@@ -1,7 +1,7 @@
 import { Pressable, View } from 'react-native';
 import { AppText } from '@/components/AppText';
 import { Icon, type IconName } from '@/components/Icon';
-import { c, radius, role } from '@/theme';
+import { c, radius, role, space } from '@/theme';
 
 // The few buttons of the book page and the reader that nothing else in the app has: the gold bar that starts or goes on reading (a screen reader says
 // the whole title of the chapter it opens), the round button of the reader's bar (an icon, 56 there, dimmed and disabled when there is nothing to go to) and the
@@ -16,7 +16,7 @@ export function ReadButton({ label, spoken, hint, onPress }: { label: string; sp
       accessibilityLabel={spoken}
       accessibilityHint={hint}
       onPress={onPress}
-      style={({ pressed }) => ({ minHeight: 56, paddingHorizontal: 24, paddingVertical: 12, borderRadius: radius.pill, backgroundColor: c.gold, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.85 : 1 })}
+      style={({ pressed }) => ({ minHeight: 56, paddingHorizontal: space[6], paddingVertical: space[3], borderRadius: radius.pill, backgroundColor: c.gold, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.85 : 1 })}
     >
       <AppText variant="label" color={role.onHighlight} style={{ textAlign: 'center' }}>{label}</AppText>
     </Pressable>
@@ -26,15 +26,16 @@ export function ReadButton({ label, spoken, hint, onPress }: { label: string; sp
 /** The notice every book page shows (notices.ts says what it says): small and plain, in a quiet box with a flag, so that it is seen and is not an alarm. */
 export function BookNotice({ text }: { text: string }) {
   return (
-    <View accessibilityRole="summary" style={{ flexDirection: 'row', gap: 12, padding: 14, borderRadius: radius.lg, backgroundColor: role.sunken, alignItems: 'flex-start' }}>
+    <View accessibilityRole="summary" style={{ flexDirection: 'row', gap: space[3], padding: space[4], borderRadius: radius.lg, backgroundColor: role.sunken, alignItems: 'flex-start' }}>
       <Icon name="flag" color={role.muted} size={20} />
       <AppText variant="small" style={{ flex: 1, minWidth: 0 }}>{text}</AppText>
     </View>
   );
 }
 
-/** A round 44 button with an icon. `disabled` dims it and tells a screen reader; it is still drawn, so that nothing moves. */
-export function IconTap({ icon, label, hint, disabled, size = 44, onPress }: { icon: IconName; label: string; hint?: string; disabled?: boolean; size?: number; onPress: () => void }) {
+/** A round 48 button with an icon (24; 32 in a button of 56 or more). `disabled` dims it and tells a screen reader; it is still drawn, so that nothing moves. */
+export function IconTap({ icon, label, hint, disabled, size = 48, onPress }: { icon: IconName; label: string; hint?: string; disabled?: boolean; size?: number; onPress: () => void }) {
+  const glyph = size >= 56 ? 32 : 24;
   return (
     <Pressable
       accessibilityRole="button"
@@ -43,10 +44,9 @@ export function IconTap({ icon, label, hint, disabled, size = 44, onPress }: { i
       accessibilityState={{ disabled: !!disabled }}
       disabled={disabled}
       onPress={onPress}
-      hitSlop={2}
       style={({ pressed }) => ({ width: size, height: size, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center', backgroundColor: pressed ? role.sunken : 'transparent', opacity: disabled ? 0.35 : 1 })}
     >
-      <Icon name={icon} color={role.text} size={Math.round((size / 44) * 24)} />
+      <Icon name={icon} color={role.text} size={glyph} />
     </Pressable>
   );
 }
@@ -65,7 +65,7 @@ export function SizeTap({ larger, disabled, onPress }: { larger: boolean; disabl
       onPress={onPress}
       style={({ pressed }) => ({ width: HEADER_BUTTON, height: HEADER_BUTTON, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center', backgroundColor: pressed ? role.sunken : role.surface, borderWidth: 1, borderColor: role.border, opacity: disabled ? 0.35 : 1 })}
     >
-      <AppText variant="h4" maxFontSizeMultiplier={1} style={{ fontSize: larger ? 24 : 15, lineHeight: larger ? 28 : 20 }}>A</AppText>
+      <AppText variant={larger ? 'h4' : 'h6'} maxFontSizeMultiplier={1}>A</AppText>
     </Pressable>
   );
 }

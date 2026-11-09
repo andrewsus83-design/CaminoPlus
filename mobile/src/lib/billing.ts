@@ -16,6 +16,25 @@ export async function getMyStorage(): Promise<MyStorage> {
   return res.data as MyStorage;
 }
 
+/** The last answer saved on this phone, or null. */
+export async function cachedMyStorage(uid: string | null | undefined): Promise<MyStorage | null> {
+  if (!uid) return null;
+  try { return (await localStore.getJSON<MyStorage>(userKey(uid, 'storage'))) ?? null; } catch { return null; }
+}
+
+/** The plan and storage now: the server's answer, or the last one saved on this phone, or null when neither is there. */
+export async function loadMyStorage(uid: string | null | undefined): Promise<MyStorage | null> {
+  if (!uid) return null;
+  const key = userKey(uid, 'storage');
+  try {
+    const fresh = await getMyStorage();
+    void localStore.setJSON(key, fresh);
+    return fresh;
+  } catch {
+    return (await localStore.getJSON<MyStorage>(key).catch(() => null)) ?? null;
+  }
+}
+
 export function useMyStorage() {
   const { session } = useAuth();
   const uid = session?.user.id;

@@ -348,10 +348,12 @@ check('the design page shows the same Library: the two tabs Bible and Books, the
   assert.doesNotMatch(bible, /scr-title|<h1/, 'a title is back on the Library phone');
 
   // Bible: the tab strip, then the compact banner, then the three parts, the heading and the count, the source line, the tiles, the tab bar; no notice, no chip, no floating bar, no gold pen
-  const order = ['class="lib-head"', 'class="cp-subtabs"', 'class="cp-banner cmp"', 'class="lib-seg"', 'class="lib-hrow"', 'class="lib-src"', 'class="lib-grid"', 'class="lib-tile"', 'class="tabdock"'].map((needle) => bible.indexOf(needle));
+  const order = ['class="lib-head"', 'class="cp-subtabs"', 'class="cp-banner cmp dl"', 'class="lib-seg"', 'class="lib-hrow"', 'class="lib-src"', 'class="lib-grid"', 'class="lib-tile"', 'class="tabdock"'].map((needle) => bible.indexOf(needle));
   assert.ok(order.every((i) => i > 0) && order.every((i, k) => k === 0 || i > order[k - 1]), `Bible: head, tabs, banner, the three parts, heading, source line, tiles, the tab bar (${order})`);
   assert.match(bible, /<div class="cp-subtabs"[^>]*><span class="on">Bible<\/span><span>Books<\/span><\/div>/, 'two tabs: there is no Notes tab in the Library');
-  assert.match(bible, /<div class="cp-banner cmp" role="button" aria-label="Read today\. Daily reading\. Sunday 8 November">\s*<div class="ey">Sunday 8 November<\/div>\s*<h4>Daily reading<\/h4>\s*<div class="row"><span class="hw">Buen Camino!<\/span><span class="pill">Read today<\/span><\/div>/);
+  // the daily banner (drawn by designDaily.ts from the functions of the app): the date, the title with the pill, the day of the Church's year, the readings; no handwritten note
+  assert.match(bible, /<div class="cp-banner cmp dl" role="button" aria-label="Read today\. Daily reading\. Sunday 8 November\. 32nd Sunday in Ordinary Time\. Readings: Wisdom, chapter 6, verses 12 to 16; Psalm 63; First Thessalonians, chapter 4, verses 13 to 18; Matthew, chapter 25, verses 1 to 13">\s*<div class="ey">Sunday 8 November<\/div>\s*<div class="tr"><h4>Daily reading<\/h4><span class="pill">Read today<\/span><\/div>\s*<div class="dd">32nd Sunday in Ordinary Time<\/div>\s*<div class="rf">Wisdom&nbsp;6:12-16&nbsp;· Psalm&nbsp;63&nbsp;· 1&nbsp;Thessalonians&nbsp;4:13-18&nbsp;· Matthew&nbsp;25:1-13<\/div>\s*<\/div>/);
+  assert.doesNotMatch(bible.slice(bible.indexOf('class="cp-banner cmp dl"'), bible.indexOf('class="lib-seg"')), /Buen Camino|class="hw"/, 'the owner asked for the words to go: the banner has the day and the readings instead');
   assert.doesNotMatch(bible, /cp-dots|cp-banner lib|art"/, 'the banner is one compact card: no dots, no big glyph');
   assert.match(bible, /<h4 class="lib-h">Books of the Bible<\/h4><span class="cnt" aria-label="Old Testament, 39 books">39 books<\/span>/);
   assert.match(bible, /<p class="lib-src">World English Bible, Catholic edition · public&nbsp;domain<\/p>/);
@@ -370,16 +372,16 @@ check('the design page shows the same Library: the two tabs Bible and Books, the
   assert.doesNotMatch(bible, /class="nm h(?!4|5|6)/, 'a name is h4, h5 or h6');
   assert.match(bible, /aria-label="1 Samuel, 31 chapters"><span class="nm h4">1<br>Samuel<\/span>/, 'a number stands on a line of its own');
   assert.match(bible, /aria-label="Song of Songs, 8 chapters"><span class="nm h4">Song of<br>Songs<\/span>/);
-  assert.equal(count(bible, /class="hw"/g), 1, 'one handwritten note on the screen');
+  assert.equal(count(bible, /class="hw"/g), 0, 'no handwritten note on the Bible tab: the banner says the day and the readings instead (the brand rule is at most one, not exactly one)');
 
   // Continue: no card in the page (the banner is right under the tabs), and the Continue reading bar floats above the tab bar, drawn over the dock's fade (its z-index is above the dock's) and before the scroll in the markup;
   // the place is drawn in two pieces, the name and the chapter; the New Testament chosen, 27 tiles
   assert.doesNotMatch(cont, /cont-card/, 'the card is gone from the page');
   assert.match(cont, /<div class="cont-bar">\s*<div class="main" role="button" aria-label="Continue reading, Psalm 121"><svg class="cp-icon ic"><use href="#i-book"\/><\/svg><div class="t"><div class="k">Continue reading<\/div><div class="r"><span class="h">Psalm<\/span><span class="c">121<\/span><\/div><\/div><\/div>\s*<button class="x" aria-label="Hide Continue reading"><svg class="cp-icon"><use href="#i-x"\/><\/svg><\/button>\s*<\/div>/);
-  assert.ok(cont.indexOf('class="cp-subtabs"') < cont.indexOf('class="cp-banner cmp"'), 'the banner is right under the tabs, with no card between');
+  assert.ok(cont.indexOf('class="cp-subtabs"') < cont.indexOf('class="cp-banner cmp dl"'), 'the banner is right under the tabs, with no card between');
   assert.ok(cont.indexOf('class="cont-bar"') < cont.indexOf('class="scroll"'), 'the bar is not inside the scroll: it floats, and the cover grid of a phone ends before anything of it');
   assert.equal(count(cont, /class="cont-bar"/g), 1, 'one bar on the screen');
-  assert.equal(count(cont, /class="hw"/g), 1, 'the bar adds no handwriting: the banner has the one note');
+  assert.equal(count(cont, /class="hw"/g), 0, 'the bar adds no handwriting, and the banner of the Bible tab has none');
   assert.equal(count(cont, /class="lib-tile"/g), 27);
   assert.match(cont, /aria-label="1 Thessalonians, 5 chapters"><span class="nm h5">1<br>Thessalonians<\/span>/, 'the longest word of all comes down to 17 (h5) on a phone of 390: the fit counts every letter rounded up to a pixel, as a browser that hints the glyphs draws it');
   assert.equal(count(bible, /cont-bar|cont-card/g), 0, 'without a chapter read there is no bar and no card');
@@ -729,16 +731,16 @@ check('the four fonts by role on the Bible side of the Library: Fraunces for nam
     [join(L, 'LibraryTabs.tsx'), /<AppText variant="h4" accessibilityRole="header">Books of the Bible<\/AppText>/, 'the heading of the Bible tab is Fraunces'],
     [join(L, 'LibraryTabs.tsx'), /<AppText variant="mono" muted accessibilityLiveRegion="polite"[^>]*>\{countLine\(testament\)\}<\/AppText>/, 'the count of books of a part is JetBrains Mono'],
     [join(L, 'LibraryTabs.tsx'), /<AppText variant="caption" muted>\{BIBLE_SOURCE_LINE/, 'the source line is Inter'],
-    [join(L, 'LibraryTabs.tsx'), /<AppText variant="h4" style=\{\{ fontSize: 20, lineHeight: 26 \}\}>\{b\.name\}<\/AppText>/, 'the name of a book of the Bible in a row of results is Fraunces'],
-    [join(L, 'LibraryTabs.tsx'), /<AppText variant="mono" muted style=\{\{ fontSize: 14, lineHeight: 21 \}\}>\{chaptersLabel\(book\.chapters\)\}<\/AppText>/, 'its count is JetBrains Mono'],
-    [join(L, 'bible', 'TestamentBar.tsx'), /<AppText variant="label" maxFontSizeMultiplier=\{BAR_MAX_FONT_SCALE\}/, 'the three choices are Inter'],
+    [join(L, 'LibraryTabs.tsx'), /<AppText variant="h5">\{b\.name\}<\/AppText>/, 'the name of a book of the Bible in a row of results is Fraunces'],
+    [join(L, 'LibraryTabs.tsx'), /<AppText variant="mono" muted>\{chaptersLabel\(book\.chapters\)\}<\/AppText>/, 'its count is JetBrains Mono'],
+    [join(L, 'bible', 'TestamentBar.tsx'), /<AppText variant="caption" maxFontSizeMultiplier=\{BAR_MAX_FONT_SCALE\}/, 'the three choices are Inter'],
     [join(L, 'LibraryBanner.tsx'), /<AppText variant="mono"[^>]*>\{label\}<\/AppText>/, 'the date line of the banner is JetBrains Mono'],
     [join(L, 'LibraryBanner.tsx'), /<AppText variant="h4"[^>]*>\{title\}<\/AppText>/, 'the title of the banner is Fraunces'],
     [join(L, 'LibraryBanner.tsx'), /<AppText variant="accent"[^>]*>\{note\}<\/AppText>/, 'the one note of the banner is Caveat'],
     [join(L, 'LibraryBanner.tsx'), /<AppText variant="label"[^>]*>\{cta\}<\/AppText>/, 'the label of the gold pill is Inter, never the handwriting'],
-    [join(L, 'continueBar', 'ContinueBar.tsx'), /<AppText variant="h4"[^>]*>\{view\.head\}<\/AppText>/, 'the name of the place on the Continue reading bar is Fraunces (h4)'],
-    [join(L, 'continueBar', 'ContinueBar.tsx'), /<AppText variant="h4"[^>]*>\{view\.tail\}<\/AppText>/, 'and so is its chapter: the one piece of it that is never cut'],
-    [join(L, 'continueBar', 'ContinueBar.tsx'), /<AppText variant="label"[^>]*>\{CONTINUE_TITLE\}<\/AppText>/, 'the words over it are Inter'],
+    [join(L, 'continueBar', 'ContinueBar.tsx'), /<AppText variant="h5"[^>]*>\{view\.head\}<\/AppText>/, 'the name of the place on the Continue reading bar is Fraunces (h5)'],
+    [join(L, 'continueBar', 'ContinueBar.tsx'), /<AppText variant="h5"[^>]*>\{view\.tail\}<\/AppText>/, 'and so is its chapter: the one piece of it that is never cut'],
+    [join(L, 'continueBar', 'ContinueBar.tsx'), /<AppText variant="caption"[^>]*>\{CONTINUE_TITLE\}<\/AppText>/, 'the words over it are Inter'],
     [join(L, 'bible', 'Reader.tsx'), /<AppText variant="h4" color=\{role\.accentText\}[^>]*>\{book\.name\}<\/AppText>/, 'the name of the book over the chapter is Fraunces'],
     [join(L, 'bible', 'Reader.tsx'), /<AppText variant="h2" accessibilityRole="header"[^>]*>\{chapterTitle\(place\)\}<\/AppText>/, 'the title of the chapter is Fraunces'],
     [join(L, 'bible', 'Reader.tsx'), /\{!!chapter\.title && <AppText variant="h4" muted /, 'the title of a psalm is Fraunces'],
@@ -790,7 +792,9 @@ check('the four fonts by role on the Bible side of the Library: Fraunces for nam
     return (design.slice(start, next > 0 ? next : undefined).match(/class="hw"/g) ?? []).length;
   };
   for (const label of phones) assert.ok(handwriting(label) <= 1, `the phone "${label}" has ${handwriting(label)} handwritten notes`);
-  for (const label of ['Library', 'Library · Continue', 'Library · Dark', 'Library · Deuterocanon', 'Library · Chapters', 'Reader · Psalm 121', 'Reader · John 1']) assert.equal(handwriting(label), 1, `the phone "${label}" has its handwritten note`);
+  for (const label of ['Library · Chapters', 'Reader · Psalm 121', 'Reader · John 1']) assert.equal(handwriting(label), 1, `the phone "${label}" has its handwritten note`);
+  // the banner of the Bible tab has none since the daily reading says the day and the readings there: the Library phones that show it have no handwritten note
+  for (const label of ['Library', 'Library · Continue', 'Library · Dark', 'Library · Deuterocanon', 'Library · 320 wide']) assert.equal(handwriting(label), 0, `the phone "${label}" has no handwritten note`);
 });
 
 check('every screen registered in the root layout is a file, so the stack never warns about a missing route', () => {

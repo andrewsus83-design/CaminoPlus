@@ -20,6 +20,15 @@ export default function Onboarding() {
   const insets = useSafeAreaInsets();
   const [step, setStep] = useState<Step>('name');
   const [name, setName] = useState(profile?.display_name ?? '');
+  // The name can arrive a moment after this screen opens (Sign in with Apple saves Apple's name, then reloads the
+  // profile): take it, unless the pilgrim has already typed something else.
+  const [shownName, setShownName] = useState(profile?.display_name ?? '');
+  useEffect(() => {
+    const fresh = profile?.display_name ?? '';
+    if (fresh === shownName) return;
+    setShownName(fresh);
+    setName((typed) => (typed === shownName ? fresh : typed));
+  }, [profile?.display_name, shownName]);
   const [routes, setRoutes] = useState<Route[] | null>(null);
   const [route, setRoute] = useState<Route | null>(null);
   const [stages, setStages] = useState<Stage[] | null>(null);

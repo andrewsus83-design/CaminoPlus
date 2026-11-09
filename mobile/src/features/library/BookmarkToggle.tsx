@@ -7,7 +7,7 @@ export const bookmarkLabel = (on: boolean, title: string) => `${on ? 'Remove boo
 
 /**
  * The bookmark button at the end of a row, of the Library and of the Bookmarks screen: a bare icon, filled when the row is
- * bookmarked, in a 44 round touch area (52 with the slop). Its own file, apart from the rows, so the rows themselves stay
+ * bookmarked, in a 48 by 48 touch area (the hard minimum of a tap target). Its own file, apart from the rows, so the rows themselves stay
  * plain pictures of what will be there (src/lib/__tests__/navigation.test.ts keeps anything that can be pressed out of them).
  * `color` is for a cover, which does not change with light and dark.
  */
@@ -17,8 +17,7 @@ export function BookmarkToggle({ on, title, toggle, color }: { on: boolean; titl
       accessibilityRole="button"
       accessibilityLabel={bookmarkLabel(on, title)}
       onPress={toggle}
-      hitSlop={4}
-      style={({ pressed }) => ({ width: 44, height: 44, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.6 : 1 })}
+      style={({ pressed }) => ({ width: 48, height: 48, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.6 : 1 })}
     >
       <Icon name="bookmark" color={color ?? role.action} size={24} filled={on} />
     </Pressable>

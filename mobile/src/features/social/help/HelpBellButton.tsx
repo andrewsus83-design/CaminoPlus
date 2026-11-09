@@ -4,20 +4,23 @@
 import { useSyncExternalStore } from 'react';
 import { Pressable, View } from 'react-native';
 import { Icon } from '@/components/Icon';
-import { c, shadowStyle } from '@/theme';
+import { fixed, shadowStyle } from '@/theme';
 import { clockTime } from '../logic';
 import { getAlert, subscribeAlert } from './alertStore';
 import { activeAlert, alertLastAt } from './logic';
 
+// design-lint-ignore: color the night button of the Walk view, the same navy as `button` in the night palette of features/map/WalkUi.tsx: a colour of the map, not of the interface
 const NIGHT_BUTTON = '#13243C';
+// design-lint-ignore: color the hairline of the night buttons of the Walk view (parchment at 24 %), as WalkUi.tsx draws it
 const NIGHT_BORDER = 'rgba(246,239,226,0.24)';
+// design-lint-ignore: color Cross Red lightened to 5.4 : 1 on the night button, where the plain red is 2.5 : 1; no token has it
 const NIGHT_BELL = '#E8776A';
 
 export function HelpBellButton({ tone = 'day', onPress, size = 56 }: { tone?: 'day' | 'night'; onPress: () => void; size?: number }) {
   const night = tone === 'night';
   const alert = useSyncExternalStore(subscribeAlert, getAlert, getAlert);
   const rung = activeAlert(alert, Date.now());
-  const bg = night ? NIGHT_BUTTON : c.parchment;
+  const bg = night ? NIGHT_BUTTON : fixed.parchment; // the button sits on the map, which has its own day and night: never the app's dark mode
   return (
     <Pressable
       accessibilityRole="button"
@@ -30,8 +33,8 @@ export function HelpBellButton({ tone = 'day', onPress, size = 56 }: { tone?: 'd
         alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.85 : 1, ...shadowStyle('md'),
       })}
     >
-      <Icon name="bell" color={night ? NIGHT_BELL : c.red} size={Math.round(size * 0.5)} strokeWidth={2.1} />
-      {!!rung && <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants" style={{ position: 'absolute', top: 6, right: 6, width: 14, height: 14, borderRadius: 7, backgroundColor: night ? NIGHT_BELL : c.red, borderWidth: 2, borderColor: bg }} />}
+      <Icon name="bell" color={night ? NIGHT_BELL : fixed.red} size={Math.round(size * 0.5)} strokeWidth={2.1} />
+      {!!rung && <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants" style={{ position: 'absolute', top: 6, right: 6, width: 14, height: 14, borderRadius: 7, backgroundColor: night ? NIGHT_BELL : fixed.red, borderWidth: 2, borderColor: bg }} />}
     </Pressable>
   );
 }

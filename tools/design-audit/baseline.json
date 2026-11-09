@@ -1,61 +1,58 @@
 {
  "$comment": "The design-lint baseline: how far the app code is from design/tokens.json today. Written by `python3 tools/design-audit/scan.py --update-baseline`, never by hand. `python3 tools/design-audit/scan.py --check` fails when a category total goes up, or when a file that has no entry here gets a violation (code that only moved to it is not one). `fp` is one short fingerprint per violation (its rule, value and source line, not its line number), so a failure can name the new violations and a move between files is told from a new violation. tools/design-audit/README.md has the rest.",
  "version": 1,
- "commit": "eb5627ee326d56e8caaabafdd3eca83e4d83d540",
+ "commit": "54463b79e52387740f6feb9051b1610ead73cd33",
  "totals": {
-  "color": 189,
-  "font": 201,
-  "spacing": 348,
-  "size": 125,
-  "inset": 33,
+  "color": 163,
+  "font": 39,
+  "spacing": 88,
+  "size": 44,
+  "inset": 11,
   "ignore": 0
  },
  "kinds": {
-  "color/raw": 189,
-  "font/letter-spacing": 22,
-  "font/line-height": 85,
-  "font/size": 31,
-  "font/small": 63,
-  "inset/text-near-edge": 33,
-  "size/icon": 92,
-  "size/radius": 12,
-  "size/touch": 21,
-  "spacing/gap": 154,
-  "spacing/margin": 37,
-  "spacing/padding": 157
+  "color/raw": 163,
+  "font/letter-spacing": 7,
+  "font/line-height": 17,
+  "font/size": 3,
+  "font/small": 12,
+  "inset/text-near-edge": 11,
+  "size/icon": 30,
+  "size/radius": 4,
+  "size/touch": 10,
+  "spacing/gap": 35,
+  "spacing/margin": 8,
+  "spacing/padding": 45
  },
  "apart": {
-  "color/role-first": 326,
-  "spacing/offset": 55,
-  "spacing/negative": 10,
-  "size/touch-below-primary": 64
+  "color/role-first": 107,
+  "spacing/offset": 47,
+  "spacing/negative": 8,
+  "size/touch-below-primary": 63
  },
  "duplicates": {
-  "pill": 30,
-  "icon_button": 40,
-  "card": 8,
+  "pill": 28,
+  "icon_button": 38,
+  "card": 9,
   "notice": 1,
   "subtab": 2,
   "fab": 0,
-  "segment": 4
+  "segment": 5
  },
  "files": {
   "app/(tabs)/explore.tsx": {
    "counts": {
-    "spacing": 5,
-    "size": 1,
-    "inset": 1
+    "spacing": 2
    },
-   "fp": "492344e8a9 5429c940b2 5c68c49854 6a08aa6805 a1b146a1b0 e5c531f656 f65671c834"
+   "fp": "243a6dccbb f1337cd00e"
   },
   "app/(tabs)/maps.tsx": {
    "counts": {
     "color": 2,
-    "spacing": 12,
-    "size": 11,
-    "inset": 5
+    "spacing": 3,
+    "inset": 1
    },
-   "fp": "0b65e696ef 0e91272fbd 1b4eb54f25 3e77b84890 51b741e49d 5ef52e3ff9 65764a4caa 6b73887927 712053e439 72e3f7c478 838201fbc0 86c5555263 8b5647f281 8cb46aeeb6 8e6688a7af 92377f6a78 92f054d55f 968dbe20b1 9a9e6439d7 9b21a7f649 a17d8d5a00 b06989bf0e b4eb56a72c b7377fa71c c243034442 c582eed67a c9106e99e4 d912244c24 ef6d730597 fd05fba2b3"
+   "fp": "3e77b84890 51b741e49d 6391baa596 712053e439 72e3f7c478 b06989bf0e"
   },
   "app/(tabs)/me.tsx": {
    "counts": {
@@ -66,141 +63,11 @@
    },
    "fp": "029062f5b0 179ab52fb5 29b91bb612 2d9c542da6 3abca9c3bf 449b55b5a8 4ab02e2810 57c605ea71 6bc506c39c 73fc04110d a70ef545a9 af78e9695d c5fc08cfc0 c89969a82c cf9577380a da013d3fe8"
   },
-  "app/(tabs)/stays.tsx": {
-   "counts": {
-    "font": 1,
-    "spacing": 10,
-    "size": 3,
-    "inset": 1
-   },
-   "fp": "02e7e175e2 0575222348 09ef1ecc13 09ef1ecc13 09ef1ecc13 09ef1ecc13 12a667ad4a 4dff1f4a62 65a8375321 a9aa0a3d62 ae46c81fc7 ae6e1be810 b2b455610f bd91832bd6 bdca41ce76"
-  },
-  "app/business/dashboard.tsx": {
-   "counts": {
-    "spacing": 6,
-    "size": 1
-   },
-   "fp": "2d9c542da6 2d9c542da6 5ac7b34e48 6571bc101b 9a9e6439d7 a9aa0a3d62 e06756080d"
-  },
-  "app/business/index.tsx": {
-   "counts": {
-    "spacing": 1
-   },
-   "fp": "ac5ac04a7f"
-  },
-  "app/business/register.tsx": {
-   "counts": {
-    "font": 1,
-    "spacing": 3,
-    "size": 3
-   },
-   "fp": "00f3845719 1627779d14 4883ebb697 b69e289d56 e52c3c9699 f4b6bbee2e fa17292575"
-  },
-  "app/business/status.tsx": {
-   "counts": {
-    "spacing": 3,
-    "size": 2,
-    "inset": 1
-   },
-   "fp": "6b0900c6dc 8e1a51efed a0a4fcee51 d20fad73c1 e02e6313c8 f219f8b192"
-  },
-  "app/chat/[id].tsx": {
-   "counts": {
-    "font": 4,
-    "spacing": 5,
-    "size": 2
-   },
-   "fp": "1224e357c4 265d847fc9 5263e234a1 612a0a5091 a605306b4e acbdf190e2 b38bd11533 bac72dd81f d5b68e8e04 e01ac6fe22 ef1c80abd0"
-  },
-  "app/chat/info/[id].tsx": {
-   "counts": {
-    "font": 7,
-    "spacing": 11,
-    "size": 1,
-    "inset": 2
-   },
-   "fp": "179ab52fb5 179ab52fb5 206d476372 370cb6426e 3d222829b7 5553c2d543 677b9020c6 7574d873aa 7ab812bee3 7c1a95cf5c 82bcb45880 85f919e32a a068f96aa2 c01b3107dd caec88316e cc6692795c ceeb7e5c65 d5a0da71ec e42419d56f f1c46e8737 f2fa132ba5"
-  },
-  "app/chat/new-group.tsx": {
-   "counts": {
-    "font": 3,
-    "spacing": 5,
-    "size": 1,
-    "inset": 1
-   },
-   "fp": "09ef1ecc13 1a1a0b6c3f 29306f5f18 39415a6679 3a0f8d2792 5aaad19bd8 67b423355f 932deb8ade 94d7e983ac a616a24d91"
-  },
-  "app/chat/new.tsx": {
-   "counts": {
-    "font": 4,
-    "spacing": 4,
-    "size": 2
-   },
-   "fp": "3d712c5b68 3fe3ed1026 46f5ecde73 5a9ee92626 76968c86d1 7ba4ba7091 8ebb6bb7e7 a260714cd0 b6e92c708c eb7e31a8e8"
-  },
-  "app/diary/[id].tsx": {
-   "counts": {
-    "spacing": 8
-   },
-   "fp": "7c8e27c70f 870feae030 b785b6ab2b d29cf723f4 d9a7fc0653 d9a7fc0653 e8819b4c14 ed2bac72b7"
-  },
-  "app/diary/index.tsx": {
-   "counts": {
-    "size": 1
-   },
-   "fp": "6ca12d47f0"
-  },
   "app/friends.tsx": {
    "counts": {
     "spacing": 4
    },
    "fp": "0662025467 0ca8807982 0ca8807982 9a9e6439d7"
-  },
-  "app/inbox.tsx": {
-   "counts": {
-    "font": 1,
-    "spacing": 5
-   },
-   "fp": "2619d159fc 31f7722bca 6841135f4a 8d3fe9c756 8e3f163929 a05753b4cc"
-  },
-  "app/library/bible/[code]/index.tsx": {
-   "counts": {
-    "spacing": 1
-   },
-   "fp": "bdca41ce76"
-  },
-  "app/offline-maps.tsx": {
-   "counts": {
-    "color": 1,
-    "font": 3,
-    "spacing": 6,
-    "size": 1
-   },
-   "fp": "171e3e024e 241b1ea859 348d0c9df0 4259ed3a7c 51a7d7cc5c 5adcf92410 8cb46aeeb6 a5e428194c b7f0b3bb5c c1afaca951 e25b00ae02"
-  },
-  "app/planner.tsx": {
-   "counts": {
-    "color": 1,
-    "font": 3,
-    "spacing": 5,
-    "size": 1
-   },
-   "fp": "09ef1ecc13 2bb25d54c0 4bd6fe685f 691c195016 73a5b7dfe6 7593e04a40 87c6ae5016 8fae7c52c8 9698e9f63e f8fbfaf8c0"
-  },
-  "app/stay/[id].tsx": {
-   "counts": {
-    "font": 1,
-    "spacing": 5
-   },
-   "fp": "179ab52fb5 1deec077cf 1e17ec1ded bdca41ce76 bdca41ce76 e2bb2d4760"
-  },
-  "app/watches.tsx": {
-   "counts": {
-    "spacing": 2,
-    "size": 2,
-    "inset": 1
-   },
-   "fp": "18f0c42d6a 348d0c9df0 4e5b4e5431 a58eb600f8 f9febacf8a"
   },
   "app/write.tsx": {
    "counts": {
@@ -302,24 +169,6 @@
    },
    "fp": "0ce850396b 10980be2d4 197bb5a8c9 1d1feb33ec 206ae20bdb 206ae20bdb 2348a9bb79 25b4dc104e 26b09990d6 34178e6186 37300e9ac8 397260d128 4733d368cd 4e7594f58a 50fe547e92 513c01682e 52611774b3 5dda56a203 5dda56a203 5fd88b28ad 740f0b4c4d 752e0fd413 772c036352 85e360b5c4 920b1f3692 9c6217a0fe 9faeae9842 9fb6cb0089 a16be65e0b a4b177999e a4d332f473 b3804af1ac c7cd87e66c cb251e8191 cf53364885 cfb8e6278b f40004c271 f691055ad2 fb3ca1425d fb3ca1425d"
   },
-  "src/features/business/BusinessCard.tsx": {
-   "counts": {
-    "color": 1,
-    "font": 3,
-    "spacing": 5,
-    "size": 4
-   },
-   "fp": "39ab6c521f 3b5d70cdff 50ac0e05a3 58f0ce82e8 6af4e4ef6f 6fbae0f09d 979fc8c2c5 a90a22b685 d10b439928 db638835f8 e1544cb295 f2285642f9 f7ddb96f50"
-  },
-  "src/features/business/ui.tsx": {
-   "counts": {
-    "font": 1,
-    "spacing": 6,
-    "size": 3,
-    "inset": 1
-   },
-   "fp": "01eca8454f 05f8974bb3 4ae59cc821 7ac19c15b7 85954c4cec a49ef205c7 d430096bc8 e307074246 ebbfe1d477 fa6b0f900b fe9692f374"
-  },
   "src/features/diary/FormatBar.tsx": {
    "counts": {
     "spacing": 1
@@ -342,53 +191,6 @@
    },
    "fp": "18c292bb19 18c292bb19 3b016f2326 8cb46aeeb6"
   },
-  "src/features/diary/RichText.tsx": {
-   "counts": {
-    "spacing": 3
-   },
-   "fp": "9a9e6439d7 b4a992245f c4bc2f76d7"
-  },
-  "src/features/library/LibraryBanner.tsx": {
-   "counts": {
-    "font": 6,
-    "spacing": 2
-   },
-   "fp": "0629253ffd 0bad58b08f 0e3e9e46e5 3666f4e6c5 a57f2a6f56 b4c6bd4530 e65c06bc14 eb2fa0afe4"
-  },
-  "src/features/library/LibraryTabs.tsx": {
-   "counts": {
-    "font": 5,
-    "spacing": 6
-   },
-   "fp": "187b0da5e3 32b72f2495 872473b70b 87533396c0 9f56be2ade a474b3ceb0 ad9732afff addd26042e b5f3704883 cd9c4a766c dbf64b2800"
-  },
-  "src/features/library/SavedPostCard.tsx": {
-   "counts": {
-    "spacing": 1
-   },
-   "fp": "d9b75a1c8d"
-  },
-  "src/features/library/SearchBar.tsx": {
-   "counts": {
-    "spacing": 2,
-    "size": 1
-   },
-   "fp": "12a5f5ee01 ea71293b61 ee6e722664"
-  },
-  "src/features/library/SearchResults.tsx": {
-   "counts": {
-    "font": 1,
-    "spacing": 2,
-    "size": 2
-   },
-   "fp": "28f20c369f 46f5ecde73 4e004a2e47 4e597e9ef3 dee02ffd6e"
-  },
-  "src/features/library/bible/ChapterGrid.tsx": {
-   "counts": {
-    "font": 2
-   },
-   "fp": "4b1148648c cf9c2ba322"
-  },
   "src/features/library/bible/ChapterNav.tsx": {
    "counts": {
     "font": 2,
@@ -410,13 +212,6 @@
    },
    "fp": "2e7f9c8638 993b861ac1 bbc75c527a"
   },
-  "src/features/library/bible/TestamentBar.tsx": {
-   "counts": {
-    "font": 2,
-    "spacing": 2
-   },
-   "fp": "2c0557209e 395e59cfb0 7b3a3b55da ada8a4f6c5"
-  },
   "src/features/library/bible/VerseActions.tsx": {
    "counts": {
     "font": 2,
@@ -425,56 +220,11 @@
    },
    "fp": "7711eb311f 8988ede6bf 9e5d6cd3aa c88857b70f f6788a4e2c"
   },
-  "src/features/library/bible/VerseRows.tsx": {
-   "counts": {
-    "font": 2,
-    "spacing": 5
-   },
-   "fp": "22ed0fccfb 4839555252 4839555252 d398d77781 e6d3bc23a3 f5ba9b1297 fe776bd3d7"
-  },
   "src/features/library/books/BookCover.tsx": {
    "counts": {
     "spacing": 1
    },
    "fp": "f766d46153"
-  },
-  "src/features/library/books/BookPage.tsx": {
-   "counts": {
-    "font": 19,
-    "spacing": 4,
-    "inset": 2
-   },
-   "fp": "100eb150ba 283950baf3 65f044259a 69053981d6 70b3c6df5f 71392aac5f 83d391eaa3 86015b769b 88d5440378 8a7dc3da55 8b25ead741 931f1265fa 9c376465fb a57f9011ef b15678cf45 b9bfd36c83 bc288a8949 bdc3d2f7e8 c7534bd119 cbbd9287da d213856dd3 dd69d3a12e e72f6ab5ae f0ef211ca0 fca9def3b7"
-  },
-  "src/features/library/books/BookRows.tsx": {
-   "counts": {
-    "font": 6,
-    "spacing": 6,
-    "inset": 1
-   },
-   "fp": "1af1232141 2d9c542da6 41ef931088 527f5df889 593dd34ebb 62a72d0613 6d5e17f37c 854a317b6f b5b189479c bf422dc08d cb17a4e99f d3f6ee2939 ebf6d19514"
-  },
-  "src/features/library/books/BookUi.tsx": {
-   "counts": {
-    "font": 1,
-    "spacing": 1
-   },
-   "fp": "0e20af635d 768907b93f"
-  },
-  "src/features/library/books/BooksGrid.tsx": {
-   "counts": {
-    "font": 2,
-    "spacing": 2
-   },
-   "fp": "13f682b49e 69fcab2e89 bdca41ce76 f916452612"
-  },
-  "src/features/library/books/ChapterFooter.tsx": {
-   "counts": {
-    "font": 4,
-    "spacing": 1,
-    "size": 2
-   },
-   "fp": "0360fd9302 08e67903d6 2546ed8818 7fe66cd09a 99faabe0b2 f1149a2b34 f1bff51694"
   },
   "src/features/library/books/PassageActions.tsx": {
    "counts": {
@@ -483,14 +233,6 @@
     "size": 1
    },
    "fp": "7711eb311f 8988ede6bf 958622278f dc1ce6e996 f6788a4e2c"
-  },
-  "src/features/library/books/PassageRows.tsx": {
-   "counts": {
-    "font": 3,
-    "spacing": 3,
-    "size": 1
-   },
-   "fp": "005da3ef02 552439ea62 5f41046ef7 752b829e0b 76e953d3a5 77da2e2912 96669e7dd1"
   },
   "src/features/library/books/Reader.tsx": {
    "counts": {
@@ -517,14 +259,6 @@
    },
    "fp": "fcc7ec9c79"
   },
-  "src/features/library/continueBar/ContinueBar.tsx": {
-   "counts": {
-    "font": 6,
-    "spacing": 1,
-    "size": 1
-   },
-   "fp": "04ea933ae6 0f6abcbc2b 4d048aec36 54f595ef5b 7b1035c120 7bb9488159 9977853676 dc1ab241e4"
-  },
   "src/features/library/daily/CalendarSheet.tsx": {
    "counts": {
     "spacing": 1,
@@ -532,25 +266,6 @@
     "inset": 1
    },
    "fp": "005da3ef02 252677b048 e0ae601583"
-  },
-  "src/features/library/daily/DailyBookmarks.tsx": {
-   "counts": {
-    "spacing": 3
-   },
-   "fp": "602c06edfd 96cd32de76 f04dd22a94"
-  },
-  "src/features/library/daily/DayReading.tsx": {
-   "counts": {
-    "font": 4,
-    "spacing": 4
-   },
-   "fp": "09ef1ecc13 12d1764529 314f901e02 3f17290867 5240f3b59b 71392aac5f 8764c0f1c7 eb5f4cf3d6"
-  },
-  "src/features/library/daily/LiturgicalCard.tsx": {
-   "counts": {
-    "font": 2
-   },
-   "fp": "12d1764529 314f901e02"
   },
   "src/features/library/daily/MonthCalendar.tsx": {
    "counts": {
@@ -577,12 +292,10 @@
   "src/features/map/WalkUi.tsx": {
    "counts": {
     "color": 25,
-    "font": 4,
-    "spacing": 9,
-    "size": 3,
-    "inset": 2
+    "spacing": 3,
+    "size": 1
    },
-   "fp": "073df440d1 0816da8d84 0d21be0a04 0d21be0a04 1c1e1ccfb3 1c1e1ccfb3 2310f5a1a2 24e151c8d8 2bb46f04cf 2d9337e977 33d152dc61 35c7f12b9a 37160b2328 4acc91bd77 51b0852657 58476dedaa 61e62212b4 652503c6b7 66ae7c2dd8 6b4aff6876 73a5447b30 73a5447b30 78ae4fc2a1 7a7ba56fbd 7c4f11cb94 8474341368 86bd5653ef 87813d6f93 a26147e554 a6aa120e97 a7d4747056 ac65ee026a b509c4946d b56bced93a c66946bc15 cd77e2a013 cf1c3c8d78 d1b328c63e d427658575 e33d461bce f651f2866d f7b0521651 f7b0521651"
+   "fp": "073df440d1 07fb999867 0d21be0a04 0d21be0a04 1e754a1d35 3fef2811f6 3fef2811f6 43114e375a 4934e9d362 4d47cfc5b8 53a4d6eacd 58476dedaa 726b2e40ba 73a5447b30 73a5447b30 7f2a56b1ae 87813d6f93 889e742bec 9144ec40f3 950807e54b a6aa120e97 aad6f80108 b10c621183 bfb7d69272 c5a07fd846 daaf7d9956 db6556eeb4 f7b0521651 f7b0521651"
   },
   "src/features/map/style.ts": {
    "counts": {
@@ -610,105 +323,6 @@
     "spacing": 1
    },
    "fp": "c76df0d496"
-  },
-  "src/features/notes/NoteMedia.tsx": {
-   "counts": {
-    "spacing": 2
-   },
-   "fp": "1d1365fd99 1d6f78bfc6"
-  },
-  "src/features/notes/NoteRow.tsx": {
-   "counts": {
-    "font": 2,
-    "spacing": 6,
-    "size": 6,
-    "inset": 1
-   },
-   "fp": "005da3ef02 005da3ef02 005da3ef02 005da3ef02 4fa3521e8f 5610b001dd 6e11d25c18 75e99bedd2 855db71d9a 8f0f3709e2 9d7ae69782 a0ac1cf9a9 b850e6afd7 dbc3c98a52 f8f164e315"
-  },
-  "src/features/notes/NotesHeader.tsx": {
-   "counts": {
-    "spacing": 1,
-    "size": 2
-   },
-   "fp": "46f5ecde73 8cfc93aead eb240a1942"
-  },
-  "src/features/social/components/chat.tsx": {
-   "counts": {
-    "color": 5,
-    "font": 15,
-    "spacing": 28,
-    "size": 15,
-    "inset": 3
-   },
-   "fp": "010a353333 083d2ae4ab 08fdc889bf 08fdc889bf 126a331018 150a63dacb 18cdc50ed2 19a4dfe882 1cbca0e73e 1d6ffc8688 1d6ffc8688 1f5f875144 200afbd430 2449664983 2634c20d7f 26757b6e0d 39049f17af 39cdac4570 3a492bd40a 3a6b75e55a 3b561c786a 414811aedd 441a02838a 469e0748d5 47274c9719 494ac0bbce 4ad395ef0a 4b2c59d74d 512df18ef2 55a91c6a8d 58067f41d6 58067f41d6 64fd6801b4 7623eaba77 76b3362232 77d100af9a 79f4eb0afc 7a9a3b6f88 7c5c9ab8c2 84d298629b 8541efb72e 907ff36f04 9166a3962c 91cdd6b023 948f61bd11 96bc0e4a14 9934c3aa27 a20517fe4b a4290b5f3c a90b63764e bc1488294f c28f858b16 c4d3a50536 c599b6d58b c59bb3d5d8 c91a09c12e ceda7884dd d09ce4d04c d8e7b346e4 dcb8b153c1 e5c81f27ca ec1aa575f1 f3dc91bead f5c87591ee fc50e98f55 ff21ac5d56"
-  },
-  "src/features/social/components/dialogs.tsx": {
-   "counts": {
-    "font": 2,
-    "spacing": 8
-   },
-   "fp": "09ef1ecc13 09ef1ecc13 09ef1ecc13 2d963375cb 310d475d65 38889cd900 47b47ae78f 5751aea9bd c145a4843b c3c7b52809"
-  },
-  "src/features/social/components/people.tsx": {
-   "counts": {
-    "spacing": 1
-   },
-   "fp": "3d712c5b68"
-  },
-  "src/features/social/components/primitives.tsx": {
-   "counts": {
-    "font": 2,
-    "spacing": 7,
-    "size": 3,
-    "inset": 1
-   },
-   "fp": "164917090e 26428475a4 2928fbb771 3c2647555f 3e9f3b5675 46a4194e97 52d9b264cb 8c67dba449 8cafdbb921 99b9fb48e7 9b7c739b49 eddd9e4259 f81a97922b"
-  },
-  "src/features/social/components/rows.tsx": {
-   "counts": {
-    "font": 13,
-    "spacing": 8,
-    "size": 2
-   },
-   "fp": "025be8ef88 0a856c0c43 0fc37c2070 1118c1a821 179ab52fb5 1caa993723 29f11358c5 314bf71ef3 348d0c9df0 4adbbcd130 5e33f1e7f8 623c64f349 8a0bb6f5b4 8b81fed14c 96a7ff844a a01a8566fd a1f07631c7 a37fa4d380 a64068a863 b04805f510 b3b8cbd4b7 b49bd2e534 b67854327b"
-  },
-  "src/features/social/components/states.tsx": {
-   "counts": {
-    "font": 3,
-    "spacing": 11,
-    "size": 2
-   },
-   "fp": "131caf31fc 182f74436e 28639b10e7 345e282793 38e1d1776f 4246856031 4c8e0a87b4 4f5f0da46d 67e802dfd8 67f2017db1 841c0dde1e 8de51e40b4 9cbb49f40c d3bd3bd8bd e87aa90191 f752838edc"
-  },
-  "src/features/social/help/HelpBellButton.tsx": {
-   "counts": {
-    "color": 3
-   },
-   "fp": "25f4699d56 5f66330fdd ccdd285d98"
-  },
-  "src/features/social/help/HelpSheet.tsx": {
-   "counts": {
-    "color": 1,
-    "font": 20,
-    "spacing": 30,
-    "size": 2
-   },
-   "fp": "0128d44efe 0128d44efe 017077adb5 0400d2c24e 0907fa8d46 09ef1ecc13 13b23c70b5 179ab52fb5 1c32653aa0 1f589097ca 33d2eaae53 3489203c8d 3615629500 3fad24cbf9 45e289ae16 46e44f12ec 4932f85550 54dce8e868 55f8878d84 57031451e8 575440b019 6223b62f48 725d0d684b 77ebc8dde4 79d44c2ff3 7bf2e0419a 809989104e 862f2418d4 8cb46aeeb6 8cb46aeeb6 8cee075615 932deb8ade 94343cf507 951901ccc2 9560e02116 97108ea7bc 9f6ac2e5c5 a399a787b0 a6759fa1ff a8f4dd8842 ab0ae706b4 afb7d5d2b9 baee63457c be2b0bdad5 ca49aab294 db505b58ac dc8423744d e35df4368a e431fb3f4d e60d0dce89 ed6a16813a f1ae698af0 f984a2004b"
-  },
-  "src/features/social/help/bubble.tsx": {
-   "counts": {
-    "font": 4,
-    "spacing": 1,
-    "size": 1
-   },
-   "fp": "5377e68beb 81d9d46cb6 8cb46aeeb6 a4e2a9b4fd d3f301495d f2c7963957"
-  },
-  "src/features/social/logic.ts": {
-   "counts": {
-    "color": 14
-   },
-   "fp": "1163dbbad2 1f22867a43 27a13eb2b7 29ad791712 31c480856b 42b426dd00 509358ade9 7119aa71c0 80b2875081 ce48a31d2c d4a92ecfbf d6b718e091 e16240641f eebddf8cbf"
   }
  }
 }

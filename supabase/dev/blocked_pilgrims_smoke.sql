@@ -68,9 +68,9 @@ grant execute on all functions in schema blocked_test to anon, authenticated;
 
 -- ---------------------------------------------------------------- people
 insert into auth.users (id, email, raw_user_meta_data)
-select id, 'zz1d.' || name || '@example.com', jsonb_build_object('full_name', initcap(name) || ' Zzblocked')
+select id, 'zz1d.' || name || '@example.com', jsonb_build_object('full_name', initcap(name) || ' Zzblocked', 'username', 'zz1d.' || name)
 from blocked_test.users;
-update public.profiles set avatar_url = 'https://example.com/zz1d-bob.png' where id = blocked_test.u('bob');
+update public.profiles set avatar_url = 'https://lh3.googleusercontent.com/a/zz1d-bob' where id = blocked_test.u('bob');
 do $$ begin
   assert (select count(*) from public.profiles where id::text like '1d%') = 5, 'test pilgrims created';
 end $$;
@@ -109,7 +109,7 @@ begin
   assert (select array_agg(user_id) from public.list_blocked_pilgrims()) = array[blocked_test.u('carol'), blocked_test.u('bob')], 'newest first';
   assert (select username from public.list_blocked_pilgrims() where user_id = blocked_test.u('bob')) = 'zz1d.bob', 'username';
   assert (select display_name from public.list_blocked_pilgrims() where user_id = blocked_test.u('bob')) = 'Bob Zzblocked', 'display name';
-  assert (select avatar_url from public.list_blocked_pilgrims() where user_id = blocked_test.u('bob')) = 'https://example.com/zz1d-bob.png', 'avatar';
+  assert (select avatar_url from public.list_blocked_pilgrims() where user_id = blocked_test.u('bob')) = 'https://lh3.googleusercontent.com/a/zz1d-bob', 'avatar';
   assert (select avatar_url is null from public.list_blocked_pilgrims() where user_id = blocked_test.u('carol')), 'no avatar stays null';
   assert (select blocked_at < now() - interval '1 day' from public.list_blocked_pilgrims() where user_id = blocked_test.u('bob')), 'blocked_at is when the block was made';
   assert (select blocked_at > now() - interval '1 minute' from public.list_blocked_pilgrims() where user_id = blocked_test.u('carol')), 'and it is the server clock';

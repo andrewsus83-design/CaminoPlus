@@ -1,7 +1,7 @@
 import { Pressable, View } from 'react-native';
 import { AppText } from '@/components/AppText';
 import { Card, SectionLabel } from '@/components/ui';
-import { role } from '@/theme';
+import { role, space } from '@/theme';
 import { BookmarkToggle } from './BookmarkToggle';
 import { BibleBookGrid } from './bible/BookGrid';
 import { TestamentBar } from './bible/TestamentBar';
@@ -25,9 +25,9 @@ import type { LibraryMarks } from './useLibraryBookmarks';
 // what a search result and the Bookmarks screen draw (LibraryGroups), where a tap opens the book (books/BookRows.tsx for the Library's). The banners are in
 // LibraryBanner.tsx (the Bible tab's) and books/BooksBanner.tsx (the Books tab's).
 
-/** The padding of a row: 16 at the start, and 6 at the end when the bookmark button (44 wide) is there. */
+/** The padding of a row: 16 at the start, and 8 at the end when the bookmark button (48 wide) is there (the card around the rows adds 4, so the words are 20 from its edge). */
 const rowStyle = (first: boolean, marks?: LibraryMarks) => ({
-  paddingLeft: 16, paddingRight: marks ? 6 : 16, paddingVertical: 10,
+  paddingLeft: space[4], paddingRight: marks ? space[2] : space[4],
   borderTopWidth: first ? 0 : 1, borderTopColor: role.border,
 });
 
@@ -41,7 +41,7 @@ const Mark = ({ marks, tab, id, title, color }: { marks?: LibraryMarks; tab: Row
 const BibleBookLine = ({ book, withPart }: { book: BibleBook; withPart: boolean }) => (
   <AppText variant="caption" muted>
     {withPart ? `${partWords(book)} · ` : ''}
-    <AppText variant="mono" muted style={{ fontSize: 14, lineHeight: 21 }}>{chaptersLabel(book.chapters)}</AppText>
+    <AppText variant="mono" muted>{chaptersLabel(book.chapters)}</AppText>
     {book.detail ? ` · ${book.detail}` : ''}
   </AppText>
 );
@@ -53,11 +53,11 @@ const BibleBookLine = ({ book, withPart }: { book: BibleBook; withPart: boolean 
  */
 export function BibleBookRows({ items, marks, withPart = false, onOpen }: { items: readonly BibleBook[]; marks?: LibraryMarks; withPart?: boolean; onOpen: (code: string) => void }) {
   return (
-    <Card style={{ padding: 4 }}>
+    <Card style={{ padding: space[1] }}>
       {items.map((b, i) => (
-        <View key={b.id} style={{ ...rowStyle(i === 0, marks), minHeight: 64, flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 4 }}>
-          <Pressable accessibilityRole="button" accessibilityLabel={`${b.name}, ${bookLine(b, withPart).replace(/\u00a0/g, ' ')}`} accessibilityHint="Opens the chapters" onPress={() => onOpen(b.code)} style={{ flex: 1, minWidth: 0, gap: 2, paddingVertical: 6 }}>
-            <AppText variant="h4" style={{ fontSize: 20, lineHeight: 26 }}>{b.name}</AppText>
+        <View key={b.id} style={{ ...rowStyle(i === 0, marks), minHeight: 64, flexDirection: 'row', alignItems: 'center', gap: space[2], paddingVertical: space[1] }}>
+          <Pressable accessibilityRole="button" accessibilityLabel={`${b.name}, ${bookLine(b, withPart).replace(/\u00a0/g, ' ')}`} accessibilityHint="Opens the chapters" onPress={() => onOpen(b.code)} style={{ flex: 1, minWidth: 0, gap: space[1], paddingVertical: space[2] }}>
+            <AppText variant="h5">{b.name}</AppText>
             <BibleBookLine book={b} withPart={withPart} />
           </Pressable>
           <Mark marks={marks} tab="Bible" id={b.id} title={b.name} />
@@ -76,7 +76,7 @@ export function LibraryGroups({ hits, marks, onOpenBook, onOpenVerse, versesCapp
   return (
     <>
       {hitGroups(hits).map((group) => (
-        <View key={group} style={{ gap: 16 }}>
+        <View key={group} style={{ gap: space[4] }}>
           <SectionLabel>{group === 'Verses' ? versesLabel(hits.Verses.length, versesCapped) : `${group} · ${hits[group].length}`}</SectionLabel>
           {group === 'Bible' && <BibleBookRows items={hits.Bible} marks={marks} withPart onOpen={onOpenBook} />}
           {group === 'Books' && <BookRows items={hits.Books} marks={marks} />}
@@ -99,11 +99,11 @@ export function BibleTab({ testament, onTestament, onOpenBook }: { testament: Te
   return (
     <>
       <TestamentBar value={testament} onChange={onTestament} />
-      <View style={{ gap: 16 }}>
-        <View style={{ gap: 4 }}>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'baseline', justifyContent: 'space-between', columnGap: 12, rowGap: 2 }}>
+      <View style={{ gap: space[4] }}>
+        <View style={{ gap: space[1] }}>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'baseline', justifyContent: 'space-between', columnGap: space[3], rowGap: space[1] }}>
             <AppText variant="h4" accessibilityRole="header">Books of the Bible</AppText>
-            <AppText variant="mono" muted accessibilityLiveRegion="polite" accessibilityLabel={`${TESTAMENT_LABEL[testament]}, ${countLine(testament)}`} style={{ fontSize: 14, lineHeight: 20 }}>{countLine(testament)}</AppText>
+            <AppText variant="mono" muted accessibilityLiveRegion="polite" accessibilityLabel={`${TESTAMENT_LABEL[testament]}, ${countLine(testament)}`}>{countLine(testament)}</AppText>
           </View>
           <AppText variant="caption" muted>{BIBLE_SOURCE_LINE.replace('public domain', 'public\u00a0domain')}</AppText>
         </View>
@@ -121,7 +121,7 @@ export function BibleTab({ testament, onTestament, onOpenBook }: { testament: Te
  */
 export function BooksTab({ marks }: { marks?: LibraryMarks }) {
   return (
-    <View style={{ gap: 16 }}>
+    <View style={{ gap: space[4] }}>
       <BooksGrid items={BOOK_CATALOG} marks={marks} />
     </View>
   );

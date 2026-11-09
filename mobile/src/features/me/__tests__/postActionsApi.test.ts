@@ -12,7 +12,7 @@ import path from 'node:path';
 import ts from 'typescript';
 
 type Call = { op: 'select' | 'insert' | 'upsert' | 'delete' | 'rpc'; table?: string; rpc?: string; select?: string; row?: unknown; opts?: unknown; args?: unknown; filters: unknown[][]; order?: unknown[]; limit?: number };
-type Answer = { data?: unknown; error?: { message: string; code?: string } | null };
+type Answer = { data?: unknown; error?: { message: string; code?: string; hint?: string } | null };
 type Script = (call: Call) => Answer | Promise<Answer>;
 type Api = {
   listMyReactions(userId: string, ids: string[]): Promise<{ liked: Set<string> | null; saved: Set<string> | null }>;
@@ -79,6 +79,9 @@ const load = (script: Script, log: Call[] = [], net: { assertOnline(): Promise<v
     if (id === './net') return net;
     if (id === './uuid') return { uuid: () => 'id' };
     if (id in modules) return modules[id];
+    // the one storage module (uploads and links of photos); post actions do not touch it
+    if (id === './mediaStorage') return { MEDIA_BUCKET: { userMedia: 'user-media', avatars: 'avatars' }, upload: nothing, signedUrls: nothing, deleteMedia: nothing };
+    if (id === './postMediaUpload') return { uploadPostMediaWith: nothing };
     throw new Error(`api.ts imports ${id}: add it to this test`);
   }) as unknown as Api;
 
@@ -258,6 +261,30 @@ const test = async (name: string, fn: () => Promise<void>) => { await fn(); n++;
     // "already there" (a retry of the same comment) is a success; anything else is an error
     await load(() => ({ data: null, error: { message: 'duplicate key value violates unique constraint "post_comments_pkey"', code: '23505' } })).addPostComment({ id: 'c9', userId: ME, postId: P1, body: 'Ultreia!' });
     await assert.rejects(() => load(() => ({ data: null, error: { message: 'new row violates row-level security policy', code: '42501' } })).addPostComment({ id: 'c9', userId: ME, postId: P1, body: 'x' }), /row-level security/);
+  });
+
+  await test('a rate limit of the database reaches the rail with its code, so the person reads when to try again (comment, like, bookmark)', async () => {
+    // migration 20261120010000: SQLSTATE 54000, a sentence for people, a hint per limit
+    const optimistic = run(compile('src/lib/optimistic.ts'), (id) => {
+      if (id === './engagement') return modules['./engagement'];
+      throw new Error(`optimistic.ts imports ${id}: add it to this test`);
+    }) as { failureMessage(kind: string, e: unknown): string };
+    const limited = (message: string, hint: string): Script => () => ({ data: null, error: { message, code: '54000', hint } });
+    const comment = 'You have written many comments in the last hour. Please wait a little and try again.';
+    let caught: unknown = null;
+    await load(limited(comment, 'rate_limited_comments')).addPostComment({ id: 'c9', userId: ME, postId: P1, body: 'x' }).catch((e) => { caught = e; });
+    assert.ok(caught instanceof Error, 'the comment is refused');
+    assert.equal((caught as { code?: string }).code, '54000', 'the code is kept');
+    assert.equal((caught as { hint?: string }).hint, 'rate_limited_comments', 'the hint is kept');
+    assert.equal(optimistic.failureMessage('comments', caught), comment, 'the sheet shows the sentence of the database');
+    const like = 'You have liked many posts in the last hour. Please wait a little and try again.';
+    caught = null;
+    await load(limited(like, 'rate_limited_likes')).likePost(ME, P1).catch((e) => { caught = e; });
+    assert.equal(optimistic.failureMessage('love', caught), like);
+    const save = 'You have saved many posts in the last hour. Please wait a little and try again.';
+    caught = null;
+    await load(limited(save, 'rate_limited_saves')).savePost(ME, P1).catch((e) => { caught = e; });
+    assert.equal(optimistic.failureMessage('save', caught), save);
   });
 
   console.log(`\n${n} passed`);

@@ -10,7 +10,6 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { DEFAULT_LIMIT, MAX_QUERY_WORDS, foldText, makeSearch, matchVerse, oneLine, queryWords } from '../bible/searchCore';
 import type { BookIndexEntry, BookText, VerseHit } from '../bible/textTypes';
-import { SAMPLE_READING } from '../daily/sample';
 import { run } from './runTs';
 
 let n = 0;
@@ -193,7 +192,7 @@ check('the places to highlight are inside the text, in order, never touching or 
     }
   }
   const h = searchVerses('lift eyes hills').find((x) => ref(x) === 'PSA 121:1')!;
-  assert.equal(h.text, SAMPLE_READING.verses[0].text);
+  assert.equal(h.text, 'I will lift up my eyes to the hills. Where does my help come from?');
   assert.deepEqual(h.marks.map(([a, b]) => h.text.slice(a, b)), ['lift', 'eyes', 'hills']);
   assert.deepEqual(h.marks, [[h.text.indexOf('lift'), h.text.indexOf('lift') + 4], [h.text.indexOf('eyes'), h.text.indexOf('eyes') + 4], [h.text.indexOf('hills'), h.text.indexOf('hills') + 5]]);
   const typed = searchVerses('lif', 1000).find((x) => ref(x) === 'PSA 121:1')!;

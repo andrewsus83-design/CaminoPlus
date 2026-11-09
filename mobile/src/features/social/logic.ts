@@ -121,8 +121,10 @@ export function notificationTime(t: TimeInput, now: TimeInput = Date.now()): str
 
 /* ------------------------------------------------------------------ names, colours, text */
 
+// design-lint-ignore: color the soft tints of the initials circles: a person keeps the same colour (it comes from the id), so they are a fixed list of identity colours, not colours of the interface
 export const AVATAR_TINTS = ['#E9C987', '#9DB4CC', '#BFD0C4', '#D7C6E0', '#F2D8B6', '#C9A48A'] as const;
 // Sender names in group chats. All readable (>= 4.5:1) on the white bubble and on parchment.
+// design-lint-ignore: color the colours that tell the senders of a group chat apart, a fixed list that keeps its contrast on both bubbles: identity colours, not colours of the interface
 export const NAME_COLORS = ['#A63D2F', '#1E4A7A', '#2F6B4F', '#7A5A0C', '#6B3F7A', '#0F6670', '#8A4B1F', '#4F5F1C'] as const;
 
 export function hashString(s: string): number {
@@ -359,6 +361,18 @@ export function classifySendError(e: { status?: number; code?: string; network?:
   return 'rejected';
 }
 
+/**
+ * What to do with the uploaded photo of an outbox item that the person deletes. Only a QUEUED item is checked (its last
+ * try failed for lack of an answer, so the message may or may not be there): when the check finds no message, the photo
+ * is deleted. A FAILED item was refused, but an earlier try may already have been delivered (a refusal such as 42501
+ * comes when the person was blocked or left the group, and then they cannot even see their own message), so its photo
+ * is kept; so is the photo of an item being sent right now. Only a later server job (not built yet) can remove kept photos.
+ */
+export function discardMediaPlan(item: { status: OutboxStatus; media_path: string | null }): 'none' | 'check' | 'keep' {
+  if (!item.media_path) return 'none';
+  return item.status === 'queued' ? 'check' : 'keep';
+}
+
 export type MessageAction = 'reply' | 'copy' | 'unsend' | 'report' | 'retry' | 'delete';
 /** What the long-press menu offers for a message. */
 export function messageActions(m: TimelineMessage, mine: boolean): MessageAction[] {
@@ -461,7 +475,7 @@ export function requestState(n: NotificationItem, incomingIds: ReadonlySet<strin
 
 /* ------------------------------------------------------------------ friends, search, groups */
 
-export const MIN_SEARCH_CHARS = 2;
+export const MIN_SEARCH_CHARS = 3; // the server answers nothing below 3 (search_pilgrims, migration 20261120010000)
 export const normalizeQuery = (q: string) => q.trim().replace(/\s+/g, ' ');
 export const isSearchable = (q: string) => normalizeQuery(q).length >= MIN_SEARCH_CHARS;
 

@@ -96,7 +96,18 @@ const FAILED: Record<RailKind, string> = {
   share: 'Could not open the share sheet. Try again.',
 };
 
-/** One short sentence for the person after a rail action did not work: offline says so, anything else says what was not saved. */
+/** A rate limit of the database (SQLSTATE 54000, e.g. "You have liked many posts in the last hour. Please wait a little and try again.").
+ *  Its message is a sentence written for people, so it is shown as it is. */
+export function rateLimitMessage(error: unknown): string | null {
+  if (!error || typeof error !== 'object') return null;
+  const e = error as { code?: unknown; message?: unknown };
+  const msg = typeof e.message === 'string' ? e.message.trim() : '';
+  return e.code === '54000' && /^[A-Z][^\n]{6,220}[.!]$/.test(msg) ? msg : null;
+}
+
+/** One short sentence for the person after a rail action did not work: offline says so, a rate limit says when to try again,
+ *  anything else says what was not saved. */
 export function failureMessage(kind: RailKind, error: unknown): string {
-  return looksOffline(error) ? `You are offline. ${NEEDS[kind]} ${kind === 'share' ? 'needs' : 'need'} a connection.` : FAILED[kind];
+  if (looksOffline(error)) return `You are offline. ${NEEDS[kind]} ${kind === 'share' ? 'needs' : 'need'} a connection.`;
+  return rateLimitMessage(error) ?? FAILED[kind];
 }

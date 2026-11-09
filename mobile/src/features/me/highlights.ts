@@ -14,7 +14,7 @@ export const MAX_HIGHLIGHTS = 40;
 export type DayLike = { id: string; to_name?: string | null; stage?: { name: string } | null; status?: string | null };
 /** What is needed of a post (the app's Post has all of it). */
 export type PostLike = { id: string; place_name: string | null; published_at: string | null };
-type MediaLike = { type: 'image' | 'video'; url: string };
+type MediaLike = { type: 'image' | 'video'; url: string; thumbUrl?: string | null };
 
 export type Highlight<P extends PostLike = PostLike> = {
   /** The id of the day: unique in the row and the same after every reload. It is the React key and what "seen" remembers. */
@@ -168,7 +168,7 @@ export function rowStartOffset(o: { nextAt: number; width: number; pinned: boole
 export function coverUrl(posts: readonly PostLike[], media: Readonly<Record<string, readonly MediaLike[] | undefined>>): string | null {
   for (const p of posts) {
     const photo = media[p.id]?.find((m) => m.type === 'image' && !!m.url);
-    if (photo) return photo.url;
+    if (photo) return photo.thumbUrl || photo.url; // the circle is small: the thumbnail is enough
   }
   return null;
 }

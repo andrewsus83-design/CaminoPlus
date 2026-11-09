@@ -75,7 +75,8 @@ function PlayBadge() {
 /** Fills its parent: photo, video or colour card with the text of the post. In the full-screen viewer the text of a colour card keeps clear of the action rail on the right, like the caption does. */
 function PostVisual({ post, media, index, active, small }: { post: Post; media?: Visual; index: number; active: boolean; small?: boolean }) {
   const col = CARD_COLORS[index % CARD_COLORS.length];
-  if (media?.type === 'image') return <Image source={media.source ?? { uri: media.url }} resizeMode="cover" style={{ width: '100%', height: '100%' }} />;
+  // A grid tile shows the small thumbnail when there is one; the viewer shows the photo itself (src/lib/media).
+  if (media?.type === 'image') return <Image source={media.source ?? { uri: (small && media.thumbUrl) || media.url }} resizeMode="cover" style={{ width: '100%', height: '100%' }} />;
   if (media?.type === 'video') {
     // A clip that comes with a poster (the sample journey) shows the poster in the grid, and only the page that is on
     // screen starts a player, so swiping through many clips never keeps many players alive at once.

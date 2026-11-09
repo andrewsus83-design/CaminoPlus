@@ -14,11 +14,12 @@ import { EmptyState, ErrorState, Notice, OFFLINE_TEXT } from '@/features/social/
 import { MessageAction, buildTimeline, conversationName, friendlyError, messageActions, pilgrimsLabel, REPORT_PROMPT, REPORT_REASONS, REPORT_THANKS, snippet, storageGate, toInverted, ts } from '@/features/social/logic';
 import { pilgrimHref } from '@/features/pilgrim/logic';
 import { goBack } from '@/features/social/nav';
-import { MAX_PHOTO_BYTES, PickerUnavailable, pickPhoto } from '@/features/social/pick';
-import type { ChatMessage, MessageEntry, ReportReason, TimelineEntry } from '@/features/social/types';
+import { PickerUnavailable, pickPhoto } from '@/features/social/pick';
+import { MediaRejected, quotaCheck, tierFor } from '@/lib/media';
+import type { ChatMessage, MessageEntry, ReportReason, StorageInfo, TimelineEntry } from '@/features/social/types';
 import { copyText } from '@/lib/clipboard';
 import { config } from '@/lib/config';
-import { c, radius, role, shadowStyle, layout } from '@/theme';
+import { c, layout, radius, role, shadowStyle, space } from '@/theme';
 
 const ACTION: Record<MessageAction, { label: string; icon: IconName; danger?: boolean }> = {
   reply: { label: 'Reply', icon: 'reply' },
@@ -45,7 +46,7 @@ export default function ChatScreen() {
   const [unblocking, setUnblocking] = useState(false);
   const nearBottom = useRef(true);
   const lastSeen = useRef<number | null>(null);
-  const storage = useRef<{ at: number; gate: ReturnType<typeof storageGate> } | null>(null);
+  const storage = useRef<{ at: number; gate: ReturnType<typeof storageGate>; info: StorageInfo | null } | null>(null);
 
   const conv = chat.conversation;
   const group = conv?.kind === 'group';
@@ -109,11 +110,13 @@ export default function ChatScreen() {
 
   const addPhoto = useCallback(async () => {
     // Photos need cloud storage (Pilgrim Plus). Ask once a minute at most; offline we let the upload decide.
-    let gate = storage.current && Date.now() - storage.current.at < 60_000 ? storage.current.gate : null;
-    if (!gate) {
-      gate = storageGate(await socialApi.storage().catch(() => null));
-      storage.current = { at: Date.now(), gate };
+    let known = storage.current && Date.now() - storage.current.at < 60_000 ? storage.current : null;
+    if (!known) {
+      const info = await socialApi.storage().catch(() => null);
+      known = { at: Date.now(), gate: storageGate(info), info };
+      storage.current = known;
     }
+    const gate = known.gate;
     if (gate === 'plus_required') {
       const go = await notice({
         title: 'Photos in chat are part of Pilgrim Plus', icon: 'image',
@@ -128,14 +131,15 @@ export default function ChatScreen() {
       return;
     }
     try {
-      const photo = await pickPhoto();
+      const photo = await pickPhoto(tierFor(known.info), () => toast('Preparing your photo…'));
       if (!photo) return;
-      if ((photo.fileSize ?? 0) > MAX_PHOTO_BYTES) { toast('That photo is bigger than 15 MB. Pick a smaller one.'); return; }
+      const room = quotaCheck(photo.fileSize ?? 0, known.info);
+      if (!room.ok) { await notice({ title: 'Not enough cloud storage', icon: 'image', message: room.message }); return; }
       chat.sendImage(photo, replyTo?.id ?? null);
       setReplyTo(null);
       scrollToBottom();
     } catch (e) {
-      toast(e instanceof PickerUnavailable ? e.message : friendlyError(e, 'Could not add that photo.'));
+      toast(e instanceof PickerUnavailable || e instanceof MediaRejected ? e.message : friendlyError(e, 'Could not add that photo.'));
     }
   }, [chat, notice, replyTo, router, scrollToBottom, toast]);
 
@@ -152,7 +156,7 @@ export default function ChatScreen() {
       if (await confirm({ title: 'Delete this message?', message: 'It has not been sent yet. It will be removed from this phone.', confirmLabel: 'Delete', destructive: true, icon: 'trash' })) chat.discard(m.id);
     } else if (action === 'unsend') {
       if (await confirm({ title: 'Unsend this message?', message: 'It will disappear for everyone in this chat.', confirmLabel: 'Unsend', destructive: true, icon: 'trash' })) {
-        const err = await chat.unsend(m.id);
+        const err = await chat.unsend(m.id, m.media_path);
         if (err) toast(err);
       }
     } else if (action === 'report') {
@@ -213,24 +217,24 @@ export default function ChatScreen() {
           listRef.current?.scrollToOffset({ offset: info.averageItemLength * info.index, animated: true });
           setTimeout(() => listRef.current?.scrollToIndex({ index: info.index, viewPosition: 0.5, animated: true }), 350);
         }}
-        contentContainerStyle={{ paddingHorizontal: layout.screenMargin, paddingVertical: 10 }}
-        ListFooterComponent={chat.loadingMore ? <ActivityIndicator color={role.action} style={{ margin: 16 }} /> : !chat.hasMore ? <StartOfChat text={group ? 'This is the start of the group' : `This is the start of your chat with ${title}`} /> : undefined}
+        contentContainerStyle={{ paddingHorizontal: layout.screenMargin, paddingVertical: space[3] }}
+        ListFooterComponent={chat.loadingMore ? <ActivityIndicator color={role.action} style={{ margin: space[4] }} /> : !chat.hasMore ? <StartOfChat text={group ? 'This is the start of the group' : `This is the start of your chat with ${title}`} /> : undefined}
       />
     );
   }
 
   return (
     <KeyboardAvoidingView behavior="padding" style={{ flex: 1, backgroundColor: role.bg }}>
-      <View style={{ paddingTop: insets.top + layout.screenTop, paddingBottom: 10, paddingHorizontal: layout.screenMargin, flexDirection: 'row', alignItems: 'center', gap: 6, borderBottomWidth: 1, borderBottomColor: role.border, backgroundColor: role.bg }}>
+      <View style={{ paddingTop: insets.top + layout.screenTop, paddingBottom: space[3], paddingHorizontal: layout.screenMargin, flexDirection: 'row', alignItems: 'center', gap: space[2], borderBottomWidth: 1, borderBottomColor: role.border, backgroundColor: role.bg }}>
         <BackButton onPress={() => goBack(router)} />
         {/* The name of a direct chat opens the profile of the pilgrim (the info button next to it is the chat's own settings); the name of a group opens the group's info. */}
         <Pressable accessibilityRole="button" accessibilityLabel={peerId ? `${title}. Friend. Open profile` : `${title}. ${group ? pilgrimsLabel(conv?.member_count ?? 0) : 'Friend'}. Open chat info`} onPress={() => router.push(peerId ? pilgrimHref(peerId) : `/chat/info/${id}`)} style={{ flex: 1, minHeight: 52, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
           {conv
             ? <PilgrimAvatar name={title} uri={group ? conv.avatar_url : conv.peer_avatar_url} seed={conv.peer_id ?? String(id)} size={44} group={group} />
-            : <View style={{ width: 44, height: 44, borderRadius: radius.pill, backgroundColor: c.sand200 }} />}
+            : <View style={{ width: 44, height: 44, borderRadius: radius.pill, backgroundColor: role.sunken }} />}
           <View style={{ flex: 1 }}>
-            <AppText variant="label" numberOfLines={1} style={{ fontSize: 18, lineHeight: 23 }}>{title}</AppText>
-            {!!conv && <AppText variant="caption" muted numberOfLines={1} style={{ letterSpacing: 0, fontSize: 14, lineHeight: 18 }}>{group ? pilgrimsLabel(conv.member_count) : 'Friend'}</AppText>}
+            <AppText variant="label" numberOfLines={1}>{title}</AppText>
+            {!!conv && <AppText variant="caption" muted numberOfLines={1}>{group ? pilgrimsLabel(conv.member_count) : 'Friend'}</AppText>}
           </View>
         </Pressable>
         <IconButton name="info" label="Chat info" onPress={() => router.push(`/chat/info/${id}`)} />
@@ -243,7 +247,7 @@ export default function ChatScreen() {
             accessibilityRole="button" accessibilityLabel={missed ? `Go to the newest messages, ${missed} new` : 'Go to the newest messages'} onPress={scrollToBottom}
             style={{ position: 'absolute', right: layout.screenMargin, bottom: 12, width: 52, height: 52, borderRadius: radius.pill, backgroundColor: role.surface, borderWidth: 1, borderColor: role.border, alignItems: 'center', justifyContent: 'center', ...shadowStyle('md') }}
           >
-            <Icon name="arrow-down" color={c.blue} size={26} />
+            <Icon name="arrow-down" color={role.action} size={28} />
             {missed > 0 && <CountBadge count={missed} tone="blue" style={{ position: 'absolute', top: -9, left: -7 }} />}
           </Pressable>
         )}
@@ -263,18 +267,18 @@ export default function ChatScreen() {
 
 function StartOfChat({ text }: { text: string }) {
   return (
-    <View style={{ alignItems: 'center', paddingVertical: 20, paddingHorizontal: layout.screenMargin, gap: 8 }}>
-      <Icon name="shell" color={c.gold} size={26} />
-      <AppText variant="caption" muted style={{ textAlign: 'center', letterSpacing: 0 }}>{text}</AppText>
+    <View style={{ alignItems: 'center', paddingVertical: space[5], paddingHorizontal: layout.screenMargin, gap: space[2] }}>
+      <Icon name="shell" color={role.highlight} size={28} />
+      <AppText variant="caption" muted style={{ textAlign: 'center' }}>{text}</AppText>
     </View>
   );
 }
 
 function LoadingBubbles() {
   return (
-    <View accessibilityRole="progressbar" accessibilityLabel="Loading messages" style={{ flex: 1, justifyContent: 'flex-end', paddingHorizontal: layout.screenMargin, paddingVertical: 14, gap: 10 }}>
+    <View accessibilityRole="progressbar" accessibilityLabel="Loading messages" style={{ flex: 1, justifyContent: 'flex-end', paddingHorizontal: layout.screenMargin, paddingVertical: space[4], gap: space[3] }}>
       {[[false, 190], [false, 120], [true, 150], [false, 230], [true, 100], [true, 210]].map(([mine, w], i) => (
-        <View key={i} style={{ alignSelf: mine ? 'flex-end' : 'flex-start', width: w as number, height: 46, borderRadius: 20, backgroundColor: mine ? c.blue100 : c.sand200 }} />
+        <View key={i} style={{ alignSelf: mine ? 'flex-end' : 'flex-start', width: w as number, height: 46, borderRadius: radius.md, backgroundColor: mine ? c.blue100 : role.sunken }} />
       ))}
     </View>
   );

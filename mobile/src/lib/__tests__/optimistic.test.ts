@@ -1,7 +1,7 @@
 // Plain-node checks for the optimistic actions of the action rail: show first, ask second, and put the old state back
 // when the server says no (no React Native). Run: npm run test:lib
 import assert from 'node:assert/strict';
-import { failureMessage, flipReaction, looksOffline, optimistic, optimisticToggle } from '../optimistic';
+import { failureMessage, flipReaction, looksOffline, optimistic, optimisticToggle, rateLimitMessage } from '../optimistic';
 import type { Reaction } from '../optimistic';
 
 let n = 0;
@@ -215,6 +215,22 @@ const tick = () => new Promise<void>((r) => setImmediate(r));
       assert.ok(!/row-level|policy|violates|post_likes/.test(m), m);
       assert.ok(m.length < 60, `short: ${m}`);
     }
+  });
+
+  await test('failureMessage: a rate limit of the database shows its own sentence (when to try again), nothing technical', () => {
+    // what lib/api.ts throws: the message plus the code and hint of the database (migration 20261120010000)
+    const likes = Object.assign(new Error('You have liked many posts in the last hour. Please wait a little and try again.'), { code: '54000', hint: 'rate_limited_likes' });
+    const comments = Object.assign(new Error('You have written many comments in the last hour. Please wait a little and try again.'), { code: '54000', hint: 'rate_limited_comments' });
+    assert.equal(failureMessage('love', likes), likes.message);
+    assert.equal(failureMessage('comments', comments), comments.message);
+    assert.equal(rateLimitMessage({ code: '54000', message: 'You have saved many posts in the last hour. Please wait a little and try again.' }), 'You have saved many posts in the last hour. Please wait a little and try again.');
+    // the same code with technical text, or another code with a sentence, keeps the plain fallback
+    assert.equal(failureMessage('love', Object.assign(new Error('statement too complex'), { code: '54000' })), 'Could not save your like. Try again.');
+    assert.equal(failureMessage('love', Object.assign(new Error('You are not allowed to do that.'), { code: '42501' })), 'Could not save your like. Try again.');
+    assert.equal(rateLimitMessage(null), null);
+    assert.equal(rateLimitMessage('54000'), null);
+    // offline still wins
+    assert.equal(failureMessage('love', { network: true, code: '54000', message: likes.message }), 'You are offline. Likes need a connection.');
   });
 
   console.log(`${n} of ${n} passed`);

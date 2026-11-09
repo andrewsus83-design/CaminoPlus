@@ -115,16 +115,17 @@ $$;
 grant execute on all functions in schema social_test to anon, authenticated;
 
 -- ---------------------------------------------------------------- people
+-- the username is asked for at sign-up (since 20261120020000 it never comes from the e-mail address)
 insert into auth.users (id, email, raw_user_meta_data)
-select id, 'zz1c.' || name || '@example.com', jsonb_build_object('full_name', initcap(name) || ' Zzcamino')
+select id, 'zz1c.' || name || '@example.com', jsonb_build_object('full_name', initcap(name) || ' Zzcamino', 'username', 'zz1c.' || name)
 from social_test.users;
 -- bulk pilgrims for the limit tests
-insert into auth.users (id, email)
-select social_test.bulk(i), 'zz1c.bulk' || i || '@example.com' from generate_series(1, 60) i;
+insert into auth.users (id, email, raw_user_meta_data)
+select social_test.bulk(i), 'zz1c.bulk' || i || '@example.com', jsonb_build_object('username', 'zz1c.bulk' || i) from generate_series(1, 60) i;
 
 do $$ begin
   assert (select count(*) from public.profiles where id::text like '1c%') = 71, 'test pilgrims created';
-  assert (select username from public.profiles where id = social_test.u('alice')) = 'zz1c.alice', 'username from email';
+  assert (select username from public.profiles where id = social_test.u('alice')) = 'zz1c.alice', 'username asked for at sign-up';
   assert (select friends_count from public.profiles where id = social_test.u('alice')) = 0, 'friends_count starts at 0';
 end $$;
 
@@ -260,9 +261,24 @@ end $$;
 select social_test.login('erin');
 do $$
 begin
-  assert (select count(*) from public.list_friend_requests()) = 0, 'declined request is gone for erin too';
-  assert public.send_friend_request(social_test.u('alice')) = 'pending', 'erin can ask again';
+  -- since 20261120010000 erin is not told: for 30 days her request still reads as not answered yet
+  assert (select count(*) from public.list_friend_requests() where direction = 'outgoing' and id = social_test.u('alice')) = 1,
+    'a declined request still looks unanswered to erin';
+  -- since 20261120010000: for 30 days after a decline, asking again looks the same to erin but reaches nobody
+  assert public.send_friend_request(social_test.u('alice')) = 'pending', 'erin asks again (cool-down: silent)';
 end $$;
+select social_test.login('alice');
+do $$
+begin
+  assert (select count(*) from public.notifications
+          where kind = 'friend_request' and actor_id = social_test.u('erin')) = 0, 'alice is not bothered during the cool-down';
+  assert (select count(*) from public.list_friend_requests()) = 0, 'and has no request to answer';
+end $$;
+select social_test.logout();
+update private.friend_request_declines set declined_at = now() - interval '31 days'
+where requester = social_test.u('erin') and decliner = social_test.u('alice');
+select social_test.login('erin');
+do $$ begin assert public.send_friend_request(social_test.u('alice')) = 'pending', 'erin can ask again after 30 days'; end $$;
 select social_test.login('alice');
 do $$
 begin
@@ -312,10 +328,21 @@ begin;
 select social_test.login(social_test.bulk(51));
 do $$ begin assert public.send_friend_request(social_test.u('judy')) = 'pending', 'bulk 51 asks judy first'; end $$;
 select social_test.login('judy');
+-- 30 new requests a day at most (20261120010000), so half of them were sent yesterday
 do $$
 declare i integer;
 begin
-  for i in 1..50 loop
+  for i in 1..25 loop
+    assert public.send_friend_request(social_test.bulk(i)) = 'pending', 'judy request ' || i;
+  end loop;
+end $$;
+select social_test.logout();
+update private.friend_request_log set sent_at = sent_at - interval '25 hours' where requester = social_test.u('judy');
+select social_test.login('judy');
+do $$
+declare i integer;
+begin
+  for i in 26..50 loop
     assert public.send_friend_request(social_test.bulk(i)) = 'pending', 'judy request ' || i;
   end loop;
   perform social_test.fails($q$select public.send_friend_request(social_test.bulk(52))$q$, '54000', 'friend_request_limit');
@@ -386,8 +413,9 @@ begin
   assert (select count(*) from public.posts where user_id = social_test.u('dave')) = 2, 'friend sees public and followers posts of a private account';
   assert (select count(*) from public.posts where id = '1c000000-0000-0000-0000-0000000000d3') = 0, 'but not private posts';
   assert (select count(*) from public.journeys where user_id = social_test.u('dave')) = 1, 'friend sees the journey';
-  assert (select count(*) from public.journey_days where user_id = social_test.u('dave')) = 1, 'friend sees the plan';
-  assert (select count(*) from public.user_stamps where user_id = social_test.u('dave')) = 1, 'friend sees the passport';
+  -- 20261114100000_plan_private.sql: a friend sees the journey (row, posts), never the plan or the stamps
+  assert (select count(*) from public.journey_days where user_id = social_test.u('dave')) = 0, 'a friend does not see the plan';
+  assert (select count(*) from public.user_stamps where user_id = social_test.u('dave')) = 0, 'a friend does not see the stamps';
 end $$;
 select social_test.login('bob');
 do $$
@@ -893,10 +921,11 @@ declare v_g uuid := social_test.c('g');
 begin
   perform social_test.fails(format($q$select public.add_group_members(%L, array[social_test.u('frank')])$q$, v_g), '42501', 'group_friends_only');
   perform social_test.fails(format($q$select public.rename_group(%L, repeat('x', 61))$q$, v_g), '22023', 'group_title');
-  perform public.rename_group(v_g, 'Camino crew 2', 'https://example.com/crew.png');
-  assert (select title || '|' || avatar_url from public.conversations where id = v_g) = 'Camino crew 2|https://example.com/crew.png', 'renamed with a picture';
+  perform social_test.fails(format($q$select public.rename_group(%L, 'Camino crew 2', 'https://tracker.example/crew.png')$q$, v_g), '23514');   -- 20261120020000
+  perform public.rename_group(v_g, 'Camino crew 2', 'https://xgikdabgdqmbdgagowva.supabase.co/storage/v1/object/public/avatars/crew/crew.png');
+  assert (select title || '|' || avatar_url from public.conversations where id = v_g) = 'Camino crew 2|https://xgikdabgdqmbdgagowva.supabase.co/storage/v1/object/public/avatars/crew/crew.png', 'renamed with a picture';
   perform public.rename_group(v_g, 'Camino crew 2');
-  assert (select avatar_url from public.conversations where id = v_g) = 'https://example.com/crew.png', 'null keeps the picture';
+  assert (select avatar_url from public.conversations where id = v_g) = 'https://xgikdabgdqmbdgagowva.supabase.co/storage/v1/object/public/avatars/crew/crew.png', 'null keeps the picture';
   assert (select count(*) from public.messages where conversation_id = v_g and body = 'Bob Zzcamino renamed the group to "Camino crew 2"') = 1,
          'one rename message, none when the name did not change';
   perform public.rename_group(v_g, 'Camino crew 2', '');

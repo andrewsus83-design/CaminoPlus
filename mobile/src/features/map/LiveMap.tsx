@@ -9,7 +9,7 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { type NativeSyntheticEvent, useWindowDimensions } from 'react-native';
 import { Camera, GeoJSONSource, Images, Layer, Map, type CameraRef, type LayerProps, type MapRef, type ViewStateChangeEvent } from '@maplibre/maplibre-react-native';
-import { layout } from '@/theme';
+import { layout, space } from '@/theme';
 import { onlineTilesUrl } from './config';
 import { normDeg } from './nav';
 import { routeBounds, towns } from './sampleRoute';
@@ -211,7 +211,8 @@ function LiveMapImpl(p: MapViewProps) {
       attribution
       attributionPosition={heli ? { bottom: p.insets.bottom + 4, left: 8 } : { bottom: p.insets.bottom + 8, right: 12 }}
       compass={heli}
-      compassPosition={{ top: p.insets.top + layout.screenTop, right: 12 }}
+      // The compass of the map shows only when the pilgrim has turned the whole-route map. It sits under the offline maps button (a round BTN at the top right), 16 from the edge.
+      compassPosition={{ top: p.insets.top + layout.screenTop + layout.touchPrimary + space[3], right: layout.screenMargin }}
       compassHiddenFacingNorth
       scaleBar={false}
       touchPitch={!heli}

@@ -3,7 +3,7 @@ import { ReactNode, useMemo, useState } from 'react';
 import { FlatList, View } from 'react-native';
 import { AppText } from '@/components/AppText';
 import { Icon } from '@/components/Icon';
-import { c, radius, layout } from '@/theme';
+import { layout, radius, role, space } from '@/theme';
 import { filterPeople, personName } from '../logic';
 import type { Friend } from '../types';
 import { SearchField } from './primitives';
@@ -12,8 +12,8 @@ import { PersonRow } from './rows';
 /** Round check mark: filled blue with a tick when picked, an empty ring otherwise. */
 export function SelectMark({ on }: { on: boolean }) {
   return (
-    <View style={{ width: 32, height: 32, borderRadius: radius.pill, borderWidth: 2, borderColor: on ? c.blue : c.sand400, backgroundColor: on ? c.blue : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
-      {on && <Icon name="check" color={c.parchment} size={18} strokeWidth={2.6} />}
+    <View style={{ width: 32, height: 32, borderRadius: radius.pill, borderWidth: 2, borderColor: on ? role.action : role.borderStrong, backgroundColor: on ? role.action : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
+      {on && <Icon name="check" color={role.onAction} size={18} strokeWidth={2.6} />}
     </View>
   );
 }
@@ -40,7 +40,7 @@ export function FriendPickList({ friends, selected, onToggle, disabled, header, 
       ListHeaderComponent={
         <View>
           {header}
-          {friends.length > 0 && <View style={{ paddingHorizontal: layout.screenMargin, paddingVertical: 10 }}><SearchField value={query} onChangeText={setQuery} placeholder="Search your friends" label="Search your friends" /></View>}
+          {friends.length > 0 && <View style={{ paddingHorizontal: layout.screenMargin, paddingVertical: space[3] }}><SearchField value={query} onChangeText={setQuery} placeholder="Search your friends" label="Search your friends" /></View>}
         </View>
       }
       ListEmptyComponent={friends.length === 0 ? <>{empty}</> : <View style={{ padding: 32, alignItems: 'center' }}><PersonHint text={`No friend matches "${query.trim()}".`} /></View>}

@@ -10,3 +10,13 @@ export function todayLine(now: Date = new Date()): string {
   if (Number.isNaN(now.getTime())) return '';
   return `${DAYS[now.getDay()]} ${now.getDate()} ${MONTHS[now.getMonth()]}`;
 }
+
+/**
+ * The milliseconds from `now` to the start of the next day on the phone's own clock, and never less than a second: when the date of the banner has to be read again by an app that stays
+ * open overnight. The next midnight is worked out as a date (not as 24 hours), so a day of 23 or 25 hours where the clocks change is the right length. A Date that does not read gives a minute.
+ */
+export function msUntilTomorrow(now: Date = new Date()): number {
+  if (Number.isNaN(now.getTime())) return 60_000;
+  const next = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0, 0);
+  return Math.max(1000, next.getTime() - now.getTime());
+}

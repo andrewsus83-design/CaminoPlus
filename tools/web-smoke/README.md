@@ -45,8 +45,8 @@ Then the **scenarios** ([scenarios.mjs](scenarios.mjs)), each in light and dark,
   for ..." with a way back); the Bookmarks button opens `/library/bookmarks` with the bookmarked rows of both tabs, a verse and the
   bookmarked post (the full account has one bookmarked post); bookmarks kept before the tabs changed (a Music row, the old example rows, `notes:` keys, the
   two Bible rows that were taken out) or kept for a verse that is not in the text are ignored without an error;
-- Bible ([bible.scenarios.mjs](bible.scenarios.mjs), the same walks on the real text): the daily banner is compact (at most 120 high at 390
-  wide, 140 at 320) and is one button; the three parts (Old Testament, Deuterocanon, New Testament) are a segmented control under the banner
+- Bible ([bible.scenarios.mjs](bible.scenarios.mjs), the same walks on the real text): the daily banner is compact (at most 216 high at 390
+  wide, 276 at 320, on the longest day), says the date, the day of the Church and the readings (no handwritten note), is one button, and its pill is in the row of the title at 390 and under the last line at 320; the three parts (Old Testament, Deuterocanon, New Testament) are a segmented control under the banner
   that scrolls with the page, and each shows its books as compact tiles, two in a row (173 by 124 on a phone of 390, 140 by 116 on 320), the words 17 from the outline
   (13 under 352 wide) and the first row clear of the tab bar; all 73 book names fit their tile at 320, 360, 390 and 430, each at a size of the type scale (24, 17 or 15, in Fraunces;
   the 21 short ones the full 24; 17 or more from 390 up) with the count in JetBrains Mono at 15; a Chromium that hints the glyphs (CI's does)
@@ -111,6 +111,14 @@ Then the **scenarios** ([scenarios.mjs](scenarios.mjs)), each in light and dark,
     card cuts no word at 320, 360, 375 and 390 wide: "Buen Camino!" is one line, nothing is clipped, ended in an ellipsis or outside the card, "1 stage done" agrees with its number. The words on a Journey tile are 15 px or more, white over a
     band that holds 4.5 : 1 over a white picture; "Roncesvalles" under a highlight is one line, never broken in the middle, the long names take two lines (one when the header is compact). The web has no status bar and no home bar,
     so a real phone is worse than these numbers; to see them, `Emulation.setSafeAreaInsetsOverride` of the Chrome DevTools Protocol gives Chromium a safe area, which the app reads like a phone's;
+- Maps ([maps.scenarios.mjs](maps.scenarios.mjs), the round controls of the Maps tab, on 320 x 568, 360 x 640, 390 x 844 and 430 x 932 with the safe area of a phone where Chromium can add it): every round
+  control, on the whole route and in the Walk view, is 56 by 56 with a 28 icon, 16 from the right edge and 12 apart, the zoom pair one capsule 56 wide and 112 high whose halves touch; the Re-center pill
+  (the map is dragged by hand first) is 56 high with a 24 arrow and "Re-center" in Inter SemiBold at 17, 16 from the left edge, level with the bottom of the column and 12 or more from it; the Walk view
+  column ends 12 above the bottom card and the whole route column 16 above the tab bar; the top row ("Whole route / Near me", 56 high, and the offline maps button) never touches at 320 wide; nothing on
+  the screen overlaps (banner, chips, notices, column, pill, card, tab bar) and no text is under 15 px; a short phone folds what does not fit into the "Map options" rows of the sheet of the flag button
+  (named "Route details and map options"), which work there, while the zoom pair and the help bell (in the column, or in the row of buttons of the card) are always there; and with the text 1.5 and 2 times
+  as big (the page's text and line heights scaled, as a phone does: the web has no such setting) nothing overlaps and the zoom pair is still reachable (in the column, or as two rows of Map options when it does not fit). The check fails on the build before the family existed
+  (the help bell was 48 wide);
 - Notes, a page is a draft until it is published: on a blank page Read and Publish are off and there is no Save draft; with words in it Save draft is at the
   top right and the date says Draft; the marks (Bold, Italic, Heading, Bulleted list, Quote) sit inside the text box, under the text and above the bottom
   row; Read is a third and Publish two thirds of one row at the bottom (margin to margin, at least 48 high); Read turns into Edit in the same place; Save draft
@@ -141,11 +149,16 @@ which never name a date (the browser's clock is the phone's, and "today" is foun
 
 - the header is one row (Back, the title, the Calendar button, the Bookmark button), every button at least 44 by 44 (they are 48); the strip has exactly seven
   days, each at least 44 by 44; a tap on a day picks it and changes the liturgical title, Today brings it back, the arrows move a week; under it
-  the card, the notice, and the readings and the reflection tagged as samples (the Psalm is the only citation, a reading opens and closes);
+  the liturgical card and the readings card (no sample, no notice, no handwritten line); a reading opens and closes, or the day says the readings are not in the app yet (or that they differ from country to country);
 - the Calendar button opens the sheet; Escape, Close and a tap outside close it; a day chosen in it closes it and moves the strip to its week; its
   Today picks today;
 - the Bookmark button toggles and is kept; the day is a row of Bookmarks ("Daily reading", the date, the liturgical title) that opens
   `/library/daily?date=YYYY-MM-DD`; taking it off there removes the row;
+- the readings (the one walk that names days, in `?date=`, because it knows their readings): a Sunday has its four references (said in words to a screen reader) and the source line ("the Lectionary for Mass used in the United
+  States"), the Gospel opens to its words from the Bible in the app, the Psalm opens whole with its note over the words, nothing on the screen is under 15 px and nothing runs out of a phone of 320; a weekday with a memorial
+  has the saint as its title and the day of the calendar under it; a reference with no words is a line, not a button, and the line under it says why; Trinity Sunday says that the source lists no second reading, between the
+  psalm and the Gospel; a psalm that reads a verse in two halves (12 November, Psalm 146) has the verse once, with the note that a verse with a letter is shown whole; Thanksgiving Day (26 November) shows the day of the calendar
+  and says that the readings differ from country to country; a day with no readings says so in one line and has no small print;
 - `?date=` opens that day (also one far outside the five years) and anything that is not a day opens today.
 
 The Bible screens are the Bible feature's own, and they run on the real text (Psalm 121, John 1,
@@ -253,10 +266,13 @@ Chromium; a test checks they agree). Bump both on purpose, with the tests looked
 | [me.scenarios.mjs](me.scenarios.mjs) | the walks of Me: the header with the gear alone, the chat button and where it opens, the card of Journey (also in the sample journey), the card of Notes |
 | [mesmall.scenarios.mjs](mesmall.scenarios.mjs) | the walks of Me on small phones: the strip against the chat button at four phone sizes, the My Camino card on narrow phones, the captions of the Journey grid, the names under the highlights |
 | [pilgrim.scenarios.mjs](pilgrim.scenarios.mjs) | the walks of the profile of another pilgrim: a friend, a stranger, a private one, one that is not there, no signal, the name of a comment author, and that nothing private is on it |
+| [share.scenarios.mjs](share.scenarios.mjs) | the walks of share links: Share plan link on Plan (the question first, Cancel makes nothing, what is sent and what reaches the share sheet), Settings > Shared links and Stop sharing |
 | [allplaces.scenarios.mjs](allplaces.scenarios.mjs) | the walks of the All item of Me: the row, the stamps of the route, the journeys at a place, the way back, Plan and Health, no destination, no places |
+| [maps.scenarios.mjs](maps.scenarios.mjs) | the walks of the Maps tab: the round controls as one family, nothing overlapping, the folded controls in Map options, large text |
 | [bible.scenarios.mjs](bible.scenarios.mjs) | the walks of the Bible tab and the reader (kept apart so the other walks stay short) |
 | [books.scenarios.mjs](books.scenarios.mjs) | the walks of the Books tab: the covers, a book page, the reader, the place kept on the phone, the notice of each kind |
 | [continue.scenarios.mjs](continue.scenarios.mjs) | the walks of the Continue reading bar above the tab bar of the Library: where it sits, closing it, the most recent place, a mark that does not read |
 | [fixtures.mjs](fixtures.mjs) | the Supabase project, the saved state of the phone, the realtime socket |
 | [collector.mjs](collector.mjs) | what counts as a failure; the console allow-list |
 | [server.mjs](server.mjs) | a static server with single-page-app fallback, on a free port |
+| [share-page.mjs](share-page.mjs) | not part of the app sweep: the share-link page of the WEBSITE (`web/s/index.html`, `web/assets/share.js`) served from `web/` with `get_shared` mocked; a plan, a note (its words never drawn as HTML), an unknown, a malformed and a failing link, light and dark, 390 and 320 wide. `node tools/web-smoke/share-page.mjs [--shots DIR]` |

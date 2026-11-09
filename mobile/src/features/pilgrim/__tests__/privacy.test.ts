@@ -58,10 +58,29 @@ check('NOTES, PLAN, HEALTH: the profile asks for none of their tables or columns
   assert.doesNotMatch(code(read(SCREEN)), /\btablist\b|role=["']tab["']|accessibilityRole="tab"/, 'the profile has no strip of tabs: the journey is one section');
 });
 
+check('SHARE LINKS: no file of another pilgrim\'s profile reads a private table, opens a share link or makes one', () => {
+  // The owner's rule (2026-11-08): friends see the journey only; a plan or a note is seen through a link the owner made, on the website,
+  // never through the profile of a friend. Every file under src/features/pilgrim is scanned, also one added tomorrow.
+  const all = fs.readdirSync(path.join(root, FEATURE), { recursive: true, withFileTypes: true })
+    .filter((e) => e.isFile() && /\.tsx?$/.test(e.name) && !/__tests__/.test(path.join(e.parentPath ?? (e as unknown as { path: string }).path, e.name)))
+    .map((e) => path.relative(root, path.join(e.parentPath ?? (e as unknown as { path: string }).path, e.name)).split(path.sep).join('/'));
+  assert.ok(all.length >= 5 && all.includes(`${FEATURE}/api.ts`), all.join(', '));
+  for (const f of [...all, SCREEN]) {
+    const src = code(read(f));
+    assert.doesNotMatch(src, /\b(journey_days|user_stamps|tracks|journey_private|health_daily|health_workouts|shared_links)\b/, `${f} names a private table`);
+    assert.doesNotMatch(src, /\b(get_shared|create_share_link|list_share_links|revoke_share_link)\b/, `${f} calls a share-link function`);
+    for (const spec of importsOf(src)) {
+      assert.doesNotMatch(spec, /shareLinks|ShareLinkSheet|shared-links/, `${f} imports ${spec}`);
+    }
+  }
+});
+
 check('the data: three small reads under the row level security that is already there, and exactly these columns', () => {
   const api = code(read(`${FEATURE}/api.ts`));
   assert.deepEqual([...api.matchAll(/\.from\('(\w+)'\)/g)].map((m) => m[1]).sort(), ['friendships', 'posts', 'profiles'], 'the tables it reads');
-  assert.doesNotMatch(api, /\.rpc\(|\.storage\b|\.insert\(|\.update\(|\.upsert\(|\.delete\(/, 'it only reads, and asks no function of the database');
+  // the one function it asks is list_friend_requests (read only, my own requests): a declined request of mine still reads "Requested" (30 days)
+  assert.deepEqual([...api.matchAll(/\.rpc\('(\w+)'/g)].map((m) => m[1]), ['list_friend_requests'], 'the only function it asks');
+  assert.doesNotMatch(api.replace(/\.rpc\('list_friend_requests'\)/g, ''), /\.rpc\(|\.storage\b|\.insert\(|\.update\(|\.upsert\(|\.delete\(/, 'it only reads');
   const cols = (name: string) => new RegExp(`${name} = '([^']+)'`).exec(api)?.[1].split(',').map((c) => c.trim());
   assert.deepEqual(cols('PILGRIM_COLS'), ['id', 'username', 'display_name', 'bio', 'avatar_url', 'is_private', 'km_walked', 'posts_count', 'stamps_count']);
   assert.deepEqual(cols('FRIENDSHIP_COLS'), ['status', 'requested_by']);

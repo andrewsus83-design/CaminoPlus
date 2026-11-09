@@ -456,7 +456,9 @@ test('search helpers: normalize and minimum length', () => {
   assert.equal(normalizeQuery('  ana   torres '), 'ana torres');
   assert.ok(!isSearchable('a'));
   assert.ok(!isSearchable(' a '));
-  assert.ok(isSearchable('an'));
+  assert.ok(!isSearchable('an'), 'two letters: the server answers nothing below 3');
+  assert.ok(isSearchable('ana'));
+  assert.ok(!isSearchable(' an '));
 });
 
 test('debouncer fires once, after the pause, with the last arguments', () => {

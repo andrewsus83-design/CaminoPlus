@@ -11,6 +11,12 @@ export const chapterTileLabel = (book: BibleBook, n: number): string => (book.co
 type TileProps = { book: BibleBook; n: number; tile: number; onOpen: (n: number) => void };
 
 /**
+ * The number on a tile: JetBrains Mono (a chapter number is data, so it keeps the mono variant) at the size and the line of the type scale's body, 19 on 28. It was 20 on 26, a
+ * size the scale does not have; the other step next to it is lead, 22 on 32 (the owner chooses, see the report).
+ */
+const NUMBER = { fontSize: 19, lineHeight: 28 } as const;
+
+/**
  * The tile of one chapter: a square button with its number in JetBrains Mono (the chapter numbers are data), never under 56 (gridMath.ts). The number
  * is held to 1.3 times its size by maxFontSizeMultiplier, so that three digits ("150") still fit a tile of 56 at the largest text.
  */
@@ -25,7 +31,7 @@ const ChapterTile = memo(function ChapterTile({ book, n, tile, onOpen }: TilePro
         backgroundColor: pressed ? role.sunken : role.surface, borderWidth: 1, borderColor: role.border, ...shadowStyle('sm'),
       })}
     >
-      <AppText variant="mono" maxFontSizeMultiplier={1.3} numberOfLines={1} style={{ fontSize: 20, lineHeight: 26 }}>{n}</AppText>
+      <AppText variant="mono" maxFontSizeMultiplier={1.3} numberOfLines={1} style={NUMBER}>{n}</AppText>
     </Pressable>
   );
 });

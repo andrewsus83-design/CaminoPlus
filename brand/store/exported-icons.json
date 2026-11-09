@@ -1,0 +1,63 @@
+{
+  "note": "Written by tools/export_app_icons.mjs. tools/tests/test_store_assets.py checks it.",
+  "exporter": {
+    "path": "tools/export_app_icons.mjs",
+    "sha256": "9ee47cda0ba23a75aef27ff74275fd2feb04bc9cdf670ab2848a70495c5a4335"
+  },
+  "files": [
+    {
+      "png": "mobile/assets/icon.png",
+      "svg": "brand/svg/app-icon/app-icon-ios-1024.svg",
+      "width": 1024,
+      "height": 1024,
+      "colorType": 2,
+      "svgSha256": "7fa821929558dc22543666c76d579158e4b33d63ff1d20540cf8eb3afcd7d059",
+      "pngSha256": "a6672fd58e2cfdbb20fbb965faed3df7d3b0f804f3562c219281976539dbb50a"
+    },
+    {
+      "png": "mobile/assets/android-icon-foreground.png",
+      "svg": "brand/svg/app-icon/android-adaptive-foreground.svg",
+      "width": 1024,
+      "height": 1024,
+      "colorType": 6,
+      "svgSha256": "6390f99a615f9d02ba2efc6f01824ad3d8ddc02863e01cd53a8c05e6e4aa46b5",
+      "pngSha256": "c4af0d8e6886b5f0cda5bc61bbb172f05db6d3a858d4e864fbc914b7ca89f979"
+    },
+    {
+      "png": "mobile/assets/android-icon-background.png",
+      "svg": "brand/svg/app-icon/android-adaptive-background.svg",
+      "width": 1024,
+      "height": 1024,
+      "colorType": 2,
+      "svgSha256": "f30b7eb3b2e6673867db0e4ae28d280aa880113463b20af539307644bce47899",
+      "pngSha256": "b7184ec697edb4361791aaedbb10e47733155161cbbff1d5a93745cf4cb0ad3a"
+    },
+    {
+      "png": "mobile/assets/android-icon-monochrome.png",
+      "svg": "brand/svg/app-icon/android-adaptive-monochrome.svg",
+      "width": 1024,
+      "height": 1024,
+      "colorType": 6,
+      "svgSha256": "08f88f673210f19793bcd7d24561a97a9930e80bf735decb581cef4eef0e5afe",
+      "pngSha256": "7ae615ffa1a48d7f4c1fd3c47f0e4c5ae0f3c032a4df8a47134c0cc38fc3a226"
+    },
+    {
+      "png": "mobile/assets/splash-icon.png",
+      "svg": "brand/svg/app-icon/splash-icon.svg",
+      "width": 1024,
+      "height": 1024,
+      "colorType": 6,
+      "svgSha256": "fecee344ad402cc84e1978a01c2d3fa30aa42242a8d6982d913a5e706ea298a7",
+      "pngSha256": "b04ec0a2028b8970ee480f2d98b5fdf0888b9c16459d0adb1521e78227f3af95"
+    },
+    {
+      "png": "brand/store/play-store-icon-512.png",
+      "svg": "brand/svg/app-icon/app-icon-ios-1024.svg",
+      "width": 512,
+      "height": 512,
+      "colorType": 6,
+      "svgSha256": "7fa821929558dc22543666c76d579158e4b33d63ff1d20540cf8eb3afcd7d059",
+      "pngSha256": "4e7894536d93c2ce53857c0a62bda49dcc7fa7c2d852245a48c14d474b58407e"
+    }
+  ]
+}
