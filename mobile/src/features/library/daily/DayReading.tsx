@@ -15,7 +15,8 @@ import { runsOf, type PassageText } from './reference';
 // the reference can be shown with confidence, its words when the row is opened. The readings are the references of the Lectionary for Mass used in the United States for the days we
 // have (assets/library/daily, content.ts), the words are read from the Bible inside the app (the World English Bible, Catholic edition), and a day we have no readings for says so (or says
 // that the readings differ from country to country) instead of showing anything else. A reference with no words says why under it; a Sunday or a solemnity with no second reading in the
-// source says that too. The screen asks for nothing but the day it was given and draws what it gets. The one line of small print under the readings says where readings and words come from.
+// source says that too; a day with more than one Mass (24 and 25 December) says which Mass the readings are of. The screen asks for nothing but the day it was given and draws what it
+// gets. The one line of small print under the readings says where readings and words come from.
 
 /** The small line over a card: mono (the 15 of the type scale), capitals, muted, like the label of the Bible tab's "Today's reading" card. */
 const EYEBROW = { textTransform: 'uppercase' } as const;
@@ -97,13 +98,14 @@ export function DayReading({ day }: { day: Ymd }) {
       {/* keyed by the day, so that a text opened on one day is closed again on the next */}
       <Card key={key} style={{ paddingVertical: space[3] }}>
         <View style={{ paddingBottom: space[1] }}><AppText variant="mono" muted style={EYEBROW}>Readings</AppText></View>
+        {!!content.mass && <View style={{ paddingBottom: space[3] }}><AppText variant="caption" muted>{content.mass}</AppText></View>}
         {content.readings
           ? content.readings.map((reading, i) => (
               <Fragment key={reading.kind}>
                 {content.noSecond && reading.kind === 'gospel' && (
                   <View style={{ borderTopWidth: 1, borderTopColor: role.border, paddingVertical: space[3] }}><AppText variant="caption" muted>{NO_SECOND_READING}</AppText></View>
                 )}
-                <ReadingRow reading={reading} first={i === 0} />
+                <ReadingRow reading={reading} first={i === 0 && !content.mass} />
               </Fragment>
             ))
           : <AppText variant="small" muted style={{ paddingVertical: space[3] }}>{content.unavailable}</AppText>}

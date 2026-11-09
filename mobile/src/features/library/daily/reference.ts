@@ -210,9 +210,10 @@ export type PassageLine = { n: string; c: number; text: string } | { gap: true }
  *   'whole'  a psalm with a title shown whole, although the reference names some of its verses (the numbers of the lectionary count the title);
  *   'psalm'  a psalm shown whole because the reference names the psalm and no verses;
  *   'part'   a verse shown whole where the reference has a letter after its number (4b: the lectionary reads a part of it);
+ *   'unclear' a psalm shown whole because the source wrote its verses in a form nobody reads (content.ts sets it, from what the importer marked; readPassage never does);
  *   null     the words are what the reference names.
  */
-export type PassageNote = 'whole' | 'psalm' | 'part' | null;
+export type PassageNote = 'whole' | 'psalm' | 'part' | 'unclear' | null;
 
 /** The words of a reference. */
 export type PassageText = { lines: readonly PassageLine[]; note: PassageNote };

@@ -45,7 +45,7 @@ const ymd = (y: number, m: number, d: number): Ymd => ({ y, m, d });
 
 /* ============================================================================================ the Daily reading phones */
 
-export type ScreenName = 'daily' | 'memorial' | 'reading' | 'calendar' | 'dark' | 'darkreading' | 'darkcalendar' | 'narrow' | 'solemnity' | 'none' | 'differ' | 'nowords' | 'nosecond' | 'halves';
+export type ScreenName = 'daily' | 'memorial' | 'reading' | 'calendar' | 'dark' | 'darkreading' | 'darkcalendar' | 'narrow' | 'solemnity' | 'none' | 'differ' | 'nowords' | 'nosecond' | 'halves' | 'christmas' | 'unclear';
 
 export type ScreenSpec = {
   /** The day that is picked. */
@@ -72,6 +72,8 @@ export const SCREENS: Record<ScreenName, ScreenSpec> = {
   nowords: { picked: ymd(2026, 11, 29), open: 'psalm' },
   nosecond: { picked: ymd(2026, 5, 31), open: 'gospel' },
   halves: { picked: ymd(2026, 11, 12), open: 'psalm' },
+  christmas: { picked: ymd(2026, 12, 25), open: 'first' },
+  unclear: { picked: ymd(2026, 12, 6), open: 'psalm' },
 };
 
 const INDENT = '            ';
@@ -125,7 +127,7 @@ function passageHtml(r: Reading): string {
 
 /** The readings card and the small print under it, as DayReading.tsx draws them. */
 export function readingsHtml(c: DayContent, open?: string): string {
-  const top = '<div class="dr-top"><span class="dr-eyebrow">Readings</span></div>';
+  const top = `<div class="dr-top"><span class="dr-eyebrow">Readings</span></div>${c.mass ? `<div class="dr-cap dr-mass">${html(c.mass)}</div>` : ''}`;
   if (!c.readings) return `<div class="cp-card dr-card dr-readings">${top}<div class="dr-none">${html(c.unavailable ?? '')}</div></div>`;
   const rows = c.readings.map((r) => {
     const why = r.noWords ? NO_WORDS[r.noWords] : null;

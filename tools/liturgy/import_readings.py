@@ -18,8 +18,10 @@ export and is not used: the words of a reading are read from the Bible that is i
 
 WHAT THE ASSET HOLDS, for each day: `r` the four references [first reading, psalm, second reading, Gospel] (the second reading is null on most days; any may be
 null), `n` the name of the celebration when the source gives one (a saint's memorial, a feast), and `o` = 1 when the source calls the day by that same name (the
-celebration IS the day, not a memorial kept beside a weekday). The colour is not kept: the screen takes the colour of the day from the calendar it computes on the
-phone (daily/liturgy.ts), and the source's colour is wrong on a few days (tools/liturgy/README.md lists them).
+celebration IS the day, not a memorial kept beside a weekday). Two more keys are written only where they are true: `u` the places of `r` that the importer reduced
+to a psalm alone (below), and `m` the Mass of the day that the readings are of ("morning" on 24 December, "day" on 25 December: MASS_OF). The colour is not kept: the
+screen takes the colour of the day from the calendar it computes on the phone (daily/liturgy.ts), and the source's colour is wrong on a few days (tools/liturgy/README.md
+lists them).
 
 THE DAYS LEFT OUT (NOT_GENERAL, below). On a few dates the source has the readings of the United States and the General Roman Calendar has others: Thanksgiving,
 Our Lady of Guadalupe, and the two days of Corpus Christi (the United States keeps it on the Sunday). Those days are not written as readings: the file lists them in
@@ -29,7 +31,8 @@ by reading the data against the calendar; a person with a lectionary has to chec
 WHAT THE IMPORTER DOES TO A REFERENCE. Almost nothing, on purpose: the parser of the app (daily/reference.ts) reads the forms the source uses. It takes away what is
 no part of a reference: a footnote marker the source left in ("[^1]"), runs of spaces, and the "Psalm/" that the source put in front of the book of a canticle in the
 place of the psalm ("Psalm/Deuteronomy 32" is the reading "Deuteronomy 32"). A psalm with a run of four numbers joined by hyphens ("Psalm 85:9-10-11-12, 13-14"), which
-no lectionary writes, is reduced to the psalm alone ("Psalm 85"): its verses cannot be told, its number can; the change is printed. An empty text is no reference. The
+no lectionary writes, is reduced to the psalm alone ("Psalm 85"): its verses cannot be told, its number can; the change is printed and the day is marked `u`, so that the
+app says that the list of verses for the day is not clear (it never writes a list of verses that the source does not give). An empty text is no reference. The
 output is deterministic (sorted keys, one day to a line, no clock): the same export always makes the same bytes, so --check is a byte comparison. Standard library only.
 
 Exit codes: 0 all good, 1 --check found a difference (it lists them), 2 the importer refused something (the message names the row).
@@ -66,6 +69,14 @@ NOT_GENERAL = {
     "2026-12-12": "Our Lady of Guadalupe is an optional memorial in the General Roman Calendar, with the readings of the Advent weekday: the source has the readings of the feast of the United States",
 }
 
+# The rows of the export that are the readings of ONE of the Masses of a day that has more than one: the app says which Mass they are of (the file marks the day with `m`).
+# A date here is a claim about that row of THIS export, so the importer refuses the export when the Gospel of the row is not the one named here (Pascua may correct the row,
+# and the claim would then be false). A date that the export does not have is ignored: another export has its own rows to look at. {date: (mass, Gospel of the row, why)}
+MASS_OF = {
+    "2026-12-24": ("morning", "Luke 1:67-79", "the Mass of the morning of 24 December: its Gospel is the Benedictus. The Mass of the evening, the Vigil of Christmas, has other readings"),
+    "2026-12-25": ("day", "John 1:1-18", "the Mass during the Day of Christmas: its Gospel is the Prologue of John. The other Masses of Christmas have other readings"),
+}
+
 # a run of four numbers joined by hyphens ("9-10-11-12"): no lectionary writes it
 RUN_OF_FOUR = re.compile(r"\d+-\d+-\d+-\d+")
 
@@ -75,26 +86,28 @@ class Refused(Exception):
 
 
 class Converted(dict):
-    """{year: {date: day}}: what convert makes of an export, with what it left out and what it changed. `differ` is {year: [date, ...]} (the days of NOT_GENERAL that the
-    export has, in order) and `notes` one line for each reference the importer changed."""
+    """{year: {date: day}}: what convert makes of an export, with what it left out, what it changed and what it marked. `differ` is {year: [date, ...]} (the days of
+    NOT_GENERAL that the export has, in order), `notes` one line for each reference the importer changed, `masses` {date: mass} for the days of MASS_OF."""
 
     def __init__(self):
         super().__init__()
         self.differ = {}
         self.notes = []
+        self.masses = {}
 
 
-def clean_ref(text, where, notes=None):
-    """One reference as the screen will read it, or None when the row has none. `notes`, a list, gets a line for each reference this changes beyond tidying."""
+def clean_ref_marked(text, where, notes=None):
+    """(reference, reduced): the reference as the screen will read it, or None when the row has none, and whether the importer reduced it to its psalm because the verses
+    were written in a form nobody reads (the day is then marked `u`: the app says that the list of verses is not clear). `notes`, a list, gets a line for each such change."""
     if text is None:
-        return None
+        return None, False
     if not isinstance(text, str):
         raise Refused(f"{where}: a reference must be text, not {type(text).__name__}")
     out = re.sub(r"\s*\[\^[^\]\s]*\]", "", text)  # a footnote marker of the source: "Jeremiah 14:17-22 [^1]"
     out = re.sub(r"\s+", " ", out).strip()
     out = re.sub(r"^Psalm/(?=\S)", "", out)  # the book of a canticle in the place of the psalm
     if not out:
-        return None
+        return None, False
     if len(out) > MAX_REF or re.search(r"[\x00-\x1f\x7f]", out):
         raise Refused(f"{where}: this is not a reference: {out[:60]!r}")
     psalm = re.match(r"Psalm (\d{1,3}):", out)
@@ -102,9 +115,14 @@ def clean_ref(text, where, notes=None):
         # its verses cannot be told (9-10, 11-12 or 9-12?), the psalm can: the reference is the psalm alone
         reduced = f"Psalm {psalm.group(1)}"
         if notes is not None:
-            notes.append(f"{where}: {out!r} has a run of four numbers joined by hyphens, which no lectionary writes: it is now {reduced!r}")
-        out = reduced
-    return out
+            notes.append(f"{where}: {out!r} has a run of four numbers joined by hyphens, which no lectionary writes: it is now {reduced!r}, and the day is marked (the app says that the list of verses is not clear)")
+        return reduced, True
+    return out, False
+
+
+def clean_ref(text, where, notes=None):
+    """One reference as the screen will read it, or None when the row has none (clean_ref_marked without the mark)."""
+    return clean_ref_marked(text, where, notes)[0]
 
 
 def clean_name(text, where):
@@ -161,7 +179,8 @@ def convert(rows, about):
         if key in seen:
             raise Refused(f"{where}: the day is twice in the export")
         seen.add(key)
-        refs = [clean_ref(row.get(c), f"{where} {c}", years.notes) for c in READING_COLUMNS]
+        marked = [clean_ref_marked(row.get(c), f"{where} {c}", years.notes) for c in READING_COLUMNS]
+        refs = [m[0] for m in marked]
         if all(r is None for r in refs):
             raise Refused(f"{where}: the day has no reading at all")
         if key in NOT_GENERAL:
@@ -173,6 +192,15 @@ def convert(rows, about):
             entry["n"] = name
             if same_name(name, clean_name(row.get("liturgical_day"), f"{where} liturgical_day")):
                 entry["o"] = 1
+        unclear = [place for place, m in enumerate(marked) if m[1]]
+        if unclear:
+            entry["u"] = unclear
+        if key in MASS_OF:
+            mass, gospel, _why = MASS_OF[key]
+            if refs[3] != gospel:
+                raise Refused(f"{where}: MASS_OF says these are the readings of the Mass '{mass}' (the Gospel is {gospel}), and the Gospel of the row is {refs[3]!r}: look at the row, then at MASS_OF")
+            entry["m"] = mass
+            years.masses[key] = mass
         years.setdefault(day.year, {})[key] = entry
     for listed in years.differ.values():
         listed.sort()
@@ -232,6 +260,9 @@ def describe(years):
     if years.notes:
         lines.append(f"changed in a reference ({len(years.notes)}):")
         lines += [f"  {note}" for note in years.notes]
+    if years.masses:
+        lines.append(f"marked with the Mass that the readings are of ({len(years.masses)} days): the app says which Mass it is")
+        lines += [f"  {key}  {mass}: {MASS_OF[key][2]}" for key, mass in sorted(years.masses.items())]
     return lines
 
 
