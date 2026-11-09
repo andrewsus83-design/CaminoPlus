@@ -66,26 +66,36 @@ update public.crowd_reports set moderation_status = 'removed' where id = '<targe
 ```
 
 A chat message: messages are only seen by the people in that chat. Unsend it for everybody (the text and photo
-link are cleared; the evidence stays in the report):
+link are cleared; the evidence stays in the report). First note the photo path, if there is one:
 
 ```sql
+select media_path from public.messages where id = '<target_id>';
 update public.messages set deleted_at = now(), body = null, media_path = null where id = '<target_id>';
 ```
+
+Unsending leaves the photo file itself in storage. Delete it in the dashboard: **Storage > user-media**, open the
+folder of the path you noted (`<sender id>/chat/<conversation id>/`) and delete that file. (Supabase does not let
+SQL delete storage files; the dashboard or the Storage API does.)
 
 ## 4. Ban a person
 
 Banning stops sign-in and token refresh (the app is logged out within about an hour, when its token expires).
 Also hide what they posted if it breaks the rules.
 
+The easiest way: dashboard, **Authentication > Users**, the user, **Ban user**. In SQL, use a date far in the future,
+never the word `infinity` (the sign-in server may then fail to load that user, and the dashboard's user list with it):
+
 ```sql
--- ban (dashboard alternative: Authentication > Users > the user > Ban user)
-update auth.users set banned_until = 'infinity' where id = '<target_owner_id>';
--- end their sessions now
+-- ban
+update auth.users set banned_until = now() + interval '100 years' where id = '<target_owner_id>';
+-- end their sessions now (the token the phone holds still works for up to one hour)
 delete from auth.sessions where user_id = '<target_owner_id>';
 -- hide everything they posted
 update public.posts         set moderation_status = 'removed' where user_id = '<target_owner_id>' and moderation_status = 'ok';
 update public.post_comments set moderation_status = 'removed' where user_id = '<target_owner_id>' and moderation_status = 'ok';
 update public.stay_reviews  set moderation_status = 'removed' where user_id = '<target_owner_id>' and moderation_status = 'ok';
+update public.stay_photos   set moderation_status = 'removed' where user_id = '<target_owner_id>' and moderation_status = 'ok';
+update public.crowd_reports set moderation_status = 'removed' where user_id = '<target_owner_id>' and moderation_status = 'ok';
 
 -- lift a ban
 update auth.users set banned_until = null where id = '<target_owner_id>';
@@ -110,30 +120,50 @@ The `where target_type ... target_id` form closes every report about the same th
 
 ## 6. Be told when a report arrives
 
-### Push to your phone (ntfy)
+**Never send the report row itself anywhere.** A report row can hold private data: for a reported chat message,
+`evidence` holds the message text, the sender and the conversation; `details` is what the reporter wrote. A
+Database Webhook sends the whole row, so a webhook that posts straight to ntfy (or any public topic, chat or email)
+would publish private messages. Send only the report id, its type and its reason, and read the rest in the SQL
+editor.
+
+### Push to your phone (ntfy), through a small Edge Function
 
 1. Install the ntfy app (iOS or Android) and subscribe to a topic with a long random name (for example 24 random
-   letters). On the public ntfy.sh server **anybody who knows the topic name can read it**, so treat the name like
-   a password: keep it out of the repository and out of chats.
-2. Dashboard: **Database > Webhooks > Create a new hook**.
-   - Name: `report-alert`
-   - Table: `public.content_reports`, Events: `Insert`
-   - Type: HTTP Request, Method: `POST`, URL: `https://ntfy.sh/<your topic>`
-   - HTTP headers: `Title: CaminoPlus: new report`, `Priority: high`, `Tags: warning`
-3. Send a test report from the app (report your own test post) and check the phone.
+   letters). On the public ntfy.sh server anybody who knows the topic name can read it: treat the name like a
+   password, keep it out of the repository and out of chats.
+2. Set three secrets in **Dashboard > Edge Functions > Secrets** (values only there, never in code):
+   `NTFY_TOPIC_URL` (`https://ntfy.sh/<your topic>`), `REPORT_WEBHOOK_SECRET` (a long random text you make up),
+   and, only if your ntfy topic needs one, `NTFY_TOKEN`.
+3. Create an Edge Function named `report-alert` with this code (it is not in this repository; it forwards only
+   id, type and reason):
 
-The webhook sends the whole new row as JSON (report id, type, reason, the reporter's id and their details text).
-That is personal data on a third-party server: if you prefer, run your own ntfy server, or use an ntfy access
-token (set it as the `Authorization: Bearer ...` header of the webhook; store the token only in the dashboard,
-never in this repository). Name it `NTFY_TOKEN` in your own notes.
+   ```ts
+   Deno.serve(async (req) => {
+     if (req.headers.get('x-report-secret') !== Deno.env.get('REPORT_WEBHOOK_SECRET')) return new Response('no', { status: 401 });
+     const { record } = await req.json().catch(() => ({ record: null }));
+     if (!record?.id) return new Response('ok');
+     const headers: Record<string, string> = { Title: 'CaminoPlus: new report', Priority: 'high', Tags: 'warning' };
+     const token = Deno.env.get('NTFY_TOKEN');
+     if (token) headers.Authorization = `Bearer ${token}`;
+     // only these three fields leave the database: never body, evidence, details or any user id
+     const text = `${String(record.target_type)} reported for ${String(record.reason)}. Report ${String(record.id)}`;
+     await fetch(Deno.env.get('NTFY_TOPIC_URL')!, { method: 'POST', headers, body: text });
+     return new Response('ok');
+   });
+   ```
+
+   Turn off "Verify JWT" for this function (the shared secret header protects it instead).
+4. Dashboard: **Database > Webhooks > Create a new hook**: name `report-alert`, table `public.content_reports`,
+   event `Insert`, type **Supabase Edge Functions**, function `report-alert`, and the HTTP header
+   `x-report-secret` with the value of `REPORT_WEBHOOK_SECRET`.
+5. Report your own test post from the app and check the phone: it must say only the type, the reason and the id.
 
 ### Email
 
-The ntfy.sh server can forward a notification as an email: add the header `Email: <your address>` to the same
-webhook (the public server limits how many emails it sends a day). For email through your own sender (for
-example Resend), a small Edge Function is needed that formats the email; it is not in this repository yet. It would
-read the sender key from a Supabase secret named, for example, `MODERATION_EMAIL_API_KEY` and the address from
-`MODERATION_EMAIL_TO`; set those in Dashboard > Edge Functions > Secrets, never in code.
+ntfy can forward each notification by email: in the function, add the header `Email` with your address to
+`headers` (the public ntfy.sh server sends only a few emails a day). For email through your own sender (for example
+Resend), change the `fetch` in the function to that sender's API, with its key in a secret named, for example,
+`MODERATION_EMAIL_API_KEY` and your address in `MODERATION_EMAIL_TO`. Send the same short text: type, reason, id.
 
 ## Limits that protect you
 

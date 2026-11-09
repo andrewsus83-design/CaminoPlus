@@ -80,7 +80,9 @@ left join public.profiles owner     on owner.id = case r.target_type
                                          when 'stay_photo'   then sp.user_id
                                          when 'crowd_report' then cr.user_id
                                          when 'profile'      then pr.id
-                                         when 'message'      then (r.evidence ->> 'sender_id')::uuid
+                                         -- a safe cast: one odd evidence row must never break the whole queue
+                                         when 'message'      then case when (r.evidence ->> 'sender_id') ~* '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+                                                                       then (r.evidence ->> 'sender_id')::uuid end
                                        end
 left join public.profiles reporter  on reporter.id = r.reporter_id
 where r.status in ('open', 'reviewing')

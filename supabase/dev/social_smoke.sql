@@ -261,7 +261,9 @@ end $$;
 select social_test.login('erin');
 do $$
 begin
-  assert (select count(*) from public.list_friend_requests()) = 0, 'declined request is gone for erin too';
+  -- since 20261120010000 erin is not told: for 30 days her request still reads as not answered yet
+  assert (select count(*) from public.list_friend_requests() where direction = 'outgoing' and id = social_test.u('alice')) = 1,
+    'a declined request still looks unanswered to erin';
   -- since 20261120010000: for 30 days after a decline, asking again looks the same to erin but reaches nobody
   assert public.send_friend_request(social_test.u('alice')) = 'pending', 'erin asks again (cool-down: silent)';
 end $$;

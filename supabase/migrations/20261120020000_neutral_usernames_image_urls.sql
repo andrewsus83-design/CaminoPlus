@@ -13,10 +13,11 @@
 --                       else null (the app then shows the username)
 --        avatar_url   = the provider's picture only when it is an allowed URL (see 2), else null
 --      Existing profiles are NOT touched.
---   2. private.is_allowed_image_url(text): null, '', this project's public storage URLs
---      (https://xgikdabgdqmbdgagowva.supabase.co/storage/v1/object/public/...), Google profile photos
---      (https://lh3.googleusercontent.com/...) and the local development stack
---      (http://127.0.0.1:54321/... or http://localhost:54321/...). A CHECK with it is added on
+--   2. private.is_allowed_image_url(text): null, '', this project's public storage URLs of the buckets avatars,
+--      public-media and business-media (https://xgikdabgdqmbdgagowva.supabase.co/storage/v1/object/public/<bucket>/...),
+--      Google profile photos (https://lh3. to lh6.googleusercontent.com/...) and the local development stack
+--      (http://127.0.0.1:54321/... or http://localhost:54321/...); never with whitespace, a backslash, ".." or
+--      "%2e" in it. A CHECK with it is added on
 --        public.profiles.avatar_url, public.profiles.cover_url, public.conversations.avatar_url (group photo)
 --        and public.journeys.cover_url (same risk: a followers-visible picture any client could point anywhere).
 --
@@ -58,9 +59,10 @@ as $$
       or p_url = ''
       or (char_length(p_url) <= 1000
           and p_url !~ '[[:space:]\\]'
-          and (p_url ~ '^https://xgikdabgdqmbdgagowva\.supabase\.co/storage/v1/object/public/[a-z0-9-]+/'
-               or p_url ~ '^https://lh3\.googleusercontent\.com/'
-               or p_url ~ '^http://(127\.0\.0\.1|localhost):54321/storage/v1/object/public/[a-z0-9-]+/'));
+          and p_url !~* '(\.\.|%2e)'      -- no way out of the folder ("..", or "." written as %2e)
+          and (p_url ~ '^https://xgikdabgdqmbdgagowva\.supabase\.co/storage/v1/object/public/(avatars|public-media|business-media)/'
+               or p_url ~ '^https://lh[3-6]\.googleusercontent\.com/'
+               or p_url ~ '^http://(127\.0\.0\.1|localhost):54321/storage/v1/object/public/(avatars|public-media|business-media)/'));
 $$;
 revoke execute on function private.is_allowed_image_url(text) from public;
 -- a CHECK runs as the role that writes the row
