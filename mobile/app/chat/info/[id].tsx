@@ -13,7 +13,7 @@ import { EmptyState, ErrorState, Section } from '@/features/social/components/st
 import { MAX_GROUP_TITLE, REPORT_PROMPT, REPORT_REASONS, REPORT_THANKS, blockMessage, conversationName, firstName, friendlyError, isMuted, muteLabel, personName, pilgrimsLabel } from '@/features/social/logic';
 import { goBack } from '@/features/social/nav';
 import type { Friend, Member, ReportReason } from '@/features/social/types';
-import { c, layout, radius, role } from '@/theme';
+import { c, layout, radius, role, space } from '@/theme';
 
 const FAR = '2100-01-01T00:00:00.000Z';
 const inHours = (h: number) => new Date(Date.now() + h * 3_600_000).toISOString();
@@ -26,11 +26,11 @@ function InfoRow({ icon, label, value, onPress, danger, first, busy }: { icon: I
   return (
     <Pressable
       accessibilityRole="button" accessibilityLabel={value ? `${label}, ${value}` : label} onPress={onPress} disabled={busy}
-      style={({ pressed }) => ({ minHeight: 64, flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: 18, borderTopWidth: first ? 0 : 1, borderTopColor: role.border, backgroundColor: pressed ? c.sand200 : 'transparent' })}
+      style={({ pressed }) => ({ minHeight: 64, flexDirection: 'row', alignItems: 'center', gap: space[4], paddingHorizontal: space[5], borderTopWidth: first ? 0 : 1, borderTopColor: role.border, backgroundColor: pressed ? role.sunken : 'transparent' })}
     >
-      <Icon name={icon} color={danger ? c.red : role.text} size={24} />
-      <AppText variant="body" color={danger ? c.red : role.text} style={{ flex: 1, fontSize: 18, lineHeight: 24 }}>{label}</AppText>
-      {busy ? <ActivityIndicator color={role.action} /> : !!value && <AppText variant="small" muted style={{ fontSize: 16 }}>{value}</AppText>}
+      <Icon name={icon} color={danger ? role.danger : role.text} size={24} />
+      <AppText variant="body" color={danger ? role.danger : role.text} style={{ flex: 1 }}>{label}</AppText>
+      {busy ? <ActivityIndicator color={role.action} /> : !!value && <AppText variant="small" muted>{value}</AppText>}
       {!danger && !busy && <Icon name="chevron" color={role.muted} size={20} />}
     </Pressable>
   );
@@ -39,16 +39,18 @@ function InfoRow({ icon, label, value, onPress, danger, first, busy }: { icon: I
 function RolePill({ role: r }: { role: Member['role'] }) {
   if (r === 'member') return null;
   return (
-    <View style={{ backgroundColor: r === 'owner' ? c.goldWash : c.blue50, borderRadius: radius.pill, paddingHorizontal: 10, paddingVertical: 2, borderWidth: 1, borderColor: r === 'owner' ? c.goldSoft : c.blue100 }}>
-      <AppText variant="caption" color={r === 'owner' ? c.goldInk : c.blue} style={{ letterSpacing: 0, fontSize: 13, lineHeight: 18 }}>{r === 'owner' ? 'Owner' : 'Admin'}</AppText>
+    // design-lint-ignore: inset a badge is as small as its word: 4 above and below the 15 px text, in a person row
+    <View style={{ backgroundColor: r === 'owner' ? c.goldWash : c.blue50, borderRadius: radius.pill, paddingHorizontal: space[3], paddingVertical: space[1], borderWidth: 1, borderColor: r === 'owner' ? c.goldSoft : c.blue100 }}>
+      <AppText variant="caption" color={r === 'owner' ? role.accentText : role.action}>{r === 'owner' ? 'Owner' : 'Admin'}</AppText>
     </View>
   );
 }
 
 function YouPill() {
   return (
-    <View style={{ backgroundColor: c.sand200, borderRadius: radius.pill, paddingHorizontal: 10, paddingVertical: 2 }}>
-      <AppText variant="caption" color={role.text} style={{ letterSpacing: 0, fontSize: 13, lineHeight: 18 }}>You</AppText>
+    // design-lint-ignore: inset a badge is as small as its word: 4 above and below the 15 px text, in a person row
+    <View style={{ backgroundColor: role.sunken, borderRadius: radius.pill, paddingHorizontal: space[3], paddingVertical: space[1] }}>
+      <AppText variant="caption" color={role.text}>You</AppText>
     </View>
   );
 }
@@ -126,7 +128,7 @@ export default function ChatInfo() {
   };
 
   const head = (
-    <View style={{ paddingTop: insets.top + layout.screenTop, paddingHorizontal: layout.screenMargin, paddingBottom: 8 }}>
+    <View style={{ paddingTop: insets.top + layout.screenTop, paddingHorizontal: layout.screenMargin, paddingBottom: space[2] }}>
       <ScreenHeader title={group ? 'Group info' : 'Chat info'} variant="h3" onBack={() => goBack(router)} />
     </View>
   );
@@ -142,14 +144,14 @@ export default function ChatInfo() {
   return (
     <View style={{ flex: 1, backgroundColor: role.bg }}>
       {head}
-      <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 40, gap: 6 }}>
-        <View style={{ alignItems: 'center', gap: 8, paddingVertical: 16, paddingHorizontal: layout.screenMargin }}>
+      <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 40, gap: space[2] }}>
+        <View style={{ alignItems: 'center', gap: space[2], paddingVertical: space[4], paddingHorizontal: layout.screenMargin }}>
           <PilgrimAvatar name={name} uri={group ? conv.avatar_url : conv.peer_avatar_url} seed={peerId ?? conv.id} size={104} group={group} />
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: space[2] }}>
             <AppText variant="h3" numberOfLines={2} style={{ textAlign: 'center', flexShrink: 1 }}>{name}</AppText>
             {group && canManage && (
               <Pressable accessibilityRole="button" accessibilityLabel="Rename group" onPress={rename} style={{ width: 48, height: 48, borderRadius: radius.pill, backgroundColor: role.surface, borderWidth: 1, borderColor: role.border, alignItems: 'center', justifyContent: 'center' }}>
-                <Icon name="pen" color={c.blue} size={20} />
+                <Icon name="pen" color={role.action} size={20} />
               </Pressable>
             )}
           </View>
@@ -167,7 +169,7 @@ export default function ChatInfo() {
                   <PersonRow
                     name={personName(m)} username={m.username} uri={m.avatar_url} seed={m.user_id} size={48} inset={16}
                     trailing={
-                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: space[2] }}>
                         <RolePill role={m.role} />
                         {m.user_id === info.uid && <YouPill />}
                         {m.user_id !== info.uid && (
@@ -181,7 +183,7 @@ export default function ChatInfo() {
                 </View>
               ))}
             </Card>
-            <View style={{ paddingHorizontal: layout.screenMargin, paddingTop: 18 }}><Btn label="Leave group" icon="logout" variant="dangerGhost" full onPress={leave} loading={info.busy} /></View>
+            <View style={{ paddingHorizontal: layout.screenMargin, paddingTop: space[5] }}><Btn label="Leave group" icon="logout" variant="dangerGhost" full onPress={leave} loading={info.busy} /></View>
           </>
         )}
 
@@ -194,7 +196,7 @@ export default function ChatInfo() {
                 : <InfoRow first icon="block" label={`Block ${name}`} danger onPress={() => block(peerId, name)} />}
               <InfoRow icon="flag" label={`Report ${name}`} danger onPress={() => report(peerId, name)} />
             </Card>
-            <AppText variant="caption" muted style={{ paddingHorizontal: layout.screenMargin, paddingTop: 6, letterSpacing: 0 }}>Chats are not end-to-end encrypted. Never share your location or money details here.</AppText>
+            <AppText variant="caption" muted style={{ paddingHorizontal: layout.screenMargin, paddingTop: space[2] }}>Chats are not end-to-end encrypted. Never share your location or money details here.</AppText>
           </>
         )}
       </ScrollView>
@@ -216,8 +218,8 @@ function AddPeople({ visible, inGroup, onClose, onAdd }: { visible: boolean; inG
   return (
     <Modal visible={visible} animationType="slide" onRequestClose={close} presentationStyle="pageSheet">
       <View style={{ flex: 1, backgroundColor: role.bg, paddingTop: 20 }}>
-        <View style={{ paddingHorizontal: layout.screenMargin, paddingBottom: 8 }}>
-          <ScreenHeader title="Add pilgrims" variant="h3" right={<Pressable accessibilityRole="button" accessibilityLabel="Close" onPress={close} style={{ width: 48, height: 48, borderRadius: radius.pill, backgroundColor: role.surface, borderWidth: 1, borderColor: role.border, alignItems: 'center', justifyContent: 'center' }}><Icon name="close" color={role.text} size={22} /></Pressable>} />
+        <View style={{ paddingHorizontal: layout.screenMargin, paddingBottom: space[2] }}>
+          <ScreenHeader title="Add pilgrims" variant="h3" right={<Pressable accessibilityRole="button" accessibilityLabel="Close" onPress={close} style={{ width: 48, height: 48, borderRadius: radius.pill, backgroundColor: role.surface, borderWidth: 1, borderColor: role.border, alignItems: 'center', justifyContent: 'center' }}><Icon name="close" color={role.text} size={24} /></Pressable>} />
         </View>
         {loading && <ActivityIndicator color={role.action} style={{ marginTop: 32 }} />}
         {!!error && !friends && <ErrorState text={error} onRetry={retry} />}

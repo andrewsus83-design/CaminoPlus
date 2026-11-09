@@ -223,7 +223,8 @@ set local role authenticated;
 do $$ begin
   assert (select count(*) from public.posts) = 1, 'follower sees the public post but not the private journal';
   assert (select count(*) from storage.objects) = 1, 'follower can read the post photo';
-  assert (select count(*) from public.user_stamps) = 2, 'follower sees passport of a public journey';
+  -- 20261114100000_plan_private.sql: stamps belong to their owner alone, also on a public journey
+  assert (select count(*) from public.user_stamps) = 0, 'a follower sees no stamp, not even of a public journey';
 end $$;
 insert into public.post_likes (post_id) values ('d0000000-0000-0000-0000-000000000001');
 insert into public.post_comments (post_id, body) values ('d0000000-0000-0000-0000-000000000001', 'Ultreia!');

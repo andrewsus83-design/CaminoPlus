@@ -413,8 +413,9 @@ begin
   assert (select count(*) from public.posts where user_id = social_test.u('dave')) = 2, 'friend sees public and followers posts of a private account';
   assert (select count(*) from public.posts where id = '1c000000-0000-0000-0000-0000000000d3') = 0, 'but not private posts';
   assert (select count(*) from public.journeys where user_id = social_test.u('dave')) = 1, 'friend sees the journey';
-  assert (select count(*) from public.journey_days where user_id = social_test.u('dave')) = 1, 'friend sees the plan';
-  assert (select count(*) from public.user_stamps where user_id = social_test.u('dave')) = 1, 'friend sees the passport';
+  -- 20261114100000_plan_private.sql: a friend sees the journey (row, posts), never the plan or the stamps
+  assert (select count(*) from public.journey_days where user_id = social_test.u('dave')) = 0, 'a friend does not see the plan';
+  assert (select count(*) from public.user_stamps where user_id = social_test.u('dave')) = 0, 'a friend does not see the stamps';
 end $$;
 select social_test.login('bob');
 do $$
