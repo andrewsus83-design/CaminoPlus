@@ -8,7 +8,7 @@ import { KeyboardAvoidingView, Modal, Pressable, ScrollView, TextInput, View } f
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '@/components/AppText';
 import { Icon, IconName } from '@/components/Icon';
-import { c, fonts, radius, role, scrim, shadowStyle, layout } from '@/theme';
+import { c, layout, radius, role, scrim, shadowStyle, space, textStyle } from '@/theme';
 import { Btn, noOutline } from './primitives';
 
 export type MenuOption<T extends string = string> = { key: T; label: string; icon?: IconName; destructive?: boolean; hint?: string };
@@ -59,7 +59,7 @@ function Sheet({ children, onClose, label }: { children: ReactNode; onClose: () 
     <Modal visible transparent animationType="fade" onRequestClose={onClose} statusBarTranslucent>
       <KeyboardAvoidingView behavior="padding" style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: scrim }}>
         <Pressable accessibilityLabel={`Close ${label}`} accessibilityRole="button" onPress={onClose} style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 }} />
-        <View accessibilityViewIsModal style={{ backgroundColor: role.bg, borderTopLeftRadius: radius.lg, borderTopRightRadius: radius.lg, paddingTop: 12, paddingHorizontal: layout.screenMargin, paddingBottom: Math.max(insets.bottom, 12) + 16, gap: 16, maxHeight: '88%', ...shadowStyle('xl') }}>
+        <View accessibilityViewIsModal style={{ backgroundColor: role.bg, borderTopLeftRadius: radius.lg, borderTopRightRadius: radius.lg, paddingTop: space[3], paddingHorizontal: layout.screenMargin, paddingBottom: Math.max(insets.bottom, 12) + 16, gap: space[4], maxHeight: '88%', ...shadowStyle('xl') }}>
           <View style={{ alignSelf: 'center', width: 48, height: 5, borderRadius: radius.pill, backgroundColor: role.border }} />
           {children}
         </View>
@@ -74,16 +74,16 @@ function DialogHost({ state, close, toastText }: { state: State | null; close: (
     <>
       {state?.type === 'confirm' && (
         <Sheet label={state.title} onClose={() => close(false)}>
-          <View style={{ gap: 8 }}>
+          <View style={{ gap: space[2] }}>
             {state.icon && (
-              <View style={{ width: 56, height: 56, borderRadius: radius.pill, backgroundColor: state.destructive ? c.red100 : c.goldWash, alignItems: 'center', justifyContent: 'center', marginBottom: 4 }}>
-                <Icon name={state.icon} color={state.destructive ? c.red700 : c.goldInk} size={28} />
+              <View style={{ width: 56, height: 56, borderRadius: radius.pill, backgroundColor: state.destructive ? c.red100 : c.goldWash, alignItems: 'center', justifyContent: 'center', marginBottom: space[1] }}>
+                <Icon name={state.icon} color={state.destructive ? c.red700 : role.accentText} size={28} />
               </View>
             )}
             <AppText variant="h4" accessibilityRole="header">{state.title}</AppText>
             {!!state.message && <AppText variant="small" muted>{state.message}</AppText>}
           </View>
-          <View style={{ gap: 10 }}>
+          <View style={{ gap: space[3] }}>
             <Btn label={state.confirmLabel} variant={state.destructive ? 'danger' : 'primary'} onPress={() => close(true)} />
             <Btn label={state.cancelLabel ?? 'Cancel'} variant="ghost" onPress={() => close(false)} />
           </View>
@@ -93,7 +93,7 @@ function DialogHost({ state, close, toastText }: { state: State | null; close: (
       {state?.type === 'menu' && (
         <Sheet label={state.title ?? 'menu'} onClose={() => close(null)}>
           {(!!state.title || !!state.message) && (
-            <View style={{ gap: 4 }}>
+            <View style={{ gap: space[1] }}>
               {!!state.title && <AppText variant="h4" accessibilityRole="header" numberOfLines={2}>{state.title}</AppText>}
               {!!state.message && <AppText variant="small" muted numberOfLines={3}>{state.message}</AppText>}
             </View>
@@ -103,12 +103,12 @@ function DialogHost({ state, close, toastText }: { state: State | null; close: (
               {state.options.map((o, i) => (
                 <Pressable
                   key={o.key} accessibilityRole="button" accessibilityLabel={o.label} onPress={() => close(o.key)}
-                  style={({ pressed }) => ({ minHeight: 58, flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: 18, paddingVertical: 8, borderTopWidth: i === 0 ? 0 : 1, borderTopColor: role.border, backgroundColor: pressed ? c.sand200 : 'transparent' })}
+                  style={({ pressed }) => ({ minHeight: 58, flexDirection: 'row', alignItems: 'center', gap: space[4], paddingHorizontal: space[5], paddingVertical: space[2], borderTopWidth: i === 0 ? 0 : 1, borderTopColor: role.border, backgroundColor: pressed ? role.sunken : 'transparent' })}
                 >
-                  {o.icon && <Icon name={o.icon} color={o.destructive ? c.red : role.text} size={24} />}
+                  {o.icon && <Icon name={o.icon} color={o.destructive ? role.danger : role.text} size={24} />}
                   <View style={{ flex: 1 }}>
-                    <AppText variant="body" color={o.destructive ? c.red : role.text} style={{ fontSize: 18, lineHeight: 24 }}>{o.label}</AppText>
-                    {!!o.hint && <AppText variant="caption" muted style={{ letterSpacing: 0 }}>{o.hint}</AppText>}
+                    <AppText variant="body" color={o.destructive ? role.danger : role.text}>{o.label}</AppText>
+                    {!!o.hint && <AppText variant="caption" muted>{o.hint}</AppText>}
                   </View>
                 </Pressable>
               ))}
@@ -122,14 +122,14 @@ function DialogHost({ state, close, toastText }: { state: State | null; close: (
 
       {state?.type === 'notice' && (
         <Sheet label={state.title} onClose={() => close(null)}>
-          <View style={{ gap: 10 }}>
+          <View style={{ gap: space[3] }}>
             <View style={{ width: 64, height: 64, borderRadius: radius.pill, backgroundColor: c.goldWash, alignItems: 'center', justifyContent: 'center' }}>
-              <Icon name={state.icon ?? 'shell'} color={c.goldInk} size={32} />
+              <Icon name={state.icon ?? 'shell'} color={role.accentText} size={32} />
             </View>
             <AppText variant="h4" accessibilityRole="header">{state.title}</AppText>
             <AppText variant="small" muted>{state.message}</AppText>
           </View>
-          <View style={{ gap: 10 }}>
+          <View style={{ gap: space[3] }}>
             {state.primary && <Btn label={state.primary.label} onPress={() => close(state.primary!.value)} />}
             <Btn label={state.closeLabel ?? (state.primary ? 'Not now' : 'OK')} variant={state.primary ? 'ghost' : 'primary'} onPress={() => close(null)} />
           </View>
@@ -138,7 +138,7 @@ function DialogHost({ state, close, toastText }: { state: State | null; close: (
 
       {!!toastText && (
         <View pointerEvents="none" style={{ position: 'absolute', left: layout.screenMargin, right: layout.screenMargin, bottom: insets.bottom + 96, alignItems: 'center' }}>
-          <View accessibilityLiveRegion="polite" accessibilityRole="alert" style={{ maxWidth: 420, backgroundColor: c.blue900, borderRadius: radius.pill, paddingHorizontal: 22, paddingVertical: 14, ...shadowStyle('lg') }}>
+          <View accessibilityLiveRegion="polite" accessibilityRole="alert" style={{ maxWidth: 420, backgroundColor: c.blue900, borderRadius: radius.pill, paddingHorizontal: space[6], paddingVertical: space[4], ...shadowStyle('lg') }}>
             <AppText variant="small" color={c.parchment} style={{ textAlign: 'center' }}>{toastText}</AppText>
           </View>
         </View>
@@ -152,17 +152,17 @@ function PromptSheet({ state, close }: { state: Extract<State, { type: 'prompt' 
   const ok = value.trim().length > 0;
   return (
     <Sheet label={state.title} onClose={() => close(null)}>
-      <View style={{ gap: 8 }}>
+      <View style={{ gap: space[2] }}>
         <AppText variant="h4" accessibilityRole="header">{state.title}</AppText>
         {!!state.message && <AppText variant="small" muted>{state.message}</AppText>}
       </View>
       <TextInput
         autoFocus value={value} onChangeText={setValue} maxLength={state.maxLength} placeholder={state.placeholder} placeholderTextColor={role.muted}
         accessibilityLabel={state.title} returnKeyType="done" onSubmitEditing={() => ok && close(value.trim())}
-        style={[{ minHeight: 60, borderRadius: radius.pill, backgroundColor: role.surface, borderWidth: 2, borderColor: c.gold, paddingHorizontal: 22, fontFamily: fonts.body, fontSize: 19, color: role.text }, noOutline]}
+        style={[{ minHeight: 60, borderRadius: radius.pill, backgroundColor: role.surface, borderWidth: 2, borderColor: role.highlight, paddingHorizontal: space[6], ...textStyle('body'), color: role.text }, noOutline]}
       />
       {state.maxLength != null && <AppText variant="caption" muted style={{ textAlign: 'right', marginTop: -8 }}>{value.length} / {state.maxLength}</AppText>}
-      <View style={{ flexDirection: 'row', gap: 12 }}>
+      <View style={{ flexDirection: 'row', gap: space[3] }}>
         <View style={{ flex: 1 }}><Btn label="Cancel" variant="ghost" onPress={() => close(null)} /></View>
         <View style={{ flex: 1 }}><Btn label={state.confirmLabel} disabled={!ok} onPress={() => close(value.trim())} /></View>
       </View>
