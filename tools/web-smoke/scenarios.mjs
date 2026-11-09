@@ -26,6 +26,7 @@ import { ME_SCENARIOS } from './me.scenarios.mjs';
 import { PILGRIM_SCENARIOS } from './pilgrim.scenarios.mjs';
 import { SHARE_SCENARIOS } from './share.scenarios.mjs';
 import { ALL_PLACES_SCENARIOS } from './allplaces.scenarios.mjs';
+import { MAP_SCENARIOS } from './maps.scenarios.mjs';
 
 /** design/tokens.json: the weights of the tabs of the tab bar (section tab) are read from it, as the app reads them. */
 const TAB_TOKENS = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'design', 'tokens.json'), 'utf8')).tab;
@@ -634,4 +635,5 @@ export const SCENARIOS = [
   },
   ...DAILY_SCENARIOS,
   ...ALL_PLACES_SCENARIOS,
+  ...MAP_SCENARIOS,
 ];

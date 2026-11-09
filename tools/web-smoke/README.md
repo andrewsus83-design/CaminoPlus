@@ -104,6 +104,14 @@ Then the **scenarios** ([scenarios.mjs](scenarios.mjs)), each in light and dark,
     "3 of 34 places"; a stamp shows exactly the posts at that place with the card that writes a post once, the app's one Back button over it goes back to the stamps (not to all the posts), and
     All again closes the stamps; a place with no post says "No journeys at <place> yet" over the card alone; from Plan and Health All opens the stamps of Journey, and a destination of the row
     still shows its posts (the same one again clears it); a plan with no destination still has the All item, alone in the row; an account whose route has no places has no All item;
+- Maps ([maps.scenarios.mjs](maps.scenarios.mjs), the round controls of the Maps tab, on 320 x 568, 360 x 640, 390 x 844 and 430 x 932 with the safe area of a phone where Chromium can add it): every round
+  control, on the whole route and in the Walk view, is 56 by 56 with a 28 icon, 16 from the right edge and 12 apart, the zoom pair one capsule 56 wide and 112 high whose halves touch; the Re-center pill
+  (the map is dragged by hand first) is 56 high with a 24 arrow and "Re-center" in Inter SemiBold at 17, 16 from the left edge, level with the bottom of the column and 12 or more from it; the Walk view
+  column ends 12 above the bottom card and the whole route column 16 above the tab bar; the top row ("Whole route / Near me", 56 high, and the offline maps button) never touches at 320 wide; nothing on
+  the screen overlaps (banner, chips, notices, column, pill, card, tab bar) and no text is under 15 px; a short phone folds what does not fit into the "Map options" rows of the sheet of the flag button
+  (named "Route details and map options"), which work there, while the zoom pair and the help bell (in the column, or in the row of buttons of the card) are always there; and with the text 1.5 and 2 times
+  as big (the page's text and line heights scaled, as a phone does: the web has no such setting) nothing overlaps and the zoom pair is still reachable (in the column, or as two rows of Map options when it does not fit). The check fails on the build before the family existed
+  (the help bell was 48 wide);
 - Notes, a page is a draft until it is published: on a blank page Read and Publish are off and there is no Save draft; with words in it Save draft is at the
   top right and the date says Draft; the marks (Bold, Italic, Heading, Bulleted list, Quote) sit inside the text box, under the text and above the bottom
   row; Read is a third and Publish two thirds of one row at the bottom (margin to margin, at least 48 high); Read turns into Edit in the same place; Save draft
@@ -247,6 +255,7 @@ Chromium; a test checks they agree). Bump both on purpose, with the tests looked
 | [pilgrim.scenarios.mjs](pilgrim.scenarios.mjs) | the walks of the profile of another pilgrim: a friend, a stranger, a private one, one that is not there, no signal, the name of a comment author, and that nothing private is on it |
 | [share.scenarios.mjs](share.scenarios.mjs) | the walks of share links: Share plan link on Plan (the question first, Cancel makes nothing, what is sent and what reaches the share sheet), Settings > Shared links and Stop sharing |
 | [allplaces.scenarios.mjs](allplaces.scenarios.mjs) | the walks of the All item of Me: the row, the stamps of the route, the journeys at a place, the way back, Plan and Health, no destination, no places |
+| [maps.scenarios.mjs](maps.scenarios.mjs) | the walks of the Maps tab: the round controls as one family, nothing overlapping, the folded controls in Map options, large text |
 | [bible.scenarios.mjs](bible.scenarios.mjs) | the walks of the Bible tab and the reader (kept apart so the other walks stay short) |
 | [books.scenarios.mjs](books.scenarios.mjs) | the walks of the Books tab: the covers, a book page, the reader, the place kept on the phone, the notice of each kind |
 | [continue.scenarios.mjs](continue.scenarios.mjs) | the walks of the Continue reading bar above the tab bar of the Library: where it sits, closing it, the most recent place, a mark that does not read |
