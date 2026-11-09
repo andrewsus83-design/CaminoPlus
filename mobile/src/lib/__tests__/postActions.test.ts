@@ -140,6 +140,14 @@ const test = async (name: string, fn: () => Promise<void> | void) => { await fn(
     assert.deepEqual(rows.map((c) => c.id), ['new', 'mid', 'old'], 'the rows it was given are not reordered');
   });
 
+  await test('toSheetComments: each comment says who wrote it, so a name can open that pilgrim\'s profile', () => {
+    const rows = parseComments([
+      row({ id: 'a', created_at: '2026-11-05T12:00:00Z', user_id: 'u1' }),
+      row({ id: 'b', created_at: '2026-11-05T13:00:00Z', user_id: 'me' }),
+    ])!;
+    assert.deepEqual(toSheetComments(rows, 'me').map((c) => [c.id, c.userId, c.mine]), [['a', 'u1', false], ['b', 'me', true]]);
+  });
+
   /* ---------------- local love and bookmark of sample content ---------------- */
 
   await test('parseFavs: the shape Discover has always stored, and nothing for anything else', () => {

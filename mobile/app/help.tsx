@@ -8,7 +8,7 @@ import { Pill } from '@/components/Pill';
 import { BackButton } from '@/components/BackButton';
 import { Card, SectionLabel } from '@/components/ui';
 import { SUPPORT_EMAIL, mailSupport } from '@/lib/support';
-import { c, layout, role } from '@/theme';
+import { c, layout, role, space } from '@/theme';
 
 // Settings > Support > Help centre: short answers that work without signal, then ways to reach the team.
 const FAQ: { q: string; a: string }[] = [
@@ -26,12 +26,12 @@ const FAQ: { q: string; a: string }[] = [
 function Question({ q, a, first }: { q: string; a: string; first: boolean }) {
   const [open, setOpen] = useState(false);
   return (
-    <View style={{ borderTopWidth: first ? 0 : 1, borderTopColor: c.sand300 }}>
-      <Pressable accessibilityRole="button" accessibilityState={{ expanded: open }} accessibilityLabel={q} onPress={() => setOpen((o) => !o)} style={{ minHeight: 56, flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16, paddingVertical: 12 }}>
+    <View style={{ borderTopWidth: first ? 0 : 1, borderTopColor: role.border }}>
+      <Pressable accessibilityRole="button" accessibilityState={{ expanded: open }} accessibilityLabel={q} onPress={() => setOpen((o) => !o)} style={{ minHeight: 56, flexDirection: 'row', alignItems: 'center', gap: space[3], paddingHorizontal: space[4], paddingVertical: space[3] }}>
         <AppText variant="label" style={{ flex: 1 }}>{q}</AppText>
-        <View style={{ transform: [{ rotate: open ? '90deg' : '0deg' }] }}><Icon name="chevron" color={c.blue} size={20} /></View>
+        <View style={{ transform: [{ rotate: open ? '90deg' : '0deg' }] }}><Icon name="chevron" color={role.action} size={20} /></View>
       </Pressable>
-      {open && <AppText variant="small" style={{ paddingHorizontal: 16, paddingBottom: 16 }}>{a}</AppText>}
+      {open && <AppText variant="small" style={{ paddingHorizontal: space[4], paddingBottom: space[4] }}>{a}</AppText>}
     </View>
   );
 }
@@ -42,19 +42,19 @@ export default function Help() {
   const [mailError, setMailError] = useState(false);
   return (
     <View style={{ flex: 1, backgroundColor: role.bg }}>
-      <ScrollView contentContainerStyle={{ paddingTop: insets.top + layout.screenTop, paddingHorizontal: layout.screenMargin, paddingBottom: insets.bottom + 40, gap: 20 }}>
+      <ScrollView contentContainerStyle={{ paddingTop: insets.top + layout.screenTop, paddingHorizontal: layout.screenMargin, paddingBottom: insets.bottom + space[10], gap: space[5] }}>
         <BackButton />
-        <View style={{ gap: 8 }}>
+        <View style={{ gap: space[2] }}>
           <AppText variant="h2">Help</AppText>
           <AppText variant="lead" muted>Quick answers for the road. Everything on this page works offline.</AppText>
         </View>
-        <View style={{ gap: 8 }}>
+        <View style={{ gap: space[2] }}>
           <SectionLabel>Common questions</SectionLabel>
-          <Card style={{ padding: 4 }}>
+          <Card style={{ padding: space[1] }}>
             {FAQ.map((f, i) => <Question key={f.q} q={f.q} a={f.a} first={i === 0} />)}
           </Card>
         </View>
-        <Card style={{ gap: 12, backgroundColor: c.goldWash }}>
+        <Card style={{ gap: space[3], backgroundColor: c.goldWash }}>
           <AppText variant="label">Still stuck?</AppText>
           <AppText variant="small">Send us a message and we will help. You can also write to {SUPPORT_EMAIL}.</AppText>
           <Pill large label="Send feedback" onPress={() => router.push('/feedback')} />

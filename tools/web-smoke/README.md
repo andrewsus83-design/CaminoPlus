@@ -34,7 +34,7 @@ in light. Offline, the empty account has only the account saved, the Me tab neve
 
 Then the **scenarios** ([scenarios.mjs](scenarios.mjs)), each in light and dark, written the way a person would use the app:
 
-- the tab bar shows Me, Stays, Maps, Discover and Library, and each tab opens; an inactive tab is thin and Light and its icon is drawn as thick as the stem of its label (0.8 of 24 units at 28 px, 0.93 px, within 10 percent of the 0.93 px of Inter Light at 14), the active tab heavier (the numbers of `tokens.tab`);
+- the tab bar shows Me, Stays, Maps, Discover and Library, and each tab opens; an inactive tab is thin and its icon is drawn as thick as the stem of its label (dark mode: Inter Light and 0.8 of 24 units at 28 px, 0.93 px; light mode: Inter Regular and 1.05, 1.225 px against a stem of 1.23 px; within 10 percent), the active tab heavier (the numbers of `tokens.tab`);
 - the gear on Me opens `/settings` (no tab bar there) and Back returns to `/me`, also when Settings was opened from a link;
 - switching light/dark on Settings returns to Settings, and Back goes to Me;
 - Library: its top row is a search field and the Bookmarks button (no title, no diary button); directly under it, before any banner, the two tabs
@@ -104,11 +104,30 @@ Then the **scenarios** ([scenarios.mjs](scenarios.mjs)), each in light and dark,
     "3 of 34 places"; a stamp shows exactly the posts at that place with the card that writes a post once, the app's one Back button over it goes back to the stamps (not to all the posts), and
     All again closes the stamps; a place with no post says "No journeys at <place> yet" over the card alone; from Plan and Health All opens the stamps of Journey, and a destination of the row
     still shows its posts (the same one again clears it); a plan with no destination still has the All item, alone in the row; an account whose route has no places has no All item;
+- Maps ([maps.scenarios.mjs](maps.scenarios.mjs), the round controls of the Maps tab, on 320 x 568, 360 x 640, 390 x 844 and 430 x 932 with the safe area of a phone where Chromium can add it): every round
+  control, on the whole route and in the Walk view, is 56 by 56 with a 28 icon, 16 from the right edge and 12 apart, the zoom pair one capsule 56 wide and 112 high whose halves touch; the Re-center pill
+  (the map is dragged by hand first) is 56 high with a 24 arrow and "Re-center" in Inter SemiBold at 17, 16 from the left edge, level with the bottom of the column and 12 or more from it; the Walk view
+  column ends 12 above the bottom card and the whole route column 16 above the tab bar; the top row ("Whole route / Near me", 56 high, and the offline maps button) never touches at 320 wide; nothing on
+  the screen overlaps (banner, chips, notices, column, pill, card, tab bar) and no text is under 15 px; a short phone folds what does not fit into the "Map options" rows of the sheet of the flag button
+  (named "Route details and map options"), which work there, while the zoom pair and the help bell (in the column, or in the row of buttons of the card) are always there; and with the text 1.5 and 2 times
+  as big (the page's text and line heights scaled, as a phone does: the web has no such setting) nothing overlaps and the zoom pair is still reachable (in the column, or as two rows of Map options when it does not fit). The check fails on the build before the family existed
+  (the help bell was 48 wide);
 - Notes, a page is a draft until it is published: on a blank page Read and Publish are off and there is no Save draft; with words in it Save draft is at the
   top right and the date says Draft; the marks (Bold, Italic, Heading, Bulleted list, Quote) sit inside the text box, under the text and above the bottom
   row; Read is a third and Publish two thirds of one row at the bottom (margin to margin, at least 48 high); Read turns into Edit in the same place; Save draft
   goes back to the feed with a Draft tag on the note; opened again the draft is read, with Edit and Publish; Publish takes the tag away; a published note that
   is read has Edit alone across the row, and written it has Read and Done and no Save draft;
+- Pilgrim profile ([pilgrim.scenarios.mjs](pilgrim.scenarios.mjs), the profile of ANOTHER pilgrim and their journey, `/pilgrim/<id>`): a friend opens from the friends list (the picture and
+  the name; the round chat button and the three dots stay on the row) with Back at the left and the three dots at the right (both at least 48), the card (name, @username, what they wrote, km,
+  posts, stamps), Message (56 high) and their journey as the grid of Me with NO card that writes a post (the first tile top left and the second on its row, 9:16, 2 px apart); a tile opens the
+  viewer with the action rail (love, bookmark, comments, share) and their name beside the close button, which closes it; Message opens the chat, and Back returns to the profile and then to the
+  list. **Nothing private**: no tab, no text or button named Notes, Plan or Health and no write card on the profile or in its viewer (the check is proved to fail on Me, where they are). The share
+  button of the viewer sends the invitation to the app, never their words, and counts nothing. The three dots: Unfriend, Report (with the reasons of the chat) and Block for a friend, no Unfriend
+  for anybody else; blocking makes the profile "not available" at once. A stranger found in the Find tab: Add friend (the request goes out, the button says Requested), and the journey says
+  "Journeys shared with friends are not shown here". A private stranger is a minimal card: the name and the button, none of the numbers or the words they wrote, no journey. An id nobody has, a link
+  that is not an id: one calm card, "This profile is not available", with Go to Friends; your own id goes to Me. With no signal it says you are offline, with Try again. The name of the author
+  of a comment opens that pilgrim (here Lucas, whose request is waiting: Accept and Decline), and the name in the header of a direct chat opens the friend. The route sweep draws the profile of
+  the friend in `routes.mjs` (SAMPLE_OVERRIDES); the people are in fixtures.mjs (Hannah the friend with three posts, Lucas with a request, Marta a public stranger, Ines a private one);
 - Stays lists the stays of the stage and one opens with its details;
 - logging out from Settings lands on Welcome;
 - launching the app lands on Welcome (signed out), Onboarding (signed in, no journey) or Me;
@@ -233,7 +252,9 @@ Chromium; a test checks they agree). Bump both on purpose, with the tests looked
 | [plan.mjs](plan.mjs) | which checks exist (route x state x scheme x mode, then the scenarios), the redirect list |
 | [scenarios.mjs](scenarios.mjs) | the walks a person does |
 | [me.scenarios.mjs](me.scenarios.mjs) | the walks of Me: the header with the gear alone, the chat button and where it opens, the card of Journey (also in the sample journey), the card of Notes |
+| [pilgrim.scenarios.mjs](pilgrim.scenarios.mjs) | the walks of the profile of another pilgrim: a friend, a stranger, a private one, one that is not there, no signal, the name of a comment author, and that nothing private is on it |
 | [allplaces.scenarios.mjs](allplaces.scenarios.mjs) | the walks of the All item of Me: the row, the stamps of the route, the journeys at a place, the way back, Plan and Health, no destination, no places |
+| [maps.scenarios.mjs](maps.scenarios.mjs) | the walks of the Maps tab: the round controls as one family, nothing overlapping, the folded controls in Map options, large text |
 | [bible.scenarios.mjs](bible.scenarios.mjs) | the walks of the Bible tab and the reader (kept apart so the other walks stay short) |
 | [books.scenarios.mjs](books.scenarios.mjs) | the walks of the Books tab: the covers, a book page, the reader, the place kept on the phone, the notice of each kind |
 | [continue.scenarios.mjs](continue.scenarios.mjs) | the walks of the Continue reading bar above the tab bar of the Library: where it sits, closing it, the most recent place, a mark that does not read |

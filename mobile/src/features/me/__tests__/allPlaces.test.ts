@@ -11,6 +11,7 @@ let n = 0;
 const check = (name: string, fn: () => void) => { fn(); n += 1; console.log(`ok   ${name}`); };
 const root = process.cwd(); // npm test runs from mobile/
 const read = (p: string) => readFileSync(join(root, p), 'utf8');
+const tokens = JSON.parse(read('src/theme/tokens.json')) as { text: Record<string, { size: number; lineHeight: number }> }; // the numbers of the type scale
 
 const post = (id: string, place: string | null, at: string | null = null): PostLike => ({ id, place_name: place, published_at: at });
 const names = (list: { name: string }[]) => list.map((p) => p.name);
@@ -242,6 +243,19 @@ check('the stamps are the passport\'s: three in a row, a 78 round, filled in gol
   assert.match(src, /\{p\.posts\.length\}<\/AppText>/, 'the number of posts is on the stamp');
   assert.match(src, /backgroundColor: role\.highlight[^}]*borderColor: role\.bg/, 'the count is a gold round on a ring of the page colour');
   assert.match(src, /color=\{role\.onHighlight\}/, 'its number is the text on gold');
+  // Updated on purpose with the standard (text of 15 px or more, 8 px of room between a text and the outline of its box): the count was a 28 round with 12 px digits on a line
+  // of 16 and 6 px of room; it is a 40 round with the caption variant (15 on 21) and 8 px at the sides, and it sits on the rim of the stamp (8 px out at the top right) so that
+  // a round this size does not cover the shell. The stamps stay three in a row (the column is a third of the width, the round is 78).
+  assert.match(src, /const BADGE = 40;/);
+  assert.match(src, /position: 'absolute', top: -8, right: -8, minWidth: BADGE, height: BADGE, paddingHorizontal: space\[2\]/, 'a round of 40 on the rim of the stamp, 8 px of room at the sides');
+  assert.match(src, /<AppText variant="caption" color=\{role\.onHighlight\} style=\{\{ fontFamily: fonts\.bodyBold \}\}>\{p\.posts\.length\}<\/AppText>/, 'its number is the caption variant in bold, with no size of its own');
+  assert.doesNotMatch(src, /fontSize|lineHeight|letterSpacing/, 'no size of its own in the stamps: every text is a variant of the type scale');
+  const caption = tokens.text.caption;
+  assert.ok(caption.size >= 15, 'the number is 15 px or more');
+  assert.ok((40 - caption.lineHeight) / 2 >= 8, `the number has 8 px or more above and below it inside the round (it has ${(40 - caption.lineHeight) / 2})`);
+  assert.match(src, /width: '33\.33%', alignItems: 'center', gap: space\[2\], paddingHorizontal: space\[1\]/, 'the room of a stamp is steps of the space scale');
+  assert.doesNotMatch(src, /\b(?:padding|margin|gap|rowGap|paddingHorizontal|paddingVertical)\w*: \d/, 'no padding, margin or gap written as a number');
+  assert.match(src, /<Icon name="shell" color=\{done \? role\.action : role\.borderStrong\} size=\{icon\.lg\} \/>/, 'the shell is the action colour (blue, light blue in dark mode) on a filled stamp, 32 px');
   assert.match(src, /accessibilityRole="button" accessibilityLabel=\{stampLabel\(p\)\} onPress=\{onPress\}/, 'a stamp is a button with its words');
   assert.match(src, /<ProgressBar value=\{places\.length \? visited \/ places\.length : 0\} \/>/, 'the progress bar of the passport');
   assert.match(src, /placesLine\(visited, places\.length\)/, '"5 of 33 places"');

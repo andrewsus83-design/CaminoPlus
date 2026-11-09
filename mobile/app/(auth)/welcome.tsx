@@ -8,7 +8,7 @@ import { Pill } from '@/components/Pill';
 import { Wordmark } from '@/components/auth/Wordmark';
 import { GoogleButton } from '@/components/auth/GoogleButton';
 import { FormMessage } from '@/components/auth/Field';
-import { c, layout, role } from '@/theme';
+import { fonts, layout, role, space } from '@/theme';
 
 export default function Welcome() {
   const router = useRouter();
@@ -40,19 +40,19 @@ export default function Welcome() {
       <ScrollView
         bounces={false}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ flexGrow: 1, paddingTop: height * 0.4, paddingBottom: insets.bottom + 24, paddingHorizontal: layout.screenMargin, gap: 28 }}
+        contentContainerStyle={{ flexGrow: 1, paddingTop: height * 0.4, paddingBottom: insets.bottom + space[6], paddingHorizontal: layout.screenMargin, gap: space[8] }}
       >
-        <View style={{ gap: 12 }}>
-          <AppText variant="accent" color={c.goldInk}>Buen Camino!</AppText>
+        <View style={{ gap: space[3] }}>
+          <AppText variant="accent" color={role.accentText}>Buen Camino!</AppText>
           <AppText variant="h3">Every Camino, every stage, even offline.</AppText>
           <AppText variant="lead" muted>Plan your pilgrimage, collect stamps, find a bed for tonight and share the way with friends.</AppText>
         </View>
-        <View style={{ gap: 12, marginTop: 'auto' }}>
+        <View style={{ gap: space[3], marginTop: 'auto' }}>
           {!!error && <FormMessage>{error}</FormMessage>}
           <Pill large label="Create account" onPress={() => router.push('/sign-up')} />
           <GoogleButton large onError={setError} />
           <Pressable accessibilityRole="link" onPress={() => router.push('/sign-in')} style={{ minHeight: 56, alignItems: 'center', justifyContent: 'center' }}>
-            <AppText variant="lead" color={c.blue} style={{ fontWeight: '600' }}>I already have an account</AppText>
+            <AppText variant="lead" color={role.action} style={{ fontFamily: fonts.bodyBold }}>I already have an account</AppText>
           </Pressable>
           <AppText variant="caption" muted style={{ textAlign: 'center' }}>By continuing you agree to the Terms and Privacy Policy at camino.plus.</AppText>
         </View>

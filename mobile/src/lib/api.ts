@@ -18,7 +18,8 @@ export type Journey = { id: string; route_id: string; start_stage_id: string | n
 export type JourneyDay = { id: string; day_number: number; planned_date: string | null; from_name: string | null; to_name: string | null; planned_distance_km: number | null; actual_distance_km: number | null; started_at: string | null; finished_at: string | null; notes: string | null; status: string; stage: { name: string } | null };
 export type Stamp = { id: string; place_name: string | null; stamped_at: string; verified: boolean; method: string };
 // save_count and share_count are optional: they are read by a separate query (listPostEngagement) and are missing until the database has them.
-export type Post = { id: string; body: string | null; place_name: string | null; published_at: string | null; like_count: number; comment_count: number; media_count: number; health_summary: { km?: number } | null; save_count?: number; share_count?: number };
+// author_id is only set on a post that is somebody else's (the journey of a pilgrim you opened): the rail then never puts their words on the share sheet. Your own posts have none.
+export type Post = { id: string; body: string | null; place_name: string | null; published_at: string | null; like_count: number; comment_count: number; media_count: number; health_summary: { km?: number } | null; save_count?: number; share_count?: number; author_id?: string };
 
 const PROFILE_COLS = 'id, username, display_name, bio, avatar_url, xp, level, followers_count, following_count, friends_count, posts_count, stamps_count, km_walked, is_private';
 

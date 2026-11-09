@@ -63,8 +63,8 @@
   --cp-tab-bar-border:   var(--cp-color-white);      /* its hairline: invisible in light mode (the shadow separates it), a lighter navy in dark mode */
   --cp-tab-active-stroke: 3px;                       /* the active tab icon: a little heavier in light mode, because dark on light looks thinner */
   --cp-tab-active-weight: 700;                       /* the active tab label (dark mode: 600) */
-  --cp-tab-inactive-stroke: 0.8px;                   /* the inactive tab icon: as thick as the stem of its Light label (0.8 of 24 units at 28 px = 0.93 px) */
-  --cp-tab-inactive-weight: 300;                     /* the inactive tab label (Inter Light, stem 136 of 2048 units = 0.93 px at 14 px) */
+  --cp-tab-inactive-stroke: 1.05px;                  /* the inactive tab icon: as thick as the stem of its Regular label (1.05 of 24 units at 28 px = 1.225 px; dark mode: 0.8, Light) */
+  --cp-tab-inactive-weight: 400;                     /* the inactive tab label (Inter Regular, stem 180 of 2048 units = 1.23 px at 14 px; dark mode: 300): heavier in light mode, because dark on light looks thinner */
   --cp-text-inverse:     var(--cp-color-parchment);
   --cp-text-accent:      var(--cp-color-gold-ink);
 

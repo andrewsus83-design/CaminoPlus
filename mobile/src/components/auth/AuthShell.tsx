@@ -4,7 +4,7 @@ import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText } from '../AppText';
 import { BackButton } from '../BackButton';
-import { layout, role } from '@/theme';
+import { layout, role, space } from '@/theme';
 
 /** Spacious form screen with optional back button, title and lead text. */
 export function AuthShell({ title, lead, back = true, hero, children, footer }: { title: string; lead?: string; back?: boolean; hero?: boolean; children: ReactNode; footer?: ReactNode }) {
@@ -27,16 +27,16 @@ export function AuthShell({ title, lead, back = true, hero, children, footer }: 
           </Svg>
         </View>
       )}
-      <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ flexGrow: 1, paddingTop: insets.top + layout.screenTop, paddingBottom: insets.bottom + 24, paddingHorizontal: layout.screenMargin, gap: 24 }}>
+      <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ flexGrow: 1, paddingTop: insets.top + layout.screenTop, paddingBottom: insets.bottom + space[6], paddingHorizontal: layout.screenMargin, gap: space[6] }}>
         {back && <BackButton />}
         {/* Only the hero title is pushed down (it sits below the photo). Without a back button the title is the first
             element and starts at the same distance from the camera as everything else: no margin of its own. */}
-        <View style={{ gap: 8, marginTop: hero ? 90 : 0 }}>
+        <View style={{ gap: space[2], marginTop: hero ? space[24] : 0 }}>
           <AppText variant="h2">{title}</AppText>
           {!!lead && <AppText variant="lead" muted>{lead}</AppText>}
         </View>
-        <View style={{ gap: 18 }}>{children}</View>
-        {footer && <View style={{ marginTop: 'auto', gap: 12 }}>{footer}</View>}
+        <View style={{ gap: space[5] }}>{children}</View>
+        {footer && <View style={{ marginTop: 'auto', gap: space[3] }}>{footer}</View>}
       </ScrollView>
     </KeyboardAvoidingView>
   );
