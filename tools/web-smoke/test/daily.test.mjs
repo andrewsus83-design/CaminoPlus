@@ -30,6 +30,6 @@ test('the five walks of the Daily reading are in the plan: the header and the st
 test('no scenario of the Daily reading names a day of the calendar by its date, except the dates it hands to the address on purpose', () => {
   const src = readFileSync(join(here, '..', 'daily.scenarios.mjs'), 'utf8').split('\n').filter((l) => !/^\s*\/\//.test(l)).join('\n');
   const dates = [...src.matchAll(/\b\d{4}-\d{1,2}-\d{1,2}\b/g)].map((m) => m[0]).sort();
-  assert.deepEqual(dates, ['2019-03-03', '2026-02-30', '2026-12-25', '2026-1-5', '2026-13-01', '2026-11-08', '2026-11-08', '2026-11-11', '2026-09-08', '2026-05-31', '2026-11-12', '2026-11-26', '2027-01-17'].sort(), 'only the dates given to ?date=: the days whose readings the scenario knows (a Sunday, a memorial, a reference with no words, a day with no readings)');
+  assert.deepEqual(dates, ['2019-03-03', '2026-02-30', '2026-12-25', '2026-1-5', '2026-13-01', '2026-11-08', '2026-11-08', '2026-11-11', '2026-09-08', '2026-05-31', '2026-11-12', '2026-11-26', '2027-01-17', '2026-12-06', '2026-12-24', '2026-12-25', '2026-12-26'].sort(), 'only the dates given to ?date=: the days whose readings the scenario knows (a Sunday, a memorial, a reference with no words, a day with no readings)');
   assert.doesNotMatch(src, /new Date\(|Date\.now\(/, 'the clock is the browser\'s, found through the day that says "today"');
 });

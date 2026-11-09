@@ -17,7 +17,7 @@ import { COLOUR_NAMES, LITURGY_NOTE, RANK_NAMES, SEASON_NAMES, liturgicalDay } f
 import { WEEKDAY_LETTERS, canMoveWeek, dayCellLabel, nextWeekLabel, previousWeekLabel, weekDays, weekSpoken, weekTitle } from '../daily/week';
 import { arrows, dailyReducer, initDaily, type DailyAction, type DailyState } from '../daily/state';
 import { BANNER_WIDTH, MARKERS, applyDaily, dayOf, screenHtml } from './designDaily';
-import { NO_READINGS, NO_SECOND_READING, NO_WORDS, PASSAGE_NOTES, READINGS_DIFFER, READINGS_SOURCE, WHOLE_PSALM_NOTE } from '../daily/content';
+import { MASS_LINES, NO_READINGS, NO_SECOND_READING, NO_WORDS, PASSAGE_NOTES, READINGS_DIFFER, READINGS_SOURCE, UNCLEAR_PSALM_NOTE, WHOLE_PSALM_NOTE } from '../daily/content';
 import './liturgy.test'; // the liturgical calendar (daily/liturgy.ts): its own file, run here so no script has to name it
 import './weekstrip.test'; // the week strip, the date of a bookmark and the bookmark key of a day: its own file, run here too
 import './readings.test'; // the readings of the days: the references, the words from the Bible in the app, the files, the data of 2026 against the calendar: its own file, run here too
@@ -712,6 +712,9 @@ check('the reading under the strip: the liturgical day, then the readings with t
   assert.match(src, /const why = reading\.noWords \? NO_WORDS\[reading\.noWords\] : null;/, 'a reference with no words says why');
   assert.match(src, /\{!!why && <AppText variant="caption" muted>\{why\}<\/AppText>\}/, 'under the reference, in the small print size');
   assert.match(src, /accessibilityLabel=\{why \? `\$\{label\}\. \$\{why\}` : label\}/, 'and a screen reader says it with the reference');
+  assert.match(src, /\{!!content\.mass && <View style=\{\{ paddingBottom: space\[3\] \}\}><AppText variant="caption" muted>\{content\.mass\}<\/AppText><\/View>\}/, 'a day with more than one Mass says which Mass the readings are of, over them');
+  assert.ok(src.indexOf('>Readings</AppText>') < src.indexOf('{content.mass}') && src.indexOf('{content.mass}') < src.indexOf('<ReadingRow reading={reading}'), 'between the name of the card and the first reading');
+  assert.match(src, /<ReadingRow reading=\{reading\} first=\{i === 0 && !content\.mass\} \/>/, 'the first reading has its rule above it when a line is over it');
   assert.match(src, /\{content\.noSecond && reading\.kind === 'gospel' && \(\s*<View style=\{\{ borderTopWidth: 1, borderTopColor: role\.border, paddingVertical: space\[3\] \}\}><AppText variant="caption" muted>\{NO_SECOND_READING\}<\/AppText><\/View>\s*\)\}/, 'a Sunday or a solemnity with no second reading in the source says so where the second reading would be: before the Gospel');
   assert.match(src, /\{!!content\.readings && <AppText variant="caption" muted>\{READINGS_SOURCE\}<\/AppText>\}/, 'the source line is under readings that are there, and only then');
   assert.match(src, /if \(!reading\.text\) \{\s*return <View accessible accessibilityLabel=\{why \? `\$\{label\}\. \$\{why\}` : label\}/, 'a reference with no words is a line, not a button');
@@ -810,9 +813,9 @@ const plain = (s: string) => s.replace(/&nbsp;/g, ' ').replace(/&lt;/g, '<').re
 const PHONE_LABELS = [
   'Daily reading', 'Daily reading · Another day', 'Daily reading · The reading', 'Daily reading · Calendar', 'Daily reading · Dark', 'Daily reading · Dark, the reading', 'Daily reading · Dark, calendar',
   'Daily reading · 320 wide', 'Daily reading · Solemnity', 'Daily reading · No readings yet', 'Daily reading · Differs by country', 'Daily reading · No words', 'Daily reading · No second reading',
-  'Daily reading · A verse in two halves', 'Daily reading · In Bookmarks',
+  'Daily reading · A verse in two halves', 'Daily reading · Christmas Day', 'Daily reading · Psalm not clear', 'Daily reading · In Bookmarks',
 ];
-const SCREEN_NAMES = ['daily', 'memorial', 'reading', 'calendar', 'dark', 'darkreading', 'darkcalendar', 'narrow', 'solemnity', 'none', 'differ', 'nowords', 'nosecond', 'halves'] as const;
+const SCREEN_NAMES = ['daily', 'memorial', 'reading', 'calendar', 'dark', 'darkreading', 'darkcalendar', 'narrow', 'solemnity', 'none', 'differ', 'nowords', 'nosecond', 'halves', 'christmas', 'unclear'] as const;
 const SCREENS = phones.filter((p) => labelOf(p) !== 'Daily reading · In Bookmarks');
 const BOOKMARKS_PHONE = phones.find((p) => labelOf(p) === 'Daily reading · In Bookmarks') ?? '';
 const TODAY = day(2026, 11, 8);
@@ -911,7 +914,7 @@ check('each phone draws the screen of the app: the header row (Back, the title, 
     assert.ok(!/class="dr-hand"|lib-notice|lib-chip sample|Sample|Preview|Buen Camino/.test(p), `${where}: nothing of the sample, and no handwritten line`);
   });
   // today picked on the first, a weekday with a memorial on the second, and the reading phones keep today; the 320 phone has the third Sunday of Advent, then a solemnity and a day with no readings
-  assert.deepEqual(picked.map(iso), ['2026-11-08', '2026-11-11', '2026-11-08', '2026-11-08', '2026-11-08', '2026-11-08', '2026-11-08', '2026-12-13', '2026-12-08', '2027-01-17', '2026-11-26', '2026-11-29', '2026-05-31', '2026-11-12']);
+  assert.deepEqual(picked.map(iso), ['2026-11-08', '2026-11-11', '2026-11-08', '2026-11-08', '2026-11-08', '2026-11-08', '2026-11-08', '2026-12-13', '2026-12-08', '2027-01-17', '2026-11-26', '2026-11-29', '2026-05-31', '2026-11-12', '2026-12-25', '2026-12-06']);
   assert.match(SCREENS[1], /<button class="dr-hb on" aria-label="Remove bookmark" aria-selected="true">/, 'a bookmarked day shows its bookmark filled');
   assert.match(SCREENS[7], /<div class="dr-strip fit">/, 'the card of the 320 phone reaches into the margins');
   assert.ok(SCREENS.filter((_, i) => i !== 7).every((p) => /<div class="dr-strip">/.test(p)), 'the others stay inside them');
@@ -977,8 +980,17 @@ check('the phones show what the screen shows for each kind of day: the Sunday wi
   const halves = SCREENS[13].slice(SCREENS[13].indexOf('<div class="dr-rt">'));
   assert.ok(halves.startsWith(`<div class="dr-rt"><div class="dr-cap">${PASSAGE_NOTES.part}</div>`));
   assert.deepEqual([...halves.slice(0, halves.indexOf('</div></div>')).matchAll(/<p class="dr-v"><i>(\d+)<\/i> /g)].map((m) => m[1]), ['7', '8', '9', '10']);
+  // Christmas Day: the source has one set of readings, the Mass during the Day, and the line over them says so; the first reading is open
+  assert.ok(SCREENS[14].includes(`<div class="dr-top"><span class="dr-eyebrow">Readings</span></div><div class="dr-cap dr-mass">${MASS_LINES.day}</div><div class="dr-rr">`), 'the line is between the name of the card and the first reading');
+  assert.equal((SCREENS.filter((p) => p.includes('class="dr-cap dr-mass"'))).length, 1, 'on one phone: the others are days with one set of readings');
+  assert.deepEqual(rows(SCREENS[14]).map((m) => m[3]), ['First Reading', 'Responsorial Psalm', 'Second Reading', 'Gospel']);
+  assert.ok(SCREENS[14].includes('<div class="dr-title" role="heading" aria-level="3">The Nativity of the Lord (Christmas Day)</div>'));
+  // a psalm whose verses the source wrote in a form nobody reads: the note over the whole psalm says that the list is not clear, and not that the source names the psalm only
+  assert.ok(SCREENS[15].includes(`<div class="dr-rt"><div class="dr-cap">${UNCLEAR_PSALM_NOTE}</div><p class="dr-v"><i>1</i> `), 'the note over the words of Psalm 85');
+  assert.ok(!SCREENS[15].includes(PASSAGE_NOTES.psalm), 'and not the line for a psalm that the source names alone');
+  assert.ok(SCREENS[15].includes('<span class="c">Psalm 85</span>'), 'the reference is the psalm');
   // the phones that are scrolled to the readings are those with a reading open
-  assert.deepEqual(SCREENS.map((p) => /data-scroll-card="1"/.test(p)), [false, false, true, false, false, true, false, false, true, false, false, true, true, true]);
+  assert.deepEqual(SCREENS.map((p) => /data-scroll-card="1"/.test(p)), [false, false, true, false, false, true, false, false, true, false, false, true, true, true, true, true]);
 });
 
 check('the calendar sheet of the page is the one of the app: a dimmed page, the sheet with "Calendar" and Close, and the month calendar of the picked day with its Today', () => {

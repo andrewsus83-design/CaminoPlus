@@ -52,6 +52,16 @@ class CleanRef(unittest.TestCase):
             self.assertEqual(len(notes), before, f"{fine}: nothing changed, nothing said")
         self.assertEqual(imp.clean_ref("Isaiah 5:1-2-3-4", "x", notes), "Isaiah 5:1-2-3-4", "a book that is not the Psalms is left as it is: the app shows it as written, with no words, and says so")
 
+    def test_a_reference_that_was_reduced_to_its_psalm_says_so_and_no_other_does(self):
+        self.assertEqual(imp.clean_ref_marked("Psalm 85:9-10-11-12, 13-14", "x"), ("Psalm 85", True), "reduced: the day will be marked")
+        self.assertEqual(imp.clean_ref_marked("Psalm 85:9-10, 11-12, 13-14", "x"), ("Psalm 85:9-10, 11-12, 13-14", False), "the form the lectionary writes: kept, not marked")
+        self.assertEqual(imp.clean_ref_marked("Psalm 85", "x"), ("Psalm 85", False), "a psalm the source names alone is not a psalm that was reduced")
+        self.assertEqual(imp.clean_ref_marked("Jeremiah 14:17-22 [^1]", "x"), ("Jeremiah 14:17-22", False), "tidied, not reduced")
+        self.assertEqual(imp.clean_ref_marked("Isaiah 5:1-2-3-4", "x"), ("Isaiah 5:1-2-3-4", False), "not a psalm: left as it is, and not marked")
+        self.assertEqual(imp.clean_ref_marked(None, "x"), (None, False))
+        self.assertEqual(imp.clean_ref_marked("  ", "x"), (None, False))
+        self.assertEqual(imp.clean_ref("Psalm 85:9-10-11-12, 13-14", "x"), "Psalm 85", "clean_ref is the same without the mark")
+
     def test_nothing_is_nothing(self):
         for empty in (None, "", "   ", "[^3]"):
             self.assertIsNone(imp.clean_ref(empty, "x"), repr(empty))
@@ -112,6 +122,38 @@ class Convert(unittest.TestCase):
         with self.assertRaises(imp.Refused):
             convert([row("2026-06-04"), row("2026-06-04")])
 
+    def test_a_day_whose_psalm_was_reduced_is_marked_with_its_place_and_no_other_day_is(self):
+        years = convert([row("2026-12-06", psalm_ref="Psalm 85:9-10-11-12, 13-14"), row("2026-12-07", psalm_ref="Psalm 85:9ab and 10, 11-12, 13-14"), row("2026-12-08", psalm_ref="Psalm 85")])
+        self.assertEqual(years[2026]["2026-12-06"]["u"], [1], "the place of the psalm in r")
+        self.assertEqual(years[2026]["2026-12-06"]["r"][1], "Psalm 85")
+        self.assertNotIn("u", years[2026]["2026-12-07"], "a psalm with verses the parser reads")
+        self.assertNotIn("u", years[2026]["2026-12-08"], "a psalm the source names alone")
+        self.assertEqual(len(years.notes), 1)
+        self.assertIn("the day is marked", years.notes[0])
+        # more than one place: each one that was reduced, in order
+        both = convert([row("2026-12-09", first_reading_ref="Psalm 23:1-2-3-4", psalm_ref="Psalm 85:9-10-11-12, 13-14")])[2026]["2026-12-09"]
+        self.assertEqual(both["u"], [0, 1])
+
+    def test_the_readings_of_one_mass_of_a_day_are_marked_after_the_gospel_of_the_row_is_checked(self):
+        self.assertEqual({k: v[0] for k, v in imp.MASS_OF.items()}, {"2026-12-24": "morning", "2026-12-25": "day"})
+        years = convert([
+            row("2026-12-24", feast="", liturgical_day="December 24", gospel_ref="Luke 1:67-79", second_reading_ref=None),
+            row("2026-12-25", gospel_ref="John 1:1-18"),
+            row("2026-12-23", feast="", gospel_ref="Luke 1:57-66", second_reading_ref=None),
+        ])
+        self.assertEqual(years[2026]["2026-12-24"]["m"], "morning")
+        self.assertEqual(years[2026]["2026-12-25"]["m"], "day")
+        self.assertNotIn("m", years[2026]["2026-12-23"], "the day before has one set of readings")
+        self.assertEqual(years.masses, {"2026-12-24": "morning", "2026-12-25": "day"})
+        # a row that is not what the importer was told it is: the claim would be false, so the export is refused and the message names the row
+        for date, gospel in (("2026-12-24", "Matthew 1:1-25"), ("2026-12-25", "Luke 2:1-14"), ("2026-12-24", None)):
+            with self.assertRaises(imp.Refused, msg=date) as e:
+                convert([row(date, gospel_ref=gospel)])
+            self.assertIn(date, str(e.exception))
+            self.assertIn("MASS_OF", str(e.exception))
+        # a date of the list that another export does not have is ignored
+        self.assertEqual(convert([row("2027-12-24", gospel_ref="Matthew 1:1-25")])[2027]["2027-12-24"].get("m"), None)
+
     def test_days_are_grouped_by_year(self):
         years = convert([row("2026-12-31"), row("2027-01-01"), row("2027-01-02")])
         self.assertEqual({y: sorted(d) for y, d in years.items()}, {2026: ["2026-12-31"], 2027: ["2027-01-01", "2027-01-02"]})
@@ -133,7 +175,7 @@ class Convert(unittest.TestCase):
             convert([row(first_reading_ref=None, psalm_ref="", second_reading_ref=None, gospel_ref=" ")])
 
     def test_one_reading_is_enough(self):
-        day = convert([row("2026-12-24", first_reading_ref=None, psalm_ref=None, second_reading_ref=None)])[2026]["2026-12-24"]
+        day = convert([row("2026-12-18", first_reading_ref=None, psalm_ref=None, second_reading_ref=None)])[2026]["2026-12-18"]
         self.assertEqual(day["r"], [None, None, None, "Matthew 25:1-13"])
 
 
@@ -193,12 +235,29 @@ class Files(unittest.TestCase):
         code, text, _ = self.run_main("--export", str(export), "--out", str(out), "--ts", str(ts), "--check")
         self.assertEqual(code, 1)
         self.assertIn("2026-06-04", text, "a red check prints the list too")
+        d3, export3 = self.make([row("2026-12-24", feast="", gospel_ref="Luke 1:67-79", second_reading_ref=None), row("2026-12-25", gospel_ref="John 1:1-18")])
+        code, text, _ = self.run_main("--export", str(export3), "--out", str(d3 / "out"), "--ts", str(d3 / "x.ts"))
+        self.assertEqual(code, 0)
+        for must in ("marked with the Mass that the readings are of (2 days)", "2026-12-24  morning", "2026-12-25  day", "Benedictus", "Prologue of John"):
+            self.assertIn(must, text, "the write says: " + must)
+        code, text, _ = self.run_main("--export", str(export3), "--out", str(d3 / "out"), "--ts", str(d3 / "x.ts"), "--check")
+        self.assertEqual(code, 0)
+        self.assertIn("2026-12-25  day", text, "the check says it too")
         quiet = self.make([row("2026-11-27")])[1]
         code, text, _ = self.run_main("--export", str(quiet), "--out", str(d / "out2"), "--ts", str(d / "y.ts"))
         self.assertEqual(code, 0)
         self.assertNotIn("left out", text, "nothing is said when nothing was left out")
         self.assertNotIn("changed in a reference", text)
+        self.assertNotIn("marked with the Mass", text)
         self.assertFalse(text.endswith("\n\n"), "and no empty line")
+
+    def test_the_marks_are_in_the_file_on_the_day_and_nowhere_else(self):
+        d, export = self.make([row("2026-12-06", psalm_ref="Psalm 85:9-10-11-12, 13-14"), row("2026-12-25", gospel_ref="John 1:1-18"), row("2026-12-26", feast="")])
+        data = json.loads(imp.outputs(export, d / "out", d / "x.ts")[0][d / "out" / "readings-2026.json"])
+        self.assertEqual(data["days"]["2026-12-06"]["u"], [1])
+        self.assertEqual(data["days"]["2026-12-25"]["m"], "day")
+        self.assertEqual(set(data["days"]["2026-12-26"]), {"r"})
+        self.assertEqual(list(data["days"]["2026-12-25"]), ["m", "n", "o", "r"], "sorted keys")
 
     def test_a_plain_list_is_an_export_too(self):
         d, export = self.make([row()], as_list=True)
@@ -316,6 +375,22 @@ class CommittedFiles(unittest.TestCase):
             for ref in day["r"]:
                 if ref is not None:
                     self.assertIsNone(imp.RUN_OF_FOUR.search(ref), f"{key}: {ref}")
+
+    def test_the_marks_of_the_committed_asset_are_the_days_they_are_for(self):
+        data = json.loads((imp.DEFAULT_OUT / "readings-2026.json").read_text(encoding="utf8"))
+        marked_u = {k: v["u"] for k, v in data["days"].items() if "u" in v}
+        marked_m = {k: v["m"] for k, v in data["days"].items() if "m" in v}
+        self.assertEqual(marked_u, {"2026-12-06": [1]}, "the one psalm that the importer reduced")
+        self.assertEqual(marked_m, {"2026-12-24": "morning", "2026-12-25": "day"})
+        for key, place in marked_u.items():
+            self.assertRegex(data["days"][key]["r"][place[0]], r"^Psalm \d+$", key)
+        for entry in data["days"].values():
+            self.assertLessEqual(set(entry), {"r", "n", "o", "u", "m"})
+        by_date = {r["date"]: r for r in self.rows}
+        for key, (mass, gospel, why) in imp.MASS_OF.items():
+            self.assertEqual(by_date[key]["gospel_ref"], gospel, f"{key}: the row of the export is the one the mark was made for")
+            self.assertEqual(data["days"][key]["m"], mass)
+        self.assertEqual(by_date["2026-12-06"]["psalm_ref"], "Psalm 85:9-10-11-12, 13-14", "the export keeps what the source wrote")
 
     def test_no_reference_of_the_asset_has_a_footnote_marker_or_a_slash_book(self):
         data = json.loads((imp.DEFAULT_OUT / "readings-2026.json").read_text(encoding="utf8"))

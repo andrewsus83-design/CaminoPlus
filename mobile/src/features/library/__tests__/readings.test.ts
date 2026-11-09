@@ -14,7 +14,8 @@ import type { TextSource } from '../bible/verseRows';
 import { pillBesideTitle, INSIDE, OUTSIDE, PILL_WIDTH, ROW_GAP, TITLE_WIDTH } from '../daily/bannerLayout';
 import { parseDateKey } from '../daily/datekey';
 import {
-  FEASTS_ON_PRIVILEGED_DAYS, NO_READINGS, NO_SECOND_READING, NO_WORDS, PART_VERSE_NOTE, PASSAGE_NOTES, PSALM_ONLY_NOTE, READING_KINDS, READING_TITLES, READINGS_DIFFER, READINGS_SOURCE, WHOLE_PSALM_NOTE,
+  FEASTS_ON_PRIVILEGED_DAYS, MASS_LINES, NO_READINGS, NO_SECOND_READING, NO_WORDS, PART_VERSE_NOTE, PASSAGE_NOTES, PSALM_ONLY_NOTE, READING_KINDS, READING_TITLES, READINGS_DIFFER, READINGS_SOURCE, UNCLEAR_PSALM_NOTE,
+  WHOLE_PSALM_NOTE,
   celebrationOf, hasSecondReading, makeContent, readingsLine, readingsSpoken,
 } from '../daily/content';
 import { liturgicalDay, type LiturgicalDay } from '../daily/liturgy';
@@ -315,11 +316,21 @@ const mutate = (fn: (copy: any) => void) => { const copy = JSON.parse(JSON.strin
 check('a readings file is accepted only when it is exactly what the importer writes', () => {
   const ok = parseReadingsFile(GOOD)!;
   assert.equal(ok.year, 2026);
-  assert.deepEqual(ok.days.get('2026-11-08'), { refs: ['Wisdom 6:12-16', 'Psalm 63', null, 'Matthew 25:1-13'], name: 'A name', own: true });
-  assert.deepEqual(ok.days.get('2026-11-09'), { refs: ['Ezekiel 47:1-2', 'Psalm 46', null, 'John 2:13-22'], name: null, own: false });
+  assert.deepEqual(ok.days.get('2026-11-08'), { refs: ['Wisdom 6:12-16', 'Psalm 63', null, 'Matthew 25:1-13'], name: 'A name', own: true, unclear: [], mass: null });
+  assert.deepEqual(ok.days.get('2026-11-09'), { refs: ['Ezekiel 47:1-2', 'Psalm 46', null, 'John 2:13-22'], name: null, own: false, unclear: [], mass: null });
+  const marked = parseReadingsFile(mutate((f) => { f.days['2026-11-09'].r = ['Ezekiel 47:1-2', 'Psalm 85', null, 'John 2:13-22']; f.days['2026-11-09'].u = [1]; f.days['2026-11-09'].m = 'day'; }))!;
+  assert.deepEqual(marked.days.get('2026-11-09'), { refs: ['Ezekiel 47:1-2', 'Psalm 85', null, 'John 2:13-22'], name: null, own: false, unclear: [1], mass: 'day' }, 'the places where the list of verses was not clear, and the Mass the readings are of');
+  assert.equal(parseReadingsFile(mutate((f) => { f.days['2026-11-09'].m = 'morning'; }))!.days.get('2026-11-09')!.mass, 'morning');
   assert.deepEqual([...ok.differ], [], 'no day that differs, unless the file lists it');
   assert.deepEqual([...parseReadingsFile(mutate((f) => { f.differ = ['2026-11-10', '2026-12-12']; }))!.differ], ['2026-11-10', '2026-12-12'], 'the days that differ are listed, in order');
   const bad: Array<[string, unknown]> = [
+    ['"u" that is not a list', mutate((f) => { f.days['2026-11-09'].u = 1; })], ['an empty "u"', mutate((f) => { f.days['2026-11-09'].u = []; })],
+    ['a place of "u" that is not a number', mutate((f) => { f.days['2026-11-09'].u = ['1']; })], ['a place of "u" that is past the four readings', mutate((f) => { f.days['2026-11-09'].u = [4]; })],
+    ['a place of "u" that is not whole', mutate((f) => { f.days['2026-11-09'].u = [0.5]; })], ['a place of "u" that is negative', mutate((f) => { f.days['2026-11-09'].u = [-1]; })],
+    ['a place of "u" that has no reference', mutate((f) => { f.days['2026-11-09'].u = [2]; })], ['a place of "u" that is not a psalm named alone', mutate((f) => { f.days['2026-11-09'].u = [0]; })],
+    ['a place of "u" that is a psalm with verses', mutate((f) => { f.days['2026-11-09'].r[1] = 'Psalm 46:2-3'; f.days['2026-11-09'].u = [1]; })],
+    ['"u" with a place twice', mutate((f) => { f.days['2026-11-09'].r[1] = 'Psalm 46'; f.days['2026-11-09'].u = [1, 1]; })], ['"u" not in order', mutate((f) => { f.days['2026-11-09'].r = ['Psalm 1', 'Psalm 46', null, 'John 2:13-22']; f.days['2026-11-09'].u = [1, 0]; })],
+    ['"m" that is another Mass', mutate((f) => { f.days['2026-11-09'].m = 'night'; })], ['"m" that is a number', mutate((f) => { f.days['2026-11-09'].m = 1; })], ['"m" that is empty', mutate((f) => { f.days['2026-11-09'].m = ''; })],
     ['"differ" that is not a list', mutate((f) => { f.differ = '2026-11-10'; })], ['an empty "differ"', mutate((f) => { f.differ = []; })], ['a day of "differ" that is a number', mutate((f) => { f.differ = [20261110]; })],
     ['a day of "differ" in another year', mutate((f) => { f.differ = ['2027-01-01']; })], ['a day of "differ" that does not exist', mutate((f) => { f.differ = ['2026-02-30']; })],
     ['a day of "differ" that is a day with readings', mutate((f) => { f.differ = ['2026-11-08']; })], ['"differ" not in order', mutate((f) => { f.differ = ['2026-12-12', '2026-11-10']; })],
@@ -439,7 +450,7 @@ check('a Sunday, a solemnity and a feast of the Lord keep the title of the calen
   const advent = litOf('2026-12-21');
   const octave = litOf('2026-12-26');
   const lent = litOf('2027-03-10');
-  const record = (name: string | null, own = false): DayRecord => ({ refs: ['a 1:1', null, null, null], name, own });
+  const record = (name: string | null, own = false): DayRecord => ({ refs: ['a 1:1', null, null, null], name, own, unclear: [], mass: null });
   const at = (key: string) => ymd(key);
   assert.deepEqual(celebrationOf(sunday, record('Thirty-second Sunday in Ordinary Time', true), at('2026-11-08')), { title: '32nd Sunday in Ordinary Time', under: null });
   assert.deepEqual(celebrationOf(sunday, record('Some Saint'), at('2026-11-08')), { title: '32nd Sunday in Ordinary Time', under: null }, 'a Sunday is never renamed');
@@ -526,7 +537,7 @@ check('the day as the screens ask for it: the Sunday, a weekday with a memorial,
     assert.equal(none.unavailable, NO_READINGS, `${key}: the honest line`);
     assert.equal(none.noSecond, false);
   }
-  assert.deepEqual(content.dayContent('not a day'), { dateKey: 'not a day', title: '', under: null, readings: null, unavailable: NO_READINGS, noSecond: false });
+  assert.deepEqual(content.dayContent('not a day'), { dateKey: 'not a day', title: '', under: null, readings: null, unavailable: NO_READINGS, noSecond: false, mass: null });
   assert.deepEqual(content.dayBrief('2026-02-30'), { dateKey: '2026-02-30', title: '', under: null, readings: null, unavailable: NO_READINGS });
   assert.equal(NO_READINGS, 'The readings for this day are not in the app yet.');
   assert.equal(READINGS_DIFFER, 'The readings for this day differ from country to country and are not in the app yet.');
@@ -535,11 +546,45 @@ check('the day as the screens ask for it: the Sunday, a weekday with a memorial,
   assert.equal(WHOLE_PSALM_NOTE, 'This is the whole psalm. Mass uses only the verses named above.');
   assert.equal(PSALM_ONLY_NOTE, 'The source names the psalm only, not the verses Mass uses: this is the whole psalm.');
   assert.equal(PART_VERSE_NOTE, 'A verse with a letter after its number is shown whole; the reading uses only part of it.');
-  assert.deepEqual(PASSAGE_NOTES, { whole: WHOLE_PSALM_NOTE, psalm: PSALM_ONLY_NOTE, part: PART_VERSE_NOTE });
+  assert.equal(UNCLEAR_PSALM_NOTE, "The source's list of verses for this day is not clear, so the whole psalm is shown.");
+  assert.deepEqual(PASSAGE_NOTES, { whole: WHOLE_PSALM_NOTE, psalm: PSALM_ONLY_NOTE, part: PART_VERSE_NOTE, unclear: UNCLEAR_PSALM_NOTE });
+  assert.deepEqual(MASS_LINES, { morning: 'These are the readings of the Mass of the morning. The evening Mass has other readings.', day: 'These are the readings of the Mass during the Day. The other Masses of Christmas have other readings.' });
   assert.equal(NO_SECOND_READING, 'The source lists no second reading for this day.');
-  assert.deepEqual(NO_WORDS, { numbering: 'Words not shown: this Bible numbers these verses differently.', chapter: 'Words not shown: the source names the chapter and no verses.', form: 'Words not shown: this reference could not be read.' });
+  assert.deepEqual(NO_WORDS, { numbering: 'Words not shown: this Bible may number these verses differently.', chapter: 'Words not shown: the source names the chapter and no verses.', form: 'Words not shown: this reference could not be read.' });
   assert.deepEqual(READING_KINDS, ['first', 'psalm', 'second', 'gospel']);
   assert.deepEqual(READING_TITLES, { first: 'First Reading', psalm: 'Responsorial Psalm', second: 'Second Reading', gospel: 'Gospel' });
+});
+
+check('24 December says that its readings are those of the Mass of the morning and 25 December those of the Mass during the Day, over the readings; no other day says it; and the rows of the source are ones the line is true of', () => {
+  const morning = content.dayContent('2026-12-24');
+  const day = content.dayContent('2026-12-25');
+  assert.equal(morning.mass, MASS_LINES.morning);
+  assert.equal(day.mass, MASS_LINES.day);
+  assert.equal(morning.mass, 'These are the readings of the Mass of the morning. The evening Mass has other readings.');
+  assert.equal(day.mass, 'These are the readings of the Mass during the Day. The other Masses of Christmas have other readings.');
+  const file = parseReadingsFile(FILE_2026)!;
+  assert.deepEqual([...file.days].filter(([, d]) => d.mass !== null).map(([k, d]) => [k, d.mass]), [['2026-12-24', 'morning'], ['2026-12-25', 'day']], 'two days of the file, marked by the importer');
+  for (const key of file.days.keys()) if (key !== '2026-12-24' && key !== '2026-12-25') assert.equal(content.dayContent(key).mass, null, `${key} says nothing of a Mass`);
+  assert.equal(content.dayContent('2026-12-23').mass, null);
+  assert.equal(content.dayContent('2026-12-26').mass, null);
+  assert.equal(content.dayContent('2027-12-25').mass, null, 'a day the file does not have says nothing');
+  assert.equal(content.dayContent('2026-11-26').mass, null, 'nor does a day that differs');
+  // the evidence, in the source: one row for each of the two days, and the Gospel of each is that of the Mass the line names (the importer refuses the export if either changes)
+  const row = (key: string) => EXPORT.rows.find((r) => r.date === key)!;
+  assert.equal(row('2026-12-24').liturgical_day, 'December 24');
+  assert.equal(row('2026-12-24').gospel_ref, 'Luke 1:67-79', 'the Benedictus: the Mass of the morning of 24 December');
+  assert.equal(row('2026-12-24').second_reading_ref, null);
+  assert.equal(row('2026-12-25').gospel_ref, 'John 1:1-18', 'the Prologue of John: the Mass during the Day');
+  assert.equal(row('2026-12-25').first_reading_ref, 'Isaiah 52:7-10');
+  assert.equal(row('2026-12-25').second_reading_ref, 'Hebrews 1:1-6');
+  assert.deepEqual(day.readings!.map((r) => r.kind), ['first', 'psalm', 'second', 'gospel'], 'the screen still gives the four readings of the source');
+  // the banner lists references only: it has no such line
+  assert.ok(!('mass' in content.dayBrief('2026-12-25')));
+  // the line is made from the mark of the file and from nothing else: a made-up day with the mark has it, and the same day without the mark has none
+  const made = (m?: string) => makeContent({ lookup: makeReadingsLookup([() => mutate((f) => { if (m) f.days['2026-11-09'].m = m; })]), source }).dayContent('2026-11-09');
+  assert.equal(made('morning').mass, MASS_LINES.morning);
+  assert.equal(made('day').mass, MASS_LINES.day);
+  assert.equal(made().mass, null);
 });
 
 check('the banner asks for the references only: the brief never opens a book of the Bible', () => {
@@ -558,8 +603,19 @@ check('a psalm the source names with no verses (or whose verses it writes in a f
   assert.equal(psalm.reference, 'Psalm 85', 'the importer reduced "Psalm 85:9-10-11-12, 13-14", a run no lectionary writes, to the psalm');
   assert.equal(psalm.short, 'Psalm 85');
   assert.equal(psalm.spoken, 'Psalm 85');
-  assert.equal(psalm.text!.note, 'psalm', 'the source names the psalm only');
+  assert.equal(psalm.text!.note, 'unclear', 'the source DID give verses, in a form nobody reads: the note says the list is not clear, and does not say that the source names the psalm only');
+  assert.equal(PASSAGE_NOTES[psalm.text!.note!], "The source's list of verses for this day is not clear, so the whole psalm is shown.");
   assert.equal(psalm.noWords, null);
+  assert.deepEqual(parseReadingsFile(FILE_2026)!.days.get('2026-12-06')!.unclear, [1], 'the importer marked the day: the line is not guessed from the words of the reference');
+  // every other psalm that is named alone is named alone by the source: its note is the other one
+  let alone = 0;
+  for (const [key, record] of parseReadingsFile(FILE_2026)!.days) {
+    if (key === '2026-12-06' || !record.refs[1] || !/^Psalm \d+$/.test(record.refs[1])) continue;
+    alone += 1;
+    assert.deepEqual(record.unclear, [], key);
+    assert.equal(content.dayContent(key).readings!.find((r) => r.kind === 'psalm')!.text!.note, 'psalm', `${key}: the source names the psalm only`);
+  }
+  assert.equal(alone, 108);
   assert.ok(texts(psalm.text!.lines).length >= 13, 'the whole psalm');
   assert.equal(texts(psalm.text!.lines)[0].n, '1', 'with the numbers of the Bible, which are the Bible\'s own');
   // the same psalm, if a file ever held the form nobody reads: the parser refuses it, the psalm is named by its number and shown whole, without numbers (they would be a guess)
@@ -568,7 +624,7 @@ check('a psalm the source names with no verses (or whose verses it writes in a f
     source,
   }).dayContent('2026-11-08');
   assert.deepEqual(odd.readings!.map((r) => [r.reference, r.short, r.spoken, r.text === null, r.noWords]), [['Nowhere 1:1', 'Nowhere 1:1', 'Nowhere 1:1', true, 'form'], ['Psalm 85', 'Psalm 85', 'Psalm 85', false, null], ['Matthew 25:1-13', 'Matthew 25:1-13', 'Matthew, chapter 25, verses 1 to 13', false, null]]);
-  assert.equal(odd.readings![1].text!.note, 'psalm');
+  assert.equal(odd.readings![1].text!.note, 'unclear', 'a psalm the source gave verses for, in a form that cannot be read: the list is not clear (a hand-made file has no mark, the form says it)');
   assert.ok(texts(odd.readings![1].text!.lines).every((l) => l.n === ''));
   // a canticle the file gives in a form that is not read: the reference as it is, no words, and the line that says it could not be read
   const canticle = makeContent({
@@ -586,6 +642,12 @@ check('a reference with no words says why: the numbers of this Bible differ, the
   assert.deepEqual(lonely('2026-07-27'), [['Deuteronomy 32', 'chapter']]);
   assert.deepEqual(lonely('2026-12-20'), [['Romans 16:25-27', 'numbering']]);
   assert.deepEqual(lonely('2026-11-08'), [], 'a Sunday whose four readings all have words says nothing of the kind');
+  // the verses of these three have the same numbers in both Bibles, and only later verses of the chapter move: so the line says "may", for them and for every other reference of its kind
+  assert.deepEqual(lonely('2026-06-19'), [['2 Kings 11:1-4, 9-18, 20', 'numbering']]);
+  assert.deepEqual(lonely('2026-07-09'), [['Hosea 11:1-4, 8e-9', 'numbering']]);
+  assert.deepEqual(lonely('2026-10-02'), [['Job 38:1, 12-21; 40:3-5', 'numbering']]);
+  assert.match(NO_WORDS.numbering, /\bmay number\b/, 'it does not say that this Bible numbers them differently: it may');
+  assert.doesNotMatch(NO_WORDS.numbering, /numbers these verses differently/);
   for (const key of ['2026-09-08', '2026-07-24']) assert.ok(content.dayContent(key).readings!.filter((r) => r.noWords).every((r) => !r.text));
 });
 
@@ -764,7 +826,7 @@ const MID_SENTENCE = new Set([
 
 check('every reading of the data that gets words starts where a sentence starts and ends where one ends, or is one of the readings that the lectionary starts or ends inside a sentence', () => {
   let shown = 0, alone = 0;
-  const notes = { whole: 0, psalm: 0, part: 0, none: 0 };
+  const notes = { whole: 0, psalm: 0, unclear: 0, part: 0, none: 0 };
   const aloneList: string[] = [];
   const unexpected: string[] = [];
   for (const [key, record] of parseReadingsFile(FILE_2026)!.days) {
@@ -775,7 +837,7 @@ check('every reading of the data that gets words starts where a sentence starts 
       assert.equal(reading.noWords, null, `${key} ${reading.reference}: words, and nothing to say about their absence`);
       shown += 1;
       notes[reading.text.note ?? 'none'] += 1;
-      if (reading.text.note === 'whole' || reading.text.note === 'psalm') continue;
+      if (reading.text.note === 'whole' || reading.text.note === 'psalm' || reading.text.note === 'unclear') continue;
       const letters = !!parsed && parsed.segments.some((s) => s.l1 || s.l2);
       assert.equal(letters, reading.text.note === 'part', `${key} ${reading.reference}: the note that a verse is shown whole is there when the reference has a letter, and only then`);
       if (letters) continue; // a part of a verse: the whole verse is shown, and it may start or end anywhere
@@ -789,7 +851,7 @@ check('every reading of the data that gets words starts where a sentence starts 
   assert.deepEqual(unexpected, [], 'a reading that starts or ends in the middle of a sentence and is not on the list: a verse may be shifted');
   assert.equal(shown + alone, 689, 'the references of the 217 days that have readings');
   assert.equal(alone, 14);
-  assert.deepEqual(notes, { whole: 63, psalm: 109, part: 60, none: 443 }, 'what the words say about themselves: a psalm shown whole for named verses, a psalm the source names with no verses, a verse shown whole where the reference has a letter, and words that are what the reference names');
+  assert.deepEqual(notes, { whole: 63, psalm: 108, unclear: 1, part: 60, none: 443 }, 'what the words say about themselves: a psalm shown whole for named verses, a psalm the source names with no verses, a verse shown whole where the reference has a letter, and words that are what the reference names');
   assert.deepEqual(aloneList, [
     '2026-06-19 2 Kings 11:1-4, 9-18, 20', '2026-07-06 Hosea 2:16, 17c-18, 21-22', '2026-07-09 Hosea 11:1-4, 8e-9', '2026-07-10 Hosea 14:2-10', '2026-07-24 Jeremiah 31', '2026-07-27 Deuteronomy 32',
     '2026-08-07 Nahum 2:1, 3; 3:1-3, 6-7', '2026-08-17 Deuteronomy 32', '2026-09-08 Micah 5:1-4a', '2026-10-02 Job 38:1, 12-21; 40:3-5', '2026-10-25 Exodus 22:20-26',
