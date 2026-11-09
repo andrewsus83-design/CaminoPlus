@@ -13,7 +13,6 @@ import { join, resolve } from 'node:path';
 import { BIBLE_BOOKS } from '../bible/books';
 import { makeBibleText, type BookLoaders, type TextIndex } from '../bible/textCore';
 import type { BookText } from '../bible/textTypes';
-import { SAMPLE_READING } from '../daily/sample';
 import { run } from './runTs';
 
 let n = 0;
@@ -279,14 +278,18 @@ check('the five joined labels are all Sirach, all verses without words (11:15-16
   for (const j of joined) assert.ok(NO_WORDS.includes(j), `${j} has only a note in the edition`);
 });
 
-check('Psalm 121, verses 1 to 4, are the sample of the Daily reading, word for word, and the title of the psalm is the one the sample gives', () => {
+check('Psalm 121 is a Song of Ascents of eight verses, and its first four are the words of the pilgrim psalm, word for word', () => {
   const psalm = book('PSA').chapters[120];
   assert.equal(psalm.c, 121);
-  assert.equal(psalm.title, SAMPLE_READING.title);
   assert.equal(psalm.title, 'A Song of Ascents.');
   assert.equal(psalm.verses.length, 8);
-  for (const sample of SAMPLE_READING.verses) assert.equal(oneLine(psalm.verses[sample.n - 1].t), sample.text, `Psalm 121:${sample.n}`);
-  assert.equal(SAMPLE_READING.verses.length, 4);
+  const first = [
+    'I will lift up my eyes to the hills. Where does my help come from?',
+    'My help comes from the LORD, who made heaven and earth.',
+    'He will not allow your foot to be moved. He who keeps you will not slumber.',
+    'Behold, he who keeps Israel will neither slumber nor sleep.',
+  ];
+  first.forEach((text, i) => assert.equal(oneLine(psalm.verses[i].t), text, `Psalm 121:${i + 1}`));
 });
 
 // ------------------------------------------------------------------------------------------------------- lines, paragraphs, headings

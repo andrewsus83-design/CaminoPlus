@@ -1,13 +1,11 @@
 // Plain-node checks of the week strip of the Daily reading screen and of what stands behind it: the days of a week, their words, the arrows that move a
-// week, the `date` of a bookmark, the readings provider and the bookmark key of a day. No React, no network. Run: npm run test:library (daily.test.ts runs
+// week, the `date` of a bookmark and the bookmark key of a day (the readings of a day are checked in readings.test.ts). No React, no network. Run: npm run test:library (daily.test.ts runs
 // this file, so no script has to name it).
 import assert from 'node:assert/strict';
 import { addDays, rangeAround, weekdayIndex, type Ymd } from '../daily/calendar';
 import { dailyDaysOf, dailyKey, dayOfDailyKey } from '../daily/bookmarks';
-import { READING_TITLES, SAMPLE_CITATION, dayContent, readingKinds } from '../daily/content';
 import { dateKey, parseDateKey } from '../daily/datekey';
 import { liturgicalDay } from '../daily/liturgy';
-import { SAMPLE_READING, SAMPLE_REFLECTION } from '../daily/sample';
 import { arrows, dailyReducer, initDaily, weekArrows } from '../daily/state';
 import { WEEKDAY_LETTERS, canMoveWeek, dayCellLabel, nextWeekLabel, previousWeekLabel, weekDays, weekSpoken, weekStart, weekTitle } from '../daily/week';
 
@@ -106,37 +104,6 @@ check('the screen opens on the day it was asked for (the date of a bookmark), al
   assert.equal(weekArrows(old).back, false, 'at the first month of its range the arrow is off');
   const late = initDaily(nov8, day(2040, 6, 1));
   assert.deepEqual(late.range.max, { y: 2040, m: 6 });
-});
-
-check('the readings provider: the same shape for every day, a second reading on Sundays and solemnities only, and every card says it is a sample', () => {
-  const kinds = (y: number, m: number, d: number) => readingKinds(liturgicalDay(y, m, d));
-  assert.deepEqual(kinds(2026, 11, 8), ['first', 'psalm', 'second', 'acclamation', 'gospel'], 'a Sunday');
-  assert.deepEqual(kinds(2026, 11, 1), ['first', 'psalm', 'second', 'acclamation', 'gospel'], 'All Saints, a solemnity');
-  assert.deepEqual(kinds(2026, 11, 7), ['first', 'psalm', 'acclamation', 'gospel'], 'a weekday');
-  assert.deepEqual(kinds(2026, 7, 25), ['first', 'psalm', 'acclamation', 'gospel'], 'a feast on a weekday');
-  assert.deepEqual(READING_TITLES, { first: 'First reading', psalm: 'Psalm', second: 'Second reading', acclamation: 'Gospel acclamation', gospel: 'Gospel' });
-  const sunday = dayContent('2026-11-08');
-  assert.equal(sunday.dateKey, '2026-11-08');
-  assert.equal(sunday.sample, true, 'the readings are examples');
-  assert.deepEqual(sunday.passages.map((p) => p.kind), ['first', 'psalm', 'second', 'acclamation', 'gospel']);
-  assert.deepEqual(dayContent('2026-11-07').passages.map((p) => p.kind), ['first', 'psalm', 'acclamation', 'gospel']);
-  const psalm = sunday.passages.find((p) => p.kind === 'psalm')!;
-  assert.equal(psalm.citation, SAMPLE_READING.reference);
-  assert.deepEqual(psalm.lines.map((l) => l.text), SAMPLE_READING.verses.map((v) => v.text));
-  assert.deepEqual(psalm.lines.map((l) => l.n), [1, 2, 3, 4]);
-  assert.match(psalm.credit ?? '', /World English Bible · public domain · an example, not the psalm of this day/);
-  for (const p of sunday.passages.filter((q) => q.kind !== 'psalm')) {
-    assert.equal(p.citation, null, `${p.kind} has no citation: none is invented`);
-    assert.match(p.lines[0].text, /^Sample text\./);
-  }
-  assert.equal(SAMPLE_CITATION, 'Sample citation');
-  assert.equal(sunday.reflections.length, 1);
-  assert.equal(sunday.reflections[0].paragraphs.length, 3, 'a few short paragraphs');
-  assert.equal(sunday.reflections[0].paragraphs.join(' '), SAMPLE_REFLECTION.text, 'the same words as the sample');
-  assert.equal(sunday.reflections[0].label, 'Sample reflection');
-  assert.match(sunday.reflections[0].source, /not by a real author/);
-  assert.deepEqual(dayContent('2030-05-05').reflections, sunday.reflections, 'the same for every day');
-  assert.deepEqual(dayContent('not a day'), { dateKey: 'not a day', sample: true, passages: [], reflections: [] });
 });
 
 check('a day is bookmarked under "daily:YYYY-MM-DD", which never changes for a day, and only keys of real days are days', () => {

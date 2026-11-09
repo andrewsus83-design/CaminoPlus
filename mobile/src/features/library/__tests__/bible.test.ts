@@ -12,7 +12,7 @@ import {
   ADDITIONS_NOTE, BIBLE_BOOKS, DEUTERO_NOTE, TESTAMENTS, TESTAMENT_LABEL, TESTAMENT_SEARCH, bookByCode, bookById, bookLine, booksOf, chaptersLabel, countLine, partWords,
   type BibleBook, type Testament,
 } from '../bible/books';
-import { todayLine } from '../bible/today';
+import { msUntilTomorrow, todayLine } from '../bible/today';
 
 let n = 0;
 const check = (name: string, fn: () => void) => { fn(); n += 1; console.log(`ok   ${name}`); };
@@ -159,6 +159,19 @@ check('the date line of the daily reading banner: "Sunday 8 November", in the ph
   assert.equal(todayLine(new Date(2028, 1, 29, 12)), 'Tuesday 29 February');
   assert.equal(todayLine(new Date('not a date')), '');
   assert.match(todayLine(), /^(Sun|Mon|Tues|Wednes|Thurs|Fri|Satur)day \d{1,2} (January|February|March|April|May|June|July|August|September|October|November|December)$/, 'with no argument it is today');
+});
+
+check('the banner reads its date again at the next midnight of the phone: the milliseconds to the start of the next day, by the calendar and not by 24 hours, and never under a second', () => {
+  assert.equal(msUntilTomorrow(new Date(2026, 10, 8, 23, 59, 59)), 1000, 'a second before midnight');
+  assert.equal(msUntilTomorrow(new Date(2026, 10, 8, 23, 59, 59, 500)), 1000, 'under a second is a second: a timer that fires early does not spin');
+  assert.equal(msUntilTomorrow(new Date(2026, 10, 8, 12)), 12 * 3600 * 1000, 'noon');
+  assert.equal(msUntilTomorrow(new Date(2026, 10, 8, 0, 0, 0)), 24 * 3600 * 1000, 'midnight itself: a whole day');
+  assert.equal(msUntilTomorrow(new Date(2026, 11, 31, 18)), 6 * 3600 * 1000, 'the end of a year');
+  assert.equal(msUntilTomorrow(new Date(2028, 1, 28, 12)), 12 * 3600 * 1000, 'the day before a 29 February');
+  assert.equal(msUntilTomorrow(new Date('not a date')), 60000, 'a date that does not read waits a minute');
+  const sooner = msUntilTomorrow(new Date(2026, 10, 8, 20));
+  assert.ok(sooner < 24 * 3600 * 1000 && sooner > 0);
+  assert.ok(msUntilTomorrow() > 0 && msUntilTomorrow() <= 25 * 3600 * 1000, 'with no argument it is now (at most 25 hours, the longest day)');
 });
 
 check('the data files are pure: no React, no React Native, no theme, nothing that could not run in plain node', () => {

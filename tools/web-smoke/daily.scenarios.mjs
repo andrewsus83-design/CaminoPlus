@@ -7,6 +7,9 @@
 //   the sheet       the Calendar button opens the month calendar; Escape, Close and a tap outside close it; a day chosen in it, or Today, closes it and moves the strip
 //   the bookmark    the button toggles and the day is kept; it is a row of Bookmarks that opens the Daily reading on that date
 //   the date        ?date=YYYY-MM-DD opens that day (one far outside the five years too); anything that is not a day opens today
+//   the readings    the references of the Lectionary for Mass used in the United States and the words from the Bible in the app: a Sunday, a memorial (the saint is the title), a reference with no words
+//                   (and the line that says why), a Sunday with no second reading in the source, a psalm read in two halves of a verse (the verse is shown once), a day that differs from country to
+//                   country, a day with no readings; nothing is a sample, and nothing on the screen is under 15 px
 import assert from 'node:assert/strict';
 import { eventually, pathOf } from './harness.mjs';
 
@@ -14,6 +17,16 @@ const WEEKDAY = '(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)';
 const MONTH = '(January|February|March|April|May|June|July|August|September|October|November|December)';
 /** A day of the strip: "Sunday 8 November, 32nd Sunday in Ordinary Time" (the days of the month calendar have the year and no comma: "Sunday 8 November 2026"). */
 const STRIP_DAY = new RegExp(`^${WEEKDAY} \\d{1,2} ${MONTH}, `);
+/** A reading of the day: its name and its reference are its label ("Gospel, Matthew 25:1-13"). */
+const READING_ROW = /^(First Reading|Responsorial Psalm|Second Reading|Gospel), /;
+const LITURGY_NOTE = 'General Roman Calendar, computed on this phone; your country may move some feasts to a Sunday';
+const NO_READINGS = 'The readings for this day are not in the app yet.';
+const READINGS_DIFFER = 'The readings for this day differ from country to country and are not in the app yet.';
+const READINGS_SOURCE = 'Readings: the Lectionary for Mass used in the United States. Words: World English Bible, Catholic edition, not the lectionary translation.';
+const WHOLE_PSALM = 'This is the whole psalm. Mass uses only the verses named above.';
+const NO_WORDS_NUMBERING = 'Words not shown: this Bible numbers these verses differently.';
+const NO_SECOND = 'The source lists no second reading for this day.';
+const PART_VERSE = 'A verse with a letter after its number is shown whole; the reading uses only part of it.';
 
 const box = async (locator, what) => {
   const b = await locator.boundingBox();
@@ -69,7 +82,7 @@ export const DAILY_SCENARIOS = [
       const todayLabel = labels.find((l) => l.endsWith(', today'));
       await eventually(() => isSelected(cellNamed(page, todayLabel)), (v) => v === 'true', { what: 'today is picked when the screen opens' });
       const startTitle = titleOf(todayLabel);
-      await page.getByRole('heading', { name: startTitle, exact: true }).waitFor();
+      await page.getByText(startTitle, { exact: true }).first().waitFor(); // the heading, or the line under the name of a saint when the day has a memorial
       await eventually(() => page.getByRole('button', { name: 'Today', exact: true }).count(), (n) => n === 0, { what: 'the number of Today buttons while today is picked' });
       step('tap another day: it is picked and the liturgical title becomes its own');
       const other = labels.find((l) => !l.endsWith(', today'));
@@ -77,12 +90,12 @@ export const DAILY_SCENARIOS = [
       await cellNamed(page, other).click();
       await eventually(() => isSelected(cellNamed(page, other)), (v) => v === 'true', { what: 'the day that was tapped is picked' });
       await eventually(() => isSelected(cellNamed(page, todayLabel)), (v) => v === 'false', { what: 'today is not picked any more' });
-      await page.getByRole('heading', { name: titleOf(other), exact: true }).waitFor();
-      await eventually(() => page.getByRole('heading', { name: startTitle, exact: true }).count(), (n) => n === 0, { what: 'the number of headings with the old title' });
+      await page.getByText(titleOf(other), { exact: true }).first().waitFor();
+      await eventually(() => page.getByText(startTitle, { exact: true }).count(), (n) => n === 0, { what: 'the number of lines with the old title' });
       step('Today shows now, and brings the screen back to today');
       await page.getByRole('button', { name: 'Today', exact: true }).click();
       await eventually(() => isSelected(cellNamed(page, todayLabel)), (v) => v === 'true', { what: 'today is picked again' });
-      await page.getByRole('heading', { name: startTitle, exact: true }).waitFor();
+      await page.getByText(startTitle, { exact: true }).first().waitFor();
       await eventually(() => page.getByRole('button', { name: 'Today', exact: true }).count(), (n) => n === 0, { what: 'the number of Today buttons once today is picked again' });
       step('the arrows move the picked day a week: the strip shows another week and the same weekday');
       const before = labels.map((l) => l.split(',')[0]);
@@ -91,22 +104,25 @@ export const DAILY_SCENARIOS = [
       await page.getByRole('button', { name: 'Today', exact: true }).waitFor();
       await page.getByRole('button', { name: /^Previous week/ }).click();
       await eventually(async () => (await stripCells(page)).labels.map((l) => l.split(',')[0]).join('|'), (v) => v === before.join('|'), { what: 'the days of the strip after Previous week' });
-      step('under it: the liturgical card (season and colour, rank, the two cycles, the small print), the notice, and the readings and the reflection as samples');
-      for (const text of ['Liturgical day', 'Season', 'Rank', 'Sunday cycle', 'Weekday cycle', 'General Roman Calendar, computed on this phone; your country may move some feasts to a Sunday', 'Preview', 'Readings', 'Sample reflection']) await page.getByText(text, { exact: true }).first().waitFor();
-      await eventually(() => page.getByLabel('Sample', { exact: true }).count(), (n) => n === 2, { what: 'the number of Sample tags (the readings and the reflection)' });
-      const kinds = await page.getByRole('button', { name: /^(First reading|Psalm|Second reading|Gospel acclamation|Gospel), / }).evaluateAll((els) => els.map((e) => e.getAttribute('aria-label')));
-      assert(kinds.length === 4 || kinds.length === 5, `${kinds.length} readings`);
-      assert(kinds.find((k) => k.startsWith('Psalm, ')) === 'Psalm, Psalm 121:1–4', 'the one real citation is the sample psalm');
-      assert(kinds.filter((k) => !k.startsWith('Psalm, ')).every((k) => k.endsWith(', Sample citation')), 'the other readings give no citation of their own');
-      step('a reading opens its text and closes it again');
-      const psalm = page.getByRole('button', { name: 'Psalm, Psalm 121:1–4', exact: true });
-      assert.equal(await psalm.getAttribute('aria-expanded'), 'false');
-      await psalm.click();
-      await page.getByText(/I will lift up my eyes to the hills/).waitFor();
-      await page.getByText(/an example, not the psalm of this day/).waitFor();
-      await eventually(() => psalm.getAttribute('aria-expanded'), (v) => v === 'true', { what: 'the Psalm says it is open' });
-      await psalm.click();
-      await eventually(() => page.getByText(/I will lift up my eyes to the hills/).count(), (n) => n === 0, { what: 'the number of Psalm verses once it is closed' });
+      step('under it: the liturgical card (season and colour, the two cycles, the small print) and the readings card; no sample, no notice, no handwritten line');
+      for (const text of ['Liturgical day', 'Season', 'Sunday cycle', 'Weekday cycle', LITURGY_NOTE, 'Readings']) await page.getByText(text, { exact: true }).first().waitFor();
+      for (const gone of ['Preview', 'Sample', 'Buen Camino']) await eventually(() => page.getByText(gone).count(), (n) => n === 0, { what: `the number of "${gone}" on the Daily reading` });
+      const rows = page.getByRole('button', { name: READING_ROW });
+      const count = await rows.count();
+      if (count === 0) {
+        step('a day the app has no readings for says so (not in the app yet, or differing from country to country), or every reference of the day has no words');
+        const said = (await page.getByText(NO_READINGS, { exact: true }).count()) + (await page.getByText(READINGS_DIFFER, { exact: true }).count());
+        if (said === 0) await page.getByText(/^(First Reading|Responsorial Psalm|Second Reading|Gospel)$/).first().waitFor();
+      } else {
+        step('a reading opens its words and closes them again');
+        const first = rows.first();
+        assert.equal(await first.getAttribute('aria-expanded'), 'false');
+        await first.click();
+        await eventually(() => first.getAttribute('aria-expanded'), (v) => v === 'true', { what: 'the first reading says it is open' });
+        await first.click();
+        await eventually(() => first.getAttribute('aria-expanded'), (v) => v === 'false', { what: 'the first reading says it is closed' });
+        await page.getByText(READINGS_SOURCE, { exact: true }).waitFor();
+      }
     },
   },
   {
@@ -210,6 +226,114 @@ export const DAILY_SCENARIOS = [
       await page.getByRole('button', { name: 'Back', exact: true }).filter({ visible: true }).click();
       await waitPath(page, '/library/bookmarks', 'the address after Back');
       await eventually(() => page.getByRole('heading', { name: 'Daily reading', exact: true }).filter({ visible: true }).count(), (n) => n === 0, { what: 'the number of Daily reading headings once the day is off' });
+    },
+  },
+  {
+    name: 'Daily reading: the readings of a day are references of the Lectionary for Mass used in the United States with the words of the Bible in the app (a memorial is the title, a reference with no words is a line that says why, a day with none says so, a verse read in two halves is shown once), and nothing is a sample or under 15 px',
+    persona: 'in',
+    async run(ctx) {
+      const { page, step } = ctx;
+      const labels = () => page.getByRole('button', { name: READING_ROW }).evaluateAll((els) => els.map((e) => e.getAttribute('aria-label')));
+      step('a Sunday: four readings with their references, the source line, the words of the Gospel from the Bible');
+      await openDaily(ctx, '/library/daily?date=2026-11-08');
+      await page.getByRole('heading', { name: '32nd Sunday in Ordinary Time', exact: true }).waitFor();
+      await eventually(labels, (l) => l.length === 4, { what: 'the number of readings of the Sunday' });
+      assert.deepEqual(await labels(), ['First Reading, Wisdom, chapter 6, verses 12 to 16', 'Responsorial Psalm, Psalm 63, verses 2, 3 to 4, 5 to 6 and 7 to 8', 'Second Reading, First Thessalonians, chapter 4, verses 13 to 18', 'Gospel, Matthew, chapter 25, verses 1 to 13'], 'a screen reader hears the references in words');
+      for (const written of ['Wisdom 6:12-16', 'Psalm 63:2, 3-4, 5-6, 7-8', '1 Thessalonians 4:13-18', 'Matthew 25:1-13']) await page.getByText(written, { exact: true }).waitFor();
+      await page.getByText(READINGS_SOURCE, { exact: true }).waitFor();
+      for (const gone of ['Preview', 'Sample', 'Buen Camino']) await eventually(() => page.getByText(gone).count(), (n) => n === 0, { what: `the number of "${gone}"` });
+      const gospel = page.getByRole('button', { name: 'Gospel, Matthew, chapter 25, verses 1 to 13', exact: true });
+      await gospel.click();
+      await eventually(() => gospel.getAttribute('aria-expanded'), (v) => v === 'true', { what: 'the Gospel says it is open' });
+      await page.getByText(/Then the Kingdom of Heaven will be like ten virgins who took their lamps/).waitFor();
+      await page.getByText(/Watch therefore, for you don’t know the day nor the hour/).waitFor();
+      step('no text of the screen is under 15 px');
+      const smallest = await page.evaluate(() => {
+        let min = 999, who = '';
+        const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+        for (let t = walker.nextNode(); t; t = walker.nextNode()) {
+          if (!t.textContent.trim()) continue;
+          const el = t.parentElement, st = getComputedStyle(el), r = el.getBoundingClientRect();
+          if (st.visibility === 'hidden' || st.display === 'none' || r.width === 0 || r.height === 0) continue;
+          const size = parseFloat(st.fontSize);
+          if (size < min) { min = size; who = t.textContent.trim().slice(0, 40); }
+        }
+        return { min, who };
+      });
+      assert(smallest.min >= 15, `the smallest text of the Daily reading is ${smallest.min} px ("${smallest.who}")`);
+      await gospel.click();
+      await eventually(() => page.getByText(/Then the Kingdom of Heaven will be like ten virgins/).count(), (n) => n === 0, { what: 'the number of Gospel verses once it is closed' });
+      step('the Psalm is shown whole, with its note over the words, one verse to a line');
+      const psalm = page.getByRole('button', { name: 'Responsorial Psalm, Psalm 63, verses 2, 3 to 4, 5 to 6 and 7 to 8', exact: true });
+      await psalm.click();
+      await page.getByText(/^God, you are my God\. I will earnestly seek you/).waitFor();
+      const note = await box(page.getByText(WHOLE_PSALM, { exact: true }), 'the note of the psalm');
+      const words = await box(page.getByText(/^God, you are my God\. I will earnestly seek you/), 'the first verse of the psalm');
+      assert(note.y < words.y, `the note is over the words (${note.y} against ${words.y})`);
+      await psalm.click();
+      step('on a phone 320 wide nothing runs out of the screen');
+      await page.setViewportSize({ width: 320, height: 640 });
+      await page.getByText('Wisdom 6:12-16', { exact: true }).waitFor();
+      const wide = await page.evaluate(() => document.documentElement.scrollWidth);
+      assert(wide <= 321, `the page is ${wide} wide on a phone of 320`);
+      const ref = await box(page.getByText('1 Thessalonians 4:13-18', { exact: true }), 'the reference of the second reading');
+      assert(ref.x + ref.width <= 320, `the reference ends at ${ref.x + ref.width} on a phone of 320`);
+      await page.setViewportSize({ width: 390, height: 844 });
+
+      step('a weekday with a memorial: the saint is the title, the day of the calendar is under it, no second reading');
+      await openDaily(ctx, '/library/daily?date=2026-11-11');
+      await page.getByRole('heading', { name: 'Saint Martin of Tours, Bishop', exact: true }).waitFor();
+      await page.getByText('Wednesday of the 32nd Week in Ordinary Time', { exact: true }).waitFor();
+      await eventually(labels, (l) => l.length === 3, { what: 'the number of readings of the weekday' });
+      assert.deepEqual(await labels(), ['First Reading, Titus, chapter 3, verses 1 to 7', 'Responsorial Psalm, Psalm 23, verses 1b to 3a, 3bc to 4, 5 and 6', 'Gospel, Luke, chapter 17, verses 11 to 19']);
+      await eventually(() => page.getByText('Rank', { exact: true }).count(), (n) => n === 0, { what: 'the number of Rank lines under a memorial (the calendar of the app does not know the saints)' });
+
+      step('a reference that cannot be shown with confidence is a line, not a button, and the line under it says why');
+      await openDaily(ctx, '/library/daily?date=2026-09-08');
+      await page.getByRole('heading', { name: 'The Nativity of the Blessed Virgin Mary', exact: true }).waitFor();
+      await page.getByText('Micah 5:1-4a', { exact: true }).waitFor();
+      await eventually(() => page.getByRole('button', { name: /^First Reading, Micah/ }).count(), (n) => n === 0, { what: 'the number of buttons for a reading with no words' });
+      await eventually(labels, (l) => l.length === 2, { what: 'the number of readings with words that day (the psalm and the Gospel)' });
+      await page.getByText(NO_WORDS_NUMBERING, { exact: true }).waitFor();
+      await eventually(() => page.getByText(NO_WORDS_NUMBERING, { exact: true }).count(), (n) => n === 1, { what: 'the number of lines that say why (one reading has no words)' });
+      await page.getByLabel(`First Reading, Micah, chapter 5, verses 1 to 4a. ${NO_WORDS_NUMBERING}`, { exact: true }).waitFor(); // what a screen reader says for the line: the reference in words, and why there are no words
+
+      step('a Sunday that has no second reading in the source says so, where the second reading would be');
+      await openDaily(ctx, '/library/daily?date=2026-05-31');
+      await page.getByRole('heading', { name: 'The Most Holy Trinity', exact: true }).waitFor();
+      await eventually(labels, (l) => l.length === 3, { what: 'the number of readings of Trinity Sunday in the source' });
+      const missing = await box(page.getByText(NO_SECOND, { exact: true }), 'the line about the second reading');
+      const psalmRow = await box(page.getByRole('button', { name: /^Responsorial Psalm, / }), 'the psalm');
+      const gospelRow = await box(page.getByRole('button', { name: /^Gospel, / }), 'the Gospel');
+      assert(psalmRow.y < missing.y && missing.y < gospelRow.y, `the line is between the psalm and the Gospel (${psalmRow.y}, ${missing.y}, ${gospelRow.y})`);
+      await openDaily(ctx, '/library/daily?date=2026-11-08');
+      await eventually(() => page.getByText(NO_SECOND, { exact: true }).count(), (n) => n === 0, { what: 'the number of such lines on a Sunday that has its second reading' });
+
+      step('a psalm that reads the first half of a verse and then its second half: the verse is in the words once, and a note says that a verse with a letter is shown whole');
+      await openDaily(ctx, '/library/daily?date=2026-11-12');
+      await page.getByRole('heading', { name: 'Saint Josaphat, Bishop and Martyr', exact: true }).waitFor();
+      const halves = page.getByRole('button', { name: 'Responsorial Psalm, Psalm 146, verses 7, 8 to 9a and 9bc to 10', exact: true });
+      await halves.click();
+      await eventually(() => halves.getAttribute('aria-expanded'), (v) => v === 'true', { what: 'the psalm says it is open' });
+      await page.getByText(PART_VERSE, { exact: true }).waitFor();
+      await page.getByText(/who executes justice for the oppressed/).waitFor();
+      await eventually(() => page.getByText(/The LORD preserves the foreigners/).count(), (n) => n === 1, { what: 'the number of times verse 9 is in the words' });
+      await page.getByText(/Praise the LORD!/).waitFor();
+
+      step('a day on which the source has the readings of one country (Thanksgiving Day): the day of the calendar and one line that says the readings differ from country to country');
+      await openDaily(ctx, '/library/daily?date=2026-11-26');
+      await page.getByRole('heading', { name: 'Thursday of the 34th Week in Ordinary Time', exact: true }).waitFor();
+      await page.getByText(READINGS_DIFFER, { exact: true }).waitFor();
+      await eventually(labels, (l) => l.length === 0, { what: 'the number of readings of a day that differs' });
+      await eventually(() => page.getByText(READINGS_SOURCE, { exact: true }).count(), (n) => n === 0, { what: 'the number of source lines under a day that differs' });
+      await eventually(() => page.getByText(/Thanksgiving|Sirach 50/).count(), (n) => n === 0, { what: 'the number of lines that name the readings of the source: they are not shown' });
+
+      step('a day the app has no readings for: the day of the calendar and one honest line, no small print');
+      await openDaily(ctx, '/library/daily?date=2027-01-17');
+      await page.getByRole('heading', { name: '2nd Sunday in Ordinary Time', exact: true }).waitFor();
+      await page.getByText(NO_READINGS, { exact: true }).waitFor();
+      await eventually(labels, (l) => l.length === 0, { what: 'the number of readings of a day with none' });
+      await eventually(() => page.getByText(READINGS_SOURCE, { exact: true }).count(), (n) => n === 0, { what: 'the number of source lines under no readings' });
     },
   },
   {

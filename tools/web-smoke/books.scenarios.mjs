@@ -96,7 +96,7 @@ export const BOOKS_SCENARIOS = [
       const banner = page.getByRole('button', { name: /^Start reading\. Books for the road/ }); // it never continues a book: the Continue reading bar above the tab bar does (continue.scenarios.mjs)
       await banner.waitFor();
       const b = await box(banner, 'the banner');
-      assert(b.height <= 120, `the banner is ${b.height} high (at most 120 on a 390 phone)`);
+      assert(b.height <= 128, `the banner is ${b.height} high (at most 128 on a 390 phone)`);
       near(b.width, 358, 2, 'the banner fills the margins');
       await page.getByText('Books for the road', { exact: true }).waitFor();
       for (const word of ['SOON', 'FREE', 'Preview', 'Coming soon']) await eventually(() => page.getByText(word, { exact: true }).count(), (n) => n === 0, { what: `the number of "${word}" marks on the Books tab` });

@@ -25,7 +25,7 @@ export const barBottom = (insetBottom: number): number => tabBarBottom(insetBott
  */
 export const BAR_ROOM = BAR_HEIGHT + BAR_GAP;
 
-/** The button that hides the bar: a square this wide and high, at least the 44 a thumb needs. */
+/** The button that hides the bar: a square this wide and high, the 48 that is the least a tap target may be. */
 export const CLOSE_SIZE = 48;
 /** The ends of the bar are half circles of radius 32: the glyph (28 wide) sits 16 in from the left end and the close button (48) 8 in from the right end, which puts the centre of each near the centre of its curve. */
 export const BAR_PAD_LEFT = 16;

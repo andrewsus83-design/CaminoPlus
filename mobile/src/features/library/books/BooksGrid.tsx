@@ -2,7 +2,7 @@ import { useCallback, useMemo } from 'react';
 import { View, useWindowDimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import { AppText } from '@/components/AppText';
-import { layout } from '@/theme';
+import { layout, space } from '@/theme';
 import { itemKey } from '../search';
 import type { LibraryMarks } from '../useLibraryBookmarks';
 import { BookCover } from './BookCover';
@@ -11,7 +11,7 @@ import { bookPath, shelves } from './copy';
 import { coverGrid } from './cover';
 
 /** The space between two rows of covers. The columns are GRID_GAP apart (12); a row has a little more under it, where the shadow of the covers falls. */
-export const ROW_GAP = 16;
+export const ROW_GAP = space[4];
 
 /**
  * The books of the Books tab as covers, two in a row, on one shelf for each kind of book (the guides, then the readings, copy.ts shelves), each shelf with a heading, a quiet
@@ -28,13 +28,13 @@ export function BooksGrid({ items, marks }: { items: readonly CatalogBook[]; mar
   const bookmark = useCallback((id: string) => toggle?.(itemKey('Books', id)), [toggle]);
   const onShelves = useMemo(() => shelves(items), [items]);
   return (
-    <View style={{ gap: 28 }}>
+    <View style={{ gap: space[8] }}>
       {onShelves.map((shelf) => (
-        <View key={shelf.kind} style={{ gap: 12 }}>
-          <View style={{ gap: 2 }}>
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'baseline', justifyContent: 'space-between', columnGap: 12 }}>
+        <View key={shelf.kind} style={{ gap: space[3] }}>
+          <View style={{ gap: space[1] }}>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'baseline', justifyContent: 'space-between', columnGap: space[3] }}>
               <AppText variant="h4" accessibilityRole="header">{shelf.title}</AppText>
-              <AppText variant="mono" muted style={{ fontSize: 14, lineHeight: 20 }}>{`${shelf.books.length} ${shelf.books.length === 1 ? 'book' : 'books'}`}</AppText>
+              <AppText variant="mono" muted>{`${shelf.books.length} ${shelf.books.length === 1 ? 'book' : 'books'}`}</AppText>
             </View>
             {!!shelf.line && <AppText variant="caption" muted>{shelf.line}</AppText>}
           </View>

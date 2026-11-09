@@ -1,6 +1,7 @@
 import { View } from 'react-native';
 import { AppText } from '@/components/AppText';
 import { Card } from '@/components/ui';
+import { layout, space } from '@/theme';
 import { BookmarkToggle } from './BookmarkToggle';
 import { postByline, postHeading, type SavedPost } from './savedPosts';
 
@@ -15,7 +16,7 @@ const dayOf = (iso: string | null) => (iso ? new Date(iso).toLocaleDateString([]
 export function SavedPostCard({ post, me, on, toggle }: { post: SavedPost; me: string | null; on: boolean; toggle: () => void }) {
   const heading = postHeading(post.place, dayOf(post.publishedAt));
   return (
-    <Card style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingVertical: 16, paddingLeft: 20, paddingRight: 6 }}>
+    <Card style={{ flexDirection: 'row', alignItems: 'center', gap: space[1], paddingVertical: space[4], paddingLeft: layout.cardPadding, paddingRight: space[2] }}>
       <View style={{ flex: 1, gap: 4 }}>
         <AppText variant="label">{heading}</AppText>
         {!!post.body && <AppText variant="small" muted numberOfLines={3}>{post.body}</AppText>}

@@ -1,10 +1,11 @@
-import { Pressable, View } from 'react-native';
+import { Pressable, View, useWindowDimensions } from 'react-native';
 import { AppText } from '@/components/AppText';
-import { radius, role } from '@/theme';
+import { radius, role, space } from '@/theme';
 import { TESTAMENTS, TESTAMENT_LABEL, type Testament } from './books';
+import { NARROW_UNDER } from './gridMath';
 
-/** The control is this high (the choices inside it are 48, never under 44). */
-export const BAR_HEIGHT = 56;
+/** The control is this high: the choices inside it are 58 (the two lines of a label, 21 each, and 8 above and below), with 4 of the track around them. */
+export const BAR_HEIGHT = 66;
 
 /** A person who has made the phone's text larger still gets larger labels here, up to this much: three labels in a row of a 320 wide phone cannot grow without end. */
 export const BAR_MAX_FONT_SCALE = 1.2;
@@ -13,22 +14,29 @@ export const BAR_MAX_FONT_SCALE = 1.2;
 export const BAR_DRAWN: Record<Testament, string> = { old: 'Old\nTestament', deutero: 'Deuterocanon', new: 'New\nTestament' };
 
 /**
+ * What is drawn on a choice on a phone narrower than NARROW_UNDER (352): the word "Testament" is 80 wide at 15 and the two outer choices have 73 on a phone 320 wide (92 on 352), so it
+ * would touch the edge of its choice; the three are "Old", "Deuterocanon" and "New" there. A screen reader says the plain label (TESTAMENT_LABEL) either way.
+ */
+export const BAR_DRAWN_NARROW: Record<Testament, string> = { old: 'Old', deutero: 'Deuterocanon', new: 'New' };
+
+/**
  * The three choices of the Bible tab: Old Testament, Deuterocanon, New Testament. One is on at a time (the filled one); the grid of books under it
  * shows the books of that part. It sits in the page, directly under the daily reading banner and above the books, and scrolls with them: it is a
  * segmented pill (a sunken track and a filled choice), not the underline of the Bible and Books strip at the very top of the screen.
  *
  * A group of radio choices for a screen reader ("Old Testament, radio button, checked"), not tabs: the real tab bar below is the only thing on the
  * screen that is a "tab" to it. (`aria-checked` is there as well as `accessibilityState`, because the web build only reads the first.) The labels are
- * Inter, 14 with the weight of the tab bar's, the same for the filled one and the others so that nothing moves when the choice changes. The middle label
+ * the caption of the type scale (Inter Medium 15), the same for the filled one and the others so that nothing moves when the choice changes. The middle label
  * is a single long word, so it keeps its own width (it never shrinks, never wraps) and the other two share what is left, each on two lines (BAR_DRAWN).
  * Colours are roles: the filled choice is role.action with role.onAction, the others role.text on the role.sunken track.
  */
 export function TestamentBar({ value, onChange }: { value: Testament; onChange: (t: Testament) => void }) {
+  const drawn = useWindowDimensions().width < NARROW_UNDER ? BAR_DRAWN_NARROW : BAR_DRAWN;
   return (
     <View
       accessibilityRole="radiogroup"
       accessibilityLabel="Part of the Bible"
-      style={{ height: BAR_HEIGHT, flexDirection: 'row', alignItems: 'stretch', gap: 2, padding: 4, borderRadius: radius.pill, backgroundColor: role.sunken }}
+      style={{ height: BAR_HEIGHT, flexDirection: 'row', alignItems: 'stretch', gap: space[1], padding: space[1], borderRadius: radius.pill, backgroundColor: role.sunken }}
     >
       {TESTAMENTS.map((t) => {
         const on = t === value;
@@ -42,11 +50,11 @@ export function TestamentBar({ value, onChange }: { value: Testament; onChange: 
             onPress={() => onChange(t)}
             style={({ pressed }) => ({
               flexGrow: t === 'deutero' ? 0 : 1, flexShrink: t === 'deutero' ? 0 : 1, flexBasis: t === 'deutero' ? 'auto' : 0,
-              paddingHorizontal: 6, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center',
+              paddingHorizontal: space[1], paddingVertical: space[2], borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center',
               backgroundColor: on ? role.action : 'transparent', opacity: pressed ? 0.85 : 1,
             })}
           >
-            <AppText variant="label" maxFontSizeMultiplier={BAR_MAX_FONT_SCALE} color={on ? role.onAction : role.text} style={{ fontSize: 14, lineHeight: 18, textAlign: 'center' }}>{BAR_DRAWN[t]}</AppText>
+            <AppText variant="caption" maxFontSizeMultiplier={BAR_MAX_FONT_SCALE} color={on ? role.onAction : role.text} style={{ textAlign: 'center' }}>{drawn[t]}</AppText>
           </Pressable>
         );
       })}

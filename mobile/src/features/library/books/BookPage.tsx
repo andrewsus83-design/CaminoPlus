@@ -8,7 +8,7 @@ import { Screen } from '@/components/Screen';
 import { BackButton } from '@/components/BackButton';
 import { Card } from '@/components/ui';
 import { FormMessage } from '@/components/auth/Field';
-import { c, radius, role } from '@/theme';
+import { c, layout, radius, role, space } from '@/theme';
 import { BOOKMARK_NOT_SAVED } from '../bookmarks';
 import { itemKey } from '../search';
 import { useLibraryBookmarks } from '../useLibraryBookmarks';
@@ -33,11 +33,11 @@ import { useBooksReading } from './useBooksReading';
 /** How wide the cover is on the page: about 60 % of the screen's width, so larger than the covers of the grid (173 on a 390 phone) and never more than 240. */
 export const coverWidthOf = (screen: number): number => Math.min(Math.max(Math.round((screen - 32) * 0.6), 150), 240);
 
-/** The kind of book under the title, in JetBrains Mono capitals on a pale ground. */
+/** The kind of book under the title, in JetBrains Mono capitals on a pale ground, with 8 above and below the words and 12 at the sides. */
 function KindMark({ kind }: { kind: string }) {
   return (
-    <View accessibilityLabel={kindName(kind)} style={{ paddingHorizontal: 12, height: 26, borderRadius: radius.pill, backgroundColor: role.sunken, justifyContent: 'center' }}>
-      <AppText variant="mono" color={role.muted} style={{ fontSize: 12, lineHeight: 16, letterSpacing: 1 }}>{kindName(kind).toUpperCase()}</AppText>
+    <View accessibilityLabel={kindName(kind)} style={{ paddingHorizontal: space[3], paddingVertical: space[2], borderRadius: radius.pill, backgroundColor: role.sunken }}>
+      <AppText variant="mono" color={role.muted}>{kindName(kind).toUpperCase()}</AppText>
     </View>
   );
 }
@@ -54,20 +54,20 @@ const TocRow = memo(function TocRow({ entry, minutes, read, here, first, onOpen 
       accessibilityRole="button"
       accessibilityLabel={spoken}
       onPress={() => onOpen(entry.id)}
-      style={({ pressed }) => ({ minHeight: 56, flexDirection: 'row', alignItems: 'flex-start', gap: 12, paddingVertical: 17, paddingHorizontal: 12, borderTopWidth: first ? 0 : 1, borderTopColor: role.border, backgroundColor: pressed ? role.sunken : 'transparent' })}
+      style={({ pressed }) => ({ minHeight: 56, flexDirection: 'row', alignItems: 'flex-start', gap: space[3], paddingVertical: space[4], paddingHorizontal: layout.cardPadding, borderTopWidth: first ? 0 : 1, borderTopColor: role.border, backgroundColor: pressed ? role.sunken : 'transparent' })}
     >
-      <AppText variant="mono" muted style={{ width: 28, textAlign: 'right', fontSize: 14, lineHeight: 20, marginTop: 1 }}>{entry.index + 1}</AppText>
-      <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
+      <AppText variant="mono" muted style={{ width: 28, textAlign: 'right' }}>{entry.index + 1}</AppText>
+      <View style={{ flex: 1, minWidth: 0, gap: space[1] }}>
         <AppText variant="label">{label}</AppText>
-        {!!subtitle && <AppText variant="small" muted numberOfLines={3} style={{ fontSize: 15, lineHeight: 21 }}>{subtitle}</AppText>}
+        {!!subtitle && <AppText variant="caption" muted numberOfLines={3}>{subtitle}</AppText>}
         {here && (
-          <View style={{ alignSelf: 'flex-start', paddingHorizontal: 8, height: 20, borderRadius: radius.pill, backgroundColor: role.sunken, justifyContent: 'center' }}>
-            <AppText variant="mono" muted style={{ fontSize: 11, lineHeight: 14, letterSpacing: 1 }}>LAST READ</AppText>
+          <View style={{ alignSelf: 'flex-start', paddingHorizontal: space[3], paddingVertical: space[2], borderRadius: radius.pill, backgroundColor: role.sunken }}>
+            <AppText variant="mono" muted>LAST READ</AppText>
           </View>
         )}
       </View>
-      <View style={{ alignItems: 'flex-end', gap: 4 }}>
-        {!!minutes && <AppText variant="mono" muted style={{ fontSize: 13, lineHeight: 20 }}>{formatMinutes(minutes)}</AppText>}
+      <View style={{ alignItems: 'flex-end', gap: space[1] }}>
+        {!!minutes && <AppText variant="mono" muted>{formatMinutes(minutes)}</AppText>}
         {read && <Icon name="check" color={c.success} size={20} strokeWidth={2.2} />}
       </View>
     </Pressable>
@@ -80,7 +80,7 @@ function Missing() {
     <Screen tabBar={false}>
       <BackButton fallback="/library" />
       <AppText variant="h2" accessibilityRole="header">Not found</AppText>
-      <Card style={{ gap: 12 }}>
+      <Card style={{ gap: space[3] }}>
         <AppText variant="h4" accessibilityRole="header">{UNKNOWN_TITLE}</AppText>
         <AppText variant="small" accessibilityLiveRegion="polite">{UNKNOWN_TEXT}</AppText>
         <Pill variant="primary" label="Open the Library" onPress={() => router.replace('/library')} />
@@ -120,21 +120,21 @@ function Page({ book, notice }: { book: CatalogBook; notice?: string }) {
       <BackButton fallback="/library" />
       {!!notice && <FormMessage tone="info">{notice}</FormMessage>}
       {marks.failed && <FormMessage>{BOOKMARK_NOT_SAVED}</FormMessage>}
-      <View style={{ alignItems: 'center', gap: 12 }}>
+      <View style={{ alignItems: 'center', gap: space[3] }}>
         <BookCover book={book} width={coverWidth} bookmarked={marks.has(key)} onBookmark={toggle} />
-        <View style={{ alignItems: 'center', gap: 4, marginTop: 8 }}>
+        <View style={{ alignItems: 'center', gap: space[1], marginTop: space[2] }}>
           <AppText variant="h3" accessibilityRole="header" style={{ textAlign: 'center' }}>{book.title}</AppText>
           {!!book.subtitle && <AppText variant="small" muted style={{ textAlign: 'center' }}>{book.subtitle}</AppText>}
         </View>
         <KindMark kind={book.kind} />
-        <AppText variant="mono" muted style={{ fontSize: 13, lineHeight: 19, textAlign: 'center' }}>{bookFacts(book.chapters.length, book.words)}</AppText>
+        <AppText variant="mono" muted style={{ textAlign: 'center' }}>{bookFacts(book.chapters.length, book.words)}</AppText>
       </View>
       <AppText variant="body">{book.description}</AppText>
       <BookNotice text={noticeFor(book.kind)} />
 
       {text && target && nav ? (
         <>
-          <View style={{ gap: 8 }}>
+          <View style={{ gap: space[2] }}>
             <ReadButton
               label={readButtonLabel(chapters, place)}
               spoken={readButtonSpoken(chapters, place)}
@@ -142,21 +142,21 @@ function Page({ book, notice }: { book: CatalogBook; notice?: string }) {
               onPress={() => open(target.id)}
             />
             {!resume.fresh && (
-              <AppText variant="mono" muted style={{ fontSize: 13, lineHeight: 19, textAlign: 'center' }}>{[nav.part ? partName(nav.part) : null, positionLine(nav)].filter(Boolean).join(' · ')}</AppText>
+              <AppText variant="mono" muted style={{ textAlign: 'center' }}>{[nav.part ? partName(nav.part) : null, positionLine(nav)].filter(Boolean).join(' · ')}</AppText>
             )}
             <AppText variant="accent" color={role.accentText} style={{ textAlign: 'center' }}>{pageNote(book.kind)}</AppText>
           </View>
-          <View style={{ gap: 12 }}>
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'baseline', justifyContent: 'space-between', columnGap: 12 }}>
+          <View style={{ gap: space[3] }}>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'baseline', justifyContent: 'space-between', columnGap: space[3] }}>
               <AppText variant="h4" accessibilityRole="header">Contents</AppText>
-              <AppText variant="mono" muted style={{ fontSize: 14, lineHeight: 20 }}>{`${chapters.length} ${chapters.length === 1 ? 'chapter' : 'chapters'}`}</AppText>
+              <AppText variant="mono" muted>{`${chapters.length} ${chapters.length === 1 ? 'chapter' : 'chapters'}`}</AppText>
             </View>
             {groups.map((g, gi) => (
-              <View key={`${gi}-${g.part ?? ''}`} style={{ gap: 8 }}>
+              <View key={`${gi}-${g.part ?? ''}`} style={{ gap: space[2] }}>
                 {!!g.part && (
-                  <View accessible accessibilityRole="header" accessibilityLabel={g.part} style={{ gap: 2, marginTop: gi === 0 ? 0 : 8 }}>
-                    <AppText variant="h4" style={{ fontSize: 19, lineHeight: 25 }}>{partName(g.part)}</AppText>
-                    {!!partSubtitle(g.part) && <AppText variant="small" muted numberOfLines={4} style={{ fontSize: 15, lineHeight: 21 }}>{partSubtitle(g.part)}</AppText>}
+                  <View accessible accessibilityRole="header" accessibilityLabel={g.part} style={{ gap: space[1], marginTop: gi === 0 ? 0 : space[2] }}>
+                    <AppText variant="h5">{partName(g.part)}</AppText>
+                    {!!partSubtitle(g.part) && <AppText variant="caption" muted numberOfLines={4}>{partSubtitle(g.part)}</AppText>}
                   </View>
                 )}
                 <Card style={{ padding: 0, overflow: 'hidden' }}>
@@ -168,14 +168,14 @@ function Page({ book, notice }: { book: CatalogBook; notice?: string }) {
             ))}
           </View>
           {!!text.credit && (
-            <View style={{ gap: 4 }}>
-              <AppText variant="mono" muted style={{ fontSize: 12, lineHeight: 16, letterSpacing: 1.5, textTransform: 'uppercase' }}>Credit</AppText>
+            <View style={{ gap: space[1] }}>
+              <AppText variant="mono" muted style={{ textTransform: 'uppercase' }}>Credit</AppText>
               <AppText variant="caption" muted>{text.credit}</AppText>
             </View>
           )}
         </>
       ) : (
-        <Card style={{ gap: 8 }}>
+        <Card style={{ gap: space[2] }}>
           <AppText variant="h4" accessibilityRole="header">{UNREADABLE_TITLE}</AppText>
           <AppText variant="small">{UNREADABLE_TEXT}</AppText>
         </Card>
