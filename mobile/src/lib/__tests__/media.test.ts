@@ -90,6 +90,10 @@ check('the quota check: unknown lets the server decide, no storage and too littl
   assert.ok(!full.ok && /full/.test(full.message));
 });
 
+check('no sentence suggests that something can be bought today', () => {
+  assert.doesNotMatch(L.NO_CLOUD_STORAGE_MESSAGE, /Plus|buy|upgrade|subscribe/i);
+});
+
 check('the wording: plain limits and "higher resolution" only; no comparison words and no "4K" in what the app says', () => {
   const texts = [L.problemMessage('too_long'), L.problemMessage('too_big', { capBytes: 45 * MB }), L.problemMessage('quota', { neededBytes: 1, remainingBytes: 0 }), L.NO_CLOUD_STORAGE_MESSAGE];
   for (const t of texts) {
@@ -256,7 +260,8 @@ check('every upload site prepares its media first: the post composer, the avatar
   assert.match(batch, /d\.prepareImage\(/);
   assert.match(batch, /d\.prepareVideo\(/);
   assert.match(batch, /thumb: true/, 'a post photo gets its thumbnail');
-  assert.match(composer, /await loadMyStorage\(/, 'the plan is known before the picker opens');
+  assert.match(composer, /withTimeout\(loadMyStorage\(uid\), PLAN_WAIT_MS, null\)\) \?\? \(await cachedMyStorage\(uid\)\)/, 'the plan is known before the picker opens, waited for a few seconds at most');
+  assert.match(composer, /if \(picking\.current\) return;[^\n]*\n\s*picking\.current = true;/, 'a second tap does not open a second picker');
   assert.match(composer, /PLAN_UNKNOWN_NOTE/);
   assert.match(composer, /if \(sharing\.current\) return;/, 'a double tap makes one post');
   assert.match(composer, /quotaCheck\(/);
@@ -283,7 +288,7 @@ check('files no message or post uses any more are deleted: a failed post row, a 
 check('signing out forgets every signed link, so the next account on the phone never gets the last one\'s links', () => {
   const auth = read(join('src', 'lib', 'auth.tsx'));
   assert.match(auth, /signOut: async \(\) => \{\s*const uid = userId;\s*clearSignedUrlMemo\(\);/);
-  assert.match(auth, /if \(event === 'SIGNED_OUT'\) clearSignedUrlMemo\(\);/);
+  assert.match(auth, /if \(event === 'SIGNED_OUT' \|\| \(uid && linksFor && uid !== linksFor\)\) clearSignedUrlMemo\(\);/, 'also when another account signs in');
 });
 
 check('the preparing screen: a progress bar for screen readers, an announcement on iPhone, Android Back cancels', () => {

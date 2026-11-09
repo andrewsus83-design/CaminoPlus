@@ -4,8 +4,8 @@ import assert from 'node:assert/strict';
 import { storeAvatar, AvatarDeps } from '../avatarFlow';
 import { PostMediaDeps, PreparedUpload, insertOutcome, uploadPostMediaWith } from '../postMediaUpload';
 import { ImageManipulatorLike, MediaCancelled, MediaDeps, MediaRejected, createMedia } from '../media/core';
-import { BatchDeps, COULD_NOT_READ, PickedFile, prepareBatch } from '../media/batch';
-import { LOCATION_REFUSED_MESSAGE, UNSUPPORTED_TYPE_MESSAGE, isSupportedPick, looksLikeJpeg } from '../media/limits';
+import { BatchDeps, COULD_NOT_READ, PickedFile, prepareBatch, withTimeout } from '../media/batch';
+import { LOCATION_REFUSED_MESSAGE, UNSUPPORTED_TYPE_MESSAGE, VIDEO_LOCATION_REFUSED_MESSAGE, isSupportedPick, looksLikeJpeg } from '../media/limits';
 import { discardMediaPlan } from '../../features/social/logic';
 
 let n = 0;
@@ -106,9 +106,9 @@ check('post media: 23505 (an earlier try already stored the row) is uploaded, no
 
 /* ------------------------------------------------------------------ chat photos that are deleted from the outbox */
 
-check('a discarded chat photo is deleted only when no message can use it', () => {
-  assert.equal(discardMediaPlan({ status: 'failed', media_path: 'u/chat/c/1.jpg' }), 'delete', 'refused by the server');
+check('a discarded chat photo: only a queued one is checked (and deleted when no message is found); a failed or sending one is kept', () => {
   assert.equal(discardMediaPlan({ status: 'queued', media_path: 'u/chat/c/1.jpg' }), 'check', 'may have landed after a lost answer');
+  assert.equal(discardMediaPlan({ status: 'failed', media_path: 'u/chat/c/1.jpg' }), 'keep', 'an earlier try may have been delivered, and a 42501 sender cannot see it');
   assert.equal(discardMediaPlan({ status: 'sending', media_path: 'u/chat/c/1.jpg' }), 'keep', 'may land any moment');
   assert.equal(discardMediaPlan({ status: 'failed', media_path: null }), 'none');
 });
@@ -198,6 +198,21 @@ check('a batch: progress is passed on, unsupported clips (3GP, WebM) and refused
   assert.ok(stages.includes('Preparing your video 0.4'));
   assert.equal(isSupportedPick('video', null, 'file:///clip.MOV'), true);
   assert.equal(isSupportedPick('video', null, 'file:///clip.3gp'), false);
+});
+
+check('prepareVideo says at pick time when a clip cannot lose its recording place; a clip that cannot be read here is left to the upload', async () => {
+  const bad = createMedia(mediaDeps({ videoReadable: async () => false }));
+  await assert.rejects(bad.prepareVideo('file:///v.mp4', 'free', undefined, undefined, { mimeType: 'video/mp4' }), (e: unknown) => e instanceof MediaRejected && e.kind === 'video_location' && e.message === VIDEO_LOCATION_REFUSED_MESSAGE);
+  for (const answer of [true, null] as const) {
+    const ok = createMedia(mediaDeps({ videoReadable: async () => answer }));
+    assert.equal((await ok.prepareVideo('file:///v.mp4', 'free', undefined, undefined, { mimeType: 'video/mp4' })).uri, 'file:///v.mp4');
+  }
+});
+
+check('withTimeout: the answer in time, else the fallback (also when the work fails)', async () => {
+  assert.equal(await withTimeout(Promise.resolve(1), 50, null), 1);
+  assert.equal(await withTimeout(new Promise((r) => setTimeout(() => r(1), 200)), 20, null), null);
+  assert.equal(await withTimeout(Promise.reject(new Error('x')), 50, 'free'), 'free');
 });
 
 check('prepareVideo refuses a clip type the cloud does not take', async () => {

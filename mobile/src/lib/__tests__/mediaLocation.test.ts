@@ -7,7 +7,7 @@ import { join } from 'node:path';
 import { stripJpegLocation } from '../media/exif';
 import { stripVideoLocation } from '../media/videoLocation';
 import { UploadRefused, cleanForUpload, normaliseType } from '../media/clean';
-import { LOCATION_REFUSED_MESSAGE, UNSUPPORTED_TYPE_MESSAGE } from '../media/limits';
+import { LOCATION_REFUSED_MESSAGE, UNSUPPORTED_TYPE_MESSAGE, VIDEO_LOCATION_REFUSED_MESSAGE } from '../media/limits';
 
 let n = 0;
 const check = (name: string, fn: () => void) => { fn(); n += 1; console.log(`ok   ${name}`); };
@@ -209,12 +209,13 @@ for (const o of [{ quicktime: false, bigMdat: false, moovFirst: true }, { quickt
     assert.equal(bytes, src, 'changed in place, no copy of a 45 MB clip');
     assert.deepEqual(whereFrom(bytes), []);
     assert.ok(B(bytes).includes(Buffer.from('Apple')), 'the other metadata items stay');
-    // the changed bytes are exactly the values: the ©xyz texts, the loci body, the ISO6709 data value
+    // the changed bytes are exactly: the ©xyz and loci boxes (turned into free boxes, type and body), the ISO6709 value
     const ranges: Array<[number, number]> = [];
     for (const at of every(B(copy), Buffer.from(POS, 'latin1'))) ranges.push([at, at + POS.length]);
-    for (const at of every(B(copy), Buffer.from('+42.88-008.54/', 'latin1'))) ranges.push([at, at + 14]);
-    const loci = B(copy).indexOf(Buffer.from('loci', 'latin1'));
-    ranges.push([loci + 4 + 4 + 2, loci - 4 + B(copy).readUInt32BE(loci - 4)]);
+    for (const type of ['\u00a9xyz', 'loci']) {
+      for (const at of every(B(copy), Buffer.from(type, 'latin1'))) ranges.push([at, at - 4 + B(copy).readUInt32BE(at - 4)]);
+    }
+    assert.ok(B(bytes).includes(Buffer.from('free', 'latin1')));
     changesOnlyIn(copy, bytes, ranges, name);
     const mdat = B(copy).indexOf(Buffer.from('mdat', 'latin1'));
     assert.deepEqual(B(bytes).subarray(mdat, mdat + 4000), B(copy).subarray(mdat, mdat + 4000), 'the picture data is untouched');
@@ -229,6 +230,86 @@ check('a clip without a location, a broken clip, and a file that is not a clip a
   const broken = new Uint8Array(Buffer.concat([box('ftyp', Buffer.from('isom', 'latin1')), Buffer.from([0, 0, 0xff, 0xff, 0x6d, 0x6f, 0x6f, 0x76, 1, 2])]));
   assert.doesNotThrow(() => stripVideoLocation(broken));
   assert.equal(stripVideoLocation(new Uint8Array([1, 2, 3])).removed, false);
+});
+
+/* ------------------------------------------------------------------ clips made with ffmpeg, and broken ones (fixtures/video/make.py) */
+
+const VID = join(FIX, 'video');
+const vfile = (f: string) => new Uint8Array(readFileSync(join(VID, f)));
+const typeOf = (f: string) => (f.endsWith('.mov') ? 'video/quicktime' : 'video/mp4');
+/** A loci box holds the position as 16.16 numbers: 42.88 and -8.545 as ffmpeg writes them, and -555 / 2810 of make.py. */
+const lociNumbers = (x: Uint8Array) => [[0x00, 0x2a, 0xe1, 0x47], [0xff, 0xf7, 0x74, 0x7b], [0xff, 0xff, 0xfd, 0xd5, 0x00, 0x00, 0x0a, 0xfa]].some((n) => B(x).includes(Buffer.from(n)));
+
+const GOOD_CLIPS = ['ff_android_like.mp4', 'ff_faststart.mp4', 'ff_fragmented.mp4', 'ff_iphone_like.mov', 'h_all_layouts.mov', 'h_moov_size0.mp4', 'h_mdat64.mp4', 'h_deep_nesting.mp4'];
+const BROKEN_CLIPS = ['h_truncated_mid_moov.mp4', 'h_lying_free_before_moov.mp4', 'h_loop_in_udta.mp4', 'h_child_longer_than_parent.mp4', 'h_keys_lying_entry.mov'];
+
+check('the clip fixtures are all there, and each carries a place before cleaning', () => {
+  const have = readdirSync(VID);
+  for (const f of [...GOOD_CLIPS, ...BROKEN_CLIPS, 'h_heic_as_video.mp4']) assert.ok(have.includes(f), f);
+  for (const f of [...GOOD_CLIPS, ...BROKEN_CLIPS].filter((x) => !x.includes('truncated'))) assert.ok(whereFrom(vfile(f)).length > 0 || lociNumbers(vfile(f)), `${f} carries a place`);
+});
+
+for (const f of GOOD_CLIPS) {
+  check(`${f}: goes up without its place, same length, only the place bytes changed`, () => {
+    const src = vfile(f);
+    const before = new Uint8Array(src);
+    const out = cleanForUpload(src, typeOf(f));
+    assert.deepEqual(whereFrom(out.bytes), [], `${f}: ${whereFrom(out.bytes).join(', ')}`);
+    assert.equal(lociNumbers(out.bytes), false);
+    assert.equal(out.bytes.length, before.length);
+    const mdat = B(before).indexOf(Buffer.from('mdat', 'latin1'));
+    const mdatSize = mdat >= 4 ? B(before).readUInt32BE(mdat - 4) : 0;
+    if (mdatSize > 16) {
+      const from = mdat + (mdatSize === 1 ? 12 : 4);
+      const to = mdatSize === 1 ? mdat - 4 + Number(B(before).readBigUInt64BE(mdat + 4)) : mdat - 4 + mdatSize;
+      assert.ok(B(out.bytes).subarray(from, to).equals(B(before).subarray(from, to)), `${f}: the picture data is untouched`);
+    }
+  });
+}
+
+for (const f of BROKEN_CLIPS) {
+  check(`${f}: a clip whose boxes do not add up is refused, with a plain message`, () => {
+    assert.throws(() => cleanForUpload(vfile(f), typeOf(f)), (e: unknown) => e instanceof UploadRefused && e.message === VIDEO_LOCATION_REFUSED_MESSAGE);
+    assert.equal(stripVideoLocation(vfile(f)).complete, false);
+  });
+}
+
+check('nesting deeper than the walk reads is refused, not skipped', () => {
+  let inner = box('\u00a9xyz', Buffer.from([0, 18, 0x15, 0xc7]), Buffer.from('+42.8800-008.5450/', 'latin1'));
+  for (let i = 0; i < 12; i++) inner = box('udta', inner);
+  const deep = new Uint8Array(Buffer.concat([box('ftyp', Buffer.from('isom', 'latin1'), u32(0)), box('moov', inner)]));
+  assert.throws(() => cleanForUpload(deep, 'video/mp4'), (e: unknown) => e instanceof UploadRefused && e.message === VIDEO_LOCATION_REFUSED_MESSAGE);
+});
+
+check('a clip cut short by 1, 3 or 8 bytes is refused (its place may sit in the part that cannot be read)', () => {
+  const whole = vfile('ff_android_like.mp4');
+  assert.equal(stripVideoLocation(new Uint8Array(whole)).complete, true);
+  for (const cut of [1, 3, 8]) {
+    assert.throws(() => cleanForUpload(new Uint8Array(whole.subarray(0, whole.length - cut)), 'video/mp4'), (e: unknown) => e instanceof UploadRefused, `cut ${cut}`);
+  }
+});
+
+check('a HEIC photo that says it is a video is refused (its brands are those of a photo)', () => {
+  assert.throws(() => cleanForUpload(vfile('h_heic_as_video.mp4'), 'video/mp4'), (e: unknown) => e instanceof UploadRefused && e.message === UNSUPPORTED_TYPE_MESSAGE);
+  for (const brand of ['heic', 'heix', 'mif1', 'msf1', 'avif']) {
+    const f = new Uint8Array(Buffer.concat([box('ftyp', Buffer.from(brand, 'latin1'), u32(0)), box('moov', box('mvhd', full(), Buffer.alloc(96)))]));
+    assert.throws(() => cleanForUpload(f, 'video/mp4'), UploadRefused, brand);
+  }
+  const compat = new Uint8Array(Buffer.concat([box('ftyp', Buffer.from('isom', 'latin1'), u32(0), Buffer.from('mif1', 'latin1')), box('moov', box('mvhd', full(), Buffer.alloc(96)))]));
+  assert.throws(() => cleanForUpload(compat, 'video/mp4'), UploadRefused, 'a still brand among the compatible ones');
+});
+
+check('XMP in udta/XMP_ and in a top-level XMP uuid box is blanked; a QuickTime list of boxes that ends with a zero is fine', () => {
+  const xmpUuid = Buffer.from('BE7ACFCB97A942E89C71999491E3AFAC', 'hex');
+  const clip = new Uint8Array(Buffer.concat([
+    box('ftyp', Buffer.from('isom', 'latin1'), u32(0)),
+    box('moov', box('mvhd', full(), Buffer.alloc(96)), box('udta', box('XMP_', Buffer.from('<x exif:GPSLatitude="42,52.8N"/>', 'latin1')), u32(0))),
+    box('uuid', xmpUuid, Buffer.from('<x exif:GPSLongitude="8,32.7W"/>', 'latin1')),
+    box('mdat', Buffer.alloc(32, 3)),
+  ]));
+  const out = cleanForUpload(clip, 'video/mp4');
+  assert.deepEqual(whereFrom(out.bytes), []);
+  assert.ok(B(out.bytes).includes(xmpUuid), 'the uuid itself stays');
 });
 
 /* ------------------------------------------------------------------ what may go up at all */

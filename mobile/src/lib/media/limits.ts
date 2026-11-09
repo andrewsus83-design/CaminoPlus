@@ -108,12 +108,16 @@ export function estimateVideoBytes(seconds: number, tier: MediaTier): number {
 
 /* ------------------------------------------------------------------ honest messages */
 
-export type MediaProblem = 'too_long' | 'too_big' | 'quota' | 'location' | 'unsupported';
+export type MediaProblem = 'too_long' | 'too_big' | 'quota' | 'location' | 'video_location' | 'unsupported';
 
 /** A photo that could not be saved again and is not a JPEG (HEIC above all) would go up with its position: refused. */
 export const LOCATION_REFUSED_MESSAGE = 'This photo format cannot be shared without its location. Try another photo.';
+/** A clip that cannot be read to the end (cut short, sizes that do not add up) may keep its place: refused. */
+export const VIDEO_LOCATION_REFUSED_MESSAGE = 'This video cannot be shared without the place where it was recorded. Try another video.';
 /** The cloud takes JPEG photos (every photo is turned into one) and MP4 or MOV videos. */
 export const UNSUPPORTED_TYPE_MESSAGE = 'This file type is not supported. Use a photo or an MP4 or MOV video.';
+/** How long the composer waits for the plan before it opens the picker (ms); then it uses the saved answer or the Free sizes. */
+export const PLAN_WAIT_MS = 4000;
 /** The plan could not be checked (offline, not loaded yet): the smaller sizes are used, and the composer says so. */
 export const PLAN_UNKNOWN_NOTE = 'Sizes for the Free plan. Your plan could not be checked.';
 
@@ -142,6 +146,7 @@ export function formatMB(bytes: number): string {
 
 export function problemMessage(kind: MediaProblem, o: { capBytes?: number; neededBytes?: number; remainingBytes?: number } = {}): string {
   if (kind === 'location') return LOCATION_REFUSED_MESSAGE;
+  if (kind === 'video_location') return VIDEO_LOCATION_REFUSED_MESSAGE;
   if (kind === 'unsupported') return UNSUPPORTED_TYPE_MESSAGE;
   if (kind === 'too_long') return `This video is longer than ${MAX_VIDEO_SECONDS} seconds. Trim it in your Photos app, then add it again.`;
   if (kind === 'too_big') return `This file is too big to upload, even after making it smaller. The limit is ${formatMB(o.capBytes ?? 0)}. Try a shorter clip or another photo.`;
@@ -151,8 +156,9 @@ export function problemMessage(kind: MediaProblem, o: { capBytes?: number; neede
     : 'Your cloud storage is full. Free up space in Settings, then try again.';
 }
 
-/** When the account has no cloud storage at all (the same sentence Settings shows). */
-export const NO_CLOUD_STORAGE_MESSAGE = 'Photos and videos in your posts and chats are saved in the cloud. That is part of Pilgrim Plus.';
+/** When the account has no cloud storage at all. Neutral on purpose: Pilgrim Plus cannot be bought yet (the plan branch
+ *  replaces this with its own text). */
+export const NO_CLOUD_STORAGE_MESSAGE = 'Cloud storage is switched off for now. Photos and videos cannot be saved yet.';
 
 /** Is there room in the plan's storage for these bytes? Unknown storage (offline, not loaded) lets the server decide. */
 export function quotaCheck(neededBytes: number, storage: { quota_bytes?: number | null; remaining_bytes?: number | null } | null | undefined): { ok: true } | { ok: false; message: string } {

@@ -49,3 +49,11 @@ export async function prepareBatch(picked: readonly PickedFile[], tier: MediaTie
   if (signal.aborted) return cancel();
   return { ready, problems, cancelled: false };
 }
+
+/** The answer of `work`, or `fallback` when it takes longer than `ms` or fails. */
+export function withTimeout<T, F>(work: Promise<T>, ms: number, fallback: F): Promise<T | F> {
+  return new Promise((resolve) => {
+    const timer = setTimeout(() => resolve(fallback), ms);
+    work.then((v) => { clearTimeout(timer); resolve(v); }, () => { clearTimeout(timer); resolve(fallback); });
+  });
+}

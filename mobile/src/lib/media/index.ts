@@ -11,6 +11,7 @@ import { File, Paths } from 'expo-file-system';
 import { NativeName, hasNativeModule } from '@/lib/optionalNative';
 import { ImageManipulatorLike, MediaDeps, VideoCompressorLike, createMedia } from './core';
 import { PickedFile, Stage, prepareBatch } from './batch';
+import { stripVideoLocation } from './videoLocation';
 import type { MediaTier } from './limits';
 
 let manipulatorCache: ImageManipulatorLike | null | undefined;
@@ -59,7 +60,14 @@ function removeFile(uri: string) {
   } catch { /* the system empties its cache folder anyway */ }
 }
 
-const deps: MediaDeps = { manipulator, compressor, byteSize, removeFile };
+/** Read the clip once and check that its recording place can be removed (the bytes read here are thrown away). */
+async function videoReadable(uri: string): Promise<boolean | null> {
+  let bytes: Uint8Array;
+  try { bytes = new Uint8Array(await (await fetch(uri)).arrayBuffer()); } catch { return null; }
+  return stripVideoLocation(bytes).complete;
+}
+
+const deps: MediaDeps = { manipulator, compressor, byteSize, removeFile, videoReadable };
 export const { prepareImage, prepareVideo } = createMedia(deps);
 
 /** Delete the files prepareImage made (Cancel, or slides that were left out). Originals are never touched. */
@@ -74,6 +82,7 @@ export const canCompressVideo = () => compressor() != null;
 
 export { MediaCancelled, MediaRejected } from './core';
 export type { PickedFile, ReadyFile, Stage } from './batch';
+export { withTimeout } from './batch';
 
 /** Make the files picked for a post ready, one after the other (./batch.ts): Cancel adds nothing and deletes what was made. */
 export const preparePicked = (picked: readonly PickedFile[], tier: MediaTier, signal: AbortSignal, onStage: (s: Stage) => void) =>

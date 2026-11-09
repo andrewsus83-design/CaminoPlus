@@ -16,6 +16,12 @@ export async function getMyStorage(): Promise<MyStorage> {
   return res.data as MyStorage;
 }
 
+/** The last answer saved on this phone, or null. */
+export async function cachedMyStorage(uid: string | null | undefined): Promise<MyStorage | null> {
+  if (!uid) return null;
+  try { return (await localStore.getJSON<MyStorage>(userKey(uid, 'storage'))) ?? null; } catch { return null; }
+}
+
 /** The plan and storage now: the server's answer, or the last one saved on this phone, or null when neither is there. */
 export async function loadMyStorage(uid: string | null | undefined): Promise<MyStorage | null> {
   if (!uid) return null;

@@ -108,8 +108,7 @@ export function discardItem(id: string) {
   if (gone?.media_path) {
     const path = gone.media_path;
     const plan = discardMediaPlan(gone);
-    if (plan === 'delete') void socialApi.deleteChatImage(path);
-    else if (plan === 'check') {
+    if (plan === 'check') {
       void socialApi.getMessages([gone.id]).then((found) => { if (found.length === 0) void socialApi.deleteChatImage(path); }).catch(() => {});
     }
   }

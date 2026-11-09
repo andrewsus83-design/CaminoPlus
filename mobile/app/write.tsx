@@ -10,8 +10,8 @@ import { FormMessage } from '@/components/auth/Field';
 import { c, fixed, fonts, radius, role, layout } from '@/theme';
 import { useAuth } from '@/lib/auth';
 import { PickedMedia, PreparedMedia, createJournalPost, uploadPostMedia } from '@/lib/api';
-import { loadMyStorage, useMyStorage } from '@/lib/billing';
-import { MAX_VIDEO_SECONDS, MediaTier, PLAN_UNKNOWN_NOTE, canResizePhotos, discardPrepared, pickerQuality, pickerVideoPreset, preparePicked, quotaCheck, tierFor } from '@/lib/media';
+import { cachedMyStorage, loadMyStorage, useMyStorage } from '@/lib/billing';
+import { MAX_VIDEO_SECONDS, MediaTier, PLAN_UNKNOWN_NOTE, PLAN_WAIT_MS, withTimeout, canResizePhotos, discardPrepared, pickerQuality, pickerVideoPreset, preparePicked, quotaCheck, tierFor } from '@/lib/media';
 import { MediaPreparing } from '@/components/MediaPreparing';
 import { NativeName, hasNativeModule } from '@/lib/optionalNative';
 
@@ -109,6 +109,7 @@ export default function Write() {
   const [planUnknown, setPlanUnknown] = useState(false);
   const mounted = useRef(true);
   const sharing = useRef(false);
+  const picking = useRef(false);
   useEffect(() => () => { mounted.current = false; cancelRef.current?.abort(); }, []);
 
   const slide = slides[idx];
@@ -121,9 +122,21 @@ export default function Write() {
 
   /** Pick, then make each file ready. Files that cannot go up are left out, with the reason; Cancel adds nothing. */
   const addMedia = async () => {
-    if (cancelRef.current) return; // already preparing
-    // Wait for the plan before the picker opens, so a Pilgrim Plus member never gets the smaller sizes by accident.
-    const info = storage.data ?? (await loadMyStorage(session?.user.id));
+    if (picking.current) return; // a second tap while the plan is loaded, the picker is open or files are prepared
+    picking.current = true;
+    try {
+      await pickAndPrepare();
+    } catch (e) {
+      if (mounted.current) setError(e instanceof Error ? e.message : 'Could not add that photo or video.');
+    } finally {
+      picking.current = false;
+    }
+  };
+  const pickAndPrepare = async () => {
+    // Wait for the plan before the picker opens (a few seconds at most), so a Pilgrim Plus member never gets the smaller
+    // sizes by accident. No answer in time: the saved answer, or the Free sizes and the line that says so.
+    const uid = session?.user.id;
+    const info = storage.data ?? (await withTimeout(loadMyStorage(uid), PLAN_WAIT_MS, null)) ?? (await cachedMyStorage(uid));
     const tier: MediaTier = tierFor(info);
     const raw = await pickMedia(tier);
     if (!raw || raw.length === 0 || !mounted.current) return;

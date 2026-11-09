@@ -29,7 +29,10 @@ What it costs: data sent out (egress), not stored bytes, is most of the bill. A 
 5. `mediaStorage.upload` sends it, through `src/lib/media/clean.ts`: the type is read from the file's first bytes (not from its name), and every JPEG loses its location (`exif.ts`): the GPS block of every EXIF block in the file is emptied (also one that only IFD1 points to, one no pointer leads to, and the one of a second image inside the file), and XMP and Photoshop/IPTC blocks become empty comments. The length of the file does not change, so the picture still decodes. Any image that is not a JPEG by its bytes is refused.
 6. Before sharing, the composer checks the plan's free storage (the same `get_my_storage` answer Settings shows) and says plainly when there is not enough.
 
-What is not covered: location text inside an XMP or IPTC block whose segment header is broken (no phone camera writes that).
+What is not covered, honestly:
+- Location text inside an XMP or IPTC block whose segment header is broken (no phone camera writes that).
+- Data after a JPEG's end marker, such as the video inside a "motion photo". It only goes up when the photo could not be saved again (the saved copy has none).
+- On that same fallback path, the HDR gain map's XMP of an Ultra HDR photo is blanked with the other XMP, so the photo loses its HDR effect (it stays a normal photo).
 
 ## What happens to a video
 
@@ -40,7 +43,10 @@ So today:
 - On Android the clip goes up as it was recorded, as long as it is within the plan's file limit. A Free pilgrim on Android can therefore upload a 1080p clip if it is under 25 MB.
 - A clip over 60 seconds, or over the file limit, is refused with a plain message ("This video is longer than 60 seconds. Trim it in your Photos app, then add it again.").
 - Only MP4 and MOV clips are taken. Others (3GP, WebM) are refused when picked: "This file type is not supported. Use a photo or an MP4 or MOV video."
-- The place where a clip was recorded is removed on upload (`src/lib/media/videoLocation.ts`): the `©xyz` text in `moov/udta` (also inside a track), the 3GPP `loci` box, and the `com.apple.quicktime.location.ISO6709` item of `moov/meta` are overwritten with spaces or zeros of the same length. Only the box headers are read (the picture data is jumped over), nothing moves, and the clip plays as before. Tested on constructed MP4 and MOV files; not yet on clips from real phones (see the test list below).
+- The place where a clip was recorded is removed on upload (`src/lib/media/videoLocation.ts`): the `©xyz` box in `moov/udta` (also inside a track), the 3GPP `loci` box and an XMP box (`udta/XMP_`) become empty `free` boxes of the same size; the `com.apple.quicktime.location.ISO6709` item of `moov/meta` (and an iTunes-style `©xyz` item) gets spaces instead of its value; a top-level XMP `uuid` box is blanked. Only the box headers are read (the picture data is jumped over), nothing moves, and the clip plays as before. Checked with ffmpeg and ffprobe on clips ffmpeg made (an Android-style MP4, an iPhone-style MOV, a fast-start and a fragmented MP4, a 37 MB clip): no location tag is left, and every clip decodes. Not yet checked on clips from real phones (see the test list below).
+- A clip whose boxes do not add up (cut short, a size that lies, a box longer than the one it is in, nesting deeper than eight levels) is refused when it is picked: "This video cannot be shared without the place where it was recorded. Try another video." After cleaning, everything outside the picture data is searched once more for a position or XMP GPS text; if any is left, the clip is refused too.
+- A HEIC or AVIF photo that says it is a video (its brands are those of a photo) is refused.
+- Not covered: a timed GPS track inside the clip (`gpmd`, as action cameras write, or a `mebx` metadata track). Phones do not write these in normal clips, but such a clip would go up with its track.
 - The "Preparing your video… 40%" screen with Cancel is there and works; without a compressor it finishes at once. A compressor plugs into `compressor()` in `src/lib/media/index.ts` (shape `VideoCompressorLike` in `core.ts`); the tests already cover progress, cancel and a failing compressor.
 
 ## On a build without the new module

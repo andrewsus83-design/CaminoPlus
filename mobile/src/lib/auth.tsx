@@ -69,8 +69,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
     readStoredSession().then((s) => { if (alive) { setSession(s); setSessionReady(true); } });
     // Only synchronous work in this callback (supabase-js holds a lock while it runs).
+    let linksFor: string | null = null; // the account the remembered signed links belong to
     const { data } = supabase.auth.onAuthStateChange((event, s) => {
-      if (event === 'SIGNED_OUT') clearSignedUrlMemo(); // links signed for the account that left are never reused
+      // Links signed for one account are never reused for another: forget them when it leaves, or when another signs in.
+      const uid = s?.user?.id ?? null;
+      if (event === 'SIGNED_OUT' || (uid && linksFor && uid !== linksFor)) clearSignedUrlMemo();
+      if (uid) linksFor = uid;
       void reconcile(s).then(() => { if (alive) setSessionReady(true); });
     });
     return () => { alive = false; data.subscription.unsubscribe(); };

@@ -360,16 +360,15 @@ export function classifySendError(e: { status?: number; code?: string; network?:
 }
 
 /**
- * What to do with the uploaded photo of an outbox item that the person deletes. A failed item was refused by the server
- * (only a clear refusal makes an item failed), so no message uses its photo: delete it. A queued item may have landed
- * after a lost answer: ask first. While it is being sent the message may land any moment: keep the photo (an unused
- * one is left to the server's orphan sweep).
+ * What to do with the uploaded photo of an outbox item that the person deletes. Only a QUEUED item is checked (its last
+ * try failed for lack of an answer, so the message may or may not be there): when the check finds no message, the photo
+ * is deleted. A FAILED item was refused, but an earlier try may already have been delivered (a refusal such as 42501
+ * comes when the person was blocked or left the group, and then they cannot even see their own message), so its photo
+ * is kept; so is the photo of an item being sent right now. Kept photos are left to the server's orphan sweep.
  */
-export function discardMediaPlan(item: { status: OutboxStatus; media_path: string | null }): 'none' | 'delete' | 'check' | 'keep' {
+export function discardMediaPlan(item: { status: OutboxStatus; media_path: string | null }): 'none' | 'check' | 'keep' {
   if (!item.media_path) return 'none';
-  if (item.status === 'failed') return 'delete';
-  if (item.status === 'queued') return 'check';
-  return 'keep';
+  return item.status === 'queued' ? 'check' : 'keep';
 }
 
 export type MessageAction = 'reply' | 'copy' | 'unsend' | 'report' | 'retry' | 'delete';

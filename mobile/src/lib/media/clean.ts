@@ -3,7 +3,7 @@
 // sent without its location is refused. Pure, checked by src/lib/__tests__/media.test.ts.
 import { isJpeg, stripJpegLocation } from './exif';
 import { isIsoMedia, stripVideoLocation } from './videoLocation';
-import { LOCATION_REFUSED_MESSAGE, UNSUPPORTED_TYPE_MESSAGE, UPLOAD_VIDEO_TYPES } from './limits';
+import { LOCATION_REFUSED_MESSAGE, UNSUPPORTED_TYPE_MESSAGE, UPLOAD_VIDEO_TYPES, VIDEO_LOCATION_REFUSED_MESSAGE } from './limits';
 
 /** The file cannot go up: `message` says why, in plain words. */
 export class UploadRefused extends Error {}
@@ -16,7 +16,8 @@ export const normaliseType = (t: string | null | undefined) => {
 
 /**
  * The bytes to upload and their type. Photos must be JPEG by their bytes (prepareImage turns every photo into one);
- * videos must be MP4 or MOV. The location is removed from both (photos: a copy; videos: in place). Throws UploadRefused.
+ * videos must be MP4 or MOV (not a HEIF / AVIF photo in disguise). The location is removed from both (photos: a copy;
+ * videos: in place); a clip that cannot be read to the end is refused. Throws UploadRefused.
  */
 export function cleanForUpload(bytes: Uint8Array, contentType: string | null | undefined): { bytes: Uint8Array; contentType: string } {
   const type = normaliseType(contentType);
@@ -26,7 +27,10 @@ export function cleanForUpload(bytes: Uint8Array, contentType: string | null | u
   }
   if (type.startsWith('image/') || type === '') throw new UploadRefused(type === '' ? UNSUPPORTED_TYPE_MESSAGE : LOCATION_REFUSED_MESSAGE);
   if ((UPLOAD_VIDEO_TYPES as readonly string[]).includes(type) && isIsoMedia(bytes)) {
-    return { bytes: stripVideoLocation(bytes).bytes, contentType: type };
+    const v = stripVideoLocation(bytes);
+    // a clip we could not read to the end may keep its place in the part we did not read: never upload it
+    if (!v.complete) throw new UploadRefused(VIDEO_LOCATION_REFUSED_MESSAGE);
+    return { bytes: v.bytes, contentType: type };
   }
   throw new UploadRefused(UNSUPPORTED_TYPE_MESSAGE);
 }

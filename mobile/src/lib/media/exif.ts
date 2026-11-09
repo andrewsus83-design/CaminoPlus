@@ -122,6 +122,12 @@ function clearGps(b: Uint8Array, tiff: number, end: number): number {
   return removed;
 }
 
+/** Where the picture data of the first image starts (its SOS marker, FF DA), or the end of the file. */
+function firstScan(b: Uint8Array): number {
+  for (let i = 2; i + 1 < b.length; i++) if (b[i] === 0xff && b[i + 1] === 0xda) return i;
+  return b.length;
+}
+
 /** Turn the segment that ends at `end` and whose identifier starts at `id` into a comment of spaces (same length). */
 function blankSegment(b: Uint8Array, id: number, end: number) {
   b[id - 3] = COM;
@@ -136,9 +142,13 @@ export function stripJpegLocation(input: Uint8Array): { bytes: Uint8Array; remov
   if (!isJpeg(input)) return { bytes: input, removed: false };
   const b = new Uint8Array(input);
   let removed = false;
+  const sos = firstScan(b);
   for (const id of indexesOf(b, EXIF_ID)) {
     const end = segmentEnd(b, id, [0xe1]);
-    const bound = end > 0 ? end : Math.min(b.length, id + MAX_SEGMENT);
+    // Without a proper segment header, only a block before the first picture data is touched: compressed picture data
+    // that happens to contain these bytes is never changed.
+    if (end < 0 && id > sos) continue;
+    const bound = end > 0 ? end : Math.min(b.length, id + MAX_SEGMENT, sos);
     if (clearGps(b, id + EXIF_ID.length, bound) > 0) removed = true;
   }
   for (const [ids, markers] of [[XMP_IDS, [0xe1]], [[PHOTOSHOP_ID], [0xed]]] as const) {

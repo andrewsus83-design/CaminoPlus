@@ -21,6 +21,9 @@ export type MediaDeps = {
   byteSize: (uri: string) => Promise<number | null>;
   /** Delete a file this module made (cancel, or a file that was left out). Best effort. */
   removeFile?: (uri: string) => void;
+  /** Can this clip be read to the end, so its recording place can be removed on upload? null: the file cannot be read here
+   *  (the upload then decides). Without it, the upload decides. */
+  videoReadable?: (uri: string) => Promise<boolean | null>;
 };
 
 /* ------------------------------------------------------------------ results and errors */
@@ -159,6 +162,13 @@ export function createMedia(deps: MediaDeps) {
     const bytes = await measure(out, processed ? null : meta.bytes);
     check();
     if (bytes != null && bytes > rule.capBytes) throw tooBig(rule.capBytes);
+    // Said now, not after Share: a clip whose place cannot be removed is never uploaded (videoLocation.ts).
+    if (deps.videoReadable) {
+      let readable: boolean | null = null;
+      try { readable = await deps.videoReadable(out); } catch { readable = null; }
+      if (readable === false) throw new MediaRejected('video_location', problemMessage('video_location'));
+    }
+    check();
     onProgress?.(1);
     const fit = processed && meta.width && meta.height ? fitWithin(meta.width, meta.height, rule.maxEdge) : null;
     return {
