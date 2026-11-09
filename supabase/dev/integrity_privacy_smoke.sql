@@ -1309,9 +1309,10 @@ do $$ begin
   end;
 end $$;
 update public.journey_private set notes = 'overwritten' where journey_id = '1a100000-0000-0000-0000-0000000000a1';
--- a follower of a followers-only journey reads its stamp photo
+-- a follower of a followers-only journey does NOT read its stamp photo: stamps are the owner's alone since
+-- 20261114100000_plan_private.sql (the photo follows the stamp row through private.can_read_user_media)
 do $$ begin
-  assert (select count(*) from storage.objects where name = '1a000000-0000-0000-0000-0000000000a1/stamps/s1.jpg') = 1, 'S7: a follower reads the stamp photo of the journey';
+  assert (select count(*) from storage.objects where name = '1a000000-0000-0000-0000-0000000000a1/stamps/s1.jpg') = 0, 'S7: a follower does not read the stamp photo of the journey';
 end $$;
 commit;
 begin;

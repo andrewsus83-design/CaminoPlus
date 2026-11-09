@@ -60,6 +60,9 @@ begin
   select string_agg(p.oid::regprocedure::text, ', ') into bad
   from pg_proc p join pg_namespace n on n.oid = p.pronamespace
   where n.nspname = 'public' and p.prosecdef
+    -- the one exception, by design: the web page of a share link calls it without a session, with the token it holds
+    -- (20261114100100_share_links.sql; tested by share_links_smoke.sql). It is still closed to PUBLIC.
+    and not (p.oid = to_regprocedure('public.get_shared(text)') and not has_function_privilege('public', p.oid, 'execute'))
     and (has_function_privilege('public', p.oid, 'execute') or has_function_privilege('anon', p.oid, 'execute'));
   assert bad is null, 'SECURITY DEFINER functions in public callable without a session: ' || coalesce(bad, '');
 
