@@ -13,12 +13,17 @@ import { allHint, allLabel } from './routePoints';
 // phone: .highlights, .cp-ring, .cp-ring.seen, .add). What a highlight is and which posts belong to it is highlights.ts.
 // The first item at the left is "All": a round item with the shell, pinned there while the destinations scroll next to it. It opens the stamps, one for
 // every place of the Camino (AllPlaces.tsx, routePoints.ts). It is never "seen" or "unseen"; when its view is on, its ring is gold and its label bold.
-// The words under a round are the caption variant (15 px, the smallest text there is) on one line of the item's width; a name that does not fit ends in "…" and
-// the item's label (the screen reader's) says it whole.
+// The words under a round are the caption variant (15 px, the smallest text there is), centred, on up to TWO lines of the cell's width; a word is never cut in the middle
+// while it fits the cell (a name only ends in "…" when it needs a third line), and the item's label (the screen reader's) says the name whole.
+// The cell of a destination is wider than the round (ITEM_W 108, the round stays 66): the longest word of the Camino names, "Roncesvalles", is 99 px at this size and
+// 104 px in the bold of the open destination, so a narrower cell cuts the first stop of the Camino Francés in the middle of the word; at 108 every name of the 54 tried, from
+// "Zubiri" to "Villamayor de Monjardín", wraps at a word, and only "Santo Domingo de la Calzada" and "Terradillos de los Templarios" need more than two lines.
 const RING = 66; // a 3 px ring (a border, so it is a stroke and not a padding) around the 60 px picture
 const PICTURE = 60; // its outer 3 px are the page colour, so the picture sits clear of the ring, as in the design
-const ITEM_W = 72;
-const GAP = space[4];
+const ALL_W = 72; // the All item: its label is one short word, so its cell stays as it was
+const ITEM_W = 108; // a destination: the round is centred in it
+const GAP = space[4]; // between the All item and the first destination
+const ITEM_GAP = space[1]; // between two destinations: the round to the next round is ITEM_W - RING + ITEM_GAP = 46
 const SEEN_NAME = 'highlights.seen';
 
 /**
@@ -53,10 +58,10 @@ function useSeen(userId: string | null | undefined) {
 }
 
 /** The first item of the row: every place of the Camino as stamps. The shell in a round of the card's surface with a hairline; gold ring and bold label while its view is on. */
-function AllItem({ visited, total, on, onPress }: { visited: number; total: number; on: boolean; onPress: () => void }) {
+function AllItem({ visited, total, on, dense, onPress }: { visited: number; total: number; on: boolean; dense: boolean; onPress: () => void }) {
   const glyph = <Icon name="shell" color={role.action} size={icon.mdPlus} />;
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={allLabel(visited, total)} accessibilityHint={allHint(on)} accessibilityState={{ selected: on }} aria-selected={on} onPress={onPress} style={{ width: ITEM_W, alignItems: 'center', gap: space[2] }}>
+    <Pressable accessibilityRole="button" accessibilityLabel={allLabel(visited, total)} accessibilityHint={allHint(on)} accessibilityState={{ selected: on }} aria-selected={on} onPress={onPress} style={{ width: ALL_W, alignItems: 'center', gap: dense ? space[1] : space[2] }}>
       {on ? (
         // the ring of an opened highlight: gold, then the page colour, then the round itself
         <View style={{ width: RING, height: RING, borderRadius: RING / 2, borderWidth: 3, borderColor: role.highlight }}>
@@ -65,17 +70,17 @@ function AllItem({ visited, total, on, onPress }: { visited: number; total: numb
       ) : (
         <View style={{ width: RING, height: RING, borderRadius: RING / 2, borderWidth: 1, borderColor: role.border, backgroundColor: role.surface, alignItems: 'center', justifyContent: 'center' }}>{glyph}</View>
       )}
-      <AppText variant="caption" numberOfLines={1} style={{ width: ITEM_W, textAlign: 'center', fontFamily: on ? fonts.bodyBold : fonts.bodyMedium }}>All</AppText>
+      <AppText variant="caption" numberOfLines={1} style={{ width: ALL_W, textAlign: 'center', fontFamily: on ? fonts.bodyBold : fonts.bodyMedium }}>All</AppText>
     </Pressable>
   );
 }
 
-function Item({ h, cover, seen, active, onPress }: { h: Highlight<Post>; cover: string | null; seen: boolean; active: boolean; onPress: () => void }) {
+function Item({ h, cover, seen, active, dense, onPress }: { h: Highlight<Post>; cover: string | null; seen: boolean; active: boolean; dense: boolean; onPress: () => void }) {
   // The link that did not load (a signed link lasts an hour) is drawn as the letter, not as an empty circle, until a new link comes.
   const [failed, setFailed] = useState<string | null>(null);
   const visited = h.state === 'visited';
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={highlightLabel(h, active)} onPress={onPress} style={{ width: ITEM_W, alignItems: 'center', gap: space[2] }}>
+    <Pressable accessibilityRole="button" accessibilityLabel={highlightLabel(h, active)} onPress={onPress} style={{ width: ITEM_W, alignItems: 'center', gap: dense ? space[1] : space[2] }}>
       {visited ? (
         // gold until it is opened, then the quiet strong border colour
         <View style={{ width: RING, height: RING, borderRadius: RING / 2, borderWidth: 3, borderColor: seen ? role.borderStrong : role.highlight }}>
@@ -91,7 +96,7 @@ function Item({ h, cover, seen, active, onPress }: { h: Highlight<Post>; cover: 
           <Icon name="pin" color={role.muted} size={icon.md} />
         </View>
       )}
-      <AppText variant="caption" numberOfLines={1} style={{ width: ITEM_W, textAlign: 'center', fontFamily: active ? fonts.bodyBold : fonts.bodyMedium }}>{h.name}</AppText>
+      <AppText variant="caption" numberOfLines={dense ? 1 : 2} style={{ width: ITEM_W, textAlign: 'center', fontFamily: active ? fonts.bodyBold : fonts.bodyMedium }}>{h.name}</AppText>
     </Pressable>
   );
 }
@@ -100,9 +105,10 @@ function Item({ h, cover, seen, active, onPress }: { h: Highlight<Post>; cover: 
  * The row. A visited destination (it has posts) is opened with `onPick`: the screen filters the Journey grid to its posts. A
  * destination with no post opens that day in the planner, as the plan tracker does. With no destinations nothing is drawn, not
  * even the space. The row reaches out to the screen edges (the screen pads its content by layout.screenMargin) and, on a long
- * plan, opens at the next destination, so it does not open at the first day.
+ * plan, opens at the next destination, so it does not open at the first day. `dense` is the compact header of a short phone (features/me/headerFit.ts): less air above the
+ * row and between a round and its name, and a name keeps to one line.
  */
-export function Highlights({ items, days, media, activeKey, userId, onPick, all }: {
+export function Highlights({ items, days, media, activeKey, userId, onPick, all, dense = false }: {
   items: Highlight<Post>[];
   days: readonly DayLike[];
   /** The photos of the posts (usePostMedia). */
@@ -113,6 +119,8 @@ export function Highlights({ items, days, media, activeKey, userId, onPick, all 
   onPick: (h: Highlight<Post>) => void;
   /** The All item: how many of the route's places have journeys, whether its view is on, and what a tap does. null (the route has no places): no All item. */
   all?: { visited: number; total: number; on: boolean; onPress: () => void } | null;
+  /** The compact header: tighter spacing, the same row. */
+  dense?: boolean;
 }) {
   const router = useRouter();
   const { width } = useWindowDimensions();
@@ -131,7 +139,7 @@ export function Highlights({ items, days, media, activeKey, userId, onPick, all 
     const plan = items[0].key;
     if (placedFor.current === plan) return;
     placedFor.current = plan;
-    const x = rowStartOffset({ nextAt, width, pinned, item: ITEM_W, gap: GAP, margin: layout.screenMargin });
+    const x = rowStartOffset({ nextAt, width, pinned, item: ITEM_W, gap: ITEM_GAP, margin: layout.screenMargin, allItem: ALL_W, allGap: GAP, shown: (ITEM_W + RING) / 2 });
     if (x > 0) scroller.current?.scrollTo({ x, animated: false });
   };
   const press = (h: Highlight<Post>) => {
@@ -145,8 +153,8 @@ export function Highlights({ items, days, media, activeKey, userId, onPick, all 
 
   return (
     // reaches out to the screen edges (the screen pads its content by layout.screenMargin); next to the All item the margin on the left is the item's own
-    <View style={{ flexDirection: 'row', marginHorizontal: -layout.screenMargin, marginTop: space[2], paddingLeft: pinned ? layout.screenMargin : 0 }}>
-      {pinned && <AllItem visited={all.visited} total={all.total} on={all.on} onPress={all.onPress} />}
+    <View style={{ flexDirection: 'row', marginHorizontal: -layout.screenMargin, marginTop: dense ? space[1] : space[2], paddingLeft: pinned ? layout.screenMargin : 0 }}>
+      {pinned && <AllItem visited={all.visited} total={all.total} on={all.on} dense={dense} onPress={all.onPress} />}
       {items.length > 0 && (
         <ScrollView
           ref={scroller}
@@ -154,10 +162,10 @@ export function Highlights({ items, days, media, activeKey, userId, onPick, all 
           showsHorizontalScrollIndicator={false}
           onContentSizeChange={placeAtNext}
           style={{ flex: 1, marginLeft: pinned ? GAP : 0 }}
-          contentContainerStyle={{ paddingLeft: pinned ? 0 : layout.screenMargin, paddingRight: layout.screenMargin, gap: GAP }}
+          contentContainerStyle={{ paddingLeft: pinned ? 0 : space[1], paddingRight: layout.screenMargin, gap: ITEM_GAP }}
         >
           {items.map((h) => (
-            <Item key={h.key} h={h} cover={coverUrl(h.posts, media)} seen={seen.has(h.key)} active={h.key === activeKey} onPress={() => press(h)} />
+            <Item key={h.key} h={h} cover={coverUrl(h.posts, media)} seen={seen.has(h.key)} active={h.key === activeKey} dense={dense} onPress={() => press(h)} />
           ))}
         </ScrollView>
       )}

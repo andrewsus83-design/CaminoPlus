@@ -43,10 +43,14 @@ export const FIXED = {
   /** White text and icons on a photo or a dark scrim (the journey viewer and the tiles). */
   onPhoto: '#FFFFFF',
   black: '#000000',
-  /** Dark chips on a photo: the close button, the clip badge, the slide count. */
+  /** Dark chips on a photo that carry a picture or an icon: the close button, the clip badge. */
   photoChip: 'rgba(0,0,0,0.45)',
   /** The dark band under the caption in the full-screen viewer. */
   photoScrim: 'rgba(0,0,0,0.35)',
-  /** The dark band under the place name on a grid tile. */
-  tileScrim: 'rgba(0,0,0,0.28)',
+  /**
+   * The dark band under the place name on a grid tile of Me, and the slide count on it: 60 % black. White words of the caption size over it keep 4.5 : 1 over ANY picture,
+   * the whitest one included (a pure white pixel under it comes out at 5.7 : 1), and over every flat colour of the text cards (at 28 % black the gold tile gave 2.5 : 1).
+   * features/me/__tests__/tabs.test.ts mixes the colours and fails when this number is lowered.
+   */
+  tileScrim: 'rgba(0,0,0,0.6)',
 } as const;

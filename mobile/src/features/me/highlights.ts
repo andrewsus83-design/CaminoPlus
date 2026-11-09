@@ -146,13 +146,17 @@ export function nextHighlightIndex(days: readonly DayLike[], items: readonly { n
  * Where the row of destinations opens, as the x it is scrolled to (0 = at its start). On a long plan it opens at the next destination, with half of the one
  * before it showing so it can be seen that the row goes on to the left; if the next destination is already on the first screen the row stays at its start.
  * `pinned`: the All item sits at the left, outside the scrolling part, so the destinations have less room and no margin of their own on the left.
+ * `item` and `gap` are a destination's cell and the space between two; the All item has a cell of its own (`allItem`, `allGap` after it), which is the same as a destination's when they are not given.
+ * `shown` is how much of the next destination's cell has to be on the first screen (from the start of the cell): the whole cell when it is not given; with a cell wider than its round it is the round's right edge,
+ * because the rest of the cell is only air round a name.
  */
-export function rowStartOffset(o: { nextAt: number; width: number; pinned: boolean; item: number; gap: number; margin: number }): number {
+export function rowStartOffset(o: { nextAt: number; width: number; pinned: boolean; item: number; gap: number; margin: number; allItem?: number; allGap?: number; shown?: number }): number {
   if (!(o.nextAt > 0)) return 0;
   const stride = o.item + o.gap;
   const pad = o.pinned ? 0 : o.margin; // the room before the first destination, inside the scrolling part
-  const room = o.pinned ? o.width - o.margin - stride : o.width; // the width of the scrolling part
-  const onFirstScreen = pad + o.nextAt * stride + o.item <= room - o.margin;
+  const pinnedWidth = (o.allItem ?? o.item) + (o.allGap ?? o.gap); // the All item and the space after it
+  const room = o.pinned ? o.width - o.margin - pinnedWidth : o.width; // the width of the scrolling part
+  const onFirstScreen = pad + o.nextAt * stride + (o.shown ?? o.item) <= room - o.margin;
   return onFirstScreen ? 0 : pad + o.nextAt * stride - (o.item / 2 + o.gap);
 }
 

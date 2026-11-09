@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, Alert, Image, KeyboardAvoidingView, Modal, Platform, Pressable, TextInput, View } from 'react-native';
+import { ActivityIndicator, Alert, Image, KeyboardAvoidingView, Modal, PixelRatio, Platform, Pressable, TextInput, View, useWindowDimensions, type LayoutChangeEvent } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Screen } from '@/components/Screen';
@@ -20,6 +20,8 @@ import { planProgress } from '@/features/me/plan';
 import { JourneyGrid } from '@/features/me/JourneyGrid';
 import { SampleJourney } from '@/features/me/SampleJourney';
 import { Highlights, ShowAllBar } from '@/features/me/Highlights';
+import { caminoLine } from '@/features/me/caminoCard';
+import { CARD_WIDE, DENSITY, headerDensity, stripOverflows } from '@/features/me/headerFit';
 import { AllPlaces, PlaceHeader } from '@/features/me/AllPlaces';
 import { buildHighlights } from '@/features/me/highlights';
 import { buildRoutePlaces, emptyPlaceLine, visitedCount } from '@/features/me/routePoints';
@@ -30,7 +32,7 @@ import { NotesTab } from '@/features/notes/NotesTab';
 import { updateProfile } from '@/lib/api';
 import { copyText } from '@/lib/clipboard';
 import { PickerUnavailable, pickAndUploadAvatar } from '@/lib/avatar';
-import { c, fonts, layout, radius, role, scrim, shadowStyle } from '@/theme';
+import { c, fonts, layout, radius, role, scrim, shadowStyle, space } from '@/theme';
 
 type StampT = NonNullable<ReturnType<typeof useMeData>['stamps']>[number];
 type StageT = ReturnType<typeof useMeData>['stages'][number];
@@ -110,6 +112,22 @@ export default function Me() {
   const [tab, setTab] = useState<MeTab>(DEFAULT_ME_TAB);
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  // The header is drawn roomy or compact (features/me/headerFit.ts): compact when the strip of sub-tabs would end below the top edge of the chat button, which floats
+  // at the bottom right of THIS view. The height is the view's own (measured), the window's until then; the status bar and the home bar are the insets.
+  // It is worked out from the numbers first (no flash on a short phone) and checked once it is drawn: a roomy header that came out taller than its room (a long description, a larger text size than
+  // the phone reported) turns compact. The height the roomy header measured is kept, so it is roomy again when the screen gets taller, and never flips back and forth.
+  const windowHeight = useWindowDimensions().height;
+  const [host, setHost] = useState<{ width: number; height: number } | null>(null);
+  const windowWidth = useWindowDimensions().width;
+  const [roomyBottom, setRoomyBottom] = useState<number | null>(null);
+  const fit = { screenHeight: host?.height ?? windowHeight, insets, fontScale: PixelRatio.getFontScale() };
+  const narrow = (host?.width ?? windowWidth) < CARD_WIDE; // the My Camino card: the Change button goes under the words on a very narrow phone
+  const predicted = headerDensity(fit);
+  const density = predicted === 'roomy' && roomyBottom !== null && stripOverflows({ ...fit, stripBottom: roomyBottom, screenTop: layout.screenTop }) ? 'compact' : predicted;
+  const hm = DENSITY[density]; // the numbers of the header in this density
+  const checkStrip = (e: LayoutChangeEvent) => {
+    if (density === 'roomy') setRoomyBottom(e.nativeEvent.layout.y + e.nativeEvent.layout.height);
+  };
   const { profile, journey, session, refresh, stale } = useAuth();
   const unread = useUnreadTotals();
   const [editBio, setEditBio] = useState(false);
@@ -207,12 +225,18 @@ export default function Me() {
   // The one floating button is the chat button, the same on Notes, Journey, Plan and Health (features/me/tabs.ts). It opens the inbox on the tab where
   // something waits (Messages, else Notifications, else Messages) and carries the unread badge that the bell used to carry.
   const openInbox = () => router.push({ pathname: ME_FAB.href, params: { tab: inboxTab(unread) } });
+  // The gold Change button of the My Camino card: a look, not a button of its own (the whole card is the button, "Change Camino").
+  const change = (
+    <View style={{ height: 40, paddingHorizontal: space[4], borderRadius: radius.pill, backgroundColor: c.gold, justifyContent: 'center' }}>
+      <AppText variant="label" color={role.onHighlight}>Change</AppText>
+    </View>
+  );
   // Everything above the content of a sub-tab: the header (handle and gear, avatar and stats, name and bio, the My Camino card, the highlights) and the strip
-  // of sub-tabs. Both hosts below draw it, so it looks the same on every sub-tab.
+  // of sub-tabs. Both hosts below draw it, so it looks the same on every sub-tab. One view; the space between its blocks is the density's (16, or 4 when compact).
   const top = (
-    <>
+    <View>
       {/* Header follows the design system: handle pill + gear, avatar with stats, name and bio. */}
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 52 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: hm.gear }}>
         <AppText variant="h4" numberOfLines={1} style={{ flexShrink: 1 }}>{profile?.username ?? name}</AppText>
         {!!profile?.username && (
           <Pressable accessibilityRole="button" accessibilityLabel={copied ? 'Username copied' : 'Copy username'} hitSlop={10} onPress={copyUsername} style={{ width: 26, height: 26, alignItems: 'center', justifyContent: 'center' }}>
@@ -221,14 +245,14 @@ export default function Me() {
         )}
         {/* Top right: Settings only, in the corner. The inbox is the chat button at the bottom right. Settings is a screen of its own, no longer a tab. */}
         <View style={{ marginLeft: 'auto', flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-          <IconButton name="settings" label="Settings" onPress={() => router.push('/settings')} size={52} />
+          <IconButton name="settings" label="Settings" onPress={() => router.push('/settings')} size={hm.gear} />
         </View>
       </View>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 20 }}>
+      <View style={{ marginTop: hm.afterHeader, flexDirection: 'row', alignItems: 'center', gap: hm.avatarGap }}>
         <Pressable accessibilityRole="button" accessibilityLabel="Change profile picture" onPress={changePhoto} disabled={uploading}>
           {profile?.avatar_url
-            ? <Image source={{ uri: profile.avatar_url }} style={{ width: 92, height: 92, borderRadius: radius.pill, borderWidth: 3, borderColor: c.gold }} />
-            : <Avatar size={92} ring />}
+            ? <Image source={{ uri: profile.avatar_url }} style={{ width: hm.avatar, height: hm.avatar, borderRadius: radius.pill, borderWidth: 3, borderColor: c.gold }} />
+            : <Avatar size={hm.avatar} ring />}
           <View style={{ position: 'absolute', right: -2, bottom: -2, width: 26, height: 26, borderRadius: 13, backgroundColor: c.gold, borderWidth: 2, borderColor: role.bg, alignItems: 'center', justifyContent: 'center' }}>
             {uploading ? <ActivityIndicator size="small" color={role.onHighlight} /> : <Icon name="camera" color={role.onHighlight} size={13} />}
           </View>
@@ -236,14 +260,14 @@ export default function Me() {
         <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-around' }}>
           {[[String(Math.round(Number(profile?.km_walked ?? 0))), 'km'], [String(profile?.stamps_count ?? 0), 'stamps'], [String(profile?.friends_count ?? 0), 'friends']].map(([n, l]) => (
             <Pressable key={l} accessibilityRole="button" onPress={() => router.push(l === 'km' ? '/journey' : l === 'stamps' ? '/passport' : '/friends')} style={{ alignItems: 'center' }}>
-              <AppText variant="h3">{n}</AppText>
-              <AppText variant="small" muted style={{ textDecorationLine: 'underline' }}>{l}</AppText>
+              <AppText variant={hm.statNumber}>{n}</AppText>
+              <AppText variant={hm.statLabel} muted style={{ textDecorationLine: 'underline' }}>{l}</AppText>
             </Pressable>
           ))}
         </View>
       </View>
-      {/* The Screen stacks with a 16 gap. The name text sits centred in a 34 high row (3 px lower than the row top), so -11 leaves exactly 8 between the profile picture and the name. */}
-      <View style={{ gap: 4, marginTop: -11 }}>
+      {/* The name text sits centred in a 34 high row, 3 px lower than the row top: 4 above the row leave 7 between the profile picture and the name. */}
+      <View style={{ gap: 4, marginTop: space[1] }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
           <AppText variant="body" numberOfLines={1} style={{ fontFamily: 'Inter_600SemiBold', flexShrink: 1 }}>{name}</AppText>
           <Pressable accessibilityRole="button" accessibilityLabel="Edit description" hitSlop={8} onPress={() => { setBioDraft(profile?.bio ?? ''); setEditBio(true); }} style={{ width: 34, height: 34, borderRadius: radius.pill, backgroundColor: role.surface, borderWidth: 1, borderColor: role.border, alignItems: 'center', justifyContent: 'center', marginRight: -6 }}>
@@ -256,40 +280,50 @@ export default function Me() {
         </View>
         {/* Smaller text, 4 lines, then "Read more". The invisible copy measures the full length. */}
         <View>
-          <AppText variant="small" muted={!profile?.bio} numberOfLines={bioOpen ? undefined : 4}>{profile?.bio || 'Add a short description about you'}</AppText>
+          <AppText variant="small" muted={!profile?.bio} numberOfLines={bioOpen ? undefined : hm.bioLines}>{profile?.bio || 'Add a short description about you'}</AppText>
           {!!profile?.bio && (
             <AppText variant="small" accessibilityElementsHidden importantForAccessibility="no-hide-descendants" onTextLayout={(e) => setBioLines(e.nativeEvent.lines.length)} style={{ position: 'absolute', left: 0, right: 0, opacity: 0 }} pointerEvents="none">{profile.bio}</AppText>
           )}
         </View>
-        {bioLines > 4 && (
+        {bioLines > hm.bioLines && (
           <Pressable accessibilityRole="button" onPress={() => setBioOpen((v) => !v)} hitSlop={8} style={{ alignSelf: 'flex-start' }}>
             <AppText variant="small" color={role.accentText} style={{ fontFamily: 'Inter_600SemiBold' }}>{bioOpen ? 'Show less' : 'Read more'}</AppText>
           </Pressable>
         )}
         {journey?.route ? (
-          <Pressable accessibilityRole="button" accessibilityLabel="Change Camino" onPress={() => router.push('/change-camino')} style={{ marginTop: 8, flexDirection: 'row', alignItems: 'center', gap: 14, padding: 14, borderRadius: radius.lg, backgroundColor: role.inverse, ...shadowStyle('md') }}>
-            <View style={{ width: 52, height: 52, borderRadius: radius.pill, borderWidth: 1.5, borderColor: 'rgba(217,162,27,0.55)', alignItems: 'center', justifyContent: 'center' }}>
-              <ShellMark size={48} />
+          // The card, in two bands. The head: the shell, "Buen Camino!" over "My Camino", and the Change button at the right end (on a very narrow phone it moves to the end of the body: there
+          // the words beside it wrap). The body: the route and how far along it is, with the whole width of the card, so that no word is cut. Compact: a smaller shell and less air.
+          <Pressable accessibilityRole="button" accessibilityLabel="Change Camino" onPress={() => router.push('/change-camino')} style={{ marginTop: hm.cardLift, gap: hm.cardGap, padding: space[3], borderRadius: radius.lg, backgroundColor: role.inverse, ...shadowStyle('md') }}>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', columnGap: space[3], rowGap: space[2] }}>
+              {/* design-lint-ignore: color the ring is the gold of the palette at 55 percent over the dark card, as the design page draws it */}
+              <View style={{ width: hm.cardRing, height: hm.cardRing, borderRadius: radius.pill, borderWidth: 1.5, borderColor: 'rgba(217,162,27,0.55)', alignItems: 'center', justifyContent: 'center' }}>
+                <ShellMark size={hm.cardRing - 4} />
+              </View>
+              <View style={{ flexGrow: 1, flexShrink: 0 }}>
+                <AppText variant="accent" color={c.gold} style={{ fontSize: 24, lineHeight: 28 }}>Buen Camino!</AppText>
+                <AppText variant="h4" color={role.onInverseAccent} style={{ fontSize: 17, lineHeight: 21 }}>My Camino</AppText>
+              </View>
+              {!narrow && <View style={{ marginLeft: 'auto' }}>{change}</View>}
             </View>
-            <View style={{ flex: 1, gap: 2 }}>
-              <AppText variant="accent" color={c.gold} style={{ fontSize: 24, lineHeight: 28 }}>Buen Camino!</AppText>
-              <AppText variant="h4" color={role.onInverseAccent} style={{ fontSize: 17, lineHeight: 21 }}>My Camino</AppText>
-              <AppText variant="label" color={role.onInverse} numberOfLines={1}>{journey.route.name}</AppText>
-              <AppText variant="caption" color={role.onInverse} style={{ opacity: 0.85 }} numberOfLines={1}>{journey.start_stage ? `From stage ${journey.start_stage.stage_number} · ` : ''}{stagesDone} stages done</AppText>
-            </View>
-            <View style={{ height: 40, paddingHorizontal: 16, borderRadius: radius.pill, backgroundColor: c.gold, justifyContent: 'center' }}>
-              <AppText variant="label" color={role.onHighlight}>Change</AppText>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: space[3] }}>
+              <View style={{ flex: 1 }}>
+                <AppText variant="label" color={role.onInverse}>{journey.route.name}</AppText>
+                <AppText variant="caption" color={role.onInverse} style={{ opacity: 0.85 }}>{caminoLine(journey.start_stage?.stage_number, stagesDone)}</AppText>
+              </View>
+              {narrow && change}
             </View>
           </Pressable>
         ) : <AppText variant="accent" color={role.accentText}>Buen Camino!</AppText>}
-        <Highlights key={session?.user.id ?? 'none'} items={highlights} days={days ?? []} media={media} activeKey={activeKey} userId={session?.user.id} onPick={pickHighlight} all={places.length > 0 ? { visited: visitedCount(places), total: places.length, on: shown.kind === 'stamps' || shown.kind === 'place', onPress: pickAll } : null} />
+        <Highlights key={session?.user.id ?? 'none'} items={highlights} days={days ?? []} media={media} activeKey={activeKey} userId={session?.user.id} onPick={pickHighlight} all={places.length > 0 ? { visited: visitedCount(places), total: places.length, on: shown.kind === 'stamps' || shown.kind === 'place', onPress: pickAll } : null} dense={density === 'compact'} />
       </View>
-      <SubTabs tabs={ME_TABS} value={tab} onChange={setTab} />
-    </>
+      <View onLayout={checkStrip} style={{ marginTop: hm.beforeStrip }}>
+        <SubTabs tabs={ME_TABS} value={tab} onChange={setTab} />
+      </View>
+    </View>
   );
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1 }} onLayout={(e) => setHost({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.height })}>
       {onNotes ? (
         // The Notes feed owns the scroll of the screen (a virtualised list, features/notes): the header and the strip are the first thing in it, drawn with the
         // margins and the gap that Screen gives them, so they scroll away with the notes. No message about Me's data (offline, could not load) is drawn here:
