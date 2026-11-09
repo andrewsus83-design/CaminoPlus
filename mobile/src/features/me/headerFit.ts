@@ -27,9 +27,10 @@ export const STRIP_AIR = 8;
 export type Density = 'roomy' | 'compact';
 
 /**
- * The strip's bottom edge, in px from the top of the content (the 8 of layout.screenTop included, the status bar not), when the header is ROOMY with everything it can have at
- * the usual text size: the rows of the highlights with a two line name, a bio of one line. It was measured in the browser (tools/web-smoke, the Me small phones walk): 565 at 390 wide, the
- * same at 320 and 360 now that the My Camino card no longer wraps. A phone whose room is under this (counted from the status bar to the button) gets the compact header.
+ * The strip's bottom edge, in px from the top of the content (the 8 of layout.screenTop included, the status bar not), when the header is ROOMY with what a real plan gives it: the row of highlights
+ * with a name on two lines, a description of one line. Measured in the browser at 360 and 390 wide: 544 when every name is on one line, 565 when one is on two (a plan of the Camino Francés always has
+ * one); at 320 the Change button of the card moves under its words, which makes the card a line taller. A phone whose room is under this (counted from the status bar to the button) gets the compact
+ * header; a header that still comes out taller (a long description, 320 wide) is caught after it is drawn (stripOverflows).
  */
 export const ROOMY_STRIP_BOTTOM = 568;
 

@@ -129,9 +129,8 @@ export default function Me() {
   // at the bottom right of THIS view. The height is the view's own (measured), the window's until then; the status bar and the home bar are the insets.
   // It is worked out from the numbers first (no flash on a short phone) and checked once it is drawn: a roomy header that came out taller than its room (a long description, a larger text size than
   // the phone reported) turns compact. The height the roomy header measured is kept, so it is roomy again when the screen gets taller, and never flips back and forth.
-  const windowHeight = useWindowDimensions().height;
+  const { width: windowWidth, height: windowHeight } = useWindowDimensions();
   const [host, setHost] = useState<{ width: number; height: number } | null>(null);
-  const windowWidth = useWindowDimensions().width;
   const [roomyBottom, setRoomyBottom] = useState<number | null>(null);
   const fit = { screenHeight: host?.height ?? windowHeight, insets, fontScale: PixelRatio.getFontScale() };
   const narrow = (host?.width ?? windowWidth) < CARD_WIDE; // the My Camino card: the Change button goes under the words on a very narrow phone
