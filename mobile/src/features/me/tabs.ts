@@ -26,6 +26,9 @@ export const ME_FAB: MeFab = { icon: 'chat', href: '/inbox', label: INBOX_LABEL,
 
 /** The card at the head of the Journey grid: it writes a journey post. It is a card of the grid, not a button that floats. */
 export const JOURNEY_WRITE = { label: 'Write a journey post', href: '/write' } as const;
+/** What the card looks like beyond its label (features/me/WriteCard.tsx): the invitation in the title type, and how strongly the gold shows, the wash over the
+ * whole card and the large shell drawn as art behind the words. The words keep their contrast over both (tabs.test.ts mixes the colours). */
+export const JOURNEY_WRITE_CARD = { prompt: 'What did you see today?', wash: 0.07, shell: 0.22 } as const;
 
 /* ------------------------------------------------------------------------------------------------ the numbers of the chat button */
 
