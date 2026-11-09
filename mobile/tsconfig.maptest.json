@@ -15,6 +15,7 @@
   "files": [
     "src/features/map/__tests__/map.test.ts",
     "src/features/map/__tests__/nav.test.ts",
-    "src/features/map/__tests__/walkstyle.test.ts"
+    "src/features/map/__tests__/walkstyle.test.ts",
+    "src/features/map/__tests__/controlLayout.test.ts"
   ]
 }
