@@ -23,7 +23,7 @@ A merge never changes an app that is already installed on a phone. Only a new bu
 
 The native fingerprint of **release 1.2.0** is **`465f1376ea7633771b17d62fb0c15fb76f34de00`**. Release 1.1.0 had `ef37d5816b2829366ff35defbb05f59fb13c3705`. The fingerprint moved on purpose: the two new modules and the new app config each move it. The version number is not part of it.
 A phone with a 1.1.0 build takes no update made for 1.2.0, and the other way round.
-Builds older than 1.2.0 keep working. They show no Apple button, and they send photos as the picker gives them.
+A development build older than 1.2.0 still runs the new JavaScript from Metro, and nothing breaks: it shows no Apple button and sends photos as the picker gives them (their location is still removed).
 
 To read the fingerprint again, in `mobile/`:
 
