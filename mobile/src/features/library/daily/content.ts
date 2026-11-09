@@ -12,7 +12,9 @@
 // nothing else. A few days of the source are not the readings of the General Roman Calendar for that date (Thanksgiving, Our Lady of Guadalupe, the two days of Corpus Christi): the files
 // leave them out and list them, and the screen says that the readings of such a day differ from country to country. The words are read from the Bible inside the app (reference.ts
 // readPassage), when the reference can be shown with confidence; otherwise the reference stands alone and says why there are no words. A day with no file has no readings: the screen
-// says "The readings for this day are not in the app yet" and shows the day of the calendar. Nothing here is an example, and nothing is guessed.
+// says "The readings for this day are not in the app yet" and shows the day of the calendar. A day that the importer marked says which Mass its readings are of (24 and 25 December: the
+// source has one set for the day, and the day has more than one Mass), and a psalm whose verses the source wrote in a form nobody reads is shown whole, with a note that says the list of
+// verses is not clear. Nothing here is an example, and nothing is guessed.
 import type { TextSource } from '../bible/verseRows';
 import type { Ymd } from './calendar';
 import { parseDateKey } from './datekey';
@@ -46,8 +48,17 @@ export const PSALM_ONLY_NOTE = 'The source names the psalm only, not the verses 
 /** Above words where the reference has a letter after a verse (4b): the verse is shown whole. */
 export const PART_VERSE_NOTE = 'A verse with a letter after its number is shown whole; the reading uses only part of it.';
 
+/** Above a psalm that is shown whole because the source wrote the verses of the day in a form nobody reads (the importer kept the psalm alone and marked the day). */
+export const UNCLEAR_PSALM_NOTE = "The source's list of verses for this day is not clear, so the whole psalm is shown.";
+
 /** What each note of a passage (PassageText.note) says. */
-export const PASSAGE_NOTES: Record<Exclude<PassageNote, null>, string> = { whole: WHOLE_PSALM_NOTE, psalm: PSALM_ONLY_NOTE, part: PART_VERSE_NOTE };
+export const PASSAGE_NOTES: Record<Exclude<PassageNote, null>, string> = { whole: WHOLE_PSALM_NOTE, psalm: PSALM_ONLY_NOTE, part: PART_VERSE_NOTE, unclear: UNCLEAR_PSALM_NOTE };
+
+/** Over the readings of a day that has more than one Mass with readings of its own, when the source's row is those of one of them (the importer marks the day, after checking the Gospel of the row). */
+export const MASS_LINES = {
+  morning: 'These are the readings of the Mass of the morning. The evening Mass has other readings.',
+  day: 'These are the readings of the Mass during the Day. The other Masses of Christmas have other readings.',
+} as const;
 
 /** Under the readings of a Sunday or a solemnity whose second reading the source does not list. */
 export const NO_SECOND_READING = 'The source lists no second reading for this day.';
@@ -57,7 +68,7 @@ export type NoWords = 'numbering' | 'chapter' | 'form';
 
 /** Under a reference with no words. */
 export const NO_WORDS: Record<NoWords, string> = {
-  numbering: 'Words not shown: this Bible numbers these verses differently.',
+  numbering: 'Words not shown: this Bible may number these verses differently.',
   chapter: 'Words not shown: the source names the chapter and no verses.',
   form: 'Words not shown: this reference could not be read.',
 };
@@ -95,6 +106,8 @@ export type DayContent = Omit<DayBrief, 'readings'> & {
   readings: readonly Reading[] | null;
   /** True on a Sunday or a solemnity that has readings and no second reading in the source, where the lectionary has one: the screen says so. */
   noSecond: boolean;
+  /** The line over the readings that says which Mass of the day they are of (MASS_LINES), or null when the day has one set of readings. */
+  mass: string | null;
 };
 
 /** The days on which an optional memorial is not kept: the weekdays of 17 to 24 December, of the Christmas octave and of Lent, Ash Wednesday and Holy Week. */
@@ -152,7 +165,7 @@ export function makeContent({ lookup, source }: { lookup: ReadingsLookup; source
    * The readings of a record in the order they are read, each with its reference parsed. A reference that is not one of the forms we read is shown as the source has it, with no
    * words under it, except a psalm whose number is clear: that is shown by its number and whole.
    */
-  const itemsOf = (record: DayRecord): Array<{ ref: ReadingRef; parsed: Reference | null; psalm: number | null }> =>
+  const itemsOf = (record: DayRecord): Array<{ ref: ReadingRef; parsed: Reference | null; psalm: number | null; place: number }> =>
     READING_KINDS.flatMap((kind, i) => {
       const raw = record.refs[i];
       if (raw === null) return [];
@@ -168,7 +181,7 @@ export function makeContent({ lookup, source }: { lookup: ReadingsLookup; source
         spoken: parsed ? spokenReference(parsed) : reference,
         spokenShort: parsed ? spokenShort(parsed) : reference,
       };
-      return [{ ref, parsed, psalm }];
+      return [{ ref, parsed, psalm, place: i }];
     });
 
   const headOf = (dateKey: string) => {
@@ -181,6 +194,7 @@ export function makeContent({ lookup, source }: { lookup: ReadingsLookup; source
       record,
       unavailable: record ? null : lookup.differs(dateKey) ? READINGS_DIFFER : NO_READINGS,
       noSecond: !!record && record.refs[2] === null && hasSecondReading(lit),
+      mass: record?.mass ? MASS_LINES[record.mass] : null,
     };
   };
 
@@ -192,19 +206,22 @@ export function makeContent({ lookup, source }: { lookup: ReadingsLookup; source
 
   const dayContent = (dateKey: string): DayContent => {
     const head = headOf(dateKey);
-    if (!head) return { dateKey, title: '', under: null, readings: null, unavailable: NO_READINGS, noSecond: false };
-    const readings = head.record
-      ? itemsOf(head.record).map(({ ref, parsed, psalm }): Reading => {
+    if (!head) return { dateKey, title: '', under: null, readings: null, unavailable: NO_READINGS, noSecond: false, mass: null };
+    const record = head.record;
+    const readings = record
+      ? itemsOf(record).map(({ ref, parsed, psalm, place }): Reading => {
           if (parsed) {
-            const text = readPassage(parsed, source);
+            const read = readPassage(parsed, source);
+            // a psalm that the importer reduced to its number because the source wrote its verses in a form nobody reads: the note says so, in the place of "the source names the psalm only"
+            const text = read && read.note === 'psalm' && record.unclear.includes(place) ? { ...read, note: 'unclear' as const } : read;
             return { ...ref, text, noWords: text ? null : noWordsOf(parsed) };
           }
           const whole = psalm !== null ? readPassage({ code: 'PSA', segments: [{ c1: psalm, v1: null, l1: '', c2: psalm, v2: null, l2: '' }] }, source) : null;
           if (!whole) return { ...ref, text: null, noWords: 'form' };
-          return { ...ref, text: { lines: whole.lines.map((l) => ('gap' in l ? l : { ...l, n: '' })), note: 'psalm' }, noWords: null };
+          return { ...ref, text: { lines: whole.lines.map((l) => ('gap' in l ? l : { ...l, n: '' })), note: 'unclear' }, noWords: null };
         })
       : null;
-    return { dateKey, title: head.title, under: head.under, readings, unavailable: head.unavailable, noSecond: head.noSecond };
+    return { dateKey, title: head.title, under: head.under, readings, unavailable: head.unavailable, noSecond: head.noSecond, mass: head.mass };
   };
 
   return { dayContent, dayBrief };

@@ -8,8 +8,9 @@
 //   the bookmark    the button toggles and the day is kept; it is a row of Bookmarks that opens the Daily reading on that date
 //   the date        ?date=YYYY-MM-DD opens that day (one far outside the five years too); anything that is not a day opens today
 //   the readings    the references of the Lectionary for Mass used in the United States and the words from the Bible in the app: a Sunday, a memorial (the saint is the title), a reference with no words
-//                   (and the line that says why), a Sunday with no second reading in the source, a psalm read in two halves of a verse (the verse is shown once), a day that differs from country to
-//                   country, a day with no readings; nothing is a sample, and nothing on the screen is under 15 px
+//                   (and the line that says why), a Sunday with no second reading in the source, a psalm read in two halves of a verse (the verse is shown once), a psalm whose verses the source wrote
+//                   in a form nobody reads, the Mass that the readings of 24 and 25 December are of, a day that differs from country to country, a day with no readings; nothing is a sample, and
+//                   nothing on the screen is under 15 px
 import assert from 'node:assert/strict';
 import { eventually, pathOf } from './harness.mjs';
 
@@ -24,9 +25,12 @@ const NO_READINGS = 'The readings for this day are not in the app yet.';
 const READINGS_DIFFER = 'The readings for this day differ from country to country and are not in the app yet.';
 const READINGS_SOURCE = 'Readings: the Lectionary for Mass used in the United States. Words: World English Bible, Catholic edition, not the lectionary translation.';
 const WHOLE_PSALM = 'This is the whole psalm. Mass uses only the verses named above.';
-const NO_WORDS_NUMBERING = 'Words not shown: this Bible numbers these verses differently.';
+const NO_WORDS_NUMBERING = 'Words not shown: this Bible may number these verses differently.';
 const NO_SECOND = 'The source lists no second reading for this day.';
 const PART_VERSE = 'A verse with a letter after its number is shown whole; the reading uses only part of it.';
+const UNCLEAR_PSALM = "The source's list of verses for this day is not clear, so the whole psalm is shown.";
+const MASS_MORNING = 'These are the readings of the Mass of the morning. The evening Mass has other readings.';
+const MASS_DAY = 'These are the readings of the Mass during the Day. The other Masses of Christmas have other readings.';
 
 const box = async (locator, what) => {
   const b = await locator.boundingBox();
@@ -319,6 +323,28 @@ export const DAILY_SCENARIOS = [
       await page.getByText(/who executes justice for the oppressed/).waitFor();
       await eventually(() => page.getByText(/The LORD preserves the foreigners/).count(), (n) => n === 1, { what: 'the number of times verse 9 is in the words' });
       await page.getByText(/Praise the LORD!/).waitFor();
+
+      step('a psalm whose verses the source wrote in a form nobody reads: the whole psalm, and the note over it says that the list of verses is not clear');
+      await openDaily(ctx, '/library/daily?date=2026-12-06');
+      await page.getByRole('heading', { name: 'Second Sunday of Advent', exact: true }).waitFor();
+      const unclear = page.getByRole('button', { name: 'Responsorial Psalm, Psalm 85', exact: true });
+      await unclear.click();
+      await eventually(() => unclear.getAttribute('aria-expanded'), (v) => v === 'true', { what: 'the psalm says it is open' });
+      await page.getByText(UNCLEAR_PSALM, { exact: true }).waitFor();
+      await eventually(() => page.getByText(/names the psalm only/).count(), (n) => n === 0, { what: 'the number of lines that say that the source names the psalm only: it gave verses, in a form nobody reads' });
+
+      step('the readings of 24 and 25 December say which Mass they are of, over the readings; a day with one set of readings says nothing of the kind');
+      await openDaily(ctx, '/library/daily?date=2026-12-24');
+      await page.getByText(MASS_MORNING, { exact: true }).waitFor();
+      const massLine = await box(page.getByText(MASS_MORNING, { exact: true }), 'the line about the Mass');
+      const firstReading = await box(page.getByRole('button', { name: /^First Reading, / }), 'the first reading');
+      assert(massLine.y < firstReading.y, `the line is over the readings (${massLine.y}, ${firstReading.y})`);
+      await openDaily(ctx, '/library/daily?date=2026-12-25');
+      await page.getByText(MASS_DAY, { exact: true }).waitFor();
+      await eventually(() => page.getByText(MASS_MORNING, { exact: true }).count(), (n) => n === 0, { what: 'the number of lines about the Mass of the morning on Christmas Day' });
+      await eventually(labels, (l) => l.length === 4, { what: 'the four readings of Christmas Day are all there' });
+      await openDaily(ctx, '/library/daily?date=2026-12-26');
+      await eventually(() => page.getByText(/^These are the readings of the Mass/).count(), (n) => n === 0, { what: 'the number of lines about a Mass on the day after' });
 
       step('a day on which the source has the readings of one country (Thanksgiving Day): the day of the calendar and one line that says the readings differ from country to country');
       await openDaily(ctx, '/library/daily?date=2026-11-26');
