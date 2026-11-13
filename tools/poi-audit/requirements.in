@@ -3,4 +3,4 @@
 # (CI runs Python 3.12 on Linux.) Edit this file, recompile, commit both. Dependabot bumps requirements.txt.
 requests>=2.31
 pyarrow>=17
-anthropic>=2.6
+anthropic>=2.8.0
