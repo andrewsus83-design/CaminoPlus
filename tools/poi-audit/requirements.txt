@@ -2,7 +2,7 @@
 #    uv pip compile requirements.in --python-version 3.12 --python-platform x86_64-manylinux_2_28 -o requirements.txt
 annotated-types==0.8.0
     # via pydantic
-anthropic==2.6.0
+anthropic==2.8.0
     # via -r requirements.in
 anyio==4.16.0
     # via
@@ -46,8 +46,6 @@ truststore==0.10.5
 typing-extensions==4.16.0
     # via
     #   anthropic
-    #   anyio
-    #   httpx2
     #   opentelemetry-api
     #   pydantic
     #   pydantic-core
