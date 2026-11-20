@@ -8,7 +8,7 @@ charset-normalizer==3.5.2
     # via requests
 idna==3.20
     # via requests
-numpy==2.5.4
+numpy==2.5.5
     # via
     #   -r requirements.in
     #   shapely
